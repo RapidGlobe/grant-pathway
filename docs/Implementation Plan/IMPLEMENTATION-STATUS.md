@@ -13,7 +13,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
-| Phase 0 — Project Bootstrap | 6 | 5 | In progress (P0.6 needs GitHub push + Vercel) |
+| Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
 | Phase 1 — Static UI Shell | 15 | 0 | Not started |
 | Phase 2 — Risk-First Spikes | 3 | 0 | Not started |
 | Phase 3 — Infrastructure Setup | 10 | 0 | Not started |
@@ -33,14 +33,14 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Phase 0 — Project Bootstrap
 
-- [ ] **P0.1** Accounts confirmed: GitHub repo created, Vercel account linked to GitHub, Node.js 20+ verified, Docker Desktop installed (WSL2 backend), Supabase CLI installed
-  - ✅ Node.js 24.14.1 verified
+- [x] **P0.1** Accounts confirmed: GitHub repo created (RapidGlobe/grant-pathway), Vercel account created and linked, Node.js 24.14.1 verified
   - ⚠️ Supabase CLI: npm global install not supported on Windows — download binary from https://github.com/supabase/cli/releases (needed for Phase 3, not Phase 0)
-  - ⚠️ GitHub repo, Vercel account, Docker Desktop — require manual setup by owner
+  - ⚠️ Docker Desktop — needed for Phase 3 local Supabase, not required yet
 - [x] **P0.2** `create-next-app` scaffold created with TypeScript, Tailwind v4, ESLint, App Router (Next.js 16.2.5)
 - [x] **P0.3** Core dependencies installed: shadcn/ui 4.7.0 initialised; 14 components added (button, input, label, card, badge, dialog, dropdown-menu, separator, alert, progress, textarea, select, sonner, tooltip); lucide-react and zod installed. Note: `toast` deprecated — `sonner` used instead.
 - [x] **P0.4** Design tokens added to `globals.css` via Tailwind v4 `@theme inline` (no tailwind.config.ts in v4); Inter font configured via `next/font/google`; `TooltipProvider` added to root layout
 - [x] **P0.5** Directory structure created: `app/(public)/` and `app/(authenticated)/` route groups with all 16 stub pages; `lib/supabase/` stubs; `actions/` stub; `components/ui/` populated
+- [x] **P0.6** Pass-through proxy stub in place (`proxy.ts` — Next.js 16 renamed `middleware.ts` to `proxy.ts`); pushed to GitHub (RapidGlobe/grant-pathway); Vercel confirmed live at https://grant-pathway-three.vercel.app/
 - [ ] **P0.6** Pass-through proxy stub in place (`proxy.ts` — Next.js 16 renamed `middleware.ts` to `proxy.ts`); **needs: push to GitHub remote + Vercel preview URL confirmed**
 
 ---
