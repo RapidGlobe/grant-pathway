@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-04-20
+**Last updated:** 2026-05-17
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -129,6 +129,7 @@ Infrastructure, deployment, and operational decisions.
 | ADR-OPS-004 | Scheduled Job Mechanism | ✅ Decided | [ADR-OPS-004-scheduled-job-mechanism.md](ADR-OPS-004-scheduled-job-mechanism.md) |
 | ADR-OPS-005 | Error Tracking and Monitoring | ✅ Decided | [ADR-OPS-005-error-tracking.md](ADR-OPS-005-error-tracking.md) |
 | ADR-OPS-006 | Accessibility Testing | ✅ Decided | [ADR-OPS-006-accessibility-testing.md](ADR-OPS-006-accessibility-testing.md) |
+| ADR-OPS-007 | Uptime Monitoring and Application Health | ✅ Decided | [ADR-OPS-007-uptime-monitoring.md](ADR-OPS-007-uptime-monitoring.md) |
 
 ---
 
@@ -143,8 +144,8 @@ Infrastructure, deployment, and operational decisions.
 | File Handling | 4 | 4 | 0 | 0 |
 | AI Integration | 9 | 9 | 0 | 0 |
 | Export | 2 | 2 | 0 | 0 |
-| Operations | 6 | 6 | 0 | 0 |
-| **Total** | **42** | **42** | **0** | **0** |
+| Operations | 7 | 7 | 0 | 0 |
+| **Total** | **43** | **43** | **0** | **0** |
 
 ---
 
@@ -162,7 +163,7 @@ Grant Pathway has no remaining architectural blockers to production deployment.
 
 ## All Decisions Complete
 
-All 42 architectural decisions have been decided as of 2026-04-21. Grant Pathway is ready to move into the development phase.
+All 43 architectural decisions have been decided as of 2026-05-17. Grant Pathway is ready to move into the development phase.
 
 **Key implementation reminders before writing code:**
 - Run `supabase init` and create the initial migration (ADR-DATA-004)
