@@ -81,7 +81,7 @@ This allows filtering in the Sentry dashboard to distinguish "Anthropic had a bl
 
 **Data residency:** Sentry project created in the EU region (`eu.sentry.io`) for GDPR compliance. `SENTRY_DSN` added to Vercel environment variables for all environments (already in pre-launch checklist — ADR-OPS-002).
 
-**Complement:** Vercel function logs remain useful for real-time debugging during development. Sentry is the production monitoring layer.
+**Complement:** Vercel function logs remain useful for real-time debugging during development. Sentry is the production monitoring layer. For the complete observability stack — including Supabase dashboard coverage and uptime monitoring — see ADR-OPS-007.
 
 ## Consequences
 
