@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-05-18 — Step 2 Format and Scanned Error Messages Improved
+
+**What changed:**
+- `components/application-step2-form.tsx`: format and scanned error messages rewritten for consistency with the size error message.
+
+| Error | Was | Now |
+|-------|-----|-----|
+| Format | "We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly." | "We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below." |
+| Scanned | "We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead." | "We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below." |
+
+**Why:**
+The scanned error made no mention of a Word doc as an alternative, inconsistent with the format error which correctly lists both accepted formats. All three error messages now follow the same pattern: explain the problem, point to the funder's website as the primary fix, then offer the paste fallback with guidance on what to paste.
+
+---
+
 ## 2026-05-18 — Step 2 File Size Error Message Improved
 
 **What changed:**

@@ -194,11 +194,11 @@ export function ApplicationStep2Form({
               />
               <p className="text-[14px] text-[#991B1B]">
                 {uploadError === "format" &&
-                  "We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."}
+                  "We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
                 {uploadError === "size" &&
                   "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
                 {uploadError === "scanned" &&
-                  "We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."}
+                  "We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
               </p>
             </div>
             <button
