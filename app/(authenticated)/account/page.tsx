@@ -1,8 +1,15 @@
-// Account Settings — static shell built in Phase 1 (P1.13)
-export default function AccountPage() {
-  return (
-    <div className="p-8">
-      <p className="text-neutral-dark">Account Settings — stub</p>
-    </div>
-  );
+import type { Metadata } from "next";
+import { AccountSettingsForm } from "@/components/account-settings-form";
+
+export const metadata: Metadata = {
+  title: "Account Settings",
+};
+
+interface Props {
+  searchParams: Promise<{ mfa?: string }>;
+}
+
+export default async function AccountPage({ searchParams }: Props) {
+  const { mfa } = await searchParams;
+  return <AccountSettingsForm mfaEnabled={mfa === "enabled"} />;
 }
