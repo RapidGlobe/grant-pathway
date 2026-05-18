@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18
+**Last updated:** 2026-05-18 (P1.1 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,8 +14,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **0** | **Not started** |
-| &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 0 | Not started |
+| **Phase 1 — Static UI Shell** | **15** | **1** | **In progress** |
+| &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **6** | |
+| **Total** | **76** | **7** | |
 
 ---
 
@@ -61,7 +61,16 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Phase 1 — Static UI Shell
 
-- [ ] **P1.1** Global components built: unauthenticated nav bar, authenticated nav bar with account dropdown (shows first name or email), global footer, session timeout modal
+- [x] **P1.1** Global components built: unauthenticated nav bar, authenticated nav bar with account dropdown (shows first name or email), global footer, session timeout modal
+  - `components/nav-public.tsx` — sticky header, logo mark, Sign in + Register links
+  - `components/nav-authenticated.tsx` — sticky header, logo links to /dashboard, My applications + Charity profile nav links with active state, account dropdown with initials avatar, Account settings + Sign out items
+  - `components/site-footer.tsx` — © RapidGlobe Ltd, tagline, Privacy policy + Terms of service links
+  - `components/session-timeout-modal.tsx` — "Are you still there?" modal, I'm still here + Sign out now buttons; timer logic added in Slice 0 (S0.5)
+  - `components/session-timeout-stub.tsx` — client wrapper rendering the modal with isOpen=false for Phase 1
+  - `app/(public)/layout.tsx` — created; wraps public pages with NavPublic + SiteFooter + skip-nav link
+  - `app/(authenticated)/layout.tsx` — replaced stub; uses NavAuthenticated (mock first name "Sarah") + SiteFooter + SessionTimeoutStub
+  - `app/globals.css` — added 11 design tokens (warm-white, border-warm, muted/light-slate, teal-dark, amber-dark/light, error, success-light, border-light/strong); set --background to #FDF9F5, --ring to #D97706 (amber focus), --border/#input to spec values
+  - ⚠️ Design tokens use inline hex throughout components (not Tailwind utilities) — consistent with the spec but consider consolidating to Tailwind classes as patterns stabilise in later phases
 - [ ] **P1.2** Sign In / Landing page (`/`): form fields, all three error states, no marketing content
 - [ ] **P1.3** Register page (`/register`): all fields, terms and feedback checkboxes (links open in new tab), all inline validation error states
 - [ ] **P1.4** Verify Email page (`/verify-email`): all three states (awaiting with email shown and "wrong email?" link / verified with "Go to my dashboard" button / expired with "Send a new verification email")

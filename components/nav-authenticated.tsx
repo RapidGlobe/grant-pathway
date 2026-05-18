@@ -1,0 +1,113 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronDown, Settings, LogOut } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+interface NavAuthenticatedProps {
+  firstName?: string;
+  email?: string;
+}
+
+function getInitials(firstName?: string, email?: string): string {
+  if (firstName) return firstName.charAt(0).toUpperCase();
+  if (email) return email.charAt(0).toUpperCase();
+  return "U";
+}
+
+function getDisplayName(firstName?: string, email?: string): string {
+  return firstName || email || "Account";
+}
+
+export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
+  const pathname = usePathname();
+  const displayName = getDisplayName(firstName, email);
+  const initials = getInitials(firstName, email);
+
+  function navLinkClass(href: string): string {
+    const isActive = pathname === href || pathname.startsWith(href + "/");
+    return [
+      "rounded-md px-3 py-1.5 text-[14px] transition-colors",
+      isActive
+        ? "bg-[#E6F4F4] font-semibold text-[#0D6E6E]"
+        : "font-medium text-[#64748B] hover:bg-[#E6F4F4] hover:text-[#1E293B]",
+    ].join(" ");
+  }
+
+  return (
+    <header className="sticky top-0 z-[100] flex h-16 items-center border-b border-[#EDE8E1] bg-white px-10">
+      <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
+        {/* Left — logo + nav links */}
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <div
+              className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-lg bg-[#0D6E6E]"
+              aria-hidden="true"
+            >
+              <span className="text-[15px] font-bold leading-none text-white">GP</span>
+            </div>
+            <span className="text-[16px] font-bold text-[#1E293B]">Grant Pathway</span>
+          </Link>
+
+          {/* Vertical separator */}
+          <div className="h-5 w-px bg-[#EDE8E1]" aria-hidden="true" />
+
+          <nav aria-label="Main navigation">
+            <ul className="flex items-center gap-1 list-none m-0 p-0">
+              <li>
+                <Link href="/dashboard" className={navLinkClass("/dashboard")}>
+                  My applications
+                </Link>
+              </li>
+              <li>
+                <Link href="/profile" className={navLinkClass("/profile")}>
+                  Charity profile
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        {/* Right — account dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="flex items-center gap-2 rounded-md bg-[#E6F4F4] px-3 py-1.5 transition-all hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+            aria-label="Account menu"
+          >
+            <div
+              className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#0D6E6E]"
+              aria-hidden="true"
+            >
+              <span className="text-[11px] font-bold leading-none text-white">{initials}</span>
+            </div>
+            <span className="text-[14px] font-semibold text-[#0D6E6E]">{displayName}</span>
+            <ChevronDown className="h-3.5 w-3.5 text-[#0D6E6E]" aria-hidden="true" />
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent align="end" className="w-auto min-w-40">
+            <DropdownMenuItem>
+              <Link href="/account" className="flex w-full items-center gap-2">
+                <Settings className="h-4 w-4 text-[#64748B]" aria-hidden="true" />
+                Account settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive">
+              <button className="flex w-full items-center gap-2">
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Sign out
+              </button>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  );
+}

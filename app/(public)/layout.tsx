@@ -1,11 +1,7 @@
-import { NavAuthenticated } from "@/components/nav-authenticated";
+import { NavPublic } from "@/components/nav-public";
 import { SiteFooter } from "@/components/site-footer";
-import { SessionTimeoutStub } from "@/components/session-timeout-stub";
 
-// Mock user data for Phase 1 static shell — replaced with real auth in Slice 0
-const MOCK_FIRST_NAME = "Sarah";
-
-export default function AuthenticatedLayout({
+export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -19,16 +15,13 @@ export default function AuthenticatedLayout({
         Skip to main content
       </a>
 
-      <NavAuthenticated firstName={MOCK_FIRST_NAME} />
+      <NavPublic />
 
       <main id="main-content" className="flex flex-1 flex-col">
         {children}
       </main>
 
       <SiteFooter />
-
-      {/* Session timeout modal — timer logic wired in Slice 0 (S0.5) */}
-      <SessionTimeoutStub />
     </>
   );
 }
