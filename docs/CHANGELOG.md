@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-18 — Step 2 Label Renamed to "Uploaded Guidelines"
+
+**What changed:**
+- [DDR-CS-004](Business%20Design/DDR-CS-004-step-indicator.md) updated: Step 2 label changed from "Funder Guidelines" to "Uploaded Guidelines".
+- `components/step-indicator.tsx` updated to match.
+
+**Why:**
+During Phase 1 Static UI Shell review, the built label ("Upload Guidelines") was flagged as inconsistent with the spec ("Funder Guidelines"). Owner preference is "Uploaded Guidelines" — the past-tense phrasing better reflects that the user has already completed the upload action by the time they see it as a completed step, and is clearer to users at a glance than the more abstract "Funder Guidelines".
+
+---
+
 ## 2026-05-17 — Observability Stack Completed
 
 **What changed:**
@@ -176,5 +187,5 @@ Key product decisions that are unchanged from the original:
 
 ---
 
-*Last updated: 2026-05-17*
+*Last updated: 2026-05-18*
 *Maintained by: Rapidglobe Ltd*

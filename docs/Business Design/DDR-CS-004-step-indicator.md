@@ -16,7 +16,7 @@ The step indicator is displayed at the top of every screen in the application fl
 
 The five steps are:
 1. Application Details
-2. Funder Guidelines
+2. Uploaded Guidelines
 3. AI Summary
 4. Draft Answers
 5. Approve & Export
@@ -50,7 +50,7 @@ Five numbered circles connected by a horizontal line, displayed across all five 
 | Connector line (completed) | Teal (#0D6E6E) |
 | Connector line (upcoming) | Grey (#E2E8F0) |
 
-Step labels (Application Details, Funder Guidelines, AI Summary, Draft Answers, Approve & Export) appear below each circle. The indicator is read-only -- no hover state, no pointer events, no click behaviour.
+Step labels (Application Details, Uploaded Guidelines, AI Summary, Draft Answers, Approve & Export) appear below each circle. The indicator is read-only -- no hover state, no pointer events, no click behaviour.
 
 The step indicator sits in a dedicated horizontal band below the navigation bar and above the page heading, consistent across all five steps and all three mockup directions.
 

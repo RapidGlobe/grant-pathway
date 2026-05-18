@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 
 const STEPS = [
   "Application Details",
-  "Upload Guidelines",
+  "Uploaded Guidelines",
   "AI Summary",
   "Draft Answers",
   "Approve & Export",
