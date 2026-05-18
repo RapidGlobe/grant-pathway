@@ -1,19 +1,12 @@
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 
 export function NavPublic() {
   return (
     <header className="sticky top-0 z-[100] flex h-16 items-center border-b border-[#EDE8E1] bg-white px-10">
       <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
-        {/* Logo — no link on unauthenticated nav (stays on current page) */}
-        <div className="flex items-center gap-2">
-          <div
-            className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-lg bg-[#0D6E6E]"
-            aria-hidden="true"
-          >
-            <span className="text-[15px] font-bold leading-none text-white">GP</span>
-          </div>
-          <span className="text-[16px] font-bold text-[#1E293B]">Grant Pathway</span>
-        </div>
+        {/* Logo — no link on unauthenticated nav */}
+        <Logo />
 
         {/* Right — nav actions */}
         <nav aria-label="Site navigation">

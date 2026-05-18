@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Settings, LogOut } from "lucide-react";
 import {
@@ -46,14 +47,8 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
       <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
         {/* Left — logo + nav links */}
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div
-              className="flex h-[34px] w-[34px] flex-shrink-0 items-center justify-center rounded-lg bg-[#0D6E6E]"
-              aria-hidden="true"
-            >
-              <span className="text-[15px] font-bold leading-none text-white">GP</span>
-            </div>
-            <span className="text-[16px] font-bold text-[#1E293B]">Grant Pathway</span>
+          <Link href="/dashboard" aria-label="Grant Pathway home">
+            <Logo />
           </Link>
 
           {/* Vertical separator */}
