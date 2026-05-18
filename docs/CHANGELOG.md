@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-18 — Step 3 Continue Button Simplified
+
+**What changed:**
+- `components/application-step3-summary.tsx`: continue button text changed from "This looks right — continue" to "Continue".
+- `docs/PRD inputs/screen-requirements.md`: Step 3 continue button spec updated to match.
+
+**Why:**
+"This looks right — continue" is unnecessarily wordy. "Continue" is cleaner and consistent with the button label used on Steps 1 and 2.
+
+---
+
 ## 2026-05-18 — Step 2 Format and Scanned Error Messages Improved
 
 **What changed:**

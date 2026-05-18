@@ -419,7 +419,7 @@ This ensures no work is lost if the user closes their browser or navigates away 
 | Questions extracted note | *"We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."* |
 | Questions not found note | If no questions could be extracted: *"We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."* |
 | Regenerate link | *"Regenerate summary"* — secondary action. Counts as one AI request against monthly allowance (PDR-AI-005) |
-| Continue button | *"This looks right — continue"* — primary action, advances to Step 4 |
+| Continue button | *"Continue"* — primary action, advances to Step 4 |
 | Back link | Returns to Step 2 |
 | API failure state | *"We couldn't generate your summary right now. This is usually temporary — please try again."* with a **Try again** button (PDR-UI-006) |
 

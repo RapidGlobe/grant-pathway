@@ -304,7 +304,7 @@ export function ApplicationStep3Summary({
           onClick={() => router.push(`/applications/${applicationId}/step/4`)}
           className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
         >
-          This looks right — continue
+          Continue
         </Button>
       </div>
     </div>
