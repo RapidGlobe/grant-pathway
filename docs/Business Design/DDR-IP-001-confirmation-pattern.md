@@ -34,19 +34,23 @@ A separate, lower-stakes confirmation also exists: deleting an application from 
 
 ## Decision
 
-**Approve application: Option B -- inline expansion.**
+**Approve application: Option A -- modal dialog.**
 **Delete application: Option E -- modal dialog.**
 
 ### Approve application confirmation (Step 5)
 
-The "Approve my application" button expands inline to reveal the confirmation message and action buttons. No overlay or page navigation.
+A modal dialog appears when the user clicks "Approve my application". The modal interrupts the flow deliberately — the approve action is consequential (it unlocks export, and if the user has already submitted a previous export to a funder, re-approving and re-exporting creates a duplicate submission risk). An inline expansion risks being overlooked; a modal ensures the user actively acknowledges the confirmation before proceeding.
+
+This also gives the product a consistent pattern: every consequential action (approve, re-open, re-export, delete) uses a modal dialog.
+
+Note: PDR-UI-006 discourages modals for *unexpected* interruptions (errors). A user-initiated confirmation is not unexpected — the user clicked a button — so this does not conflict with that principle.
 
 | Element | Detail |
 |---------|--------|
 | Trigger | User clicks "Approve my application" (teal primary button) |
-| Behaviour | Button area expands in place to show confirmation message and two buttons |
+| Behaviour | Modal dialog overlays the page |
 | Confirmation message | "Are you sure you want to approve this application? You can re-open it to make changes at any time." |
-| Confirm button | "Yes, approve" -- teal primary |
+| Confirm button | "Approve my application" -- teal primary |
 | Cancel button | "Cancel" -- ghost/text (escape action per DDR-CS-003) |
 | Colour treatment | Teal/slate -- constructive action, not a warning |
 
@@ -67,9 +71,10 @@ Account deletion (Screen 9) uses the separate DELETE-typing confirmation mechani
 
 ## Date Decided
 
-2026-04-17
+2026-04-17 (revised 2026-05-18)
 
 ---
 
 *Status: Decided*
 *Created: 2026-04-17*
+*Revised: 2026-05-18 — Approve confirmation changed from inline expansion (Option B) to modal dialog (Option A). Confirm button text set to "Approve my application". Rationale: modal ensures the user actively acknowledges a consequential action; consistent with all other confirmation patterns in the product.*

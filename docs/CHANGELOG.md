@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-05-18 — Approve Confirmation Changed from Inline Expansion to Modal Dialog
+
+**What changed:**
+- [DDR-IP-001](Business%20Design/DDR-IP-001-confirmation-pattern.md) revised: approve application confirmation changed from **Option B (inline expansion)** to **Option A (modal dialog)**.
+- Confirm button text set to **"Approve my application"** (was "Yes, approve" in original spec; matches what was built in Phase 1).
+- No code changes required — `components/application-step5-approve.tsx` was already built with a modal dialog.
+
+**Why:**
+The approve action is consequential — once exported, a user may have already submitted to a funder, so a duplicate submission is a real risk. An inline expansion risks being overlooked; a modal ensures the user actively acknowledges the confirmation before proceeding. This also gives the product a fully consistent pattern: every consequential action (approve, re-open, re-export warning, delete application, delete account) uses a modal or explicit confirmation.
+
+PDR-UI-006 discourages modals for unexpected interruptions (errors). A user-initiated confirmation is not unexpected, so this does not conflict with that principle.
+
+---
+
 ## 2026-05-18 — Step 2 Label Renamed to "Uploaded Guidelines"
 
 **What changed:**
