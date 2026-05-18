@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.11 complete)
+**Last updated:** 2026-05-18 (P1.12 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,7 +14,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **11** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **12** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
@@ -26,7 +26,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.11 — Step 4: Draft Answers | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.12 — Step 5: Approve & Export | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.12 — Step 5: Approve & Export | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **17** | |
+| **Total** | **76** | **18** | |
 
 ---
 
@@ -115,7 +115,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **P1.11** Step 4 Draft Answers: loading state (auto-triggers on page load); content state with all answers in editable textareas, "Regenerate all answers" link, approaching-limit banner (at 16/20), limit-reached state with disabled buttons, "I've reviewed my answers — continue" button, API failure state (Try again), persistent failure state
   - `components/application-step4-draft.tsx` — client component; loading state auto-animates on mount with 3 staged messages ("Reviewing your guidelines and charity profile…" → "Writing your draft answers…" → "Almost there…"); content state shows 3 mock questions as bold headings each with an editable pre-populated textarea; manual question entry field when no questions extracted; approaching-limit amber banner; limit-reached red banner with "Regenerate all answers" link disabled; link re-triggers loading animation when not at limit; "I've reviewed my answers — continue" → step 5; API failure + persistent failure states with Back link; Back → step 3
   - `app/(authenticated)/applications/[id]/step/4/page.tsx` — server component; exports `title: "Draft Answers"`; reads `?state=`, `?questions=none`, `?usage=high|limit`
-- [ ] **P1.12** Step 5 Approve & Export: heading "Review and approve your application", three review prompts above answers, read-only answer view, "Approve my application" button with confirmation prompt, export button enabled only after approval, re-export warning modal, "Re-open application" link with confirmation prompt, Back link
+- [x] **P1.12** Step 5 Approve & Export: heading "Review and approve your application", three review prompts above answers, read-only answer view, "Approve my application" button with confirmation prompt, export button enabled only after approval, re-export warning modal, "Re-open application" link with confirmation prompt, Back link
+  - `components/application-step5-approve.tsx` — client component; step indicator (all 4 prior steps shown as completed); three numbered review prompt cards; read-only answer view (all 3 mock questions + answers); approve confirmation Dialog; green "Application approved" banner after approval; "Download as Word document" button disabled until approved, triggers re-export warning Dialog on subsequent clicks; re-export Dialog with mock export date, "Download anyway" / "Cancel" actions; "Re-open application" link (shown after approval) triggers re-open confirmation Dialog which redirects to step 4 on confirm; Back link → step 4
+  - `app/(authenticated)/applications/[id]/step/5/page.tsx` — server component; exports `title: "Approve & Export"`; reads `?state=approved|exported` to pre-set approval status
 - [ ] **P1.13** Account Settings (`/account`): heading "Account settings", read-only email display, change-password form with "Update password" button, MFA opt-in section (Should Have — FR-07), delete account section with warning and link
 - [ ] **P1.14** Account Deletion (`/account/delete`): warning, data-summary list, "Type DELETE to confirm" field (case-sensitive), "Permanently delete my account" button, Cancel button → `/account`
 - [ ] **P1.15** Reusable loading and error components: page-level skeleton, inline AI error with Try again button, form error summary, 404 page
