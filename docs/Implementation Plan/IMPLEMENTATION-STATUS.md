@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.6 complete)
+**Last updated:** 2026-05-18 (P1.7 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,14 +14,14 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **6** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **7** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **12** | |
+| **Total** | **76** | **13** | |
 
 ---
 
@@ -97,7 +97,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `components/dashboard-empty.tsx` — client; "Welcome to Grant Pathway, Sarah" heading; charity profile incomplete banner with "Set up charity profile" link; "You don't have any applications yet"; Start button disabled with Tooltip "Please set up your charity profile first" when profile incomplete, enabled Link when complete; three-step explainer (Upload → Sparkles → FileText icons with step labels)
   - `components/dashboard-populated.tsx` — client; "My Applications" heading + "+ New Application" teal link-button; summary strip with all four status counts and AI usage indicator (3 of 20); profile banner; four mock application cards covering all statuses; status pills with correct colours (slate/amber/green/teal); Continue button (teal) for not_started/in_progress; View button (outline) for approved/exported; Delete link (red); three status-specific delete confirmation Dialogs; re-open confirmation Dialog for approved/exported View button; all modal text matches spec verbatim
   - `app/(authenticated)/dashboard/page.tsx` — server; reads `?state=populated` param; exports `title: "My Applications"`
-- [ ] **P1.7** Charity Profile (`/profile`): setup state (five fields per screen requirements — no registered address, no mission statement; "Save profile" button; success with "Go to my dashboard" button); edit state ("Your charity profile" heading, "Save changes" button); all three Charity Commission lookup states (match, no match, API unavailable — unavailable state includes Try again button + Enter manually fallback)
+- [x] **P1.7** Charity Profile (`/profile`): setup state (five fields per screen requirements — no registered address, no mission statement; "Save profile" button; success with "Go to my dashboard" button); edit state ("Your charity profile" heading, "Save changes" button); all three Charity Commission lookup states (match, no match, API unavailable — unavailable state includes Try again button + Enter manually fallback)
+  - `components/charity-profile-form.tsx` — client component; Charity Commission lookup section (search field + "Look up charity" button); three lookup result states (match: teal success note + pre-populated charity name and reg number; no-match: amber warning note; unavailable: amber warning note + "Try again" button + "Enter details manually" link that collapses the lookup section); five form fields (charity name required, reg number optional, what does it do / who it helps / where it works as required textareas/input); "Save profile" (setup) / "Save changes" (edit) button; inline field validation; setup success replaces form with green success card + "Go to my dashboard" button; edit success shows green banner above the form
+  - `app/(authenticated)/profile/page.tsx` — server component; reads `?state=edit` for edit mode; reads `?lookup=match|no-match|unavailable` to pre-set lookup state for testing; exports `title: "Charity Profile"`
+  - All states accessible via URL params: `/profile` (setup), `/profile?state=edit` (edit), `/profile?lookup=match` (match result), `/profile?lookup=no-match` (no-match result), `/profile?lookup=unavailable` (API unavailable)
 - [ ] **P1.8** Step 1 Application Details: step indicator, heading "Start a new application", correct field labels, Cancel link, Continue button
 - [ ] **P1.9** Step 2 Upload Guidelines: heading "Add the funder's guidelines", upload area + paste textarea, large-document warning, all three file error states, Back + Continue
 - [ ] **P1.10** Step 3 AI Summary: loading state (auto-triggers on page load); content state with heading "Your funder guidelines — summary", correct summary content, questions-extracted note, questions-not-found note, approaching-limit banner (at 16/20), "Regenerate summary" link, "This looks right — continue" button, API failure state (Try again), persistent failure state
