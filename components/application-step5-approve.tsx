@@ -223,15 +223,10 @@ export function ApplicationStep5Approve({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Download again?</DialogTitle>
-            <DialogDescription asChild>
-              <div className="space-y-2 text-[14px] text-[#374151]">
-                <p>
-                  You exported this application on {MOCK_EXPORT_DATE}. If you have already
-                  submitted that version to the funder, please contact them to let them know a
-                  revised version is being submitted.
-                </p>
-                <p>Funders may treat multiple submissions as separate applications.</p>
-              </div>
+            <DialogDescription>
+              You exported this application on {MOCK_EXPORT_DATE}. If you have already submitted
+              that version to the funder, please contact them to let them know a revised version is
+              being submitted. Funders may treat multiple submissions as separate applications.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
