@@ -1,8 +1,35 @@
-// Step 3: AI Summary — static shell built in Phase 1 (P1.10)
-export default function Step3Page() {
+import type { Metadata } from "next";
+import { ApplicationStep3Summary } from "@/components/application-step3-summary";
+
+export const metadata: Metadata = {
+  title: "AI Summary",
+};
+
+type DisplayState = "loading" | "content" | "failure" | "persistent-failure";
+
+interface Props {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ state?: string; questions?: string; usage?: string }>;
+}
+
+export default async function Step3Page({ params, searchParams }: Props) {
+  const { id } = await params;
+  const { state, questions, usage } = await searchParams;
+
+  const stateMap: Record<string, DisplayState> = {
+    content: "content",
+    failure: "failure",
+    "persistent-failure": "persistent-failure",
+  };
+  const initialState: DisplayState =
+    state && state in stateMap ? stateMap[state] : "loading";
+
   return (
-    <div className="p-8">
-      <p className="text-neutral-dark">Step 3: AI Summary — stub</p>
-    </div>
+    <ApplicationStep3Summary
+      applicationId={id}
+      initialState={initialState}
+      questionsNotFound={questions === "none"}
+      approachingLimit={usage === "high"}
+    />
   );
 }

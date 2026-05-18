@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.9 complete)
+**Last updated:** 2026-05-18 (P1.10 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,7 +14,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **9** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **10** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
@@ -24,7 +24,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.11 — Step 4: Draft Answers | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.12 — Step 5: Approve & Export | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **15** | |
+| **Total** | **76** | **16** | |
 
 ---
 
@@ -109,7 +109,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **P1.9** Step 2 Upload Guidelines: heading "Add the funder's guidelines", upload area + paste textarea, large-document warning, all three file error states, Back + Continue
   - `components/application-step2-form.tsx` — client component; step indicator (Step 2 highlighted, Step 1 shown as completed); heading + instruction; drag-and-drop file upload area (idle/uploading/uploaded states); mock animated progress bar on file select; uploaded file shown with remove button; real client-side validation (wrong format → format error, >10MB → size error); three error states with "Try a different file" link; large document warning banner; paste textarea; Continue disabled until file uploaded or paste text entered; Back → step 1
   - `app/(authenticated)/applications/[id]/step/2/page.tsx` — server component; exports `title: "Upload Guidelines"`; reads `?error=format|size|scanned` and `?warning=large` params for static shell testing
-- [ ] **P1.10** Step 3 AI Summary: loading state (auto-triggers on page load); content state with heading "Your funder guidelines — summary", correct summary content, questions-extracted note, questions-not-found note, approaching-limit banner (at 16/20), "Regenerate summary" link, "This looks right — continue" button, API failure state (Try again), persistent failure state
+- [x] **P1.10** Step 3 AI Summary: loading state (auto-triggers on page load); content state with heading "Your funder guidelines — summary", correct summary content, questions-extracted note, questions-not-found note, approaching-limit banner (at 16/20), "Regenerate summary" link, "This looks right — continue" button, API failure state (Try again), persistent failure state
+  - `components/application-step3-summary.tsx` — client component; loading state auto-animates on mount (staged messages: "Reading your funder guidelines…" → "Almost there…", teal progress bar, transitions to content after ~3s); content state with mock summary card (about, amount, who can apply, what funder wants, 3 extracted questions with word limits, key requirements); questions-extracted (green) and questions-not-found (grey) notes; approaching-limit amber banner; "Regenerate summary" link re-triggers loading; "This looks right — continue" → step 4; API failure state with "Try again" (re-triggers loading); persistent failure state; Back link on all non-loading states
+  - `app/(authenticated)/applications/[id]/step/3/page.tsx` — server component; exports `title: "AI Summary"`; reads `?state=content|failure|persistent-failure`, `?questions=none`, `?usage=high`
 - [ ] **P1.11** Step 4 Draft Answers: loading state (auto-triggers on page load); content state with all answers in editable textareas, "Regenerate all answers" link, approaching-limit banner (at 16/20), limit-reached state with disabled buttons, "I've reviewed my answers — continue" button, API failure state (Try again), persistent failure state
 - [ ] **P1.12** Step 5 Approve & Export: heading "Review and approve your application", three review prompts above answers, read-only answer view, "Approve my application" button with confirmation prompt, export button enabled only after approval, re-export warning modal, "Re-open application" link with confirmation prompt, Back link
 - [ ] **P1.13** Account Settings (`/account`): heading "Account settings", read-only email display, change-password form with "Update password" button, MFA opt-in section (Should Have — FR-07), delete account section with warning and link
