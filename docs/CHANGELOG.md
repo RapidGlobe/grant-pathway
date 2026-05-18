@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-05-18 — Charity Profile Incomplete Banner Corrected (design-requirements.md §5.12)
+
+**What changed:**
+- `components/dashboard-empty.tsx` and `components/dashboard-populated.tsx`: charity profile incomplete banner updated to match design-requirements.md Section 5.12.
+
+| Property | Was | Now |
+|----------|-----|-----|
+| Background | `#FEF9F5` (warm white) | `#FEF3C7` (pale amber) |
+| Border | `1px solid #EDE8E1` (warm border) | `1.5px solid #FDE68A` (amber-200) |
+| Icon | None | `AlertTriangle` in `#D97706` |
+| Text | "Before you start, add your charity details…" `#1E293B` | "Your charity profile isn't complete yet…" `#92400E` 500 weight |
+| Button | Teal outline "Set up charity profile" | Amber fill "Complete your profile" |
+
+**Why:**
+The banner was built with warm-white styling instead of the spec'd pale amber. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
 ## 2026-05-18 — Review Prompts Moved to Step 4 Sticky Sidebar (DDR-LA-002)
 
 **What changed:**

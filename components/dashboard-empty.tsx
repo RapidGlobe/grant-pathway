@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Upload, Sparkles, FileText, ArrowRight } from "lucide-react";
+import { Upload, Sparkles, FileText, ArrowRight, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -26,16 +26,19 @@ export function DashboardEmpty({
 
       {/* Charity profile incomplete banner */}
       {profileIncomplete && (
-        <div className="mb-8 flex items-center justify-between gap-4 rounded-xl border border-[#EDE8E1] bg-[#FEF9F5] px-5 py-4">
-          <p className="text-[14px] text-[#1E293B]">
-            Before you start, add your charity details — we&apos;ll use these to personalise your
-            applications.
-          </p>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 rounded-lg border-[1.5px] border-[#FDE68A] bg-[#FEF3C7] px-5 py-[14px]">
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#D97706]" aria-hidden="true" />
+            <p className="text-[14px] font-medium text-[#92400E]">
+              Your charity profile isn&apos;t complete yet. You&apos;ll need to fill it in before
+              you can start an application.
+            </p>
+          </div>
           <Link
             href="/profile"
-            className="flex-shrink-0 rounded-md border border-[#0D6E6E] px-3 py-1.5 text-[13px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+            className="flex-shrink-0 rounded-md bg-[#D97706] px-3 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#B45309] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
           >
-            Set up charity profile
+            Complete your profile
           </Link>
         </div>
       )}
