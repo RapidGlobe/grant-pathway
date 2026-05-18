@@ -42,10 +42,10 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
                 <div
                   className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold ${
                     isCurrent
-                      ? "bg-[#0D6E6E] text-white ring-2 ring-[#0D6E6E] ring-offset-2"
+                      ? "bg-[#0D6E6E] text-white"
                       : isComplete
                         ? "bg-[#0D6E6E] text-white"
-                        : "bg-[#E2E8F0] text-[#94A3B8]"
+                        : "border-2 border-[#E2E8F0] bg-white text-[#94A3B8]"
                   }`}
                   aria-current={isCurrent ? "step" : undefined}
                 >

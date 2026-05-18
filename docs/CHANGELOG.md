@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-05-18 — Step Indicator Circle Styles Corrected (DDR-CS-004, DDR-AC-001)
+
+**What changed:**
+- `components/step-indicator.tsx`: two circle style fixes.
+
+| State | Was | Now |
+|-------|-----|-----|
+| Current step | Teal fill + persistent teal ring | Teal fill only — no ring in default state |
+| Upcoming steps | Grey fill (`#E2E8F0`) | White fill + `2px solid #E2E8F0` border |
+
+**Why:**
+DDR-CS-004 specifies upcoming steps as white fill with grey border, not grey fill. DDR-AC-001 specifies the amber focus ring (`#D97706`) applied on `:focus-visible` only — a persistent teal ring on the current step is not part of the spec. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
 ## 2026-05-18 — Charity Profile Incomplete Banner Corrected (design-requirements.md §5.12)
 
 **What changed:**
