@@ -27,8 +27,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.11 — Step 4: Draft Answers | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.12 — Step 5: Approve & Export | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 0 | Not started |
-| &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 0 | Not started |
 | Phase 2 — Risk-First Spikes | 3 | 0 | Not started |
 | Phase 3 — Infrastructure Setup | 10 | 0 | Not started |
