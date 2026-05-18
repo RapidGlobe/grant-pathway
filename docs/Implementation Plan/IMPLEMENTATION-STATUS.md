@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.15 complete — Phase 1 Static UI Shell complete)
+**Last updated:** 2026-05-18 (Summary table expanded — all phases broken down into individual tasks)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -13,7 +13,13 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
-| Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
+| **Phase 0 — Project Bootstrap** | **6** | **6** | **✅ Complete** |
+| &nbsp;&nbsp;P0.1 — Accounts confirmed (GitHub, Vercel, Node.js) | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P0.2 — Next.js scaffold | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P0.3 — Core dependencies installed | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P0.4 — Design tokens and font | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P0.5 — Directory structure | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P0.6 — Proxy stub, GitHub push, Vercel live | 1 | 1 | ✅ Complete |
 | **Phase 1 — Static UI Shell** | **15** | **15** | **✅ Complete** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
@@ -30,18 +36,74 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 1 | ✅ Complete |
-| Phase 2 — Risk-First Spikes | 3 | 0 | Not started |
-| Phase 3 — Infrastructure Setup | 10 | 0 | Not started |
-| Phase 4 — Slice 0: Auth | 6 | 0 | Not started |
-| Phase 4 — Slice 1: Charity Profile | 4 | 0 | Not started |
-| Phase 4 — Slice 2: Dashboard & Application Management | 5 | 0 | Not started |
-| Phase 4 — Slice 3: Step 1 Application Details | 3 | 0 | Not started |
-| Phase 4 — Slice 4: Step 2 File Upload | 4 | 0 | Not started |
-| Phase 4 — Slice 5: Step 3 AI Summary | 4 | 0 | Not started |
-| Phase 4 — Slice 6: Step 4 Draft Answers | 4 | 0 | Not started |
-| Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
-| Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
-| Phase 5 — Pre-Launch | 6 | 0 | Not started |
+| **Phase 2 — Risk-First Spikes** | **3** | **0** | Not started |
+| &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 0 | Not started |
+| &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 0 | Not started |
+| &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 0 | Not started |
+| **Phase 3 — Infrastructure Setup** | **10** | **0** | Not started |
+| &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.2 — Environment variables | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.4 — Auth middleware | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.5 — HTTP security headers | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.6 — Upstash Redis rate limiting | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.7 — Sentry error monitoring | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.8 — Resend email sending | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.9 — Seed data | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 0 | Not started |
+| **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
+| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.2 — Profile save | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.4 — Profile incomplete banner | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 2 — Dashboard and Application Management** | **5** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.1 — Applications list and empty state | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.2 — New application creation | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.3 — Resume application | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.4 — Delete application | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.5 — Start button disabled until profile complete | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 3 — Step 1: Application Details** | **3** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.3 — Step locking | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 4 — Step 2: File Upload** | **4** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.1 — Upload path | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.2 — Paste path | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.3 — File error states | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.4 — Orphan cleanup cron | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 5 — Step 3: AI Summary** | **4** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.1 — Prompt library | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Draft Answers** | **4** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Questions pre-populated | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Generate draft API route | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Editable textareas and auto-save | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Continue to Step 5 | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export** | **3** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.3 — Plain text export | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 8 — Account Management** | **3** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 0 | Not started |
+| **Phase 5 — Pre-Launch** | **6** | **0** | Not started |
+| &nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
+| &nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
+| &nbsp;&nbsp;P5.3 — Accessibility | 1 | 0 | Not started |
+| &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
+| &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
+| &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
 | **Total** | **76** | **21** | |
 
 ---
