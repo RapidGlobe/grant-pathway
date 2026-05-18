@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.2 complete)
+**Last updated:** 2026-05-18 (P1.3 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,10 +14,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **2** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **3** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.3 — Register page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **8** | |
+| **Total** | **76** | **9** | |
 
 ---
 
@@ -77,7 +77,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `app/(public)/page.tsx` — server component; exports `title: "Sign in"`; renders SignInForm centred on page
   - `app/layout.tsx` — metadata updated to use title template `"%s — Grant Pathway"` so all pages produce correct browser tab titles
   - ⚠️ Deviation noted: `design-requirements.md` section 4.3 describes a two-column hero layout for Sign In; `screen-requirements.md` (and P1.2 task spec) explicitly says "no marketing content, hero section, or feature list — clean sign-in page with tagline only". Followed screen-requirements. Confirm this is correct before P1.3.
-- [ ] **P1.3** Register page (`/register`): all fields, terms and feedback checkboxes (links open in new tab), all inline validation error states
+- [x] **P1.3** Register page (`/register`): all fields, terms and feedback checkboxes (links open in new tab), all inline validation error states
+  - `components/register-form.tsx` — client component; heading, first name, last name, email, password (show/hide toggle, 10-char hint), confirm password (show/hide toggle), terms checkbox with ToS + Privacy Policy links (open in new tab), feedback opt-in checkbox (FR-08), Create account button (full-width teal), Already have an account? Sign in prompt
+  - All inline validation error states implemented: required first/last name, invalid email, password <10 chars, passwords don't match, terms not accepted
+  - Form-level "email_exists" error state implemented (wired to auth in Slice 0)
+  - `app/(public)/register/page.tsx` — server component; exports `title: "Register"`; renders RegisterForm centred on page
+  - Terms of Service and Privacy Policy link to `/terms` and `/privacy` (placeholder routes until legal docs published per BRD items 45–46)
 - [ ] **P1.4** Verify Email page (`/verify-email`): all three states (awaiting with email shown and "wrong email?" link / verified with "Go to my dashboard" button / expired with "Send a new verification email")
 - [ ] **P1.5** Forgot Password (`/forgot-password`): State 1 with generic confirmation (does not confirm email exists); State 2 with "Save new password" button, stay-on-page success with Sign in button, and expired-link state
 - [ ] **P1.6** Dashboard (`/dashboard`): empty state (heading "Welcome to Grant Pathway, [first name]", profile banner, three-step explainer, start button with disabled tooltip); populated state (summary strip, AI usage indicator "n of 20 AI requests used this month", application cards with funder name first, correct status pills and colours, Continue/View button distinction, three status-specific delete confirmation modals, re-opening confirmation prompt for approved/exported cards)
