@@ -1,8 +1,10 @@
-// New Application (Step 1) — static shell built in Phase 1 (P1.8)
+import type { Metadata } from "next";
+import { ApplicationStep1Form } from "@/components/application-step1-form";
+
+export const metadata: Metadata = {
+  title: "New Application",
+};
+
 export default function NewApplicationPage() {
-  return (
-    <div className="p-8">
-      <p className="text-neutral-dark">New Application (Step 1) — stub</p>
-    </div>
-  );
+  return <ApplicationStep1Form />;
 }

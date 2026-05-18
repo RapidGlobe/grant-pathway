@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.7 complete)
+**Last updated:** 2026-05-18 (P1.8 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,7 +14,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **7** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **8** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
@@ -22,7 +22,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.11 — Step 4: Draft Answers | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **13** | |
+| **Total** | **76** | **14** | |
 
 ---
 
@@ -101,7 +101,11 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `components/charity-profile-form.tsx` — client component; Charity Commission lookup section (search field + "Look up charity" button); three lookup result states (match: teal success note + pre-populated charity name and reg number; no-match: amber warning note; unavailable: amber warning note + "Try again" button + "Enter details manually" link that collapses the lookup section); five form fields (charity name required, reg number optional, what does it do / who it helps / where it works as required textareas/input); "Save profile" (setup) / "Save changes" (edit) button; inline field validation; setup success replaces form with green success card + "Go to my dashboard" button; edit success shows green banner above the form
   - `app/(authenticated)/profile/page.tsx` — server component; reads `?state=edit` for edit mode; reads `?lookup=match|no-match|unavailable` to pre-set lookup state for testing; exports `title: "Charity Profile"`
   - All states accessible via URL params: `/profile` (setup), `/profile?state=edit` (edit), `/profile?lookup=match` (match result), `/profile?lookup=no-match` (no-match result), `/profile?lookup=unavailable` (API unavailable)
-- [ ] **P1.8** Step 1 Application Details: step indicator, heading "Start a new application", correct field labels, Cancel link, Continue button
+- [x] **P1.8** Step 1 Application Details: step indicator, heading "Start a new application", correct field labels, Cancel link, Continue button
+  - `components/step-indicator.tsx` — reusable horizontal step indicator (5 steps); current step has teal filled circle + ring; completed steps show a tick; future steps are grey; sr-only text announces "Current:" / "Completed:" for screen readers; used by steps 1–5
+  - `components/application-step1-form.tsx` — client component; step indicator (Step 1 highlighted); heading "Start a new application"; "Who is offering this grant?" field (placeholder: "e.g. National Lottery Community Fund"); "What is the grant called?" field (placeholder: "e.g. Awards for All England"); inline validation errors per spec; Cancel link → `/dashboard`; Continue button → `/applications/[id]/step/2` (mock ID `123` for `/applications/new`)
+  - `app/(authenticated)/applications/new/page.tsx` — server component; exports `title: "New Application"`; renders `ApplicationStep1Form` with no pre-fill
+  - `app/(authenticated)/applications/[id]/step/1/page.tsx` — server component; exports `title: "Application Details"`; renders `ApplicationStep1Form` with mock pre-filled funder and grant name
 - [ ] **P1.9** Step 2 Upload Guidelines: heading "Add the funder's guidelines", upload area + paste textarea, large-document warning, all three file error states, Back + Continue
 - [ ] **P1.10** Step 3 AI Summary: loading state (auto-triggers on page load); content state with heading "Your funder guidelines — summary", correct summary content, questions-extracted note, questions-not-found note, approaching-limit banner (at 16/20), "Regenerate summary" link, "This looks right — continue" button, API failure state (Try again), persistent failure state
 - [ ] **P1.11** Step 4 Draft Answers: loading state (auto-triggers on page load); content state with all answers in editable textareas, "Regenerate all answers" link, approaching-limit banner (at 16/20), limit-reached state with disabled buttons, "I've reviewed my answers — continue" button, API failure state (Try again), persistent failure state
