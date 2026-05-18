@@ -9,7 +9,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Grant Pathway",
+  title: {
+    template: "%s — Grant Pathway",
+    default: "Grant Pathway",
+  },
   description: "Your free grant writing companion for UK charities",
 };
 

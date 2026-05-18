@@ -1,8 +1,14 @@
-// Sign In / Landing — static shell built in Phase 1 (P1.2)
+import type { Metadata } from "next";
+import { SignInForm } from "@/components/sign-in-form";
+
+export const metadata: Metadata = {
+  title: "Sign in",
+};
+
 export default function SignInPage() {
   return (
-    <main className="flex flex-1 items-center justify-center p-8">
-      <p className="text-neutral-dark">Sign In / Landing — stub</p>
-    </main>
+    <div className="flex flex-1 items-center justify-center px-6 py-12">
+      <SignInForm />
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.1 complete)
+**Last updated:** 2026-05-18 (P1.2 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,9 +14,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **1** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **2** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **7** | |
+| **Total** | **76** | **8** | |
 
 ---
 
@@ -71,7 +71,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `app/(authenticated)/layout.tsx` — replaced stub; uses NavAuthenticated (mock first name "Sarah") + SiteFooter + SessionTimeoutStub
   - `app/globals.css` — added 11 design tokens (warm-white, border-warm, muted/light-slate, teal-dark, amber-dark/light, error, success-light, border-light/strong); set --background to #FDF9F5, --ring to #D97706 (amber focus), --border/#input to spec values
   - ⚠️ Design tokens use inline hex throughout components (not Tailwind utilities) — consistent with the spec but consider consolidating to Tailwind classes as patterns stabilise in later phases
-- [ ] **P1.2** Sign In / Landing page (`/`): form fields, all three error states, no marketing content
+- [x] **P1.2** Sign In / Landing page (`/`): form fields, all three error states, no marketing content
+  - `components/sign-in-form.tsx` — client component; tagline, email field, password field with show/hide toggle, Forgot password link (right-aligned), Sign in button (full-width teal), Register for free prompt
+  - All three error states implemented: credentials error alert, unverified email alert with Resend link, inline field validation (empty email, empty/invalid email format, empty password)
+  - `app/(public)/page.tsx` — server component; exports `title: "Sign in"`; renders SignInForm centred on page
+  - `app/layout.tsx` — metadata updated to use title template `"%s — Grant Pathway"` so all pages produce correct browser tab titles
+  - ⚠️ Deviation noted: `design-requirements.md` section 4.3 describes a two-column hero layout for Sign In; `screen-requirements.md` (and P1.2 task spec) explicitly says "no marketing content, hero section, or feature list — clean sign-in page with tagline only". Followed screen-requirements. Confirm this is correct before P1.3.
 - [ ] **P1.3** Register page (`/register`): all fields, terms and feedback checkboxes (links open in new tab), all inline validation error states
 - [ ] **P1.4** Verify Email page (`/verify-email`): all three states (awaiting with email shown and "wrong email?" link / verified with "Go to my dashboard" button / expired with "Send a new verification email")
 - [ ] **P1.5** Forgot Password (`/forgot-password`): State 1 with generic confirmation (does not confirm email exists); State 2 with "Save new password" button, stay-on-page success with Sign in button, and expired-link state
