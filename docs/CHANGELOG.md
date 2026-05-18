@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-05-18 — Step 2 File Size Error Message Improved
+
+**What changed:**
+- `components/application-step2-form.tsx`: size error message rewritten.
+
+| Was | Now |
+|-----|-----|
+| "Your file is over 10MB. Please upload a smaller file or paste the text directly." | "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below." |
+
+**Why:**
+The original message was unhelpful — it told users to get a smaller file without explaining how. The revised message points users to the funder's website first (cleanest fix) and then offers the paste fallback as a secondary option.
+
+---
+
 ## 2026-05-18 — Step 1 Heading Differentiated for New vs Existing Applications
 
 **What changed:**

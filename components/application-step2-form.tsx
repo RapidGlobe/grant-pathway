@@ -196,7 +196,7 @@ export function ApplicationStep2Form({
                 {uploadError === "format" &&
                   "We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."}
                 {uploadError === "size" &&
-                  "Your file is over 10MB. Please upload a smaller file or paste the text directly."}
+                  "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
                 {uploadError === "scanned" &&
                   "We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."}
               </p>
