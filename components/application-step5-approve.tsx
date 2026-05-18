@@ -22,12 +22,6 @@ interface ApplicationStep5ApproveProps {
   initialStatus?: ApprovalStatus;
 }
 
-const REVIEW_PROMPTS = [
-  "Does this accurately describe your charity and project?",
-  "Are all figures, dates, and facts correct?",
-  "Does this answer the question that was asked?",
-];
-
 // Same mock questions/answers as Step 4
 const MOCK_QUESTIONS = [
   {
@@ -94,24 +88,6 @@ export function ApplicationStep5Approve({
       <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
         Review and approve your application
       </h1>
-
-      {/* Three review prompts */}
-      <div className="mb-8 space-y-3">
-        {REVIEW_PROMPTS.map((prompt, i) => (
-          <div
-            key={i}
-            className="flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4"
-          >
-            <span
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0D6E6E] text-[12px] font-bold text-white"
-              aria-hidden="true"
-            >
-              {i + 1}
-            </span>
-            <p className="text-[14px] text-[#374151]">{prompt}</p>
-          </div>
-        ))}
-      </div>
 
       {/* Read-only answers */}
       <div className="mb-8 space-y-5">

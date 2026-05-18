@@ -27,6 +27,12 @@ const LOADING_MESSAGES = [
   { threshold: 75, text: "Almost there…" },
 ];
 
+const REVIEW_PROMPTS = [
+  "Does this accurately describe your charity and project?",
+  "Are all figures, dates, and facts correct?",
+  "Does this answer the question that was asked?",
+];
+
 // Mock questions + AI-generated draft answers
 const MOCK_QUESTIONS = [
   {
@@ -193,126 +199,159 @@ export function ApplicationStep4Draft({
 
   // ── Content state ───────────────────────────────────────────────────────────
   return (
-    <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
-      <StepIndicator currentStep={4} />
-
-      <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
-
-      {/* Approaching-limit banner */}
-      {usageState === "high" && (
-        <div
-          role="alert"
-          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
-        >
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
-            You&apos;ve used most of your monthly AI allowance.
-          </p>
-        </div>
-      )}
-
-      {/* Limit-reached banner */}
-      {limitReached && (
-        <div
-          role="alert"
-          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
-        >
-          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[13px] text-[#991B1B]">
-            You&apos;ve reached your monthly AI limit. You can still edit your answers manually,
-            but you won&apos;t be able to regenerate them until next month.
-          </p>
-        </div>
-      )}
-
-      {/* Manual question entry (no questions extracted in Step 3) */}
-      {questionsNotFound ? (
-        <div className="mb-8">
-          <div className="mb-5">
-            <Label
-              htmlFor="manualQuestion"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-            >
-              Enter your application question
-            </Label>
-            <Input
-              id="manualQuestion"
-              type="text"
-              value={manualQuestion}
-              onChange={(e) => setManualQuestion(e.target.value)}
-              placeholder="e.g. Describe your project and who it will help."
-              className="h-10 text-[14px]"
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor="manualAnswer"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-            >
-              Your answer
-            </Label>
-            <Textarea
-              id="manualAnswer"
-              rows={8}
-              className="text-[14px]"
-              placeholder="Write your answer here…"
-            />
-          </div>
-        </div>
-      ) : (
-        /* AI-generated draft answers */
-        <div className="mb-6 space-y-8">
-          {MOCK_QUESTIONS.map((q) => (
-            <div key={q.id}>
-              <p className="mb-2 text-[15px] font-semibold text-[#1E293B]">
-                {q.id}. {q.text}
-                <span className="ml-2 text-[13px] font-normal text-[#64748B]">
-                  ({q.wordLimit} words)
-                </span>
-              </p>
-              <Textarea
-                id={`answer-${q.id}`}
-                value={answers[q.id]}
-                onChange={(e) =>
-                  setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
-                }
-                rows={7}
-                aria-label={`Answer for question ${q.id}`}
-                className="text-[14px]"
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Regenerate all answers link */}
-      <div className="mb-8">
-        <button
-          type="button"
-          onClick={handleRegenerate}
-          disabled={limitReached}
-          className="flex items-center gap-1.5 rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
-        >
-          <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-          Regenerate all answers
-        </button>
+    <div className="mx-auto w-full max-w-[980px] px-4 py-10 sm:px-6">
+      {/* Step indicator constrained to main column width */}
+      <div className="max-w-[640px]">
+        <StepIndicator currentStep={4} />
       </div>
 
-      {/* Back + Continue */}
-      <div className="flex items-center justify-between">
-        <Link
-          href={`/applications/${applicationId}/step/3`}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+      <div className="flex items-start gap-8">
+        {/* ── Left: main content ── */}
+        <div className="w-full min-w-0 max-w-[640px]">
+          <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
+
+          {/* Approaching-limit banner */}
+          {usageState === "high" && (
+            <div
+              role="alert"
+              className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
+            >
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
+              <p className="text-[13px] text-[#78350F]">
+                You&apos;ve used most of your monthly AI allowance.
+              </p>
+            </div>
+          )}
+
+          {/* Limit-reached banner */}
+          {limitReached && (
+            <div
+              role="alert"
+              className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
+              <p className="text-[13px] text-[#991B1B]">
+                You&apos;ve reached your monthly AI limit. You can still edit your answers manually,
+                but you won&apos;t be able to regenerate them until next month.
+              </p>
+            </div>
+          )}
+
+          {/* Manual question entry (no questions extracted in Step 3) */}
+          {questionsNotFound ? (
+            <div className="mb-8">
+              <div className="mb-5">
+                <Label
+                  htmlFor="manualQuestion"
+                  className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+                >
+                  Enter your application question
+                </Label>
+                <Input
+                  id="manualQuestion"
+                  type="text"
+                  value={manualQuestion}
+                  onChange={(e) => setManualQuestion(e.target.value)}
+                  placeholder="e.g. Describe your project and who it will help."
+                  className="h-10 text-[14px]"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="manualAnswer"
+                  className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+                >
+                  Your answer
+                </Label>
+                <Textarea
+                  id="manualAnswer"
+                  rows={8}
+                  className="text-[14px]"
+                  placeholder="Write your answer here…"
+                />
+              </div>
+            </div>
+          ) : (
+            /* AI-generated draft answers */
+            <div className="mb-6 space-y-8">
+              {MOCK_QUESTIONS.map((q) => (
+                <div key={q.id}>
+                  <p className="mb-2 text-[15px] font-semibold text-[#1E293B]">
+                    {q.id}. {q.text}
+                    <span className="ml-2 text-[13px] font-normal text-[#64748B]">
+                      ({q.wordLimit} words)
+                    </span>
+                  </p>
+                  <Textarea
+                    id={`answer-${q.id}`}
+                    value={answers[q.id]}
+                    onChange={(e) =>
+                      setAnswers((prev) => ({ ...prev, [q.id]: e.target.value }))
+                    }
+                    rows={7}
+                    aria-label={`Answer for question ${q.id}`}
+                    className="text-[14px]"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Regenerate all answers link */}
+          <div className="mb-8">
+            <button
+              type="button"
+              onClick={handleRegenerate}
+              disabled={limitReached}
+              className="flex items-center gap-1.5 rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+            >
+              <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+              Regenerate all answers
+            </button>
+          </div>
+
+          {/* Back + Continue */}
+          <div className="flex items-center justify-between">
+            <Link
+              href={`/applications/${applicationId}/step/3`}
+              className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+            >
+              Back
+            </Link>
+            <Button
+              type="button"
+              onClick={() => router.push(`/applications/${applicationId}/step/5`)}
+              className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+            >
+              I&apos;ve reviewed my answers — continue
+            </Button>
+          </div>
+        </div>
+
+        {/* ── Right: sticky review prompts sidebar ── */}
+        <aside
+          aria-label="Review checklist"
+          className="hidden w-[280px] shrink-0 lg:block"
         >
-          Back
-        </Link>
-        <Button
-          type="button"
-          onClick={() => router.push(`/applications/${applicationId}/step/5`)}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
-        >
-          I&apos;ve reviewed my answers — continue
-        </Button>
+          <div className="sticky top-8 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
+            <h2 className="mb-4 text-[12px] font-semibold uppercase tracking-wide text-[#64748B]">
+              Before you continue
+            </h2>
+            <ul className="space-y-4">
+              {REVIEW_PROMPTS.map((prompt, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0D6E6E] text-[11px] font-bold text-white"
+                    aria-hidden="true"
+                  >
+                    {i + 1}
+                  </span>
+                  <p className="text-[13px] leading-snug text-[#374151]">{prompt}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
       </div>
     </div>
   );

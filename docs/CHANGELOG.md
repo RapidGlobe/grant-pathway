@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-18 — Review Prompts Moved to Step 4 Sticky Sidebar (DDR-LA-002)
+
+**What changed:**
+- `components/application-step4-draft.tsx`: content state changed from single-column to two-column layout. Main content (left, max 640px) + sticky right sidebar (280px) containing the three review prompts per DDR-LA-002 and DDR-LA-001.
+- `components/application-step5-approve.tsx`: review prompts removed entirely. Step 5 is single-column per DDR-LA-001.
+
+**Why:**
+Review prompts were incorrectly placed inline at the top of Step 5 during Phase 1 implementation. DDR-LA-001 specifies single-column for Steps 1, 2, and 5, and two-column for Steps 3 and 4. DDR-LA-002 specifies the review prompts belong in a sticky right-hand sidebar on Step 4, always visible while the user edits answers. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
 ## 2026-05-18 — Step 5 Review Prompts Corrected to Exact Acceptance Criteria Wording
 
 **What changed:**
