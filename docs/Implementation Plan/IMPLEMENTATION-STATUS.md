@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.14 complete)
+**Last updated:** 2026-05-18 (P1.15 complete — Phase 1 Static UI Shell complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,7 +14,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **14** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **15** | **✅ Complete** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
@@ -29,7 +29,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.12 — Step 5: Approve & Export | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 1 | ✅ Complete |
 | Phase 2 — Risk-First Spikes | 3 | 0 | Not started |
 | Phase 3 — Infrastructure Setup | 10 | 0 | Not started |
 | Phase 4 — Slice 0: Auth | 6 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **20** | |
+| **Total** | **76** | **21** | |
 
 ---
 
@@ -125,7 +125,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **P1.14** Account Deletion (`/account/delete`): warning, data-summary list, "Type DELETE to confirm" field (case-sensitive), "Permanently delete my account" button, Cancel button → `/account`
   - `components/delete-account-form.tsx` — client component; red warning banner ("This cannot be undone."); data-summary card listing three items to be deleted (charity profile, applications and AI content, account and login details); "Type DELETE to confirm" input (monospace, case-sensitive); inline validation error if submitted without exact match; "Permanently delete my account" red button; Cancel outline button → `/account`; static shell simulates deletion by redirecting to `/?deleted=true`
   - `app/(authenticated)/account/delete/page.tsx` — server component; exports `title: "Delete Account"`; renders `DeleteAccountForm`
-- [ ] **P1.15** Reusable loading and error components: page-level skeleton, inline AI error with Try again button, form error summary, 404 page
+- [x] **P1.15** Reusable loading and error components: page-level skeleton, inline AI error with Try again button, form error summary, 404 page
+  - `components/ui/skeleton.tsx` — shadcn skeleton primitive (animated grey pulse)
+  - `components/page-skeleton.tsx` — page-level loading skeleton matching the standard max-w-[640px] layout; heading + two input blocks + textarea block + button block; `aria-busy="true"` and `aria-label="Loading…"` for screen readers
+  - `components/ai-error.tsx` — inline AI error banner; two variants: transient (red border/bg, "We couldn't complete that request", "Try again" outline button) and persistent (`persistent` prop, "If this keeps happening, please try again later. Your work has been saved.", no retry button); `role="alert"`
+  - `components/form-error-summary.tsx` — form-level error summary; takes array of `{ field, fieldId, message }`; "There are N errors in this form" heading; each error links to its field via `href="#fieldId"`; hidden when errors array is empty; `role="alert"` and `aria-labelledby`
+  - `app/not-found.tsx` — Next.js App Router 404 page; FileQuestion icon, "Page not found" heading, descriptive message, "Go to my dashboard" teal link-button
 
 ---
 
