@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-05-18 — Step 1 Heading Differentiated for New vs Existing Applications
+
+**What changed:**
+- `docs/PRD inputs/screen-requirements.md`: Step 1 heading split into two variants.
+- `components/application-step1-form.tsx`: heading now conditional on whether an `applicationId` is present.
+
+| Route | Heading |
+|-------|---------|
+| `/applications/new` | "Start a new application" |
+| `/applications/[id]/step/1` | "Continue your application" |
+
+**Why:**
+The original spec had a single heading for both states. When returning to an existing application the user is not starting anything new — "Continue your application" better reflects the context and avoids confusion.
+
+---
+
 ## 2026-05-18 — Step Indicator Circle Styles Corrected (DDR-CS-004, DDR-AC-001)
 
 **What changed:**

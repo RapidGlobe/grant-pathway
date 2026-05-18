@@ -51,7 +51,7 @@ export function ApplicationStep1Form({
       <StepIndicator currentStep={1} />
 
       <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
-        Start a new application
+        {applicationId ? "Continue your application" : "Start a new application"}
       </h1>
 
       <form noValidate onSubmit={handleSubmit}>

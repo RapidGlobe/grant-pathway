@@ -371,7 +371,8 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 | Element | Detail |
 |---------|--------|
-| Page heading | *"Start a new application"* |
+| Page heading (new) | *"Start a new application"* — shown at `/applications/new` |
+| Page heading (existing) | *"Continue your application"* — shown at `/applications/[id]/step/1` when returning to an existing application |
 | Funder name | Text input, required. Label: *"Who is offering this grant?"* Placeholder: *"e.g. National Lottery Community Fund"* |
 | Grant name | Text input, required. Label: *"What is the grant called?"* Placeholder: *"e.g. Awards for All England"* |
 | Continue button | Primary action — teal. Creates application record (status: `not_started`), advances to Step 2 |
