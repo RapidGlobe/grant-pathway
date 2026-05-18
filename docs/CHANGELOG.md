@@ -6,6 +6,70 @@
 
 ---
 
+## 2026-05-18 — Charity Profile Lookup Unavailable State Simplified
+
+**What changed:**
+- `components/charity-profile-form.tsx`: removed "Try again" and "Enter details manually" buttons from the API unavailable error state.
+- Replaced with a single plain message: "We couldn't reach the Charity Commission right now. You can try again using the **Look up charity** button above, or fill in your details manually in the fields below."
+- Removed the `showLookup` state and the conditional wrapper around the lookup section — the lookup is now always visible.
+- Removed unused `handleTryAgain` and `handleEnterManually` functions.
+
+**Why:**
+"Try again" was redundant — the "Look up charity" button already visible above does the same thing. "Enter details manually" hid the lookup section, which was jarring and unnecessary since the form fields are always visible below. One clear message pointing to what is already on screen is simpler and less confusing.
+
+---
+
+## 2026-05-18 — Charity Profile AI Paraphrase on Lookup Match
+
+**What changed:**
+- `components/charity-profile-form.tsx`: when the Charity Commission lookup finds a match, "What does your charity do?" and "Who does your charity help?" are now pre-filled with AI-paraphrased plain-English versions of the charity's legal objects and beneficiary description.
+- An amber "AI-generated content below" banner appears above the two fields explaining the source and instructing the user to review and edit before saving.
+- The individual hint texts for those two fields are hidden when the banner is active (the banner replaces them). They remain visible when the lookup has not been run.
+- A `paraphrasedFromLookup` state tracks whether pre-fill is active; also initialised from the `?lookup=match` URL param for static shell testing.
+
+**Why:**
+Asking non-technical users to locate and rewrite formal Charity Commission legal objects language is a barrier. AI paraphrase removes that burden while the prominent disclaimer ensures users understand the content is AI-generated and must be reviewed. One AI call (paraphrase on lookup match) rather than two.
+
+---
+
+## 2026-05-18 — Charity Profile Form Hint Text Added
+
+**What changed:**
+- `components/charity-profile-form.tsx`: added hint text beneath the label for three fields — "What does your charity do?", "Who does your charity help?", and "Where do you work?". Each hint is linked to its field via `aria-describedby`.
+
+| Field | Hint text |
+|-------|-----------|
+| What does your charity do? | Points to Charity Commission entry (charitable objects) and website 'About us' page. |
+| Who does your charity help? | Prompts user to think about age, background, or circumstances of beneficiaries; notes Charity Commission entry as a source. |
+| Where do you work? | Suggests town, county, or region; explains 'National'; fallback to charity's home town if unsure. |
+
+**Why:**
+Non-technical users (primary persona Margaret) may not know what information to enter in these open-ended fields. The hints point to authoritative, accessible sources (Charity Commission register, charity website) and give concrete examples to reduce blank-page anxiety.
+
+---
+
+## 2026-05-18 — Step 5 Back Button Hidden After Approval
+
+**What changed:**
+- `components/application-step5-approve.tsx`: Back link now only renders when `isApproved` is false (pending state). It is hidden once the application is approved or exported.
+
+**Why:**
+Once approved or exported, "Re-open application" is the correct route back to Step 4 — it shows a confirmation dialog warning that approval will be removed. The plain Back link bypassed that dialog, silently navigating to Step 4 with no context. It was redundant at best and misleading at worst.
+
+---
+
+## 2026-05-18 — Step 3 Approaching-Limit Banner Moved to Step 4
+
+**What changed:**
+- `components/application-step3-summary.tsx`: removed `approachingLimit` prop and amber "You've used most of your monthly AI allowance" banner.
+- `app/(authenticated)/applications/[id]/step/3/page.tsx`: removed `usage` search param and `approachingLimit` prop pass-through.
+- `components/application-step3-summary.tsx`: fixed missing space between question count and "application" in green questions-found banner (rendered as "3application" → "3 application").
+
+**Why:**
+The approaching-limit banner on Step 3 contradicted the green banner below it, which promised to generate draft answers in the next step. Step 3 displays a summary that has already been generated, so the AI allowance warning is irrelevant at this point. Step 4 already shows the same warning immediately before the user triggers the draft-generation AI call, which is the correct placement.
+
+---
+
 ## 2026-05-18 — Step 3 Continue Button Simplified
 
 **What changed:**

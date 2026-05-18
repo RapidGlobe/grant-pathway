@@ -155,15 +155,17 @@ export function ApplicationStep5Approve({
         </div>
       )}
 
-      {/* Back link */}
-      <div>
-        <Link
-          href={`/applications/${applicationId}/step/4`}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-        >
-          Back
-        </Link>
-      </div>
+      {/* Back link — only shown before approval */}
+      {!isApproved && (
+        <div>
+          <Link
+            href={`/applications/${applicationId}/step/4`}
+            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          >
+            Back
+          </Link>
+        </div>
+      )}
 
       {/* ── Approve confirmation dialog ───────────────────────────────────── */}
       <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>

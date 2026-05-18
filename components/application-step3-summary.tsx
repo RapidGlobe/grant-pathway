@@ -13,7 +13,6 @@ interface ApplicationStep3SummaryProps {
   applicationId: string;
   initialState?: DisplayState;
   questionsNotFound?: boolean;
-  approachingLimit?: boolean;
 }
 
 // Staged loading messages keyed to progress thresholds
@@ -68,7 +67,6 @@ export function ApplicationStep3Summary({
   applicationId,
   initialState = "loading",
   questionsNotFound = false,
-  approachingLimit = false,
 }: ApplicationStep3SummaryProps) {
   const router = useRouter();
   const [displayState, setDisplayState] = useState<DisplayState>(initialState);
@@ -205,19 +203,6 @@ export function ApplicationStep3Summary({
         Your funder guidelines — summary
       </h1>
 
-      {/* Approaching limit banner */}
-      {approachingLimit && (
-        <div
-          role="alert"
-          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
-        >
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
-            You&apos;ve used most of your monthly AI allowance.
-          </p>
-        </div>
-      )}
-
       {/* AI summary content */}
       <div className="mb-6 space-y-5 rounded-xl border border-[#E2E8F0] bg-white p-6">
         <Section title="About this grant">
@@ -273,7 +258,7 @@ export function ApplicationStep3Summary({
             ✓
           </span>
           <p className="text-[13px] text-[#065F46]">
-            We found {MOCK_SUMMARY.questions.length} application questions in these guidelines.
+            We found {MOCK_SUMMARY.questions.length}{" "}application questions in these guidelines.
             We&apos;ll use these to generate your draft answers in the next step.
           </p>
         </div>
