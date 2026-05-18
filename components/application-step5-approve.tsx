@@ -23,9 +23,9 @@ interface ApplicationStep5ApproveProps {
 }
 
 const REVIEW_PROMPTS = [
-  "Check that your answers are accurate and reflect your charity's work.",
-  "Make sure you have answered every question the funder asked.",
-  "Read through as if you were the funder — does your application make a strong case?",
+  "Does this accurately describe your charity and project?",
+  "Are all figures, dates, and facts correct?",
+  "Does this answer the question that was asked?",
 ];
 
 // Same mock questions/answers as Step 4

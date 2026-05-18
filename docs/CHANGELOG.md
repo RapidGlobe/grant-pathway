@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-05-18 — Step 5 Review Prompts Corrected to Exact Acceptance Criteria Wording
+
+**What changed:**
+- `components/application-step5-approve.tsx`: three review prompts replaced with exact wording from AC-FR-32-01.
+
+| Was | Now |
+|-----|-----|
+| "Check that your answers are accurate and reflect your charity's work." | "Does this accurately describe your charity and project?" |
+| "Make sure you have answered every question the funder asked." | "Are all figures, dates, and facts correct?" |
+| "Read through as if you were the funder — does your application make a strong case?" | "Does this answer the question that was asked?" |
+
+**Why:**
+Custom prompt text was written during Phase 1 implementation instead of reading AC-FR-32-01 verbatim. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
 ## 2026-05-18 — Approve Confirmation Changed from Inline Expansion to Modal Dialog
 
 **What changed:**
