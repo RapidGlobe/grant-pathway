@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.5 complete)
+**Last updated:** 2026-05-18 (P1.6 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,13 +14,13 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **5** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **6** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **11** | |
+| **Total** | **76** | **12** | |
 
 ---
 
@@ -93,7 +93,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `components/forgot-password-request-form.tsx` — client component; email field with validation, "Send reset link" primary button; on submit shows generic confirmation with mail icon (never confirms if email exists — security best practice); "Remembered your password? Sign in" link
   - `components/reset-password-form.tsx` — client component; new password + confirm password (both show/hide toggles, 10-char hint); "Save new password" button; on success stays on page and shows "Your password has been updated" + Sign in button; `isExpired` prop shows expired state with amber clock icon + "Request a new link" button → `/forgot-password`
   - `app/(public)/forgot-password/page.tsx` — server component; reads `?state=` param: default → request form, `?state=reset` → reset form, `?state=expired` → expired state; exports `title: "Reset your password"`
-- [ ] **P1.6** Dashboard (`/dashboard`): empty state (heading "Welcome to Grant Pathway, [first name]", profile banner, three-step explainer, start button with disabled tooltip); populated state (summary strip, AI usage indicator "n of 20 AI requests used this month", application cards with funder name first, correct status pills and colours, Continue/View button distinction, three status-specific delete confirmation modals, re-opening confirmation prompt for approved/exported cards)
+- [x] **P1.6** Dashboard (`/dashboard`): empty state (heading "Welcome to Grant Pathway, [first name]", profile banner, three-step explainer, start button with disabled tooltip); populated state (summary strip, AI usage indicator "n of 20 AI requests used this month", application cards with funder name first, correct status pills and colours, Continue/View button distinction, three status-specific delete confirmation modals, re-opening confirmation prompt for approved/exported cards)
+  - `components/dashboard-empty.tsx` — client; "Welcome to Grant Pathway, Sarah" heading; charity profile incomplete banner with "Set up charity profile" link; "You don't have any applications yet"; Start button disabled with Tooltip "Please set up your charity profile first" when profile incomplete, enabled Link when complete; three-step explainer (Upload → Sparkles → FileText icons with step labels)
+  - `components/dashboard-populated.tsx` — client; "My Applications" heading + "+ New Application" teal link-button; summary strip with all four status counts and AI usage indicator (3 of 20); profile banner; four mock application cards covering all statuses; status pills with correct colours (slate/amber/green/teal); Continue button (teal) for not_started/in_progress; View button (outline) for approved/exported; Delete link (red); three status-specific delete confirmation Dialogs; re-open confirmation Dialog for approved/exported View button; all modal text matches spec verbatim
+  - `app/(authenticated)/dashboard/page.tsx` — server; reads `?state=populated` param; exports `title: "My Applications"`
 - [ ] **P1.7** Charity Profile (`/profile`): setup state (five fields per screen requirements — no registered address, no mission statement; "Save profile" button; success with "Go to my dashboard" button); edit state ("Your charity profile" heading, "Save changes" button); all three Charity Commission lookup states (match, no match, API unavailable — unavailable state includes Try again button + Enter manually fallback)
 - [ ] **P1.8** Step 1 Application Details: step indicator, heading "Start a new application", correct field labels, Cancel link, Continue button
 - [ ] **P1.9** Step 2 Upload Guidelines: heading "Add the funder's guidelines", upload area + paste textarea, large-document warning, all three file error states, Back + Continue
