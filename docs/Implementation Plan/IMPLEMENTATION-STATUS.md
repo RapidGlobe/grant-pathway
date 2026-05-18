@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.13 complete)
+**Last updated:** 2026-05-18 (P1.14 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,7 +14,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **13** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **14** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **19** | |
+| **Total** | **76** | **20** | |
 
 ---
 
@@ -122,7 +122,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `components/account-settings-form.tsx` — client component; four sections separated by `<hr>`; email (read-only mock "sarah@helpinghandsuk.org"); change password with three fields (current, new, confirm), show/hide toggles on all three, inline validation ("at least 10 characters", match check), success banner "Your password has been updated." which clears the form; MFA section with "Status: Enabled / Not enabled", "Set up two-factor authentication" outline button toggles to "Remove two-factor authentication" link and vice versa; delete account section with warning paragraph and red "Delete my account" button → `/account/delete`
   - `app/(authenticated)/account/page.tsx` — server component; exports `title: "Account Settings"`; reads `?mfa=enabled` to pre-set MFA state
   - All states accessible via URL params: `/account` (default, MFA off), `/account?mfa=enabled` (MFA on)
-- [ ] **P1.14** Account Deletion (`/account/delete`): warning, data-summary list, "Type DELETE to confirm" field (case-sensitive), "Permanently delete my account" button, Cancel button → `/account`
+- [x] **P1.14** Account Deletion (`/account/delete`): warning, data-summary list, "Type DELETE to confirm" field (case-sensitive), "Permanently delete my account" button, Cancel button → `/account`
+  - `components/delete-account-form.tsx` — client component; red warning banner ("This cannot be undone."); data-summary card listing three items to be deleted (charity profile, applications and AI content, account and login details); "Type DELETE to confirm" input (monospace, case-sensitive); inline validation error if submitted without exact match; "Permanently delete my account" red button; Cancel outline button → `/account`; static shell simulates deletion by redirecting to `/?deleted=true`
+  - `app/(authenticated)/account/delete/page.tsx` — server component; exports `title: "Delete Account"`; renders `DeleteAccountForm`
 - [ ] **P1.15** Reusable loading and error components: page-level skeleton, inline AI error with Try again button, form error summary, 404 page
 
 ---
