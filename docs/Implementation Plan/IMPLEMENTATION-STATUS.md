@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-08
+**Last updated:** 2026-05-18
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,7 +14,22 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| Phase 1 — Static UI Shell | 15 | 0 | Not started |
+| **Phase 1 — Static UI Shell** | **15** | **0** | **Not started** |
+| &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.3 — Register page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.10 — Step 3: AI Summary | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.11 — Step 4: Draft Answers | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.12 — Step 5: Approve & Export | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 0 | Not started |
 | Phase 2 — Risk-First Spikes | 3 | 0 | Not started |
 | Phase 3 — Infrastructure Setup | 10 | 0 | Not started |
 | Phase 4 — Slice 0: Auth | 6 | 0 | Not started |
@@ -27,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **0** | |
+| **Total** | **76** | **6** | |
 
 ---
 
@@ -41,7 +56,6 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **P0.4** Design tokens added to `globals.css` via Tailwind v4 `@theme inline` (no tailwind.config.ts in v4); Inter font configured via `next/font/google`; `TooltipProvider` added to root layout
 - [x] **P0.5** Directory structure created: `app/(public)/` and `app/(authenticated)/` route groups with all 16 stub pages; `lib/supabase/` stubs; `actions/` stub; `components/ui/` populated
 - [x] **P0.6** Pass-through proxy stub in place (`proxy.ts` — Next.js 16 renamed `middleware.ts` to `proxy.ts`); pushed to GitHub (RapidGlobe/grant-pathway); Vercel confirmed live at https://grant-pathway-three.vercel.app/
-- [ ] **P0.6** Pass-through proxy stub in place (`proxy.ts` — Next.js 16 renamed `middleware.ts` to `proxy.ts`); **needs: push to GitHub remote + Vercel preview URL confirmed**
 
 ---
 
