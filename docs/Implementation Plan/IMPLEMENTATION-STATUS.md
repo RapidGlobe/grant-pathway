@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (P1.4 complete)
+**Last updated:** 2026-05-18 (P1.5 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -14,12 +14,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase | Tasks | Done | Status |
 |-------|-------|------|--------|
 | Phase 0 — Project Bootstrap | 6 | 6 | ✅ Complete |
-| **Phase 1 — Static UI Shell** | **15** | **4** | **In progress** |
+| **Phase 1 — Static UI Shell** | **15** | **5** | **In progress** |
 | &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.2 — Sign In / Landing page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.3 — Register page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.4 — Verify Email page | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 0 | Not started |
+| &nbsp;&nbsp;P1.5 — Forgot Password page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states) | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.7 — Charity Profile page | 1 | 0 | Not started |
 | &nbsp;&nbsp;P1.8 — Step 1: Application Details | 1 | 0 | Not started |
@@ -42,7 +42,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | Phase 4 — Slice 7: Step 5 Approve & Export | 3 | 0 | Not started |
 | Phase 4 — Slice 8: Account Management | 3 | 0 | Not started |
 | Phase 5 — Pre-Launch | 6 | 0 | Not started |
-| **Total** | **76** | **10** | |
+| **Total** | **76** | **11** | |
 
 ---
 
@@ -89,7 +89,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - State 2 (`?state=verified`): green check icon, "Email verified" heading, "Go to my dashboard" teal link-button to `/dashboard`
   - State 3 (`?state=expired`): amber clock icon, "This link has expired" heading, "Send a new verification email" primary button
   - Resend buttons are present but noop in Phase 1; wired to Supabase resend in Slice 0 (S0.2); rate-limit of 3/hour enforced server-side in S0.2
-- [ ] **P1.5** Forgot Password (`/forgot-password`): State 1 with generic confirmation (does not confirm email exists); State 2 with "Save new password" button, stay-on-page success with Sign in button, and expired-link state
+- [x] **P1.5** Forgot Password (`/forgot-password`): State 1 with generic confirmation (does not confirm email exists); State 2 with "Save new password" button, stay-on-page success with Sign in button, and expired-link state
+  - `components/forgot-password-request-form.tsx` — client component; email field with validation, "Send reset link" primary button; on submit shows generic confirmation with mail icon (never confirms if email exists — security best practice); "Remembered your password? Sign in" link
+  - `components/reset-password-form.tsx` — client component; new password + confirm password (both show/hide toggles, 10-char hint); "Save new password" button; on success stays on page and shows "Your password has been updated" + Sign in button; `isExpired` prop shows expired state with amber clock icon + "Request a new link" button → `/forgot-password`
+  - `app/(public)/forgot-password/page.tsx` — server component; reads `?state=` param: default → request form, `?state=reset` → reset form, `?state=expired` → expired state; exports `title: "Reset your password"`
 - [ ] **P1.6** Dashboard (`/dashboard`): empty state (heading "Welcome to Grant Pathway, [first name]", profile banner, three-step explainer, start button with disabled tooltip); populated state (summary strip, AI usage indicator "n of 20 AI requests used this month", application cards with funder name first, correct status pills and colours, Continue/View button distinction, three status-specific delete confirmation modals, re-opening confirmation prompt for approved/exported cards)
 - [ ] **P1.7** Charity Profile (`/profile`): setup state (five fields per screen requirements — no registered address, no mission statement; "Save profile" button; success with "Go to my dashboard" button); edit state ("Your charity profile" heading, "Save changes" button); all three Charity Commission lookup states (match, no match, API unavailable — unavailable state includes Try again button + Enter manually fallback)
 - [ ] **P1.8** Step 1 Application Details: step indicator, heading "Start a new application", correct field labels, Cancel link, Continue button
