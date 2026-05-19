@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-19 (P3.7 complete — Sentry error monitoring)
+**Last updated:** 2026-05-19 (P3.9 complete — seed data)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,7 +40,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **10** | **7** | In progress |
+| **Phase 3 — Infrastructure Setup** | **10** | **8** | In progress |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 1 | ✅ Complete |
@@ -49,7 +49,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.6 — Upstash Redis rate limiting | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.7 — Sentry error monitoring | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.8 — Resend email sending | 1 | 0 | Not started |
-| &nbsp;&nbsp;P3.9 — Seed data | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.9 — Seed data | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 0 | Not started |
 | **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **0** | Not started |
@@ -104,7 +104,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **76** | **21** | |
+| **Total** | **76** | **22** | |
 
 ---
 
@@ -245,7 +245,14 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - Alert: new issue created → notify on preferred channel (email)
   - SENTRY_DSN and NEXT_PUBLIC_SENTRY_DSN set in `.env.local` and Vercel
 - [ ] **P3.8** Resend: sending domain verified (SPF + DKIM); Supabase Auth SMTP configured; email templates customised (verification, password reset, inactivity warning — Email 3, inactivity deletion — Email 4)
-- [ ] **P3.9** Seed data in `supabase/seed.sql` using correct status values; `supabase db reset` loads seed; app boots locally
+- [x] **P3.9** Seed data in `supabase/seed.sql` using correct status values; `supabase db reset` loads seed; app boots locally
+  - Auth user: margaret@helpinghandsuk.org / TestPassword123! (bcrypt via pgcrypto `crypt()`)
+  - user_profile (Margaret Thompson, b0000000-...), charity_profile (Helping Hands Community Trust, Harrogate, reg: 1187432, c0000000-...)
+  - Application 1 (d0000000-...001): National Lottery / Awards for All England, not_started, step 1
+  - Application 2 (d0000000-...002): Tudor Trust / Core Costs Grant 2026, in_progress, step 3, with full AI summary
+  - Application 3 (d0000000-...003): Lloyds Bank Foundation / Invest Programme 2025, approved, step 5, 3 answers (2 user_edited + 1 ai_generated, all approved), last_exported_at set
+  - 3 ai_usage_log entries; all UUIDs fixed (a/b/c/d/e0000000-...) for reproducibility
+  - ⚠️ Run `supabase db reset` locally to apply seed; seed is local-only (never run against production)
 - [ ] **P3.10** AWS Bedrock spend cap configured in AWS Billing/Bedrock console: £70 alert threshold and £100 hard cap; confirmed active before production traffic
 
 ---
