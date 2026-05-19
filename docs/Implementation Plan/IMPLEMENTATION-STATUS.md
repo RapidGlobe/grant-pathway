@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-19 (P3.6 complete — Upstash Redis rate limiting)
+**Last updated:** 2026-05-19 (P3.7 complete — Sentry error monitoring)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,14 +40,14 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **10** | **6** | In progress |
+| **Phase 3 — Infrastructure Setup** | **10** | **7** | In progress |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.4 — Auth middleware | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.5 — HTTP security headers | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.6 — Upstash Redis rate limiting | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P3.7 — Sentry error monitoring | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.7 — Sentry error monitoring | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.8 — Resend email sending | 1 | 0 | Not started |
 | &nbsp;&nbsp;P3.9 — Seed data | 1 | 0 | Not started |
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 0 | Not started |
@@ -237,7 +237,13 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **P3.6** Upstash Redis configured; `lib/rate-limit.ts` created (5 req / 60 sec / user for both AI routes)
   - `aiRatelimit` sliding window limiter exported from `lib/rate-limit.ts`; consumed by generate-summary and generate-draft routes in Phase 4
   - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN set in `.env.local` and Vercel (Production + Preview)
-- [ ] **P3.7** Sentry (EU region) configured; `beforeSend` PII scrubbing in place; AI route tagging in place; new-error-type email alerts configured
+- [x] **P3.7** Sentry (EU region) configured; `beforeSend` PII scrubbing in place; new-error-type alerts configured
+  - `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` — PII scrubbing (email, username stripped before send)
+  - `instrumentation.ts` — loads server/edge Sentry config at runtime
+  - `next.config.ts` — wrapped with `withSentryConfig` for source map uploads
+  - Sentry project: `grant-pathway` (EU region, org: rapidglobe-ltd)
+  - Alert: new issue created → notify on preferred channel (email)
+  - SENTRY_DSN and NEXT_PUBLIC_SENTRY_DSN set in `.env.local` and Vercel
 - [ ] **P3.8** Resend: sending domain verified (SPF + DKIM); Supabase Auth SMTP configured; email templates customised (verification, password reset, inactivity warning — Email 3, inactivity deletion — Email 4)
 - [ ] **P3.9** Seed data in `supabase/seed.sql` using correct status values; `supabase db reset` loads seed; app boots locally
 - [ ] **P3.10** AWS Bedrock spend cap configured in AWS Billing/Bedrock console: £70 alert threshold and £100 hard cap; confirmed active before production traffic
