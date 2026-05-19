@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-19 (Phase 2 complete — all 3 spikes passed)
+**Last updated:** 2026-05-19 (P3.1 migration written — awaiting supabase init + CLI install)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,8 +40,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **10** | **0** | Not started |
-| &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 0 | Not started |
+| **Phase 3 — Infrastructure Setup** | **10** | **0** | In progress |
+| &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 0 | ⏳ Awaiting CLI install |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 0 | Not started |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 0 | Not started |
 | &nbsp;&nbsp;P3.4 — Auth middleware | 1 | 0 | Not started |
@@ -211,6 +211,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ## Phase 3 — Infrastructure Setup
 
 - [ ] **P3.1** Supabase: dev + prod projects created (London region); initial migration written with full schema (5 tables); `user_profiles` has no `last_login_at` (uses `auth.users.last_sign_in_at`); `charity_profiles` includes `lookup_source`; `application_answers` includes `answer_source` enum and `is_approved`; `applications.status` uses values `not_started, in_progress, approved, exported`; RLS policies in place; UPDATE/DELETE denied on `ai_usage_log`; `guidelines-temp` private bucket created; `supabase db reset` runs clean
+  - ✅ Migration file written: `supabase/migrations/20260519000000_initial_schema.sql` — 5 tables, 3 enum types, updated_at triggers, all RLS policies, storage bucket
+  - ⏳ Pending: Supabase CLI install → `supabase init` → `supabase link` → create dev + prod projects → `supabase db reset`
 - [ ] **P3.2** Environment variables: `.env.example` committed; `.env.local` populated; confirmed in `.gitignore`
 - [ ] **P3.3** Supabase client instances created: `lib/supabase/server.ts`, `lib/supabase/client.ts`, `lib/supabase/middleware.ts`
 - [ ] **P3.4** Real auth middleware in place: route protection, session refresh, redirect rules, matcher configured
