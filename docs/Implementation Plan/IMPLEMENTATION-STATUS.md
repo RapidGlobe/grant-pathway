@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-19 (P3.1 complete — schema live on dev and prod)
+**Last updated:** 2026-05-19 (P3.2 complete — env vars)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,9 +40,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **10** | **1** | In progress |
+| **Phase 3 — Infrastructure Setup** | **10** | **2** | In progress |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P3.2 — Environment variables | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 0 | Not started |
 | &nbsp;&nbsp;P3.4 — Auth middleware | 1 | 0 | Not started |
 | &nbsp;&nbsp;P3.5 — HTTP security headers | 1 | 0 | Not started |
@@ -214,7 +214,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `grant-pathway-dev` (eu-west-2, ref: stanwaejdvlvremtffkf) — 5 tables, 18 RLS policies, guidelines-temp bucket confirmed
   - `grant-pathway-prod` (eu-west-2, ref: mvmjryipieepvsjudche) — same schema confirmed
   - Migration: `supabase/migrations/20260519000000_initial_schema.sql`
-- [ ] **P3.2** Environment variables: `.env.example` committed; `.env.local` populated; confirmed in `.gitignore`
+- [x] **P3.2** Environment variables: `.env.example` committed; `.env.local` populated; confirmed in `.gitignore`
+  - ⚠️ `.env.local` Supabase keys point to old dev project — must be updated to new dev project (ref: stanwaejdvlvremtffkf) keys from Supabase dashboard → Settings → API
+  - UPSTASH, CRON_SECRET, SENTRY_DSN placeholders added — filled in during P3.6 and P3.7
 - [ ] **P3.3** Supabase client instances created: `lib/supabase/server.ts`, `lib/supabase/client.ts`, `lib/supabase/middleware.ts`
 - [ ] **P3.4** Real auth middleware in place: route protection, session refresh, redirect rules, matcher configured
 - [ ] **P3.5** HTTP security headers configured in `next.config.js` (all 6 headers)
