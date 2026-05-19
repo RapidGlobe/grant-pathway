@@ -1,3 +1,8 @@
-// Supabase browser client — stub for Phase 1 (wired in Phase 3, P3.3)
-// Uses @supabase/ssr createBrowserClient for Client Components
-export {};
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
