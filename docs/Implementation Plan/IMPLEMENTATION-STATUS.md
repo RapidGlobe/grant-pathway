@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-18 (Summary table expanded — all phases broken down into individual tasks)
+**Last updated:** 2026-05-19 (P2.1 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -36,8 +36,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P1.13 — Account Settings page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.14 — Account Deletion page | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P1.15 — Reusable loading and error components | 1 | 1 | ✅ Complete |
-| **Phase 2 — Risk-First Spikes** | **3** | **0** | Not started |
-| &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 0 | Not started |
+| **Phase 2 — Risk-First Spikes** | **3** | **1** | In progress |
+| &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 0 | Not started |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 0 | Not started |
 | **Phase 3 — Infrastructure Setup** | **10** | **0** | Not started |
@@ -198,7 +198,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Phase 2 — Risk-First Spikes
 
-- [ ] **P2.1** Spike 1 complete: Bedrock Claude Sonnet 4.6 call works from Next.js API route using `anthropic.claude-sonnet-4-6` in eu-west-2; auth errors and throttling observed; spike route deleted
+- [x] **P2.1** Spike 1 complete: Bedrock Claude Sonnet 4.6 call works from Next.js API route using `anthropic.claude-sonnet-4-6` in eu-west-2; response received in 3,352ms (well under 30s NFR-01 target); spike route deleted
+  - ⚠️ Deviation: `@anthropic-ai/sdk` v0.97.0 does not include `AnthropicBedrock` — it has been moved to a separate package `@anthropic-ai/bedrock-sdk` (v0.29.2). All production Bedrock code in Phase 4 must import from `@anthropic-ai/bedrock-sdk`, not `@anthropic-ai/sdk`.
 - [ ] **P2.2** Spike 2 complete: 10MB file uploads directly to Supabase `guidelines-temp` bucket via signed URL (bypassing Vercel); server retrieves and deletes file; `try/finally` deletes file on error; spike routes deleted
 - [ ] **P2.3** Spike 3 complete: PDF extraction (unpdf) works on real PDF; scanned-PDF detection works; mammoth extracts clean text from real .docx; Bedrock call with large text stays within timeout; generated .docx opens cleanly in Word; spike script deleted
 
