@@ -9,8 +9,12 @@ const PUBLIC_API = ['/api/health']
 // Protected routes — require an authenticated session (D1 resolution: plural /applications)
 const PROTECTED = ['/dashboard', '/profile', '/applications', '/account']
 
-// Auth-only routes — redirect to /dashboard if already signed in
-const AUTH_ONLY = ['/', '/register', '/verify-email', '/forgot-password']
+// Auth-only routes — redirect to /dashboard if already signed in.
+// NOTE: /verify-email is intentionally excluded — after clicking the
+// verification link the user is authenticated and the callback redirects
+// them here to show the "Email verified" state.  Putting it in AUTH_ONLY
+// would immediately redirect them away before they see that confirmation.
+const AUTH_ONLY = ['/', '/register', '/forgot-password']
 
 function isProtected(pathname: string) {
   return PROTECTED.some(

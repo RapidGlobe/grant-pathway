@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (S0.1 complete — Registration)
+**Last updated:** 2026-05-20 (S0.2 complete — Email Verification)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,10 +54,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **1** | In progress |
-| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **1** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **2** | In progress |
+| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **2** | In progress |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 0 | Not started |
@@ -302,7 +302,15 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - Duplicate email detection: `data.user.identities?.length === 0` (Supabase privacy-preserving behaviour — no error returned for duplicate emails when confirmation is enabled)
   - `supabase/migrations/20260520000001_handle_new_user_trigger.sql` — `handle_new_user()` trigger (`SECURITY DEFINER SET search_path = ''`) auto-creates `user_profiles` row on `auth.users` INSERT
   - `components/register-form.tsx` — `useActionState(registerUser, { error: null })`; client-side validation blocks Server Action on field errors; `action={action}` fires Server Action when validation passes; all inputs have `name` attributes for FormData; `disabled={isPending}` + loading text on submit button; `state.error === 'email_exists'` and `state.error === 'unknown'` banners
-- [ ] **S0.2** Email verification wired up: three states; state 1 shows email address and "wrong email?" link; verified → "Go to my dashboard"; expired → "Send a new verification email"; resend rate-limited to 3/hour
+- [x] **S0.2** Email verification wired up: three states; state 1 shows email address and "wrong email?" link; verified → "Go to my dashboard"; expired → "Send a new verification email"; resend rate-limited to 3/hour
+  - `app/auth/callback/route.ts` (new) — GET handler; calls `verifyOtp({ token_hash, type })` or `exchangeCodeForSession(code)`; success → `/verify-email?state=verified`; failure → `/verify-email?state=expired`
+  - `proxy.ts` — removed `/verify-email` from AUTH_ONLY; it must remain accessible after verification when the user is authenticated
+  - `lib/rate-limit.ts` — added `resendRatelimit` (3/hour per email, `grant-pathway:resend` prefix)
+  - `actions/auth.ts` — `registerUser` updated: `emailRedirectTo` set to `{origin}/auth/callback`; redirect updated to `/verify-email?email=xxx`; `resendVerificationEmail` action added (rate-checked, calls `supabase.auth.resend()`)
+  - `components/verify-email-resend-form.tsx` (new) — client component; `useActionState(resendVerificationEmail)`; `mode="awaiting"` (hidden email input + outline button) or `mode="expired"` (visible email input + primary button); shows sent / rate_limited / error feedback
+  - `app/(public)/verify-email/page.tsx` — replaced MOCK_EMAIL with real email from `?email=` param or session; wired `VerifyEmailResendForm` into AwaitingState and ExpiredState
+  - `supabase/config.toml` — added `http://127.0.0.1:3000/auth/callback` to `additional_redirect_urls`
+  - ⚠️ **Production action needed:** Add production callback URL to Supabase dashboard → Authentication → URL Configuration → Redirect URLs before any real users register
 - [ ] **S0.3** Sign in wired up: same error message for wrong password and unknown email; unverified email state
 - [ ] **S0.4** Password reset wired up: State 1 posts generic confirmation (never confirms email exists); State 2 success stays on page with Sign in button; expired link state shows "Request a new link"
 - [ ] **S0.5** Session timeout wired up: 60-minute inactivity timer; warning at 55 min; `signOut()` + redirect at 60 min

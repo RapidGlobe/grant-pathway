@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-05-20 — S0.2: Email verification wired up
+
+**What changed:**
+- `app/auth/callback/route.ts` (new) — handles the Supabase redirect after the user clicks their verification email link. Calls `verifyOtp({ token_hash, type })` for email OTP flow (the default); falls back to `exchangeCodeForSession(code)` for PKCE flows (OAuth, magic links). On success → `/verify-email?state=verified`; on any failure → `/verify-email?state=expired`.
+- `proxy.ts` — removed `/verify-email` from `AUTH_ONLY`. After clicking the verification link, the callback sets the session and redirects the now-authenticated user to `/verify-email?state=verified`. Having it in AUTH_ONLY would redirect them to `/dashboard` before they see the confirmation.
+- `lib/rate-limit.ts` — added `resendRatelimit` (3 per hour per email, Upstash sliding window, prefix `grant-pathway:resend`) to satisfy AC-FR-03-06.
+- `actions/auth.ts` — two changes to `registerUser`: (1) `emailRedirectTo: ${origin}/auth/callback` added to `signUp()` so the verification link points to our callback; (2) redirect updated to `/verify-email?email=xxx` so the page can display the email without a session (Supabase does not create a session before email confirmation when `enable_confirmations = true`). New `resendVerificationEmail` action: rate-checks via `resendRatelimit`, calls `supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo } })`.
+- `components/verify-email-resend-form.tsx` (new) — `"use client"` component using `useActionState(resendVerificationEmail)`. Two modes: `awaiting` (hidden email input, outline button) and `expired` (visible email input for correction, primary button). Four feedback states: sent (green), rate_limited (amber), error (red), missing_email (red).
+- `app/(public)/verify-email/page.tsx` — MOCK_EMAIL replaced; page reads email from `?email=` query param first, then from Supabase session (local dev where email confirmation is disabled), then falls back to empty string. `VerifyEmailResendForm` wired into both AwaitingState and ExpiredState.
+
+**Why:**
+`/auth/callback` is the standard Next.js + Supabase SSR pattern for handling the token returned after email verification. The `emailRedirectTo` option on `signUp()` is the mechanism that tells Supabase which URL to embed in the verification email — without it, Supabase uses the `site_url` (the homepage) which would not invoke our callback. The `?email=` param on the redirect avoids a session dependency: locally `enable_confirmations = false` so a session exists, but in production `enable_confirmations = true` means no session until the email is verified.
+
+---
+
 ## 2026-05-20 — S0.1: Registration wired up
 
 **What changed:**

@@ -15,3 +15,12 @@ export const aiRatelimit = new Ratelimit({
   analytics: false,
   prefix: 'grant-pathway:ai',
 })
+
+// 3 resend requests per hour per email address — AC-FR-03-06.
+// Keyed by email address so the limit applies per user regardless of IP.
+export const resendRatelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, '1 h'),
+  analytics: false,
+  prefix: 'grant-pathway:resend',
+})

@@ -1,31 +1,41 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Mail, CheckCircle, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
+import { VerifyEmailResendForm } from "@/components/verify-email-resend-form";
 
 export const metadata: Metadata = {
   title: "Verify your email",
 };
 
-// Slice 0: email comes from auth session; mock used for Phase 1
-const MOCK_EMAIL = "sarah@example.org";
-
 interface Props {
-  searchParams: Promise<{ state?: string }>;
+  searchParams: Promise<{ state?: string; email?: string }>;
 }
 
 export default async function VerifyEmailPage({ searchParams }: Props) {
-  const { state } = await searchParams;
+  const { state, email: emailParam } = await searchParams;
+
+  // Resolve the user's email address.
+  // Priority: ?email= query param (set by registerUser redirect) → session
+  // (set when email confirmation is disabled, e.g. local dev) → empty string.
+  let email = emailParam ?? "";
+  if (!email) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    email = user?.email ?? "";
+  }
 
   if (state === "verified") {
     return <VerifiedState />;
   }
 
   if (state === "expired") {
-    return <ExpiredState />;
+    return <ExpiredState email={email} />;
   }
 
-  return <AwaitingState email={MOCK_EMAIL} />;
+  return <AwaitingState email={email} />;
 }
 
 // ── State 1: Awaiting verification ──────────────────────────────────────────
@@ -45,19 +55,14 @@ function AwaitingState({ email }: { email: string }) {
         <p className="mb-1 text-[15px] text-[#64748B]">
           We&apos;ve sent a verification link to
         </p>
-        <p className="mb-6 text-[15px] font-semibold text-[#1E293B]">{email}</p>
+        {email && (
+          <p className="mb-6 text-[15px] font-semibold text-[#1E293B]">{email}</p>
+        )}
         <p className="mb-8 text-[15px] text-[#64748B]">
           Click the link in the email to activate your account.
         </p>
 
-        {/* Resend button — action wired in Slice 0 */}
-        <Button
-          type="button"
-          variant="outline"
-          className="h-10 w-full border-[#0D6E6E] text-[14px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4]"
-        >
-          Resend verification email
-        </Button>
+        <VerifyEmailResendForm email={email} mode="awaiting" />
 
         <p className="mt-6 text-[14px] text-[#64748B]">
           Wrong email address?{" "}
@@ -104,7 +109,7 @@ function VerifiedState() {
 
 // ── State 3: Link expired or invalid ────────────────────────────────────────
 
-function ExpiredState() {
+function ExpiredState({ email }: { email: string }) {
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-12">
       <div className="w-full max-w-[440px] text-center">
@@ -120,13 +125,7 @@ function ExpiredState() {
           Your verification link is no longer valid. Request a new one below.
         </p>
 
-        {/* Resend button — action wired in Slice 0 */}
-        <Button
-          type="button"
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
-        >
-          Send a new verification email
-        </Button>
+        <VerifyEmailResendForm email={email} mode="expired" />
       </div>
     </div>
   );
