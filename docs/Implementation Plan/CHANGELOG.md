@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-20 — S0.3: Sign in wired up
+
+**What changed:**
+- `actions/auth.ts` — new `signIn` Server Action. Calls `supabase.auth.signInWithPassword()`. Detects `error.code === 'email_not_confirmed'` and returns `{ error: 'unverified' }` so the form can show the resend link. All other auth errors (wrong password, unknown email, rate limit) return the same `{ error: 'credentials' }` message — intentional, to prevent email enumeration (AC-FR-04-03). On success: `redirect('/dashboard')`.
+- `components/sign-in-form.tsx` — fully wired. `useActionState(signIn)` replaces the static `useState` stub. Same validation-first / Server Action pattern as the register form: `handleSubmit` calls `e.preventDefault()` on field errors, does nothing on success. `name` attributes added to email and password inputs. Submit button shows `disabled={isPending}` and "Signing in…". The "Resend verification email" stub button replaced with a `<Link>` to `/verify-email?email=xxx` — takes the user to the existing resend flow with their email pre-filled.
+
+**Why:**
+The same `credentials` error for both wrong password and unknown email is deliberate (AC-FR-04-03) — returning different messages would let an attacker enumerate registered email addresses. Linking to `/verify-email` for the resend (rather than calling the resend action inline) reuses the existing rate-limited resend flow and avoids duplicating resend logic on the sign-in page.
+
+---
+
 ## 2026-05-20 — S0.2: Email verification wired up
 
 **What changed:**

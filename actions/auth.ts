@@ -83,6 +83,48 @@ export async function registerUser(
 }
 
 // ---------------------------------------------------------------------------
+// S0.3 — Sign in
+// ---------------------------------------------------------------------------
+
+export type SignInState = {
+  error: 'credentials' | 'unverified' | 'unknown' | null
+}
+
+/**
+ * Signs a user in via Supabase Auth signInWithPassword().
+ * On success: redirects to /dashboard.
+ * On unverified email: returns { error: 'unverified' }.
+ * On wrong credentials (or unknown email — same message to prevent enumeration):
+ *   returns { error: 'credentials' }.
+ * On any other failure: returns { error: 'unknown' }.
+ *
+ * Called from SignInForm via useActionState (React 19).
+ * Client-side validation (email format, non-empty password) runs first.
+ */
+export async function signIn(
+  _prevState: SignInState,
+  formData: FormData,
+): Promise<SignInState> {
+  const email = (formData.get('email') as string | null) ?? ''
+  const password = (formData.get('password') as string | null) ?? ''
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
+
+  if (error) {
+    // Supabase error code for email not yet confirmed
+    if (error.code === 'email_not_confirmed') {
+      return { error: 'unverified' }
+    }
+    // All other errors (wrong password, unknown email, rate limit) surface as
+    // the same generic credentials message to prevent email enumeration (AC-FR-04-03).
+    return { error: 'credentials' }
+  }
+
+  redirect('/dashboard')
+}
+
+// ---------------------------------------------------------------------------
 // S0.2 — Resend verification email
 // ---------------------------------------------------------------------------
 

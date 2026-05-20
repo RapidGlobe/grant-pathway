@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (S0.2 complete — Email Verification)
+**Last updated:** 2026-05-20 (S0.3 complete — Sign In)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,11 +54,11 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **2** | In progress |
-| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **2** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **3** | In progress |
+| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **3** | In progress |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in | 1 | 0 | Not started |
@@ -311,7 +311,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `app/(public)/verify-email/page.tsx` — replaced MOCK_EMAIL with real email from `?email=` param or session; wired `VerifyEmailResendForm` into AwaitingState and ExpiredState
   - `supabase/config.toml` — added `http://127.0.0.1:3000/auth/callback` to `additional_redirect_urls`
   - ⚠️ **Production action needed:** Add production callback URL to Supabase dashboard → Authentication → URL Configuration → Redirect URLs before any real users register
-- [ ] **S0.3** Sign in wired up: same error message for wrong password and unknown email; unverified email state
+- [x] **S0.3** Sign in wired up: same error message for wrong password and unknown email; unverified email state
+  - `actions/auth.ts` — `signIn` Server Action: calls `signInWithPassword()`; `email_not_confirmed` error code → `{ error: 'unverified' }`; all other auth errors → `{ error: 'credentials' }` (same message prevents email enumeration, AC-FR-04-03); success → `redirect('/dashboard')`
+  - `components/sign-in-form.tsx` — wired via `useActionState(signIn, { error: null })`; same validation-first / Server Action pattern as RegisterForm; `name` attributes on inputs; `disabled={isPending}` + "Signing in…" loading text; "Resend verification email" changed from stub button to `<Link href="/verify-email?email=xxx">` so the user lands on the existing resend flow
 - [ ] **S0.4** Password reset wired up: State 1 posts generic confirmation (never confirms email exists); State 2 success stays on page with Sign in button; expired link state shows "Request a new link"
 - [ ] **S0.5** Session timeout wired up: 60-minute inactivity timer; warning at 55 min; `signOut()` + redirect at 60 min
 - [ ] **S0.6** MFA opt-in wired up (Should Have — FR-07)
