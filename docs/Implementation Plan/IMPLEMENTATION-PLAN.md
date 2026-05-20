@@ -743,9 +743,13 @@ Configure `next.config.js` with all headers from `technical-design.md` Section 1
    - Must reference "Grant Pathway"
    - Teal CTA buttons
    - Warm, approachable tone (BRD Section 12)
-5. Create Resend templates for inactivity emails (used by scheduled jobs in Slice 8):
-   - **Email 3 — Inactivity warning:** subject "Your Grant Pathway account will be deleted in 30 days"; sent at 23 months of no login; includes link to sign in to retain account
-   - **Email 4 — Account deleted (inactivity):** sent immediately after automated deletion at 24 months; confirms account and data have been removed
+5. Inactivity emails (Emails 3 + 4) built as code functions in `lib/emails/` (not Resend templates):
+   - `lib/emails/inactivity-warning.ts` — exports `buildInactivityWarningEmail(firstName, deletionDate): string`
+   - `lib/emails/account-deleted-inactivity.ts` — exports `buildAccountDeletedEmail(firstName): string`
+   - Cron jobs in Slice 8 call these functions and pass the resulting HTML to `resend.emails.send()`
+   - **Why:** Resend's HTML template editor does not support variable substitution; keeping email HTML in code also separates content from cron logic, making both easier to maintain
+   - **Email 3 — Inactivity warning:** subject "Your Grant Pathway account will be deleted in 30 days"; sent at 23 months of no login; includes `{first_name}` and `{deletion_date}` variables; links to sign-in page
+   - **Email 4 — Account deleted (inactivity):** subject "Your Grant Pathway account has been deleted"; sent immediately after automated deletion at 24 months; includes `{first_name}` variable; links to registration page
 
 ### P3.10 — AWS Bedrock Spend Cap
 
