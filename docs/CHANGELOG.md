@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-05-20 — P3.8 Complete: Email Infrastructure; Inactivity Emails Moved to Code
+
+**What changed:**
+- Resend sending domain `grantpathway.org.uk` verified (SPF + DKIM via GoDaddy DNS).
+- Supabase Auth SMTP configured to send via Resend: `smtp.resend.com:465`, sender `noreply@grantpathway.org.uk`.
+- Supabase Auth email templates updated: Confirm sign up and Reset password — teal CTA buttons, Grant Pathway branding, tone aligned to voice guide.
+- Inactivity emails (Email 3 — inactivity warning; Email 4 — account deleted) will be built as dedicated code functions in `lib/emails/inactivity-warning.ts` and `lib/emails/account-deleted-inactivity.ts`, not as Resend templates.
+- `RESEND_API_KEY` added to `.env.example` and `.env.local`.
+- ⚠️ Prerequisite before testing: `noreply@grantpathway.org.uk` mailbox must be created in GoDaddy before any email flow is tested.
+
+**Why:**
+Resend's HTML template editor does not support variable substitution — variables rendered as literal strings (`{first_name}`) rather than being replaced at send time. Rather than use a workaround, the inactivity email HTML will be built in code as pure functions that accept variables and return an HTML string. This also separates email content from cron job logic, making both easier to maintain independently. The cron jobs in Slice 8 will call `resend.emails.send({ html: buildInactivityWarningEmail(firstName, deletionDate) })`.
+
+---
+
 ## 2026-05-18 — Charity Profile Lookup Unavailable State Simplified
 
 **What changed:**
@@ -381,5 +396,5 @@ Key product decisions that are unchanged from the original:
 
 ---
 
-*Last updated: 2026-05-18*
+*Last updated: 2026-05-20*
 *Maintained by: Rapidglobe Ltd*
