@@ -738,6 +738,7 @@ Configure `next.config.js` with all headers from `technical-design.md` Section 1
 1. Create Resend account
 2. Verify sending domain (SPF + DKIM DNS records for grantpathway.org.uk)
 3. Configure Supabase Auth SMTP with Resend credentials
+   - ⚠️ **Prerequisite before testing:** Create the `noreply@grantpathway.org.uk` mailbox in GoDaddy (or configure it to forward/route) before any email sending is tested. Supabase will send from this address and delivery will fail if the mailbox does not exist.
 4. Customise Supabase Auth email templates (verification + password reset):
    - Must reference "Grant Pathway"
    - Teal CTA buttons

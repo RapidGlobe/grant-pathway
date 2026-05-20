@@ -245,6 +245,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - Alert: new issue created → notify on preferred channel (email)
   - SENTRY_DSN and NEXT_PUBLIC_SENTRY_DSN set in `.env.local` and Vercel
 - [ ] **P3.8** Resend: sending domain verified (SPF + DKIM); Supabase Auth SMTP configured; email templates customised (verification, password reset, inactivity warning — Email 3, inactivity deletion — Email 4)
+  - ⚠️ **Before testing:** Create `noreply@grantpathway.org.uk` mailbox in GoDaddy before testing any email flow — Supabase sends from this address and delivery will fail if the mailbox does not exist
 - [x] **P3.9** Seed data in `supabase/seed.sql` using correct status values; `supabase db reset` loads seed; app boots locally
   - Auth user: margaret@helpinghandsuk.org / TestPassword123! (bcrypt via pgcrypto `crypt()`)
   - user_profile (Margaret Thompson, b0000000-...), charity_profile (Helping Hands Community Trust, Harrogate, reg: 1187432, c0000000-...)
