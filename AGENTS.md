@@ -18,6 +18,21 @@ When working on any Phase 1 task (P1.1 through P1.15):
 4. This rule applies even if the next task seems straightforward.
 <!-- END:phase1-approval-rules -->
 
+<!-- BEGIN:adr-consequences-rules -->
+# ADR Consequences — Mandatory pre-task check
+
+Every ADR has a **Consequences** section listing concrete actions that must be implemented. These are binding requirements, not suggestions. Omissions found in Phase 0–3 (missing `word_limit` column, missing `@axe-core/react`, missing `/api/health` task, missing Sentry `beforeSend` on edge config, session cookies lost on redirect) all traced back to ADR consequences not being walked through before implementation.
+
+Before starting any implementation task:
+
+1. **Identify every ADR relevant to that task area.** Read the full Consequences section of each one.
+2. **For each consequence bullet, confirm there is a specific step in the current task that covers it.** If there is not, add the step before writing any code.
+3. **Before starting a new Phase, do a full ADR consequences sweep.** Walk all 42 ADRs. For every consequence that does not map to a completed or planned task, add a task to the implementation plan. Get this sign-off documented in `IMPLEMENTATION-STATUS.md` before the first task of the new phase begins.
+4. **This rule applies to all phases going forward.** It is not optional and cannot be skipped even if the task seems straightforward.
+
+**Why this rule exists:** Implementation tasks are written feature-first ("what does the app need to run?"). ADR consequences are spec-first ("what does the architecture require?"). Without an explicit check, the gap between the two is invisible until something breaks or a compliance review finds it after the fact.
+<!-- END:adr-consequences-rules -->
+
 <!-- BEGIN:github-commit-rules -->
 # GitHub — Always commit and push after changes
 
