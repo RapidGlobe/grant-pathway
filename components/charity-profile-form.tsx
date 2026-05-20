@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Search, CheckCircle, AlertCircle, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { lookupCharity } from "@/actions/charity";
 
 type LookupState = null | "match" | "no-match" | "unavailable";
 
@@ -18,65 +19,44 @@ interface FieldErrors {
 }
 
 interface CharityProfileFormProps {
+  /** True when editing an existing profile rather than creating the first one. */
   isEdit?: boolean;
-  initialLookupState?: LookupState;
 }
 
-// Mock data for edit state and lookup match
-const MOCK_EDIT = {
-  charityName: "Helping Hands UK",
-  regNumber: "1234567",
-  whatDoes:
-    "We provide food, shelter, and support services to people experiencing homelessness and poverty across the North West.",
-  whoHelps: "Adults and families experiencing homelessness, poverty, or social exclusion.",
-  whereWorks: "Greater Manchester, Lancashire, and Cheshire",
-};
-
-const MOCK_MATCH = {
-  charityName: "St Mary's Community Trust",
-  regNumber: "1189345",
-  whatDoesPara:
-    "We provide community support services, food assistance, and social activities for people experiencing poverty and social isolation in Greater Manchester. We bring local people together through shared events and practical programmes that help them rebuild their lives.",
-  whoHelpsPara:
-    "People living in Greater Manchester who are experiencing poverty, financial hardship, or social isolation — including older adults living alone, families struggling to make ends meet, and individuals who are homeless or at risk of homelessness.",
-};
-
-export function CharityProfileForm({
-  isEdit = false,
-  initialLookupState = null,
-}: CharityProfileFormProps) {
+export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) {
   const [lookupQuery, setLookupQuery] = useState("");
-  const [lookupResult, setLookupResult] = useState<LookupState>(initialLookupState);
+  const [lookupResult, setLookupResult] = useState<LookupState>(null);
+  const [isLookingUp, startLookup] = useTransition();
 
-  const prefillMatch = initialLookupState === "match";
-
-  const [charityName, setCharityName] = useState(
-    isEdit ? MOCK_EDIT.charityName : prefillMatch ? MOCK_MATCH.charityName : ""
-  );
-  const [regNumber, setRegNumber] = useState(
-    isEdit ? MOCK_EDIT.regNumber : prefillMatch ? MOCK_MATCH.regNumber : ""
-  );
-  const [whatDoes, setWhatDoes] = useState(
-    isEdit ? MOCK_EDIT.whatDoes : prefillMatch ? MOCK_MATCH.whatDoesPara : ""
-  );
-  const [whoHelps, setWhoHelps] = useState(
-    isEdit ? MOCK_EDIT.whoHelps : prefillMatch ? MOCK_MATCH.whoHelpsPara : ""
-  );
-  const [whereWorks, setWhereWorks] = useState(isEdit ? MOCK_EDIT.whereWorks : "");
-  const [paraphrasedFromLookup, setParaphrasedFromLookup] = useState(prefillMatch);
+  // Controlled field values — pre-filled by the lookup on match (S1.1);
+  // pre-filled from saved profile data when editing (S1.3).
+  const [charityName, setCharityName] = useState("");
+  const [regNumber, setRegNumber] = useState("");
+  const [whatDoes, setWhatDoes] = useState("");
+  const [whoHelps, setWhoHelps] = useState("");
+  const [whereWorks, setWhereWorks] = useState("");
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [saved, setSaved] = useState(false);
 
+  // ── Charity Commission lookup ──────────────────────────────────────────────
+
   function handleLookup() {
     if (!lookupQuery.trim()) return;
-    // Static mock: always returns a match
-    setLookupResult("match");
-    setCharityName(MOCK_MATCH.charityName);
-    setRegNumber(MOCK_MATCH.regNumber);
-    setWhatDoes(MOCK_MATCH.whatDoesPara);
-    setWhoHelps(MOCK_MATCH.whoHelpsPara);
-    setParaphrasedFromLookup(true);
+    startLookup(async () => {
+      const result = await lookupCharity(lookupQuery.trim());
+      if (result.ok) {
+        setLookupResult("match");
+        // Pre-fill name and registration number (AC-FR-10-01).
+        // Fields remain editable — the user can correct anything before saving.
+        setCharityName(result.charityName);
+        setRegNumber(result.registrationNumber);
+      } else if (result.reason === "not_found") {
+        setLookupResult("no-match");
+      } else {
+        setLookupResult("unavailable");
+      }
+    });
   }
 
   function handleLookupKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -85,6 +65,8 @@ export function CharityProfileForm({
       handleLookup();
     }
   }
+
+  // ── Form submission (save wired in S1.2) ──────────────────────────────────
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -95,11 +77,13 @@ export function CharityProfileForm({
     if (!whereWorks.trim()) errors.whereWorks = "Please tell us where your charity works";
     setFieldErrors(errors);
     if (Object.keys(errors).length === 0) {
+      // Static success — replaced by real Server Action in S1.2
       setSaved(true);
     }
   }
 
-  // Setup success: replace the form with a success screen
+  // ── First-time save success screen ────────────────────────────────────────
+
   if (saved && !isEdit) {
     return (
       <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
@@ -107,7 +91,8 @@ export function CharityProfileForm({
           <CheckCircle className="mx-auto mb-4 h-12 w-12 text-[#16A34A]" aria-hidden="true" />
           <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Profile saved</h1>
           <p className="mb-6 text-[15px] text-[#374151]">
-            Your charity profile has been saved. You&apos;re ready to start your first application.
+            Your charity profile has been saved. You&apos;re ready to start your first
+            application.
           </p>
           <Link
             href="/dashboard"
@@ -140,74 +125,78 @@ export function CharityProfileForm({
         {isEdit ? "Your charity profile" : "Set up your charity profile"}
       </h1>
 
-      {/* Charity Commission lookup */}
+      {/* ── Charity Commission lookup ────────────────────────────────────── */}
       <div className="mb-6 rounded-xl border border-[#EDE8E1] bg-[#FDF9F5] p-5">
-          <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
-            Find your charity on the Charity Commission register
-          </p>
-          <div className="flex gap-2">
-            <Input
-              type="search"
-              placeholder="Search by charity name or registration number"
-              value={lookupQuery}
-              onChange={(e) => setLookupQuery(e.target.value)}
-              onKeyDown={handleLookupKeyDown}
-              aria-label="Search by charity name or registration number"
-              className="h-10 flex-1 text-[14px]"
-            />
-            <Button
-              type="button"
-              onClick={handleLookup}
-              className="h-10 shrink-0 bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white hover:bg-[#0A5A5A]"
-            >
-              <Search className="mr-1.5 h-4 w-4" aria-hidden="true" />
-              Look up charity
-            </Button>
-          </div>
-
-          {/* Lookup result: match */}
-          {lookupResult === "match" && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-3">
-              <CheckCircle
-                className="mt-0.5 h-4 w-4 shrink-0 text-[#059669]"
-                aria-hidden="true"
-              />
-              <p className="text-[13px] text-[#065F46]">
-                Details retrieved from the Charity Commission register. You can edit these fields
-                before saving.
-              </p>
-            </div>
-          )}
-
-          {/* Lookup result: no match */}
-          {lookupResult === "no-match" && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
-              <AlertTriangle
-                className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
-                aria-hidden="true"
-              />
-              <p className="text-[13px] text-[#78350F]">
-                We couldn&apos;t find that charity. Please enter your details manually.
-              </p>
-            </div>
-          )}
-
-          {/* Lookup result: API unavailable */}
-          {lookupResult === "unavailable" && (
-            <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
-              <AlertCircle
-                className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
-                aria-hidden="true"
-              />
-              <p className="text-[13px] text-[#78350F]">
-                We couldn&apos;t reach the Charity Commission right now. You can try again using
-                the <span className="font-semibold">Look up charity</span> button above, or fill
-                in your details manually in the fields below.
-              </p>
-            </div>
-          )}
+        <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+          Find your charity on the Charity Commission register
+        </p>
+        <div className="flex gap-2">
+          <Input
+            type="search"
+            placeholder="Search by charity name or registration number"
+            value={lookupQuery}
+            onChange={(e) => setLookupQuery(e.target.value)}
+            onKeyDown={handleLookupKeyDown}
+            aria-label="Search by charity name or registration number"
+            className="h-10 flex-1 text-[14px]"
+            disabled={isLookingUp}
+          />
+          <Button
+            type="button"
+            onClick={handleLookup}
+            disabled={isLookingUp || !lookupQuery.trim()}
+            className="h-10 shrink-0 bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white hover:bg-[#0A5A5A]"
+          >
+            <Search className="mr-1.5 h-4 w-4" aria-hidden="true" />
+            {isLookingUp ? "Searching…" : "Look up charity"}
+          </Button>
         </div>
 
+        {/* Match found (AC-FR-10-01) */}
+        {lookupResult === "match" && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-3">
+            <CheckCircle
+              className="mt-0.5 h-4 w-4 shrink-0 text-[#059669]"
+              aria-hidden="true"
+            />
+            <p className="text-[13px] text-[#065F46]">
+              Details retrieved from the Charity Commission register. You can edit these
+              fields before saving.
+            </p>
+          </div>
+        )}
+
+        {/* No match (AC-FR-10-02) */}
+        {lookupResult === "no-match" && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
+            <AlertTriangle
+              className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
+              aria-hidden="true"
+            />
+            <p className="text-[13px] text-[#78350F]">
+              We couldn&apos;t find that charity. Please enter your details manually.
+            </p>
+          </div>
+        )}
+
+        {/* API unavailable (AC-FR-11-01) */}
+        {lookupResult === "unavailable" && (
+          <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
+            <AlertCircle
+              className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
+              aria-hidden="true"
+            />
+            <p className="text-[13px] text-[#78350F]">
+              We couldn&apos;t reach the Charity Commission right now. You can try again
+              using the{" "}
+              <span className="font-semibold">Look up charity</span> button above, or
+              fill in your details manually in the fields below.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Profile fields (AC-FR-11-02: always editable without lookup) ─── */}
       <form noValidate onSubmit={handleSubmit}>
         {/* Charity name */}
         <div className="mb-5">
@@ -215,7 +204,10 @@ export function CharityProfileForm({
             htmlFor="charityName"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            Charity name <span className="text-[#DC2626]" aria-hidden="true">*</span>
+            Charity name{" "}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <Input
             id="charityName"
@@ -228,7 +220,11 @@ export function CharityProfileForm({
             className="h-10 text-[14px]"
           />
           {fieldErrors.charityName && (
-            <p id="charityName-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="charityName-error"
+              role="alert"
+              className="mt-1.5 text-[13px] text-[#DC2626]"
+            >
               {fieldErrors.charityName}
             </p>
           )}
@@ -252,24 +248,6 @@ export function CharityProfileForm({
           />
         </div>
 
-        {/* AI paraphrase banner — shown after a successful lookup */}
-        {paraphrasedFromLookup && (
-          <div
-            role="alert"
-            className="mb-5 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
-          >
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-            <p className="text-[13px] text-[#78350F]">
-              <span className="font-semibold">AI-generated content below.</span> The two fields
-              below have been pre-filled by AI using the description from your Charity Commission
-              entry. The original legal language has been paraphrased into plain English to give you
-              a starting point — please read carefully and edit to make sure it accurately reflects
-              your charity&apos;s work before saving. You can edit any of the fields at any time
-              before clicking <span className="font-semibold">Save profile</span>.
-            </p>
-          </div>
-        )}
-
         {/* What does your charity do? */}
         <div className="mb-5">
           <Label
@@ -277,27 +255,37 @@ export function CharityProfileForm({
             className="mb-1 block text-[14px] font-medium text-[#1E293B]"
           >
             What does your charity do?{" "}
-            <span className="text-[#DC2626]" aria-hidden="true">*</span>
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
-          {!paraphrasedFromLookup && (
-            <p id="whatDoes-hint" className="mb-1.5 text-[13px] text-[#64748B]">
-              Your Charity Commission entry (see the lookup above) lists your charitable objects — this is a good starting point. Your website&apos;s &lsquo;About us&rsquo; page is another useful source.
-            </p>
-          )}
+          <p id="whatDoes-hint" className="mb-1.5 text-[13px] text-[#64748B]">
+            Your Charity Commission entry (see the lookup above) lists your charitable
+            objects — this is a good starting point. Your website&apos;s &lsquo;About
+            us&rsquo; page is another useful source.
+          </p>
           <Textarea
             id="whatDoes"
             value={whatDoes}
             onChange={(e) => setWhatDoes(e.target.value)}
             rows={3}
             aria-invalid={!!fieldErrors.whatDoes || undefined}
-            aria-describedby={[
-              "whatDoes-hint",
-              fieldErrors.whatDoes ? "whatDoes-error" : "",
-            ].filter(Boolean).join(" ")}
+            aria-describedby={
+              [
+                "whatDoes-hint",
+                fieldErrors.whatDoes ? "whatDoes-error" : "",
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
             className="text-[14px]"
           />
           {fieldErrors.whatDoes && (
-            <p id="whatDoes-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="whatDoes-error"
+              role="alert"
+              className="mt-1.5 text-[13px] text-[#DC2626]"
+            >
               {fieldErrors.whatDoes}
             </p>
           )}
@@ -310,27 +298,37 @@ export function CharityProfileForm({
             className="mb-1 block text-[14px] font-medium text-[#1E293B]"
           >
             Who does your charity help?{" "}
-            <span className="text-[#DC2626]" aria-hidden="true">*</span>
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
-          {!paraphrasedFromLookup && (
-            <p id="whoHelps-hint" className="mb-1.5 text-[13px] text-[#64748B]">
-              Think about the people your charity serves — their age, background, or circumstances. Your Charity Commission entry may also describe your beneficiaries.
-            </p>
-          )}
+          <p id="whoHelps-hint" className="mb-1.5 text-[13px] text-[#64748B]">
+            Think about the people your charity serves — their age, background, or
+            circumstances. Your Charity Commission entry may also describe your
+            beneficiaries.
+          </p>
           <Textarea
             id="whoHelps"
             value={whoHelps}
             onChange={(e) => setWhoHelps(e.target.value)}
             rows={3}
             aria-invalid={!!fieldErrors.whoHelps || undefined}
-            aria-describedby={[
-              "whoHelps-hint",
-              fieldErrors.whoHelps ? "whoHelps-error" : "",
-            ].filter(Boolean).join(" ")}
+            aria-describedby={
+              [
+                "whoHelps-hint",
+                fieldErrors.whoHelps ? "whoHelps-error" : "",
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
             className="text-[14px]"
           />
           {fieldErrors.whoHelps && (
-            <p id="whoHelps-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="whoHelps-error"
+              role="alert"
+              className="mt-1.5 text-[13px] text-[#DC2626]"
+            >
               {fieldErrors.whoHelps}
             </p>
           )}
@@ -343,10 +341,15 @@ export function CharityProfileForm({
             className="mb-1 block text-[14px] font-medium text-[#1E293B]"
           >
             Where do you work?{" "}
-            <span className="text-[#DC2626]" aria-hidden="true">*</span>
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <p id="whereWorks-hint" className="mb-1.5 text-[13px] text-[#64748B]">
-            Enter a town, county, or region — for example, &lsquo;Leeds&rsquo; or &lsquo;South Yorkshire&rsquo;. If you work across the whole country, enter &lsquo;National&rsquo;. If you&apos;re not sure, use the town or city where your charity is based.
+            Enter a town, county, or region — for example, &lsquo;Leeds&rsquo; or
+            &lsquo;South Yorkshire&rsquo;. If you work across the whole country, enter
+            &lsquo;National&rsquo;. If you&apos;re not sure, use the town or city where
+            your charity is based.
           </p>
           <Input
             id="whereWorks"
@@ -354,14 +357,22 @@ export function CharityProfileForm({
             value={whereWorks}
             onChange={(e) => setWhereWorks(e.target.value)}
             aria-invalid={!!fieldErrors.whereWorks || undefined}
-            aria-describedby={[
-              "whereWorks-hint",
-              fieldErrors.whereWorks ? "whereWorks-error" : "",
-            ].filter(Boolean).join(" ")}
+            aria-describedby={
+              [
+                "whereWorks-hint",
+                fieldErrors.whereWorks ? "whereWorks-error" : "",
+              ]
+                .filter(Boolean)
+                .join(" ") || undefined
+            }
             className="h-10 text-[14px]"
           />
           {fieldErrors.whereWorks && (
-            <p id="whereWorks-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="whereWorks-error"
+              role="alert"
+              className="mt-1.5 text-[13px] text-[#DC2626]"
+            >
               {fieldErrors.whereWorks}
             </p>
           )}

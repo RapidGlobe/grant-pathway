@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-05-20 — S1.1: Charity Commission lookup wired up
+
+**What changed:**
+- `actions/charity.ts` (new) — `lookupCharity(query)` Server Action. Detects whether the query is a registration number (6–8 digits) or a name string and calls the appropriate Charity Commission API endpoint. Uses an `AbortController` with a 10-second timeout so a slow or unreachable API surfaces as `unavailable` rather than hanging. Returns `{ ok: true, charityName, registrationNumber }` on match; `{ ok: false, reason: 'not_found' | 'unavailable' }` otherwise. Called via `useTransition` (not `useActionState`) because it returns structured data to drive client-side field pre-fill, not a form state update.
+- `components/charity-profile-form.tsx` — `handleLookup` wired to `lookupCharity` via `useTransition`. Pre-fills `charityName` and `regNumber` on match. All mock data (`MOCK_EDIT`, `MOCK_MATCH`), the `initialLookupState` prop, and the `paraphrasedFromLookup` AI-paraphrase banner removed. The AI banner was speculative Phase 1 content not backed by any acceptance criterion — AC-FR-10-01 specifies only name and registration number are pre-filled from the API.
+- `app/(authenticated)/profile/page.tsx` — `lookup` searchParam removed (was a static demo affordance); page now passes only `isEdit` prop.
+- `.env.example` — `CHARITY_COMMISSION_API_KEY` added.
+
+**Why:**
+The `lookupCharity` action uses `useTransition` rather than `useActionState` for the same reason `mfaEnroll` does: it returns structured data that the component needs to display rather than a status value. The paraphrase banner was removed because it implied AI processing of charitable objects text — that was never specified in the acceptance criteria and would require an additional Bedrock call that is not planned for any slice.
+
+**Action required (WJ):** Register for a Charity Commission API key at https://api.charitycommission.gov.uk/ and add it to `.env.local` as `CHARITY_COMMISSION_API_KEY`, and to Vercel environment variables for production. Until the key is present the lookup button will return the "unavailable" state gracefully.
+
+---
+
 ## 2026-05-20 — S0.6: MFA opt-in wired up
 
 **What changed:**

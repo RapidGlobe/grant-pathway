@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (S0.6 complete — MFA opt-in)
+**Last updated:** 2026-05-20 (S1.1 complete — Charity Commission lookup)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **6** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **7** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -62,8 +62,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **1** | In progress |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.2 — Profile save | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.4 — Profile incomplete banner | 1 | 0 | Not started |
@@ -336,7 +336,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ### Slice 1 — Charity Profile
 
-- [ ] **S1.1** Charity Commission lookup wired up: searches by name or number; pre-fills charity name and registration number; all three result states handled (match / no match / API unavailable)
+- [x] **S1.1** Charity Commission lookup wired up: searches by name or number; pre-fills charity name and registration number; all three result states handled (match / no match / API unavailable)
+  - `actions/charity.ts` (new) — `lookupCharity(query)` Server Action; detects number (6–8 digits) vs name query; calls `GET /allCharityDetails/{n}` or `GET /charitySearch/{name}/1/1`; 10-second `AbortController` timeout; maps errors to `not_found` or `unavailable`; `toTitleCase()` helper converts ALL-CAPS API names for display
+  - `components/charity-profile-form.tsx` — static `handleLookup` replaced with `startTransition(async () => lookupCharity(...))` (same pattern as `mfaEnroll`); pre-fills `charityName` and `regNumber` on match; all mock data and `initialLookupState` prop removed; `paraphrasedFromLookup` state and AI banner removed (not in AC); lookup button shows "Searching…" while pending and is disabled when query is empty
+  - `app/(authenticated)/profile/page.tsx` — `lookup` searchParam removed; page simplified to pass only `isEdit` prop
+  - `.env.example` — `CHARITY_COMMISSION_API_KEY` added with registration instructions
+  - **Note:** `CHARITY_COMMISSION_API_KEY` must be added to `.env.local` and to Vercel environment variables before lookup will work in production. If the key is absent, the action returns `unavailable` gracefully.
 - [ ] **S1.2** Profile save wired up: five-field form with Zod validation; `lookup_source` set to `charity_commission` or `manual`; first save shows "Go to my dashboard" button; subsequent saves show "Your changes have been saved."
 - [ ] **S1.3** Profile edit wired up: pre-fills from database; saves updates correctly
 - [ ] **S1.4** Profile incomplete banner shown/hidden correctly based on profile existence
