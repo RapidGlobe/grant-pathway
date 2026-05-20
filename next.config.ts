@@ -21,7 +21,8 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
-      "connect-src 'self' https://*.supabase.co",
+      // Sentry EU ingest added in P3.7 review — must be present or browser SDK is silently blocked
+      "connect-src 'self' https://*.supabase.co https://*.ingest.de.sentry.io",
       "frame-ancestors 'none'",
     ].join('; '),
   },
