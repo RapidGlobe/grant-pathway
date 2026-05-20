@@ -250,5 +250,5 @@ Before each phase begins, this section must be completed by reviewing the gaps r
 | Phase 0 → Phase 1 | — | Not reviewed (gate added retrospectively) | GAP-11, GAP-14 existed | — |
 | Phase 1 → Phase 2 | — | Not reviewed (gate added retrospectively) | — | — |
 | Phase 2 → Phase 3 | — | Not reviewed (gate added retrospectively) | — | — |
-| Phase 3 → Phase 4 | 2026-05-20 | All 20 gaps identified and registered | GAP-01 through GAP-20 — see IMPLEMENTATION-PLAN.md for resolution tasks | Pending |
+| Phase 3 → Phase 4 | 2026-05-20 | All 20 gaps reviewed. GAP-06/08/09/10/14/18 resolved. GAP-11 blocked (GitHub Pro required — documented). GAP-01–05/07/12/13/15–17/19/20 deferred to natural Phase 4 touch-points. ADR-SEC-001–006 and ADR-DATA-001–004 reviewed by project owner. | GAP-11 (GitHub Pro), GAP-17 (P5.2 test), GAP-20 (P5.1 licence review) | ✅ Signed off — WJ, 2026-05-20 |
 | Phase 4 → Phase 5 | | | | |

@@ -280,11 +280,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Phase 3 → Phase 4 Gate
 
-- [ ] All Phase 3 tasks complete (P3.1–P3.12), or any incomplete tasks explicitly deferred
-- [ ] ADR Traceability Table reviewed — all ⚠️ Gap rows covered or documented as N/A
-- [ ] GAP-06, GAP-08, GAP-09, GAP-10, GAP-11, GAP-14, GAP-18 resolved
-- [ ] Security and GDPR-critical ADRs reviewed by project owner (ADR-SEC-001–006, ADR-DATA-001–004)
-- [ ] Gate sign-off row in `docs/Implementation Plan/ADR-TRACEABILITY.md` completed
+- [x] All Phase 3 tasks complete (P3.1–P3.12), or any incomplete tasks explicitly deferred
+- [x] ADR Traceability Table reviewed — all ⚠️ Gap rows covered or documented as N/A
+- [x] GAP-06, GAP-08, GAP-09, GAP-10, GAP-11, GAP-14, GAP-18 resolved (GAP-11 explicitly blocked/documented)
+- [x] Security and GDPR-critical ADRs reviewed by project owner (ADR-SEC-001–006, ADR-DATA-001–004) — **signed off 2026-05-20**
+- [x] Gate sign-off row in `docs/Implementation Plan/ADR-TRACEABILITY.md` completed — **2026-05-20**
+- [x] Compliance sweep: no new gaps identified — P3.12 files created to resolve ADR consequences, no new consequences introduced
   - UptimeRobot monitor configured in P5.4 once production domain is live
 - [x] **P3.10** AWS Bedrock spend cap configured in AWS Billing console: budget `grant-pathway-bedrock-cap` created ($127 / ~£100); Alert #1 at $89 (~£70), Alert #2 at $127 (~£100); both alerts email mailinglist@rapidglobe.com; health status confirmed OK
   - ⚠️ Budget is scoped to All AWS services (not Bedrock-only) — Bedrock does not yet appear in the service filter as it has no billing history. Edit the budget scope to filter to Bedrock only once the first Bedrock invoice is generated.
