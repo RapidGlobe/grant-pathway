@@ -768,6 +768,38 @@ Write `supabase/seed.sql` with realistic sample data:
 
 Confirm `supabase db reset` loads the seed data and the app boots locally.
 
+### P3.11 — Health Endpoint
+
+Build the `/api/health` endpoint required by ADR-OPS-007. The endpoint provides a richer liveness signal than the homepage — it confirms both application availability and database connectivity, and is the URL that UptimeRobot (configured in P5.4) will poll every 5 minutes.
+
+**1. Create `app/api/health/route.ts`**
+
+```typescript
+import { createClient } from '@/lib/supabase/server'
+import { NextResponse } from 'next/server'
+
+export async function GET() {
+  try {
+    const supabase = await createClient()
+    await supabase.from('user_profiles').select('count').limit(1)
+    return NextResponse.json({ status: 'ok' }, { status: 200 })
+  } catch {
+    return NextResponse.json({ status: 'error' }, { status: 503 })
+  }
+}
+```
+
+- Returns `200 OK` when the app is running and the Supabase database is reachable.
+- Returns `503 Service Unavailable` if the database query fails.
+- No authentication required — returns no user data.
+- Note: the ADR code sample queries `profiles`; the correct table name in this project is `user_profiles`.
+
+**2. Add `/api/health` to the public routes matcher in `proxy.ts`**
+
+The endpoint must be reachable without a session or UptimeRobot's requests will be redirected to the sign-in page and treated as failures.
+
+**3. UptimeRobot monitor** — configured in P5.4 (pre-launch infrastructure), once the production domain is live.
+
 ---
 
 ## Phase 4 — Vertical Slices

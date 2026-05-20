@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (Phase 3 compliance review — word_limit migration applied)
+**Last updated:** 2026-05-20 (Phase 3 compliance review — P3.11 health endpoint added)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,7 +40,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **10** | **10** | ✅ Complete |
+| **Phase 3 — Infrastructure Setup** | **11** | **10** | ⚠️ 1 task added |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 1 | ✅ Complete |
@@ -51,6 +51,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.8 — Resend email sending | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.9 — Seed data | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 0 | Not started |
 | **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 0 | Not started |
@@ -104,7 +105,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **76** | **24** | |
+| **Total** | **77** | **24** | |
 
 ---
 
@@ -261,6 +262,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - Application 3 (d0000000-...003): Lloyds Bank Foundation / Invest Programme 2025, approved, step 5, 3 answers (2 user_edited + 1 ai_generated, all approved), last_exported_at set
   - 3 ai_usage_log entries; all UUIDs fixed (a/b/c/d/e0000000-...) for reproducibility
   - ⚠️ Run `supabase db reset` locally to apply seed; seed is local-only (never run against production)
+- [ ] **P3.11** Health endpoint: `app/api/health/route.ts` returns 200/503 based on Supabase connectivity; `/api/health` added to public routes matcher in `proxy.ts` (ADR-OPS-007)
+  - UptimeRobot monitor configured in P5.4 once production domain is live
 - [x] **P3.10** AWS Bedrock spend cap configured in AWS Billing console: budget `grant-pathway-bedrock-cap` created ($127 / ~£100); Alert #1 at $89 (~£70), Alert #2 at $127 (~£100); both alerts email mailinglist@rapidglobe.com; health status confirmed OK
   - ⚠️ Budget is scoped to All AWS services (not Bedrock-only) — Bedrock does not yet appear in the service filter as it has no billing history. Edit the budget scope to filter to Bedrock only once the first Bedrock invoice is generated.
   - ⚠️ No automated hard-stop action attached to Alert #2 — requires IAM role setup. Flagged for P5.4 (production infrastructure) before launch. The per-user 20 req/month app-level limit remains the primary cost control.
@@ -356,6 +359,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | 2026-05-07 | Plan updated to v1.4 following review against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006. Three additional discrepancies documented (D20–D22). Corrections: hard 150k character truncation removed (soft warning only per PDR-AI-004); Try again button added to Charity Commission unavailable state; persistent AI failure state added to Steps 3 and 4. No new tasks — total remains 76. All 17 PRD decisions now verified. |
 | 2026-05-07 | Plan updated to v1.5 following full review of all 42 ADRs and technical-design.md. Eight additional discrepancies documented (D23–D30). Key corrections: large-document threshold unit conflict documented; responsive strategy reconciled (desktop-first + 320px min); explicit protected routes list added to P3.4 (plural /applications/:path*); inactivity deletion authority note added; AI usage count display added to dashboard (P1.6, Slice 2); ADR-SEC-006 incomplete note added to P3.2; user_profiles schema authority documented. No new tasks — total remains 76. All 42 ADRs now verified. |
 | 2026-05-20 | **Phase 3 complete. P3.10 complete.** AWS Budget `grant-pathway-bedrock-cap` created ($127/~£100). Two email alerts: $89 (~£70 warning) and $127 (~£100 cap). Scoped to All AWS services for now — narrow to Bedrock once first Bedrock invoice generated. No automated hard-stop action attached (IAM role setup deferred to P5.4 pre-launch). |
+| 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
 | 2026-05-08 | **Phase 0 implementation started.** Next.js 16.2.5 scaffold created (Turbopack, React 19, Tailwind v4). Key deviations from plan: (1) Tailwind v4 has no `tailwind.config.ts` — design tokens added via `@theme inline` in `globals.css` instead. (2) Next.js 16 deprecates `middleware.ts` in favour of `proxy.ts` with `export function proxy()` — plan's middleware stub updated accordingly. (3) shadcn `toast` component deprecated — replaced with `sonner`. (4) shadcn `form` component not available in shadcn 4.7.0 registry — to be created manually in Phase 1 using react-hook-form directly. P0.2–P0.5 complete; P0.6 pending GitHub push and Vercel link (manual steps for owner). |
