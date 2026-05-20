@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-20 — Phase 0–3 Re-audit: Supabase Session Cookie Bug Fixed (proxy.ts)
+
+**What changed:**
+- `proxy.ts` updated to forward refreshed Supabase session cookies on redirect responses.
+- A `redirectWithCookies()` helper function introduced — called in both redirect branches (unauthenticated user → sign-in page; authenticated user → dashboard).
+
+**Why:**
+Both redirect branches previously returned a bare `NextResponse.redirect(url)` without carrying the session cookies from `supabaseResponse`. The Supabase SSR documentation explicitly warns that failing to forward these cookies on every response — including redirects — prevents the session token from being refreshed. This could cause spurious logouts for users navigating to or from protected routes. Found during a full Phase 0–3 compliance re-audit (finding D-27).
+
+---
+
 ## 2026-05-20 — Phase 3 Compliance Review: word_limit Migration Applied
 
 **What changed:**

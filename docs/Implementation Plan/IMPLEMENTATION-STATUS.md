@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (Phase 3 compliance review — P3.11 health endpoint added)
+**Last updated:** 2026-05-20 (Phase 0–3 re-audit — D-27 session cookie bug fixed)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -224,6 +224,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `client.ts` — `createBrowserClient` for Client Components
   - `middleware.ts` — `updateSession()` helper; refreshes session token and returns user; consumed by proxy.ts (P3.4)
 - [x] **P3.4** Real auth middleware in place: route protection, session refresh, redirect rules, matcher configured
+  - ✅ Session cookie forwarding fixed 2026-05-20 — redirect responses now carry refreshed Supabase session cookies via `redirectWithCookies()` helper; bare `NextResponse.redirect()` would have caused spurious logouts (D-27, Phase 0–3 re-audit)
   - Unauthenticated → protected route: redirects to `/`
   - Authenticated → auth-only route (`/`, `/register`, `/verify-email`, `/forgot-password`): redirects to `/dashboard`
   - Protected routes: `/dashboard`, `/profile`, `/applications/:path*`, `/account/:path*` (D1 plural resolution)
