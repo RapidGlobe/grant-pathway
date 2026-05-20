@@ -362,6 +362,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ## Phase 5 — Pre-Launch
 
 - [ ] **P5.1** Compliance: AWS DPA review confirmed; Terms of Service published; Privacy Policy published (BRD items 44–46)
+  - ⚠️ **Action during Phase 4 (noted 2026-05-20):** Both documents should be drafted during Phase 4, not left until P5.1 begins — UI copy in Phase 4 slices may reference commitments made in these documents. Claude can produce initial drafts from the ADRs and BRD. A solicitor should review before publication, particularly the Privacy Policy (UK GDPR). Ask when ready.
 - [ ] **P5.2** Security: OWASP Top 10 review complete; securityheaders.com score A or above; no secrets in repository
 - [ ] **P5.3** Accessibility: axe-core violations resolved; Lighthouse 95+ on all key pages; keyboard navigation test passed; NVDA + Chrome screen reader test passed; WCAG 2.2 AA checklist complete
 - [ ] **P5.4** Production infrastructure: Vercel Pro active; `maxDuration = 90` on AI routes confirmed; all production env vars set; migrations applied to production Supabase; Sentry production configured; Resend domain verified; email templates confirmed

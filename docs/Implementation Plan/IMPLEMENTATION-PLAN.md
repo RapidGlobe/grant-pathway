@@ -1248,11 +1248,14 @@ Checklist:
 
 ### P5.1 — Compliance (BRD Section 14)
 
+> **⚠️ Ahead-of-time action required (noted 2026-05-20):** The Privacy Policy and Terms of Service documents should be drafted *during Phase 4*, not left until P5.1 begins. Both documents contain commitments (data retention, funder relationships, AI disclaimers) that may influence UI copy written in Phase 4 slices. Claude can produce initial drafts based on the ADRs, BRD, and product requirements — ask when ready. A solicitor should review both documents before publication, particularly the Privacy Policy (UK GDPR compliance).
+
 | Item | Action | BRD ref |
 |------|--------|---------|
 | AWS DPA review | Confirm the AWS Data Processing Addendum covers the Bedrock use case and satisfies UK GDPR | Item 44 |
-| Terms of Service | Draft and publish before launch. Must state: (1) does not guarantee funding, (2) does not submit applications, (3) makes no representations to funders | Item 45 |
-| Privacy Policy | Draft and publish before launch. Must cover: data collected, Supabase London storage, Vercel edge network, Bedrock eu-west-2 with EU/EEA Geo fallback, no AI training commitment, user rights, retention | Item 46 |
+| Terms of Service | Draft and publish before launch. Must state: (1) does not guarantee funding, (2) does not submit applications, (3) makes no representations to funders. **Draft during Phase 4.** | Item 45 |
+| Privacy Policy | Draft and publish before launch. Must cover: data collected, Supabase London storage, Vercel edge network, Bedrock eu-west-2 with EU/EEA Geo fallback, no AI training commitment, user rights, retention period. **Draft during Phase 4. Requires solicitor review before publication.** | Item 46 |
+| Dependency licence review | Audit all npm dependencies for licence compatibility (GAP-20) | — |
 
 ### P5.2 — Security
 
