@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/bedrock-sdk": "^0.29.2",
-    "@anthropic-ai/sdk": "^0.97.0",
+    "@anthropic-ai/sdk": "^0.97.1",
     "@base-ui/react": "^1.4.1",
     "@sentry/nextjs": "^10.53.1",
     "@supabase/ssr": "^0.10.3",
