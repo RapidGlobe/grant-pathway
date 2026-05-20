@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-20 — P3.11: Health Endpoint and Public API Bypass Pattern (ADR-OPS-007)
+
+**What changed:**
+- `app/api/health/route.ts` created: queries `user_profiles` count; returns `{ status: 'ok' }` 200 on success, `{ status: 'error' }` 503 if Supabase is unreachable. Required by ADR-OPS-007 for UptimeRobot monitoring (to be configured in P5.4).
+- `proxy.ts` extended with a `PUBLIC_API = ['/api/health']` list. Any route in this list short-circuits before `updateSession()` is called, returning `NextResponse.next()` immediately.
+
+**Why:**
+ADR-OPS-007 requires a health check endpoint polled by UptimeRobot every 5 minutes. The endpoint must be reachable without an authenticated session. Rather than relying on the route falling through the auth checks (which would still invoke `updateSession()` and incur Supabase SSR overhead), an explicit `PUBLIC_API` early-return was introduced. This establishes a pattern for any future routes that must be public at the infrastructure level — add them to `PUBLIC_API` rather than letting them leak through the auth logic. UptimeRobot monitor configuration deferred to P5.4 when the production domain is confirmed.
+
+---
+
 ## 2026-05-20 — Documentation Restructure: CHANGELOG moved to Implementation Plan folder
 
 **What changed:**
