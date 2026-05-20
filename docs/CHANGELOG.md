@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-05-20 — Phase 3 Compliance Review: High Severity Fixes Applied
+
+**What changed:**
+
+1. **CSP Sentry EU ingest domain added** (`next.config.ts`)
+   - `connect-src` directive updated to include `https://*.ingest.de.sentry.io`.
+   - Without this, the Sentry browser SDK was silently blocked and no client-side errors were being reported. The omission occurred because P3.5 (security headers) and P3.7 (Sentry setup) were completed independently with no cross-referencing of the CSP against the SDK's required domains.
+
+2. **Sentry edge config PII scrubbing added** (`sentry.edge.config.ts`)
+   - `beforeSend` hook added — strips `event.user.email` and `event.user.username` before transmission to Sentry.
+   - `sentry.client.config.ts` and `sentry.server.config.ts` already had this hook (ADR-SEC-006); the edge config was overlooked. GDPR risk: without this, user email addresses could be included in Sentry reports for middleware-layer errors.
+
+3. **Security-critical dependency updates**
+   - `next` 16.2.5 → 16.2.6: fixes CVE-2026-44575 (High) — middleware/proxy bypass via segment-prefetch routes with Turbopack enabled.
+   - `@tailwindcss/postcss` 4.2.4 → 4.3.0: resolves PostCSS XSS vulnerability (Medium).
+   - `@anthropic-ai/sdk` 0.97.0 → 0.97.1: routine patch.
+   - `tailwind-merge` 3.5.0 → 3.6.0: routine patch.
+   - `lucide-react` updated via Dependabot PR #1 (merged).
+   - Dependabot PRs #2–5 closed and consolidated into a single batch install to avoid `package-lock.json` conflicts.
+
+**Why:**
+Phase 3 compliance review against ADRs, TDD, and PRD identified 8 discrepancies. These 2 High severity items were fixed immediately. 6 Medium/Low items remain (schema migration, docs updates, health endpoint, ADR correction) — to be addressed before Phase 4 begins.
+
+---
+
 ## 2026-05-20 — Phase 3 Complete: AWS Bedrock Spend Cap Configured
 
 **What changed:**

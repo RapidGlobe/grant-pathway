@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (P3.10 complete — Phase 3 complete)
+**Last updated:** 2026-05-20 (Phase 3 compliance review — High severity fixes applied)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -232,13 +232,15 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - Referrer-Policy: strict-origin-when-cross-origin
   - Permissions-Policy: camera=(), microphone=(), geolocation=()
   - Strict-Transport-Security: max-age=31536000; includeSubDomains
-  - Content-Security-Policy: default-src self; connect-src allows *.supabase.co
+  - Content-Security-Policy: default-src self; connect-src allows *.supabase.co and Sentry EU ingest (*.ingest.de.sentry.io)
   - ⚠️ CSP to be tightened after first production deploy — validate at securityheaders.com (P5.2)
+  - ✅ CSP `connect-src` updated 2026-05-20 to include Sentry EU ingest — omission found in Phase 3 compliance review
 - [x] **P3.6** Upstash Redis configured; `lib/rate-limit.ts` created (5 req / 60 sec / user for both AI routes)
   - `aiRatelimit` sliding window limiter exported from `lib/rate-limit.ts`; consumed by generate-summary and generate-draft routes in Phase 4
   - UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN set in `.env.local` and Vercel (Production + Preview)
 - [x] **P3.7** Sentry (EU region) configured; `beforeSend` PII scrubbing in place; new-error-type alerts configured
   - `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` — PII scrubbing (email, username stripped before send)
+  - ✅ `sentry.edge.config.ts` `beforeSend` hook added 2026-05-20 — omission found in Phase 3 compliance review (GDPR risk: middleware-layer user emails could have been included in Sentry reports)
   - `instrumentation.ts` — loads server/edge Sentry config at runtime
   - `next.config.ts` — wrapped with `withSentryConfig` for source map uploads
   - Sentry project: `grant-pathway` (EU region, org: rapidglobe-ltd)
@@ -353,5 +355,6 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | 2026-05-07 | Plan updated to v1.4 following review against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006. Three additional discrepancies documented (D20–D22). Corrections: hard 150k character truncation removed (soft warning only per PDR-AI-004); Try again button added to Charity Commission unavailable state; persistent AI failure state added to Steps 3 and 4. No new tasks — total remains 76. All 17 PRD decisions now verified. |
 | 2026-05-07 | Plan updated to v1.5 following full review of all 42 ADRs and technical-design.md. Eight additional discrepancies documented (D23–D30). Key corrections: large-document threshold unit conflict documented; responsive strategy reconciled (desktop-first + 320px min); explicit protected routes list added to P3.4 (plural /applications/:path*); inactivity deletion authority note added; AI usage count display added to dashboard (P1.6, Slice 2); ADR-SEC-006 incomplete note added to P3.2; user_profiles schema authority documented. No new tasks — total remains 76. All 42 ADRs now verified. |
 | 2026-05-20 | **Phase 3 complete. P3.10 complete.** AWS Budget `grant-pathway-bedrock-cap` created ($127/~£100). Two email alerts: $89 (~£70 warning) and $127 (~£100 cap). Scoped to All AWS services for now — narrow to Bedrock once first Bedrock invoice generated. No automated hard-stop action attached (IAM role setup deferred to P5.4 pre-launch). |
+| 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
 | 2026-05-08 | **Phase 0 implementation started.** Next.js 16.2.5 scaffold created (Turbopack, React 19, Tailwind v4). Key deviations from plan: (1) Tailwind v4 has no `tailwind.config.ts` — design tokens added via `@theme inline` in `globals.css` instead. (2) Next.js 16 deprecates `middleware.ts` in favour of `proxy.ts` with `export function proxy()` — plan's middleware stub updated accordingly. (3) shadcn `toast` component deprecated — replaced with `sonner`. (4) shadcn `form` component not available in shadcn 4.7.0 registry — to be created manually in Phase 1 using react-hook-form directly. P0.2–P0.5 complete; P0.6 pending GitHub push and Vercel link (manual steps for owner). |
