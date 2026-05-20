@@ -33,6 +33,23 @@ Before starting any implementation task:
 **Why this rule exists:** Implementation tasks are written feature-first ("what does the app need to run?"). ADR consequences are spec-first ("what does the architecture require?"). Without an explicit check, the gap between the two is invisible until something breaks or a compliance review finds it after the fact.
 <!-- END:adr-consequences-rules -->
 
+<!-- BEGIN:implementation-docs-rules -->
+# Implementation Plan folder — update all relevant docs after every change
+
+All implementation documentation lives in `docs/Implementation Plan/`. After completing any task, check each of the four documents in that folder and update as appropriate:
+
+| Document | Update when |
+|----------|-------------|
+| `IMPLEMENTATION-STATUS.md` | After every task — mark complete `[x]`, update summary table counts, update **Last updated** date, add a Notes entry for any deviation or significant decision |
+| `CHANGELOG.md` | Any significant design decision, deviation from the original plan, or architectural change that a team member would need context for |
+| `ADR-TRACEABILITY.md` | When a GAP item is resolved — update the Task column and change status from ⚠️ to ✅; also update the phase gate sign-off table when a gate is passed |
+| `IMPLEMENTATION-PLAN.md` | When the approach for a future task changes during implementation — update the task spec so it reflects current intent |
+
+**The rule:** One folder, one check. After any task, open `docs/Implementation Plan/` mentally and ask: does each of these four documents reflect what just happened? If not, update before committing.
+
+**Why this matters for a team:** Teammates and future AI sessions rely on these documents to understand the current state of the project. An update missed here means someone works from stale information. The changelog in particular captures *why* decisions were made — that context is lost if it is not recorded at the time.
+<!-- END:implementation-docs-rules -->
+
 <!-- BEGIN:github-commit-rules -->
 # GitHub — Always commit and push after changes
 

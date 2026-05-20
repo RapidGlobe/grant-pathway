@@ -6,6 +6,33 @@
 
 ---
 
+## 2026-05-20 — Documentation Restructure: CHANGELOG moved to Implementation Plan folder
+
+**What changed:**
+- `docs/CHANGELOG.md` moved to `docs/Implementation Plan/CHANGELOG.md`.
+- All four implementation documents now live in one folder: `IMPLEMENTATION-STATUS.md`, `CHANGELOG.md`, `IMPLEMENTATION-PLAN.md`, `ADR-TRACEABILITY.md`.
+- `AGENTS.md` updated with a blanket rule: after every task, check all four documents in `docs/Implementation Plan/` and update as appropriate.
+
+**Why:**
+The changelog was previously in `docs/` root while the other implementation documents were in `docs/Implementation Plan/`. This made it easy to forget to update — there was no single rule that covered all relevant documents. Co-locating them means one folder, one check, one rule. Appropriate for a team project where multiple contributors need reliable, up-to-date documentation.
+
+---
+
+## 2026-05-20 — Process: ADR Traceability Table, Phase Gates, and Gap Resolutions
+
+**What changed:**
+- `docs/Implementation Plan/ADR-TRACEABILITY.md` created — maps every consequence of all 42 ADRs to a specific implementation task. 20 gaps identified (GAP-01 to GAP-20).
+- `P3.12` added to Phase 3: 7 High/Medium gap resolutions required before Phase 4 begins.
+- Formal Phase 3→4 and Phase 4→5 gate checklists added to the implementation plan.
+- Accessibility definition-of-done added to the Phase 4 introduction (ADR-OPS-006).
+- `AGENTS.md` updated with mandatory ADR consequences pre-task check rule.
+- Plan version 1.6. Total tasks: 78.
+
+**Why:**
+Full ADR consequences sweep found that 20 ADR consequences had no corresponding implementation task. Root cause: tasks were written feature-first; ADR consequences are spec-first. The traceability table makes gaps permanently visible. Phase gates make the sweep a formal required step before each phase begins rather than an ad-hoc activity. Three layers of control: AGENTS.md rule (pre-task), traceability table (ongoing visibility), phase gates (phase-boundary enforcement).
+
+---
+
 ## 2026-05-20 — Phase 0–3 Re-audit: Supabase Session Cookie Bug Fixed (proxy.ts)
 
 **What changed:**
