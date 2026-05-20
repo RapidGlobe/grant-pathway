@@ -1069,7 +1069,7 @@ export const maxDuration = 90;
 - Read `guidelines_text` from POST body
 - Fetch charity profile from Supabase
 - Call `buildSummaryPrompt()` → Bedrock Claude
-- On success: save summary to `applications.ai_summary`; insert row into `ai_usage_log`; return summary and extracted questions to client
+- On success: save summary to `applications.ai_summary`; insert row into `ai_usage_log`; return summary and extracted questions to client; client calls `clearGuidelines(applicationId)` from `lib/guidelines-session.ts` to remove extracted text from sessionStorage (GAP-10, ADR-FILE-004)
 - Error handling via `lib/ai-error-handler.ts` (retries: 2× for 429/500/529 with 1s/3s delays; no retry for 400/auth)
 - First failure: "We couldn't generate your summary right now. This is usually temporary — please try again." + **Try again** button
 - Persistent failure (retry also fails): "If this keeps happening, please try again later. Your work has been saved." (PDR-UI-006)

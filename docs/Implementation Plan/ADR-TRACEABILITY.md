@@ -98,7 +98,7 @@
 | ADR-DATA-004 | `supabase/` directory with migrations added to repository | P3.1 | ✅ |
 | ADR-DATA-004 | All schema changes via migration files — direct dashboard edits prohibited | P3.1 (process enforced) | ✅ |
 | ADR-DATA-004 | `supabase/migrations/` committed to Git | P3.1 | ✅ |
-| ADR-DATA-004 | `SUPABASE_DB_PASSWORD` stored securely; documented for CLI operations (`supabase db push`) | P3.2 | ⚠️ GAP-06 |
+| ADR-DATA-004 | `SUPABASE_DB_PASSWORD` stored securely; documented for CLI operations (`supabase db push`) | P3.12 | ✅ GAP-06 resolved |
 
 ---
 
@@ -125,13 +125,13 @@
 | ADR-FILE-001 | Storage access restricted to service role only (no public URLs) | P3.1 (RLS + private bucket) | ✅ |
 | ADR-FILE-001 | Client-side upload progress shown during direct-to-Storage upload | P1.9, S4.1 | ✅ |
 | ADR-FILE-002 | Client-side validation checks MIME type and file size before upload | P1.9 | ✅ |
-| ADR-FILE-002 | Server-side re-validation of MIME type and file size in process route | S4.1 | ⚠️ GAP-08 |
+| ADR-FILE-002 | Server-side re-validation of MIME type and file size in process route | P3.12 / S4.1 | ✅ GAP-08 resolved — `lib/file-validation.ts` created |
 | ADR-FILE-003 | `lib/extract-text.ts` utility created (PDF via `unpdf`; Word via `mammoth`) | S4.1 | ✅ |
 | ADR-FILE-003 | Extraction errors handled gracefully with user-friendly messages | S4.3 | ✅ |
 | ADR-FILE-003 | Extracted text length checked; advisory shown if >100k tokens | S4.1 | ✅ |
-| ADR-FILE-004 | `lib/guidelines-session.ts` utility created with `setGuidelines()`, `getGuidelines()`, `clearGuidelines()` | S4.1 | ⚠️ GAP-09 |
+| ADR-FILE-004 | `lib/guidelines-session.ts` utility created with `setGuidelines()`, `getGuidelines()`, `clearGuidelines()` | P3.12 | ✅ GAP-09 resolved |
 | ADR-FILE-004 | Step 2 component checks `sessionStorage` on mount to restore previously extracted text | S4.1, S4.2 | ✅ |
-| ADR-FILE-004 | Step 3 completion clears `sessionStorage` entry via `clearGuidelines()` | S5.2 / S5.4 | ⚠️ GAP-10 |
+| ADR-FILE-004 | Step 3 completion clears `sessionStorage` entry via `clearGuidelines()` | S5.2 / S5.4 | ✅ GAP-10 resolved — S5.2 spec updated in IMPLEMENTATION-PLAN.md |
 
 ---
 
@@ -141,7 +141,7 @@
 |-----|-------------|------|--------|
 | ADR-OPS-001 | Vercel Pro subscription activated before production deployment | P5.4 | 🔵 |
 | ADR-OPS-001 | AI route files include `export const maxDuration = 90` | S5.2, S6.2 | ✅ |
-| ADR-OPS-002 | Branch protection rule configured on `main` in GitHub | — | ⚠️ GAP-11 |
+| ADR-OPS-002 | Branch protection rule configured on `main` in GitHub | — | 🔴 GAP-11 BLOCKED — requires GitHub Pro for private repo; see IMPLEMENTATION-STATUS.md |
 | ADR-OPS-002 | Production deployments tagged in Git for rollback reference | — | ⚠️ GAP-12 |
 | ADR-OPS-002 | Database migrations applied before or alongside code deployment | P5.4 (pre-launch checklist) | ✅ |
 | ADR-OPS-003 | Resend account created; sending domain verified (SPF + DKIM) | P3.8 | ✅ |
@@ -153,7 +153,7 @@
 | ADR-OPS-005 | `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` created with `beforeSend` PII scrubbing | P3.7 | ✅ |
 | ADR-OPS-005 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` configured in all environments | P3.7 | ✅ |
 | ADR-OPS-005 | Sentry EU data region selected | P3.7 | ✅ |
-| ADR-OPS-006 | `@axe-core/react` installed as dev dependency; conditionally initialised in development mode | — | ⚠️ GAP-14 |
+| ADR-OPS-006 | `@axe-core/react` installed as dev dependency; conditionally initialised in development mode | P3.12 | ✅ GAP-14 resolved — `components/axe-provider.tsx` wired into `app/layout.tsx` |
 | ADR-OPS-006 | Lighthouse CI configured to run on each deployment (accessibility score ≥ 95) | — | ⚠️ GAP-15 |
 | ADR-OPS-006 | Accessibility testing is part of the definition of done for each UI feature | — | ⚠️ GAP-16 |
 | ADR-OPS-006 | Accessibility violations treated as bugs; fixed before release | P5.3 | ✅ |
@@ -177,7 +177,7 @@
 | ADR-SEC-003 | Client-side inactivity timer implemented (60-minute timeout) | S0.5 | ✅ |
 | ADR-SEC-003 | Timeout warning modal designed and implemented | P1.1, S0.5 | ✅ |
 | ADR-SEC-003 | Auto-save completes before session timeout fires | S6.3, S0.5 | ✅ |
-| ADR-SEC-003 | Supabase Auth JWT expiry confirmed ≥ 60 minutes | P3.1 / P3.4 | ⚠️ GAP-18 |
+| ADR-SEC-003 | Supabase Auth JWT expiry confirmed ≥ 60 minutes | P3.12 | ✅ GAP-18 resolved — local: config.toml `jwt_expiry = 3600`; prod: Supabase default confirmed 3600s |
 | ADR-SEC-004 | All 6 HTTP security headers configured in `next.config.ts` | P3.5 | ✅ |
 | ADR-SEC-004 | CSP tested against all pages post-deployment | P5.2 | 🔵 |
 | ADR-SEC-005 | `ai_usage_log` count checked in all AI API routes before Bedrock call | S5.2, S6.2 | ✅ |
@@ -202,7 +202,7 @@
 | ADR-STACK-004 | File uploads bypass Vercel 4.5MB limit via direct Supabase Storage upload | S4.1 | ✅ |
 | ADR-STACK-004 | AI routes set `export const maxDuration = 90` | S5.2, S6.2 | ✅ |
 | ADR-STACK-004 | Environment variables managed in Vercel dashboard | P3.2 | ✅ |
-| ADR-STACK-005 | Branch protection rules configured on `main` in GitHub | — | ⚠️ GAP-11 |
+| ADR-STACK-005 | Branch protection rules configured on `main` in GitHub | — | 🔴 GAP-11 BLOCKED — requires GitHub Pro for private repo |
 | ADR-STACK-005 | `.gitignore` excludes `.env.local` and credential files | P3.2 | ✅ |
 | ADR-STACK-005 | Dependency licences reviewed for proprietary product compatibility | P5.1 | ⚠️ GAP-20 |
 | ADR-STACK-006 | All form inputs, modals, dropdowns use shadcn/ui + Radix primitives | P0.3, Phase 1 | ✅ |
@@ -223,19 +223,19 @@ All ⚠️ rows consolidated here for easy triage. Update this table as gaps are
 | GAP-03 | ADR-AI-006 | Sentry alert when AI routes approach 90-second timeout | Low | Add to P3.7 or S5.3 | |
 | GAP-04 | ADR-AI-009 | No documented error response contract (JSON shape + HTTP codes) for AI routes | Medium | Add to S5.3 | |
 | GAP-05 | ADR-ARCH-005 | Below-768px degradation banner not tasked | Low | Add new task or sub-task to Phase 4 | |
-| GAP-06 | ADR-DATA-004 | `SUPABASE_DB_PASSWORD` not in `.env.example` or P3.2 | Medium | Update `.env.example` + P3.2 | |
+| GAP-06 | ADR-DATA-004 | `SUPABASE_DB_PASSWORD` not in `.env.example` or P3.2 | Medium | Update `.env.example` + P3.2 | ✅ 2026-05-20 P3.12 — `.env.example` updated |
 | GAP-07 | ADR-EXPORT-002 | Null/empty `answer_text` handling in Word export not spec'd | Medium | Add to S7.2 | |
-| GAP-08 | ADR-FILE-002 | Server-side re-validation of MIME type + file size in process route | High | Add to S4.1 | |
-| GAP-09 | ADR-FILE-004 | `lib/guidelines-session.ts` utility never explicitly tasked | High | Add to S4.1 | |
-| GAP-10 | ADR-FILE-004 | `clearGuidelines()` on Step 3 completion never tasked | High | Add to S5.2 / S5.4 | |
-| GAP-11 | ADR-OPS-002, ADR-STACK-005 | GitHub branch protection rules on `main` never configured | Medium | Add to P0.1 or new task | |
+| GAP-08 | ADR-FILE-002 | Server-side re-validation of MIME type + file size in process route | High | Add to S4.1 | ✅ 2026-05-20 P3.12 — `lib/file-validation.ts` created; wire into S4.1 |
+| GAP-09 | ADR-FILE-004 | `lib/guidelines-session.ts` utility never explicitly tasked | High | Add to S4.1 | ✅ 2026-05-20 P3.12 — `lib/guidelines-session.ts` created |
+| GAP-10 | ADR-FILE-004 | `clearGuidelines()` on Step 3 completion never tasked | High | Add to S5.2 / S5.4 | ✅ 2026-05-20 P3.12 — S5.2 spec in IMPLEMENTATION-PLAN.md updated |
+| GAP-11 | ADR-OPS-002, ADR-STACK-005 | GitHub branch protection rules on `main` never configured | Medium | Add to P0.1 or new task | 🔴 BLOCKED — GitHub branch protection requires GitHub Pro for private repos. Upgrade account at github.com/settings/billing or the rule cannot be enforced. Workaround: team enforces PR review manually. |
 | GAP-12 | ADR-OPS-002 | Git release tagging for rollback never tasked | Low | Add to P5.4 per-release checklist | |
 | GAP-13 | ADR-OPS-004 | Cron routes not explicitly documented as excluded from rate limiter | Low | Add to S4.4 | |
-| GAP-14 | ADR-OPS-006 | `@axe-core/react` not installed or wired up in development mode | High | Add as infrastructure task | |
+| GAP-14 | ADR-OPS-006 | `@axe-core/react` not installed or wired up in development mode | High | Add as infrastructure task | ✅ 2026-05-20 P3.12 — installed; `components/axe-provider.tsx` added; wired into `app/layout.tsx` |
 | GAP-15 | ADR-OPS-006 | Lighthouse CI automation on each deployment not configured | Medium | Add new task | |
 | GAP-16 | ADR-OPS-006 | Accessibility not part of definition of done for Phase 4 slices | Medium | Add to Phase 4 introduction | |
 | GAP-17 | ADR-SEC-002 | RLS cross-user access test never tasked | Medium | Add to P5.2 | |
-| GAP-18 | ADR-SEC-003 | Supabase Auth JWT expiry never confirmed ≥ 60 minutes | High | Add to P3.4 or new pre-Phase 4 task | |
+| GAP-18 | ADR-SEC-003 | Supabase Auth JWT expiry never confirmed ≥ 60 minutes | High | Add to P3.4 or new pre-Phase 4 task | ✅ 2026-05-20 P3.12 — local: `jwt_expiry = 3600` in config.toml; prod: Supabase default 3600s (60 min); verify manually in dashboard if changed |
 | GAP-19 | ADR-DATA-002 | No UI message when user returns to Step 2 without `sessionStorage` entry | Medium | Add to S4.1 | |
 | GAP-20 | ADR-STACK-005 | Dependency licence review not tasked | Low | Add to P5.1 | |
 

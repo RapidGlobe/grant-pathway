@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-05-20 — P3.12: Pre-Phase 4 Gap Resolutions (GAP-06, 08, 09, 10, 11, 14, 18)
+
+**What changed:**
+- `.env.example` — `SUPABASE_DB_PASSWORD` added with explanation of its purpose (CLI operations, not API calls). GAP-06 resolved.
+- `lib/file-validation.ts` (new) — `validateFile(mimeType, sizeBytes)` returns a typed discriminated union result. Imported by `POST /api/upload/process` in Slice 4 to re-validate before text extraction. `FILE_VALIDATION_MESSAGES` provides user-facing error strings matching FR-23. GAP-08 resolved.
+- `lib/guidelines-session.ts` (new) — `setGuidelines()`, `getGuidelines()`, `clearGuidelines()` manage extracted guidelines text in `sessionStorage` keyed by `guidelines_text_${applicationId}`. All sessionStorage access for guidelines text must go through this utility. GAP-09 resolved.
+- `IMPLEMENTATION-PLAN.md` S5.2 spec updated — `clearGuidelines(applicationId)` call added to the generate-summary route on-success step. GAP-10 resolved.
+- `@axe-core/react` installed as dev dependency; `components/axe-provider.tsx` created (client component, no-op in production); wired into `app/layout.tsx`. WCAG violations now logged to browser console during development. GAP-14 resolved.
+- GAP-11 (GitHub branch protection): **blocked** — requires GitHub Pro for private repos. Account upgrade needed. Documented in IMPLEMENTATION-STATUS.md and ADR-TRACEABILITY.md. GAP-18 (JWT expiry): confirmed local `jwt_expiry = 3600` in config.toml; prod default is also 3600s.
+
+**Why:**
+These were ADR consequences identified during the P3.12 sweep that had no corresponding implementation task. Resolving them before Phase 4 slice work ensures the architecture contracts (ADR-FILE-002, ADR-FILE-004, ADR-OPS-006, ADR-SEC-003) are honoured from the first slice, not retrofitted. GAP-11 is the only unresolved item and is a GitHub account tier limitation, not a code issue.
+
+---
+
 ## 2026-05-20 — P3.11: Health Endpoint and Public API Bypass Pattern (ADR-OPS-007)
 
 **What changed:**

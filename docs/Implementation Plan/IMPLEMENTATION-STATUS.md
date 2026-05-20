@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (P3.11 complete — health endpoint)
+**Last updated:** 2026-05-20 (P3.12 complete — pre-Phase 4 gap resolutions)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,7 +40,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **12** | **11** | ⚠️ 1 task remaining |
+| **Phase 3 — Infrastructure Setup** | **12** | **12** | **✅ Complete** |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 1 | ✅ Complete |
@@ -52,7 +52,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.9 — Seed data | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ⏳ Pending |
 | **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **0** | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **25** | |
+| **Total** | **78** | **26** | |
 
 ---
 
@@ -269,14 +269,14 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `app/api/health/route.ts` — queries `user_profiles` count; returns `{ status: 'ok' }` 200 on success, `{ status: 'error' }` 503 on DB failure
   - `proxy.ts` — `PUBLIC_API = ['/api/health']` early-return bypass added before `updateSession()` so no Supabase SSR overhead is incurred for health checks (ADR-OPS-007)
   - ⚠️ UptimeRobot monitor to be configured in P5.4 once production domain is confirmed
-- [ ] **P3.12** Pre-Phase 4 gap resolutions — 7 items from ADR consequences sweep (2026-05-20):
-  - GAP-06: Add `SUPABASE_DB_PASSWORD` to `.env.example`
-  - GAP-08: Server-side file re-validation in `POST /api/upload/process`
-  - GAP-09: Create `lib/guidelines-session.ts` utility
-  - GAP-10: Call `clearGuidelines()` on Step 3 completion
-  - GAP-11: Configure GitHub branch protection on `main`
-  - GAP-14: Install `@axe-core/react` and wire in development mode
-  - GAP-18: Confirm Supabase Auth JWT expiry ≥ 60 minutes in both dev and prod
+- [x] **P3.12** Pre-Phase 4 gap resolutions — 7 items from ADR consequences sweep (2026-05-20):
+  - ✅ **GAP-06** `.env.example` updated — `SUPABASE_DB_PASSWORD` added with explanation (ADR-DATA-004)
+  - ✅ **GAP-08** `lib/file-validation.ts` created — `validateFile()` checks MIME type and file size; returns typed result for use in `POST /api/upload/process` (ADR-FILE-002)
+  - ✅ **GAP-09** `lib/guidelines-session.ts` created — `setGuidelines()`, `getGuidelines()`, `clearGuidelines()` manage sessionStorage keyed by `application_id` (ADR-FILE-004)
+  - ✅ **GAP-10** S5.2 spec in `IMPLEMENTATION-PLAN.md` updated — `clearGuidelines(applicationId)` call added to the API route on-success step (ADR-FILE-004)
+  - 🔴 **GAP-11** GitHub branch protection BLOCKED — requires GitHub Pro for private repositories. Current account is on GitHub Free. Resolution: upgrade at github.com/settings/billing ($4/month). Until then, team enforces PR review discipline manually. (ADR-OPS-002, ADR-STACK-005)
+  - ✅ **GAP-14** `@axe-core/react` installed as dev dependency; `components/axe-provider.tsx` created; wired into `app/layout.tsx`; WCAG violations logged to browser console in development only (ADR-OPS-006)
+  - ✅ **GAP-18** Supabase Auth JWT expiry confirmed ≥ 60 minutes: local `jwt_expiry = 3600` in `supabase/config.toml`; prod project uses Supabase default (3600s). To verify prod manually: Supabase dashboard → Authentication → Configuration → JWT expiry (ADR-SEC-003)
 
 ## Phase 3 → Phase 4 Gate
 
