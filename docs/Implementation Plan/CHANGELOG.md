@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-05-20 — S0.1: Registration wired up
+
+**What changed:**
+- `supabase/migrations/20260520000001_handle_new_user_trigger.sql` (new) — `handle_new_user()` trigger (`SECURITY DEFINER SET search_path = ''`) on `auth.users` INSERT. Auto-creates a `user_profiles` row by reading `first_name`, `last_name`, and `feedback_consent` from `raw_user_meta_data`. Chosen over a service-role API call in the Server Action because the trigger is atomic with the user creation, cannot be skipped, and is the Supabase-recommended pattern for profile initialisation.
+- `actions/auth.ts` (new) — `registerUser` Server Action. Calls `supabase.auth.signUp()` with profile data in `options.data`. Detects duplicate email by checking `data.user.identities?.length === 0` (Supabase does not return an error for duplicate emails when email confirmation is enabled — privacy-preserving behaviour). Returns `{ error: 'email_exists' }` or `{ error: 'unknown' }` on failure; redirects to `/verify-email` on success.
+- `components/register-form.tsx` — wired from static shell to real Server Action using React 19 `useActionState`. Client-side validation runs first (`handleSubmit`): calls `e.preventDefault()` on field errors, does nothing on success (allowing `action={action}` to fire the Server Action). All inputs given `name` attributes for FormData. Submit button shows `disabled={isPending}` and "Creating account…" loading text. Two server-error banners: `email_exists` (with "Sign in instead?" link) and `unknown`.
+
+**Why:**
+Standard React 19 App Router pattern: `useActionState` binds the Server Action to the form; client validation guards against obviously invalid data without a round-trip; the database trigger keeps profile creation atomic.
+
+---
+
 ## 2026-05-20 — P3.12: Pre-Phase 4 Gap Resolutions (GAP-06, 08, 09, 10, 11, 14, 18)
 
 **What changed:**

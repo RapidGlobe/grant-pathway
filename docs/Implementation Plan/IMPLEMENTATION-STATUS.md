@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (P3.12 complete — pre-Phase 4 gap resolutions)
+**Last updated:** 2026-05-20 (S0.1 complete — Registration)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -53,10 +53,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
-| **Phase 3 → Phase 4 Gate** | — | — | ⏳ Pending |
-| **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
-| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 0 | Not started |
+| **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
+| **Phase 4 — Vertical Slices** | **36** | **1** | In progress |
+| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **1** | In progress |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 0 | Not started |
@@ -297,7 +297,11 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ### Slice 0 — Authentication
 
-- [ ] **S0.1** Registration wired up: form → `signUp()`; validation; verification email sent; redirect to `/verify-email`
+- [x] **S0.1** Registration wired up: form → `signUp()`; validation; verification email sent; redirect to `/verify-email`
+  - `actions/auth.ts` — `registerUser` Server Action using React 19 `useActionState`; calls `supabase.auth.signUp()`; passes `first_name`, `last_name`, `feedback_consent` via `options.data`
+  - Duplicate email detection: `data.user.identities?.length === 0` (Supabase privacy-preserving behaviour — no error returned for duplicate emails when confirmation is enabled)
+  - `supabase/migrations/20260520000001_handle_new_user_trigger.sql` — `handle_new_user()` trigger (`SECURITY DEFINER SET search_path = ''`) auto-creates `user_profiles` row on `auth.users` INSERT
+  - `components/register-form.tsx` — `useActionState(registerUser, { error: null })`; client-side validation blocks Server Action on field errors; `action={action}` fires Server Action when validation passes; all inputs have `name` attributes for FormData; `disabled={isPending}` + loading text on submit button; `state.error === 'email_exists'` and `state.error === 'unknown'` banners
 - [ ] **S0.2** Email verification wired up: three states; state 1 shows email address and "wrong email?" link; verified → "Go to my dashboard"; expired → "Send a new verification email"; resend rate-limited to 3/hour
 - [ ] **S0.3** Sign in wired up: same error message for wrong password and unknown email; unverified email state
 - [ ] **S0.4** Password reset wired up: State 1 posts generic confirmation (never confirms email exists); State 2 success stays on page with Sign in button; expired link state shows "Request a new link"

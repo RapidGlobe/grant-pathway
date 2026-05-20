@@ -1,14 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-// "email_exists" is set by the auth response in Slice 0
-type FormError = "email_exists" | null;
+import { registerUser } from "@/actions/auth";
 
 interface FieldErrors {
   firstName?: string;
@@ -20,6 +18,8 @@ interface FieldErrors {
 }
 
 export function RegisterForm() {
+  const [state, action, isPending] = useActionState(registerUser, { error: null });
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,11 +29,9 @@ export function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [terms, setTerms] = useState(false);
   const [feedbackOptIn, setFeedbackOptIn] = useState(false);
-  const [formError] = useState<FormError>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
     const errors: FieldErrors = {};
 
     if (!firstName.trim()) {
@@ -55,9 +53,17 @@ export function RegisterForm() {
       errors.terms = "Please accept the Terms of Service and Privacy Policy to continue";
     }
 
-    setFieldErrors(errors);
-    // Slice 0: auth call replaces the above
-    void feedbackOptIn; // consumed by Slice 0 signUp call
+    if (Object.keys(errors).length > 0) {
+      // Prevent the Server Action from firing; show errors inline instead
+      e.preventDefault();
+      setFieldErrors(errors);
+      return;
+    }
+
+    // Validation passed — clear any previous field errors and let the
+    // Server Action (action={action} on the form) handle the submission
+    setFieldErrors({});
+    void feedbackOptIn; // value is in FormData via the named checkbox input
   }
 
   return (
@@ -67,7 +73,7 @@ export function RegisterForm() {
       </h1>
 
       {/* Form-level error: email already registered */}
-      {formError === "email_exists" && (
+      {state.error === "email_exists" && (
         <div
           role="alert"
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
@@ -88,7 +94,23 @@ export function RegisterForm() {
         </div>
       )}
 
-      <form noValidate onSubmit={handleSubmit}>
+      {/* Form-level error: unexpected server failure */}
+      {state.error === "unknown" && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]"
+            aria-hidden="true"
+          />
+          <p className="text-[14px] text-[#991B1B]">
+            Something went wrong. Please try again in a moment.
+          </p>
+        </div>
+      )}
+
+      <form noValidate action={action} onSubmit={handleSubmit}>
         {/* First name */}
         <div className="mb-5">
           <Label
@@ -99,6 +121,7 @@ export function RegisterForm() {
           </Label>
           <Input
             id="first-name"
+            name="firstName"
             type="text"
             autoComplete="given-name"
             value={firstName}
@@ -124,6 +147,7 @@ export function RegisterForm() {
           </Label>
           <Input
             id="last-name"
+            name="lastName"
             type="text"
             autoComplete="family-name"
             value={lastName}
@@ -149,6 +173,7 @@ export function RegisterForm() {
           </Label>
           <Input
             id="email"
+            name="email"
             type="email"
             autoComplete="email"
             value={email}
@@ -175,6 +200,7 @@ export function RegisterForm() {
           <div className="relative">
             <Input
               id="password"
+              name="password"
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               value={password}
@@ -296,6 +322,7 @@ export function RegisterForm() {
           <div className="flex items-start gap-3">
             <input
               id="feedback-opt-in"
+              name="feedbackConsent"
               type="checkbox"
               checked={feedbackOptIn}
               onChange={(e) => setFeedbackOptIn(e.target.checked)}
@@ -313,9 +340,10 @@ export function RegisterForm() {
         {/* Create account — full width, primary teal */}
         <Button
           type="submit"
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+          disabled={isPending}
+          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
-          Create account
+          {isPending ? "Creating account…" : "Create account"}
         </Button>
       </form>
 
