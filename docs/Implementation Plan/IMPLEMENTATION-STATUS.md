@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (S0.3 complete — Sign In)
+**Last updated:** 2026-05-20 (S0.4 complete — Password Reset)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,12 +54,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **3** | In progress |
-| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **3** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **4** | In progress |
+| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **4** | In progress |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in | 1 | 0 | Not started |
 | &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **0** | Not started |
@@ -314,7 +314,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **S0.3** Sign in wired up: same error message for wrong password and unknown email; unverified email state
   - `actions/auth.ts` — `signIn` Server Action: calls `signInWithPassword()`; `email_not_confirmed` error code → `{ error: 'unverified' }`; all other auth errors → `{ error: 'credentials' }` (same message prevents email enumeration, AC-FR-04-03); success → `redirect('/dashboard')`
   - `components/sign-in-form.tsx` — wired via `useActionState(signIn, { error: null })`; same validation-first / Server Action pattern as RegisterForm; `name` attributes on inputs; `disabled={isPending}` + "Signing in…" loading text; "Resend verification email" changed from stub button to `<Link href="/verify-email?email=xxx">` so the user lands on the existing resend flow
-- [ ] **S0.4** Password reset wired up: State 1 posts generic confirmation (never confirms email exists); State 2 success stays on page with Sign in button; expired link state shows "Request a new link"
+- [x] **S0.4** Password reset wired up: State 1 posts generic confirmation (never confirms email exists); State 2 success stays on page with Sign in button; expired link state shows "Request a new link"
+  - `actions/auth.ts` — `requestPasswordReset`: calls `resetPasswordForEmail()` with `redirectTo: {origin}/auth/callback`; always returns `{ status: 'sent' }` regardless of whether email is registered (AC-FR-05-02 anti-enumeration). `resetPassword`: verifies session exists first; calls `updateUser({ password })`; returns `success`, `expired`, or `error` status
+  - `app/auth/callback/route.ts` — updated: `type === 'recovery'` now routes success to `/forgot-password?state=reset` and failure to `/forgot-password?state=expired`; email verification routing unchanged
+  - `proxy.ts` — removed `/forgot-password` from AUTH_ONLY; the callback sets a recovery session making the user authenticated, which would otherwise cause the middleware to redirect them to `/dashboard` before they can set their password
+  - `components/forgot-password-request-form.tsx` — wired via `useActionState(requestPasswordReset)`; `state.status === 'sent'` drives success view; `name="email"` added; loading state on button
+  - `components/reset-password-form.tsx` — wired via `useActionState(resetPassword)`; `isExpired` prop (link expired on arrival) and `state.status === 'expired'` (session expired mid-form) both render the expired view; `name="password"` added; loading state on button; generic error banner for unexpected failures
 - [ ] **S0.5** Session timeout wired up: 60-minute inactivity timer; warning at 55 min; `signOut()` + redirect at 60 min
 - [ ] **S0.6** MFA opt-in wired up (Should Have — FR-07)
 

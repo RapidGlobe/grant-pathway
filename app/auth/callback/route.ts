@@ -22,13 +22,23 @@ export async function GET(request: Request) {
   const type = searchParams.get('type') as EmailOtpType | null
   const code = searchParams.get('code')
 
-  // Email verification: ?token_hash=xxx&type=email
+  // Token hash flow — covers email verification (type=email) and password
+  // reset (type=recovery). Route the success/failure redirect based on type.
   if (token_hash && type) {
     const supabase = await createClient()
     const { error } = await supabase.auth.verifyOtp({ token_hash, type })
     if (!error) {
+      if (type === 'recovery') {
+        // Recovery session set — send user to the "choose new password" form
+        return NextResponse.redirect(`${origin}/forgot-password?state=reset`)
+      }
       return NextResponse.redirect(`${origin}/verify-email?state=verified`)
     }
+    // Token was invalid or expired — route to the appropriate expired state
+    if (type === 'recovery') {
+      return NextResponse.redirect(`${origin}/forgot-password?state=expired`)
+    }
+    return NextResponse.redirect(`${origin}/verify-email?state=expired`)
   }
 
   // PKCE code exchange — used by OAuth providers and magic links
@@ -40,6 +50,6 @@ export async function GET(request: Request) {
     }
   }
 
-  // Token missing, invalid, or expired
+  // Token/code missing — fall back to verify-email expired state
   return NextResponse.redirect(`${origin}/verify-email?state=expired`)
 }

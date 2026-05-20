@@ -1,23 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { requestPasswordReset, type PasswordResetRequestState } from "@/actions/auth";
 
 interface FieldErrors {
   email?: string;
 }
 
+const INITIAL_STATE: PasswordResetRequestState = { status: "idle" };
+
 export function ForgotPasswordRequestForm() {
+  const [state, action, isPending] = useActionState(requestPasswordReset, INITIAL_STATE);
+
   const [email, setEmail] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [submitted, setSubmitted] = useState(false);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
     const errors: FieldErrors = {};
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -25,16 +28,17 @@ export function ForgotPasswordRequestForm() {
     }
 
     if (Object.keys(errors).length > 0) {
+      e.preventDefault();
       setFieldErrors(errors);
       return;
     }
 
     setFieldErrors({});
-    setSubmitted(true);
-    // Slice 0: Supabase resetPasswordForEmail() call replaces the above
   }
 
-  if (submitted) {
+  // Success state — shown after the Server Action returns { status: 'sent' }.
+  // Same message for registered and unregistered emails (AC-FR-05-01/02).
+  if (state.status === "sent") {
     return (
       <div className="w-full max-w-[440px] text-center">
         <div className="mb-6 flex justify-center">
@@ -61,26 +65,27 @@ export function ForgotPasswordRequestForm() {
         Enter the email address for your account and we&apos;ll send you a reset link.
       </p>
 
-      <form noValidate onSubmit={handleSubmit}>
+      <form noValidate action={action} onSubmit={handleSubmit}>
         <div className="mb-6">
           <Label
-            htmlFor="email"
+            htmlFor="reset-email"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
             Email address
           </Label>
           <Input
-            id="email"
+            id="reset-email"
+            name="email"
             type="email"
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             aria-invalid={!!fieldErrors.email || undefined}
-            aria-describedby={fieldErrors.email ? "email-error" : undefined}
+            aria-describedby={fieldErrors.email ? "reset-email-error" : undefined}
             className="h-10 text-[14px]"
           />
           {fieldErrors.email && (
-            <p id="email-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="reset-email-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
               {fieldErrors.email}
             </p>
           )}
@@ -88,9 +93,10 @@ export function ForgotPasswordRequestForm() {
 
         <Button
           type="submit"
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+          disabled={isPending}
+          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
-          Send reset link
+          {isPending ? "Sending…" : "Send reset link"}
         </Button>
       </form>
 

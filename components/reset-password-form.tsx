@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, CheckCircle, Clock } from "lucide-react";
+import { Eye, EyeOff, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { resetPassword, type ResetPasswordState } from "@/actions/auth";
 
 interface FieldErrors {
   password?: string;
@@ -13,19 +14,26 @@ interface FieldErrors {
 }
 
 interface ResetPasswordFormProps {
+  /** True when the reset link was already expired before the user reached
+   *  this page (i.e. /auth/callback redirected to ?state=expired). */
   isExpired?: boolean;
 }
 
+const INITIAL_STATE: ResetPasswordState = { status: "idle" };
+
 export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps) {
+  const [state, action, isPending] = useActionState(resetPassword, INITIAL_STATE);
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [success, setSuccess] = useState(false);
 
-  // Expired link state
-  if (isExpired) {
+  // ── Expired view ─────────────────────────────────────────────────────────
+  // Shown when: (a) the link was expired on arrival (isExpired prop), or
+  // (b) the recovery session expired while the user was on the form.
+  if (isExpired || state.status === "expired") {
     return (
       <div className="w-full max-w-[440px] text-center">
         <div className="mb-6 flex justify-center">
@@ -50,8 +58,8 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
     );
   }
 
-  // Success state
-  if (success) {
+  // ── Success view ─────────────────────────────────────────────────────────
+  if (state.status === "success") {
     return (
       <div className="w-full max-w-[440px] text-center">
         <div className="mb-6 flex justify-center">
@@ -75,7 +83,6 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
   }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
     const errors: FieldErrors = {};
 
     if (!password || password.length < 10) {
@@ -86,37 +93,54 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
     }
 
     if (Object.keys(errors).length > 0) {
+      e.preventDefault();
       setFieldErrors(errors);
       return;
     }
 
     setFieldErrors({});
-    setSuccess(true);
-    // Slice 0: Supabase updateUser({ password }) call replaces the above
   }
 
+  // ── Reset form ────────────────────────────────────────────────────────────
   return (
     <div className="w-full max-w-[400px]">
       <h1 className="mb-8 text-[22px] font-bold text-[#1E293B]">Choose a new password</h1>
 
-      <form noValidate onSubmit={handleSubmit}>
+      {/* Server error */}
+      {state.status === "error" && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]"
+            aria-hidden="true"
+          />
+          <p className="text-[14px] text-[#991B1B]">
+            Something went wrong. Please try again.
+          </p>
+        </div>
+      )}
+
+      <form noValidate action={action} onSubmit={handleSubmit}>
         {/* New password */}
         <div className="mb-5">
           <Label
-            htmlFor="password"
+            htmlFor="new-password"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
             New password
           </Label>
           <div className="relative">
             <Input
-              id="password"
+              id="new-password"
+              name="password"
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               aria-invalid={!!fieldErrors.password || undefined}
-              aria-describedby={fieldErrors.password ? "password-error" : "password-hint"}
+              aria-describedby={fieldErrors.password ? "new-password-error" : "new-password-hint"}
               className="h-10 pr-10 text-[14px]"
             />
             <button
@@ -133,11 +157,11 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             </button>
           </div>
           {fieldErrors.password ? (
-            <p id="password-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="new-password-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
               {fieldErrors.password}
             </p>
           ) : (
-            <p id="password-hint" className="mt-1.5 text-[13px] text-[#64748B]">
+            <p id="new-password-hint" className="mt-1.5 text-[13px] text-[#64748B]">
               At least 10 characters
             </p>
           )}
@@ -146,28 +170,30 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
         {/* Confirm new password */}
         <div className="mb-6">
           <Label
-            htmlFor="confirm-password"
+            htmlFor="confirm-new-password"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
             Confirm new password
           </Label>
           <div className="relative">
             <Input
-              id="confirm-password"
+              id="confirm-new-password"
               type={showConfirmPassword ? "text" : "password"}
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               aria-invalid={!!fieldErrors.confirmPassword || undefined}
               aria-describedby={
-                fieldErrors.confirmPassword ? "confirm-password-error" : undefined
+                fieldErrors.confirmPassword ? "confirm-new-password-error" : undefined
               }
               className="h-10 pr-10 text-[14px]"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword((v) => !v)}
-              aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+              aria-label={
+                showConfirmPassword ? "Hide confirm password" : "Show confirm password"
+              }
               className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
             >
               {showConfirmPassword ? (
@@ -178,7 +204,11 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             </button>
           </div>
           {fieldErrors.confirmPassword && (
-            <p id="confirm-password-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="confirm-new-password-error"
+              role="alert"
+              className="mt-1.5 text-[13px] text-[#DC2626]"
+            >
               {fieldErrors.confirmPassword}
             </p>
           )}
@@ -186,9 +216,10 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
 
         <Button
           type="submit"
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+          disabled={isPending}
+          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
-          Save new password
+          {isPending ? "Saving…" : "Save new password"}
         </Button>
       </form>
     </div>

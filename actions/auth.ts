@@ -83,6 +83,85 @@ export async function registerUser(
 }
 
 // ---------------------------------------------------------------------------
+// S0.4 — Password reset (request + set new password)
+// ---------------------------------------------------------------------------
+
+export type PasswordResetRequestState = {
+  status: 'idle' | 'sent'
+}
+
+/**
+ * Sends a password reset email via Supabase Auth resetPasswordForEmail().
+ * Always returns { status: 'sent' } regardless of whether the email is
+ * registered — never reveals if an account exists (AC-FR-05-02).
+ *
+ * Called from ForgotPasswordRequestForm via useActionState.
+ */
+export async function requestPasswordReset(
+  _prevState: PasswordResetRequestState,
+  formData: FormData,
+): Promise<PasswordResetRequestState> {
+  const email = (formData.get('email') as string | null) ?? ''
+  const origin = (await headers()).get('origin') ?? ''
+
+  const supabase = await createClient()
+
+  // Fire and forget — we do not check the error because we must never reveal
+  // whether the email address is registered (AC-FR-05-02).
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback`,
+  })
+
+  return { status: 'sent' }
+}
+
+export type ResetPasswordState = {
+  status: 'idle' | 'success' | 'expired' | 'error'
+}
+
+/**
+ * Updates the user's password via Supabase Auth updateUser().
+ * Requires an active recovery session set by the /auth/callback route after
+ * the user clicks their reset link.
+ * On success: returns { status: 'success' }.
+ * On expired/missing session: returns { status: 'expired' }.
+ * On any other error: returns { status: 'error' }.
+ *
+ * Called from ResetPasswordForm via useActionState.
+ */
+export async function resetPassword(
+  _prevState: ResetPasswordState,
+  formData: FormData,
+): Promise<ResetPasswordState> {
+  const password = (formData.get('password') as string | null) ?? ''
+
+  const supabase = await createClient()
+
+  // Verify the recovery session is still valid before attempting the update
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { status: 'expired' }
+  }
+
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    // Session expired or token no longer valid
+    if (
+      error.code === 'session_not_found' ||
+      error.code === 'user_not_found' ||
+      error.status === 401 ||
+      error.status === 403
+    ) {
+      return { status: 'expired' }
+    }
+    return { status: 'error' }
+  }
+
+  return { status: 'success' }
+}
+
+// ---------------------------------------------------------------------------
 // S0.3 — Sign in
 // ---------------------------------------------------------------------------
 

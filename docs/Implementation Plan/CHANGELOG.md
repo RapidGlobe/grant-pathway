@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-05-20 — S0.4: Password reset wired up
+
+**What changed:**
+- `actions/auth.ts` — two new actions. `requestPasswordReset`: calls `resetPasswordForEmail(email, { redirectTo: {origin}/auth/callback })`; always returns `{ status: 'sent' }` — never reveals whether the email is registered (AC-FR-05-02). `resetPassword`: checks session exists first, then calls `updateUser({ password })`; maps session errors to `{ status: 'expired' }` so the user sees the "link expired" view rather than a generic error.
+- `app/auth/callback/route.ts` — added `type === 'recovery'` routing. On success routes to `/forgot-password?state=reset`; on failure routes to `/forgot-password?state=expired`. Email verification routing (`type === 'email'`) unchanged.
+- `proxy.ts` — removed `/forgot-password` from AUTH_ONLY. The callback sets a recovery session (making the user technically "authenticated") before redirecting to `/forgot-password?state=reset`. Keeping it in AUTH_ONLY would redirect them to `/dashboard` instead of the password form.
+- `components/forgot-password-request-form.tsx` — wired via `useActionState`. `state.status === 'sent'` replaces the old `submitted` useState toggle. Anti-enumeration: the success view always shows regardless of whether the email is registered.
+- `components/reset-password-form.tsx` — wired via `useActionState`. Two expired paths: `isExpired` prop (link was expired when the user arrived) and `state.status === 'expired'` (session expired while the user was on the form). Both render the same expired view with a "Request a new link" button.
+
+**Why:**
+The `requestPasswordReset` action always returns `sent` because revealing whether an email is registered would let an attacker enumerate accounts (AC-FR-05-02). The `/forgot-password` AUTH_ONLY removal mirrors the `/verify-email` fix from S0.2 — Supabase's recovery session makes the user "authenticated" immediately after the callback, so the route must be publicly accessible in all auth states.
+
+---
+
 ## 2026-05-20 — S0.3: Sign in wired up
 
 **What changed:**

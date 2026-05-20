@@ -10,11 +10,13 @@ const PUBLIC_API = ['/api/health']
 const PROTECTED = ['/dashboard', '/profile', '/applications', '/account']
 
 // Auth-only routes — redirect to /dashboard if already signed in.
-// NOTE: /verify-email is intentionally excluded — after clicking the
-// verification link the user is authenticated and the callback redirects
-// them here to show the "Email verified" state.  Putting it in AUTH_ONLY
-// would immediately redirect them away before they see that confirmation.
-const AUTH_ONLY = ['/', '/register', '/forgot-password']
+// NOTE: /verify-email and /forgot-password are intentionally excluded.
+// After clicking their email link the user is authenticated (Supabase sets
+// an email-confirmation or recovery session in the callback) and the
+// callback redirects them here.  Putting those routes in AUTH_ONLY would
+// bounce them to /dashboard before they can see the confirmation or set
+// their new password.
+const AUTH_ONLY = ['/', '/register']
 
 function isProtected(pathname: string) {
   return PROTECTED.some(
