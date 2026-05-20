@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Search, CheckCircle, AlertCircle, AlertTriangle } from "lucide-react";
+import { Search, CheckCircle, AlertCircle, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,6 +36,13 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
   const [whoHelps, setWhoHelps] = useState("");
   const [whereWorks, setWhereWorks] = useState("");
 
+  /**
+   * True when Bedrock successfully paraphrased the charitable objects on
+   * the most recent lookup. Drives the AI-generated-content review banner
+   * and condensed hint text on whatDoes / whoHelps (S1.1 CHANGELOG 2026-05-18).
+   */
+  const [paraphrasedFromLookup, setParaphrasedFromLookup] = useState(false);
+
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [saved, setSaved] = useState(false);
 
@@ -43,6 +50,8 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
 
   function handleLookup() {
     if (!lookupQuery.trim()) return;
+    // Reset paraphrase flag on every new lookup attempt
+    setParaphrasedFromLookup(false);
     startLookup(async () => {
       const result = await lookupCharity(lookupQuery.trim());
       if (result.ok) {
@@ -51,6 +60,11 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
         // Fields remain editable — the user can correct anything before saving.
         setCharityName(result.charityName);
         setRegNumber(result.registrationNumber);
+        // Pre-fill AI-paraphrased descriptions when Bedrock returns content (S1.1).
+        // Only set if non-empty so a partial Bedrock failure does not clear existing input.
+        if (result.whatDoes) setWhatDoes(result.whatDoes);
+        if (result.whoHelps) setWhoHelps(result.whoHelps);
+        if (result.whatDoes || result.whoHelps) setParaphrasedFromLookup(true);
       } else if (result.reason === "not_found") {
         setLookupResult("no-match");
       } else {
@@ -166,6 +180,23 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
           </div>
         )}
 
+        {/* AI-generated descriptions banner (S1.1 — shown when Bedrock paraphrase succeeded) */}
+        {lookupResult === "match" && paraphrasedFromLookup && (
+          <div
+            role="note"
+            className="mt-2 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3"
+          >
+            <Sparkles
+              className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
+              aria-hidden="true"
+            />
+            <p className="text-[13px] text-[#78350F]">
+              The descriptions below were drafted by AI from your Charity Commission
+              entry. Please review and personalise them before saving.
+            </p>
+          </div>
+        )}
+
         {/* No match (AC-FR-10-02) */}
         {lookupResult === "no-match" && (
           <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
@@ -260,9 +291,9 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
             </span>
           </Label>
           <p id="whatDoes-hint" className="mb-1.5 text-[13px] text-[#64748B]">
-            Your Charity Commission entry (see the lookup above) lists your charitable
-            objects — this is a good starting point. Your website&apos;s &lsquo;About
-            us&rsquo; page is another useful source.
+            {paraphrasedFromLookup
+              ? "Drafted from your Charity Commission entry — edit to personalise."
+              : "Your Charity Commission entry (see the lookup above) lists your charitable objects — this is a good starting point. Your website’s ‘About us’ page is another useful source."}
           </p>
           <Textarea
             id="whatDoes"
@@ -303,9 +334,9 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
             </span>
           </Label>
           <p id="whoHelps-hint" className="mb-1.5 text-[13px] text-[#64748B]">
-            Think about the people your charity serves — their age, background, or
-            circumstances. Your Charity Commission entry may also describe your
-            beneficiaries.
+            {paraphrasedFromLookup
+              ? "Drafted from your Charity Commission entry — edit to personalise."
+              : "Think about the people your charity serves — their age, background, or circumstances. Your Charity Commission entry may also describe your beneficiaries."}
           </p>
           <Textarea
             id="whoHelps"

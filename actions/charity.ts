@@ -3,24 +3,66 @@
 // Charity Server Actions (Slice 1)
 // Charity Commission lookup is centralised here so the component stays thin.
 
+import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+/** Bedrock model identifier (ADR-AI-001) */
+const MODEL = 'anthropic.claude-sonnet-4-6'
+
+/** Charity Commission Register of Charities API base URL */
+const BASE_URL = 'https://api.charitycommission.gov.uk/register/api'
+
+/** Charity Commission API call timeout (10 s) */
+const CC_TIMEOUT_MS = 10_000
+
+/** Bedrock paraphrase timeout (30 s — well within the 60 s maxDuration on the profile route) */
+const BEDROCK_TIMEOUT_MS = 30_000
+
 // ---------------------------------------------------------------------------
 // S1.1 — Charity Commission lookup
 // ---------------------------------------------------------------------------
 
 export type CharityLookupResult =
-  | { ok: true; charityName: string; registrationNumber: string }
+  | {
+      ok: true
+      charityName: string
+      registrationNumber: string
+      /**
+       * Plain-English description of what the charity does, paraphrased by AI
+       * from the charity's charitable objects text. Empty string if the
+       * governing document call or Bedrock paraphrase fails.
+       */
+      whatDoes: string
+      /**
+       * Plain-English description of who the charity helps, paraphrased by AI.
+       * Empty string if the governing document call or Bedrock paraphrase fails.
+       */
+      whoHelps: string
+    }
   | { ok: false; reason: 'not_found' | 'unavailable' }
 
 /**
  * Looks up a charity by name or registration number via the Charity Commission
- * for England and Wales public API (FR-10).
+ * for England and Wales public API (FR-10), then paraphrases the charitable
+ * objects using Amazon Bedrock to generate plain-English descriptions (S1.1).
  *
- * - Registration number (6–8 digits): calls GET /allCharityDetails/{number}
- * - Name string: calls GET /charitySearch/{name}/1/1 (first result only)
+ * Flow:
+ *   1. Name or number → GET /searchCharityName/{name}
+ *                     or GET /charityRegNumber/{number}/0
+ *      → resolves charity_name + reg_charity_number
+ *   2. GET /charitygoverningdocument/{number}/0
+ *      → resolves charitable_objects (free-text legal description)
+ *   3. Bedrock Claude call → paraphrase into whatDoes + whoHelps
  *
- * On match:   returns { ok: true, charityName, registrationNumber }
- * No match:   returns { ok: false, reason: 'not_found' }
- * API error / missing key: returns { ok: false, reason: 'unavailable' }
+ * Failure modes:
+ *   - Missing API key         → { ok: false, reason: 'unavailable' }
+ *   - Charity not found       → { ok: false, reason: 'not_found' }
+ *   - CC API unreachable      → { ok: false, reason: 'unavailable' }
+ *   - Governing doc fails     → ok: true, whatDoes/whoHelps = '' (degrade)
+ *   - Bedrock fails/times out → ok: true, whatDoes/whoHelps = '' (degrade)
  *
  * Called from CharityProfileForm via useTransition (returns structured data,
  * not FormData, so useActionState is not appropriate here).
@@ -34,49 +76,43 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
   const trimmed = query.trim()
   if (!trimmed) return { ok: false, reason: 'not_found' }
 
-  const baseUrl = 'https://api.charitycommission.gov.uk/register/api'
   const headers = { 'Ocp-Apim-Subscription-Key': apiKey }
 
-  // Abort after 10 seconds so a slow or unreachable API surface as 'unavailable'
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), 10_000)
+  // ── Step 1: resolve charity_name and reg_charity_number ─────────────────
+
+  let charityName: string
+  let regNumber: string
 
   try {
     const isNumber = /^\d{6,8}$/.test(trimmed)
 
     if (isNumber) {
-      // ── Look up by registration number ───────────────────────────────────
-      const res = await fetch(`${baseUrl}/allCharityDetails/${trimmed}`, {
-        headers,
-        signal: controller.signal,
-        // Never serve stale charity data from the Next.js fetch cache
-        cache: 'no-store',
-      })
-
-      clearTimeout(timeout)
+      // GET /charityRegNumber/{RegisteredNumber}/{suffix}
+      // suffix=0 for the main registered charity (not a subsidiary)
+      const res = await fetchWithTimeout(
+        `${BASE_URL}/charityRegNumber/${trimmed}/0`,
+        { headers, cache: 'no-store' },
+        CC_TIMEOUT_MS,
+      )
 
       if (res.status === 404) return { ok: false, reason: 'not_found' }
       if (!res.ok) return { ok: false, reason: 'unavailable' }
 
       const data = (await res.json()) as Record<string, unknown>
-      const name = (data.charity_name ?? data.charityName ?? '') as string
+      const name = (data.charity_name ?? '') as string
       if (!name) return { ok: false, reason: 'not_found' }
 
-      return {
-        ok: true,
-        charityName: toTitleCase(name),
-        registrationNumber: trimmed,
-      }
+      charityName = toTitleCase(name)
+      regNumber = trimmed
     } else {
-      // ── Search by name — take first result ───────────────────────────────
+      // GET /searchCharityName/{charityname}
+      // Returns an array; take the first result only
       const encoded = encodeURIComponent(trimmed)
-      const res = await fetch(`${baseUrl}/charitySearch/${encoded}/1/1`, {
-        headers,
-        signal: controller.signal,
-        cache: 'no-store',
-      })
-
-      clearTimeout(timeout)
+      const res = await fetchWithTimeout(
+        `${BASE_URL}/searchCharityName/${encoded}`,
+        { headers, cache: 'no-store' },
+        CC_TIMEOUT_MS,
+      )
 
       if (!res.ok) return { ok: false, reason: 'unavailable' }
 
@@ -86,29 +122,115 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
       }
 
       const first = data[0] as Record<string, unknown>
-      const name = (first.charity_name ?? first.charityName ?? '') as string
-      const regNum = String(
-        first.reg_charity_number ?? first.registeredCharityNumber ?? '',
-      )
+      const name = (first.charity_name ?? '') as string
+      const num = String(first.reg_charity_number ?? '')
 
       if (!name) return { ok: false, reason: 'not_found' }
 
-      return {
-        ok: true,
-        charityName: toTitleCase(name),
-        registrationNumber: regNum,
-      }
+      charityName = toTitleCase(name)
+      regNumber = num
     }
   } catch {
-    clearTimeout(timeout)
-    // Network error, timeout, or JSON parse failure → treat as unavailable
+    // Network error, timeout, or JSON parse failure
     return { ok: false, reason: 'unavailable' }
   }
+
+  // ── Step 2: fetch charitable objects from governing document ─────────────
+  // GET /charitygoverningdocument/{RegisteredNumber}/{suffix}
+  // Returns { governing_document_description, charitable_objects, area_of_benefit }
+  // charitable_objects is the free-text legal description — perfect for AI paraphrase.
+
+  let charitableObjects = ''
+
+  try {
+    const res = await fetchWithTimeout(
+      `${BASE_URL}/charitygoverningdocument/${regNumber}/0`,
+      { headers, cache: 'no-store' },
+      CC_TIMEOUT_MS,
+    )
+    if (res.ok) {
+      const data = (await res.json()) as Record<string, unknown>
+      charitableObjects = ((data.charitable_objects ?? '') as string).trim()
+    }
+    // A non-2xx status here is not fatal — we continue without charitable objects
+  } catch {
+    // Timeout or network error for governing document — continue without it
+  }
+
+  // ── Step 3: Bedrock paraphrase ───────────────────────────────────────────
+  // Only attempted when we have charitable objects to paraphrase.
+  // Failures here degrade gracefully — the form hint text guides the user
+  // to fill in whatDoes and whoHelps manually.
+
+  let whatDoes = ''
+  let whoHelps = ''
+
+  // Guard: only call Bedrock when we have content to paraphrase AND AWS credentials.
+  // Narrowing awsAccessKey/awsSecretKey to string satisfies AnthropicBedrock's type.
+  const awsAccessKey = process.env.AWS_ACCESS_KEY_ID
+  const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
+
+  if (charitableObjects && awsAccessKey && awsSecretKey) {
+    try {
+      const bedrock = new AnthropicBedrock({
+        awsAccessKey,
+        awsSecretKey,
+        awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
+      })
+
+      const messagePromise = bedrock.messages.create({
+        model: MODEL,
+        max_tokens: 512,
+        messages: [{ role: 'user', content: buildParaphrasePrompt(charitableObjects) }],
+      })
+
+      // Promise.race gives us a hard timeout without relying on SDK signal support
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('bedrock timeout')), BEDROCK_TIMEOUT_MS),
+      )
+
+      const message = await Promise.race([messagePromise, timeoutPromise])
+
+      const raw =
+        message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
+
+      if (raw) {
+        // Strip any markdown code fences the model may have added
+        const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+        const parsed = JSON.parse(cleaned) as { whatDoes?: unknown; whoHelps?: unknown }
+        whatDoes = typeof parsed.whatDoes === 'string' ? parsed.whatDoes : ''
+        whoHelps = typeof parsed.whoHelps === 'string' ? parsed.whoHelps : ''
+      }
+    } catch {
+      // Bedrock unavailable, timeout, or JSON parse error.
+      // The name + registration number are still returned successfully.
+    }
+  }
+
+  return { ok: true, charityName, registrationNumber: regNumber, whatDoes, whoHelps }
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Wraps fetch() with an AbortController-based timeout.
+ * The caller is responsible for handling thrown errors.
+ */
+async function fetchWithTimeout(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number,
+): Promise<Response> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...init, signal: controller.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
 
 /**
  * Converts an ALL-CAPS charity name (as returned by the Charity Commission API)
@@ -117,7 +239,29 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
  * The user can correct edge cases (e.g. "Uk" → "UK") before saving.
  */
 function toTitleCase(str: string): string {
-  return str
-    .toLowerCase()
-    .replace(/\b[a-z]/g, (c) => c.toUpperCase())
+  return str.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase())
+}
+
+/**
+ * Builds the Bedrock prompt for paraphrasing a charity's charitable objects
+ * into plain-English whatDoes and whoHelps descriptions.
+ *
+ * The input is truncated to 2,000 characters to stay well within Bedrock's
+ * context window and keep costs predictable.
+ */
+function buildParaphrasePrompt(charitableObjects: string): string {
+  const truncated = charitableObjects.slice(0, 2000)
+  return `You are a helpful assistant for UK charities. You will receive the charitable objects text from a charity's governing document, as registered with the Charity Commission for England and Wales.
+
+Your task is to extract two short, plain-English summaries:
+1. "whatDoes": 1-2 sentences describing what the charity does (its activities and purposes). Avoid legal jargon.
+2. "whoHelps": 1-2 sentences describing who the charity helps (its beneficiaries). Avoid legal jargon.
+
+Write these as friendly, accessible descriptions suitable for a grant application.
+
+Return ONLY a JSON object in this exact format, with no other text before or after:
+{"whatDoes": "...", "whoHelps": "..."}
+
+Charitable objects:
+${truncated}`
 }

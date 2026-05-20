@@ -6,18 +6,29 @@
 
 ---
 
-## 2026-05-20 — S1.1: Charity Commission lookup wired up
+## 2026-05-20 — S1.1: Charity Commission lookup — corrected endpoints and AI paraphrase restored
 
 **What changed:**
-- `actions/charity.ts` (new) — `lookupCharity(query)` Server Action. Detects whether the query is a registration number (6–8 digits) or a name string and calls the appropriate Charity Commission API endpoint. Uses an `AbortController` with a 10-second timeout so a slow or unreachable API surfaces as `unavailable` rather than hanging. Returns `{ ok: true, charityName, registrationNumber }` on match; `{ ok: false, reason: 'not_found' | 'unavailable' }` otherwise. Called via `useTransition` (not `useActionState`) because it returns structured data to drive client-side field pre-fill, not a form state update.
-- `components/charity-profile-form.tsx` — `handleLookup` wired to `lookupCharity` via `useTransition`. Pre-fills `charityName` and `regNumber` on match. All mock data (`MOCK_EDIT`, `MOCK_MATCH`), the `initialLookupState` prop, and the `paraphrasedFromLookup` AI-paraphrase banner removed. The AI banner was speculative Phase 1 content not backed by any acceptance criterion — AC-FR-10-01 specifies only name and registration number are pre-filled from the API.
-- `app/(authenticated)/profile/page.tsx` — `lookup` searchParam removed (was a static demo affordance); page now passes only `isEdit` prop.
-- `.env.example` — `CHARITY_COMMISSION_API_KEY` added.
+- `actions/charity.ts` (rewritten) — `lookupCharity(query)` Server Action now uses the correct Charity Commission Register of Charities API endpoints, confirmed from the official OpenAPI YAML spec:
+  - Name search: `GET /searchCharityName/{charityname}` (was incorrectly `/charitySearch/{name}/1/1`)
+  - Number search: `GET /charityRegNumber/{RegisteredNumber}/0` (was incorrectly `/allCharityDetails/{n}`)
+  - New: second call to `GET /charitygoverningdocument/{RegisteredNumber}/0` to retrieve `charitable_objects` (free-text legal description from governing document)
+  - New: Amazon Bedrock Claude (`anthropic.claude-sonnet-4-6`, eu-west-2) paraphrases `charitable_objects` into plain-English `whatDoes` and `whoHelps` descriptions. Uses `Promise.race` with a 30-second timeout. Bedrock failure degrades gracefully — name + registration number are still returned, and `whatDoes`/`whoHelps` are empty strings.
+  - Return type extended: `{ ok: true; charityName; registrationNumber; whatDoes; whoHelps }`.
+- `components/charity-profile-form.tsx` — `paraphrasedFromLookup` state restored (was incorrectly removed in initial S1.1 pass); `handleLookup` now pre-fills `whatDoes` and `whoHelps` from Bedrock result when non-empty; amber Sparkles banner displayed on match when AI descriptions were generated, prompting user to review and personalise; hint text on `whatDoes`/`whoHelps` fields condenses when `paraphrasedFromLookup` is true.
+- `app/(authenticated)/profile/page.tsx` — `export const maxDuration = 60` added (two Charity Commission API calls at 10 s each plus Bedrock at up to 30 s exceeds Vercel's default 10 s timeout).
+- `.env.example` — `CHARITY_COMMISSION_API_KEY` entry unchanged (already added in initial pass).
 
-**Why:**
-The `lookupCharity` action uses `useTransition` rather than `useActionState` for the same reason `mfaEnroll` does: it returns structured data that the component needs to display rather than a status value. The paraphrase banner was removed because it implied AI processing of charitable objects text — that was never specified in the acceptance criteria and would require an additional Bedrock call that is not planned for any slice.
+**Why the initial implementation was wrong:**
+The initial S1.1 pass used endpoint paths reverse-engineered from the Charity Commission developer portal screenshots rather than the authoritative OpenAPI spec. After the user provided the full `register-of-charities-api.yaml`, the correct paths were confirmed. The AI paraphrase feature was also incorrectly removed in the initial pass, incorrectly assessed as "speculative Phase 1 content" — the CHANGELOG entry from 2026-05-18 (below) records it as a deliberate design decision that was always part of S1.1.
 
-**Action required (WJ):** Register for a Charity Commission API key at https://api.charitycommission.gov.uk/ and add it to `.env.local` as `CHARITY_COMMISSION_API_KEY`, and to Vercel environment variables for production. Until the key is present the lookup button will return the "unavailable" state gracefully.
+**Why `useTransition` (not `useActionState`):**
+`lookupCharity` returns structured data (`{ charityName, registrationNumber, whatDoes, whoHelps }`) rather than a form state value. The same pattern applies as `mfaEnroll`.
+
+**Why `GetCharityGoverningDocument` (not `GetCharityWhoWhatHow`):**
+`GetCharityWhoWhatHow` returns structured taxonomy codes (`classification_code`, `classification_type`, `classification_desc`) — these are classification labels, not natural language. `GetCharityGoverningDocument.charitable_objects` is the actual legal free-text description of the charity's purposes — far better as input for an AI paraphrase prompt.
+
+**Action required (WJ):** Register for a Charity Commission API key at https://api.charitycommission.gov.uk/ and add it to `.env.local` as `CHARITY_COMMISSION_API_KEY`, and to Vercel environment variables for production. Also ensure `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_REGION` are set — without these the Bedrock paraphrase step is silently skipped and `whatDoes`/`whoHelps` will be empty on lookup.
 
 ---
 

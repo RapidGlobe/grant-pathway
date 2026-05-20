@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (S1.1 complete — Charity Commission lookup)
+**Last updated:** 2026-05-20 (S1.1 corrected — endpoints fixed + Bedrock paraphrase restored)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -336,10 +336,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ### Slice 1 — Charity Profile
 
-- [x] **S1.1** Charity Commission lookup wired up: searches by name or number; pre-fills charity name and registration number; all three result states handled (match / no match / API unavailable)
-  - `actions/charity.ts` (new) — `lookupCharity(query)` Server Action; detects number (6–8 digits) vs name query; calls `GET /allCharityDetails/{n}` or `GET /charitySearch/{name}/1/1`; 10-second `AbortController` timeout; maps errors to `not_found` or `unavailable`; `toTitleCase()` helper converts ALL-CAPS API names for display
-  - `components/charity-profile-form.tsx` — static `handleLookup` replaced with `startTransition(async () => lookupCharity(...))` (same pattern as `mfaEnroll`); pre-fills `charityName` and `regNumber` on match; all mock data and `initialLookupState` prop removed; `paraphrasedFromLookup` state and AI banner removed (not in AC); lookup button shows "Searching…" while pending and is disabled when query is empty
-  - `app/(authenticated)/profile/page.tsx` — `lookup` searchParam removed; page simplified to pass only `isEdit` prop
+- [x] **S1.1** Charity Commission lookup wired up: searches by name or number; pre-fills all four profile fields (name, registration number, whatDoes, whoHelps) on match; all three result states handled (match / no match / API unavailable)
+  - `actions/charity.ts` (rewritten) — `lookupCharity(query)` Server Action with three-step flow: (1) name search via `GET /searchCharityName/{name}` or number search via `GET /charityRegNumber/{n}/0`; (2) governing document via `GET /charitygoverningdocument/{n}/0` to get `charitable_objects` free text; (3) Bedrock Claude paraphrase into `whatDoes` + `whoHelps`. Returns `{ ok: true, charityName, registrationNumber, whatDoes, whoHelps }` on match. Bedrock call uses `Promise.race` with a 30-second timeout; failures degrade gracefully (name/number still returned, AI fields empty). Model: `anthropic.claude-sonnet-4-6`. Note: initial implementation had wrong endpoint paths (`/allCharityDetails/` and `/charitySearch/.../1/1`) and omitted the Bedrock paraphrase — corrected after reviewing full OpenAPI YAML spec from Charity Commission.
+  - `components/charity-profile-form.tsx` — `paraphrasedFromLookup` state restored; `handleLookup` pre-fills `whatDoes` and `whoHelps` from Bedrock result when non-empty; amber Sparkles banner shown on match when AI descriptions were generated, prompting user to review; hint text on `whatDoes`/`whoHelps` fields condenses to "Drafted from your Charity Commission entry — edit to personalise." when `paraphrasedFromLookup` is true
+  - `app/(authenticated)/profile/page.tsx` — `export const maxDuration = 60` added (Bedrock + two CC API calls can take up to 50 s; default 10 s would time out)
   - `.env.example` — `CHARITY_COMMISSION_API_KEY` added with registration instructions
   - **Note:** `CHARITY_COMMISSION_API_KEY` must be added to `.env.local` and to Vercel environment variables before lookup will work in production. If the key is absent, the action returns `unavailable` gracefully.
 - [ ] **S1.2** Profile save wired up: five-field form with Zod validation; `lookup_source` set to `charity_commission` or `manual`; first save shows "Go to my dashboard" button; subsequent saves show "Your changes have been saved."
