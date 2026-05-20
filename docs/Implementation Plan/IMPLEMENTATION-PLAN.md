@@ -800,12 +800,89 @@ The endpoint must be reachable without a session or UptimeRobot's requests will 
 
 **3. UptimeRobot monitor** — configured in P5.4 (pre-launch infrastructure), once the production domain is live.
 
+### P3.12 — Pre-Phase 4 Gap Resolutions
+
+The following tasks were identified by the ADR consequences sweep (2026-05-20) as missing from the plan. All must be completed or explicitly deferred before Phase 4 slice work begins. See `docs/Implementation Plan/ADR-TRACEABILITY.md` for the full gap register.
+
+**GAP-06 — Add `SUPABASE_DB_PASSWORD` to `.env.example` (ADR-DATA-004)**
+Add `SUPABASE_DB_PASSWORD=` to `.env.example` with a comment explaining it is required for `supabase db push` in the deployment checklist. Update the P3.2 env vars note to reference this variable.
+
+**GAP-08 — Server-side re-validation in file process route (ADR-FILE-002)**
+In `POST /api/upload/process`, re-validate MIME type (only `application/pdf` or `.docx` permitted) and file size (reject >10MB) before passing to text extraction. Never rely on client-side validation alone.
+
+**GAP-09 — Create `lib/guidelines-session.ts` utility (ADR-FILE-004)**
+Create `lib/guidelines-session.ts` exporting:
+- `setGuidelines(applicationId: string, text: string): void`
+- `getGuidelines(applicationId: string): string | null`
+- `clearGuidelines(applicationId: string): void`
+
+All `sessionStorage` access for guidelines text must go through these functions — never accessed directly in components. This keeps `sessionStorage` usage testable and consistent.
+
+**GAP-10 — Clear `sessionStorage` on Step 3 completion (ADR-FILE-004)**
+In S5.2 (generate-summary route) or S5.4 (Step 3 wiring), call `clearGuidelines(applicationId)` after the AI summary is successfully saved to the database. Guidelines text should not persist in the browser once the summary exists.
+
+**GAP-11 — Configure GitHub branch protection on `main` (ADR-OPS-002, ADR-STACK-005)**
+In GitHub repository settings, configure a branch protection rule on `main`: require the Vercel build to pass before merge. This applies even for solo development — protects against accidentally pushing a broken build to production.
+
+**GAP-14 — Install and wire `@axe-core/react` (ADR-OPS-006)**
+Install as a dev dependency: `npm install --save-dev @axe-core/react`.
+Add conditional initialisation in `app/layout.tsx` (client-side, development only):
+```typescript
+if (process.env.NODE_ENV !== 'production') {
+  const axe = require('@axe-core/react')
+  const React = require('react')
+  const ReactDOM = require('react-dom')
+  axe(React, ReactDOM, 1000)
+}
+```
+This surfaces accessibility violations in the browser console during development.
+
+**GAP-18 — Confirm Supabase Auth JWT expiry ≥ 60 minutes (ADR-SEC-003)**
+In the Supabase dashboard for both dev and prod projects: Authentication → Settings → JWT expiry. Confirm the value is ≥ 3600 seconds (1 hour). If less, increase to 3600s. Document the confirmed value in IMPLEMENTATION-STATUS.md. This ensures the application-level 60-minute inactivity timer fires before the JWT expires and causes a silent logout.
+
+---
+
+The following gaps are lower priority and are folded into their natural Phase 4 task as additional steps. They do not block Phase 4 start but must be addressed at the point of implementing the relevant slice:
+
+- **GAP-01** (S5.1) — `lib/prompts.ts` inline comments
+- **GAP-02** (S5.2, S6.2) — Progress bar edge cases (hold at ~90%; snap to 100%)
+- **GAP-03** (P3.7 / S5.3) — Sentry alert for AI routes approaching 90s
+- **GAP-04** (S5.3) — Documented error response contract for AI routes
+- **GAP-05** (Phase 4 intro) — Below-768px degradation banner
+- **GAP-07** (S7.2) — Null answer handling in Word export
+- **GAP-12** (P5.4) — Git release tagging
+- **GAP-13** (S4.4) — Cron routes excluded from rate limiter (document explicitly)
+- **GAP-15** (P5.2 / P5.4) — Lighthouse CI automation
+- **GAP-16** (Phase 4 intro) — Accessibility as definition of done
+- **GAP-17** (P5.2) — RLS cross-user access test
+- **GAP-19** (S4.1) — UI message when user returns to Step 2 without `sessionStorage` entry
+- **GAP-20** (P5.1) — Dependency licence review
+
+---
+
+## Phase 3 → Phase 4 Gate
+
+**This gate must be signed off before any Slice 0 work begins.**
+
+The gate exists because implementation tasks are written feature-first and ADR consequences are spec-first. Without an explicit check, the gap between the two is invisible until something breaks. See `docs/Implementation Plan/ADR-TRACEABILITY.md` for the full consequences map.
+
+Checklist:
+- [ ] All Phase 3 tasks complete (P3.1–P3.12), or any incomplete tasks explicitly deferred with justification
+- [ ] ADR Traceability Table reviewed — all ⚠️ Gap rows either have a covering task or a documented N/A justification
+- [ ] GAP-06, GAP-08, GAP-09, GAP-10, GAP-11, GAP-14, GAP-18 resolved (High/Medium blockers)
+- [ ] Security and GDPR-critical ADRs (ADR-SEC-001 to ADR-SEC-006, ADR-DATA-001 to ADR-DATA-004) reviewed by project owner
+- [ ] Phase 3 → Phase 4 gate row in `ADR-TRACEABILITY.md` sign-off table completed
+- [ ] Run compliance sweep agent: confirm no new gaps since last sweep
+
 ---
 
 ## Phase 4 — Vertical Slices
 
 **Goal:** Wire each feature up to the real backend, replacing mock data and adding real functionality. Work in the order a user encounters the feature.
 **Estimated time:** 6–7 weeks
+
+**Accessibility — definition of done for every slice (ADR-OPS-006, GAP-16):**
+Before marking any slice complete, run `@axe-core/react` in development mode and resolve all console violations. Keyboard navigation through the slice's interactive elements must be fully operable (Tab, Shift+Tab, Enter, Space, Arrow keys where applicable).
 
 For each slice: replace the static mock page with real data fetching, add Server Actions and API routes, and validate against the acceptance criteria in `business/PRD inputs/acceptance-criteria.md`.
 
@@ -1146,6 +1223,20 @@ Two Vercel cron jobs handle automated inactivity deletion. Both validate `Author
 - For each: executes the same cascade deletion as user-initiated deletion (same order: answers → applications → charity_profiles → ai_usage_log → user_profiles → Supabase Auth `deleteUser`)
 - Sends Email 4 via Resend immediately after deletion
 - Logs each deletion to Sentry with user ID (not email — PII scrubbing applies)
+
+---
+
+## Phase 4 → Phase 5 Gate
+
+**This gate must be signed off before any Phase 5 task begins.**
+
+Checklist:
+- [ ] All Phase 4 slices complete (Slice 0–8), or any incomplete slices explicitly deferred with justification
+- [ ] ADR Traceability Table reviewed — all ⚠️ Gap rows resolved or documented as N/A
+- [ ] All GAP-01 through GAP-20 resolved or explicitly signed off as deferred
+- [ ] Run compliance sweep agent: confirm no new gaps introduced during Phase 4
+- [ ] Security and GDPR-critical ADRs re-reviewed by project owner
+- [ ] Phase 4 → Phase 5 gate row in `ADR-TRACEABILITY.md` sign-off table completed
 
 ---
 

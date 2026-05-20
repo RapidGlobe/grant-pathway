@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (Phase 0–3 re-audit — D-27 session cookie bug fixed)
+**Last updated:** 2026-05-20 (ADR traceability table created; P3.12 gap resolutions added; phase gates added)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,7 +40,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **11** | **10** | ⚠️ 1 task added |
+| **Phase 3 — Infrastructure Setup** | **12** | **10** | ⚠️ 2 tasks remaining |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 1 | ✅ Complete |
@@ -52,6 +52,8 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.9 — Seed data | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 0 | Not started |
+| **Phase 3 → Phase 4 Gate** | — | — | ⏳ Pending |
 | **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 0 | Not started |
@@ -105,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **77** | **24** | |
+| **Total** | **78** | **24** | |
 
 ---
 
@@ -264,6 +266,22 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - 3 ai_usage_log entries; all UUIDs fixed (a/b/c/d/e0000000-...) for reproducibility
   - ⚠️ Run `supabase db reset` locally to apply seed; seed is local-only (never run against production)
 - [ ] **P3.11** Health endpoint: `app/api/health/route.ts` returns 200/503 based on Supabase connectivity; `/api/health` added to public routes matcher in `proxy.ts` (ADR-OPS-007)
+- [ ] **P3.12** Pre-Phase 4 gap resolutions — 7 items from ADR consequences sweep (2026-05-20):
+  - GAP-06: Add `SUPABASE_DB_PASSWORD` to `.env.example`
+  - GAP-08: Server-side file re-validation in `POST /api/upload/process`
+  - GAP-09: Create `lib/guidelines-session.ts` utility
+  - GAP-10: Call `clearGuidelines()` on Step 3 completion
+  - GAP-11: Configure GitHub branch protection on `main`
+  - GAP-14: Install `@axe-core/react` and wire in development mode
+  - GAP-18: Confirm Supabase Auth JWT expiry ≥ 60 minutes in both dev and prod
+
+## Phase 3 → Phase 4 Gate
+
+- [ ] All Phase 3 tasks complete (P3.1–P3.12), or any incomplete tasks explicitly deferred
+- [ ] ADR Traceability Table reviewed — all ⚠️ Gap rows covered or documented as N/A
+- [ ] GAP-06, GAP-08, GAP-09, GAP-10, GAP-11, GAP-14, GAP-18 resolved
+- [ ] Security and GDPR-critical ADRs reviewed by project owner (ADR-SEC-001–006, ADR-DATA-001–004)
+- [ ] Gate sign-off row in `docs/Implementation Plan/ADR-TRACEABILITY.md` completed
   - UptimeRobot monitor configured in P5.4 once production domain is live
 - [x] **P3.10** AWS Bedrock spend cap configured in AWS Billing console: budget `grant-pathway-bedrock-cap` created ($127 / ~£100); Alert #1 at $89 (~£70), Alert #2 at $127 (~£100); both alerts email mailinglist@rapidglobe.com; health status confirmed OK
   - ⚠️ Budget is scoped to All AWS services (not Bedrock-only) — Bedrock does not yet appear in the service filter as it has no billing history. Edit the budget scope to filter to Bedrock only once the first Bedrock invoice is generated.
@@ -360,6 +378,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | 2026-05-07 | Plan updated to v1.4 following review against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006. Three additional discrepancies documented (D20–D22). Corrections: hard 150k character truncation removed (soft warning only per PDR-AI-004); Try again button added to Charity Commission unavailable state; persistent AI failure state added to Steps 3 and 4. No new tasks — total remains 76. All 17 PRD decisions now verified. |
 | 2026-05-07 | Plan updated to v1.5 following full review of all 42 ADRs and technical-design.md. Eight additional discrepancies documented (D23–D30). Key corrections: large-document threshold unit conflict documented; responsive strategy reconciled (desktop-first + 320px min); explicit protected routes list added to P3.4 (plural /applications/:path*); inactivity deletion authority note added; AI usage count display added to dashboard (P1.6, Slice 2); ADR-SEC-006 incomplete note added to P3.2; user_profiles schema authority documented. No new tasks — total remains 76. All 42 ADRs now verified. |
 | 2026-05-20 | **Phase 3 complete. P3.10 complete.** AWS Budget `grant-pathway-bedrock-cap` created ($127/~£100). Two email alerts: $89 (~£70 warning) and $127 (~£100 cap). Scoped to All AWS services for now — narrow to Bedrock once first Bedrock invoice generated. No automated hard-stop action attached (IAM role setup deferred to P5.4 pre-launch). |
+| 2026-05-20 | **ADR traceability table created; P3.12 and phase gates added.** Full ADR consequences sweep completed across all 42 ADRs. 20 gaps found (GAP-01 to GAP-20) — none were security vulnerabilities but several were implementation-blocking. `docs/Implementation Plan/ADR-TRACEABILITY.md` created as a living document mapping every consequence to a task. P3.12 captures the 7 High/Medium blockers that must be resolved before Phase 4 starts. Formal Phase 3→4 and Phase 4→5 gates added to the plan. AGENTS.md updated with a mandatory pre-task ADR consequences check rule. Plan version → 1.6. Total tasks: 78. |
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
