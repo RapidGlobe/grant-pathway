@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (ADR traceability table created; P3.12 gap resolutions added; phase gates added)
+**Last updated:** 2026-05-20 (P3.11 complete — health endpoint)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -40,7 +40,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export | 1 | 1 | ✅ Complete |
-| **Phase 3 — Infrastructure Setup** | **12** | **10** | ⚠️ 2 tasks remaining |
+| **Phase 3 — Infrastructure Setup** | **12** | **11** | ⚠️ 1 task remaining |
 | &nbsp;&nbsp;P3.1 — Supabase schema and RLS | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.2 — Environment variables | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.3 — Supabase client instances | 1 | 1 | ✅ Complete |
@@ -51,7 +51,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.8 — Resend email sending | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.9 — Seed data | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 0 | Not started |
+| &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 0 | Not started |
 | **Phase 3 → Phase 4 Gate** | — | — | ⏳ Pending |
 | **Phase 4 — Vertical Slices** | **36** | **0** | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **24** | |
+| **Total** | **78** | **25** | |
 
 ---
 
@@ -265,7 +265,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - Application 3 (d0000000-...003): Lloyds Bank Foundation / Invest Programme 2025, approved, step 5, 3 answers (2 user_edited + 1 ai_generated, all approved), last_exported_at set
   - 3 ai_usage_log entries; all UUIDs fixed (a/b/c/d/e0000000-...) for reproducibility
   - ⚠️ Run `supabase db reset` locally to apply seed; seed is local-only (never run against production)
-- [ ] **P3.11** Health endpoint: `app/api/health/route.ts` returns 200/503 based on Supabase connectivity; `/api/health` added to public routes matcher in `proxy.ts` (ADR-OPS-007)
+- [x] **P3.11** Health endpoint: `app/api/health/route.ts` returns 200/503 based on Supabase connectivity; `/api/health` added to public routes matcher in `proxy.ts` (ADR-OPS-007)
+  - `app/api/health/route.ts` — queries `user_profiles` count; returns `{ status: 'ok' }` 200 on success, `{ status: 'error' }` 503 on DB failure
+  - `proxy.ts` — `PUBLIC_API = ['/api/health']` early-return bypass added before `updateSession()` so no Supabase SSR overhead is incurred for health checks (ADR-OPS-007)
+  - ⚠️ UptimeRobot monitor to be configured in P5.4 once production domain is confirmed
 - [ ] **P3.12** Pre-Phase 4 gap resolutions — 7 items from ADR consequences sweep (2026-05-20):
   - GAP-06: Add `SUPABASE_DB_PASSWORD` to `.env.example`
   - GAP-08: Server-side file re-validation in `POST /api/upload/process`

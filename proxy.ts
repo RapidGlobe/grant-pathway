@@ -1,6 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
+// Public API routes — bypass session handling entirely (ADR-OPS-007)
+// These routes must be reachable without a session (e.g. UptimeRobot health checks).
+// They are listed here rather than in the matcher so the intent is explicit.
+const PUBLIC_API = ['/api/health']
+
 // Protected routes — require an authenticated session (D1 resolution: plural /applications)
 const PROTECTED = ['/dashboard', '/profile', '/applications', '/account']
 
@@ -20,8 +25,15 @@ function isAuthOnly(pathname: string) {
 }
 
 export async function proxy(request: NextRequest) {
-  const { supabaseResponse, user } = await updateSession(request)
   const { pathname } = request.nextUrl
+
+  // Public API routes bypass session handling entirely — return immediately
+  // without calling updateSession() so no Supabase SSR overhead is incurred
+  if (PUBLIC_API.some((route) => pathname === route || pathname.startsWith(route + '/'))) {
+    return NextResponse.next()
+  }
+
+  const { supabaseResponse, user } = await updateSession(request)
 
   // Unauthenticated user trying to access a protected route → sign in page
   if (!user && isProtected(pathname)) {
