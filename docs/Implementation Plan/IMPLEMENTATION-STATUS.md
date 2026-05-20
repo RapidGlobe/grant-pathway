@@ -276,7 +276,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - ✅ **GAP-10** S5.2 spec in `IMPLEMENTATION-PLAN.md` updated — `clearGuidelines(applicationId)` call added to the API route on-success step (ADR-FILE-004)
   - 🔴 **GAP-11** GitHub branch protection BLOCKED — requires GitHub Pro for private repositories. Current account is on GitHub Free. Resolution: upgrade at github.com/settings/billing ($4/month). Until then, team enforces PR review discipline manually. (ADR-OPS-002, ADR-STACK-005)
   - ✅ **GAP-14** `@axe-core/react` installed as dev dependency; `components/axe-provider.tsx` created; wired into `app/layout.tsx`; WCAG violations logged to browser console in development only (ADR-OPS-006)
-  - ✅ **GAP-18** Supabase Auth JWT expiry confirmed ≥ 60 minutes: local `jwt_expiry = 3600` in `supabase/config.toml`; prod project uses Supabase default (3600s). To verify prod manually: Supabase dashboard → Authentication → Configuration → JWT expiry (ADR-SEC-003)
+  - ✅ **GAP-18** Supabase Auth JWT expiry confirmed ≥ 60 minutes: local `jwt_expiry = 3600` in `supabase/config.toml`; prod verified 2026-05-20 — Supabase dashboard → Project Settings → API → Legacy JWT Secret → **Access token expiry time: 3600 seconds** (ADR-SEC-003)
 
 ## Phase 3 → Phase 4 Gate
 

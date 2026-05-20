@@ -177,7 +177,7 @@
 | ADR-SEC-003 | Client-side inactivity timer implemented (60-minute timeout) | S0.5 | ✅ |
 | ADR-SEC-003 | Timeout warning modal designed and implemented | P1.1, S0.5 | ✅ |
 | ADR-SEC-003 | Auto-save completes before session timeout fires | S6.3, S0.5 | ✅ |
-| ADR-SEC-003 | Supabase Auth JWT expiry confirmed ≥ 60 minutes | P3.12 | ✅ GAP-18 resolved — local: config.toml `jwt_expiry = 3600`; prod: Supabase default confirmed 3600s |
+| ADR-SEC-003 | Supabase Auth JWT expiry confirmed ≥ 60 minutes | P3.12 | ✅ GAP-18 resolved — local: config.toml `jwt_expiry = 3600`; prod: verified 2026-05-20 at 3600s (Project Settings → API → Legacy JWT Secret) |
 | ADR-SEC-004 | All 6 HTTP security headers configured in `next.config.ts` | P3.5 | ✅ |
 | ADR-SEC-004 | CSP tested against all pages post-deployment | P5.2 | 🔵 |
 | ADR-SEC-005 | `ai_usage_log` count checked in all AI API routes before Bedrock call | S5.2, S6.2 | ✅ |
@@ -235,7 +235,7 @@ All ⚠️ rows consolidated here for easy triage. Update this table as gaps are
 | GAP-15 | ADR-OPS-006 | Lighthouse CI automation on each deployment not configured | Medium | Add new task | |
 | GAP-16 | ADR-OPS-006 | Accessibility not part of definition of done for Phase 4 slices | Medium | Add to Phase 4 introduction | |
 | GAP-17 | ADR-SEC-002 | RLS cross-user access test never tasked | Medium | Add to P5.2 | |
-| GAP-18 | ADR-SEC-003 | Supabase Auth JWT expiry never confirmed ≥ 60 minutes | High | Add to P3.4 or new pre-Phase 4 task | ✅ 2026-05-20 P3.12 — local: `jwt_expiry = 3600` in config.toml; prod: Supabase default 3600s (60 min); verify manually in dashboard if changed |
+| GAP-18 | ADR-SEC-003 | Supabase Auth JWT expiry never confirmed ≥ 60 minutes | High | Add to P3.4 or new pre-Phase 4 task | ✅ 2026-05-20 P3.12 — local: `jwt_expiry = 3600` in config.toml; prod: manually verified 3600s (Project Settings → API → Legacy JWT Secret → Access token expiry time) |
 | GAP-19 | ADR-DATA-002 | No UI message when user returns to Step 2 without `sessionStorage` entry | Medium | Add to S4.1 | |
 | GAP-20 | ADR-STACK-005 | Dependency licence review not tasked | Low | Add to P5.1 | |
 
