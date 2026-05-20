@@ -1,3 +1,5 @@
+// ⚠️ Three-file rule: any init option added here must also be added to
+// sentry.server.config.ts and sentry.edge.config.ts
 import * as Sentry from '@sentry/nextjs'
 
 Sentry.init({
