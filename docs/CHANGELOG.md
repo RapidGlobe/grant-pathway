@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-20 — Phase 3 Compliance Review: word_limit Migration Applied
+
+**What changed:**
+- New migration `20260520000000_add_word_limit_to_application_answers.sql` adds `word_limit integer` (nullable) to `application_answers`.
+- Applied to both dev (`stanwaejdvlvremtffkf`) and prod (`mvmjryipieepvsjudche`).
+
+**Why:**
+`word_limit` is specified in ADR-DATA-001, technical-design.md, and ADR-AI-004 but was omitted from the initial schema during P3.1. It is populated by the AI Summary step (Slice 5) when questions are extracted from funder guidelines, and used as a per-question constraint in the draft-answer prompt (Slice 6). Adding it now as a dedicated migration keeps a clean audit trail.
+
+---
+
 ## 2026-05-20 — Phase 3 Compliance Review: High Severity Fixes Applied
 
 **What changed:**

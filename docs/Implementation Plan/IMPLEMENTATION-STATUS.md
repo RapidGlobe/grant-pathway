@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (Phase 3 compliance review — High severity fixes applied)
+**Last updated:** 2026-05-20 (Phase 3 compliance review — word_limit migration applied)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -214,6 +214,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `grant-pathway-dev` (eu-west-2, ref: stanwaejdvlvremtffkf) — 5 tables, 18 RLS policies, guidelines-temp bucket confirmed
   - `grant-pathway-prod` (eu-west-2, ref: mvmjryipieepvsjudche) — same schema confirmed
   - Migration: `supabase/migrations/20260519000000_initial_schema.sql`
+  - ✅ `word_limit integer` column added to `application_answers` 2026-05-20 via `20260520000000_add_word_limit_to_application_answers.sql` — omitted from initial schema; applied to dev and prod
 - [x] **P3.2** Environment variables: `.env.example` committed; `.env.local` populated; confirmed in `.gitignore`
   - ⚠️ `.env.local` Supabase keys point to old dev project — must be updated to new dev project (ref: stanwaejdvlvremtffkf) keys from Supabase dashboard → Settings → API
   - UPSTASH, CRON_SECRET, SENTRY_DSN placeholders added — filled in during P3.6 and P3.7
