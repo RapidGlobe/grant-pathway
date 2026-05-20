@@ -83,6 +83,108 @@ export async function registerUser(
 }
 
 // ---------------------------------------------------------------------------
+// S0.6 — MFA opt-in (TOTP via Supabase Auth)
+// ---------------------------------------------------------------------------
+
+/**
+ * Starts TOTP enrollment for the current user.
+ * Returns the QR code SVG data URL and the factorId needed to complete
+ * enrollment.  Called directly from a client-side event handler (not via
+ * useActionState) because it returns structured data rather than FormData.
+ */
+export type MfaEnrollResult =
+  | { ok: true; factorId: string; qrCode: string; secret: string }
+  | { ok: false; error: string }
+
+export async function mfaEnroll(): Promise<MfaEnrollResult> {
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'totp' })
+  if (error) return { ok: false, error: error.message }
+  return {
+    ok: true,
+    factorId: data.id,
+    qrCode: data.totp.qr_code,
+    secret: data.totp.secret,
+  }
+}
+
+export type MfaVerifyEnrollmentState = {
+  status: 'idle' | 'success' | 'invalid_code' | 'error'
+}
+
+/**
+ * Verifies the 6-digit TOTP code entered during enrollment.
+ * On success the factor is marked verified in Supabase and MFA is active.
+ * FormData: factorId (hidden), code (user-entered 6 digits).
+ */
+export async function mfaVerifyEnrollment(
+  _prevState: MfaVerifyEnrollmentState,
+  formData: FormData,
+): Promise<MfaVerifyEnrollmentState> {
+  const factorId = (formData.get('factorId') as string | null) ?? ''
+  const code = ((formData.get('code') as string | null) ?? '').replace(/\s/g, '')
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code })
+
+  if (error) {
+    if (error.status === 422) return { status: 'invalid_code' }
+    return { status: 'error' }
+  }
+  return { status: 'success' }
+}
+
+export type MfaUnenrollState = {
+  status: 'idle' | 'success' | 'error'
+}
+
+/**
+ * Removes the user's TOTP factor.  After success the caller should
+ * call router.refresh() to re-read the updated MFA status from the server.
+ * FormData: factorId (hidden).
+ */
+export async function mfaUnenroll(
+  _prevState: MfaUnenrollState,
+  formData: FormData,
+): Promise<MfaUnenrollState> {
+  const factorId = (formData.get('factorId') as string | null) ?? ''
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.mfa.unenroll({ factorId })
+
+  if (error) return { status: 'error' }
+  return { status: 'success' }
+}
+
+export type VerifyMfaState = {
+  error: 'invalid_code' | 'unknown' | null
+}
+
+/**
+ * Completes MFA sign-in by challenging and verifying the TOTP code.
+ * Called from MfaChallengeForm on the /mfa page.
+ * On success: redirects to /dashboard (session upgraded to aal2).
+ * FormData: factorId (hidden), code (user-entered 6 digits).
+ */
+export async function verifyMfaSignIn(
+  _prevState: VerifyMfaState,
+  formData: FormData,
+): Promise<VerifyMfaState> {
+  const factorId = (formData.get('factorId') as string | null) ?? ''
+  const code = ((formData.get('code') as string | null) ?? '').replace(/\s/g, '')
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.mfa.challengeAndVerify({ factorId, code })
+
+  if (error) {
+    if (error.status === 422) return { error: 'invalid_code' }
+    return { error: 'unknown' }
+  }
+
+  redirect('/dashboard')
+}
+
+// ---------------------------------------------------------------------------
 // S0.5 — Sign out (called directly from SessionTimeoutProvider timer and
 //         from the authenticated nav sign-out button)
 // ---------------------------------------------------------------------------
@@ -214,6 +316,14 @@ export async function signIn(
     // All other errors (wrong password, unknown email, rate limit) surface as
     // the same generic credentials message to prevent email enumeration (AC-FR-04-03).
     return { error: 'credentials' }
+  }
+
+  // Check whether a second factor is required (AC-FR-07-03).
+  // If the user has a verified TOTP factor the next required level is aal2;
+  // redirect to the MFA challenge page before granting access to the app.
+  const { data: mfaData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+  if (mfaData?.nextLevel === 'aal2' && mfaData?.currentLevel !== 'aal2') {
+    redirect('/mfa')
   }
 
   redirect('/dashboard')

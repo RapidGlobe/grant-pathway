@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-05-20 — S0.6: MFA opt-in wired up
+
+**What changed:**
+- `actions/auth.ts` — four new Server Actions: `mfaEnroll()` (returns QR code SVG data URL, factorId, and TOTP secret for display; called directly from a useTransition handler, not useActionState, because it returns structured data), `mfaVerifyEnrollment()` (verifies the 6-digit code entered during setup; maps status 422 to `invalid_code`), `mfaUnenroll()` (removes the TOTP factor), `verifyMfaSignIn()` (completes MFA sign-in; redirects to `/dashboard` on success). `signIn()` updated: after a successful `signInWithPassword`, calls `getAuthenticatorAssuranceLevel()`; if `nextLevel === 'aal2'` and `currentLevel !== 'aal2'`, redirects to `/mfa` instead of `/dashboard`.
+- `proxy.ts` — `/mfa` added to PROTECTED (requires an active aal1 session to reach the challenge page).
+- `app/(authenticated)/mfa/page.tsx` (new) — reads first TOTP factor via `listFactors()`; redirects to `/dashboard` if the user somehow arrives with no factor enrolled; renders `MfaChallengeForm`.
+- `components/mfa-challenge-form.tsx` (new) — `useActionState(verifyMfaSignIn)`; hidden `factorId` input; numeric code input with `inputMode="numeric"` and `autoComplete="one-time-code"`; separate error banners for `invalid_code` and `unknown`.
+- `app/(authenticated)/account/page.tsx` — rewritten as async Server Component. Previously passed `?mfa=enabled` URL param from a static demo. Now reads real email from `auth.getUser()` and real MFA status from `mfa.listFactors()` (filters by `factor_type === 'totp'` and `status === 'verified'`). Passes `email`, `mfaEnabled`, `mfaFactorId` to `AccountSettingsForm`.
+- `components/mfa-setup-panel.tsx` (new) — two-state panel. Not enabled: "Set up" button calls `mfaEnroll()` inside `useTransition` (not `useActionState`) since it returns data, not FormData; shows QR code and manual setup key; verify form uses `useActionState(mfaVerifyEnrollment)`. Enabled: unenroll form uses `useActionState(mfaUnenroll)`. `router.refresh()` triggered via `useEffect` when either action reaches `status === 'success'`, causing the parent Server Component to re-fetch and pass updated props.
+- `components/account-settings-form.tsx` — `MOCK_EMAIL` replaced with real `email` prop; static MFA toggle (local `mfaOn` useState) replaced with `MfaSetupPanel`; interface updated with `email`, `mfaEnabled`, `mfaFactorId` props.
+
+**Why:**
+`mfaEnroll()` is called outside `useActionState` because it returns structured data (QR code, factorId, secret) that the component needs to display. Encoding those as FormData round-trips would add unnecessary complexity. `useTransition` provides the pending state. The `router.refresh()` approach (useEffect on status change) is preferred over a server `redirect()` inside the action because the user stays on `/account` after MFA setup — only the data changes.
+
+---
+
 ## 2026-05-20 — S0.5: Session timeout wired up
 
 **What changed:**

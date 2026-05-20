@@ -6,6 +6,7 @@ import { Eye, EyeOff, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MfaSetupPanel } from "@/components/mfa-setup-panel";
 
 interface FieldErrors {
   currentPassword?: string;
@@ -14,13 +15,20 @@ interface FieldErrors {
 }
 
 interface AccountSettingsFormProps {
+  /** Real email address from auth.users — passed from the Server Component. */
+  email: string;
+  /** Whether the user has a verified TOTP factor. */
   mfaEnabled?: boolean;
+  /** Factor ID of the enrolled TOTP factor (empty string if not enabled). */
+  mfaFactorId?: string;
 }
 
-const MOCK_EMAIL = "sarah@helpinghandsuk.org";
-
-export function AccountSettingsForm({ mfaEnabled = false }: AccountSettingsFormProps) {
-  // Change password form state
+export function AccountSettingsForm({
+  email,
+  mfaEnabled = false,
+  mfaFactorId = "",
+}: AccountSettingsFormProps) {
+  // Change password form state (wired to Supabase in S8.1)
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,9 +37,6 @@ export function AccountSettingsForm({ mfaEnabled = false }: AccountSettingsFormP
   const [showConfirm, setShowConfirm] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [passwordUpdated, setPasswordUpdated] = useState(false);
-
-  // MFA state (toggled by URL param in static shell)
-  const [mfaOn, setMfaOn] = useState(mfaEnabled);
 
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -73,7 +78,7 @@ export function AccountSettingsForm({ mfaEnabled = false }: AccountSettingsFormP
         <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3">
           <p className="text-[14px] text-[#374151]">
             <span className="font-medium">Your email address:</span>{" "}
-            <span>{MOCK_EMAIL}</span>
+            <span>{email}</span>
           </p>
         </div>
       </section>
@@ -235,29 +240,16 @@ export function AccountSettingsForm({ mfaEnabled = false }: AccountSettingsFormP
         </h2>
         <p className="mb-4 text-[14px] text-[#64748B]">
           Status:{" "}
-          <span className={mfaOn ? "font-medium text-[#16A34A]" : "text-[#64748B]"}>
-            {mfaOn ? "Enabled" : "Not enabled"}
+          <span
+            className={
+              mfaEnabled ? "font-medium text-[#16A34A]" : "text-[#64748B]"
+            }
+          >
+            {mfaEnabled ? "Enabled" : "Not enabled"}
           </span>
         </p>
 
-        {mfaOn ? (
-          <button
-            type="button"
-            onClick={() => setMfaOn(false)}
-            className="rounded text-[14px] text-[#DC2626] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-          >
-            Remove two-factor authentication
-          </button>
-        ) : (
-          <Button
-            type="button"
-            onClick={() => setMfaOn(true)}
-            variant="outline"
-            className="h-10 border-[#0D6E6E] px-5 text-[14px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4]"
-          >
-            Set up two-factor authentication
-          </Button>
-        )}
+        <MfaSetupPanel mfaEnabled={mfaEnabled} mfaFactorId={mfaFactorId} />
       </section>
 
       <hr className="mb-8 border-[#E2E8F0]" />

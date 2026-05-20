@@ -7,7 +7,8 @@ import { updateSession } from '@/lib/supabase/middleware'
 const PUBLIC_API = ['/api/health']
 
 // Protected routes — require an authenticated session (D1 resolution: plural /applications)
-const PROTECTED = ['/dashboard', '/profile', '/applications', '/account']
+// /mfa is the TOTP challenge page reached after password auth when aal2 is required (S0.6)
+const PROTECTED = ['/dashboard', '/profile', '/applications', '/account', '/mfa']
 
 // Auth-only routes — redirect to /dashboard if already signed in.
 // NOTE: /verify-email and /forgot-password are intentionally excluded.
