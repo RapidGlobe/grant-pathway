@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-05-20 — Phase 3 Complete: AWS Bedrock Spend Cap Configured
+
+**What changed:**
+- AWS Budget `grant-pathway-bedrock-cap` created in AWS Billing console: $127/month (~£100).
+- Alert #1 at $89 (~£70): early warning email to mailinglist@rapidglobe.com.
+- Alert #2 at $127 (~£100): hard cap email to mailinglist@rapidglobe.com.
+- Budget scoped to All AWS services — Bedrock does not yet appear in the service filter as it has no billing history. To be narrowed to Bedrock-only after first Bedrock invoice.
+- No automated IAM hard-stop action attached to Alert #2 — deferred to P5.4 (pre-launch infrastructure) due to complexity of IAM role setup.
+
+**Why:**
+The per-user 20 req/month limit in the application is the primary cost control. The AWS budget is a secondary backstop. Email alerts at £70 and £100 provide sufficient warning to intervene manually before launch traffic is significant. The IAM hard-stop will be properly configured during P5.4 when the full production infrastructure is reviewed.
+
+**Phase 3 is now complete.** All 10 infrastructure tasks done. Next: Phase 4 — Vertical Slices.
+
+---
+
 ## 2026-05-20 — P3.8 Complete: Email Infrastructure; Inactivity Emails Moved to Code
 
 **What changed:**
