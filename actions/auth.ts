@@ -83,6 +83,22 @@ export async function registerUser(
 }
 
 // ---------------------------------------------------------------------------
+// S0.5 — Sign out (called directly from SessionTimeoutProvider timer and
+//         from the authenticated nav sign-out button)
+// ---------------------------------------------------------------------------
+
+/**
+ * Signs the current user out via Supabase Auth signOut().
+ * Intentionally does NOT call redirect() — the caller (client component)
+ * handles navigation so this works correctly from both form submissions and
+ * timer callbacks.
+ */
+export async function signOut(): Promise<void> {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+}
+
+// ---------------------------------------------------------------------------
 // S0.4 — Password reset (request + set new password)
 // ---------------------------------------------------------------------------
 

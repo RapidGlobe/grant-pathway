@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-20 (S0.4 complete — Password Reset)
+**Last updated:** 2026-05-20 (S0.5 complete — Session Timeout)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,13 +54,13 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **4** | In progress |
-| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **4** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **5** | In progress |
+| &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **5** | In progress |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in | 1 | 0 | Not started |
 | &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup | 1 | 0 | Not started |
@@ -320,7 +320,11 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `proxy.ts` — removed `/forgot-password` from AUTH_ONLY; the callback sets a recovery session making the user authenticated, which would otherwise cause the middleware to redirect them to `/dashboard` before they can set their password
   - `components/forgot-password-request-form.tsx` — wired via `useActionState(requestPasswordReset)`; `state.status === 'sent'` drives success view; `name="email"` added; loading state on button
   - `components/reset-password-form.tsx` — wired via `useActionState(resetPassword)`; `isExpired` prop (link expired on arrival) and `state.status === 'expired'` (session expired mid-form) both render the expired view; `name="password"` added; loading state on button; generic error banner for unexpected failures
-- [ ] **S0.5** Session timeout wired up: 60-minute inactivity timer; warning at 55 min; `signOut()` + redirect at 60 min
+- [x] **S0.5** Session timeout wired up: 60-minute inactivity timer; warning at 55 min; `signOut()` + redirect at 60 min
+  - `actions/auth.ts` — `signOut` Server Action added; no `redirect()` — client handles navigation so it works correctly from both form actions and timer callbacks
+  - `components/session-timeout-provider.tsx` (new) — client component; listens for `mousemove`, `keydown`, `click`, `touchstart` on `document` (passive); resets two timers on activity: warning at 55 min (opens modal, starts 1-min countdown), auto sign-out at 60 min; "I'm still here" → `resetTimers()`; "Sign out now" → `doSignOut()` → `router.push('/')`; stable `useCallback` refs prevent stale closures; cleanup removes all listeners and timers on unmount
+  - `app/(authenticated)/layout.tsx` — `SessionTimeoutStub` replaced with `SessionTimeoutProvider`; layout converted to async Server Component; reads real `first_name` and `email` from `supabase.auth.getUser()` (via `user_metadata`) and passes to `NavAuthenticated`
+  - `components/session-timeout-stub.tsx` — deleted (no longer referenced)
 - [ ] **S0.6** MFA opt-in wired up (Should Have — FR-07)
 
 ### Slice 1 — Charity Profile

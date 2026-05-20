@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-05-20 — S0.5: Session timeout wired up
+
+**What changed:**
+- `actions/auth.ts` — new `signOut` Server Action; calls `supabase.auth.signOut()` only, no `redirect()`. Navigation is handled by the caller. This is intentional — calling `redirect()` inside a `setTimeout` callback is unreliable; having the client component own the navigation is cleaner and more predictable.
+- `components/session-timeout-provider.tsx` (new) — client component that implements FR-06. Attaches passive event listeners (`mousemove`, `keydown`, `click`, `touchstart`) to `document`. Any activity resets two timers: a 55-minute warning timer and a 60-minute sign-out timer. At 55 minutes, `SessionTimeoutModal` opens with a 5-minute countdown (decremented each minute via `setInterval`). At 60 minutes, `signOut()` is called and the user is sent to `/`. "I'm still here" calls `resetTimers()`. "Sign out now" calls `doSignOut()` immediately. Stable `useCallback` references ensure the `useEffect` only runs once on mount and the activity handlers always call the current version of `resetTimers`.
+- `app/(authenticated)/layout.tsx` — converted to async Server Component; `SessionTimeoutStub` replaced with `SessionTimeoutProvider`; real `first_name` and `email` now read from `supabase.auth.getUser()` via `user_metadata` and passed to `NavAuthenticated`. `MOCK_FIRST_NAME` removed.
+- `components/session-timeout-stub.tsx` — deleted.
+
+**Why:**
+The `signOut` action omits `redirect()` because Server Action redirects work reliably from form submissions (via React's transition system) but are fragile when called from timer callbacks. Owning the navigation in the client component makes the timeout flow predictable. The layout is a Server Component so it can call `getUser()` at render time without adding a client-side data-fetch waterfall.
+
+---
+
 ## 2026-05-20 — S0.4: Password reset wired up
 
 **What changed:**
