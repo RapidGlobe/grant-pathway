@@ -751,14 +751,6 @@ Configure `next.config.js` with all headers from `technical-design.md` Section 1
    - **Email 3 — Inactivity warning:** subject "Your Grant Pathway account will be deleted in 30 days"; sent at 23 months of no login; includes `{first_name}` and `{deletion_date}` variables; links to sign-in page
    - **Email 4 — Account deleted (inactivity):** subject "Your Grant Pathway account has been deleted"; sent immediately after automated deletion at 24 months; includes `{first_name}` variable; links to registration page
 
-### P3.10 — AWS Bedrock Spend Cap
-
-Configure a monthly spend cap in the AWS Billing / Amazon Bedrock console (PDR-AI-005):
-- Set a monthly spend alert at £70 (acts as early warning before the £100/month budget limit is breached)
-- Set a hard spend cap at £100/month
-- This is a secondary backstop — the primary control is the per-user 20 req/month limit in the application
-- Confirm the cap is active before any production traffic is sent to Bedrock
-
 ### P3.9 — Seed Data
 
 Write `supabase/seed.sql` with realistic sample data:
@@ -767,6 +759,14 @@ Write `supabase/seed.sql` with realistic sample data:
 - Several draft answers
 
 Confirm `supabase db reset` loads the seed data and the app boots locally.
+
+### P3.10 — AWS Bedrock Spend Cap
+
+Configure a monthly spend cap in the AWS Billing / Amazon Bedrock console (PDR-AI-005):
+- Set a monthly spend alert at £70 (acts as early warning before the £100/month budget limit is breached)
+- Set a hard spend cap at £100/month
+- This is a secondary backstop — the primary control is the per-user 20 req/month limit in the application
+- Confirm the cap is active before any production traffic is sent to Bedrock
 
 ### P3.11 — Health Endpoint
 

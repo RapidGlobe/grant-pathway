@@ -47,7 +47,7 @@ Every push to `main` deploys to production. Every branch push creates a Vercel p
 2. Configure Resend SMTP in Supabase Auth dashboard (ADR-OPS-003)
 3. Customise Supabase Auth email templates — verification and password reset must reference "Grant Pathway", not "Supabase". Follow tone and voice guide in design-requirements.md (ADR-OPS-003)
 4. Add SPF and DKIM DNS records for the sending domain (ADR-OPS-003)
-5. Set Anthropic API spend limit in the Anthropic dashboard (ADR-AI-008)
+5. Configure AWS Bedrock spend cap in the AWS Billing console (PDR-AI-005) — Grant Pathway uses AWS Bedrock, not the Anthropic API directly
 6. Configure Sentry EU data region and add `SENTRY_DSN` to Vercel production environment (ADR-OPS-005)
 7. Validate HTTP security headers at securityheaders.com (ADR-SEC-004)
 8. Set production Supabase environment variables in Vercel Production scope (ADR-SEC-006)

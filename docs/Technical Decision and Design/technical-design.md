@@ -503,7 +503,7 @@ Both extraction functions live in `lib/extract-text.ts`. (ADR-FILE-003)
 | `.docx` | `mammoth` | If extraction throws: user-friendly error message |
 | Password-protected PDF | `unpdf` throws | "This PDF is password protected — please remove the password or paste the text instead." |
 
-Post-extraction, text is truncated at 150,000 characters before being passed to the AI API (ADR-AI-007).
+If extracted text exceeds 100,000 tokens (~75,000 words), a plain-language advisory message is shown before processing. The user may proceed with the full document or upload a trimmed version. No hard truncation is applied — the document is passed to the AI in full (PDR-AI-004, ADR-AI-007).
 
 ### Orphaned file protection
 
@@ -678,7 +678,7 @@ Content-Disposition: attachment; filename="[funder-name-slugified]-application.d
 - One section per question: question text as a heading, draft answer as body text, word count where a word limit was specified
 - Unanswered questions included with a blank answer section
 
-**Styling:** Inter font, teal headings consistent with the design system.
+**Styling:** Calibri 11pt body / 14pt headings, A4 page, 2.54cm margins, footer on every page. No web design system fonts or teal branding — the exported document is a professional submission to a funder (PDR-DH-003).
 
 Document generation is fast (milliseconds). No `maxDuration` extension is needed.
 
