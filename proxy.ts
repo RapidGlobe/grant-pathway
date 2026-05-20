@@ -27,18 +27,32 @@ export async function proxy(request: NextRequest) {
   if (!user && isProtected(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/'
-    return NextResponse.redirect(url)
+    return redirectWithCookies(url, supabaseResponse)
   }
 
   // Authenticated user trying to access sign in / register → dashboard
   if (user && isAuthOnly(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
-    return NextResponse.redirect(url)
+    return redirectWithCookies(url, supabaseResponse)
   }
 
   // All other requests — return the response with refreshed session cookies
   return supabaseResponse
+}
+
+/**
+ * Returns a redirect response that carries the refreshed Supabase session
+ * cookies from `supabaseResponse`. Without this, the session token is not
+ * refreshed on redirect responses and users may be spuriously logged out.
+ * See: https://supabase.com/docs/guides/auth/server-side/nextjs (SSR cookie warning)
+ */
+function redirectWithCookies(url: URL, supabaseResponse: NextResponse): NextResponse {
+  const redirect = NextResponse.redirect(url)
+  supabaseResponse.cookies.getAll().forEach((cookie) => {
+    redirect.cookies.set(cookie)
+  })
+  return redirect
 }
 
 export const config = {
