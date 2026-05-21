@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (S1.2 complete — profile save wired to Supabase)
+**Last updated:** 2026-05-21 (S1.3 complete — profile edit pre-fills from database)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **8** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **9** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -62,10 +62,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **2** | In progress |
+| &nbsp;&nbsp;**Slice 1 — Charity Profile** | **4** | **3** | In progress |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.2 — Profile save | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.4 — Profile incomplete banner | 1 | 0 | Not started |
 | &nbsp;&nbsp;**Slice 2 — Dashboard and Application Management** | **5** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S2.1 — Applications list and empty state | 1 | 0 | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **27** | |
+| **Total** | **78** | **28** | |
 
 ---
 
@@ -345,7 +345,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - [x] **S1.2** Profile save wired up: five-field form with Zod validation; `lookup_source` set to `charity_commission` or `manual`; first save shows "Go to my dashboard" button; subsequent saves show "Your changes have been saved."
   - `actions/charity.ts` — `saveCharityProfile(data)` Server Action added; Zod validation; `createClient()` Supabase server client; `auth.getUser()` for user isolation (ADR-DATA-001); checks for existing profile before upsert to determine `isFirstSave`; upserts to `charity_profiles` with `onConflict: 'user_id'`; sets `lookup_source = 'charity_commission'` when `paraphrasedFromLookup` is true, `'manual'` otherwise (D14)
   - `components/charity-profile-form.tsx` — `saveCharityProfile` imported; `isSaving` / `startSaving` transition added; `saveError` state added; `handleSubmit` now calls real Server Action via `startSaving`; save error banner rendered above submit button; submit button disabled and shows "Saving…" during transition
-- [ ] **S1.3** Profile edit wired up: pre-fills from database; saves updates correctly
+- [x] **S1.3** Profile edit wired up: pre-fills from database; saves updates correctly
+  - `actions/charity.ts` — `getCharityProfile()` added; fetches `charity_profiles` row for the authenticated user via `maybeSingle()`; returns `CharityProfileData` or `null` if no profile exists
+  - `components/charity-profile-form.tsx` — `initialData` prop added; all five `useState` fields initialised from `initialData` so form is pre-filled on edit; `CharityProfileData` type imported
+  - `app/(authenticated)/profile/page.tsx` — calls `getCharityProfile()` server-side; `isEdit` now derived from whether a profile row exists (replaces `?state=edit` URL param approach)
 - [ ] **S1.4** Profile incomplete banner shown/hidden correctly based on profile existence
 
 ### Slice 2 — Dashboard and Application Management
@@ -424,5 +427,6 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
+| 2026-05-21 | **S1.3 complete.** `getCharityProfile()` fetches existing profile from `charity_profiles`; `CharityProfileData` type exported; form `initialData` prop pre-fills all five fields; `isEdit` now derived from DB state not URL param. TypeScript clean. |
 | 2026-05-21 | **S1.2 complete.** `saveCharityProfile()` Server Action added to `actions/charity.ts`; Zod validation, Supabase upsert on `user_id` conflict, `lookup_source` correctly set to `charity_commission` or `manual` (D14). Form wired with real save, loading state, and error banner. TypeScript clean (0 errors). |
 | 2026-05-08 | **Phase 0 implementation started.** Next.js 16.2.5 scaffold created (Turbopack, React 19, Tailwind v4). Key deviations from plan: (1) Tailwind v4 has no `tailwind.config.ts` — design tokens added via `@theme inline` in `globals.css` instead. (2) Next.js 16 deprecates `middleware.ts` in favour of `proxy.ts` with `export function proxy()` — plan's middleware stub updated accordingly. (3) shadcn `toast` component deprecated — replaced with `sonner`. (4) shadcn `form` component not available in shadcn 4.7.0 registry — to be created manually in Phase 1 using react-hook-form directly. P0.2–P0.5 complete; P0.6 pending GitHub push and Vercel link (manual steps for owner). |

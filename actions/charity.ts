@@ -25,6 +25,50 @@ const CC_TIMEOUT_MS = 10_000
 const BEDROCK_TIMEOUT_MS = 30_000
 
 // ---------------------------------------------------------------------------
+// S1.3 — Fetch charity profile
+// ---------------------------------------------------------------------------
+
+export type CharityProfileData = {
+  charityName: string
+  registrationNumber: string | null
+  whatDoes: string
+  whoHelps: string
+  whereWorks: string
+}
+
+/**
+ * Fetches the authenticated user's charity profile for pre-filling the form.
+ * Returns null if no profile exists yet (first-time setup flow).
+ */
+export async function getCharityProfile(): Promise<CharityProfileData | null> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const { data } = await supabase
+    .from('charity_profiles')
+    .select(
+      'charity_name, registration_number, what_charity_does, who_charity_helps, where_charity_works',
+    )
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!data) return null
+
+  return {
+    charityName: data.charity_name,
+    registrationNumber: data.registration_number,
+    whatDoes: data.what_charity_does,
+    whoHelps: data.who_charity_helps,
+    whereWorks: data.where_charity_works,
+  }
+}
+
+// ---------------------------------------------------------------------------
 // S1.2 — Save charity profile
 // ---------------------------------------------------------------------------
 

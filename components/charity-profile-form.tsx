@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { lookupCharity, saveCharityProfile } from "@/actions/charity";
+import { lookupCharity, saveCharityProfile, type CharityProfileData } from "@/actions/charity";
 
 type LookupState = null | "match" | "no-match" | "unavailable";
 
@@ -19,24 +19,29 @@ interface FieldErrors {
 }
 
 interface CharityProfileFormProps {
-  /** True when editing an existing profile rather than creating the first one. */
+  /**
+   * Existing profile data passed from the server — pre-fills all fields (S1.3).
+   * Null/undefined when the user is setting up their profile for the first time.
+   */
+  initialData?: CharityProfileData | null;
+  /** Derived from initialData in the page — true when an existing profile was found. */
   isEdit?: boolean;
 }
 
-export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) {
+export function CharityProfileForm({ initialData, isEdit = false }: CharityProfileFormProps) {
   const [lookupQuery, setLookupQuery] = useState("");
   const [lookupResult, setLookupResult] = useState<LookupState>(null);
   const [isLookingUp, startLookup] = useTransition();
   const [isSaving, startSaving] = useTransition();
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Controlled field values — pre-filled by the lookup on match (S1.1);
-  // pre-filled from saved profile data when editing (S1.3).
-  const [charityName, setCharityName] = useState("");
-  const [regNumber, setRegNumber] = useState("");
-  const [whatDoes, setWhatDoes] = useState("");
-  const [whoHelps, setWhoHelps] = useState("");
-  const [whereWorks, setWhereWorks] = useState("");
+  // Controlled field values — pre-filled from initialData when editing (S1.3),
+  // or pre-filled by the Charity Commission lookup on match (S1.1).
+  const [charityName, setCharityName] = useState(initialData?.charityName ?? "");
+  const [regNumber, setRegNumber] = useState(initialData?.registrationNumber ?? "");
+  const [whatDoes, setWhatDoes] = useState(initialData?.whatDoes ?? "");
+  const [whoHelps, setWhoHelps] = useState(initialData?.whoHelps ?? "");
+  const [whereWorks, setWhereWorks] = useState(initialData?.whereWorks ?? "");
 
   /**
    * True when Bedrock successfully paraphrased the charitable objects on
