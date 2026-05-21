@@ -1,3 +1,16 @@
+// ⚠️  PLACEHOLDER LOGO — replace before launch
+//
+// The SVG below is a temporary stand-in built during development.
+// The real Grant Pathway logo (SVG or PNG, ideally both light and dark
+// variants) must be supplied by Wac / RapidGlobe Ltd before the
+// production launch (P5.4).
+//
+// When the real asset is ready:
+//   1. Add the logo file(s) to /public/images/
+//   2. Replace the <svg> below with <Image> (next/image) referencing
+//      the real file, or swap the SVG path data in place.
+//   3. Remove this comment block.
+
 interface LogoProps {
   className?: string;
 }
@@ -5,7 +18,7 @@ interface LogoProps {
 export function Logo({ className }: LogoProps) {
   return (
     <span className={`flex items-center gap-2 ${className ?? ""}`}>
-      {/* Icon mark — stylised G with person motif */}
+      {/* ⚠️ Placeholder icon mark — replace with real logo asset (see comment above) */}
       <svg
         width="32"
         height="32"
