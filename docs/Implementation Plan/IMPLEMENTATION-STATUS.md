@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (Slice 2 complete)
+**Last updated:** 2026-05-21 (Slice 3 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **15** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **18** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -73,10 +73,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S2.3 — Resume application | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S2.4 — Delete application | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S2.5 — Start button disabled until profile complete | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 3 — Step 1: Application Details** | **3** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S3.3 — Step locking | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 3 — Step 1: Application Details** | **3** | **3** | **✅ Complete** |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.3 — Step locking | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Slice 4 — Step 2: File Upload** | **4** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S4.1 — Upload path | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S4.2 — Paste path | 1 | 0 | Not started |
@@ -389,9 +389,15 @@ All five test scenarios passed. Bugs found and fixed during testing:
 
 ### Slice 3 — Step 1: Application Details
 
-- [ ] **S3.1** New application: creates `applications` row with `status = not_started`; funder name and grant name fields with correct labels; redirect to Step 2 on Continue
-- [ ] **S3.2** Existing application: loads from database; edits save correctly; Continue advances `current_step` to 2 (status remains `not_started` until Step 2 guidelines are saved)
-- [ ] **S3.3** Step locking: accessing Step 2+ without completing Step 1 redirects to Step 1
+- [x] **S3.1** New application saves correctly; redirect to Step 2 on Continue
+  - `actions/applications.ts` — `saveApplicationStep1(applicationId, funderName, grantName)` Server Action; updates `funder_name`, `grant_name`, advances `current_step` to `max(current_step, 2)` so returning to Step 1 never resets progress beyond it; calls `redirect()` to Step 2 on success; returns `{ ok: false, error }` on DB failure
+  - `components/application-step1-form.tsx` — rewritten; `applicationId` now always required (creation always happens first via S2.2); `useTransition` drives `isSaving` state; Continue button shows "Saving…" in-flight; server-side save error rendered as inline alert; heading shows "Start a new application" when both name fields are empty (`isNew` prop), "Continue your application" otherwise
+  - `app/(authenticated)/applications/[id]/step/1/page.tsx` — passes `isNew` prop derived from empty `funder_name` + `grant_name`
+- [x] **S3.2** Existing application loads and saves correctly
+  - Step 1 page already loads real `funder_name`/`grant_name` from DB (done in S2.2); `saveApplicationStep1` updates the row correctly on re-save; `current_step` never regresses
+- [x] **S3.3** Step locking implemented
+  - `lib/application-guard.ts` (new) — `getApplicationOrRedirect(applicationId, requestedStep)` fetches the application, verifies ownership, and redirects to `current_step` if `requestedStep > current_step`; used by every step page (2–5) so locking logic lives in one place
+  - `app/(authenticated)/applications/[id]/step/2/page.tsx` — calls `getApplicationOrRedirect(id, 2)`; attempting to access Step 2 without saving Step 1 redirects to Step 1 automatically
 
 ### Slice 4 — Step 2: File Upload
 
@@ -457,6 +463,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
+| 2026-05-21 | **Slice 3 complete.** Step 1 saves funder/grant names to DB and advances current_step to 2. Reusable `lib/application-guard.ts` helper introduced for step locking across all step pages (2–5). Step 2 now enforces step locking via `getApplicationOrRedirect`. TypeScript clean (0 errors). No manual steps required. |
 | 2026-05-21 | **Slice 2 complete.** Dashboard fetches real applications and AI usage count. `createApplication()` creates a DB row and redirects to Step 1. Continue navigates to stored `current_step`. View (approved/exported) triggers re-open flow. Delete with status-specific confirmation removes the row and refreshes the list. TypeScript clean (0 errors). No manual steps required — all Slice 2 tables and GRANTs were already in place from Phase 3. |
 | 2026-05-21 | **Logo placeholder recorded.** `components/logo.tsx` marked with `⚠️ PLACEHOLDER LOGO — replace before launch` comment. Real Grant Pathway logo (SVG/PNG, light + dark variants) to be supplied by Wac / RapidGlobe Ltd before P5.4 production launch. Instructions for swapping in the real asset are embedded in the component. |
 | 2026-05-21 | **S1.4 complete. Slice 1 complete.** Dashboard page fetches real first name and profile existence; banner shown/hidden correctly on both empty and populated states. `MOCK_PROFILE_INCOMPLETE` removed from `dashboard-populated.tsx`. |

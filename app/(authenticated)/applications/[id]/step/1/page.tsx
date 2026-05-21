@@ -43,11 +43,16 @@ export default async function Step1Page({ params }: Props) {
     redirect('/dashboard')
   }
 
+  // isNew: both fields empty means the application was just created and
+  // the user hasn't named it yet — show "Start a new application" heading.
+  const isNew = !application.funder_name && !application.grant_name
+
   return (
     <ApplicationStep1Form
       applicationId={id}
       initialFunderName={application.funder_name}
       initialGrantName={application.grant_name}
+      isNew={isNew}
     />
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ApplicationStep2Form } from "@/components/application-step2-form";
+import { getApplicationOrRedirect } from "@/lib/application-guard";
 
 export const metadata: Metadata = {
   title: "Upload Guidelines",
@@ -12,16 +13,27 @@ interface Props {
   searchParams: Promise<{ error?: string; warning?: string }>;
 }
 
+/**
+ * Step 2 — Upload Guidelines (S3.3 step locking applied).
+ *
+ * getApplicationOrRedirect(id, 2) enforces that current_step >= 2 before
+ * this page renders. If Step 1 hasn't been saved yet, the user is
+ * redirected back to Step 1 automatically.
+ */
 export default async function Step2Page({ params, searchParams }: Props) {
   const { id } = await params;
   const { error, warning } = await searchParams;
+
+  // Step locking: redirects to Step 1 if current_step < 2
+  await getApplicationOrRedirect(id, 2);
 
   const errorMap: Record<string, UploadError> = {
     format: "format",
     size: "size",
     scanned: "scanned",
   };
-  const initialError: UploadError = error && error in errorMap ? errorMap[error] : null;
+  const initialError: UploadError =
+    error && error in errorMap ? errorMap[error] : null;
   const showLargeWarning = warning === "large";
 
   return (

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { StepIndicator } from "@/components/step-indicator";
+import { saveApplicationStep1 } from "@/actions/applications";
 
 interface FieldErrors {
   funderName?: string;
@@ -14,36 +14,46 @@ interface FieldErrors {
 }
 
 interface ApplicationStep1FormProps {
-  // Provided when editing an existing application; undefined for /applications/new
-  applicationId?: string;
+  applicationId: string;
   initialFunderName?: string;
   initialGrantName?: string;
+  /** True when the application was just created and both name fields are empty. */
+  isNew?: boolean;
 }
-
-// Mock application ID used for static navigation in the shell
-const MOCK_ID = "123";
 
 export function ApplicationStep1Form({
   applicationId,
   initialFunderName = "",
   initialGrantName = "",
+  isNew = false,
 }: ApplicationStep1FormProps) {
-  const router = useRouter();
   const [funderName, setFunderName] = useState(initialFunderName);
   const [grantName, setGrantName] = useState(initialGrantName);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isSaving, startSaving] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Client-side validation — avoids a server round-trip for empty fields
     const errors: FieldErrors = {};
     if (!funderName.trim()) errors.funderName = "Please enter the funder's name";
     if (!grantName.trim()) errors.grantName = "Please enter the grant name";
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    // Static shell: navigate to Step 2 with a mock or existing ID
-    const id = applicationId ?? MOCK_ID;
-    router.push(`/applications/${id}/step/2`);
+    setSaveError(null);
+    startSaving(async () => {
+      // On success, saveApplicationStep1 calls redirect() and never returns.
+      // Only reaches the next line when there is a DB error.
+      const result = await saveApplicationStep1(
+        applicationId,
+        funderName.trim(),
+        grantName.trim(),
+      );
+      setSaveError(result.error);
+    });
   }
 
   return (
@@ -51,7 +61,7 @@ export function ApplicationStep1Form({
       <StepIndicator currentStep={1} />
 
       <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
-        {applicationId ? "Continue your application" : "Start a new application"}
+        {isNew ? "Start a new application" : "Continue your application"}
       </h1>
 
       <form noValidate onSubmit={handleSubmit}>
@@ -82,7 +92,7 @@ export function ApplicationStep1Form({
         </div>
 
         {/* What is the grant called? */}
-        <div className="mb-8">
+        <div className="mb-5">
           <Label
             htmlFor="grantName"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
@@ -107,19 +117,27 @@ export function ApplicationStep1Form({
           )}
         </div>
 
+        {/* Server-side save error */}
+        {saveError && (
+          <p role="alert" className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]">
+            {saveError}
+          </p>
+        )}
+
         {/* Cancel + Continue */}
-        <div className="flex items-center justify-between">
+        <div className="mt-8 flex items-center justify-between">
           <Link
             href="/dashboard"
-            className="text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 rounded"
+            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Cancel
           </Link>
           <Button
             type="submit"
-            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+            disabled={isSaving}
+            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
           >
-            Continue
+            {isSaving ? "Saving…" : "Continue"}
           </Button>
         </div>
       </form>

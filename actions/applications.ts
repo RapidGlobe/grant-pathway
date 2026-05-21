@@ -121,6 +121,61 @@ export async function deleteApplication(
 }
 
 // ---------------------------------------------------------------------------
+// S3.1 / S3.2 — Save Step 1 (Application Details)
+// ---------------------------------------------------------------------------
+
+/**
+ * Saves funder_name and grant_name for an existing application and
+ * redirects to Step 2.
+ *
+ * current_step advances to 2 on first save (new application). If the
+ * user returns to Step 1 later (current_step already >= 2), current_step
+ * is left unchanged so their progress further along is not reset.
+ *
+ * Returns { ok: false, error } only when the DB update fails — the
+ * success path always calls redirect() and never returns normally.
+ */
+export async function saveApplicationStep1(
+  applicationId: string,
+  funderName: string,
+  grantName: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  // Fetch current step so we only advance it, never regress it
+  const { data: existing } = await supabase
+    .from('applications')
+    .select('current_step')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  const newStep = Math.max(existing?.current_step ?? 1, 2)
+
+  const { error } = await supabase
+    .from('applications')
+    .update({
+      funder_name: funderName,
+      grant_name: grantName,
+      current_step: newStep,
+    })
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { ok: false, error: 'Could not save your application. Please try again.' }
+  }
+
+  redirect(`/applications/${applicationId}/step/2`)
+}
+
+// ---------------------------------------------------------------------------
 // S2.3 — Re-open application
 // ---------------------------------------------------------------------------
 
