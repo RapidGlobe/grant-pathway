@@ -8,7 +8,7 @@ export function SiteFooter() {
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-start justify-between gap-4 px-10 py-[22px]">
         <div>
           <p className="text-[13px] text-[#64748B]">© RapidGlobe Ltd {year}</p>
-          <p className="mt-0.5 text-[12px] text-[#94A3B8]">
+          <p className="mt-0.5 text-[12px] text-[#64748B]">
             Your free grant writing companion for UK charities
           </p>
         </div>
