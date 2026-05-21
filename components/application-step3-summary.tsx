@@ -1,79 +1,107 @@
 "use client";
 
-import { useState, useEffect } from "react";
+// Step 3 — AI Summary (S5.2, S5.3, S5.4)
+//
+// Auto-generation (AC-FR-24-01):
+//   On mount, if no existing summary is in the database, the component reads
+//   guidelines text from sessionStorage and calls /api/generate-summary.
+//   If sessionStorage is empty AND no DB summary exists, a "no guidelines"
+//   state prompts the user to go back and re-upload.
+//
+// Existing summary (returning user):
+//   If aiSummary is passed from the page (non-null), the component skips
+//   generation and shows the content state immediately. The DB value is the
+//   parsed JSON from applications.ai_summary.
+//
+// Progress bar (GAP-02):
+//   Advances 0 → ~89% on a timer (never reaches 90% on its own).
+//   Snaps to 100% immediately when the API responds — fast if Bedrock is quick,
+//   holds near 90% if Bedrock is slow.
+//
+// Retry logic:
+//   First failure → "failure" state with Try again button.
+//   Clicking Try again → second attempt → "persistent-failure" if that also fails.
+//   Regenerate → always resets to first attempt (fresh generation counts as new).
+//
+// sessionStorage cleanup (GAP-10, ADR-FILE-004):
+//   clearGuidelines(applicationId) is called after a successful generation.
+//   Guidelines text must not persist in the browser once a summary exists in the DB.
+
+import { useState, useEffect, useRef, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { RefreshCw, AlertCircle, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepIndicator } from "@/components/step-indicator";
+import { getGuidelines, clearGuidelines } from "@/lib/guidelines-session";
+import { advanceToStep4 } from "@/actions/applications";
+import type { AiSummaryData } from "@/app/api/generate-summary/route";
 
-type DisplayState = "loading" | "content" | "failure" | "persistent-failure";
+type DisplayState =
+  | "loading"
+  | "content"
+  | "failure"
+  | "persistent-failure"
+  | "no-guidelines";
 
 interface ApplicationStep3SummaryProps {
   applicationId: string;
-  initialState?: DisplayState;
-  questionsNotFound?: boolean;
+  /** Existing summary JSON string from the database. If non-null, skip generation. */
+  existingSummary: string | null;
 }
 
-// Staged loading messages keyed to progress thresholds
 const LOADING_MESSAGES = [
   { threshold: 0, text: "Reading your funder guidelines…" },
-  { threshold: 60, text: "Almost there…" },
+  { threshold: 50, text: "Identifying key information…" },
+  { threshold: 75, text: "Almost there…" },
 ];
-
-// Mock AI summary content
-const MOCK_SUMMARY = {
-  aboutGrant:
-    "Awards for All England is a small grants programme run by The National Lottery Community Fund. It supports local communities to thrive by funding projects that bring people together and build strong, connected communities.",
-  amount: "Between £300 and £10,000.",
-  whoCanApply: [
-    "Voluntary or community organisations",
-    "Constituted groups and charitable incorporated organisations (CIOs)",
-    "Registered charities and community interest companies (CICs) not distributing profit",
-    "Organisations based in England with an annual income under £500,000",
-  ],
-  lookingFor: [
-    "Projects that bring people together in their local community",
-    "Activities that help people become more active in community life",
-    "Initiatives that build connections between people who might otherwise be isolated",
-    "Work that enables communities to take on more active and visible roles",
-  ],
-  questions: [
-    {
-      number: 1,
-      text: "Describe your project and who it will help. What problem are you addressing?",
-      wordLimit: 400,
-    },
-    {
-      number: 2,
-      text: "How does your project meet our funding priorities?",
-      wordLimit: 300,
-    },
-    {
-      number: 3,
-      text: "How will you know your project has been successful?",
-      wordLimit: 200,
-    },
-  ],
-  keyRequirements: [
-    "Activities must take place in England",
-    "Project must be completed within 12 months of receiving funding",
-    "You must demonstrate how communities will be involved in your project",
-    "Funds cannot be used for activities that have already taken place",
-  ],
-};
 
 export function ApplicationStep3Summary({
   applicationId,
-  initialState = "loading",
-  questionsNotFound = false,
+  existingSummary,
 }: ApplicationStep3SummaryProps) {
-  const router = useRouter();
-  const [displayState, setDisplayState] = useState<DisplayState>(initialState);
+  // ── State ──────────────────────────────────────────────────────────────────
+  const [displayState, setDisplayState] = useState<DisplayState>(() => {
+    // If the DB already has a summary, show it immediately without loading
+    if (existingSummary) return "content";
+    return "loading";
+  });
+
+  const [summary, setSummary] = useState<AiSummaryData | null>(() => {
+    if (!existingSummary) return null;
+    try {
+      return JSON.parse(existingSummary) as AiSummaryData;
+    } catch {
+      return null;
+    }
+  });
+
+  const [questionsFound, setQuestionsFound] = useState<boolean>(() => {
+    if (!existingSummary) return false;
+    try {
+      const parsed = JSON.parse(existingSummary) as AiSummaryData;
+      return Array.isArray(parsed.questions) && parsed.questions.length > 0;
+    } catch {
+      return false;
+    }
+  });
+
+  const [approachingLimit, setApproachingLimit] = useState(false);
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0].text);
 
-  // Auto-animate loading → content
+  // Track whether the current loading cycle is a "Try again" retry.
+  // First failure → failure state; retry failure → persistent-failure state.
+  const [isRetry, setIsRetry] = useState(false);
+
+  // Ref to the interval so we can snap the progress bar on API return (GAP-02)
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const [continueError, setContinueError] = useState<string | null>(null);
+  const [isContinuing, startContinuing] = useTransition();
+
+  // ── Progress bar timer (GAP-02) ────────────────────────────────────────────
+  // Advances asymptotically towards 89% — never reaches 90% on its own.
+  // Cleared and snapped to 100% when the API returns (fast or slow).
   useEffect(() => {
     if (displayState !== "loading") return;
 
@@ -81,32 +109,142 @@ export function ApplicationStep3Summary({
     setLoadingMessage(LOADING_MESSAGES[0].text);
 
     let p = 0;
-    const interval = setInterval(() => {
-      p += Math.random() * 7 + 3;
+    progressIntervalRef.current = setInterval(() => {
+      // Logarithmic advance: fast at start, slows near 89%
+      p += (89 - p) * 0.04;
+      setProgress(p);
+
       const msg =
         [...LOADING_MESSAGES].reverse().find((m) => p >= m.threshold)?.text ??
         LOADING_MESSAGES[0].text;
       setLoadingMessage(msg);
+    }, 200);
 
-      if (p >= 100) {
-        p = 100;
-        clearInterval(interval);
-        setProgress(100);
-        setTimeout(() => setDisplayState("content"), 300);
-      } else {
-        setProgress(p);
-      }
-    }, 160);
-
-    return () => clearInterval(interval);
+    return () => {
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
   }, [displayState]);
 
-  function handleRegenerate() {
+  // ── AI generation ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (displayState !== "loading") return;
+
+    // If the DB already has a summary, the initial state is "content" and
+    // this effect never runs. If we reach here, we need to generate.
+    const guidelinesText = getGuidelines(applicationId);
+
+    if (!guidelinesText) {
+      // No guidelines in sessionStorage and no DB summary — user must re-upload
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      setDisplayState("no-guidelines");
+      return;
+    }
+
+    let cancelled = false;
+
+    async function generate() {
+      try {
+        const res = await fetch("/api/generate-summary", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ applicationId, guidelinesText }),
+        });
+
+        if (cancelled) return;
+
+        const data = (await res.json()) as {
+          summary?: AiSummaryData;
+          questionsFound?: boolean;
+          approachingLimit?: boolean;
+          error?: string;
+          message?: string;
+        };
+
+        if (!res.ok || !data.summary) {
+          // Stop the progress bar, show error state
+          if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+          setDisplayState(isRetry ? "persistent-failure" : "failure");
+          return;
+        }
+
+        // Success — snap progress to 100%, then transition to content (GAP-02)
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        setProgress(100);
+
+        setSummary(data.summary);
+        setQuestionsFound(data.questionsFound ?? false);
+        setApproachingLimit(data.approachingLimit ?? false);
+
+        // Clear guidelines from sessionStorage (GAP-10, ADR-FILE-004)
+        clearGuidelines(applicationId);
+
+        setTimeout(() => {
+          if (!cancelled) setDisplayState("content");
+        }, 300);
+      } catch {
+        if (cancelled) return;
+        if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+        setDisplayState(isRetry ? "persistent-failure" : "failure");
+      }
+    }
+
+    generate();
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayState]);
+
+  // ── Handlers ───────────────────────────────────────────────────────────────
+
+  function handleTryAgain() {
+    setIsRetry(true);
     setDisplayState("loading");
   }
 
-  function handleTryAgain() {
+  function handleRegenerate() {
+    // Regenerate is a fresh attempt — reset retry tracking
+    setIsRetry(false);
     setDisplayState("loading");
+  }
+
+  function handleContinue() {
+    setContinueError(null);
+    startContinuing(async () => {
+      const result = await advanceToStep4(applicationId);
+      setContinueError(result.error);
+    });
+  }
+
+  // ── No guidelines state (user navigated here without sessionStorage) ────────
+  if (displayState === "no-guidelines") {
+    return (
+      <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
+        <StepIndicator currentStep={3} />
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
+        >
+          <AlertTriangle
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
+            aria-hidden="true"
+          />
+          <p className="text-[14px] text-[#78350F]">
+            Your guidelines document is no longer available. Please go back to Step 2 and
+            upload or paste your guidelines again.
+          </p>
+        </div>
+        <div className="mt-6">
+          <Link
+            href={`/applications/${applicationId}/step/2`}
+            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          >
+            Back to Step 2
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   // ── Loading state ───────────────────────────────────────────────────────────
@@ -195,6 +333,10 @@ export function ApplicationStep3Summary({
   }
 
   // ── Content state ───────────────────────────────────────────────────────────
+  // summary is always non-null here: either parsed from existingSummary or from
+  // a successful API response. The null fallback is a safety guard only.
+  if (!summary) return null;
+
   return (
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
       <StepIndicator currentStep={3} />
@@ -203,53 +345,69 @@ export function ApplicationStep3Summary({
         Your funder guidelines — summary
       </h1>
 
+      {/* Approaching limit banner */}
+      {approachingLimit && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
+        >
+          <AlertTriangle
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
+            aria-hidden="true"
+          />
+          <p className="text-[13px] text-[#78350F]">
+            You&apos;re approaching your monthly AI request limit. You have a limited number of
+            requests remaining this month — use Regenerate sparingly.
+          </p>
+        </div>
+      )}
+
       {/* AI summary content */}
       <div className="mb-6 space-y-5 rounded-xl border border-[#E2E8F0] bg-white p-6">
         <Section title="About this grant">
-          <p className="text-[14px] text-[#374151]">{MOCK_SUMMARY.aboutGrant}</p>
+          <p className="text-[14px] text-[#374151]">{summary.aboutGrant}</p>
         </Section>
 
         <Section title="Grant amount">
-          <p className="text-[14px] text-[#374151]">{MOCK_SUMMARY.amount}</p>
+          <p className="text-[14px] text-[#374151]">{summary.amount}</p>
         </Section>
 
-        <Section title="Who can apply">
-          <BulletList items={MOCK_SUMMARY.whoCanApply} />
-        </Section>
+        {summary.whoCanApply?.length > 0 && (
+          <Section title="Who can apply">
+            <BulletList items={summary.whoCanApply} />
+          </Section>
+        )}
 
-        <Section title="What the funder is looking for">
-          <BulletList items={MOCK_SUMMARY.lookingFor} />
-        </Section>
+        {summary.lookingFor?.length > 0 && (
+          <Section title="What the funder is looking for">
+            <BulletList items={summary.lookingFor} />
+          </Section>
+        )}
 
-        <Section title="Application questions">
-          {MOCK_SUMMARY.questions.map((q) => (
-            <div key={q.number} className="mb-2 last:mb-0">
-              <p className="text-[14px] text-[#374151]">
-                <span className="font-medium">{q.number}.</span> {q.text}{" "}
-                <span className="text-[#64748B]">({q.wordLimit} words)</span>
-              </p>
-            </div>
-          ))}
-        </Section>
+        {summary.questions?.length > 0 && (
+          <Section title="Application questions">
+            {summary.questions.map((q) => (
+              <div key={q.number} className="mb-2 last:mb-0">
+                <p className="text-[14px] text-[#374151]">
+                  <span className="font-medium">{q.number}.</span> {q.text}
+                  {q.wordLimit && (
+                    <span className="text-[#64748B]"> ({q.wordLimit} words)</span>
+                  )}
+                </p>
+              </div>
+            ))}
+          </Section>
+        )}
 
-        <Section title="Key requirements">
-          <BulletList items={MOCK_SUMMARY.keyRequirements} />
-        </Section>
+        {summary.keyRequirements?.length > 0 && (
+          <Section title="Key requirements">
+            <BulletList items={summary.keyRequirements} />
+          </Section>
+        )}
       </div>
 
       {/* Questions extracted / not found note */}
-      {questionsNotFound ? (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
-          <AlertTriangle
-            className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
-            aria-hidden="true"
-          />
-          <p className="text-[13px] text-[#475569]">
-            We couldn&apos;t identify specific application questions in this document. In the next
-            step, you&apos;ll be able to enter your questions manually.
-          </p>
-        </div>
-      ) : (
+      {questionsFound ? (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
           <span
             className="mt-0.5 h-4 w-4 shrink-0 text-center text-[13px] font-bold leading-4 text-[#059669]"
@@ -258,8 +416,20 @@ export function ApplicationStep3Summary({
             ✓
           </span>
           <p className="text-[13px] text-[#065F46]">
-            We found {MOCK_SUMMARY.questions.length}{" "}application questions in these guidelines.
-            We&apos;ll use these to generate your draft answers in the next step.
+            We found {summary.questions.length} application question
+            {summary.questions.length === 1 ? "" : "s"} in these guidelines. We&apos;ll use
+            these to generate your draft answers in the next step.
+          </p>
+        </div>
+      ) : (
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+          <AlertTriangle
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+            aria-hidden="true"
+          />
+          <p className="text-[13px] text-[#475569]">
+            We couldn&apos;t identify specific application questions in this document. In the next
+            step, you&apos;ll be able to enter your questions manually.
           </p>
         </div>
       )}
@@ -276,6 +446,13 @@ export function ApplicationStep3Summary({
         </button>
       </div>
 
+      {/* Server-side continue error */}
+      {continueError && (
+        <p role="alert" className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]">
+          {continueError}
+        </p>
+      )}
+
       {/* Back + Continue */}
       <div className="flex items-center justify-between">
         <Link
@@ -286,15 +463,18 @@ export function ApplicationStep3Summary({
         </Link>
         <Button
           type="button"
-          onClick={() => router.push(`/applications/${applicationId}/step/4`)}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+          disabled={isContinuing}
+          onClick={handleContinue}
+          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
         >
-          Continue
+          {isContinuing ? "Saving…" : "This looks right — continue"}
         </Button>
       </div>
     </div>
   );
 }
+
+// ── Sub-components ─────────────────────────────────────────────────────────
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -312,7 +492,10 @@ function BulletList({ items }: { items: string[] }) {
     <ul className="space-y-1">
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-2 text-[14px] text-[#374151]">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D6E6E]" aria-hidden="true" />
+          <span
+            className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D6E6E]"
+            aria-hidden="true"
+          />
           {item}
         </li>
       ))}

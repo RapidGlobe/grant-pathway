@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-05-21 — Slice 5: Step 3 AI Summary wired up
+
+**What changed:**
+- `lib/prompts.ts` (new) — `MODEL = 'anthropic.claude-sonnet-4-6'`; `AI_SYSTEM_PROMPT` enforces UK grant expert persona + JSON-only output (no prose, no markdown); `buildSummaryPrompt(guidelinesText, charity|null)` injects charity context when available and specifies the exact JSON schema (`aboutGrant`, `amount`, `whoCanApply[]`, `lookingFor[]`, `questions[]`, `keyRequirements[]`); `buildDraftPrompt()` pre-built for Slice 6; `ApplicationQuestion` type exported.
+- `lib/ai-error-handler.ts` (new) — `AiErrorCode` union (8 codes); `httpStatusForError()` and `aiErrorBody()` provide consistent GAP-04 error shapes across all AI routes; `classifyBedrockError()` maps SDK `.status` codes; `withRetry<T>()` wraps any async call with 2 retries for `rate_limited`, `overloaded`, `server_error`, `timeout` — delays 1 s / 3 s; non-retryable for 400/401/403.
+- `POST /api/generate-summary` (new) — `maxDuration = 90` (Bedrock calls up to ~35 s in production; Vercel default 10 s too short — Vercel Pro required per ADR-AI-006/ADR-OPS-001); `SUMMARY_MAX_TOKENS = 1200` (reduced from spike's 1500 to cut response time while still fitting a full summary, per P2.3 deviation note); flow: auth → ownership check → monthly cap (20/month, `ai_usage_log` WHERE current month) → Upstash rate limit → charity profile fetch → Bedrock withRetry → strip markdown fences → JSON.parse → one retry on parse failure → save to `applications.ai_summary` → insert `ai_usage_log` (`request_type: 'guideline_summary'`) → return `{ summary, questionsFound, approachingLimit }`.
+- `actions/applications.ts` — `advanceToStep4()` added; advances `current_step` to `max(current, 4)`; no status change (remains `in_progress` from Step 2); redirects to step/4 on success.
+- `app/(authenticated)/applications/[id]/step/3/page.tsx` — rewritten; calls `getApplicationOrRedirect(id, 3)` for step locking; passes `existingSummary` (from `applications.ai_summary` DB column) to component so previously generated summaries are shown immediately on revisit without a Bedrock call.
+- `components/application-step3-summary.tsx` — fully rewritten; five display states; on mount: if `existingSummary` is non-null → parse JSON → render `"content"` immediately; else check sessionStorage → if no guidelines → `"no-guidelines"`; else call `/api/generate-summary`; asymptotic progress bar (GAP-02: `p += (89−p) × 0.04` every 200 ms, snaps to 100 on API return); staged loading messages; `clearGuidelines()` on success (GAP-10); `isRetry` bool — second failure shows `"persistent-failure"` (no retry button); Regenerate resets `isRetry`; `advanceToStep4()` via `useTransition`.
+
+**Key decisions:**
+- `SUMMARY_MAX_TOKENS = 1200` not 1500: P2.3 spike showed 1500 tokens caused 33 s response times, marginally over the 30 s NFR-01 target. 1200 tokens fits a complete summary and typically returns in ~20–25 s. Documented as P2.3 deviation in API route comment.
+- Parse failure retry uses multi-turn conversation: the retry sends the original prompt, Claude's malformed response, and a new user message demanding JSON-only output. This gives Claude the context to understand what it got wrong, more reliable than repeating the original prompt cold (ADR-AI-004).
+- `maxDuration = 90` requires Vercel Pro: noted in the route file header and tracked in P5.4 production infrastructure. On Hobby (default 10 s), the route will time out in production for large guideline documents. The current dev environment (no function timeout cap) is unaffected.
+- `clearGuidelines()` called on summary success, not on Regenerate: the guidelines must remain in sessionStorage for the user to be able to regenerate. They are only cleared once the user is satisfied with the summary (GAP-10). Navigating away and returning to Step 3 — if the DB `ai_summary` column is populated — renders the existing summary without needing sessionStorage again.
+
+---
+
 ## 2026-05-20 — S1.1: Charity Commission lookup — corrected endpoints and AI paraphrase restored
 
 **What changed:**

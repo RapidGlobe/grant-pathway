@@ -6,40 +6,31 @@ export const metadata: Metadata = {
   title: "AI Summary",
 };
 
-type DisplayState = "loading" | "content" | "failure" | "persistent-failure";
-
 interface Props {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ state?: string; questions?: string }>;
 }
 
 /**
- * Step 3 — AI Summary (S3.3 step locking applied).
+ * Step 3 — AI Summary (S3.3 step locking, S5.4).
  *
  * getApplicationOrRedirect(id, 3) enforces that current_step >= 3 before
- * this page renders. If Step 2 hasn't been completed yet, the user is
+ * this page renders. If the user hasn't completed Step 2 yet, they are
  * redirected back to their current step automatically.
+ *
+ * aiSummary from the database is passed to the component so it can display
+ * a previously generated summary immediately (without re-calling Bedrock)
+ * when the user navigates back to Step 3.
  */
-export default async function Step3Page({ params, searchParams }: Props) {
+export default async function Step3Page({ params }: Props) {
   const { id } = await params;
-  const { state, questions } = await searchParams;
 
   // Step locking: redirects to current step if current_step < 3
-  await getApplicationOrRedirect(id, 3);
-
-  const stateMap: Record<string, DisplayState> = {
-    content: "content",
-    failure: "failure",
-    "persistent-failure": "persistent-failure",
-  };
-  const initialState: DisplayState =
-    state && state in stateMap ? stateMap[state] : "loading";
+  const { aiSummary } = await getApplicationOrRedirect(id, 3);
 
   return (
     <ApplicationStep3Summary
       applicationId={id}
-      initialState={initialState}
-      questionsNotFound={questions === "none"}
+      existingSummary={aiSummary}
     />
   );
 }

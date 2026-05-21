@@ -242,6 +242,58 @@ export async function advanceToStep3(
 }
 
 // ---------------------------------------------------------------------------
+// S5.4 — Advance to Step 4 (summary confirmed)
+// ---------------------------------------------------------------------------
+
+/**
+ * Called when the user clicks "This looks right — continue" on Step 3.
+ * Advances current_step to 4 (never regresses if already further along).
+ * Does NOT change status — it remains 'in_progress' from Step 2.
+ *
+ * Returns never on success (calls redirect). Returns { ok: false, error }
+ * only when the DB update fails.
+ */
+export async function advanceToStep4(
+  applicationId: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  try {
+    const { data: existing } = await supabase
+      .from('applications')
+      .select('current_step')
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+      .single()
+
+    const newStep = Math.max(existing?.current_step ?? 3, 4)
+
+    const { error } = await supabase
+      .from('applications')
+      .update({ current_step: newStep })
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+
+    if (error) {
+      return { ok: false, error: 'Could not save your progress. Please try again.' }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: 'Could not reach the server. Please check your connection and try again.',
+    }
+  }
+
+  redirect(`/applications/${applicationId}/step/4`)
+}
+
+// ---------------------------------------------------------------------------
 // S2.3 — Re-open application
 // ---------------------------------------------------------------------------
 

@@ -218,10 +218,10 @@ All ⚠️ rows consolidated here for easy triage. Update this table as gaps are
 
 | Gap | ADR | Description | Priority | Resolution task | Resolved |
 |-----|-----|-------------|----------|-----------------|---------|
-| GAP-01 | ADR-AI-003 | `lib/prompts.ts` inline comments required | Low | Add to S5.1 | |
-| GAP-02 | ADR-AI-005 | Progress bar: hold at ~90% if API slow; snap to 100% on early response | Medium | Add to S5.2, S6.2 | |
-| GAP-03 | ADR-AI-006 | Sentry alert when AI routes approach 90-second timeout | Low | Add to P3.7 or S5.3 | |
-| GAP-04 | ADR-AI-009 | No documented error response contract (JSON shape + HTTP codes) for AI routes | Medium | Add to S5.3 | |
+| GAP-01 | ADR-AI-003 | `lib/prompts.ts` inline comments required | Low | Add to S5.1 | ✅ 2026-05-21 S5.1 — `lib/prompts.ts` has section comments explaining intent of each prompt segment |
+| GAP-02 | ADR-AI-005 | Progress bar: hold at ~90% if API slow; snap to 100% on early response | Medium | Add to S5.2, S6.2 | ✅ 2026-05-21 S5.4 — asymptotic formula `p += (89−p) × 0.04` every 200ms; `clearInterval` + `setProgress(100)` on API return |
+| GAP-03 | ADR-AI-006 | Sentry alert when AI routes approach 90-second timeout | Low | Add to P3.7 or S5.3 | 🔵 Deferred to P5.4 — Sentry performance monitoring requires Vercel Pro + production baseline; not actionable on Hobby plan |
+| GAP-04 | ADR-AI-009 | No documented error response contract (JSON shape + HTTP codes) for AI routes | Medium | Add to S5.3 | ✅ 2026-05-21 S5.3 — `lib/ai-error-handler.ts` provides `httpStatusForError()` and `aiErrorBody()`; all AI routes use these functions |
 | GAP-05 | ADR-ARCH-005 | Below-768px degradation banner not tasked | Low | Add new task or sub-task to Phase 4 | |
 | GAP-06 | ADR-DATA-004 | `SUPABASE_DB_PASSWORD` not in `.env.example` or P3.2 | Medium | Update `.env.example` + P3.2 | ✅ 2026-05-20 P3.12 — `.env.example` updated |
 | GAP-07 | ADR-EXPORT-002 | Null/empty `answer_text` handling in Word export not spec'd | Medium | Add to S7.2 | |
