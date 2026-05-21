@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (Slice 0 + Slice 1 end-to-end tested and passing)
+**Last updated:** 2026-05-21 (Slice 2 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **10** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **15** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -67,12 +67,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.2 — Profile save | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S1.4 — Profile incomplete banner | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 2 — Dashboard and Application Management** | **5** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.1 — Applications list and empty state | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.2 — New application creation | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.3 — Resume application | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.4 — Delete application | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.5 — Start button disabled until profile complete | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 2 — Dashboard and Application Management** | **5** | **5** | **✅ Complete** |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.1 — Applications list and empty state | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.2 — New application creation | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.3 — Resume application | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.4 — Delete application | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.5 — Start button disabled until profile complete | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Slice 3 — Step 1: Application Details** | **3** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application | 1 | 0 | Not started |
@@ -369,11 +369,23 @@ All five test scenarios passed. Bugs found and fixed during testing:
 
 ### Slice 2 — Dashboard and Application Management
 
-- [ ] **S2.1** Applications fetched from database, sorted by updated_at descending; empty state shows personalised heading and three-step explainer; populated state shows summary strip with all four status counts and AI usage indicator ("n of 20 AI requests used this month" from ai_usage_log current-month count)
-- [ ] **S2.2** New application creation: `createApplication()` Server Action; redirect to Step 1
-- [ ] **S2.3** Resume application: card click → `/applications/[id]` → redirects to `current_step` for not_started/in_progress; View for approved/exported shows re-opening confirmation prompt, sets status to `in_progress` and resets `is_approved = false` on all answers on confirm, redirects to Step 4
-- [ ] **S2.4** Delete application: status-specific confirmation prompt (three variants) → `deleteApplication()` Server Action; card removed
-- [ ] **S2.5** Start button disabled with tooltip until profile complete
+- [x] **S2.1** Applications fetched from database, sorted by updated_at descending; empty state shows personalised heading and three-step explainer; populated state shows summary strip with all four status counts and AI usage indicator ("n of 20 AI requests used this month" from ai_usage_log current-month count)
+  - `app/(authenticated)/dashboard/page.tsx` — rewritten; fetches applications + AI usage count in parallel via `Promise.all`; renders `DashboardEmpty` when list is empty, `DashboardPopulated` otherwise; `?state=populated` URL param from static shell removed
+  - AI usage count: `SELECT count(*) FROM ai_usage_log WHERE user_id = $1 AND created_at >= first-day-of-month`
+- [x] **S2.2** New application creation: `createApplication()` Server Action; redirect to Step 1
+  - `actions/applications.ts` (new) — `createApplication()` inserts a new row with empty `funder_name`/`grant_name`, `status = not_started`, `current_step = 1`, and calls `redirect()` to the new application's Step 1; returns `never`
+  - `app/(authenticated)/applications/new/page.tsx` — rewritten as a creation intermediary: calls `createApplication()` server-side and immediately redirects; no UI rendered on this route
+  - `app/(authenticated)/applications/[id]/step/1/page.tsx` — updated to load real `funder_name` and `grant_name` from the database (replaces static mock pre-fill); redirects to `/dashboard` if application not found or does not belong to user
+  - ℹ️ New applications are created with empty names; a card showing "New application / —" may appear briefly if the user abandons Step 1 before saving. This is resolved by S3.1 which wires up the save.
+- [x] **S2.3** Resume application wired up
+  - Continue button: `<Link href="/applications/[id]/step/[currentStep]">` — navigates directly to the application's stored step; no intermediate redirect route needed
+  - View button (approved/exported): opens re-open confirmation dialog → `reopenApplication()` Server Action sets `status = in_progress`, `current_step = 4`, resets `is_approved = false` on all `application_answers` rows → client redirects to Step 4
+  - `actions/applications.ts` — `reopenApplication(applicationId)` Server Action added
+- [x] **S2.4** Delete application wired up
+  - `actions/applications.ts` — `deleteApplication(applicationId)` Server Action; hard-deletes the `applications` row; `application_answers` cascade-delete automatically via FK `ON DELETE CASCADE`; `ai_usage_log` rows retained with `application_id` set to null (`ON DELETE SET NULL`)
+  - `components/dashboard-populated.tsx` — `useTransition` drives `isDeleting` loading state on Delete button and disables Cancel during in-flight delete; `router.refresh()` on success removes the deleted card without a full navigation
+  - Three status-specific modal texts preserved from static shell
+- [x] **S2.5** Start button disabled with tooltip until profile complete — confirmed working end-to-end; `profileIncomplete` prop already wired from S1.4; no additional changes needed
 
 ### Slice 3 — Step 1: Application Details
 
@@ -445,6 +457,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
+| 2026-05-21 | **Slice 2 complete.** Dashboard fetches real applications and AI usage count. `createApplication()` creates a DB row and redirects to Step 1. Continue navigates to stored `current_step`. View (approved/exported) triggers re-open flow. Delete with status-specific confirmation removes the row and refreshes the list. TypeScript clean (0 errors). No manual steps required — all Slice 2 tables and GRANTs were already in place from Phase 3. |
 | 2026-05-21 | **Logo placeholder recorded.** `components/logo.tsx` marked with `⚠️ PLACEHOLDER LOGO — replace before launch` comment. Real Grant Pathway logo (SVG/PNG, light + dark variants) to be supplied by Wac / RapidGlobe Ltd before P5.4 production launch. Instructions for swapping in the real asset are embedded in the component. |
 | 2026-05-21 | **S1.4 complete. Slice 1 complete.** Dashboard page fetches real first name and profile existence; banner shown/hidden correctly on both empty and populated states. `MOCK_PROFILE_INCOMPLETE` removed from `dashboard-populated.tsx`. |
 | 2026-05-21 | **S1.3 complete.** `getCharityProfile()` fetches existing profile from `charity_profiles`; `CharityProfileData` type exported; form `initialData` prop pre-fills all five fields; `isEdit` now derived from DB state not URL param. TypeScript clean. |

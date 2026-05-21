@@ -1,10 +1,14 @@
-import type { Metadata } from "next";
-import { ApplicationStep1Form } from "@/components/application-step1-form";
+import { createApplication } from '@/actions/applications'
 
-export const metadata: Metadata = {
-  title: "New Application",
-};
-
-export default function NewApplicationPage() {
-  return <ApplicationStep1Form />;
+/**
+ * /applications/new — creation intermediary (S2.2).
+ *
+ * Navigating here creates a new empty application row in the database
+ * and immediately redirects to that application's Step 1 page.
+ * No UI is rendered — this page exists only to give the dashboard
+ * Link buttons a stable href that triggers server-side creation.
+ */
+export default async function NewApplicationPage() {
+  // createApplication() always calls redirect() — never returns normally.
+  await createApplication()
 }
