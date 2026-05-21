@@ -13,7 +13,9 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useFormStatus } from "react-dom";
 import {
+  createApplication,
   deleteApplication,
   reopenApplication,
 } from "@/actions/applications";
@@ -118,12 +120,12 @@ export function DashboardPopulated({
       {/* Heading + New Application button */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <h1 className="text-[24px] font-bold text-[#1E293B]">My Applications</h1>
-        <Link
-          href="/applications/new"
-          className="inline-flex h-10 items-center gap-1.5 rounded-md bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
-        >
-          + New Application
-        </Link>
+        {/* Form + Server Action prevents /applications/new from entering
+            browser history — Back from Step 1 returns here, not to the
+            creation intermediary which would spawn another empty record. */}
+        <form action={createApplication}>
+          <NewApplicationButton />
+        </form>
       </div>
 
       {/* Summary strip */}
@@ -333,6 +335,20 @@ export function DashboardPopulated({
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+/** Reads pending state from the nearest <form> via useFormStatus. */
+function NewApplicationButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="inline-flex h-10 items-center gap-1.5 rounded-md bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+    >
+      {pending ? "Creating…" : "+ New Application"}
+    </button>
   );
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useFormStatus } from "react-dom";
 import { Upload, Sparkles, FileText, ArrowRight, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { createApplication } from "@/actions/applications";
 
 interface DashboardEmptyProps {
   firstName?: string;
@@ -69,12 +71,12 @@ export function DashboardEmpty({
             </TooltipContent>
           </Tooltip>
         ) : (
-          <Link
-            href="/applications/new"
-            className="inline-flex h-10 items-center rounded-md bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
-          >
-            Start your first application
-          </Link>
+          // Form + Server Action so the creation URL is never added to browser
+          // history — pressing Back from Step 1 returns to the dashboard, not
+          // to /applications/new (which would create another empty record).
+          <form action={createApplication}>
+            <StartButton label="Start your first application" />
+          </form>
         )}
 
         {/* Three-step explainer */}
@@ -99,6 +101,23 @@ export function DashboardEmpty({
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Submit button that reads pending state from the nearest <form>.
+ * useFormStatus must be called inside a component that is a child of the form.
+ */
+function StartButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="inline-flex h-10 items-center rounded-md bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+    >
+      {pending ? "Creating…" : label}
+    </button>
   );
 }
 
