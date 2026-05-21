@@ -33,6 +33,9 @@
     "unpdf": "^1.6.2",
     "zod": "^4.4.3"
   },
+  "overrides": {
+    "postcss": ">=8.5.10"
+  },
   "devDependencies": {
     "@axe-core/react": "^4.11.3",
     "@tailwindcss/postcss": "^4.3.0",
