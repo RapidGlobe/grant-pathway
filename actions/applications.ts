@@ -438,6 +438,53 @@ export async function advanceToStep5(
 }
 
 // ---------------------------------------------------------------------------
+// S7.1 — Approve application
+// ---------------------------------------------------------------------------
+
+export type ApproveApplicationResult =
+  | { ok: true }
+  | { ok: false; error: string }
+
+/**
+ * Approves an application:
+ *   1. Sets applications.status = 'approved'
+ *   2. Sets is_approved = true on all application_answers rows
+ *
+ * The client updates local state after receiving { ok: true }.
+ * updated_at is managed by the database trigger on both tables.
+ */
+export async function approveApplication(
+  applicationId: string,
+): Promise<ApproveApplicationResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  // 1. Update application status (ownership check via user_id)
+  const { error: appError } = await supabase
+    .from('applications')
+    .update({ status: 'approved' })
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+
+  if (appError) {
+    return { ok: false, error: 'Could not approve the application. Please try again.' }
+  }
+
+  // 2. Set is_approved on all answers (non-fatal if no answers exist)
+  await supabase
+    .from('application_answers')
+    .update({ is_approved: true })
+    .eq('application_id', applicationId)
+
+  return { ok: true }
+}
+
+// ---------------------------------------------------------------------------
 // S2.3 — Re-open application
 // ---------------------------------------------------------------------------
 

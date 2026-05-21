@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (Slice 6 complete)
+**Last updated:** 2026-05-21 (Slice 7 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **30** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **33** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -92,10 +92,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Generate draft API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Editable textareas and auto-save | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Continue to Step 5 | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export** | **3** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S7.3 — Plain text export | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export** | **3** | **3** | **✅ Complete** |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.3 — Plain text export | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Slice 8 — Account Management** | **3** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 0 | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **41** | |
+| **Total** | **78** | **44** | |
 
 ---
 
@@ -437,9 +437,13 @@ All five test scenarios passed. Bugs found and fixed during testing:
 
 ### Slice 7 — Step 5: Approve & Export
 
-- [ ] **S7.1** Step 5: three review prompts visible on page load; read-only answer view; "Approve my application" button with confirmation prompt; sets `status = approved`; "Re-open application" link sets `status = in_progress` and resets `is_approved = false` on all answers after confirmation prompt
-- [ ] **S7.2** Word export (`/api/export/[id]`): auth + ownership check; `docx` generation per PDR-DH-003 (title "[Grant name] — Application", specific disclaimer with user's full name, Calibri 11pt/14pt, A4 page, 2.54cm margins, footer on every page, no branding); sets `status = exported` on first download; re-export warning shown if already exported
-- [ ] **S7.3** Plain text export wired up (Could Have — FR-38)
+- [x] **S7.1** Step 5 page rewritten: fetches real answers, `last_exported_at`, and application data from DB; `ApplicationStep5Approve` component rewritten with three checklist prompts (all must be checked before Approve button activates); read-only Q&A view with per-answer word count, source badge (AI generated / AI + edited / Written by you), over-limit warning; `approveApplication()` Server Action added to `actions/applications.ts` — sets `status = approved` + `is_approved = true` on all answers; `reopenApplication()` already existed (S2.3) — wired to re-open dialog → redirect to Step 4; dialogs for approve + re-open show loading/error states via `useTransition`
+  - `actions/applications.ts` — `ApproveApplicationResult` type and `approveApplication(applicationId)` added before `reopenApplication`; ownership check via `user_id` filter on update
+  - `app/.../step/5/page.tsx` — rewritten; `getApplicationOrRedirect(id, 5)`; separate query for `last_exported_at`; `application_answers` fetched ordered by `question_order`; typed `AnswerRow[]` passed to component
+  - `components/application-step5-approve.tsx` — full rewrite; `AnswerRow` type exported; approval-status banner with last-exported date; three-item checklist gates Approve button; word count + source badges; two download buttons (docx + txt); download via `fetch()` + `createObjectURL` (shows error state on failure); re-export warning dialog with real `lastExported` date
+- [x] **S7.2** `GET /api/export/[applicationId]` route built: auth + ownership check; status must be `approved` or `exported`; fetches answers ordered by `question_order` and user profile (first name + last name); generates `.docx` using `docx` v9.6.1 per PDR-DH-003 — A4 (11906×16838 twips), 2.54cm margins, Calibri default font, title (18pt bold centred), funder + date sub-header, horizontal rule, disclaimer (italic, 10pt), Q&A (14pt bold underline question / 11pt answer), footer (9pt grey centred); updates `status = exported` and `last_exported_at = now()` on every download; returns `Buffer → Uint8Array → Response` with correct MIME type and filename
+  - `app/api/export/[applicationId]/route.ts` (new)
+- [x] **S7.3** Plain text export via `?format=txt` on same route; same auth/status/ownership checks; structured text file (title, funder, date, disclaimer, Q&A with separators, footer line); `Content-Type: text/plain; charset=utf-8`; safe filename derived from grant name
 
 ### Slice 8 — Account Management
 
@@ -478,6 +482,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
+| 2026-05-21 | **Slice 7 complete.** Full approve-and-export pipeline wired: `approveApplication()` SA sets `status = approved` + `is_approved = true`; Step 5 page rewritten with real DB data; `ApplicationStep5Approve` component fully rewritten — three-item checklist gates Approve button, real approve/re-open dialogs with `useTransition`, per-answer word count and source badges; `GET /api/export/[applicationId]` generates A4 Word doc (docx v9, Calibri, 2.54cm margins, PDR-DH-003 format) and plain text; first export sets `status = exported` and `last_exported_at`; re-export warning dialog shows last export date. TypeScript clean (0 errors). |
 | 2026-05-21 | **Slice 6 complete.** Full draft answers pipeline wired: questions populated from `ai_summary` into `application_answers` rows on Step 4 page load (ON CONFLICT DO NOTHING); `POST /api/generate-draft` generates all answers in one Bedrock call; `components/application-step4-draft.tsx` rewritten with real data, auto-save (400ms debounce + 60s background), per-answer word count, and correct `answer_source` tracking. `saveAnswer`, `saveManualAnswer`, `advanceToStep5` Server Actions added. TypeScript clean (0 errors). ⚠️ `DRAFT_MAX_TOKENS = 3000` — may truncate very long applications (e.g. Garfield Weston 5 sections × 600 words). Monitor in testing; increase or switch to Haiku if timeout observed. |
 | 2026-05-21 | **Slice 5 complete.** Full AI summary pipeline wired: `lib/prompts.ts` (prompt library), `lib/ai-error-handler.ts` (retry + error classification), `POST /api/generate-summary` (Bedrock call, DB save, usage logging), `components/application-step3-summary.tsx` (auto-load, asymptotic progress bar, regenerate, persistent failure, step advance). `advanceToStep4()` Server Action added to `actions/applications.ts`. Step 3 page rewritten to pass `existingSummary` from DB. TypeScript clean (0 errors). Test: upload a real funder guidelines PDF → Step 3 should now show AI-generated summary, not mock National Lottery data. |
 | 2026-05-21 | **Slice 4 complete.** Full file upload pipeline wired: signed URL → XHR direct upload to Supabase Storage → server-side extraction (`lib/extract-text.ts`) → `sessionStorage` storage → `advanceToStep3()` Server Action. Paste path wired. All error states live. Orphan cleanup cron (`vercel.json`, every 30 min) deployed. Session restore and re-upload advisory (GAP-13, GAP-19) implemented. TypeScript clean (0 errors). ⚠️ Confirm cron active in Vercel dashboard after deployment. |

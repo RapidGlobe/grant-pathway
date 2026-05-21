@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { CheckCircle2, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useTransition } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { CheckCircle2, Download, FileText, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -12,199 +12,471 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { StepIndicator } from "@/components/step-indicator";
+} from '@/components/ui/dialog'
+import { StepIndicator } from '@/components/step-indicator'
+import { approveApplication, reopenApplication } from '@/actions/applications'
+import type { ApplicationStatus } from '@/lib/application-guard'
 
-type ApprovalStatus = "pending" | "approved" | "exported";
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
-interface ApplicationStep5ApproveProps {
-  applicationId: string;
-  initialStatus?: ApprovalStatus;
+export type AnswerRow = {
+  id: string
+  questionOrder: number
+  questionText: string
+  wordLimit: number | null
+  answerText: string
+  answerSource: 'ai_generated' | 'user_edited' | 'user_written' | null
 }
 
-// Same mock questions/answers as Step 4
-const MOCK_QUESTIONS = [
-  {
-    id: 1,
-    text: "Describe your project and who it will help. What problem are you addressing?",
-    wordLimit: 400,
-    answer:
-      "Helping Hands UK runs Community Kitchens, a programme providing free hot meals and social activities for adults experiencing homelessness and social isolation in Greater Manchester.\n\nWe address a dual crisis: food poverty and loneliness. Many people who are homeless or at risk of homelessness have few social connections, which compounds the effects of poverty and makes it harder to rebuild their lives. Our Community Kitchens sessions provide more than food — they create a space where people feel seen, valued, and part of a community.\n\nOver the next 12 months we will deliver 156 meal sessions, reaching over 500 unique individuals across Greater Manchester, Lancashire, and Cheshire. Each session is attended by around 40 participants and facilitated by trained volunteers.",
-  },
-  {
-    id: 2,
-    text: "How does your project meet our funding priorities?",
-    wordLimit: 300,
-    answer:
-      "Community Kitchens directly meets the National Lottery Community Fund's Awards for All priorities by bringing people together, building connections, and enabling communities to take more active roles.\n\nOur sessions are co-designed with participants, many of whom go on to volunteer themselves — creating a clear pathway from isolation to community involvement. We actively recruit volunteers from the communities we serve, which builds local capacity and strengthens the social fabric of the areas we work in.\n\nThe project also supports people to become more active in community life by connecting participants with local groups, activities, and services they may not have been aware of.",
-  },
-  {
-    id: 3,
-    text: "How will you know your project has been successful?",
-    wordLimit: 200,
-    answer:
-      "We will measure success through a combination of quantitative and qualitative indicators. Quantitatively, we will track attendance at each session, the number of unique individuals reached, and volunteer hours contributed.\n\nQualitatively, we will collect short feedback forms from participants every quarter, asking about their sense of belonging, social connections, and wellbeing. We will also carry out follow-up conversations with a sample of 20 participants to understand the longer-term impact of the project.",
-  },
-];
+interface ApplicationStep5ApproveProps {
+  applicationId: string
+  funderName: string
+  grantName: string
+  status: ApplicationStatus
+  answers: AnswerRow[]
+  lastExportedAt: string | null
+}
 
-const MOCK_EXPORT_DATE = "18 May 2026";
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function countWords(text: string): number {
+  return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
+}
+
+function formatExportDate(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+function sourceBadge(
+  source: AnswerRow['answerSource'],
+): { label: string; className: string } | null {
+  if (source === 'ai_generated') {
+    return { label: 'AI generated', className: 'bg-[#EEF2FF] text-[#4338CA]' }
+  }
+  if (source === 'user_edited') {
+    return { label: 'AI + edited', className: 'bg-[#F0FDF4] text-[#166534]' }
+  }
+  if (source === 'user_written') {
+    return { label: 'Written by you', className: 'bg-[#F8FAFC] text-[#475569]' }
+  }
+  return null
+}
+
+// ---------------------------------------------------------------------------
+// Review checklist items
+// ---------------------------------------------------------------------------
+
+const REVIEW_ITEMS = [
+  {
+    id: 'read',
+    label: 'I have read through every answer and am satisfied with the content.',
+  },
+  {
+    id: 'accurate',
+    label: 'I confirm the information is accurate and true to the best of my knowledge.',
+  },
+  {
+    id: 'responsibility',
+    label:
+      'I understand this application was drafted with AI assistance, and I take responsibility for everything submitted.',
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
 
 export function ApplicationStep5Approve({
   applicationId,
-  initialStatus = "pending",
+  funderName,
+  grantName,
+  status,
+  answers,
+  lastExportedAt,
 }: ApplicationStep5ApproveProps) {
-  const router = useRouter();
-  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(initialStatus);
-  const [showApproveDialog, setShowApproveDialog] = useState(false);
-  const [showReExportDialog, setShowReExportDialog] = useState(false);
-  const [showReOpenDialog, setShowReOpenDialog] = useState(false);
+  const router = useRouter()
 
-  const isApproved = approvalStatus === "approved" || approvalStatus === "exported";
-  const isExported = approvalStatus === "exported";
+  // ── Status ─────────────────────────────────────────────────────────────────
+  type ApprovalStatus = 'pending' | 'approved' | 'exported'
 
-  function handleApproveConfirm() {
-    setApprovalStatus("approved");
-    setShowApproveDialog(false);
+  function toApprovalStatus(s: ApplicationStatus): ApprovalStatus {
+    if (s === 'approved') return 'approved'
+    if (s === 'exported') return 'exported'
+    return 'pending'
   }
 
-  function handleDownloadClick() {
-    if (isExported) {
-      setShowReExportDialog(true);
-    } else {
-      // First download — mark as exported (static shell simulates the action)
-      setApprovalStatus("exported");
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(
+    toApprovalStatus(status),
+  )
+  const [lastExported, setLastExported] = useState<string | null>(lastExportedAt)
+
+  const isApproved = approvalStatus === 'approved' || approvalStatus === 'exported'
+  const isExported = approvalStatus === 'exported'
+
+  // ── Review checklist ───────────────────────────────────────────────────────
+  const [checked, setChecked] = useState<Record<string, boolean>>({
+    read: false,
+    accurate: false,
+    responsibility: false,
+  })
+  const allChecked = REVIEW_ITEMS.every((item) => checked[item.id])
+
+  function toggleCheck(id: string) {
+    setChecked((prev) => ({ ...prev, [id]: !prev[id] }))
+  }
+
+  // ── Dialogs ────────────────────────────────────────────────────────────────
+  const [showApproveDialog, setShowApproveDialog] = useState(false)
+  const [showReExportDialog, setShowReExportDialog] = useState(false)
+  const [showReOpenDialog, setShowReOpenDialog] = useState(false)
+  const [pendingFormat, setPendingFormat] = useState<'docx' | 'txt'>('docx')
+
+  // ── Approve action ─────────────────────────────────────────────────────────
+  const [isApproving, startApproveTransition] = useTransition()
+  const [approveError, setApproveError] = useState<string | null>(null)
+
+  function handleApproveConfirm() {
+    setApproveError(null)
+    startApproveTransition(async () => {
+      const result = await approveApplication(applicationId)
+      if (result.ok) {
+        setApprovalStatus('approved')
+        setShowApproveDialog(false)
+      } else {
+        setApproveError(result.error ?? 'Could not approve. Please try again.')
+      }
+    })
+  }
+
+  // ── Re-open action ─────────────────────────────────────────────────────────
+  const [isReopening, startReopenTransition] = useTransition()
+  const [reopenError, setReopenError] = useState<string | null>(null)
+
+  function handleReOpenConfirm() {
+    setReopenError(null)
+    startReopenTransition(async () => {
+      const result = await reopenApplication(applicationId)
+      if (result.ok) {
+        setShowReOpenDialog(false)
+        router.push(`/applications/${applicationId}/step/4`)
+      } else {
+        setReopenError(result.error ?? 'Could not re-open. Please try again.')
+      }
+    })
+  }
+
+  // ── Download action ────────────────────────────────────────────────────────
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
+
+  async function doDownload(format: 'docx' | 'txt') {
+    setIsDownloading(true)
+    setDownloadError(null)
+    try {
+      const res = await fetch(
+        `/api/export/${applicationId}${format === 'txt' ? '?format=txt' : ''}`,
+      )
+      if (!res.ok) {
+        let errMsg = 'Download failed. Please try again.'
+        try {
+          const data = (await res.json()) as { error?: string }
+          if (data.error) errMsg = data.error
+        } catch {
+          // ignore parse error
+        }
+        setDownloadError(errMsg)
+        return
+      }
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      const safeName = grantName
+        .replace(/[^a-zA-Z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '_')
+      a.href = url
+      a.download = `${safeName}_Application.${format}`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      const now = new Date().toISOString()
+      setApprovalStatus('exported')
+      setLastExported(now)
+    } catch {
+      setDownloadError('Download failed. Please try again.')
+    } finally {
+      setIsDownloading(false)
+      setShowReExportDialog(false)
     }
   }
 
-  function handleReOpenConfirm() {
-    setShowReOpenDialog(false);
-    router.push(`/applications/${applicationId}/step/4`);
+  function handleDownloadClick(format: 'docx' | 'txt') {
+    if (isExported) {
+      setPendingFormat(format)
+      setShowReExportDialog(true)
+    } else {
+      void doDownload(format)
+    }
   }
 
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
       <StepIndicator currentStep={5} />
 
-      <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
         Review and approve your application
       </h1>
+      <p className="mb-6 text-[14px] text-[#64748B]">
+        Prepared for: {funderName} — {grantName}
+      </p>
 
-      {/* Read-only answers */}
-      <div className="mb-8 space-y-5">
-        {MOCK_QUESTIONS.map((q) => (
-          <div key={q.id} className="rounded-xl border border-[#E2E8F0] bg-white p-5">
-            <p className="mb-3 text-[14px] font-semibold text-[#1E293B]">
-              {q.id}.&nbsp;{q.text}
-              <span className="ml-2 text-[12px] font-normal text-[#64748B]">
-                ({q.wordLimit} words)
-              </span>
-            </p>
-            <p className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#374151]">
-              {q.answer}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Approved indicator */}
+      {/* ── Approval status banner ─────────────────────────────────────────── */}
       {isApproved && (
         <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4">
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
-          <p className="text-[14px] font-medium text-[#166534]">
-            {isExported ? "Application approved and exported." : "Application approved."}
-          </p>
+          <CheckCircle2
+            className="h-5 w-5 shrink-0 text-[#16A34A]"
+            aria-hidden="true"
+          />
+          <div>
+            <p className="text-[14px] font-medium text-[#166534]">
+              {isExported ? 'Application approved and exported.' : 'Application approved.'}
+            </p>
+            {isExported && lastExported && (
+              <p className="mt-0.5 text-[13px] text-[#16A34A]">
+                Last exported: {formatExportDate(lastExported)}
+              </p>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="mb-6 space-y-3">
-        {/* Approve button — shown only when pending */}
+      {/* ── Review checklist (only shown while pending) ────────────────────── */}
+      {!isApproved && (
+        <div className="mb-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
+          <p className="mb-3 text-[14px] font-semibold text-[#1E293B]">
+            Before you approve, please confirm:
+          </p>
+          <ul className="space-y-3">
+            {REVIEW_ITEMS.map((item) => (
+              <li key={item.id} className="flex items-start gap-3">
+                <input
+                  id={`check-${item.id}`}
+                  type="checkbox"
+                  checked={checked[item.id] ?? false}
+                  onChange={() => toggleCheck(item.id)}
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-[#CBD5E1] accent-[#0D6E6E]"
+                />
+                <label
+                  htmlFor={`check-${item.id}`}
+                  className="cursor-pointer text-[14px] leading-snug text-[#374151]"
+                >
+                  {item.label}
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* ── Read-only answers ─────────────────────────────────────────────── */}
+      <div className="mb-8 space-y-5">
+        {answers.length === 0 ? (
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 text-center text-[14px] text-[#64748B]">
+            No answers found for this application.
+          </div>
+        ) : (
+          answers.map((answer) => {
+            const wordCount = countWords(answer.answerText)
+            const overLimit = answer.wordLimit !== null && wordCount > answer.wordLimit
+            const badge = sourceBadge(answer.answerSource)
+
+            return (
+              <div
+                key={answer.id}
+                className="rounded-xl border border-[#E2E8F0] bg-white p-5"
+              >
+                {/* Question header */}
+                <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                  <p className="text-[14px] font-semibold text-[#1E293B]">
+                    {answer.questionOrder}.&nbsp;{answer.questionText}
+                  </p>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {badge && (
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.className}`}
+                      >
+                        {badge.label}
+                      </span>
+                    )}
+                    {answer.wordLimit !== null && (
+                      <span
+                        className={`text-[12px] font-medium ${
+                          overLimit
+                            ? 'text-[#DC2626]'
+                            : 'text-[#64748B]'
+                        }`}
+                      >
+                        {wordCount} / {answer.wordLimit} words
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Answer text */}
+                <p
+                  className={`whitespace-pre-wrap text-[14px] leading-relaxed ${
+                    answer.answerText ? 'text-[#374151]' : 'italic text-[#94A3B8]'
+                  }`}
+                >
+                  {answer.answerText || 'No answer provided.'}
+                </p>
+
+                {/* Over-limit warning */}
+                {overLimit && (
+                  <p className="mt-2 flex items-center gap-1 text-[12px] text-[#DC2626]">
+                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                    Answer exceeds the word limit.
+                  </p>
+                )}
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      {/* ── Action buttons ────────────────────────────────────────────────── */}
+      <div className="mb-3 space-y-3">
+        {/* Approve — only shown when pending */}
         {!isApproved && (
           <Button
             type="button"
             onClick={() => setShowApproveDialog(true)}
-            className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+            disabled={!allChecked}
+            className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Approve my application
           </Button>
         )}
 
-        {/* Download button */}
+        {/* Download as Word */}
         <Button
           type="button"
-          onClick={handleDownloadClick}
-          disabled={!isApproved}
+          onClick={() => handleDownloadClick('docx')}
+          disabled={!isApproved || isDownloading}
           variant="outline"
           className="h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-          Download as Word document
+          {isDownloading ? 'Downloading…' : 'Download as Word document (.docx)'}
+        </Button>
+
+        {/* Download as plain text */}
+        <Button
+          type="button"
+          onClick={() => handleDownloadClick('txt')}
+          disabled={!isApproved || isDownloading}
+          variant="outline"
+          className="h-10 w-full border-[#CBD5E1] text-[15px] font-semibold text-[#475569] hover:bg-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+          {isDownloading ? 'Downloading…' : 'Download as plain text (.txt)'}
         </Button>
       </div>
 
-      {/* Re-open link — shown after approval */}
-      {isApproved && (
-        <div className="mb-8">
+      {/* Download error */}
+      {downloadError && (
+        <p
+          role="alert"
+          className="mb-4 flex items-center gap-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {downloadError}
+        </p>
+      )}
+
+      {/* ── Re-open / back links ─────────────────────────────────────────── */}
+      <div className="mb-8">
+        {isApproved ? (
           <button
             type="button"
             onClick={() => setShowReOpenDialog(true)}
             className="rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
-            Re-open application
+            Re-open application to make changes
           </button>
-        </div>
-      )}
-
-      {/* Back link — only shown before approval */}
-      {!isApproved && (
-        <div>
+        ) : (
           <Link
             href={`/applications/${applicationId}/step/4`}
             className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Back
           </Link>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* ── Approve confirmation dialog ───────────────────────────────────── */}
+      {/* ── Approve confirmation dialog ────────────────────────────────────── */}
       <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Approve this application?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to approve this application? You can re-open it to make changes
-              at any time.
+              You are approving your answers for{' '}
+              <strong>
+                {grantName} — {funderName}
+              </strong>
+              . You can re-open it to make changes at any time before submission.
             </DialogDescription>
           </DialogHeader>
+          {approveError && (
+            <p className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]">
+              {approveError}
+            </p>
+          )}
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowApproveDialog(false)}
+              disabled={isApproving}
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleApproveConfirm}
+              disabled={isApproving}
               className="bg-[#0D6E6E] text-white hover:bg-[#0A5A5A]"
             >
-              Approve my application
+              {isApproving ? 'Approving…' : 'Approve my application'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ── Re-export warning dialog ──────────────────────────────────────── */}
+      {/* ── Re-export warning dialog ───────────────────────────────────────── */}
       <Dialog open={showReExportDialog} onOpenChange={setShowReExportDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Download again?</DialogTitle>
             <DialogDescription>
-              You exported this application on {MOCK_EXPORT_DATE}. If you have already submitted
-              that version to the funder, please contact them to let them know a revised version is
-              being submitted. Funders may treat multiple submissions as separate applications.
+              {lastExported
+                ? `You last exported this application on ${formatExportDate(lastExported)}.`
+                : 'You have already exported this application.'}{' '}
+              If you have already submitted that version to the funder, please contact
+              them if you intend to submit a revised version — funders may treat multiple
+              submissions as separate applications.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -212,48 +484,57 @@ export function ApplicationStep5Approve({
               type="button"
               variant="outline"
               onClick={() => setShowReExportDialog(false)}
+              disabled={isDownloading}
             >
               Cancel
             </Button>
             <Button
               type="button"
-              onClick={() => setShowReExportDialog(false)}
+              onClick={() => void doDownload(pendingFormat)}
+              disabled={isDownloading}
               className="bg-[#0D6E6E] text-white hover:bg-[#0A5A5A]"
             >
-              Download anyway
+              {isDownloading ? 'Downloading…' : 'Download anyway'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* ── Re-open confirmation dialog ───────────────────────────────────── */}
+      {/* ── Re-open confirmation dialog ────────────────────────────────────── */}
       <Dialog open={showReOpenDialog} onOpenChange={setShowReOpenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Re-open this application?</DialogTitle>
             <DialogDescription>
-              Re-opening this application will remove your approval. You will need to review and
+              Re-opening will remove your approval. You will need to review and
               approve your answers again before you can export.
             </DialogDescription>
           </DialogHeader>
+          {reopenError && (
+            <p className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]">
+              {reopenError}
+            </p>
+          )}
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowReOpenDialog(false)}
+              disabled={isReopening}
             >
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleReOpenConfirm}
+              disabled={isReopening}
               className="bg-[#0D6E6E] text-white hover:bg-[#0A5A5A]"
             >
-              Re-open application
+              {isReopening ? 'Re-opening…' : 'Re-open application'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
-  );
+  )
 }

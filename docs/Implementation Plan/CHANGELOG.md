@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-05-21 — Slice 7: Step 5 Approve & Export wired up
+
+**What changed:**
+- `actions/applications.ts` — `approveApplication(applicationId)` Server Action added. Sets `applications.status = 'approved'` and `is_approved = true` on all `application_answers` rows. Ownership enforced via `user_id` filter on the applications UPDATE (prevents one user approving another's application even if they know the ID).
+- `app/(authenticated)/applications/[id]/step/5/page.tsx` — fully rewritten; `getApplicationOrRedirect(id, 5)` for step locking; separate query for `last_exported_at` (not in `ApplicationData` type); `application_answers` fetched ordered by `question_order`; typed `AnswerRow[]` and application metadata passed to component.
+- `components/application-step5-approve.tsx` — full rewrite; `AnswerRow` type exported; three-item checklist (must all be checked before Approve activates); read-only Q&A view with per-answer word count, source badge, over-limit warning; approve + re-open dialogs with real Server Action calls via `useTransition`; two download buttons (`.docx` and `.txt`); download via `fetch()` + `response.blob()` + `createObjectURL` (shows error state if route fails); re-export warning dialog shows real `lastExported` date from DB; status and `lastExported` updated client-side on first download.
+- `app/api/export/[applicationId]/route.ts` (new) — `GET` route; auth + ownership + status check (`approved` or `exported` required); fetches answers and user profile for disclaimer; generates A4 Word doc (docx v9.6.1) per PDR-DH-003; updates `status = 'exported'` and `last_exported_at = now()` on every call; `?format=txt` returns plain-text variant.
+
+**Key decisions:**
+- Three-item checklist gates the Approve button (not just a confirmation dialog): this reflects P1.12's spec intention of "three review prompts" and ensures users consciously confirm accuracy and AI responsibility before approving. The dialog then provides a second confirmation with grant/funder details shown.
+- Download updates status on every call (not just the first): `last_exported_at` is always current, so the re-export warning can show the accurate "last exported on [date]" message. This matches the data-model.md note: "last_exported_at is updated on every export, not just the first".
+- Source badges on read-only view: showing "AI generated / AI + edited / Written by you" on Step 5 helps users quickly spot answers they haven't personally reviewed. This was not explicitly in the spec but is low-cost and directly supports the accuracy checklist.
+- `Uint8Array` conversion before `new Response(...)`: `Packer.toBuffer()` returns `Buffer<ArrayBufferLike>` which TypeScript 5.x does not accept as `BodyInit`. Wrapping with `new Uint8Array(buffer)` is the correct fix (zero-copy for Node.js Buffers backed by `ArrayBuffer`).
+
+---
+
 ## 2026-05-21 — Slice 5: Step 3 AI Summary wired up
 
 **What changed:**
