@@ -141,7 +141,7 @@
 |-----|-------------|------|--------|
 | ADR-OPS-001 | Vercel Pro subscription activated before production deployment | P5.4 | 🔵 |
 | ADR-OPS-001 | AI route files include `export const maxDuration = 90` | S5.2, S6.2 | ✅ |
-| ADR-OPS-002 | Branch protection rule configured on `main` in GitHub | P5.4 | 🔵 GAP-11 DEFERRED — deliberately scheduled for P5.4 pre-launch baseline. Project is single-developer + AI assistant through all of Phase 4; branch protection solves a team-conflict risk that does not exist in this setup. Will be configured (with GitHub Team upgrade if required) when production infrastructure is baselined before launch. |
+| ADR-OPS-002 | Branch protection rule configured on `main` in GitHub | P5.4 | 🔵 GAP-11 DEFERRED — deliberately scheduled for P5.4 pre-launch baseline. Project is single-developer + AI assistant through all of Phase 4; branch protection solves a team-conflict risk that does not exist in this setup. GitHub Team upgrade confirmed by Wac (2026-05-21); will be actioned at P5.4 when production infrastructure is baselined before launch. |
 | ADR-OPS-002 | Production deployments tagged in Git for rollback reference | — | ⚠️ GAP-12 |
 | ADR-OPS-002 | Database migrations applied before or alongside code deployment | P5.4 (pre-launch checklist) | ✅ |
 | ADR-OPS-003 | Resend account created; sending domain verified (SPF + DKIM) | P3.8 | ✅ |
