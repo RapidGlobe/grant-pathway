@@ -294,6 +294,150 @@ export async function advanceToStep4(
 }
 
 // ---------------------------------------------------------------------------
+// S6.3 — Save answer (auto-save and manual save from Step 4)
+// ---------------------------------------------------------------------------
+
+export type SaveAnswerResult =
+  | { ok: true }
+  | { ok: false; error: string }
+
+/**
+ * Saves a single answer text for an existing application_answers row.
+ * Called by the debounced auto-save (400 ms) and the 60-second background
+ * save in the Step 4 component.
+ *
+ * answer_source must be 'user_edited' (user modified an AI-generated answer)
+ * or 'user_written' (user wrote without AI). 'ai_generated' is set by the
+ * /api/generate-draft route only, never by this action.
+ *
+ * user_id check is belt-and-braces in addition to RLS on application_answers.
+ */
+export async function saveAnswer(
+  answerId: string,
+  answerText: string,
+  answerSource: 'user_edited' | 'user_written',
+): Promise<SaveAnswerResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  const { error } = await supabase
+    .from('application_answers')
+    .update({
+      answer_text: answerText,
+      answer_source: answerSource,
+    })
+    .eq('id', answerId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { ok: false, error: 'Could not save your answer. Please try again.' }
+  }
+
+  return { ok: true }
+}
+
+/**
+ * Upserts a single manually-entered question + answer.
+ * Used when no questions were extracted from the guidelines.
+ * V1 supports one manual question (question_order = 1).
+ * ON CONFLICT updates the row so re-submitting the form is idempotent.
+ */
+export async function saveManualAnswer(
+  applicationId: string,
+  questionText: string,
+  answerText: string,
+): Promise<SaveAnswerResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  if (!questionText.trim()) {
+    return { ok: false, error: 'Please enter your application question.' }
+  }
+
+  const { error } = await supabase
+    .from('application_answers')
+    .upsert(
+      {
+        application_id: applicationId,
+        user_id: user.id,
+        question_text: questionText.trim(),
+        question_order: 1,
+        answer_text: answerText.trim() || null,
+        answer_source: 'user_written',
+      },
+      { onConflict: 'application_id,question_order' },
+    )
+
+  if (error) {
+    return { ok: false, error: 'Could not save your answer. Please try again.' }
+  }
+
+  return { ok: true }
+}
+
+// ---------------------------------------------------------------------------
+// S6.4 — Advance to Step 5
+// ---------------------------------------------------------------------------
+
+/**
+ * Called when the user clicks "I've reviewed my answers — continue" on Step 4.
+ * Advances current_step to 5 (never regresses if already further along).
+ * Does not change status — it remains 'in_progress' from Step 2.
+ *
+ * Returns never on success (calls redirect). Returns { ok: false, error }
+ * only when the DB update fails.
+ */
+export async function advanceToStep5(
+  applicationId: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  try {
+    const { data: existing } = await supabase
+      .from('applications')
+      .select('current_step')
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+      .single()
+
+    const newStep = Math.max(existing?.current_step ?? 4, 5)
+
+    const { error } = await supabase
+      .from('applications')
+      .update({ current_step: newStep })
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+
+    if (error) {
+      return { ok: false, error: 'Could not save your progress. Please try again.' }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: 'Could not reach the server. Please check your connection and try again.',
+    }
+  }
+
+  redirect(`/applications/${applicationId}/step/5`)
+}
+
+// ---------------------------------------------------------------------------
 // S2.3 — Re-open application
 // ---------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (Slice 5 complete)
+**Last updated:** 2026-05-21 (Slice 6 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **26** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **30** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -87,11 +87,11 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 6 — Step 4: Draft Answers** | **4** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Questions pre-populated | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Generate draft API route | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Editable textareas and auto-save | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Continue to Step 5 | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Draft Answers** | **4** | **4** | **✅ Complete** |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Questions pre-populated | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Generate draft API route | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Editable textareas and auto-save | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Continue to Step 5 | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export** | **3** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 0 | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **37** | |
+| **Total** | **78** | **41** | |
 
 ---
 
@@ -429,10 +429,11 @@ All five test scenarios passed. Bugs found and fixed during testing:
 
 ### Slice 6 — Step 4: Draft Answers
 
-- [ ] **S6.1** Questions from Step 3 pre-populated as `application_answers` rows; manual entry field shown if no questions extracted
-- [ ] **S6.2** `/api/generate-draft` route: called automatically on Step 4 page load; generates all answers in one Bedrock call; JSON parse with one retry; usage check and rate limit; approaching-limit flag returned when usage ≥ 16/20; first failure shows Try again; persistent failure (after retry) shows "If this keeps happening, please try again later. Your work has been saved."
-- [ ] **S6.3** Editable textareas for all answers; auto-save debounced (300–500ms) and silent 60-second background save; `answer_source` updated to `user_edited` when user modifies AI answer; "Regenerate all answers" link with usage warnings
-- [ ] **S6.4** "I've reviewed my answers — continue" advances to Step 5
+- [x] **S6.1** `app/.../step/4/page.tsx` rewritten: calls `getApplicationOrRedirect(id, 4)`; fetches `application_answers` rows; if none exist AND `ai_summary` has questions, upserts question rows (`ON CONFLICT DO NOTHING` — never overwrites existing answers); computes `hasExistingAnswers` and monthly usage state; passes all data to component as props
+- [x] **S6.2** `POST /api/generate-draft` route wired: `maxDuration = 90`; auth + ownership; monthly cap + Upstash rate limit; questions fetched from `application_answers`; charity profile fetched; `buildDraftPrompt()` called; `DRAFT_MAX_TOKENS = 3000`; markdown fence strip + JSON.parse; one retry with explicit "return ONLY array" instruction; validates returned IDs against known question IDs (guards against hallucinated UUIDs); upserts each answer with `answer_source = 'ai_generated'`; logs to `ai_usage_log` (`request_type: 'draft_generation'`); returns `{ answers, approachingLimit }`
+  - `actions/applications.ts` — `saveAnswer()`, `saveManualAnswer()`, `advanceToStep5()` Server Actions added
+- [x] **S6.3** `components/application-step4-draft.tsx` fully rewritten: `QuestionRow` type exported (used by page); 5 display states (`loading`, `content`, `failure`, `persistent-failure`, `no-questions`); auto-generates on mount when `!hasExistingAnswers`; returning users skip AI call and go straight to content; debounced auto-save (400ms) via `saveAnswer()` SA; 60-second background save for unsaved dirty answers; `aiGeneratedIdsRef` tracks which IDs were AI-generated for correct `answer_source` on save; per-answer word count display with amber/red colour at 90%/100% of limit; `isRetryRef` controls persistent failure; Regenerate resets retry counter
+- [x] **S6.4** `advanceToStep5()` Server Action advances `current_step` to `max(current, 5)` and redirects to step/5; wired to Continue button via `useTransition`; `no-questions` path saves manual entry via `saveManualAnswer()` before advancing
 
 ### Slice 7 — Step 5: Approve & Export
 
@@ -477,6 +478,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
+| 2026-05-21 | **Slice 6 complete.** Full draft answers pipeline wired: questions populated from `ai_summary` into `application_answers` rows on Step 4 page load (ON CONFLICT DO NOTHING); `POST /api/generate-draft` generates all answers in one Bedrock call; `components/application-step4-draft.tsx` rewritten with real data, auto-save (400ms debounce + 60s background), per-answer word count, and correct `answer_source` tracking. `saveAnswer`, `saveManualAnswer`, `advanceToStep5` Server Actions added. TypeScript clean (0 errors). ⚠️ `DRAFT_MAX_TOKENS = 3000` — may truncate very long applications (e.g. Garfield Weston 5 sections × 600 words). Monitor in testing; increase or switch to Haiku if timeout observed. |
 | 2026-05-21 | **Slice 5 complete.** Full AI summary pipeline wired: `lib/prompts.ts` (prompt library), `lib/ai-error-handler.ts` (retry + error classification), `POST /api/generate-summary` (Bedrock call, DB save, usage logging), `components/application-step3-summary.tsx` (auto-load, asymptotic progress bar, regenerate, persistent failure, step advance). `advanceToStep4()` Server Action added to `actions/applications.ts`. Step 3 page rewritten to pass `existingSummary` from DB. TypeScript clean (0 errors). Test: upload a real funder guidelines PDF → Step 3 should now show AI-generated summary, not mock National Lottery data. |
 | 2026-05-21 | **Slice 4 complete.** Full file upload pipeline wired: signed URL → XHR direct upload to Supabase Storage → server-side extraction (`lib/extract-text.ts`) → `sessionStorage` storage → `advanceToStep3()` Server Action. Paste path wired. All error states live. Orphan cleanup cron (`vercel.json`, every 30 min) deployed. Session restore and re-upload advisory (GAP-13, GAP-19) implemented. TypeScript clean (0 errors). ⚠️ Confirm cron active in Vercel dashboard after deployment. |
 | 2026-05-21 | **Slice 3 complete.** Step 1 saves funder/grant names to DB and advances current_step to 2. Reusable `lib/application-guard.ts` helper introduced for step locking across all step pages (2–5). Step 2 now enforces step locking via `getApplicationOrRedirect`. TypeScript clean (0 errors). No manual steps required. |
