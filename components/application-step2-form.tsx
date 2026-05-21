@@ -1,19 +1,48 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+// Step 2 — Upload Guidelines (S4.1, S4.2, S4.3)
+//
+// Upload path (S4.1):
+//   1. Client-side format/size validation (instant feedback)
+//   2. POST /api/upload/signed-url  → { signedUrl, path }
+//   3. XHR PUT to Supabase Storage  (real progress bar 0–100%)
+//   4. POST /api/upload/process     → { text, isLargeDocument }
+//   5. setGuidelines(applicationId, text) into sessionStorage
+//
+// Paste path (S4.2):
+//   1. User types/pastes into textarea
+//   2. On Continue: setGuidelines(applicationId, pasteText)
+//
+// Session restore (ADR-FILE-004):
+//   On mount, getGuidelines() checks sessionStorage. If an entry exists
+//   (user is returning from a later step), the form shows "Guidelines loaded"
+//   so they can continue without re-uploading. Clicking "Remove" clears it.
+//
+// Re-upload advisory (GAP-19):
+//   When current_step >= 3 and sessionStorage has no entry, a note prompts
+//   the user to re-upload (guidelines are not persisted to the database).
+//
+// Continue (S4.1 / S4.2):
+//   Calls advanceToStep3() Server Action → sets status=in_progress,
+//   current_step=3, redirects to Step 3.
+
+import { useState, useRef, useEffect, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Upload, FileText, X, AlertTriangle, AlertCircle } from "lucide-react";
+import { Upload, FileText, X, AlertTriangle, AlertCircle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { StepIndicator } from "@/components/step-indicator";
+import { advanceToStep3 } from "@/actions/applications";
+import { setGuidelines, getGuidelines, clearGuidelines } from "@/lib/guidelines-session";
 
-type UploadState = "idle" | "uploading" | "uploaded";
-type UploadError = "format" | "size" | "scanned" | null;
+type UploadState = "idle" | "uploading" | "processing" | "uploaded";
+type UploadError = "format" | "size" | "scanned" | "server" | null;
 
 interface ApplicationStep2FormProps {
   applicationId: string;
+  /** Current step from the database — used to show re-upload advisory (GAP-19) */
+  currentStep: number;
   initialError?: UploadError;
   showLargeWarning?: boolean;
 }
@@ -21,12 +50,23 @@ interface ApplicationStep2FormProps {
 const ACCEPTED_EXTENSIONS = [".pdf", ".docx"];
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
+const UPLOAD_ERROR_MESSAGES: Record<Exclude<UploadError, null>, string> = {
+  format:
+    "We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.",
+  size:
+    "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.",
+  scanned:
+    "We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.",
+  server:
+    "Something went wrong while processing your document. Please try again, or paste the guidelines text directly.",
+};
+
 export function ApplicationStep2Form({
   applicationId,
+  currentStep,
   initialError = null,
   showLargeWarning = false,
 }: ApplicationStep2FormProps) {
-  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [uploadState, setUploadState] = useState<UploadState>("idle");
@@ -36,41 +76,109 @@ export function ApplicationStep2Form({
   const [largeWarning, setLargeWarning] = useState(showLargeWarning);
   const [pasteText, setPasteText] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
+  const [continueError, setContinueError] = useState<string | null>(null);
+  const [isContinuing, startContinuing] = useTransition();
 
-  // Animate mock upload progress
+  // sessionStorage restore (ADR-FILE-004):
+  // Check on mount for previously extracted text from this session.
+  // Runs client-side only (sessionStorage is not available server-side).
+  const [guidelinesRestored, setGuidelinesRestored] = useState(false);
+
   useEffect(() => {
-    if (uploadState !== "uploading") return;
+    const stored = getGuidelines(applicationId);
+    if (stored) {
+      setGuidelinesRestored(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applicationId]);
 
-    let progress = 0;
-    const tick = setInterval(() => {
-      progress += Math.random() * 25 + 10;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(tick);
-        setUploadProgress(100);
-        setTimeout(() => setUploadState("uploaded"), 250);
-      } else {
-        setUploadProgress(progress);
-      }
-    }, 180);
+  // Whether the user has usable guidelines ready to continue
+  const hasContent =
+    uploadState === "uploaded" ||
+    pasteText.trim().length > 0 ||
+    guidelinesRestored;
 
-    return () => clearInterval(tick);
-  }, [uploadState]);
+  // ── File validation (client-side, instant) ──────────────────────────────
 
-  function processFile(file: File) {
+  function validateFileClient(file: File): UploadError {
     const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-      setUploadError("format");
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) return "format";
+    if (file.size > MAX_FILE_BYTES) return "size";
+    return null;
+  }
+
+  // ── Upload flow (S4.1) ───────────────────────────────────────────────────
+
+  async function processFile(file: File) {
+    // Client-side validation first — avoids a round-trip for obvious errors
+    const clientError = validateFileClient(file);
+    if (clientError) {
+      setUploadError(clientError);
       return;
     }
-    if (file.size > MAX_FILE_BYTES) {
-      setUploadError("size");
-      return;
-    }
+
+    // If sessionStorage had a previous entry, dismiss the "restored" state
+    setGuidelinesRestored(false);
     setUploadError(null);
     setUploadedFileName(file.name);
     setUploadProgress(0);
     setUploadState("uploading");
+
+    try {
+      // Step 1: Get signed upload URL
+      const signedUrlRes = await fetch("/api/upload/signed-url", { method: "POST" });
+      if (!signedUrlRes.ok) throw new Error("signed_url_failed");
+      const { signedUrl, path } = (await signedUrlRes.json()) as {
+        signedUrl: string;
+        path: string;
+      };
+
+      // Step 2: Upload directly to Supabase Storage with XHR for progress tracking
+      await uploadWithProgress(file, signedUrl, (pct) => setUploadProgress(pct));
+
+      // Step 3: Extract text from the uploaded file
+      setUploadState("processing");
+
+      const processRes = await fetch("/api/upload/process", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path, applicationId }),
+      });
+
+      const processData = (await processRes.json()) as {
+        text?: string;
+        isLargeDocument?: boolean;
+        error?: string;
+      };
+
+      if (!processRes.ok || !processData.text) {
+        const err = processData.error ?? "server";
+        // Map server-side validation errors to client-side UploadError types
+        if (err === "scanned_pdf") {
+          setUploadError("scanned");
+        } else if (err === "invalid_type") {
+          setUploadError("format");
+        } else if (err === "too_large") {
+          setUploadError("size");
+        } else {
+          setUploadError("server");
+        }
+        setUploadState("idle");
+        return;
+      }
+
+      // Step 4: Store extracted text in sessionStorage (ADR-FILE-004)
+      setGuidelines(applicationId, processData.text);
+
+      if (processData.isLargeDocument) {
+        setLargeWarning(true);
+      }
+
+      setUploadState("uploaded");
+    } catch {
+      setUploadError("server");
+      setUploadState("idle");
+    }
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -87,6 +195,8 @@ export function ApplicationStep2Form({
   }
 
   function handleRemove() {
+    clearGuidelines(applicationId);
+    setGuidelinesRestored(false);
     setUploadState("idle");
     setUploadError(null);
     setUploadedFileName(null);
@@ -94,7 +204,22 @@ export function ApplicationStep2Form({
     setLargeWarning(false);
   }
 
-  const hasContent = uploadState === "uploaded" || pasteText.trim().length > 0;
+  // ── Continue (S4.1 / S4.2) ──────────────────────────────────────────────
+
+  function handleContinue() {
+    // For the paste path: store the text in sessionStorage before advancing
+    if (pasteText.trim() && uploadState !== "uploaded" && !guidelinesRestored) {
+      setGuidelines(applicationId, pasteText.trim());
+    }
+
+    setContinueError(null);
+    startContinuing(async () => {
+      // On success, advanceToStep3 calls redirect() and never returns.
+      // Only reaches the next line on a DB error.
+      const result = await advanceToStep3(applicationId);
+      setContinueError(result.error);
+    });
+  }
 
   return (
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
@@ -107,11 +232,29 @@ export function ApplicationStep2Form({
         Upload the funder&apos;s guidelines document, or paste the text directly below.
       </p>
 
+      {/* Re-upload advisory (GAP-19) — shown when returning to Step 2 after
+          advancing past it and sessionStorage no longer has an entry */}
+      {currentStep >= 3 && !guidelinesRestored && uploadState === "idle" && !uploadError && (
+        <div
+          role="note"
+          className="mb-4 flex items-start gap-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4"
+        >
+          <Info
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]"
+            aria-hidden="true"
+          />
+          <p className="text-[13px] text-[#1E40AF]">
+            Your guidelines are not saved between sessions — please upload or paste them
+            again to continue.
+          </p>
+        </div>
+      )}
+
       {/* ── File upload area ── */}
       <div className="mb-4">
 
         {/* Idle — dropzone */}
-        {uploadState === "idle" && !uploadError && (
+        {uploadState === "idle" && !uploadError && !guidelinesRestored && (
           <div
             role="button"
             tabIndex={0}
@@ -143,7 +286,7 @@ export function ApplicationStep2Form({
           </div>
         )}
 
-        {/* Uploading — progress bar */}
+        {/* Uploading — real XHR progress bar */}
         {uploadState === "uploading" && (
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
             <div className="mb-3 flex items-center gap-3">
@@ -165,6 +308,26 @@ export function ApplicationStep2Form({
           </div>
         )}
 
+        {/* Processing — extraction in progress */}
+        {uploadState === "processing" && (
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
+            <div className="mb-3 flex items-center gap-3">
+              <FileText className="h-5 w-5 shrink-0 text-[#64748B]" aria-hidden="true" />
+              <span className="truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
+              {/* Indeterminate animation while server extracts text */}
+              <div
+                className="h-full animate-pulse rounded-full bg-[#0D6E6E]"
+                style={{ width: "100%" }}
+                role="progressbar"
+                aria-label="Processing document"
+              />
+            </div>
+            <p className="mt-2 text-[12px] text-[#64748B]">Processing document…</p>
+          </div>
+        )}
+
         {/* Uploaded — success */}
         {uploadState === "uploaded" && (
           <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white p-4">
@@ -181,7 +344,25 @@ export function ApplicationStep2Form({
           </div>
         )}
 
-        {/* Error state */}
+        {/* Session restored — guidelines loaded from this session */}
+        {guidelinesRestored && uploadState === "idle" && !uploadError && (
+          <div className="flex items-center gap-3 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4">
+            <FileText className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
+            <span className="flex-1 text-[14px] text-[#15803D]">
+              Guidelines loaded from this session
+            </span>
+            <button
+              type="button"
+              onClick={handleRemove}
+              aria-label="Remove guidelines and upload a different document"
+              className="rounded text-[#64748B] transition-colors hover:text-[#DC2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706]"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        {/* Upload error */}
         {uploadError && (
           <div>
             <div
@@ -193,12 +374,7 @@ export function ApplicationStep2Form({
                 aria-hidden="true"
               />
               <p className="text-[14px] text-[#991B1B]">
-                {uploadError === "format" &&
-                  "We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
-                {uploadError === "size" &&
-                  "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
-                {uploadError === "scanned" &&
-                  "We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."}
+                {UPLOAD_ERROR_MESSAGES[uploadError]}
               </p>
             </div>
             <button
@@ -251,12 +427,26 @@ export function ApplicationStep2Form({
         <Textarea
           id="pasteText"
           value={pasteText}
-          onChange={(e) => setPasteText(e.target.value)}
+          onChange={(e) => {
+            setPasteText(e.target.value);
+            // Typing new paste text dismisses the restored state
+            if (guidelinesRestored && e.target.value.trim()) {
+              setGuidelinesRestored(false);
+              clearGuidelines(applicationId);
+            }
+          }}
           rows={8}
           placeholder="Paste the full text of the funder's guidelines here…"
           className="text-[14px]"
         />
       </div>
+
+      {/* Server-side continue error */}
+      {continueError && (
+        <p role="alert" className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]">
+          {continueError}
+        </p>
+      )}
 
       {/* Back + Continue */}
       <div className="flex items-center justify-between">
@@ -268,13 +458,52 @@ export function ApplicationStep2Form({
         </Link>
         <Button
           type="button"
-          disabled={!hasContent}
-          onClick={() => router.push(`/applications/${applicationId}/step/3`)}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!hasContent || isContinuing || uploadState === "uploading" || uploadState === "processing"}
+          onClick={handleContinue}
+          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Continue
+          {isContinuing ? "Saving…" : "Continue"}
         </Button>
       </div>
     </div>
   );
+}
+
+// ── XHR upload helper ────────────────────────────────────────────────────────
+
+/**
+ * Uploads a file to a Supabase Storage signed URL via XMLHttpRequest.
+ * Uses XHR instead of fetch so we get real upload progress events for the
+ * progress bar (ADR-FILE-001 — client-side upload progress shown).
+ */
+function uploadWithProgress(
+  file: File,
+  signedUrl: string,
+  onProgress: (pct: number) => void,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", signedUrl);
+    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        onProgress(100);
+        resolve();
+      } else {
+        reject(new Error(`Storage upload failed: ${xhr.status}`));
+      }
+    };
+
+    xhr.onerror = () => reject(new Error("Network error during upload"));
+    xhr.onabort = () => reject(new Error("Upload aborted"));
+
+    xhr.send(file);
+  });
 }

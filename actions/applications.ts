@@ -181,6 +181,67 @@ export async function saveApplicationStep1(
 }
 
 // ---------------------------------------------------------------------------
+// S4.2 — Advance to Step 3 (saves guidelines progress)
+// ---------------------------------------------------------------------------
+
+/**
+ * Called when the user clicks Continue on Step 2 (after uploading a file
+ * or entering paste text). Sets status = 'in_progress' (the not_started →
+ * in_progress transition per D8 / application-status-model.md) and advances
+ * current_step to 3 (never regresses if already further along).
+ *
+ * The guidelines text is stored client-side in sessionStorage by this point
+ * (via setGuidelines in lib/guidelines-session.ts) — it is never sent to or
+ * stored in the database (ADR-DATA-002, ADR-FILE-004).
+ *
+ * Returns never on success (calls redirect). Returns { ok: false, error }
+ * only when the DB update fails.
+ */
+export async function advanceToStep3(
+  applicationId: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  try {
+    // Fetch current step to avoid regression
+    const { data: existing } = await supabase
+      .from('applications')
+      .select('current_step')
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+      .single()
+
+    const newStep = Math.max(existing?.current_step ?? 2, 3)
+
+    const { error } = await supabase
+      .from('applications')
+      .update({
+        status: 'in_progress',
+        current_step: newStep,
+      })
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+
+    if (error) {
+      return { ok: false, error: 'Could not save your progress. Please try again.' }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: 'Could not reach the server. Please check your connection and try again.',
+    }
+  }
+
+  redirect(`/applications/${applicationId}/step/3`)
+}
+
+// ---------------------------------------------------------------------------
 // S2.3 — Re-open application
 // ---------------------------------------------------------------------------
 

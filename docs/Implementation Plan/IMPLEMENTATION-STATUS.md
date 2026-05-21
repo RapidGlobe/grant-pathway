@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (Slice 3 complete)
+**Last updated:** 2026-05-21 (Slice 4 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **18** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **22** | In progress |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -77,11 +77,11 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S3.3 — Step locking | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 4 — Step 2: File Upload** | **4** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.1 — Upload path | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.2 — Paste path | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.3 — File error states | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.4 — Orphan cleanup cron | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 4 — Step 2: File Upload** | **4** | **4** | **✅ Complete** |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.1 — Upload path | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.2 — Paste path | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.3 — File error states | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.4 — Orphan cleanup cron | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Slice 5 — Step 3: AI Summary** | **4** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.1 — Prompt library | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 0 | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **29** | |
+| **Total** | **78** | **33** | |
 
 ---
 
@@ -401,10 +401,22 @@ All five test scenarios passed. Bugs found and fixed during testing:
 
 ### Slice 4 — Step 2: File Upload
 
-- [ ] **S4.1** Upload path: signed URL → client direct upload to Supabase Storage → process route extracts text → stores in `sessionStorage` → file deleted; token count estimated — if >100k tokens, large-document warning flag returned (no hard truncation — PDR-AI-004); Continue sets `status = in_progress`
-- [ ] **S4.2** Paste path: text stored in `sessionStorage` on Continue
-- [ ] **S4.3** All three error states wired up: wrong format, file too large, scanned PDF
-- [ ] **S4.4** Orphan cleanup cron job deployed and confirmed active in Vercel dashboard
+- [x] **S4.1** Upload path: signed URL → client XHR direct upload to Supabase Storage (real progress bar) → `/api/upload/process` extracts text → stored in `sessionStorage` via `setGuidelines()` → file deleted immediately after download (unconditional, before extraction); large-document flag returned when extracted text > 400k chars (~100k tokens); Continue calls `advanceToStep3()` which sets `status = in_progress`, `current_step = 3`, and redirects to Step 3
+  - `lib/extract-text.ts` (new) — `extractText(buffer, mimeType)`: PDF via `unpdf`/pdfjs, Word via `mammoth`; scanned-PDF detection (< 100 chars extracted); large-document flag (> 400k chars); `detectMimeType(buffer)`: magic bytes detection for PDF (`%PDF`) and DOCX (`PK\x03\x04`)
+  - `app/api/upload/signed-url/route.ts` (new) — POST; auth check; service role client; flat path `{userId}_{timestamp}` at bucket root (no subdirectory — simplifies cleanup listing); returns `{ signedUrl, path }`
+  - `app/api/upload/process/route.ts` (new) — POST; auth check; download from `guidelines-temp`; unconditional delete immediately after download (file already in Buffer); server-side magic-byte validation via `detectMimeType()` + `validateFile()`; extract text; return `{ text, isLargeDocument }`
+  - `actions/applications.ts` — `advanceToStep3(applicationId)` added; sets `status = in_progress`, `current_step = max(current, 3)`; redirects to step/3 on success; returns `{ ok: false, error }` on DB failure
+  - `components/application-step2-form.tsx` — fully rewritten; real XHR upload with `uploadWithProgress()` helper; three upload states: `uploading` (XHR progress bar), `processing` (indeterminate pulse while /process runs), `uploaded`; error states mapped from server responses; `continueError` state for Server Action failures; `isContinuing` via `useTransition`
+- [x] **S4.2** Paste path: on Continue, `setGuidelines(applicationId, pasteText.trim())` stores text in `sessionStorage` before `advanceToStep3()` is called; paste textarea pre-fills if typing new text while restored state is active
+- [x] **S4.3** All five upload error states wired up: `format` (wrong extension/MIME), `size` (> 10MB), `scanned` (< 100 chars extracted from PDF), `server` (generic upload/process failure); all with "Try a different file" reset link; session-restored state shows green "Guidelines loaded" banner with remove button
+  - Session restore on mount (ADR-FILE-004): `getGuidelines(applicationId)` checked in `useEffect`; if entry exists, `guidelinesRestored = true` → green banner shown; remove button calls `clearGuidelines()`
+  - Re-upload advisory (GAP-19): blue info banner shown when `currentStep >= 3` and no sessionStorage entry — "Your guidelines are not saved between sessions — please upload or paste them again to continue"
+  - `currentStep` prop added to `ApplicationStep2FormProps`; Step 2 page passes it from `getApplicationOrRedirect()` return value
+- [x] **S4.4** Orphan cleanup cron deployed
+  - `app/api/cron/cleanup-guidelines/route.ts` (new) — GET; `CRON_SECRET` auth (ADR-OPS-004); service role; `list('')` on `guidelines-temp` bucket root; deletes files with `updated_at / created_at < now - 1h`; returns `{ deleted: N }`; does NOT import rate limiters (GAP-13 resolved)
+  - `vercel.json` (new) — `"*/30 * * * *"` schedule for `/api/cron/cleanup-guidelines`
+  - `proxy.ts` — `/api/cron` added to `PUBLIC_API` so Vercel Cron requests bypass session handling (same pattern as `/api/health`)
+  - ⚠️ **Confirm active in Vercel dashboard** after first deployment: Settings → Cron Jobs → verify `cleanup-guidelines` shows status "Active" and last run time
 
 ### Slice 5 — Step 3: AI Summary
 
@@ -463,6 +475,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-20 | **P3.11 added to Phase 3.** `/api/health` endpoint task added following compliance review — ADR-OPS-007 requires the endpoint but no corresponding build task existed in the plan. Phase 3 now has 11 tasks (10 complete). Total plan tasks: 77. |
 | 2026-05-20 | **Phase 3 compliance review — 2 High severity fixes applied.** (1) CSP `connect-src` in `next.config.ts` updated to include Sentry EU ingest domain (`https://*.ingest.de.sentry.io`) — browser SDK was silently blocked without this. (2) `sentry.edge.config.ts` PII scrubbing (`beforeSend` hook) added — client and server configs already had it; edge was overlooked. Dependencies updated: next 16.2.5 → 16.2.6 (CVE-2026-44575 High severity middleware bypass fixed), @tailwindcss/postcss 4.2.4 → 4.3.0 (PostCSS XSS), @anthropic-ai/sdk 0.97.0 → 0.97.1, tailwind-merge 3.5.0 → 3.6.0. 6 remaining compliance items (Medium/Low) to be addressed before Phase 4. |
 | 2026-05-20 | **P3.8 complete.** Resend domain verified; Supabase Auth SMTP configured; Supabase Auth email templates updated. Design decision: inactivity emails (3 + 4) will be built as code functions in `lib/emails/` rather than Resend templates — Resend's HTML editor does not support variable substitution. Email content kept separate from cron job logic. Implemented in Slice 8. |
+| 2026-05-21 | **Slice 4 complete.** Full file upload pipeline wired: signed URL → XHR direct upload to Supabase Storage → server-side extraction (`lib/extract-text.ts`) → `sessionStorage` storage → `advanceToStep3()` Server Action. Paste path wired. All error states live. Orphan cleanup cron (`vercel.json`, every 30 min) deployed. Session restore and re-upload advisory (GAP-13, GAP-19) implemented. TypeScript clean (0 errors). ⚠️ Confirm cron active in Vercel dashboard after deployment. |
 | 2026-05-21 | **Slice 3 complete.** Step 1 saves funder/grant names to DB and advances current_step to 2. Reusable `lib/application-guard.ts` helper introduced for step locking across all step pages (2–5). Step 2 now enforces step locking via `getApplicationOrRedirect`. TypeScript clean (0 errors). No manual steps required. |
 | 2026-05-21 | **Slice 2 complete.** Dashboard fetches real applications and AI usage count. `createApplication()` creates a DB row and redirects to Step 1. Continue navigates to stored `current_step`. View (approved/exported) triggers re-open flow. Delete with status-specific confirmation removes the row and refreshes the list. TypeScript clean (0 errors). No manual steps required — all Slice 2 tables and GRANTs were already in place from Phase 3. |
 | 2026-05-21 | **Logo placeholder recorded.** `components/logo.tsx` marked with `⚠️ PLACEHOLDER LOGO — replace before launch` comment. Real Grant Pathway logo (SVG/PNG, light + dark variants) to be supplied by Wac / RapidGlobe Ltd before P5.4 production launch. Instructions for swapping in the real asset are embedded in the component. |

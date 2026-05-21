@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
-// Public API routes — bypass session handling entirely (ADR-OPS-007)
-// These routes must be reachable without a session (e.g. UptimeRobot health checks).
-// They are listed here rather than in the matcher so the intent is explicit.
-const PUBLIC_API = ['/api/health']
+// Public API routes — bypass session handling entirely (ADR-OPS-007, ADR-OPS-004)
+// These routes must be reachable without a session:
+//   /api/health  — polled by UptimeRobot without a session (ADR-OPS-007)
+//   /api/cron    — called by Vercel Cron without a user session (ADR-OPS-004, GAP-13)
+//                  Cron routes authenticate via CRON_SECRET header instead.
+const PUBLIC_API = ['/api/health', '/api/cron']
 
 // Protected routes — require an authenticated session (D1 resolution: plural /applications)
 // /mfa is the TOTP challenge page reached after password auth when aal2 is required (S0.6)
