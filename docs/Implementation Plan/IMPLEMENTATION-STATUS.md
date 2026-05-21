@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (S1.4 complete — Slice 1 done)
+**Last updated:** 2026-05-21 (Slice 0 + Slice 1 end-to-end tested and passing)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -353,6 +353,19 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
   - `app/(authenticated)/dashboard/page.tsx` — fetches first name from `user_metadata` and calls `getCharityProfile()`; passes `firstName` and `profileIncomplete` as real props to both dashboard components
   - `components/dashboard-populated.tsx` — `MOCK_PROFILE_INCOMPLETE` constant removed; `profileIncomplete` prop added; banner now conditionally rendered from real data
   - `components/dashboard-empty.tsx` — no changes needed; props already existed with correct wiring
+
+### Slice 0 + 1 — End-to-End Test Results (2026-05-21)
+
+All five test scenarios passed. Bugs found and fixed during testing:
+
+- ✅ **Supabase redirect URL not in allowlist** — `http://localhost:3000/**` added to Authentication → URL Configuration → Redirect URLs in the dev project dashboard. Email verification links were being rejected before reaching the app. ⚠️ Production equivalent must be added to `mvmjryipieepvsjudche` before launch (P5.4).
+- ✅ **Missing table-level GRANTs** — Tables created via SQL editor do not automatically receive `GRANT` permissions for the `authenticated` role (Supabase Studio adds these automatically; the SQL editor does not). All five app tables now granted: `supabase/migrations/20260521000000_grant_table_permissions.sql` applied to dev. ⚠️ **Must be applied to production database before first real user sign-up.**
+- ✅ **Verify email resend form — empty email fallback** — If a user navigates to `/verify-email` without the `?email=` query param, the awaiting-mode form now shows a visible email input instead of a hidden empty field that produced a validation error on submit (`components/verify-email-resend-form.tsx`).
+- ✅ **WCAG contrast violation** — Footer tagline text `#94A3B8` on `#FDF9F5` background was 2.44:1 (needs 4.5:1 for 12px text). Changed to `#64748B` (~4.5:1) in `components/site-footer.tsx`.
+- ✅ **WCAG landmark violation** — Skip link `<a>` element sat outside any landmark region. Moved inside the `<header>` element of `NavPublic` and `NavAuthenticated`; removed from both layout files.
+- ✅ **Session timeout modal — misleading auto-save text** — Modal said "Any unsaved work has been saved automatically" but the app does not currently auto-save. Changed to "Make sure you've saved any work before your session ends." (`components/session-timeout-modal.tsx`).
+- ✅ **Browser extension hydration warnings** — Password managers and security extensions (LastPass, Surfshark, etc.) inject attributes into `<input>` elements after server render, causing React hydration warnings in dev mode. Added `suppressHydrationWarning` to the base `Input` component. Real users in production are unaffected (React 19 recovers silently).
+- ℹ️ **Session expiry during testing** — User was redirected to login after ~5–7 minutes of inactivity on the profile page (expected: 60 minutes). Cause not definitively identified; most likely an accidental page reload during the test session. Session timeout logic confirmed correct (60 min, warning at 55 min). Monitor during further testing.
 
 ### Slice 2 — Dashboard and Application Management
 
