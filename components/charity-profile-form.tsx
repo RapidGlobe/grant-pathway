@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { lookupCharity } from "@/actions/charity";
+import { lookupCharity, saveCharityProfile } from "@/actions/charity";
 
 type LookupState = null | "match" | "no-match" | "unavailable";
 
@@ -27,6 +27,8 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
   const [lookupQuery, setLookupQuery] = useState("");
   const [lookupResult, setLookupResult] = useState<LookupState>(null);
   const [isLookingUp, startLookup] = useTransition();
+  const [isSaving, startSaving] = useTransition();
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Controlled field values — pre-filled by the lookup on match (S1.1);
   // pre-filled from saved profile data when editing (S1.3).
@@ -80,20 +82,36 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
     }
   }
 
-  // ── Form submission (save wired in S1.2) ──────────────────────────────────
+  // ── Form submission ────────────────────────────────────────────────────────
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    // Client-side validation
     const errors: FieldErrors = {};
     if (!charityName.trim()) errors.charityName = "Please enter your charity name";
     if (!whatDoes.trim()) errors.whatDoes = "Please tell us what your charity does";
     if (!whoHelps.trim()) errors.whoHelps = "Please tell us who your charity helps";
     if (!whereWorks.trim()) errors.whereWorks = "Please tell us where your charity works";
     setFieldErrors(errors);
-    if (Object.keys(errors).length === 0) {
-      // Static success — replaced by real Server Action in S1.2
-      setSaved(true);
-    }
+    if (Object.keys(errors).length > 0) return;
+
+    setSaveError(null);
+    startSaving(async () => {
+      const result = await saveCharityProfile({
+        charityName: charityName.trim(),
+        registrationNumber: regNumber.trim() || undefined,
+        whatDoes: whatDoes.trim(),
+        whoHelps: whoHelps.trim(),
+        whereWorks: whereWorks.trim(),
+        paraphrasedFromLookup,
+      });
+      if (result.ok) {
+        setSaved(true);
+      } else {
+        setSaveError(result.error);
+      }
+    });
   }
 
   // ── First-time save success screen ────────────────────────────────────────
@@ -409,11 +427,29 @@ export function CharityProfileForm({ isEdit = false }: CharityProfileFormProps) 
           )}
         </div>
 
+        {saveError && (
+          <div
+            role="alert"
+            className="mb-4 flex items-start gap-3 rounded-lg border border-[#FECACA] bg-[#FEF2F2] p-4"
+          >
+            <AlertCircle
+              className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]"
+              aria-hidden="true"
+            />
+            <p className="text-[14px] text-[#991B1B]">{saveError}</p>
+          </div>
+        )}
+
         <Button
           type="submit"
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A]"
+          disabled={isSaving}
+          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
-          {isEdit ? "Save changes" : "Save profile"}
+          {isSaving
+            ? "Saving…"
+            : isEdit
+              ? "Save changes"
+              : "Save profile"}
         </Button>
       </form>
     </div>

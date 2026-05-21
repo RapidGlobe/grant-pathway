@@ -1,9 +1,12 @@
 'use server'
 
 // Charity Server Actions (Slice 1)
-// Charity Commission lookup is centralised here so the component stays thin.
+// Charity Commission lookup and profile save are centralised here so
+// components stay thin.
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+import { z } from 'zod'
+import { createClient } from '@/lib/supabase/server'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -20,6 +23,93 @@ const CC_TIMEOUT_MS = 10_000
 
 /** Bedrock paraphrase timeout (30 s — well within the 60 s maxDuration on the profile route) */
 const BEDROCK_TIMEOUT_MS = 30_000
+
+// ---------------------------------------------------------------------------
+// S1.2 — Save charity profile
+// ---------------------------------------------------------------------------
+
+const saveProfileSchema = z.object({
+  charityName: z.string().min(1, 'Please enter your charity name'),
+  registrationNumber: z.string().optional(),
+  whatDoes: z.string().min(1, 'Please tell us what your charity does'),
+  whoHelps: z.string().min(1, 'Please tell us who your charity helps'),
+  whereWorks: z.string().min(1, 'Please tell us where your charity works'),
+  /** True when Bedrock paraphrased the charitable objects on the most recent lookup */
+  paraphrasedFromLookup: z.boolean(),
+})
+
+export type SaveProfileInput = z.infer<typeof saveProfileSchema>
+
+export type SaveProfileResult =
+  | { ok: true; isFirstSave: boolean }
+  | { ok: false; error: string }
+
+/**
+ * Upserts the authenticated user's charity profile.
+ *
+ * - lookup_source is set to 'charity_commission' when the form was pre-filled
+ *   via Bedrock paraphrase of the Charity Commission governing document (D14).
+ * - lookup_source is set to 'manual' when the user entered all data themselves.
+ * - INSERT on first save; UPDATE on subsequent saves (conflict on user_id).
+ * - RLS on charity_profiles ensures users can only read/write their own row (ADR-DATA-001).
+ */
+export async function saveCharityProfile(
+  data: SaveProfileInput,
+): Promise<SaveProfileResult> {
+  const parsed = saveProfileSchema.safeParse(data)
+  if (!parsed.success) {
+    return { ok: false, error: 'Invalid profile data. Please check the form.' }
+  }
+
+  const {
+    charityName,
+    registrationNumber,
+    whatDoes,
+    whoHelps,
+    whereWorks,
+    paraphrasedFromLookup,
+  } = parsed.data
+
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
+  if (authError || !user) {
+    return { ok: false, error: 'You must be signed in to save your profile.' }
+  }
+
+  // Detect first save before the upsert so we can return the correct flag
+  const { data: existing } = await supabase
+    .from('charity_profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const isFirstSave = !existing
+
+  const { error: saveError } = await supabase.from('charity_profiles').upsert(
+    {
+      user_id: user.id,
+      charity_name: charityName,
+      registration_number: registrationNumber || null,
+      what_charity_does: whatDoes,
+      who_charity_helps: whoHelps,
+      where_charity_works: whereWorks,
+      lookup_source: paraphrasedFromLookup ? 'charity_commission' : 'manual',
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' },
+  )
+
+  if (saveError) {
+    return { ok: false, error: 'Could not save your profile. Please try again.' }
+  }
+
+  return { ok: true, isFirstSave }
+}
 
 // ---------------------------------------------------------------------------
 // S1.1 — Charity Commission lookup
