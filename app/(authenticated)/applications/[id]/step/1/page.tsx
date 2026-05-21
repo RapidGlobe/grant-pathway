@@ -32,14 +32,20 @@ export default async function Step1Page({ params }: Props) {
 
   if (!user) redirect('/')
 
-  const { data: application, error } = await supabase
-    .from('applications')
-    .select('funder_name, grant_name')
-    .eq('id', id)
-    .eq('user_id', user.id)
-    .single()
+  let application: { funder_name: string; grant_name: string } | null = null
 
-  if (error || !application) {
+  try {
+    const { data, error } = await supabase
+      .from('applications')
+      .select('funder_name, grant_name')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (error || !data) redirect('/dashboard')
+    application = data
+  } catch {
+    // Network error or Supabase unavailable — return user to dashboard
     redirect('/dashboard')
   }
 

@@ -148,28 +148,33 @@ export async function saveApplicationStep1(
 
   if (!user) redirect('/')
 
-  // Fetch current step so we only advance it, never regress it
-  const { data: existing } = await supabase
-    .from('applications')
-    .select('current_step')
-    .eq('id', applicationId)
-    .eq('user_id', user.id)
-    .single()
+  try {
+    // Fetch current step so we only advance it, never regress it
+    const { data: existing } = await supabase
+      .from('applications')
+      .select('current_step')
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+      .single()
 
-  const newStep = Math.max(existing?.current_step ?? 1, 2)
+    const newStep = Math.max(existing?.current_step ?? 1, 2)
 
-  const { error } = await supabase
-    .from('applications')
-    .update({
-      funder_name: funderName,
-      grant_name: grantName,
-      current_step: newStep,
-    })
-    .eq('id', applicationId)
-    .eq('user_id', user.id)
+    const { error } = await supabase
+      .from('applications')
+      .update({
+        funder_name: funderName,
+        grant_name: grantName,
+        current_step: newStep,
+      })
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
 
-  if (error) {
-    return { ok: false, error: 'Could not save your application. Please try again.' }
+    if (error) {
+      return { ok: false, error: 'Could not save your application. Please try again.' }
+    }
+  } catch {
+    // Network error or Supabase unavailable
+    return { ok: false, error: 'Could not reach the server. Please check your connection and try again.' }
   }
 
   redirect(`/applications/${applicationId}/step/2`)
