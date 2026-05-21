@@ -57,7 +57,6 @@ const MOCK_APPLICATIONS: Application[] = [
 
 const MOCK_AI_REQUESTS_USED = 3;
 const AI_REQUESTS_LIMIT = 20;
-const MOCK_PROFILE_INCOMPLETE = true;
 
 const STATUS_CONFIG: Record<
   ApplicationStatus,
@@ -88,7 +87,12 @@ function formatDate(iso: string): string {
   });
 }
 
-export function DashboardPopulated() {
+interface DashboardPopulatedProps {
+  /** True when no charity_profiles row exists for this user (S1.4). */
+  profileIncomplete?: boolean;
+}
+
+export function DashboardPopulated({ profileIncomplete = false }: DashboardPopulatedProps) {
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [reopenTarget, setReopenTarget] = useState<Application | null>(null);
 
@@ -132,7 +136,7 @@ export function DashboardPopulated() {
       </div>
 
       {/* Charity profile incomplete banner */}
-      {MOCK_PROFILE_INCOMPLETE && (
+      {profileIncomplete && (
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border-[1.5px] border-[#FDE68A] bg-[#FEF3C7] px-5 py-[14px]">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#D97706]" aria-hidden="true" />
