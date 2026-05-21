@@ -47,8 +47,10 @@ export function VerifyEmailResendForm({ email, mode }: Props) {
 
   return (
     <form action={action}>
-      {/* Email field — hidden in awaiting mode, visible in expired mode */}
-      {mode === "awaiting" ? (
+      {/* Email field — hidden in awaiting mode when email is known; visible
+          in expired mode OR when email is unknown (e.g. user navigated
+          directly to /verify-email without the ?email= query param). */}
+      {mode === "awaiting" && email ? (
         <input type="hidden" name="email" value={email} />
       ) : (
         <div className="mb-4 text-left">
