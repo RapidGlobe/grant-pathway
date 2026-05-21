@@ -18,13 +18,21 @@ export default function AxeProvider() {
     if (process.env.NODE_ENV !== 'development') return
 
     void (async () => {
-      const [{ default: axe }, React, ReactDOM] = await Promise.all([
-        import('@axe-core/react'),
-        import('react'),
-        import('react-dom'),
-      ])
-      // 1000ms delay gives React time to finish rendering before axe scans the DOM
-      await axe(React, ReactDOM, 1000)
+      try {
+        const [{ default: axe }, React, ReactDOM] = await Promise.all([
+          import('@axe-core/react'),
+          import('react'),
+          import('react-dom'),
+        ])
+        // 1000ms delay gives React time to finish rendering before axe scans the DOM
+        // Note: @axe-core/react v4 is not fully compatible with React 19's read-only
+        // module exports. Wrapped in try/catch to prevent crashing the app in dev.
+        // Replace with a React 19 compatible version when available (ADR-OPS-006).
+        await axe(React, ReactDOM, 1000)
+      } catch {
+        // axe-core/react v4 incompatible with React 19 read-only module exports.
+        // Silently suppressed — does not affect functionality or production builds.
+      }
     })()
   }, [])
 
