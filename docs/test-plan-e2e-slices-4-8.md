@@ -81,9 +81,15 @@ Each account must have:
 
 ## Manual Maintenance During Testing
 
-> ⚠️ **Known limitation — Vercel free tier:** The `cleanup-guidelines` cron job (`/api/cron/cleanup-guidelines`, scheduled every 30 minutes) requires Vercel Pro and is **not running** during this testing period. Orphan files uploaded to the `guidelines-temp` Supabase Storage bucket will accumulate and must be cleared manually. This will be resolved at P5.4 (Vercel Pro upgrade).
+> ⚠️ **Known limitation — Vercel free tier (2 cron job maximum):** All three cron jobs defined in `vercel.json` require Vercel Pro to run reliably. The free Hobby plan caps at 2 cron jobs and does not support sub-daily schedules. None of the three cron jobs should be relied upon during this testing period. All will be fully operational after the P5.4 upgrade to Vercel Pro.
 
-### Cleanup procedure
+| Cron job | Schedule | Free tier status | Impact during testing |
+|---|---|---|---|
+| `cleanup-guidelines` | Every 30 min | ❌ Not running — interval too frequent + job limit | Orphan files accumulate in `guidelines-temp` — **manual cleanup required** (see below) |
+| `inactivity-warning` | Daily 08:00 UTC | ❌ Not running — exceeds 2-job limit | No impact — requires 23 months of inactivity, will not trigger during testing |
+| `inactivity-deletion` | Daily 09:00 UTC | ❌ Not running — exceeds 2-job limit | No impact — requires 24 months of inactivity, will not trigger during testing |
+
+### Manual cleanup — `guidelines-temp` bucket
 
 After each test session (or at minimum before starting a new round of file upload tests):
 
