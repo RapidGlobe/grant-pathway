@@ -84,13 +84,15 @@ The running costs of Grant Pathway are absorbed personally by the developer duri
 
 There is no advertising. There is no data selling. The service exists to serve charities, and it will remain free.
 
+The AI-powered features operate within a fair-use limit per account each month. This is a technical necessity to manage running costs — not a commercial restriction or a hidden tier. The limit is designed to accommodate the realistic needs of a small charity writing grant applications throughout the year.
+
 ---
 
 ## Data, Privacy, and Trust
 
 Charities trust us with information about their organisation, their work, and their communities. That trust is taken seriously.
 
-All data is stored in UK-based infrastructure. The charity's information is used only to provide the service — to personalise the AI outputs and save time on future applications. It is never used to train artificial intelligence models. It is never shared with third parties for commercial purposes. Users can delete their account and all associated data at any time, completely and permanently.
+All data is stored in UK-based infrastructure. The charity's information is used only to provide the service — to personalise the AI outputs and save time on future applications. It is never used to train artificial intelligence models. It is never shared with third parties for commercial purposes. Users can delete their account and all associated data at any time, completely and permanently. Accounts that have not been used for two years are automatically deleted, with a warning email sent 30 days in advance. This is a deliberate data minimisation commitment — the service does not retain information beyond what is needed, and users are given fair notice before anything is removed.
 
 The Privacy Policy and Terms of Service will set all of this out clearly, in plain English, before anyone is asked to register.
 
@@ -119,4 +121,4 @@ The ambition is simple: to make the grant application process a little less daun
 
 ---
 
-*Last updated: 2026-04-13*
+*Last updated: 2026-05-22*
