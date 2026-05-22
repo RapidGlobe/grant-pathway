@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-22 (Slice 8 complete)
+**Last updated:** 2026-05-22 (Phase 4→5 gate check complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -100,6 +100,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 1 | ✅ Complete |
+| **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off |
 | **Phase 5 — Pre-Launch** | **6** | **0** | Not started |
 | &nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
@@ -507,6 +508,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-21 | **Logo placeholder recorded.** `components/logo.tsx` marked with `⚠️ PLACEHOLDER LOGO — replace before launch` comment. Real Grant Pathway logo (SVG/PNG, light + dark variants) to be supplied by Wac / RapidGlobe Ltd before P5.4 production launch. Instructions for swapping in the real asset are embedded in the component. |
 | 2026-05-21 | **S1.4 complete. Slice 1 complete.** Dashboard page fetches real first name and profile existence; banner shown/hidden correctly on both empty and populated states. `MOCK_PROFILE_INCOMPLETE` removed from `dashboard-populated.tsx`. |
 | 2026-05-21 | **S1.3 complete.** `getCharityProfile()` fetches existing profile from `charity_profiles`; `CharityProfileData` type exported; form `initialData` prop pre-fills all five fields; `isEdit` now derived from DB state not URL param. TypeScript clean. |
+| 2026-05-22 | **Phase 4→5 gate check complete.** Full sweep of all 26 ADR gaps against Phase 4 implementation. GAP-07 (null `answer_text` in export), GAP-13 (cron rate-limiter exclusion), GAP-19 (guidelines re-upload advisory) confirmed resolved. Six new gaps identified: GAP-21 (Sentry route tagging in AI routes), GAP-22 (timeout inactivity message), GAP-23 (`loading.tsx` Suspense boundaries), GAP-24 (export disclaimer wording vs PDR-DH-003), GAP-25 (Zod absent from `actions/applications.ts` + `actions/auth.ts`), GAP-26 (`applications/[id]/page.tsx` stub — High severity, must fix before P5.5). All findings recorded in ADR-TRACEABILITY.md. Pending WJ sign-off to open Phase 5. |
 | 2026-05-22 | **Slice 8 complete. Phase 4 complete.** S8.1: `changePassword()` SA verifies current password via `signInWithPassword` before calling `updateUser`; `wrong_password` state maps to inline field error. S8.2: `POST /api/account/delete` cascade-deletes all user data (application_answers → applications → charity_profiles → ai_usage_log → user_profiles → auth.admin.deleteUser); sends Email 2 (confirmation) via Resend; sign-in page shows green banner on `?deleted=true`. S8.3: `lib/emails/` module created with four email builders; two inactivity cron routes (`/api/cron/inactivity-warning` daily 08:00 UTC, `/api/cron/inactivity-deletion` daily 09:00 UTC) page through `auth.admin.listUsers()` and handle the 23/24-month windows; `vercel.json` updated. Email helper uses Resend REST API via `fetch` (no new dependency). TypeScript clean (0 errors). ⚠️ Confirm both new cron jobs active in Vercel dashboard after next deployment. ⚠️ Set `RESEND_API_KEY` in Vercel env vars for emails to send. |
 | 2026-05-21 | **S1.2 complete.** `saveCharityProfile()` Server Action added to `actions/charity.ts`; Zod validation, Supabase upsert on `user_id` conflict, `lookup_source` correctly set to `charity_commission` or `manual` (D14). Form wired with real save, loading state, and error banner. TypeScript clean (0 errors). |
 | 2026-05-08 | **Phase 0 implementation started.** Next.js 16.2.5 scaffold created (Turbopack, React 19, Tailwind v4). Key deviations from plan: (1) Tailwind v4 has no `tailwind.config.ts` — design tokens added via `@theme inline` in `globals.css` instead. (2) Next.js 16 deprecates `middleware.ts` in favour of `proxy.ts` with `export function proxy()` — plan's middleware stub updated accordingly. (3) shadcn `toast` component deprecated — replaced with `sonner`. (4) shadcn `form` component not available in shadcn 4.7.0 registry — to be created manually in Phase 1 using react-hook-form directly. P0.2–P0.5 complete; P0.6 pending GitHub push and Vercel link (manual steps for owner). |

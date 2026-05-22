@@ -7,8 +7,8 @@
 - When a new task is added to cover a gap, update the Task column and change status to ✅ or 🔵.
 - When a task is completed, no change needed here — the task status lives in IMPLEMENTATION-STATUS.md.
 
-**Last updated:** 2026-05-20  
-**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate)
+**Last updated:** 2026-05-22  
+**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added)
 
 ## Status key
 
@@ -90,7 +90,7 @@
 | ADR-DATA-001 | Funder guidelines text intentionally absent from data model (ADR-DATA-002, ADR-FILE-004) | ADR-FILE-004 `sessionStorage` pattern | ✅ |
 | ADR-DATA-002 | Navigating away from Step 2 requires re-upload | S4.1/S4.2 | ✅ |
 | ADR-DATA-002 | Guidelines text passed in POST body; must not exceed 4.5MB Vercel limit | S4.1 (direct-to-Supabase upload bypasses Vercel) | ✅ |
-| ADR-DATA-002 | UI makes clear guidelines are not saved; prompts re-upload when user returns without a summary | S4.1 | ⚠️ GAP-19 |
+| ADR-DATA-002 | UI makes clear guidelines are not saved; prompts re-upload when user returns without a summary | S4.3 | ✅ GAP-19 resolved |
 | ADR-DATA-003 | Account deletion cascades through all tables in correct FK order | S8.2 | ✅ |
 | ADR-DATA-003 | Account deletion requires `DELETE` typed confirmation | P1.14, S8.2 | ✅ |
 | ADR-DATA-003 | Supabase Auth user deletion uses service role key | S8.2 (API route with service role client) | ✅ |
@@ -112,7 +112,7 @@
 | ADR-EXPORT-001 | Export route reads from `application_answers` — does not call Bedrock | S7.2 | ✅ |
 | ADR-EXPORT-002 | `GET /api/export/[applicationId]` route created | S7.2 | ✅ |
 | ADR-EXPORT-002 | Correct `Content-Type` and `Content-Disposition` headers set | S7.2 | ✅ |
-| ADR-EXPORT-002 | Unanswered questions (null `answer_text`) handled gracefully in export | S7.2 | ⚠️ GAP-07 |
+| ADR-EXPORT-002 | Unanswered questions (null `answer_text`) handled gracefully in export | S7.2 | ✅ GAP-07 resolved |
 
 ---
 
@@ -148,7 +148,7 @@
 | ADR-OPS-003 | Supabase Auth email templates customised (verification + password reset) | P3.8 | ✅ |
 | ADR-OPS-003 | SMTP credentials stored in Supabase dashboard (not in `.env` files) | P3.8 | ✅ |
 | ADR-OPS-004 | Cron job routes authenticate using `CRON_SECRET` header | S4.4, S8.3 | ✅ |
-| ADR-OPS-004 | Cron endpoints excluded from user-facing rate limiting | S4.4 | ⚠️ GAP-13 |
+| ADR-OPS-004 | Cron endpoints excluded from user-facing rate limiting | S4.4, S8.3 | ✅ GAP-13 resolved |
 | ADR-OPS-005 | `@sentry/nextjs` installed | P3.7 | ✅ |
 | ADR-OPS-005 | `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` created with `beforeSend` PII scrubbing | P3.7 | ✅ |
 | ADR-OPS-005 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` configured in all environments | P3.7 | ✅ |
@@ -224,20 +224,26 @@ All ⚠️ rows consolidated here for easy triage. Update this table as gaps are
 | GAP-04 | ADR-AI-009 | No documented error response contract (JSON shape + HTTP codes) for AI routes | Medium | Add to S5.3 | ✅ 2026-05-21 S5.3 — `lib/ai-error-handler.ts` provides `httpStatusForError()` and `aiErrorBody()`; all AI routes use these functions |
 | GAP-05 | ADR-ARCH-005 | Below-768px degradation banner not tasked | Low | Add new task or sub-task to Phase 4 | |
 | GAP-06 | ADR-DATA-004 | `SUPABASE_DB_PASSWORD` not in `.env.example` or P3.2 | Medium | Update `.env.example` + P3.2 | ✅ 2026-05-20 P3.12 — `.env.example` updated |
-| GAP-07 | ADR-EXPORT-002 | Null/empty `answer_text` handling in Word export not spec'd | Medium | Add to S7.2 | |
+| GAP-07 | ADR-EXPORT-002 | Null/empty `answer_text` handling in Word export not spec'd | Medium | S7.2 | ✅ 2026-05-22 S7.2 — export route substitutes '[No answer provided]' for null `answer_text` in both docx and txt formats |
 | GAP-08 | ADR-FILE-002 | Server-side re-validation of MIME type + file size in process route | High | Add to S4.1 | ✅ 2026-05-20 P3.12 — `lib/file-validation.ts` created; wire into S4.1 |
 | GAP-09 | ADR-FILE-004 | `lib/guidelines-session.ts` utility never explicitly tasked | High | Add to S4.1 | ✅ 2026-05-20 P3.12 — `lib/guidelines-session.ts` created |
 | GAP-10 | ADR-FILE-004 | `clearGuidelines()` on Step 3 completion never tasked | High | Add to S5.2 / S5.4 | ✅ 2026-05-20 P3.12 — S5.2 spec in IMPLEMENTATION-PLAN.md updated |
 | GAP-11 | ADR-OPS-002, ADR-STACK-005 | GitHub branch protection rules on `main` never configured | Medium | Add to P0.1 or new task | 🔴 BLOCKED — GitHub branch protection requires GitHub Pro for private repos. Upgrade account at github.com/settings/billing or the rule cannot be enforced. Workaround: team enforces PR review manually. |
 | GAP-12 | ADR-OPS-002 | Git release tagging for rollback never tasked | Low | Add to P5.4 per-release checklist | |
-| GAP-13 | ADR-OPS-004 | Cron routes not explicitly documented as excluded from rate limiter | Low | Add to S4.4 | |
+| GAP-13 | ADR-OPS-004 | Cron routes not explicitly documented as excluded from rate limiter | Low | S4.4, S8.3 | ✅ 2026-05-22 — confirmed: cleanup-guidelines (S4.4), inactivity-warning + inactivity-deletion (S8.3) import no rate-limiter middleware; excluded via CRON_SECRET auth |
 | GAP-14 | ADR-OPS-006 | `@axe-core/react` not installed or wired up in development mode | High | Add as infrastructure task | ✅ 2026-05-20 P3.12 — installed; `components/axe-provider.tsx` added; wired into `app/layout.tsx` |
 | GAP-15 | ADR-OPS-006 | Lighthouse CI automation on each deployment not configured | Medium | Add new task | |
 | GAP-16 | ADR-OPS-006 | Accessibility not part of definition of done for Phase 4 slices | Medium | Add to Phase 4 introduction | |
 | GAP-17 | ADR-SEC-002 | RLS cross-user access test never tasked | Medium | Add to P5.2 | |
 | GAP-18 | ADR-SEC-003 | Supabase Auth JWT expiry never confirmed ≥ 60 minutes | High | Add to P3.4 or new pre-Phase 4 task | ✅ 2026-05-20 P3.12 — local: `jwt_expiry = 3600` in config.toml; prod: manually verified 3600s (Project Settings → API → Legacy JWT Secret → Access token expiry time) |
-| GAP-19 | ADR-DATA-002 | No UI message when user returns to Step 2 without `sessionStorage` entry | Medium | Add to S4.1 | |
+| GAP-19 | ADR-DATA-002 | No UI message when user returns to Step 2 without `sessionStorage` entry | Medium | S4.3 | ✅ 2026-05-22 S4.3 — blue info banner shown when `currentStep >= 3` and no sessionStorage entry; prompts re-upload |
 | GAP-20 | ADR-STACK-005 | Dependency licence review not tasked | Low | Add to P5.1 | |
+| GAP-21 | ADR-OPS-005 | Sentry `withScope` + route tag not implemented in `generate-summary` or `generate-draft` routes; technical-design.md §14 specifies this explicitly | Low | Add to P5.3 sweep | |
+| GAP-22 | ADR-SEC-003 | Session timeout calls `router.push("/")` with no `?timeout=true` param; sign-in page has no inactivity banner; technical-design.md §5 specifies "You've been signed out due to inactivity." message | Low | Add to S0.5 patch or P5.3 | |
+| GAP-23 | ADR-ARCH-002 | No `loading.tsx` files exist in `app/`; `page-skeleton.tsx` built in P1.15 but not wired as Suspense boundaries via `loading.tsx` on any route | Medium | Add per authenticated route in P5.3 | |
+| GAP-24 | PDR-DH-003 | Export disclaimer wording deviates from spec — spec: "Please review carefully before submitting to the funder." — implementation: "All content has been checked for accuracy before submission." | Low | Fix in S7.2 patch | |
+| GAP-25 | ADR-ARCH-003 | Zod validation absent from `actions/applications.ts` and `actions/auth.ts`; ADR-ARCH-003 requires Zod on all Server Actions; only `actions/charity.ts` imports Zod | Medium | Add to P5.3 sweep | |
+| GAP-26 | PDR-UI-004 | `app/(authenticated)/applications/[id]/page.tsx` is a stub — does not redirect to `/applications/[id]/step/[current_step]` as specified in technical design and PDR-UI-004 | High | Fix as standalone task before P5.5 testing | |
 
 ---
 
@@ -251,4 +257,4 @@ Before each phase begins, this section must be completed by reviewing the gaps r
 | Phase 1 → Phase 2 | — | Not reviewed (gate added retrospectively) | — | — |
 | Phase 2 → Phase 3 | — | Not reviewed (gate added retrospectively) | — | — |
 | Phase 3 → Phase 4 | 2026-05-20 | All 20 gaps reviewed. GAP-06/08/09/10/14/18 resolved. GAP-11 blocked (GitHub Pro required — documented). GAP-01–05/07/12/13/15–17/19/20 deferred to natural Phase 4 touch-points. ADR-SEC-001–006 and ADR-DATA-001–004 reviewed by project owner. | GAP-11 (GitHub Pro), GAP-17 (P5.2 test), GAP-20 (P5.1 licence review) | ✅ Signed off — WJ, 2026-05-20 |
-| Phase 4 → Phase 5 | | | | |
+| Phase 4 → Phase 5 | 2026-05-22 | All 26 gaps reviewed. GAP-07/13/19 confirmed resolved in Phase 4 implementation. GAP-21–26 newly identified in Phase 4 exit sweep against all 42 ADRs, technical-design.md, and all PDR decisions. GAP-26 (applications/[id] stub) is High severity — must be fixed before Phase 5 final testing (P5.5). | GAP-05, GAP-11 (blocked), GAP-12, GAP-15, GAP-16, GAP-17, GAP-20 (deferred to P5), GAP-21, GAP-22, GAP-23, GAP-24, GAP-25, GAP-26 | Pending sign-off — WJ |

@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-05-22 — Phase 4→5 gate check
+
+**What changed:**
+- `ADR-TRACEABILITY.md` — full Phase 4 exit sweep completed; three previously resolved gaps marked; six new gaps added; Phase 4→5 gate row filled.
+- `IMPLEMENTATION-STATUS.md` — Phase 4→5 gate row added to summary table; notes entry added.
+
+**Resolved gaps (confirmed in Phase 4 implementation):**
+- **GAP-07** (ADR-EXPORT-002): Null `answer_text` handled — export route uses `'[No answer provided]'` fallback in both docx and txt formats (S7.2).
+- **GAP-13** (ADR-OPS-004): Cron routes confirmed excluded from rate limiter — cleanup-guidelines (S4.4), inactivity-warning + inactivity-deletion (S8.3) have no rate-limiter imports; auth is CRON_SECRET only.
+- **GAP-19** (ADR-DATA-002): Re-upload advisory implemented — blue info banner shown in Step 2 component when `currentStep >= 3` and no sessionStorage entry for guidelines (S4.3).
+
+**New gaps identified (GAP-21 to GAP-26):**
+- **GAP-21** (ADR-OPS-005 — Low): Sentry `withScope` + route tag not implemented in `generate-summary` or `generate-draft` routes. `technical-design.md` §14 specifies `scope.setTag('route', 'generate-summary')` for AI route error filtering. Sentry auto-captures global exceptions but tagged filtering is missing. Resolution deferred to P5.3.
+- **GAP-22** (ADR-SEC-003 — Low): Session timeout `SessionTimeoutProvider` calls `router.push("/")` with no `?timeout=true` query param. `technical-design.md` §5 specifies sign-in page should show "You've been signed out due to inactivity." message. `sign-in-form.tsx` has no timeout param handler. Resolution deferred to P5.3 or S0.5 patch.
+- **GAP-23** (ADR-ARCH-002 — Medium): Zero `loading.tsx` files exist in `app/`. ADR-ARCH-002 + `technical-design.md` §8 specify "Loading states handled via Next.js `loading.tsx` / skeleton components." `page-skeleton.tsx` exists (P1.15) but is not wired as Suspense boundaries. Resolution deferred to P5.3 per authenticated route.
+- **GAP-24** (PDR-DH-003 — Low): Export disclaimer wording differs from spec. PDR-DH-003 specifies: *"Please review carefully before submitting to the funder."* Implementation uses: *"All content has been checked for accuracy before submission."* — different meaning and liability implication. Resolution: patch S7.2 export route.
+- **GAP-25** (ADR-ARCH-003 — Medium): Zod validation absent from `actions/applications.ts` and `actions/auth.ts`. ADR-ARCH-003 requires Zod on all Server Actions. Only `actions/charity.ts` imports Zod. The other two actions use manual `if (!user) redirect('/')` guards only. Resolution deferred to P5.3 sweep.
+- **GAP-26** (PDR-UI-004 — High): `app/(authenticated)/applications/[id]/page.tsx` is a stub rendering "redirects to current step (stub)". Technical design and PDR-UI-004 specify it should redirect to `/applications/[id]/step/[current_step]`. A direct link to `/applications/[id]` lands on a broken page. **Must be fixed before P5.5 final testing.**
+
+---
+
 ## 2026-05-22 — Slice 8: Account Management wired up (Phase 4 complete)
 
 **What changed:**
