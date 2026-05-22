@@ -79,6 +79,25 @@ Each account must have:
 
 ---
 
+## Manual Maintenance During Testing
+
+> ⚠️ **Known limitation — Vercel free tier:** The `cleanup-guidelines` cron job (`/api/cron/cleanup-guidelines`, scheduled every 30 minutes) requires Vercel Pro and is **not running** during this testing period. Orphan files uploaded to the `guidelines-temp` Supabase Storage bucket will accumulate and must be cleared manually. This will be resolved at P5.4 (Vercel Pro upgrade).
+
+### Cleanup procedure
+
+After each test session (or at minimum before starting a new round of file upload tests):
+
+1. Log in to [supabase.com](https://supabase.com) → select the **grant-pathway-dev** project
+2. Go to **Storage** → **guidelines-temp** bucket
+3. Select all files in the bucket root
+4. Click **Delete** to remove them
+
+There is no risk to application data — the `guidelines-temp` bucket holds only in-flight upload files. All extracted text is stored in `sessionStorage` in the browser. Deleting files from this bucket does not affect any application or user record.
+
+If you notice Step 3 (AI Summary) failing with a storage error during testing, an orphaned file from a previous failed upload may be the cause — run the cleanup procedure above and retry.
+
+---
+
 ## How to read this plan
 
 Each test case has:
