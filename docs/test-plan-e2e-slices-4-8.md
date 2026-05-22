@@ -1,8 +1,8 @@
-# Grant Pathway — End-to-End Test Plan: Slices 4–8
+# Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Date:** 2026-05-22  
-**Scope:** Slices 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
+**Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
 **Environment:** Staging (Vercel preview) or local dev with Supabase + Bedrock credentials  
 **Tester:**  
 **Sign-off:**  
@@ -15,11 +15,19 @@ Complete this table after running all tests.
 
 | Section | Total | Pass | Fail | Blocked | Notes |
 |---------|-------|------|------|---------|-------|
+| Positive (S0) | 10 | | | | |
+| Positive (S1) | 6 | | | | |
+| Positive (S2) | 5 | | | | |
+| Positive (S3) | 2 | | | | |
 | Positive (S4) | 6 | | | | |
 | Positive (S5) | 6 | | | | |
 | Positive (S6) | 5 | | | | |
 | Positive (S7) | 6 | | | | |
 | Positive (S8) | 3 | | | | |
+| Negative (S0) | 9 | | | | |
+| Negative (S1) | 3 | | | | |
+| Negative (S2) | 2 | | | | |
+| Negative (S3) | 2 | | | | |
 | Negative (S4) | 5 | | | | |
 | Negative (S5) | 4 | | | | |
 | Negative (S6) | 3 | | | | |
@@ -27,7 +35,7 @@ Complete this table after running all tests.
 | Negative (S8) | 7 | | | | |
 | Non-Functional | 13 | | | | |
 | Usability / Flow | 12 | | | | |
-| **Total** | **74** | | | | |
+| **Total** | **113** | | | | |
 
 ---
 
@@ -63,19 +71,27 @@ You will need to create additional files to test error states:
 
 ## Test Accounts
 
-Create dedicated test accounts before starting. Do not use personal accounts — account deletion tests will destroy data.
+Create dedicated test accounts before starting. You do not need separate email inboxes for each — if you use Gmail, the `+` alias trick lets you create multiple accounts from a single inbox:
+
+- `yourname+gp1@gmail.com` → Primary test user
+- `yourname+gp2@gmail.com` → Secondary / cross-user test
+- `yourname+gpdelete@gmail.com` → Deletion test (this account will be destroyed)
+- `yourname+gppassword@gmail.com` → Password change test
+
+All four deliver to the same Gmail inbox. Supabase treats each as a distinct email address.
+
+> **Note:** The registration tests in Section 1 (S0-P-01 onwards) will create these accounts as part of the test run. You do not need to set them up in advance — work through S0-P-01 four times (once per account) before running any other tests.
 
 | Account | Purpose |
 |---------|---------|
-| **Primary test user** (`test1@example.com`) | Main happy-path testing |
-| **Secondary test user** (`test2@example.com`) | Cross-user security tests (RLS) |
-| **Deletion test user** (`test-delete@example.com`) | Account deletion — expect this to be destroyed |
-| **Password change test user** (`test-password@example.com`) | Password change tests |
+| **Primary test user** (`yourname+gp1@gmail.com`) | Main happy-path testing |
+| **Secondary test user** (`yourname+gp2@gmail.com`) | Cross-user security tests (RLS) |
+| **Deletion test user** (`yourname+gpdelete@gmail.com`) | Account deletion — expect this to be destroyed |
+| **Password change test user** (`yourname+gppassword@gmail.com`) | Password change tests |
 
 Each account must have:
-- Email verified
-- Charity profile complete (name, registration number, description fields filled)
-- At least one application in progress up to Step 1 completion (so you can proceed to Step 2)
+- Email verified (S0-P-02)
+- Charity profile complete (S1-P-03) — required before Step 2 onwards
 
 ---
 
@@ -113,7 +129,7 @@ Each test case has:
 - **Expected result** — what should happen
 - **Pass / Fail** — tick when run
 
-Prefix key:  `S4` = Slice 4, `S5` = Slice 5, `S6` = Slice 6, `S7` = Slice 7, `S8` = Slice 8  
+Prefix key: `S0` = Slice 0, `S1` = Slice 1, `S2` = Slice 2, `S3` = Slice 3, `S4` = Slice 4, `S5` = Slice 5, `S6` = Slice 6, `S7` = Slice 7, `S8` = Slice 8  
 Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/flow
 
 ---
@@ -121,6 +137,343 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 ---
 
 # 1. POSITIVE TESTS
+
+---
+
+## Slice 0 — Authentication
+
+### S0-P-01 — Register a new account
+
+> **Account creation test.** Run this test four times — once for each test account (primary, secondary, deletion, password). Use a different email address each time.
+
+**Preconditions:** Not signed in. Browser at `grant-pathway-three.vercel.app`.
+
+1. Navigate to `/register`.
+2. Enter first name, last name, a valid email address, a password of at least 10 characters, and confirm the password.
+3. Tick the Terms of Service checkbox.
+4. Optionally tick the feedback opt-in checkbox.
+5. Click **Create account**.
+
+**Expected result:**
+- No inline validation errors appear when all fields are valid.
+- Browser navigates to `/verify-email` showing "Check your email" with the registered address displayed.
+- A verification email arrives at the registered address within 2 minutes (check spam if not in inbox).
+
+---
+
+### S0-P-02 — Verify email address
+
+**Preconditions:** S0-P-01 complete. Verification email received.
+
+1. Open the verification email.
+2. Click the verification link.
+
+**Expected result:**
+- Browser navigates to `/verify-email?state=verified`.
+- Page shows "Email verified" with a green tick icon.
+- A **Go to my dashboard** button is visible.
+- Clicking **Go to my dashboard** navigates to `/dashboard`.
+
+---
+
+### S0-P-03 — Sign in with valid credentials
+
+**Preconditions:** Account registered and email verified (S0-P-01, S0-P-02).
+
+1. Navigate to `/` (the sign-in page).
+2. Enter the registered email and password.
+3. Click **Sign in**.
+
+**Expected result:**
+- Browser navigates to `/dashboard`.
+- The authenticated navigation bar is visible with the user's first name or initials in the account dropdown.
+- No error messages appear.
+
+---
+
+### S0-P-04 — Sign out
+
+**Preconditions:** Signed in (S0-P-03).
+
+1. Click the account avatar/initials in the top-right navigation.
+2. Click **Sign out** in the dropdown.
+
+**Expected result:**
+- Browser navigates to `/` (sign-in page).
+- The unauthenticated navigation bar is shown.
+- Attempting to navigate directly to `/dashboard` redirects back to `/`.
+
+---
+
+### S0-P-05 — Request a password reset link
+
+**Preconditions:** Not signed in.
+
+1. Navigate to `/` (sign-in page).
+2. Click **Forgot password**.
+3. Enter the registered email address.
+4. Click **Send reset link**.
+
+**Expected result:**
+- Page shows a generic confirmation: "If that address is registered, we've sent a reset link." (or similar — exact wording per design).
+- Confirmation is shown regardless of whether the email is registered (no email enumeration).
+- A password reset email arrives within 2 minutes.
+
+---
+
+### S0-P-06 — Reset password using link
+
+**Preconditions:** S0-P-05 complete. Reset email received.
+
+1. Open the password reset email.
+2. Click the reset link.
+3. On the reset form, enter a new password (at least 10 characters) and confirm it.
+4. Click **Save new password**.
+
+**Expected result:**
+- Page shows a success message with a **Sign in** button.
+- Signing in with the new password succeeds (repeat S0-P-03 with the new password).
+- Signing in with the old password fails (repeat S0-N-07).
+
+---
+
+### S0-P-07 — Resend verification email
+
+**Preconditions:** Account registered but NOT yet verified. On the `/verify-email` page.
+
+1. Click **Resend verification email**.
+
+**Expected result:**
+- A success message confirms the email has been resent.
+- A new verification email arrives.
+- Clicking the new link verifies the account successfully.
+
+---
+
+### S0-P-08 — Set up MFA (two-factor authentication)
+
+**Preconditions:** Signed in (S0-P-03). On `/account`.
+
+1. Navigate to **Account settings** (`/account`).
+2. In the **Two-factor authentication** section, click **Set up two-factor authentication**.
+3. Scan the QR code with an authenticator app (e.g. Google Authenticator, Authy).
+4. Enter the 6-digit code shown in the authenticator app.
+5. Click **Verify**.
+
+**Expected result:**
+- MFA status changes to **Enabled**.
+- A **Remove two-factor authentication** link is shown in place of the setup button.
+
+---
+
+### S0-P-09 — Sign in with MFA enabled
+
+**Preconditions:** MFA enabled (S0-P-08). Signed out.
+
+1. Navigate to `/` and sign in with valid credentials.
+2. When the MFA challenge page appears, enter the 6-digit code from the authenticator app.
+3. Click **Verify**.
+
+**Expected result:**
+- Browser navigates to `/dashboard`.
+- Sign-in is successful.
+
+---
+
+### S0-P-10 — Remove MFA
+
+**Preconditions:** MFA enabled (S0-P-08). Signed in.
+
+1. Navigate to **Account settings** (`/account`).
+2. Click **Remove two-factor authentication**.
+3. Confirm the removal.
+
+**Expected result:**
+- MFA status changes to **Not enabled**.
+- **Set up two-factor authentication** button is shown.
+- Next sign-in does NOT prompt for an MFA code.
+
+---
+
+## Slice 1 — Charity Profile
+
+### S1-P-01 — Look up charity by name
+
+**Preconditions:** Signed in. No charity profile saved yet. On `/profile`.
+
+1. In the Charity Commission lookup field, type the name of a real UK registered charity (e.g. "Oxfam").
+2. Click **Look up charity**.
+
+**Expected result:**
+- A match result is shown with the charity name and registration number pre-filled.
+- An amber banner prompts you to review the AI-generated descriptions in the "What does it do" and "Who does it help" fields.
+- All pre-filled fields are editable.
+
+---
+
+### S1-P-02 — Look up charity by registration number
+
+**Preconditions:** As S1-P-01.
+
+1. In the Charity Commission lookup field, enter a valid charity registration number (e.g. `202918` for Oxfam).
+2. Click **Look up charity**.
+
+**Expected result:** Same as S1-P-01 — match found, fields pre-filled.
+
+---
+
+### S1-P-03 — Save charity profile (first time)
+
+**Preconditions:** Signed in. No charity profile saved yet. On `/profile`.
+
+1. Complete all required fields (charity name, what it does, who it helps, where it works). Registration number is optional.
+2. Click **Save profile**.
+
+**Expected result:**
+- Page replaces the form with a green success card: "Your profile has been saved."
+- A **Go to my dashboard** button is visible.
+- Navigating back to `/profile` shows the edit state with the saved data pre-filled.
+
+---
+
+### S1-P-04 — Edit existing charity profile
+
+**Preconditions:** Charity profile already saved (S1-P-03). On `/profile`.
+
+1. Change the content of at least one field.
+2. Click **Save changes**.
+
+**Expected result:**
+- A green success banner appears above the form: "Your changes have been saved."
+- The form remains visible with the updated values.
+- Navigating away and returning to `/profile` shows the updated values.
+
+---
+
+### S1-P-05 — Profile incomplete banner shown on dashboard
+
+**Preconditions:** Signed in. No charity profile saved.
+
+1. Navigate to `/dashboard`.
+
+**Expected result:**
+- An amber or teal banner is visible prompting the user to set up their charity profile.
+- The **Start** button (to begin a new application) is disabled.
+- Hovering over the Start button shows a tooltip: "Please set up your charity profile first" (or similar).
+
+---
+
+### S1-P-06 — Profile banner disappears after profile saved
+
+**Preconditions:** S1-P-03 complete (profile saved).
+
+1. Navigate to `/dashboard`.
+
+**Expected result:**
+- The profile incomplete banner is no longer shown.
+- The **+ New Application** or **Start** button is active.
+
+---
+
+## Slice 2 — Dashboard and Application Management
+
+### S2-P-01 — Empty state shown when no applications exist
+
+**Preconditions:** Signed in. Charity profile complete. No applications created.
+
+1. Navigate to `/dashboard`.
+
+**Expected result:**
+- A "You don't have any applications yet" message is shown (or similar).
+- A three-step explainer or getting started prompt is visible.
+- A **Start** or **New Application** button is available and active.
+
+---
+
+### S2-P-02 — Create a new application
+
+**Preconditions:** As S2-P-01.
+
+1. Click **+ New Application** (or **Start**).
+
+**Expected result:**
+- Browser navigates to `/applications/[id]/step/1`.
+- The page shows "Start a new application" with empty funder name and grant name fields.
+- A step indicator is visible with Step 1 highlighted.
+
+---
+
+### S2-P-03 — Application card shows correct status
+
+**Preconditions:** At least one application exists with a known status.
+
+1. Navigate to `/dashboard`.
+2. Observe the application card(s).
+
+**Expected result:**
+- Each card shows the funder name and grant name.
+- The status pill matches the application's actual status (Not started / In progress / Approved / Exported) in the correct colour.
+- Applications with status `not_started` or `in_progress` show a **Continue** button.
+- Applications with status `approved` or `exported` show a **View** button.
+
+---
+
+### S2-P-04 — Continue button resumes application at correct step
+
+**Preconditions:** An application exists with `current_step` > 1.
+
+1. On the dashboard, click **Continue** on an in-progress application.
+
+**Expected result:**
+- Browser navigates directly to the step stored in `current_step` for that application.
+- The correct step page is shown with any previously saved data intact.
+
+---
+
+### S2-P-05 — Delete an application
+
+**Preconditions:** At least one application exists.
+
+1. On the dashboard, click **Delete** on an application card.
+2. Read the confirmation modal.
+3. Click the confirm delete button.
+
+**Expected result:**
+- The confirmation modal shows text appropriate to the application's status.
+- After confirming, the application card is removed from the dashboard immediately.
+- If it was the only application, the empty state is shown.
+- The deletion cannot be undone — navigating back to `/dashboard` confirms the card is gone.
+
+---
+
+## Slice 3 — Step 1: Application Details
+
+### S3-P-01 — Save Step 1 details for a new application
+
+**Preconditions:** Signed in. Charity profile complete. New application created (S2-P-02).
+
+1. On Step 1, enter a funder name (e.g. "National Lottery Community Fund").
+2. Enter a grant name (e.g. "Awards for All England 2026").
+3. Click **Continue**.
+
+**Expected result:**
+- Browser navigates to Step 2 (`/applications/[id]/step/2`).
+- The step indicator shows Step 1 as completed (tick) and Step 2 as current.
+- Navigating back to Step 1 shows the funder name and grant name pre-filled.
+- The dashboard card now shows the funder name as the application title.
+
+---
+
+### S3-P-02 — Return to Step 1 of an existing application
+
+**Preconditions:** Application with saved funder name and grant name exists.
+
+1. Navigate to `/applications/[id]/step/1`.
+
+**Expected result:**
+- Both the funder name and grant name fields are pre-filled with the previously saved values.
+- Heading reads "Continue your application" (not "Start a new application").
+- Editing and clicking **Continue** saves the updated values correctly.
 
 ---
 
@@ -537,6 +890,237 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 ---
 
 # 2. NEGATIVE TESTS
+
+---
+
+## Slice 0 — Authentication
+
+### S0-N-01 — Register with first name empty
+
+**Preconditions:** On `/register`.
+
+1. Leave the first name field blank.
+2. Fill all other fields correctly.
+3. Click **Create account**.
+
+**Expected result:**
+- An inline validation error appears beneath the first name field.
+- The form is not submitted.
+- No email is sent.
+
+---
+
+### S0-N-02 — Register with invalid email format
+
+**Preconditions:** On `/register`.
+
+1. Enter `notanemail` in the email field.
+2. Fill all other fields correctly.
+3. Click **Create account**.
+
+**Expected result:**
+- An inline validation error appears beneath the email field ("Enter a valid email address" or similar).
+- The form is not submitted.
+
+---
+
+### S0-N-03 — Register with password shorter than 10 characters
+
+**Preconditions:** On `/register`.
+
+1. Enter a password of fewer than 10 characters (e.g. `Short1`).
+2. Fill all other fields correctly.
+3. Click **Create account**.
+
+**Expected result:**
+- An inline validation error appears: "Password must be at least 10 characters" (or similar).
+- The form is not submitted.
+
+---
+
+### S0-N-04 — Register with mismatched passwords
+
+**Preconditions:** On `/register`.
+
+1. Enter a valid password in the password field.
+2. Enter a different value in the confirm password field.
+3. Fill all other fields correctly and click **Create account**.
+
+**Expected result:**
+- An inline validation error appears beneath the confirm password field: "Passwords do not match" (or similar).
+- The form is not submitted.
+
+---
+
+### S0-N-05 — Register without accepting terms
+
+**Preconditions:** On `/register`.
+
+1. Fill all fields correctly.
+2. Leave the Terms of Service checkbox unticked.
+3. Click **Create account**.
+
+**Expected result:**
+- An inline validation error appears next to the terms checkbox.
+- The form is not submitted.
+
+---
+
+### S0-N-06 — Register with an already-registered email
+
+**Preconditions:** On `/register`. An account already exists for the email you will use.
+
+1. Fill in the registration form using an email address that is already registered.
+2. Click **Create account**.
+
+**Expected result:**
+- An error message is shown indicating the email is already in use.
+- The form is not submitted and no duplicate account is created.
+- Note: Supabase uses a privacy-preserving approach — the error may be surfaced as a general "account already exists" message rather than a specific email-exists error. Either is acceptable as long as the duplicate account is not created.
+
+---
+
+### S0-N-07 — Sign in with wrong password
+
+**Preconditions:** On `/` (sign-in page). Valid registered and verified account exists.
+
+1. Enter the correct email address.
+2. Enter an incorrect password.
+3. Click **Sign in**.
+
+**Expected result:**
+- An error message appears: "Incorrect email address or password" (or similar generic wording — must not reveal whether the email is registered).
+- The user remains on the sign-in page.
+- No navigation to the dashboard occurs.
+
+---
+
+### S0-N-08 — Sign in with unverified email
+
+**Preconditions:** On `/` (sign-in page). Account registered but email NOT verified.
+
+1. Enter the email and password for an unverified account.
+2. Click **Sign in**.
+
+**Expected result:**
+- An error message or banner appears indicating the email has not been verified.
+- A link or button to resend the verification email is shown.
+- The user is not signed in.
+
+---
+
+### S0-N-09 — Access a protected page when signed out
+
+**Preconditions:** Signed out.
+
+1. Attempt to navigate directly to `/dashboard` by typing the URL in the browser.
+
+**Expected result:**
+- Browser redirects to `/` (sign-in page).
+- The dashboard is not accessible.
+- After signing in, the user lands on the dashboard (not a 404 or error page).
+
+---
+
+## Slice 1 — Charity Profile
+
+### S1-N-01 — Charity Commission lookup — no match
+
+**Preconditions:** Signed in. On `/profile`.
+
+1. In the Charity Commission lookup field, enter a search term that will not match any charity (e.g. `ZZZZNOTACHARITY999`).
+2. Click **Look up charity**.
+
+**Expected result:**
+- An amber "no match" result is shown.
+- The form fields are not pre-filled.
+- The user can still enter their charity details manually.
+
+---
+
+### S1-N-02 — Save profile with required fields empty
+
+**Preconditions:** Signed in. On `/profile`.
+
+1. Leave one or more required fields empty (e.g. clear the charity name field).
+2. Click **Save profile** (or **Save changes**).
+
+**Expected result:**
+- Inline validation errors appear beneath each empty required field.
+- The form is not submitted.
+- No data is saved to the database.
+
+---
+
+### S1-N-03 — Start button disabled when profile incomplete
+
+**Preconditions:** Signed in. No charity profile saved.
+
+1. Navigate to `/dashboard`.
+2. Attempt to click the **Start** or **+ New Application** button.
+
+**Expected result:**
+- The button is visually disabled (greyed out or non-clickable).
+- A tooltip appears on hover: "Please set up your charity profile first" (or similar).
+- No new application is created.
+
+---
+
+## Slice 2 — Dashboard and Application Management
+
+### S2-N-01 — Delete application — cancel in confirmation modal
+
+**Preconditions:** At least one application exists on the dashboard.
+
+1. Click **Delete** on an application card.
+2. When the confirmation modal appears, click **Cancel**.
+
+**Expected result:**
+- The modal closes.
+- The application card remains on the dashboard unchanged.
+- No data is deleted.
+
+---
+
+### S2-N-02 — Cross-user application access (RLS check)
+
+**Preconditions:** Two test accounts exist (primary and secondary). Application `[id]` belongs to the primary account.
+
+1. Sign in as the secondary test user.
+2. Attempt to navigate directly to `/applications/[id]/step/1` using the application ID that belongs to the primary user.
+
+**Expected result:**
+- The page does not display the primary user's application data.
+- The user is redirected to `/dashboard` or shown a "not found" / "access denied" result.
+- Under no circumstances is another user's application data visible.
+
+---
+
+## Slice 3 — Step 1: Application Details
+
+### S3-N-01 — Continue from Step 1 with required fields empty
+
+**Preconditions:** Signed in. On Step 1 of a new application.
+
+1. Leave both the funder name and grant name fields empty.
+2. Click **Continue**.
+
+**Expected result:**
+- Inline validation errors appear beneath the empty fields.
+- The form is not submitted.
+- The browser does not navigate to Step 2.
+
+---
+
+### S3-N-02 — Step locking — attempt to skip to Step 2 before completing Step 1
+
+**Preconditions:** Application exists with `current_step = 1` (Step 1 not yet saved).
+
+1. Manually type the Step 2 URL into the browser address bar: `/applications/[id]/step/2`.
+
+**Expected result:**
+- The browser redirects to Step 1 (`/applications/[id]/step/1`).
+- Step 2 is not accessible until Step 1 has been saved and submitted.
 
 ---
 
