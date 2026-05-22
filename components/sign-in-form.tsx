@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,7 +13,12 @@ interface FieldErrors {
   password?: string;
 }
 
-export function SignInForm() {
+interface SignInFormProps {
+  /** True when the user has just deleted their account (shows a confirmation banner). */
+  accountDeleted?: boolean;
+}
+
+export function SignInForm({ accountDeleted = false }: SignInFormProps) {
   const [state, action, isPending] = useActionState(signIn, { error: null });
 
   const [email, setEmail] = useState("");
@@ -48,6 +53,22 @@ export function SignInForm() {
       <p className="mb-8 text-center text-[16px] text-[#64748B]">
         Your free grant writing companion for UK charities
       </p>
+
+      {/* Account deleted confirmation banner */}
+      {accountDeleted && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4"
+        >
+          <CheckCircle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#16A34A]"
+            aria-hidden="true"
+          />
+          <p className="text-[14px] text-[#166534]">
+            Your account has been deleted. We&apos;ve sent you a confirmation email.
+          </p>
+        </div>
+      )}
 
       {/* Form-level error: wrong credentials (also covers unknown email — AC-FR-04-03) */}
       {state.error === "credentials" && (

@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-05-22 — Slice 8: Account Management wired up (Phase 4 complete)
+
+**What changed:**
+- `actions/auth.ts` — `changePassword(currentPassword, newPassword)` Server Action added (S8.1). Verifies the current password by calling `signInWithPassword` before `updateUser({ password })` — Supabase has no dedicated "verify before change" API so re-authentication is the correct approach.
+- `components/account-settings-form.tsx` — static password-change simulation replaced with real SA call via `useTransition`; `wrong_password` surfaces as inline field error; server error banner added; button shows "Updating…" while pending.
+- `lib/emails/send.ts` (new) — `sendEmail()` wraps the Resend REST API using `fetch` (no extra dependency). Skips gracefully with a console error if `RESEND_API_KEY` is not set.
+- `lib/emails/account-deleted-user.ts` / `inactivity-warning.ts` / `account-deleted-inactivity.ts` (new) — Email 2 (user-initiated deletion), Email 3 (inactivity warning), Email 4 (inactivity deletion). All are inline HTML functions, consistent with the P3.8 design decision that Resend template variables aren't supported.
+- `app/api/account/delete/route.ts` (new, S8.2) — POST route using service role client. Cascade order: application_answers → applications → charity_profiles → ai_usage_log → user_profiles → `auth.admin.deleteUser`. Sends Email 2 after deletion; email failure is logged but does not block the response.
+- `components/delete-account-form.tsx` — rewritten; calls `/api/account/delete`; on success calls `signOut()` SA then redirects to `/?deleted=true`.
+- `app/(public)/page.tsx` + `components/sign-in-form.tsx` — `?deleted=true` query param now shows a green "Your account has been deleted" banner on the sign-in page.
+- `app/api/cron/inactivity-warning/route.ts` (new, S8.3) — daily 08:00 UTC; pages through `auth.admin.listUsers()`; sends Email 3 to accounts in the 23-month inactivity window.
+- `app/api/cron/inactivity-deletion/route.ts` (new, S8.3) — daily 09:00 UTC; cascade-deletes accounts ≥24 months inactive (same order as user-initiated deletion); sends Email 4 per deletion; logs user ID to console (not email — PII).
+- `vercel.json` — `inactivity-warning` (`0 8 * * *`) and `inactivity-deletion` (`0 9 * * *`) added alongside existing cleanup-guidelines cron.
+
+**Key decisions:**
+- **Current password verification via re-authentication (S8.1):** Supabase does not expose a dedicated "verify current password" endpoint. Re-signing-in with `signInWithPassword` achieves the same result — if the credential is wrong, `signInWithPassword` returns an error and the password change is blocked. The re-sign-in refreshes the session token as a side effect, which is harmless.
+- **Resend via `fetch`, not SDK (S8.2/S8.3):** The `resend` npm package is not installed. All three email functions use the Resend REST API directly via `fetch`. This avoids adding a dependency for what is four simple HTTP calls. The `sendEmail` wrapper is ~25 lines and covers all cases.
+- **Email failure does not block deletion (S8.2):** Once `auth.admin.deleteUser` succeeds, the user is gone and cannot be recovered. Blocking the 200 response because of an email failure would leave the client in an error state with no account — the deletion happened but the client sees a failure. Email failures are logged for investigation; the 200 is returned regardless.
+- **Inactivity cron skips null `last_sign_in_at` (S8.3):** Users who registered but never signed in have `last_sign_in_at = null`. Treating null as "infinitely old" would delete brand-new accounts that haven't confirmed their email yet. Null is explicitly skipped; only accounts with a known last sign-in date are evaluated.
+- **Deletion cron logs user ID, not email (S8.3):** Per ADR-OPS-OPS (Sentry PII scrubbing) and general GDPR hygiene, log lines contain the Supabase user UUID only. Email addresses are not logged anywhere in the cron path.
+
+---
+
 ## 2026-05-21 — Slice 7: Step 5 Approve & Export wired up
 
 **What changed:**

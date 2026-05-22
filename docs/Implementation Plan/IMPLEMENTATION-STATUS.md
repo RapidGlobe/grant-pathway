@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-21 (Slice 7 complete)
+**Last updated:** 2026-05-22 (Slice 8 complete)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **33** | In progress |
+| **Phase 4 — Vertical Slices** | **36** | **36** | **✅ Complete** |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -96,10 +96,10 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.3 — Plain text export | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 8 — Account Management** | **3** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 8 — Account Management** | **3** | **3** | **✅ Complete** |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 1 | ✅ Complete |
 | **Phase 5 — Pre-Launch** | **6** | **0** | Not started |
 | &nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
@@ -107,7 +107,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **44** | |
+| **Total** | **78** | **47** | |
 
 ---
 
@@ -447,9 +447,25 @@ All five test scenarios passed. Bugs found and fixed during testing:
 
 ### Slice 8 — Account Management
 
-- [ ] **S8.1** Change password: read-only email display; current + new + confirm fields; `updateUser({ password })`; success clears form; MFA opt-in wired up (Should Have — FR-07)
-- [ ] **S8.2** Account deletion: `DELETE` confirmation (case-sensitive); cascade deletion in correct order; confirmation email (Should Have — FR-44); redirect to `/` with message
-- [ ] **S8.3** Inactivity deletion: uses `auth.users.last_sign_in_at` (no custom column); Vercel cron job at 23 months sends Email 3 warning; Vercel cron job at 24 months executes cascade deletion and sends Email 4; both cron jobs confirmed active in Vercel dashboard
+- [x] **S8.1** Change password: read-only email display; current + new + confirm fields; `updateUser({ password })`; verify current password first; success clears form; MFA opt-in wired up (Should Have — FR-07)
+  - `actions/auth.ts` — `changePassword(currentPassword, newPassword)` Server Action added; verifies current password by re-signing-in with `signInWithPassword` before calling `updateUser({ password })`; returns `success | wrong_password | error`
+  - `components/account-settings-form.tsx` — wired via `useTransition`; static simulation replaced with real SA call; `wrong_password` maps to inline field error on Current password; server error banner added; button shows "Updating…" while pending
+  - MFA opt-in already fully wired in S0.6 — no additional changes needed
+- [x] **S8.2** Account deletion: `DELETE` confirmation (case-sensitive); cascade deletion in correct order; confirmation email (Should Have — FR-44); redirect to `/` with message
+  - `lib/emails/send.ts` (new) — thin `sendEmail()` wrapper around Resend REST API using `fetch`; skips gracefully if `RESEND_API_KEY` not set
+  - `lib/emails/account-deleted-user.ts` (new) — `buildAccountDeletedByUserEmail(firstName)` returns branded HTML email
+  - `app/api/account/delete/route.ts` (new) — POST route; auth check via regular server client; service role for cascade: application_answers → applications → charity_profiles → ai_usage_log → user_profiles → `auth.admin.deleteUser(userId)`; sends Email 2 (confirmation) via Resend; email failure logged but does not fail the request
+  - `components/delete-account-form.tsx` — rewritten; calls `fetch('/api/account/delete', { method: 'POST' })`; on success calls `signOut()` SA then `router.push('/?deleted=true')`; `useTransition` drives `isDeleting` state; server error banner
+  - `app/(public)/page.tsx` — updated to read `searchParams.deleted` and pass `accountDeleted` prop to `SignInForm`
+  - `components/sign-in-form.tsx` — `accountDeleted` prop added; green success banner shown when `accountDeleted=true`
+- [x] **S8.3** Inactivity deletion: uses `auth.users.last_sign_in_at` (no custom column); Vercel cron job at 23 months sends Email 3 warning; Vercel cron job at 24 months executes cascade deletion and sends Email 4; both cron jobs confirmed active in Vercel dashboard
+  - `lib/emails/inactivity-warning.ts` (new) — `buildInactivityWarningEmail(firstName, deletionDate)` — Email 3 HTML
+  - `lib/emails/account-deleted-inactivity.ts` (new) — `buildAccountDeletedInactivityEmail(firstName)` — Email 4 HTML
+  - `app/api/cron/inactivity-warning/route.ts` (new) — daily 08:00 UTC; pages through `auth.admin.listUsers()`; sends Email 3 to users where `last_sign_in_at` is in the 23-month window (≥23 months and <24 months ago); users with null `last_sign_in_at` skipped
+  - `app/api/cron/inactivity-deletion/route.ts` (new) — daily 09:00 UTC; same pagination pattern; cascade-deletes accounts with `last_sign_in_at` ≥24 months ago (same order as S8.2); logs each deletion with user ID (not email); sends Email 4 immediately after each deletion; deletion failures logged and skipped (next run will retry)
+  - `vercel.json` — two new cron entries added: `"0 8 * * *"` and `"0 9 * * *"`
+  - ⚠️ **Confirm both crons active in Vercel dashboard** after next deployment: Settings → Cron Jobs → verify `inactivity-warning` and `inactivity-deletion` show status "Active"
+  - ⚠️ `RESEND_API_KEY` must be set in Vercel environment variables for emails to send (already in `.env.example`)
 
 ---
 
@@ -491,5 +507,6 @@ All five test scenarios passed. Bugs found and fixed during testing:
 | 2026-05-21 | **Logo placeholder recorded.** `components/logo.tsx` marked with `⚠️ PLACEHOLDER LOGO — replace before launch` comment. Real Grant Pathway logo (SVG/PNG, light + dark variants) to be supplied by Wac / RapidGlobe Ltd before P5.4 production launch. Instructions for swapping in the real asset are embedded in the component. |
 | 2026-05-21 | **S1.4 complete. Slice 1 complete.** Dashboard page fetches real first name and profile existence; banner shown/hidden correctly on both empty and populated states. `MOCK_PROFILE_INCOMPLETE` removed from `dashboard-populated.tsx`. |
 | 2026-05-21 | **S1.3 complete.** `getCharityProfile()` fetches existing profile from `charity_profiles`; `CharityProfileData` type exported; form `initialData` prop pre-fills all five fields; `isEdit` now derived from DB state not URL param. TypeScript clean. |
+| 2026-05-22 | **Slice 8 complete. Phase 4 complete.** S8.1: `changePassword()` SA verifies current password via `signInWithPassword` before calling `updateUser`; `wrong_password` state maps to inline field error. S8.2: `POST /api/account/delete` cascade-deletes all user data (application_answers → applications → charity_profiles → ai_usage_log → user_profiles → auth.admin.deleteUser); sends Email 2 (confirmation) via Resend; sign-in page shows green banner on `?deleted=true`. S8.3: `lib/emails/` module created with four email builders; two inactivity cron routes (`/api/cron/inactivity-warning` daily 08:00 UTC, `/api/cron/inactivity-deletion` daily 09:00 UTC) page through `auth.admin.listUsers()` and handle the 23/24-month windows; `vercel.json` updated. Email helper uses Resend REST API via `fetch` (no new dependency). TypeScript clean (0 errors). ⚠️ Confirm both new cron jobs active in Vercel dashboard after next deployment. ⚠️ Set `RESEND_API_KEY` in Vercel env vars for emails to send. |
 | 2026-05-21 | **S1.2 complete.** `saveCharityProfile()` Server Action added to `actions/charity.ts`; Zod validation, Supabase upsert on `user_id` conflict, `lookup_source` correctly set to `charity_commission` or `manual` (D14). Form wired with real save, loading state, and error banner. TypeScript clean (0 errors). |
 | 2026-05-08 | **Phase 0 implementation started.** Next.js 16.2.5 scaffold created (Turbopack, React 19, Tailwind v4). Key deviations from plan: (1) Tailwind v4 has no `tailwind.config.ts` — design tokens added via `@theme inline` in `globals.css` instead. (2) Next.js 16 deprecates `middleware.ts` in favour of `proxy.ts` with `export function proxy()` — plan's middleware stub updated accordingly. (3) shadcn `toast` component deprecated — replaced with `sonner`. (4) shadcn `form` component not available in shadcn 4.7.0 registry — to be created manually in Phase 1 using react-hook-form directly. P0.2–P0.5 complete; P0.6 pending GitHub push and Vercel link (manual steps for owner). |

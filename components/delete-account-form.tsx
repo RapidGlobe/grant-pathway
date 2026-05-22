@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { signOut } from "@/actions/auth";
 
 const DATA_SUMMARY = [
   "Your charity profile",
@@ -16,18 +17,41 @@ const DATA_SUMMARY = [
 export function DeleteAccountForm() {
   const router = useRouter();
   const [confirmText, setConfirmText] = useState("");
-  const [error, setError] = useState("");
+  const [fieldError, setFieldError] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   const isConfirmed = confirmText === "DELETE";
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!isConfirmed) {
-      setError('Please type DELETE in capitals to confirm.');
+      setFieldError("Please type DELETE in capitals to confirm.");
       return;
     }
-    // Static shell: simulate deletion — redirect to sign-in with deleted param
-    router.push("/?deleted=true");
+    setFieldError("");
+    setServerError("");
+
+    startTransition(async () => {
+      const res = await fetch("/api/account/delete", { method: "POST" });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setServerError(
+          (data as { error?: string }).error ?? "Something went wrong. Please try again.",
+        );
+        return;
+      }
+
+      // Clear the session cookie (fire and forget — deletion already succeeded)
+      try {
+        await signOut();
+      } catch {
+        // Ignore — the auth user is already deleted server-side
+      }
+
+      router.push("/?deleted=true");
+    });
   }
 
   return (
@@ -61,6 +85,16 @@ export function DeleteAccountForm() {
         </ul>
       </div>
 
+      {/* Server error */}
+      {serverError && (
+        <div
+          role="alert"
+          className="mb-6 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3"
+        >
+          <p className="text-[14px] text-[#991B1B]">{serverError}</p>
+        </div>
+      )}
+
       {/* Confirmation form */}
       <form noValidate onSubmit={handleSubmit}>
         <div className="mb-6">
@@ -77,16 +111,16 @@ export function DeleteAccountForm() {
             value={confirmText}
             onChange={(e) => {
               setConfirmText(e.target.value);
-              if (error) setError("");
+              if (fieldError) setFieldError("");
             }}
-            aria-invalid={!!error || undefined}
-            aria-describedby={error ? "confirmDelete-error" : undefined}
+            aria-invalid={!!fieldError || undefined}
+            aria-describedby={fieldError ? "confirmDelete-error" : undefined}
             className="h-10 max-w-[240px] font-mono text-[14px]"
             placeholder="DELETE"
           />
-          {error && (
+          {fieldError && (
             <p id="confirmDelete-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
-              {error}
+              {fieldError}
             </p>
           )}
         </div>
@@ -94,13 +128,15 @@ export function DeleteAccountForm() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <Button
             type="submit"
-            className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C]"
+            disabled={isPending}
+            className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-60"
           >
-            Permanently delete my account
+            {isPending ? "Deleting…" : "Permanently delete my account"}
           </Button>
           <Button
             type="button"
             variant="outline"
+            disabled={isPending}
             onClick={() => router.push("/account")}
             className="h-10 px-5 text-[14px] font-semibold"
           >

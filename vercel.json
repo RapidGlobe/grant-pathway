@@ -3,6 +3,14 @@
     {
       "path": "/api/cron/cleanup-guidelines",
       "schedule": "*/30 * * * *"
+    },
+    {
+      "path": "/api/cron/inactivity-warning",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/inactivity-deletion",
+      "schedule": "0 9 * * *"
     }
   ]
 }

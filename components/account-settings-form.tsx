@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Eye, EyeOff, CheckCircle } from "lucide-react";
+import { Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MfaSetupPanel } from "@/components/mfa-setup-panel";
+import { changePassword } from "@/actions/auth";
 
 interface FieldErrors {
   currentPassword?: string;
@@ -28,7 +29,6 @@ export function AccountSettingsForm({
   mfaEnabled = false,
   mfaFactorId = "",
 }: AccountSettingsFormProps) {
-  // Change password form state (wired to Supabase in S8.1)
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,9 +37,13 @@ export function AccountSettingsForm({
   const [showConfirm, setShowConfirm] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [passwordUpdated, setPasswordUpdated] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setServerError("");
+
     const errors: FieldErrors = {};
     if (!currentPassword) errors.currentPassword = "Please enter your current password";
     if (!newPassword) {
@@ -55,12 +59,20 @@ export function AccountSettingsForm({
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    // Static shell: simulate success
-    setPasswordUpdated(true);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setFieldErrors({});
+    startTransition(async () => {
+      const result = await changePassword(currentPassword, newPassword);
+      if (result.status === "success") {
+        setPasswordUpdated(true);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setFieldErrors({});
+      } else if (result.status === "wrong_password") {
+        setFieldErrors({ currentPassword: "Your current password is incorrect" });
+      } else {
+        setServerError("Something went wrong. Please try again.");
+      }
+    });
   }
 
   return (
@@ -102,6 +114,17 @@ export function AccountSettingsForm({
           >
             <CheckCircle className="h-4 w-4 shrink-0 text-[#16A34A]" aria-hidden="true" />
             <p className="text-[14px] text-[#166534]">Your password has been updated.</p>
+          </div>
+        )}
+
+        {/* Server error */}
+        {serverError && (
+          <div
+            role="alert"
+            className="mb-5 flex items-center gap-2 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
+            <p className="text-[14px] text-[#991B1B]">{serverError}</p>
           </div>
         )}
 
@@ -221,9 +244,10 @@ export function AccountSettingsForm({
 
           <Button
             type="submit"
-            className="h-10 bg-[#0D6E6E] px-5 text-[14px] font-semibold text-white hover:bg-[#0A5A5A]"
+            disabled={isPending}
+            className="h-10 bg-[#0D6E6E] px-5 text-[14px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
           >
-            Update password
+            {isPending ? "Updating…" : "Update password"}
           </Button>
         </form>
       </section>

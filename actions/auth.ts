@@ -330,6 +330,44 @@ export async function signIn(
 }
 
 // ---------------------------------------------------------------------------
+// S8.1 — Change password (authenticated)
+// ---------------------------------------------------------------------------
+
+export type ChangePasswordResult = {
+  status: 'success' | 'wrong_password' | 'error'
+}
+
+/**
+ * Verifies the user's current password then updates it.
+ * Verification is done by re-signing-in with the current email + password
+ * before calling updateUser — Supabase has no dedicated "verify current
+ * password" API, but signInWithPassword validates the credential correctly.
+ *
+ * Called directly from AccountSettingsForm via useTransition (not FormData).
+ */
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string,
+): Promise<ChangePasswordResult> {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email) return { status: 'error' }
+
+  // Verify the current password before allowing the change
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+  if (signInError) return { status: 'wrong_password' }
+
+  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
+  if (updateError) return { status: 'error' }
+
+  return { status: 'success' }
+}
+
+// ---------------------------------------------------------------------------
 // S0.2 — Resend verification email
 // ---------------------------------------------------------------------------
 
