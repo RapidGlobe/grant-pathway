@@ -9,6 +9,38 @@
 
 ---
 
+## Test Results Summary
+
+Complete this table after running all tests.
+
+| Section | Total | Pass | Fail | Blocked | Notes |
+|---------|-------|------|------|---------|-------|
+| Positive (S4) | 6 | | | | |
+| Positive (S5) | 6 | | | | |
+| Positive (S6) | 5 | | | | |
+| Positive (S7) | 6 | | | | |
+| Positive (S8) | 3 | | | | |
+| Negative (S4) | 5 | | | | |
+| Negative (S5) | 4 | | | | |
+| Negative (S6) | 3 | | | | |
+| Negative (S7) | 4 | | | | |
+| Negative (S8) | 7 | | | | |
+| Non-Functional | 13 | | | | |
+| Usability / Flow | 12 | | | | |
+| **Total** | **74** | | | | |
+
+---
+
+## Defect Log
+
+Log any failures that are NOT in the known expected failures list below.
+
+| ID | Test case | Description | Severity | Status |
+|----|-----------|-------------|----------|--------|
+| | | | | |
+
+---
+
 ## Test Fixtures
 
 The following real funder guideline files are available in `docs/test-fixtures/`:
@@ -1124,29 +1156,7 @@ Run the complete happy path (Steps 2 → 3 → 4 → 5 → Export) in each brows
 
 ---
 
-# 5. TEST RESULTS SUMMARY
-
-Complete this table after running all tests.
-
-| Section | Total | Pass | Fail | Blocked | Notes |
-|---------|-------|------|------|---------|-------|
-| Positive (S4) | 6 | | | | |
-| Positive (S5) | 6 | | | | |
-| Positive (S6) | 5 | | | | |
-| Positive (S7) | 6 | | | | |
-| Positive (S8) | 3 | | | | |
-| Negative (S4) | 5 | | | | |
-| Negative (S5) | 4 | | | | |
-| Negative (S6) | 3 | | | | |
-| Negative (S7) | 4 | | | | |
-| Negative (S8) | 7 | | | | |
-| Non-Functional | 13 | | | | |
-| Usability / Flow | 12 | | | | |
-| **Total** | **74** | | | | |
-
----
-
-# 6. KNOWN EXPECTED FAILURES
+# 5. KNOWN EXPECTED FAILURES
 
 These tests are expected to fail based on recorded gaps. Record the result and confirm the gap is accurately described — do not re-open new bugs for these unless the behaviour is different from the gap description.
 
@@ -1155,16 +1165,6 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | UX-06 | GAP-26 | `applications/[id]` shows stub, not redirect |
 | S7-P-03 | GAP-24 | Disclaimer wording differs from PDR-DH-003 spec |
 | NF-06 | GAP-22 | No inactivity message shown after session timeout |
-
----
-
-# 7. DEFECT LOG
-
-Log any failures that are NOT in the known expected failures list above.
-
-| ID | Test case | Description | Severity | Status |
-|----|-----------|-------------|----------|--------|
-| | | | | |
 
 ---
 
