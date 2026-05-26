@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/cleanup-guidelines",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 2 * * *"
     },
     {
       "path": "/api/cron/inactivity-warning",
