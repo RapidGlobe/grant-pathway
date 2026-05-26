@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-05-26 — ADR-DATA-005: Backup strategy decided; documentation updated
+
+**What changed:**
+- `docs/Technical Decision and Design/ADR-DATA-005-backup-strategy.md` (new) — Supabase Pro daily backup strategy decided. Decision: upgrade production Supabase project to Pro tier before go-live. Provides daily automated backups with 7-day retention, UK-hosted (eu-west-2). Zero implementation effort. Cost: ~£20/month.
+- `docs/Technical Decision and Design/ADR-INDEX.md` — ADR-DATA-005 added to Group 4 (Data); total ADRs: 43 → 44; "Last updated" date updated.
+- `docs/Technical Decision and Design/technical-design.md` (v1.0 → v1.1) — §3 operating costs table updated: Supabase line changed from "Free tier (initially)" to "Pro (~£20/month)"; total fixed costs updated from ~£16/month to ~£36/month.
+- `docs/legal/privacy-policy.md` (v1.1, new folder) — Three corrections from v1.0: (1) Section 5 provider table updated — Anthropic/US replaced with Amazon Web Services Bedrock/UK; Sentry corrected from "United States" to "European Union". (2) Section 5 AI processing note rewritten to accurately describe Bedrock eu-west-2 routing. (3) Section 6 international transfers updated — AI processing no longer a US transfer. (4) Section 7 updated to disclose 7-day automated backup retention window that applies after account deletion (GDPR Article 17 requirement).
+- `docs/legal/terms-of-service.md` (v1.1, new folder) — Section 5 updated to reference Amazon Bedrock as the AI processing layer. Section 9 updated to acknowledge operational backup infrastructure exists as an internal safeguard, with an explicit statement that this does not constitute a guarantee of data recovery.
+- `docs/overview/business-overview.md` (v1.1, new folder) — "Data, Privacy, and Trust" section updated to: (1) correct AI data residency statement (Bedrock UK/EEA, not Anthropic US); (2) acknowledge operational daily backup infrastructure for disaster recovery; (3) clarify that deletions remain immediate and permanent from the user's perspective, with backup copies purged within 7 days.
+- `docs/Implementation Plan/ADR-TRACEABILITY.md` — ADR-DATA-005 consequences added to the Data section.
+- `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` — P5.4 pre-launch checklist updated: "Activate Supabase Pro plan and confirm automated backup is active" added.
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — Notes entry added for ADR-DATA-005 decision.
+- Legal and overview documents moved from `docs/` root to `docs/legal/` and `docs/overview/` subfolders for better long-term version management.
+
+**Why:**
+The absence of any backup mechanism represented a reputational risk: a migration error, compromised credentials, or provider incident affecting multiple charities simultaneously would be permanently unrecoverable. Supabase Pro's daily automated backups (7-day retention, London region) address this risk with zero implementation effort and within the C1 budget constraint. Three pre-existing inaccuracies in the privacy policy were corrected at the same time: the Anthropic/US AI provider reference (superseded by the 2026-05-07 Bedrock migration, DR-DP-002), the Sentry region (EU, not US), and the backup retention window (a GDPR Article 17 disclosure obligation introduced by ADR-DATA-005).
+
+---
+
 ## 2026-05-22 — Phase 4→5 gate check
 
 **What changed:**

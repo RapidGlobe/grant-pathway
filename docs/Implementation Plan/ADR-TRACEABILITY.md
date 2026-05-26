@@ -7,8 +7,8 @@
 - When a new task is added to cover a gap, update the Task column and change status to ✅ or 🔵.
 - When a task is completed, no change needed here — the task status lives in IMPLEMENTATION-STATUS.md.
 
-**Last updated:** 2026-05-22  
-**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added)
+**Last updated:** 2026-05-26  
+**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26
 
 ## Status key
 
@@ -99,6 +99,11 @@
 | ADR-DATA-004 | All schema changes via migration files — direct dashboard edits prohibited | P3.1 (process enforced) | ✅ |
 | ADR-DATA-004 | `supabase/migrations/` committed to Git | P3.1 | ✅ |
 | ADR-DATA-004 | `SUPABASE_DB_PASSWORD` stored securely; documented for CLI operations (`supabase db push`) | P3.12 | ✅ GAP-06 resolved |
+| ADR-DATA-005 | Supabase Pro plan activated on production project before go-live | P5.4 | 🔵 |
+| ADR-DATA-005 | Privacy policy Section 7 updated to disclose 7-day backup retention window after account deletion | 2026-05-26 (`docs/legal/privacy-policy.md` v1.1) | ✅ |
+| ADR-DATA-005 | Operating cost table in `technical-design.md` §3 updated (Supabase Pro ~£20/month; total ~£36/month) | 2026-05-26 (`technical-design.md` v1.1) | ✅ |
+| ADR-DATA-005 | Business overview "Data, Privacy, and Trust" section updated to reflect backup infrastructure and corrected AI data residency | 2026-05-26 (`docs/overview/business-overview.md` v1.1) | ✅ |
+| ADR-DATA-005 | P5.4 pre-launch checklist updated to include Supabase Pro backup confirmation | 2026-05-26 (IMPLEMENTATION-PLAN.md) | ✅ |
 
 ---
 

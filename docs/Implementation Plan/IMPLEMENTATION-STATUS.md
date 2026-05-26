@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-22 (Phase 4→5 gate check complete)
+**Last updated:** 2026-05-26 (ADR-DATA-005 decided; P5.4 checklist updated)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -109,6 +109,16 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
 | **Total** | **78** | **47** | |
+
+---
+
+## Notes
+
+### 2026-05-26 — ADR-DATA-005: Backup strategy decided
+
+**ADR-DATA-005** (Database Backup Strategy) decided and documented. Decision: upgrade production Supabase project to Pro plan before go-live. Provides daily automated backups with 7-day retention, hosted in London (eu-west-2). No implementation task required — this is a billing dashboard action added to the P5.4 pre-launch checklist. Cost impact: Supabase line increases from £0 to ~£20/month; total fixed operating costs rise from ~£16/month to ~£36/month (within the £100/month C1 budget).
+
+Three pre-existing inaccuracies in the privacy policy were corrected at the same time: the Anthropic/US AI provider reference (superseded by the 2026-05-07 Bedrock migration), the Sentry region (EU, not US), and the GDPR backup retention disclosure. Privacy policy, Terms of Service, and Business Overview versioned to v1.1 and relocated to `docs/legal/` and `docs/overview/` subfolders.
 
 ---
 

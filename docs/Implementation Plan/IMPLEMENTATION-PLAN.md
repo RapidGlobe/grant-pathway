@@ -1278,6 +1278,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 
 - Activate Vercel Pro (~£16/month)
 - Confirm `export const maxDuration = 90` is present on both AI routes
+- **Activate Supabase Pro plan (~£20/month) on the production project and confirm automated daily backup is enabled** (ADR-DATA-005 — billing dashboard action only; no code change required)
 - Set all production environment variables in Vercel Production scope
 - Add `CRON_SECRET` to Vercel; confirm cron job appears active in dashboard
 - Apply initial migrations to production Supabase project: `supabase db push --db-url [prod-url]`

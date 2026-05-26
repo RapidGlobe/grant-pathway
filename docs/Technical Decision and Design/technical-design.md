@@ -1,8 +1,9 @@
 ﻿# Grant Pathway — Technical Design Document
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-04-21
-**Status:** Approved — all 42 architectural decisions decided
+**Last updated:** 2026-05-26
+**Status:** Approved — all 44 architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
 ---
@@ -115,12 +116,12 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 | Service | Cost |
 |---|---|
 | Vercel Pro | ~£16/month |
-| Supabase | Free tier (initially) |
+| Supabase Pro | ~£20/month (ADR-DATA-005 — includes daily automated backups) |
 | Amazon Bedrock (Claude) | Usage-based (capped at 20 req/user/month) |
 | Upstash | Free tier |
 | Resend | Free tier (3,000 emails/month) |
 | Sentry | Free tier (5,000 errors/month) |
-| **Total fixed** | **~£16/month** (well within £100/month C1 budget) |
+| **Total fixed** | **~£36/month** (well within £100/month C1 budget; ~£64/month headroom for Bedrock) |
 
 ---
 

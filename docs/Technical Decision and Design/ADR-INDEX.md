@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-05-17
+**Last updated:** 2026-05-26
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -72,6 +72,7 @@ Data model, retention, and migration decisions. Must be decided before the datab
 | ADR-DATA-002 | Data That Is Not Stored | ✅ Decided | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md) |
 | ADR-DATA-003 | Data Retention | ✅ Decided | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md) |
 | ADR-DATA-004 | Database Migrations | ✅ Decided | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md) |
+| ADR-DATA-005 | Database Backup Strategy | ✅ Decided | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md) |
 
 ---
 
@@ -140,12 +141,12 @@ Infrastructure, deployment, and operational decisions.
 | Stack | 6 | 6 | 0 | 0 |
 | Architecture | 5 | 5 | 0 | 0 |
 | Security | 6 | 6 | 0 | 0 |
-| Data | 4 | 4 | 0 | 0 |
+| Data | 5 | 5 | 0 | 0 |
 | File Handling | 4 | 4 | 0 | 0 |
 | AI Integration | 9 | 9 | 0 | 0 |
 | Export | 2 | 2 | 0 | 0 |
 | Operations | 7 | 7 | 0 | 0 |
-| **Total** | **43** | **43** | **0** | **0** |
+| **Total** | **44** | **44** | **0** | **0** |
 
 ---
 
@@ -163,7 +164,7 @@ Grant Pathway has no remaining architectural blockers to production deployment.
 
 ## All Decisions Complete
 
-All 43 architectural decisions have been decided as of 2026-05-17. Grant Pathway is ready to move into the development phase.
+All 44 architectural decisions have been decided as of 2026-05-26. Grant Pathway is ready to move into the development phase.
 
 **Key implementation reminders before writing code:**
 - Run `supabase init` and create the initial migration (ADR-DATA-004)
