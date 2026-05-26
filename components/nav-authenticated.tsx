@@ -109,11 +109,9 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
-              <button className="flex w-full items-center gap-2" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4" aria-hidden="true" />
-                Sign out
-              </button>
+            <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4" aria-hidden="true" />
+              Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
