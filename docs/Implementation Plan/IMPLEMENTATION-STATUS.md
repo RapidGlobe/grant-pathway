@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-26 (ADR-DATA-005 decided; P5.4 checklist updated)
+**Last updated:** 2026-05-26 (ADR-DATA-005 decided; P5.4 checklist updated; S0 E2E testing — 4 defects found and fixed)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -113,6 +113,23 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-05-26 — Slice 0 E2E testing: four defects found and fixed
+
+Full end-to-end walkthrough of S0-P-01 through S0-P-07 (Register → Verify → Sign in → Sign out → Password reset → Same-password guard → Post-reset navigation). Four defects were found and resolved:
+
+- **D-001 — Sign-out button no-op:** `onClick` was on an inner `<button>` inside `DropdownMenuItem`; Radix UI intercepts the event before inner elements fire. Fixed by moving `onClick` directly to `DropdownMenuItem`. Navigation also changed from `router.push("/")` to `window.location.href = "/"` to force a full page reload and clear stale Next.js router cache.
+- **D-002 — Password reset callback showed "Email verified":** `resetPasswordForEmail` uses PKCE (`?code=xxx`) not token_hash OTP. The callback had no mechanism to distinguish a recovery code exchange from an email verification exchange. Fixed by appending `?next=reset` to the `redirectTo` URL and checking the `next` param in `app/auth/callback/route.ts` to route to `forgot-password?state=reset`.
+- **D-003 — Same-password submitted showed generic error:** Supabase returns `error.code === 'same_password'` when `updateUser` is called with the current password. Fixed by detecting this code in `resetPassword` action and returning `{ status: 'same_password' }` with a specific UI banner in `reset-password-form.tsx`.
+- **D-004 — "Sign in" after successful reset navigated to `/dashboard`:** The Supabase recovery session remained active after `updateUser` succeeded, so the middleware redirected `/` to `/dashboard`. Fixed by calling `supabase.auth.signOut()` in the `resetPassword` action after the password update succeeds.
+
+Two Vercel infrastructure issues were also resolved during this session:
+- **Vercel Hobby cron limit:** The `cleanup-guidelines` cron was scheduled `*/30 * * * *` (sub-daily), which Vercel Hobby silently rejects and cancels the entire deployment. Changed to `0 2 * * *` in `vercel.json`. Revert to `*/30 * * * *` after upgrading to Vercel Pro.
+- **GitHub auto-deploy stopped:** Vercel GitHub App integration had lost its connection. Reconnected via Vercel Project Settings → Git → Disconnect/reconnect. Auto-deploy from GitHub pushes now restored.
+
+Remaining S0 tests (S0-P-08 through S0-P-10 — MFA enrol, sign in with MFA, remove MFA) and all negative/non-functional tests are still to run.
+
+---
 
 ### 2026-05-26 — ADR-DATA-005: Backup strategy decided
 
