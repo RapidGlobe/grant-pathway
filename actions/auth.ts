@@ -234,7 +234,7 @@ export async function requestPasswordReset(
 }
 
 export type ResetPasswordState = {
-  status: 'idle' | 'success' | 'expired' | 'error'
+  status: 'idle' | 'success' | 'expired' | 'same_password' | 'error'
 }
 
 /**
@@ -272,6 +272,13 @@ export async function resetPassword(
       error.status === 403
     ) {
       return { status: 'expired' }
+    }
+    // Supabase rejects a new password that matches the current one
+    if (
+      error.code === 'same_password' ||
+      error.message?.toLowerCase().includes('different from the old password')
+    ) {
+      return { status: 'same_password' }
     }
     return { status: 'error' }
   }

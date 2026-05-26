@@ -106,6 +106,22 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
     <div className="w-full max-w-[400px]">
       <h1 className="mb-8 text-[22px] font-bold text-[#1E293B]">Choose a new password</h1>
 
+      {/* Same password error */}
+      {state.status === "same_password" && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle
+            className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]"
+            aria-hidden="true"
+          />
+          <p className="text-[14px] text-[#991B1B]">
+            Your new password must be different from your current password. Please choose a different one.
+          </p>
+        </div>
+      )}
+
       {/* Server error */}
       {state.status === "error" && (
         <div
