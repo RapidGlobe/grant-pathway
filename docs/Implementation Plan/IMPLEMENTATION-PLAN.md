@@ -967,7 +967,7 @@ Note: `annual income band`, `registered address`, and separate `mission statemen
 - `actions/profile.ts` → `saveCharityProfile(data)` Server Action with Zod validation
 - Set `lookup_source = 'charity_commission'` when data was pre-filled from the Charity Commission API; `lookup_source = 'manual'` when entered manually
 - First save: "Your charity profile has been saved. You're ready to start your first application." + **Go to my dashboard** button → `/dashboard`
-- Subsequent saves: "Your changes have been saved." (stays on `/profile`)
+- Subsequent saves: redirect to `/dashboard` (changed from stay-on-page banner — see CHANGELOG 2026-05-26; beta feedback needed)
 - Profile incomplete banner hidden once profile is fully saved
 
 #### Profile as AI input (FR-14)

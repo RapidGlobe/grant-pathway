@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, CheckCircle, AlertCircle, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ interface CharityProfileFormProps {
 }
 
 export function CharityProfileForm({ initialData, isEdit = false }: CharityProfileFormProps) {
+  const router = useRouter();
   const [lookupQuery, setLookupQuery] = useState("");
   const [lookupResult, setLookupResult] = useState<LookupState>(null);
   const [isLookingUp, startLookup] = useTransition();
@@ -112,7 +114,11 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         paraphrasedFromLookup,
       });
       if (result.ok) {
-        setSaved(true);
+        if (isEdit) {
+          router.push('/dashboard');
+        } else {
+          setSaved(true);
+        }
       } else {
         setSaveError(result.error);
       }
@@ -144,20 +150,6 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
 
   return (
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
-      {/* Edit success banner */}
-      {saved && isEdit && (
-        <div
-          role="alert"
-          className="mb-6 flex items-start gap-3 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4"
-        >
-          <CheckCircle
-            className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#16A34A]"
-            aria-hidden="true"
-          />
-          <p className="text-[14px] text-[#166534]">Your changes have been saved.</p>
-        </div>
-      )}
-
       <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
         {isEdit ? "Your charity profile" : "Set up your charity profile"}
       </h1>

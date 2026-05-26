@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-05-26 — S1 testing: profile edit redirects to dashboard; beta feedback noted
+
+**What changed:**
+- `components/charity-profile-form.tsx` — After saving an edited charity profile, the page previously stayed on `/profile` and showed an inline "Your changes have been saved." banner. Changed to redirect to `/dashboard` instead.
+
+**Why:**
+During S1-P-04 testing, WJ found the stay-on-page behaviour felt like a dead end — after updating the profile the natural next step is to get on with an application. The original spec (IMPLEMENTATION-PLAN.md line 970) was: *"Subsequent saves: 'Your changes have been saved.' (stays on `/profile`)"*. The rationale was that an editor might want to review or further adjust their changes. In practice this feels less reassuring than being taken forward.
+
+**Beta feedback needed:**
+⚠️ **Collect user opinion on this during beta testing.** Ask users: "After saving changes to your charity profile, would you prefer to stay on the profile page or be taken to the dashboard?" The current behaviour (redirect to dashboard) matches new-user onboarding flow. If beta users frequently return straight to `/profile` after being redirected, reverting to stay-on-page with a success banner may be preferable.
+
+---
+
 ## 2026-05-26 — S0 testing: four auth bugs fixed; Vercel infrastructure resolved
 
 **What changed:**
