@@ -26,6 +26,15 @@ export async function GET(request: Request) {
   // reset (type=recovery). Route the success/failure redirect based on type.
   if (token_hash && type) {
     const supabase = await createClient()
+
+    // For recovery tokens, sign out any existing session first. If the user
+    // is already signed in and clicks the reset link, the active session
+    // causes verifyOtp to fail with "token expired". Signing out first gives
+    // verifyOtp a clean slate to create the recovery session.
+    if (type === 'recovery') {
+      await supabase.auth.signOut()
+    }
+
     const { error } = await supabase.auth.verifyOtp({ token_hash, type })
     if (!error) {
       if (type === 'recovery') {
