@@ -45,7 +45,7 @@ Log any failures that are NOT in the known expected failures list below.
 
 | ID | Test case | Description | Severity | Status |
 |----|-----------|-------------|----------|--------|
-| | | | | |
+| D-001 | S0-P-04 | Sign out button in nav dropdown had no onClick handler — clicking it did nothing and the user remained signed in. Fixed in `components/nav-authenticated.tsx` (2026-05-26). | High | Fixed |
 
 ---
 
@@ -173,6 +173,8 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 - Page shows "Email verified" with a green tick icon.
 - A **Go to my dashboard** button is visible.
 - Clicking **Go to my dashboard** navigates to `/dashboard`.
+
+> **Before proceeding to S0-P-03:** Sign out of the service. Click the account avatar/initials in the top-right navigation and select **Sign out**. Confirm you are returned to the sign-in page (`/`) before starting the next test.
 
 ---
 

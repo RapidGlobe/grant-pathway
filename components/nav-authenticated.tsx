@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChevronDown, Settings, LogOut } from "lucide-react";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { signOut } from "@/actions/auth";
 
 interface NavAuthenticatedProps {
   firstName?: string;
@@ -29,8 +30,14 @@ function getDisplayName(firstName?: string, email?: string): string {
 
 export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const displayName = getDisplayName(firstName, email);
   const initials = getInitials(firstName, email);
+
+  async function handleSignOut() {
+    await signOut();
+    router.push("/");
+  }
 
   function navLinkClass(href: string): string {
     const isActive = pathname === href || pathname.startsWith(href + "/");
@@ -103,7 +110,7 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive">
-              <button className="flex w-full items-center gap-2">
+              <button className="flex w-full items-center gap-2" onClick={handleSignOut}>
                 <LogOut className="h-4 w-4" aria-hidden="true" />
                 Sign out
               </button>
