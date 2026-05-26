@@ -283,6 +283,10 @@ export async function resetPassword(
     return { status: 'error' }
   }
 
+  // Sign out the recovery session so the "Sign in" button on the success
+  // screen lands on a clean sign-in page rather than redirecting to /dashboard.
+  await supabase.auth.signOut()
+
   return { status: 'success' }
 }
 
