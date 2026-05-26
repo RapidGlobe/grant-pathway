@@ -227,7 +227,7 @@ export async function requestPasswordReset(
   // Fire and forget — we do not check the error because we must never reveal
   // whether the email address is registered (AC-FR-05-02).
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback`,
+    redirectTo: `${origin}/auth/callback?next=reset`,
   })
 
   return { status: 'sent' }
