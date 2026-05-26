@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ChevronDown, Settings, LogOut } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,13 +30,12 @@ function getDisplayName(firstName?: string, email?: string): string {
 
 export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const displayName = getDisplayName(firstName, email);
   const initials = getInitials(firstName, email);
 
   async function handleSignOut() {
     await signOut();
-    router.push("/");
+    window.location.href = "/";
   }
 
   function navLinkClass(href: string): string {
