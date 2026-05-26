@@ -48,6 +48,7 @@ Log any failures that are NOT in the known expected failures list below.
 | D-001 | S0-P-04 | Sign out button in nav dropdown had no onClick handler — clicking it did nothing and the user remained signed in. Fixed in `components/nav-authenticated.tsx` (2026-05-26). | High | Fixed |
 | D-002 | S0-P-05/06 | Password reset email link landed on "Email verified" instead of "Choose a new password". PKCE code exchange in `/auth/callback` routed all successful exchanges to `verify-email?state=verified`. Fixed by passing `next=reset` in `redirectTo` so the callback can distinguish recovery from email verification (2026-05-26). | High | Fixed |
 | D-003 | S0-P-06 | Setting the same password during reset showed generic "Something went wrong" error. Fixed by detecting Supabase `same_password` error code and returning a specific message (2026-05-26). | Low | Fixed |
+| D-004 | S0-P-06 | After successful password reset, clicking "Sign in" redirected to `/dashboard` instead of the sign-in page. Recovery session remained active after `updateUser`. Fixed by signing out immediately after a successful password update (2026-05-26). | Medium | Fixed |
 
 ---
 
