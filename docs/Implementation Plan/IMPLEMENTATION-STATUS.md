@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (Step 3 summary UI redesigned: individual cards per section, two-column grid layout, wider page, button text simplified)
+**Last updated:** 2026-05-28 (Step 3: heading highlights + supporting docs removed; advanceToStep4 bug fix so prep checklist always shows on Step 3 → Step 4 navigation)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -117,6 +117,24 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-05-28 — advanceToStep4 bug fix: prep checklist always shown on Step 3 → Step 4
+
+**Bug:** After confirming the "Before you begin writing" prep checklist once (setting `draft_status = 'in_progress'`), navigating back to Step 3 and clicking Continue would skip straight to the Q&A interface. The `draftStatus === 'not_started'` gate on the Step 4 page never fired again.
+
+**Fix:** `advanceToStep4` now reads `draft_status` before updating. If it is `'in_progress'`, it is reset to `'not_started'` so the checklist gate fires again on arrival at Step 4. States further along (`ready_to_assemble`, `assembled`) are not reset — those gates must hold.
+
+File: `actions/applications.ts`
+
+---
+
+### 2026-05-28 — Step 3 summary: heading highlights + supporting documents removed
+
+Further changes to `components/application-step3-summary.tsx` based on WJ feedback:
+- `CardTitle` style updated: teal left border (`border-l-4 border-[#0D6E6E]`), 15px dark text, normal case — replaces small grey uppercase
+- `supportingDocuments` block removed from Step 3 (to be relocated to Step 4 prep checklist in a future change)
+
+---
 
 ### 2026-05-28 — Step 3 summary UI redesigned (user feedback during testing)
 
