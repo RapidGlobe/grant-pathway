@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (S6.8 complete — S6 redesign fully done; export route reads assembled_draft, Step 5 shows assembled view, reopenApplication resets draft state)
+**Last updated:** 2026-05-28 (Step 3 summary UI redesigned: individual cards per section, two-column grid layout, wider page, button text simplified)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -117,6 +117,23 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-05-28 — Step 3 summary UI redesigned (user feedback during testing)
+
+Changes to `components/application-step3-summary.tsx` based on WJ feedback after testing at grant-pathway-three.vercel.app.
+
+**What changed:**
+- Page width widened from `max-w-[640px]` to `max-w-[960px]` with `sm:px-6` padding
+- Single large summary card replaced with individual cards per section, each with its own `rounded-xl border border-[#E2E8F0] bg-white p-5`
+- Cards arranged in a `grid grid-cols-1 gap-4 md:grid-cols-2` two-column grid:
+  - "About this grant" — always full width (`md:col-span-2`)
+  - "Grant amount" + "Who can apply" — side by side; Grant amount auto-expands to full width when Who can apply is absent
+  - "What the funder is looking for", "Application questions", "Key requirements" — all full width (`md:col-span-2`)
+- `Section` sub-component replaced with `CardTitle` (inline heading, no wrapper div)
+- Continue button text changed from "This looks right — continue" → "Continue"
+- Non-content states (loading, failure, no-guidelines) unchanged at `max-w-[640px]`
+
+---
 
 ### 2026-05-28 — S6.5: Q&A interface rewrite complete
 
