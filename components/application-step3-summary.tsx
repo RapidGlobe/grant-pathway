@@ -338,7 +338,7 @@ export function ApplicationStep3Summary({
   if (!summary) return null;
 
   return (
-    <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
+    <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={3} />
 
       <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
@@ -362,47 +362,62 @@ export function ApplicationStep3Summary({
         </div>
       )}
 
-      {/* AI summary content */}
-      <div className="mb-6 space-y-5 rounded-xl border border-[#E2E8F0] bg-white p-6">
-        <Section title="About this grant">
+      {/* AI summary content — individual cards in a 2-column grid */}
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+
+        {/* About this grant — full width */}
+        <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
+          <CardTitle>About this grant</CardTitle>
           <p className="text-[14px] text-[#374151]">{summary.aboutGrant}</p>
-        </Section>
+        </div>
 
-        <Section title="Grant amount">
+        {/* Grant amount — half width if Who can apply exists, full width otherwise */}
+        <div className={`rounded-xl border border-[#E2E8F0] bg-white p-5${!(summary.whoCanApply?.length > 0) ? " md:col-span-2" : ""}`}>
+          <CardTitle>Grant amount</CardTitle>
           <p className="text-[14px] text-[#374151]">{summary.amount}</p>
-        </Section>
+        </div>
 
+        {/* Who can apply — half width (conditional) */}
         {summary.whoCanApply?.length > 0 && (
-          <Section title="Who can apply">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
+            <CardTitle>Who can apply</CardTitle>
             <BulletList items={summary.whoCanApply} />
-          </Section>
+          </div>
         )}
 
+        {/* What the funder is looking for — full width */}
         {summary.lookingFor?.length > 0 && (
-          <Section title="What the funder is looking for">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
+            <CardTitle>What the funder is looking for</CardTitle>
             <BulletList items={summary.lookingFor} />
-          </Section>
+          </div>
         )}
 
+        {/* Application questions — full width */}
         {summary.questions?.length > 0 && (
-          <Section title="Application questions">
-            {summary.questions.map((q) => (
-              <div key={q.number} className="mb-2 last:mb-0">
-                <p className="text-[14px] text-[#374151]">
-                  <span className="font-medium">{q.number}.</span> {q.text}
-                  {q.wordLimit && (
-                    <span className="text-[#64748B]"> ({q.wordLimit} words)</span>
-                  )}
-                </p>
-              </div>
-            ))}
-          </Section>
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
+            <CardTitle>Application questions</CardTitle>
+            <div className="space-y-2">
+              {summary.questions.map((q) => (
+                <div key={q.number}>
+                  <p className="text-[14px] text-[#374151]">
+                    <span className="font-medium">{q.number}.</span> {q.text}
+                    {q.wordLimit && (
+                      <span className="text-[#64748B]"> ({q.wordLimit} words)</span>
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
 
+        {/* Key requirements — full width */}
         {summary.keyRequirements?.length > 0 && (
-          <Section title="Key requirements">
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
+            <CardTitle>Key requirements</CardTitle>
             <BulletList items={summary.keyRequirements} />
-          </Section>
+          </div>
         )}
       </div>
 
@@ -520,7 +535,7 @@ export function ApplicationStep3Summary({
           onClick={handleContinue}
           className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
         >
-          {isContinuing ? "Saving…" : "This looks right — continue"}
+          {isContinuing ? "Saving…" : "Continue"}
         </Button>
       </div>
     </div>
@@ -529,14 +544,11 @@ export function ApplicationStep3Summary({
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function CardTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div>
-      <h2 className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-[#64748B]">
-        {title}
-      </h2>
+    <h2 className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-[#64748B]">
       {children}
-    </div>
+    </h2>
   );
 }
 
