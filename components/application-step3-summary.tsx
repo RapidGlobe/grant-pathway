@@ -29,7 +29,7 @@
 
 import { useState, useEffect, useRef, useTransition } from "react";
 import Link from "next/link";
-import { RefreshCw, AlertCircle, AlertTriangle } from "lucide-react";
+import { RefreshCw, AlertCircle, AlertTriangle, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepIndicator } from "@/components/step-indicator";
 import { getGuidelines, clearGuidelines } from "@/lib/guidelines-session";
@@ -406,6 +406,46 @@ export function ApplicationStep3Summary({
         )}
       </div>
 
+      {/* Funder AI policy banner (S6.2) */}
+      {summary.funderAiPolicy && (
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4">
+          <Info
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#1D4ED8]"
+            aria-hidden="true"
+          />
+          <div>
+            <p className="mb-1 text-[13px] font-semibold text-[#1E40AF]">
+              This funder&apos;s guidance on AI
+            </p>
+            <p className="text-[13px] text-[#1E40AF]">{summary.funderAiPolicy}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Supporting documents aide-memoire (S6.2) */}
+      {summary.supportingDocuments && summary.supportingDocuments.length > 0 && (
+        <div className="mb-6 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+          <p className="mb-2 text-[13px] font-semibold text-[#1E293B]">
+            Documents you will need to submit with this application
+          </p>
+          <ul className="mb-2 space-y-1">
+            {summary.supportingDocuments.map((doc, i) => (
+              <li key={i} className="flex items-start gap-2 text-[13px] text-[#374151]">
+                <span
+                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#64748B]"
+                  aria-hidden="true"
+                />
+                {doc}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[12px] text-[#64748B]">
+            Gather these before you begin Step 4. Grant Pathway does not submit documents on your
+            behalf.
+          </p>
+        </div>
+      )}
+
       {/* Questions extracted / not found note */}
       {questionsFound ? (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
@@ -417,8 +457,21 @@ export function ApplicationStep3Summary({
           </span>
           <p className="text-[13px] text-[#065F46]">
             We found {summary.questions.length} application question
-            {summary.questions.length === 1 ? "" : "s"} in these guidelines. We&apos;ll use
-            these to generate your draft answers in the next step.
+            {summary.questions.length === 1 ? "" : "s"} in these guidelines. You&apos;ll answer
+            each one in the next step.
+          </p>
+        </div>
+      ) : summary.funder_type === "free_form" ? (
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
+          <span
+            className="mt-0.5 h-4 w-4 shrink-0 text-center text-[13px] font-bold leading-4 text-[#059669]"
+            aria-hidden="true"
+          >
+            ✓
+          </span>
+          <p className="text-[13px] text-[#065F46]">
+            This funder asks for a narrative document rather than answers to specific questions.
+            In the next step, you&apos;ll write your content section by section.
           </p>
         </div>
       ) : (
@@ -428,8 +481,8 @@ export function ApplicationStep3Summary({
             aria-hidden="true"
           />
           <p className="text-[13px] text-[#475569]">
-            We couldn&apos;t identify specific application questions in this document. In the next
-            step, you&apos;ll be able to enter your questions manually.
+            We couldn&apos;t identify specific application questions in this document. You&apos;ll
+            be able to enter them in the next step.
           </p>
         </div>
       )}

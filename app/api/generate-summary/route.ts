@@ -33,12 +33,14 @@ import { NextResponse, type NextRequest } from 'next/server'
 export const maxDuration = 90
 
 // Monthly AI request cap per user (ADR-AI-008, ADR-SEC-005)
-const MONTHLY_CAP = 20
-const APPROACHING_LIMIT_THRESHOLD = 16
+// Raised from 20 → 50 on 2026-05-28 to accommodate the Q&A model call pattern.
+const MONTHLY_CAP = 50
+const APPROACHING_LIMIT_THRESHOLD = 40
 
-// max_tokens reduced from spike value (1500) to improve response time while
-// still fitting a complete structured summary (P2.3 deviation note).
-const SUMMARY_MAX_TOKENS = 1200
+// Restored to spike value (1500): the four new S6.1 fields (funder_type,
+// funderAiPolicy, supportingDocuments, is_budget_question) add ~200–300 tokens
+// of output; 1200 would be tight for guidelines with many supporting documents.
+const SUMMARY_MAX_TOKENS = 1500
 
 export async function POST(request: NextRequest) {
   // ── 1. Authenticate ────────────────────────────────────────────────────────
@@ -263,13 +265,17 @@ export type AiSummaryQuestion = {
   number: number
   text: string
   wordLimit?: number
+  is_budget_question: boolean
 }
 
 export type AiSummaryData = {
+  funder_type: 'structured' | 'free_form'
   aboutGrant: string
   amount: string
   whoCanApply: string[]
   lookingFor: string[]
   questions: AiSummaryQuestion[]
   keyRequirements: string[]
+  funderAiPolicy?: string | null
+  supportingDocuments?: string[]
 }

@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (Step 4 redesign — Q&A model adopted; S6 tasks replaced; S6.1–S6.4 superseded; 8 new S6 tasks added)
+**Last updated:** 2026-05-28 (S6.1 + S6.2 complete — Step 3 prompt extended; funderAiPolicy banner + supportingDocuments section added to Step 3 UI)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **40** | **32** | **In progress** |
+| **Phase 4 — Vertical Slices** | **40** | **34** | **In progress** |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -87,9 +87,9 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **2** | In progress |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Database migration (4 new columns) | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Preparation checklist screen | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface | 1 | 0 | Not started |
@@ -112,7 +112,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **82** | **47** | |
+| **Total** | **82** | **49** | |
 
 ---
 

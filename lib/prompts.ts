@@ -55,19 +55,25 @@ export type CharityContext = {
 /**
  * Builds the user-turn message for the funder guidelines summary.
  *
- * Output schema: typed `AiSummaryData` structure (see components/
- * application-step3-summary.tsx). The field names in the JSON schema below
- * must stay in sync with `AiSummaryData`.
+ * Output schema: typed `AiSummaryData` (route.ts in generate-summary).
+ * Field names in the JSON schema below must stay in sync with that type.
  *
- * Charity context: included so Claude can flag whether the charity is likely
- * eligible and frame "who can apply" items relative to what the charity does.
- * This context is NOT used to generate draft answers (that happens in Step 4).
+ * Charity context: included so Claude can flag eligibility considerations.
+ * Not used to generate draft answers (that happens in Step 4).
  *
  * Question extraction rules:
- *   - Extract questions EXACTLY as written in the guidelines — do not paraphrase
- *   - Include wordLimit ONLY if a word count is explicitly stated in the text
+ *   - Extract questions EXACTLY as written — do not paraphrase
+ *   - Include wordLimit ONLY if an explicit word count is stated
  *   - Return an empty "questions" array if no specific questions are found
  *   - Do not invent or synthesise questions from generic grant-writing advice
+ *   - Set is_budget_question=true for any question about budget, income,
+ *     expenditure, financial projections, or funding breakdown
+ *
+ * funder_type classification:
+ *   - "structured": guidelines contain a numbered list of questions or a form
+ *     with discrete labelled fields
+ *   - "free_form": guidelines describe themes/sections to cover in a narrative
+ *     document; no numbered questions
  *
  * @param guidelinesText  Extracted text from the uploaded PDF or Word doc,
  *                        or the user's pasted text. May be very long.
@@ -89,6 +95,7 @@ Where they work: ${charity.whereCharityWorks}`
   return `Analyse the following funder guidelines and return a JSON object with exactly these fields:
 
 {
+  "funder_type": "structured",
   "aboutGrant": "2–3 sentences describing what this grant is for and who runs it",
   "amount": "The grant amount or funding range as stated in the guidelines. If not specified, write 'Not specified.'",
   "whoCanApply": [
@@ -103,23 +110,32 @@ Where they work: ${charity.whereCharityWorks}`
     {
       "number": 1,
       "text": "Exact question text as written in the guidelines",
-      "wordLimit": 400
+      "wordLimit": 400,
+      "is_budget_question": false
     }
   ],
   "keyRequirements": [
     "Key requirement or restriction 1",
     "Key requirement or restriction 2"
+  ],
+  "funderAiPolicy": null,
+  "supportingDocuments": [
+    "Document category 1",
+    "Document category 2"
   ]
 }
 
 Rules:
+- "funder_type": set to "structured" if the guidelines contain a numbered list of questions or a downloadable form with discrete labelled fields; set to "free_form" if the guidelines ask applicants to write a narrative document covering specified themes with no numbered questions
 - "aboutGrant": 2–3 sentences maximum; include the funder name and grant programme name if present
 - "whoCanApply": short bullet-point phrases; extract from eligibility criteria sections
 - "lookingFor": short bullet-point phrases; extract from priorities, themes, or funding focus sections
-- "questions": extract EXACTLY as written; include "wordLimit" only if an explicit word count is stated in the guidelines; if no specific application questions are found, return an empty array []
+- "questions": extract EXACTLY as written; include "wordLimit" only if an explicit word count is stated; set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown; if no specific application questions are found, return an empty array []
 - "keyRequirements": important restrictions, deadlines, geographic limits, exclusions
+- "funderAiPolicy": extract any statement the funder makes about AI tool usage (verbatim or very close paraphrase); return null if no AI policy statement is found
+- "supportingDocuments": list all supporting document categories the funder requires or recommends submitting alongside the application (e.g. "Most recent annual accounts", "Governing document / constitution"); return an empty array [] if none are mentioned
 - Use UK English spelling throughout
-- All arrays must have at least one item except "questions" which may be empty
+- All arrays must have at least one item except "questions" and "supportingDocuments" which may be empty
 
 ${charitySection}
 
