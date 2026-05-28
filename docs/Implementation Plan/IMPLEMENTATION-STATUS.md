@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (S6.4 complete — preparation checklist screen live; gates Step 4 on draft_status)
+**Last updated:** 2026-05-28 (S6.5 complete — Q&A interview UI live; blur auto-save, budget question cards, refine-answer integration point, Ready to assemble button)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **40** | **36** | **In progress** |
+| **Phase 4 — Vertical Slices** | **40** | **37** | **In progress** |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -87,12 +87,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **2** | In progress |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **5** | In progress |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Database migration (4 new columns) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Preparation checklist screen | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.6 — Per-question refine-answer API route | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.7 — Senior review prompt + assembly API route | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.8 — Step 5 export updated (read from assembled_draft) | 1 | 0 | Not started |
@@ -112,11 +112,34 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **82** | **51** | |
+| **Total** | **82** | **52** | |
 
 ---
 
 ## Notes
+
+### 2026-05-28 — S6.5: Q&A interface rewrite complete
+
+Full rewrite of `components/application-step4-draft.tsx` and update to `app/(authenticated)/applications/[id]/step/4/page.tsx`.
+
+**What changed:**
+- Removed AI-on-load model entirely (no `/api/generate-draft` call, no loading state)
+- Budget question cards: amber background (`border-[#FDE68A] bg-[#FFFBEB]`), "Budget" badge, AI assist disabled with accuracy warning
+- Standard question cards: white, with "Help me improve this" button (Sparkles) — wired to `/api/refine-answer` (S6.6 integration point; returns error until S6.6 is implemented)
+- Refine-answer flow: loading → blue suggestion card with "Use this version" / "Keep my original"
+- "Use this version" saves with `answer_source = 'user_edited'`; all other saves use `'user_written'`
+- Auto-save on textarea blur + 60-second background sweep for dirty answers
+- Progress bar: X of Y questions answered; "Ready to assemble" button enabled only when all answered
+- `setDraftReadyToAssemble` server action added: sets `draft_status = 'ready_to_assemble'`, advances `current_step` to 5 (never regresses), redirects to Step 5
+- `funder_type` extracted from ai_summary and passed as `funderType` prop (used in S6.7 assembly)
+- `is_budget_question` now populated on insert from `summary.questions[n].is_budget_question`
+- `hasExistingAnswers` prop removed (no longer needed — no AI-on-load gating)
+- Layout narrowed from `max-w-[980px]` + sidebar to `max-w-[640px]` single column (sidebar removed)
+- `tsc --noEmit` clean after all changes
+
+**S6 subtotal correction:** Summary row was showing "2 done" but S6.1–S6.4 were all ✅. Corrected to "5 done" (S6.1–S6.5).
+
+---
 
 ### 2026-05-28 — Step 4 redesign: Q&A model adopted; S6 tasks replaced
 

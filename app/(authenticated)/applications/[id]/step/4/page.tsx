@@ -43,14 +43,28 @@ export default async function Step4Page({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // getApplicationOrRedirect already redirects unauthenticated users — this
-  // is a type-safety guard only
+  // getApplicationOrRedirect already redirects unauthenticated users — type guard only
   if (!user) return null
+
+  // ── Parse ai_summary once — used for both funder_type and question population ──
+  let funderType: 'structured' | 'free_form' = 'structured'
+  let parsedSummary: AiSummaryData | null = null
+
+  if (aiSummary) {
+    try {
+      parsedSummary = JSON.parse(aiSummary) as AiSummaryData
+      funderType = parsedSummary.funder_type ?? 'structured'
+    } catch {
+      // ai_summary parse failed — funderType stays 'structured'
+    }
+  }
 
   // ── S6.1: Fetch existing question rows ────────────────────────────────────
   const { data: existingRows } = await supabase
     .from('application_answers')
-    .select('id, question_text, question_order, word_limit, answer_text, answer_source')
+    .select(
+      'id, question_text, question_order, word_limit, answer_text, answer_source, is_budget_question',
+    )
     .eq('application_id', id)
     .eq('user_id', user.id)
     .order('question_order')
@@ -58,17 +72,16 @@ export default async function Step4Page({ params }: Props) {
   let questionRows = existingRows ?? []
 
   // ── S6.1: Populate from ai_summary if no rows exist yet ──────────────────
-  if (questionRows.length === 0 && aiSummary) {
+  if (questionRows.length === 0 && parsedSummary) {
     try {
-      const summary = JSON.parse(aiSummary) as AiSummaryData
-
-      if (Array.isArray(summary.questions) && summary.questions.length > 0) {
-        const inserts = summary.questions.map((q, idx) => ({
+      if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
+        const inserts = parsedSummary.questions.map((q, idx) => ({
           application_id: id,
           user_id: user.id,
           question_text: q.text,
           question_order: q.number ?? idx + 1,
           word_limit: q.wordLimit ?? null,
+          is_budget_question: q.is_budget_question ?? false,
         }))
 
         // ON CONFLICT DO NOTHING — returning to Step 4 never overwrites rows
@@ -78,19 +91,16 @@ export default async function Step4Page({ params }: Props) {
             onConflict: 'application_id,question_order',
             ignoreDuplicates: true,
           })
-          .select('id, question_text, question_order, word_limit, answer_text, answer_source')
+          .select(
+            'id, question_text, question_order, word_limit, answer_text, answer_source, is_budget_question',
+          )
 
         questionRows = inserted ?? []
       }
     } catch {
-      // ai_summary parse failed — questionRows stays empty (manual entry path)
+      // question population failed — questionRows stays empty (manual entry path)
     }
   }
-
-  // ── Determine whether answers already exist (skip AI generation) ──────────
-  const hasExistingAnswers = questionRows.some(
-    (row) => typeof row.answer_text === 'string' && row.answer_text.trim() !== '',
-  )
 
   // ── AI usage state for limit / approaching-limit banners ──────────────────
   const startOfMonth = new Date()
@@ -115,13 +125,14 @@ export default async function Step4Page({ params }: Props) {
     wordLimit: (row.word_limit as number | null) ?? null,
     answerText: (row.answer_text as string | null) ?? null,
     answerSource: (row.answer_source as QuestionRow['answerSource']) ?? null,
+    isBudgetQuestion: (row.is_budget_question as boolean) ?? false,
   }))
 
   return (
     <ApplicationStep4Draft
       applicationId={id}
       questions={questions}
-      hasExistingAnswers={hasExistingAnswers}
+      funderType={funderType}
       approachingLimit={approachingLimit}
       limitReached={limitReached}
     />

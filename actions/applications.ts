@@ -422,7 +422,62 @@ export async function saveManualAnswer(
 }
 
 // ---------------------------------------------------------------------------
-// S6.4 — Advance to Step 5
+// S6.5 — Mark draft ready to assemble
+// ---------------------------------------------------------------------------
+
+/**
+ * Called when the user clicks "Ready to assemble" on Step 4 (all questions
+ * answered). Sets draft_status = 'ready_to_assemble', advances current_step
+ * to 5 (never regresses), and redirects to Step 5.
+ *
+ * S6.7 will later intercept the 'ready_to_assemble' state to run assembly
+ * before the user reaches Step 5. For now the redirect goes straight to Step 5.
+ */
+export async function setDraftReadyToAssemble(
+  applicationId: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  try {
+    const { data: existing } = await supabase
+      .from('applications')
+      .select('current_step')
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+      .single()
+
+    const newStep = Math.max(existing?.current_step ?? 4, 5)
+
+    const { error } = await supabase
+      .from('applications')
+      .update({
+        draft_status: 'ready_to_assemble',
+        current_step: newStep,
+      })
+      .eq('id', applicationId)
+      .eq('user_id', user.id)
+
+    if (error) {
+      return { ok: false, error: 'Could not save your progress. Please try again.' }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: 'Could not reach the server. Please check your connection and try again.',
+    }
+  }
+
+  redirect(`/applications/${applicationId}/step/5`)
+}
+
+// ---------------------------------------------------------------------------
+// S6.4 — Advance to Step 5 (legacy — superseded by setDraftReadyToAssemble)
 // ---------------------------------------------------------------------------
 
 /**
