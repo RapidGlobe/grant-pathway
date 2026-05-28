@@ -294,6 +294,42 @@ export async function advanceToStep4(
 }
 
 // ---------------------------------------------------------------------------
+// S6.4 — Set draft_status to 'in_progress' (preparation checklist confirmed)
+// ---------------------------------------------------------------------------
+
+/**
+ * Called when the user clicks "I have what I need — start writing" on the
+ * Step 4 preparation checklist. Sets draft_status = 'in_progress' so the
+ * checklist is not shown again on return visits (AC-FR-28-02).
+ *
+ * Redirects back to Step 4 on success so the page re-renders showing the
+ * Q&A interface instead of the preparation checklist.
+ */
+export async function setDraftInProgress(
+  applicationId: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  const { error } = await supabase
+    .from('applications')
+    .update({ draft_status: 'in_progress' })
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { ok: false, error: 'Could not save your progress. Please try again.' }
+  }
+
+  redirect(`/applications/${applicationId}/step/4`)
+}
+
+// ---------------------------------------------------------------------------
 // S6.3 — Save answer (auto-save and manual save from Step 4)
 // ---------------------------------------------------------------------------
 

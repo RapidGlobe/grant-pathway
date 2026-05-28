@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { ApplicationStep4Draft, type QuestionRow } from '@/components/application-step4-draft'
+import { ApplicationStep4PrepChecklist } from '@/components/application-step4-prep-checklist'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
@@ -13,23 +14,29 @@ interface Props {
 }
 
 /**
- * Step 4 — Draft Answers (S6.1–S6.4).
+ * Step 4 — Q&A Interview (S6.1–S6.8).
  *
  * getApplicationOrRedirect(id, 4) enforces step locking.
+ *
+ * S6.4 — Preparation checklist gate: if draft_status = 'not_started', the
+ * preparation checklist is shown instead of the Q&A interface. The checklist
+ * sets draft_status = 'in_progress' on confirm, then redirects here so the
+ * page re-renders showing the Q&A interface (AC-FR-28-01, AC-FR-28-02).
  *
  * S6.1 — Question population: if no application_answers rows exist yet,
  * creates them from the questions extracted in the ai_summary JSON. Uses
  * ON CONFLICT DO NOTHING so returning to Step 4 never overwrites answers.
- *
- * Passes pre-fetched questions and answers to the component so it can
- * immediately show the content state if answers already exist (returning
- * user), or trigger AI generation if they don't (first visit).
  */
 export default async function Step4Page({ params }: Props) {
   const { id } = await params
 
   // Step locking: redirects to current step if current_step < 4
-  const { aiSummary } = await getApplicationOrRedirect(id, 4)
+  const { aiSummary, draftStatus } = await getApplicationOrRedirect(id, 4)
+
+  // S6.4 — Show preparation checklist on first visit (AC-FR-28-01)
+  if (draftStatus === 'not_started') {
+    return <ApplicationStep4PrepChecklist applicationId={id} />
+  }
 
   const supabase = await createClient()
   const {
@@ -97,8 +104,8 @@ export default async function Step4Page({ params }: Props) {
     .gte('created_at', startOfMonth.toISOString())
 
   const currentUsage = usageCount ?? 0
-  const approachingLimit = currentUsage >= 16
-  const limitReached = currentUsage >= 20
+  const approachingLimit = currentUsage >= 40
+  const limitReached = currentUsage >= 50
 
   // ── Map DB rows to component props ────────────────────────────────────────
   const questions: QuestionRow[] = questionRows.map((row) => ({

@@ -7,12 +7,20 @@ export type ApplicationStatus =
   | 'approved'
   | 'exported'
 
+export type DraftStatus =
+  | 'not_started'
+  | 'in_progress'
+  | 'ready_to_assemble'
+  | 'assembled'
+  | 'exported'
+
 export type ApplicationData = {
   funderName: string
   grantName: string
   status: ApplicationStatus
   currentStep: number
   aiSummary: string | null
+  draftStatus: DraftStatus
 }
 
 /**
@@ -48,7 +56,7 @@ export async function getApplicationOrRedirect(
 
   const { data, error } = await supabase
     .from('applications')
-    .select('funder_name, grant_name, status, current_step, ai_summary')
+    .select('funder_name, grant_name, status, current_step, ai_summary, draft_status')
     .eq('id', applicationId)
     .eq('user_id', user.id)
     .single()
@@ -66,5 +74,6 @@ export async function getApplicationOrRedirect(
     status: data.status as ApplicationStatus,
     currentStep: data.current_step,
     aiSummary: data.ai_summary ?? null,
+    draftStatus: (data.draft_status ?? 'not_started') as DraftStatus,
   }
 }
