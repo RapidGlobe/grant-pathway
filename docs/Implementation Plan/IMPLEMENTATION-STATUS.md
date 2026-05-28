@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (Step 3: heading highlights + supporting docs removed; advanceToStep4 bug fix so prep checklist always shows on Step 3 → Step 4 navigation)
+**Last updated:** 2026-05-28 (Step 4 section-by-section redesign: AiSummarySection type + sections[] field; sections extracted by AI for free_form funders; Step 3 shows Application Sections card; Step 4 rebuilt with wider layout, teal funder context bar, sticky progress bar, guidance notes per section; assembleAndAdvance format is funder-type-aware)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
