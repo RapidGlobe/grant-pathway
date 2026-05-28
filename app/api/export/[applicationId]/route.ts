@@ -77,6 +77,28 @@ function hrParagraph(): Paragraph {
   })
 }
 
+/**
+ * Parses the assembled_draft text (produced by assembleAndAdvance) into
+ * sections. Each section has a heading (the question line, e.g. "1. Question")
+ * and body (the answer text). Sections are separated by "\n\n---\n\n".
+ */
+type DraftSection = { heading: string; body: string }
+
+function parseAssembledDraft(text: string): DraftSection[] {
+  if (!text.trim()) return []
+  return text
+    .split('\n\n---\n\n')
+    .map((block) => {
+      const idx = block.indexOf('\n\n')
+      if (idx === -1) return { heading: block.trim(), body: '' }
+      return {
+        heading: block.slice(0, idx).trim(),
+        body: block.slice(idx + 2).trim(),
+      }
+    })
+    .filter((s) => s.heading)
+}
+
 // ---------------------------------------------------------------------------
 // Route handler
 // ---------------------------------------------------------------------------
@@ -103,7 +125,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   // ── Fetch application (ownership check via user_id) ─────────────────────
   const { data: application, error: appError } = await supabase
     .from('applications')
-    .select('id, funder_name, grant_name, status')
+    .select('id, funder_name, grant_name, status, assembled_draft')
     .eq('id', applicationId)
     .eq('user_id', user.id)
     .single()
@@ -155,6 +177,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const exportDate = formatDate(new Date())
   const funderName = application.funder_name as string
   const grantName = application.grant_name as string
+  const assembledDraft = (application.assembled_draft as string | null) ?? null
+
+  const disclaimer = `Disclaimer: This application was drafted with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`
+  const safeName = grantName.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '_')
 
   // ── Plain text export ──────────────────────────────────────────────────────
   if (format === 'txt') {
@@ -163,31 +189,31 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     lines.push(`Prepared for: ${funderName}`)
     lines.push(`Date: ${exportDate}`)
     lines.push('')
-    lines.push(
-      `Disclaimer: This application was drafted with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`,
-    )
+    lines.push(disclaimer)
     lines.push('')
     lines.push('─'.repeat(72))
     lines.push('')
 
-    for (const answer of answers) {
-      const qNum = answer.question_order as number
-      const qText = (answer.question_text as string) ?? ''
-      const aText = (answer.answer_text as string) ?? ''
-      lines.push(`Question ${qNum}: ${qText}`)
-      lines.push('')
-      lines.push(aText || '[No answer provided]')
-      lines.push('')
-      lines.push('─'.repeat(72))
-      lines.push('')
+    if (assembledDraft) {
+      lines.push(assembledDraft)
+    } else {
+      for (const answer of answers) {
+        const qNum = answer.question_order as number
+        const qText = (answer.question_text as string) ?? ''
+        const aText = (answer.answer_text as string) ?? ''
+        lines.push(`Question ${qNum}: ${qText}`)
+        lines.push('')
+        lines.push(aText || '[No answer provided]')
+        lines.push('')
+        lines.push('─'.repeat(72))
+        lines.push('')
+      }
     }
 
+    lines.push('')
     lines.push('Prepared using Grant Pathway v1 — grantpathway.org.uk')
 
-    const txtContent = lines.join('\n')
-    const safeName = grantName.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '_')
-
-    return new Response(txtContent, {
+    return new Response(lines.join('\n'), {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Content-Disposition': `attachment; filename="${safeName}_Application.txt"`,
@@ -284,7 +310,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             spacing: { after: 240 },
             children: [
               new TextRun({
-                text: `Disclaimer: This application was drafted with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`,
+                text: disclaimer,
                 italics: true,
                 font: 'Calibri',
                 size: pt(10),
@@ -293,41 +319,65 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             ],
           }),
 
-          // ── Q&A ────────────────────────────────────────────────────────────
-          ...answers.flatMap((answer) => {
-            const qNum = answer.question_order as number
-            const qText = (answer.question_text as string) ?? ''
-            const aText = (answer.answer_text as string) ?? ''
-
-            return [
-              // Question heading
-              new Paragraph({
-                spacing: { before: 320, after: 120 },
-                children: [
-                  new TextRun({
-                    text: `Question ${qNum}: ${qText}`,
-                    bold: true,
-                    font: 'Calibri',
-                    size: pt(14),
-                    underline: { type: UnderlineType.SINGLE },
+          // ── Q&A (from assembled_draft if available, else from answer rows) ─
+          ...(assembledDraft
+            ? parseAssembledDraft(assembledDraft).flatMap(({ heading, body }) => [
+                new Paragraph({
+                  spacing: { before: 320, after: 120 },
+                  children: [
+                    new TextRun({
+                      text: heading,
+                      bold: true,
+                      font: 'Calibri',
+                      size: pt(14),
+                      underline: { type: UnderlineType.SINGLE },
+                    }),
+                  ],
+                }),
+                new Paragraph({
+                  spacing: { after: 200 },
+                  children: [
+                    new TextRun({
+                      text: body || '[No answer provided]',
+                      font: 'Calibri',
+                      size: pt(11),
+                      color: body ? '000000' : '888888',
+                      italics: !body,
+                    }),
+                  ],
+                }),
+              ])
+            : answers.flatMap((answer) => {
+                const qNum = answer.question_order as number
+                const qText = (answer.question_text as string) ?? ''
+                const aText = (answer.answer_text as string) ?? ''
+                return [
+                  new Paragraph({
+                    spacing: { before: 320, after: 120 },
+                    children: [
+                      new TextRun({
+                        text: `Question ${qNum}: ${qText}`,
+                        bold: true,
+                        font: 'Calibri',
+                        size: pt(14),
+                        underline: { type: UnderlineType.SINGLE },
+                      }),
+                    ],
                   }),
-                ],
-              }),
-              // Answer
-              new Paragraph({
-                spacing: { after: 200 },
-                children: [
-                  new TextRun({
-                    text: aText || '[No answer provided]',
-                    font: 'Calibri',
-                    size: pt(11),
-                    color: aText ? '000000' : '888888',
-                    italics: !aText,
+                  new Paragraph({
+                    spacing: { after: 200 },
+                    children: [
+                      new TextRun({
+                        text: aText || '[No answer provided]',
+                        font: 'Calibri',
+                        size: pt(11),
+                        color: aText ? '000000' : '888888',
+                        italics: !aText,
+                      }),
+                    ],
                   }),
-                ],
-              }),
-            ]
-          }),
+                ]
+              })),
 
           // ── End spacer ────────────────────────────────────────────────────
           new Paragraph({ spacing: { before: 480 } }),
@@ -337,7 +387,6 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   })
 
   const buffer = await Packer.toBuffer(doc)
-  const safeName = grantName.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '_')
 
   // Convert Buffer → Uint8Array for BodyInit compatibility
   return new Response(new Uint8Array(buffer), {

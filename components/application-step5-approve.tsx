@@ -36,6 +36,7 @@ interface ApplicationStep5ApproveProps {
   grantName: string
   status: ApplicationStatus
   answers: AnswerRow[]
+  assembledDraft: string | null
   lastExportedAt: string | null
 }
 
@@ -100,6 +101,7 @@ export function ApplicationStep5Approve({
   grantName,
   status,
   answers,
+  assembledDraft,
   lastExportedAt,
 }: ApplicationStep5ApproveProps) {
   const router = useRouter()
@@ -290,69 +292,89 @@ export function ApplicationStep5Approve({
         </div>
       )}
 
-      {/* ── Read-only answers ─────────────────────────────────────────────── */}
-      <div className="mb-8 space-y-5">
-        {answers.length === 0 ? (
-          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 text-center text-[14px] text-[#64748B]">
-            No answers found for this application.
-          </div>
-        ) : (
-          answers.map((answer) => {
-            const wordCount = countWords(answer.answerText)
-            const overLimit = answer.wordLimit !== null && wordCount > answer.wordLimit
-            const badge = sourceBadge(answer.answerSource)
-
-            return (
-              <div
-                key={answer.id}
-                className="rounded-xl border border-[#E2E8F0] bg-white p-5"
-              >
-                {/* Question header */}
-                <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-                  <p className="text-[14px] font-semibold text-[#1E293B]">
-                    {answer.questionOrder}.&nbsp;{answer.questionText}
-                  </p>
-                  <div className="flex shrink-0 items-center gap-2">
-                    {badge && (
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.className}`}
-                      >
-                        {badge.label}
-                      </span>
-                    )}
-                    {answer.wordLimit !== null && (
-                      <span
-                        className={`text-[12px] font-medium ${
-                          overLimit
-                            ? 'text-[#DC2626]'
-                            : 'text-[#64748B]'
-                        }`}
-                      >
-                        {wordCount} / {answer.wordLimit} words
-                      </span>
+      {/* ── Read-only content ─────────────────────────────────────────────── */}
+      <div className="mb-8">
+        {assembledDraft ? (
+          // Assembled draft view — shown for Q&A model applications (S6.8)
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-6">
+            <p className="mb-4 text-[12px] font-semibold uppercase tracking-wide text-[#64748B]">
+              Assembled draft
+            </p>
+            {assembledDraft
+              .split('\n\n---\n\n')
+              .map((block, i) => {
+                const newlineIdx = block.indexOf('\n\n')
+                const heading = newlineIdx === -1 ? block.trim() : block.slice(0, newlineIdx).trim()
+                const body = newlineIdx === -1 ? '' : block.slice(newlineIdx + 2).trim()
+                return (
+                  <div key={i} className={i > 0 ? 'mt-6 border-t border-[#F1F5F9] pt-6' : ''}>
+                    <p className="mb-2 text-[14px] font-semibold text-[#1E293B]">{heading}</p>
+                    {body && (
+                      <p className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#374151]">
+                        {body}
+                      </p>
                     )}
                   </div>
-                </div>
-
-                {/* Answer text */}
-                <p
-                  className={`whitespace-pre-wrap text-[14px] leading-relaxed ${
-                    answer.answerText ? 'text-[#374151]' : 'italic text-[#94A3B8]'
-                  }`}
-                >
-                  {answer.answerText || 'No answer provided.'}
-                </p>
-
-                {/* Over-limit warning */}
-                {overLimit && (
-                  <p className="mt-2 flex items-center gap-1 text-[12px] text-[#DC2626]">
-                    <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
-                    Answer exceeds the word limit.
-                  </p>
-                )}
+                )
+              })}
+          </div>
+        ) : (
+          // Individual answer cards — shown for legacy applications (old AI-on-load model)
+          <div className="space-y-5">
+            {answers.length === 0 ? (
+              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 text-center text-[14px] text-[#64748B]">
+                No answers found for this application.
               </div>
-            )
-          })
+            ) : (
+              answers.map((answer) => {
+                const wordCount = countWords(answer.answerText)
+                const overLimit = answer.wordLimit !== null && wordCount > answer.wordLimit
+                const badge = sourceBadge(answer.answerSource)
+
+                return (
+                  <div
+                    key={answer.id}
+                    className="rounded-xl border border-[#E2E8F0] bg-white p-5"
+                  >
+                    <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                      <p className="text-[14px] font-semibold text-[#1E293B]">
+                        {answer.questionOrder}.&nbsp;{answer.questionText}
+                      </p>
+                      <div className="flex shrink-0 items-center gap-2">
+                        {badge && (
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.className}`}
+                          >
+                            {badge.label}
+                          </span>
+                        )}
+                        {answer.wordLimit !== null && (
+                          <span
+                            className={`text-[12px] font-medium ${overLimit ? 'text-[#DC2626]' : 'text-[#64748B]'}`}
+                          >
+                            {wordCount} / {answer.wordLimit} words
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <p
+                      className={`whitespace-pre-wrap text-[14px] leading-relaxed ${
+                        answer.answerText ? 'text-[#374151]' : 'italic text-[#94A3B8]'
+                      }`}
+                    >
+                      {answer.answerText || 'No answer provided.'}
+                    </p>
+                    {overLimit && (
+                      <p className="mt-2 flex items-center gap-1 text-[12px] text-[#DC2626]">
+                        <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+                        Answer exceeds the word limit.
+                      </p>
+                    )}
+                  </div>
+                )
+              })
+            )}
+          </div>
         )}
       </div>
 

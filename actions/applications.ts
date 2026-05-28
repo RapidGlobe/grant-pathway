@@ -668,7 +668,12 @@ export type ReopenApplicationResult =
  * Re-opens an approved or exported application:
  *   1. Sets applications.status = 'in_progress'
  *   2. Sets applications.current_step = 4 (Draft Answers)
- *   3. Resets is_approved = false on all application_answers rows
+ *   3. Resets draft_status = 'in_progress' (clears 'assembled' / 'ready_to_assemble')
+ *   4. Clears assembled_draft (will be regenerated when user re-assembles)
+ *   5. Resets is_approved = false on all application_answers rows
+ *
+ * draft_status must be reset so the Step 4 gate shows the Q&A interface
+ * rather than immediately redirecting back to Step 5 (S6.8 gate fix).
  *
  * The client redirects to Step 4 after receiving { ok: true }.
  * updated_at is managed by the database trigger on both tables.
@@ -684,12 +689,14 @@ export async function reopenApplication(
 
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
-  // 1. Update application status and step
+  // 1. Update application status, step, and draft state
   const { error: appError } = await supabase
     .from('applications')
     .update({
       status: 'in_progress',
       current_step: 4,
+      draft_status: 'in_progress',
+      assembled_draft: null,
     })
     .eq('id', applicationId)
     .eq('user_id', user.id)

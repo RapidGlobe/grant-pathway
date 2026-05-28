@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (S6.7 complete — senior review screen + assembleAndAdvance action; draft assembled to assembled_draft column, advances to Step 5)
+**Last updated:** 2026-05-28 (S6.8 complete — S6 redesign fully done; export route reads assembled_draft, Step 5 shows assembled view, reopenApplication resets draft state)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **40** | **39** | **In progress** |
+| **Phase 4 — Vertical Slices** | **40** | **40** | **✅ Complete** |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -87,7 +87,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **7** | In progress |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **8** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Database migration (4 new columns) | 1 | 1 | ✅ Complete |
@@ -95,7 +95,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.6 — Per-question refine-answer API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S6.7 — Senior review prompt + assembly API route | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.8 — Step 5 export updated (read from assembled_draft) | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.8 — Step 5 export updated (read from assembled_draft) | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export** | **3** | **3** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 1 | ✅ Complete |
@@ -104,7 +104,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 1 | ✅ Complete |
-| **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off (held open pending S6 redesign completion) |
+| **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off |
 | **Phase 5 — Pre-Launch** | **6** | **0** | Not started |
 | &nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
@@ -112,7 +112,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **82** | **54** | |
+| **Total** | **82** | **55** | |
 
 ---
 

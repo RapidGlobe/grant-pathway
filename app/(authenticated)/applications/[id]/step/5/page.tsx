@@ -34,15 +34,16 @@ export default async function Step5Page({ params }: Props) {
   // getApplicationOrRedirect already redirects unauthenticated users
   if (!user) return null
 
-  // ── Fetch last_exported_at separately (not in ApplicationData type) ────────
+  // ── Fetch last_exported_at and assembled_draft (not in ApplicationData type)
   const { data: appRow } = await supabase
     .from('applications')
-    .select('last_exported_at')
+    .select('last_exported_at, assembled_draft')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
   const lastExportedAt = (appRow?.last_exported_at as string | null) ?? null
+  const assembledDraft = (appRow?.assembled_draft as string | null) ?? null
 
   // ── Fetch answers for review ───────────────────────────────────────────────
   const { data: answerRows } = await supabase
@@ -68,6 +69,7 @@ export default async function Step5Page({ params }: Props) {
       grantName={grantName}
       status={status}
       answers={answers}
+      assembledDraft={assembledDraft}
       lastExportedAt={lastExportedAt}
     />
   )
