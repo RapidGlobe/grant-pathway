@@ -79,6 +79,9 @@ export function ApplicationStep3Summary({
     if (!existingSummary) return false;
     try {
       const parsed = JSON.parse(existingSummary) as AiSummaryData;
+      if (parsed.funder_type === "free_form") {
+        return Array.isArray(parsed.sections) && parsed.sections.length > 0;
+      }
       return Array.isArray(parsed.questions) && parsed.questions.length > 0;
     } catch {
       return false;
@@ -393,8 +396,8 @@ export function ApplicationStep3Summary({
           </div>
         )}
 
-        {/* Application questions — full width */}
-        {summary.questions?.length > 0 && (
+        {/* Application questions — structured funders only */}
+        {summary.funder_type !== "free_form" && summary.questions?.length > 0 && (
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
             <CardTitle>Application questions</CardTitle>
             <div className="space-y-2">
@@ -404,6 +407,25 @@ export function ApplicationStep3Summary({
                     <span className="font-medium">{q.number}.</span> {q.text}
                     {q.wordLimit && (
                       <span className="text-[#64748B]"> ({q.wordLimit} words)</span>
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Application sections — free_form funders only */}
+        {summary.funder_type === "free_form" && summary.sections && summary.sections.length > 0 && (
+          <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
+            <CardTitle>Application sections</CardTitle>
+            <div className="space-y-2">
+              {summary.sections.map((s) => (
+                <div key={s.number}>
+                  <p className="text-[14px] text-[#374151]">
+                    <span className="font-medium">{s.number}.</span> {s.title}
+                    {s.wordLimit && (
+                      <span className="text-[#64748B]"> ({s.wordLimit} words)</span>
                     )}
                   </p>
                 </div>
@@ -437,7 +459,7 @@ export function ApplicationStep3Summary({
         </div>
       )}
 
-      {/* Questions extracted / not found note */}
+      {/* Questions / sections extracted note */}
       {questionsFound ? (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
           <span
@@ -447,22 +469,30 @@ export function ApplicationStep3Summary({
             ✓
           </span>
           <p className="text-[13px] text-[#065F46]">
-            We found {summary.questions.length} application question
-            {summary.questions.length === 1 ? "" : "s"} in these guidelines. You&apos;ll answer
-            each one in the next step.
+            {summary.funder_type === "free_form" ? (
+              <>
+                We identified {summary.sections?.length ?? 0} section
+                {(summary.sections?.length ?? 0) === 1 ? "" : "s"} to complete. In the next step,
+                you&apos;ll write your content section by section.
+              </>
+            ) : (
+              <>
+                We found {summary.questions.length} application question
+                {summary.questions.length === 1 ? "" : "s"} in these guidelines. You&apos;ll
+                answer each one in the next step.
+              </>
+            )}
           </p>
         </div>
       ) : summary.funder_type === "free_form" ? (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
-          <span
-            className="mt-0.5 h-4 w-4 shrink-0 text-center text-[13px] font-bold leading-4 text-[#059669]"
+        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+          <AlertTriangle
+            className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
             aria-hidden="true"
-          >
-            ✓
-          </span>
-          <p className="text-[13px] text-[#065F46]">
-            This funder asks for a narrative document rather than answers to specific questions.
-            In the next step, you&apos;ll write your content section by section.
+          />
+          <p className="text-[13px] text-[#475569]">
+            This funder asks for a narrative document. We couldn&apos;t identify specific
+            sections — you&apos;ll be able to enter your content in the next step.
           </p>
         </div>
       ) : (

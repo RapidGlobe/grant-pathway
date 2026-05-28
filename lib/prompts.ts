@@ -114,6 +114,15 @@ Where they work: ${charity.whereCharityWorks}`
       "is_budget_question": false
     }
   ],
+  "sections": [
+    {
+      "number": 1,
+      "title": "About your organisation",
+      "guidance": "2–3 sentences telling the applicant what to include in this section, derived from the funder's instructions.",
+      "wordLimit": 300,
+      "is_budget_section": false
+    }
+  ],
   "keyRequirements": [
     "Key requirement or restriction 1",
     "Key requirement or restriction 2"
@@ -130,12 +139,13 @@ Rules:
 - "aboutGrant": 2–3 sentences maximum; include the funder name and grant programme name if present
 - "whoCanApply": short bullet-point phrases; extract from eligibility criteria sections
 - "lookingFor": short bullet-point phrases; extract from priorities, themes, or funding focus sections
-- "questions": extract EXACTLY as written; include "wordLimit" only if an explicit word count is stated; set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown; if no specific application questions are found, return an empty array []
+- "questions": ONLY populate for structured funders; return an empty array [] for free_form funders. Extract questions EXACTLY as written; include "wordLimit" only if an explicit word count is stated; set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown
+- "sections": ONLY populate for free_form funders; return an empty array [] for structured funders. For each narrative theme or section heading the funder asks applicants to cover, provide: "title" (as stated in the guidelines or a clear paraphrase), "guidance" (2–3 sentences telling the applicant what to include, derived from the funder's instructions), "wordLimit" only if explicitly stated, and "is_budget_section": true if the section covers budget, finances, income, expenditure, or funding breakdown. Number sections sequentially starting at 1.
 - "keyRequirements": important restrictions, deadlines, geographic limits, exclusions
 - "funderAiPolicy": extract any statement the funder makes about AI tool usage (verbatim or very close paraphrase); return null if no AI policy statement is found
 - "supportingDocuments": list all supporting document categories the funder requires or recommends submitting alongside the application (e.g. "Most recent annual accounts", "Governing document / constitution"); return an empty array [] if none are mentioned
 - Use UK English spelling throughout
-- All arrays must have at least one item except "questions" and "supportingDocuments" which may be empty
+- All arrays must have at least one item except "questions", "sections", and "supportingDocuments" which may be empty
 
 ${charitySection}
 

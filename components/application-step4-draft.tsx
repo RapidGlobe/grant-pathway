@@ -1,17 +1,17 @@
 'use client'
 
-// Step 4 — Q&A Interview (S6.1–S6.8)
+// Step 4 — Draft Answers (S6.1–S6.8)
 //
-// Charity-authored Q&A model: the user writes every answer; AI assists
-// only on request via the per-question "Help me improve this" button (S6.6).
+// Supports two modes driven by funder_type from ai_summary:
+//   free_form  — section-by-section narrative interface (Option B design)
+//   structured — numbered Q&A interview
 //
-// Auto-save: triggers on textarea blur + 60-second background sweep for
-// any answers dirtied but not yet blurred (e.g. tab-close safety net).
+// Both modes share: sticky progress bar, funder context bar, wider layout,
+// auto-save on blur, 60-second background sweep, and AI refine assist.
 //
-// answer_source tracking:
-//   'user_written' — user typed the answer without AI help
-//   'user_edited'  — user accepted an AI-refined version via "Use this version"
-//   'ai_generated' — set by /api/generate-draft only (not used in this flow)
+// Charity-authored model: the charity writes all content; AI assists only
+// on request via "Help me improve this" (S6.6). Budget sections are blocked
+// from AI assistance at the UI level.
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
@@ -35,6 +35,7 @@ export type QuestionRow = {
   answerText: string | null
   answerSource: 'ai_generated' | 'user_edited' | 'user_written' | null
   isBudgetQuestion: boolean
+  guidance: string | null
 }
 
 type RefineState =
@@ -47,6 +48,8 @@ interface ApplicationStep4DraftProps {
   applicationId: string
   questions: QuestionRow[]
   funderType: 'structured' | 'free_form'
+  funderName: string
+  grantName: string
   approachingLimit: boolean
   limitReached: boolean
 }
@@ -66,16 +69,16 @@ function countWords(text: string): number {
 export function ApplicationStep4Draft({
   applicationId,
   questions,
-  funderType: _funderType,
+  funderType,
+  funderName,
+  grantName,
   approachingLimit,
   limitReached,
 }: ApplicationStep4DraftProps) {
-  // answers keyed by application_answers.id
   const [answers, setAnswers] = useState<Record<string, string>>(
     () => Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
   )
 
-  // per-question refine state
   const [refineStates, setRefineStates] = useState<Record<string, RefineState>>(
     () => Object.fromEntries(questions.map((q) => [q.id, { status: 'idle' } as RefineState])),
   )
@@ -84,7 +87,7 @@ export function ApplicationStep4Draft({
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
 
-  // manual entry state (no-questions path)
+  // manual entry state (no questions/sections path)
   const [manualQuestion, setManualQuestion] = useState('')
   const [manualAnswer, setManualAnswer] = useState('')
   const [manualError, setManualError] = useState<string | null>(null)
@@ -92,15 +95,16 @@ export function ApplicationStep4Draft({
   const [manualContinueError, setManualContinueError] = useState<string | null>(null)
   const [isManualContinuing, startManualContinueTransition] = useTransition()
 
-  // refs
   const latestAnswers = useRef(answers)
   latestAnswers.current = answers
   const dirtyRef = useRef<Set<string>>(new Set())
   const pendingSaves = useRef(0)
 
-  // derived
   const answeredCount = questions.filter((q) => (answers[q.id] ?? '').trim() !== '').length
   const allAnswered = questions.length > 0 && answeredCount === questions.length
+
+  const itemLabel = funderType === 'free_form' ? 'section' : 'question'
+  const itemLabelPlural = funderType === 'free_form' ? 'sections' : 'questions'
 
   // ── Auto-save ─────────────────────────────────────────────────────────────
 
@@ -212,7 +216,7 @@ export function ApplicationStep4Draft({
     })
   }
 
-  // ── Manual entry continue (no-questions path) ─────────────────────────────
+  // ── Manual entry continue (no questions/sections path) ────────────────────
 
   async function handleManualContinue() {
     if (!manualQuestion.trim()) {
@@ -238,10 +242,11 @@ export function ApplicationStep4Draft({
     })
   }
 
-  // ── No questions extracted — manual entry path ────────────────────────────
+  // ── No questions/sections extracted — manual entry fallback ───────────────
+
   if (questions.length === 0) {
     return (
-      <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
+      <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
         <StepIndicator currentStep={4} />
         <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
         <p className="mb-8 text-[14px] text-[#64748B]">
@@ -329,39 +334,56 @@ export function ApplicationStep4Draft({
     )
   }
 
-  // ── Q&A interview path ────────────────────────────────────────────────────
+  // ── Main interview / section-by-section path ──────────────────────────────
+
   return (
-    <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
+    <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={4} />
 
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
-        {isSaving && (
-          <span className="text-[12px] text-[#94A3B8]" aria-live="polite">
-            Saving&hellip;
-          </span>
-        )}
+      {/* Funder context bar */}
+      <div className="mb-4 rounded-lg bg-[#0D6E6E] px-4 py-3">
+        <p className="text-[13px] font-medium text-white">
+          {funderName}
+          {grantName && grantName !== funderName && (
+            <span className="ml-2 font-normal opacity-80">&middot; {grantName}</span>
+          )}
+        </p>
       </div>
 
-      {/* Progress bar */}
-      <div className="mb-6">
-        <div className="mb-1.5 flex items-center justify-between text-[13px] text-[#64748B]">
-          <span>
-            {answeredCount} of {questions.length} questions answered
-          </span>
-        </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
-          <div
-            className="h-full rounded-full bg-[#0D6E6E] transition-all duration-300"
-            style={{ width: `${(answeredCount / questions.length) * 100}%` }}
-            role="progressbar"
-            aria-valuenow={answeredCount}
-            aria-valuemin={0}
-            aria-valuemax={questions.length}
-            aria-label="Questions answered"
-          />
+      {/* Sticky progress bar */}
+      <div className="sticky top-0 z-10 -mx-4 mb-6 border-b border-[#E2E8F0] bg-white px-4 py-3 shadow-sm sm:-mx-6 sm:px-6">
+        <div className="mx-auto max-w-[960px]">
+          <div className="mb-1.5 flex items-center justify-between">
+            <span className="text-[13px] text-[#64748B]">
+              {answeredCount} of {questions.length}{' '}
+              {answeredCount === 1 ? itemLabel : itemLabelPlural} completed
+            </span>
+            {isSaving && (
+              <span className="text-[12px] text-[#94A3B8]" aria-live="polite">
+                Saving&hellip;
+              </span>
+            )}
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
+            <div
+              className="h-full rounded-full bg-[#0D6E6E] transition-all duration-300"
+              style={{ width: `${(answeredCount / questions.length) * 100}%` }}
+              role="progressbar"
+              aria-valuenow={answeredCount}
+              aria-valuemin={0}
+              aria-valuemax={questions.length}
+              aria-label={funderType === 'free_form' ? 'Sections completed' : 'Questions answered'}
+            />
+          </div>
         </div>
       </div>
+
+      <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
+      <p className="mb-6 text-[14px] text-[#64748B]">
+        {funderType === 'free_form'
+          ? 'Write your content for each section below. Your work is saved automatically as you type.'
+          : 'Answer each question below. Your work is saved automatically as you type.'}
+      </p>
 
       {/* AI limit banners */}
       {approachingLimit && !limitReached && (
@@ -371,8 +393,8 @@ export function ApplicationStep4Draft({
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
           <p className="text-[13px] text-[#78350F]">
-            You&apos;ve used most of your monthly AI allowance. &ldquo;Help me improve this&rdquo; may not be
-            available for all questions.
+            You&apos;ve used most of your monthly AI allowance. &ldquo;Help me improve this&rdquo;
+            may not be available for all {itemLabelPlural}.
           </p>
         </div>
       )}
@@ -383,13 +405,13 @@ export function ApplicationStep4Draft({
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
           <p className="text-[13px] text-[#991B1B]">
-            You&apos;ve reached your monthly AI limit. You can still write and edit your answers —
-            AI writing assistance is unavailable until next month.
+            You&apos;ve reached your monthly AI limit. You can still write and edit your answers
+            — AI writing assistance is unavailable until next month.
           </p>
         </div>
       )}
 
-      {/* Question cards */}
+      {/* Question / section cards */}
       <div className="mb-8 space-y-6">
         {questions.map((q) => {
           const text = answers[q.id] ?? ''
@@ -408,10 +430,13 @@ export function ApplicationStep4Draft({
                   : 'border-[#E2E8F0] bg-white'
               }`}
             >
-              {/* Question header */}
-              <div className="mb-3 flex items-start justify-between gap-3">
+              {/* Card header */}
+              <div className="mb-2 flex items-start justify-between gap-3">
                 <p className="text-[15px] font-semibold leading-snug text-[#1E293B]">
-                  {q.questionOrder}.&nbsp;{q.questionText}
+                  {funderType === 'structured' && (
+                    <span className="mr-0.5">{q.questionOrder}.&nbsp;</span>
+                  )}
+                  {q.questionText}
                 </p>
                 <div className="flex shrink-0 items-center gap-2">
                   {q.wordLimit && (
@@ -427,7 +452,12 @@ export function ApplicationStep4Draft({
                 </div>
               </div>
 
-              {/* Budget question note */}
+              {/* Guidance note — free_form non-budget sections */}
+              {funderType === 'free_form' && q.guidance && !q.isBudgetQuestion && (
+                <p className="mb-3 text-[13px] leading-relaxed text-[#64748B]">{q.guidance}</p>
+              )}
+
+              {/* Budget warning */}
               {q.isBudgetQuestion && (
                 <div className="mb-3 flex items-start gap-2">
                   <AlertTriangle
@@ -435,8 +465,9 @@ export function ApplicationStep4Draft({
                     aria-hidden="true"
                   />
                   <p className="text-[12px] text-[#78350F]">
-                    Budget questions require your own figures — AI cannot help with these. Ensure
-                    all numbers are accurate before continuing.
+                    {funderType === 'free_form'
+                      ? 'This section covers your budget and finances. Enter your own figures — AI cannot assist here. Ensure all numbers are accurate.'
+                      : 'Budget questions require your own figures — AI cannot help with these. Ensure all numbers are accurate before continuing.'}
                   </p>
                 </div>
               )}
@@ -448,8 +479,16 @@ export function ApplicationStep4Draft({
                 onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                 onBlur={() => handleAnswerBlur(q.id)}
                 rows={8}
-                aria-label={`Answer for question ${q.questionOrder}`}
-                placeholder="Write your answer here…"
+                aria-label={
+                  funderType === 'free_form'
+                    ? `Content for ${q.questionText}`
+                    : `Answer for question ${q.questionOrder}`
+                }
+                placeholder={
+                  funderType === 'free_form'
+                    ? 'Write your content here…'
+                    : 'Write your answer here…'
+                }
                 className={`text-[14px] ${q.isBudgetQuestion ? 'bg-white' : ''}`}
               />
 
@@ -463,7 +502,7 @@ export function ApplicationStep4Draft({
                 {q.wordLimit ? `${words} / ${q.wordLimit} words` : `${words} words`}
               </p>
 
-              {/* Refine answer — non-budget questions only */}
+              {/* Refine answer — non-budget only */}
               {!q.isBudgetQuestion && (
                 <div className="mt-3">
                   {refineState.status === 'idle' && (
@@ -553,7 +592,7 @@ export function ApplicationStep4Draft({
           disabled={!allAnswered || isAssembling}
           title={
             !allAnswered
-              ? `Answer all ${questions.length} questions to continue`
+              ? `Complete all ${questions.length} ${itemLabelPlural} to continue`
               : undefined
           }
           className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"

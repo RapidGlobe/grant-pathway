@@ -33,7 +33,7 @@ export default async function Step4Page({ params }: Props) {
   const { id } = await params
 
   // Step locking: redirects to current step if current_step < 4
-  const { aiSummary, draftStatus } = await getApplicationOrRedirect(id, 4)
+  const { aiSummary, draftStatus, funderName, grantName } = await getApplicationOrRedirect(id, 4)
 
   // S6.4 — Show preparation checklist on first visit (AC-FR-28-01)
   if (draftStatus === 'not_started') {
@@ -83,10 +83,45 @@ export default async function Step4Page({ params }: Props) {
 
   let questionRows = existingRows ?? []
 
+  // ── Build guidance map from ai_summary sections (free_form only) ─────────
+  const guidanceMap: Record<number, string> = {}
+  if (funderType === 'free_form' && parsedSummary?.sections) {
+    for (const s of parsedSummary.sections) {
+      if (s.guidance) guidanceMap[s.number] = s.guidance
+    }
+  }
+
   // ── S6.1: Populate from ai_summary if no rows exist yet ──────────────────
   if (questionRows.length === 0 && parsedSummary) {
     try {
-      if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
+      if (
+        funderType === 'free_form' &&
+        Array.isArray(parsedSummary.sections) &&
+        parsedSummary.sections.length > 0
+      ) {
+        // Free_form: populate from narrative sections
+        const inserts = parsedSummary.sections.map((s) => ({
+          application_id: id,
+          user_id: user.id,
+          question_text: s.title,
+          question_order: s.number,
+          word_limit: s.wordLimit ?? null,
+          is_budget_question: s.is_budget_section ?? false,
+        }))
+
+        const { data: inserted } = await supabase
+          .from('application_answers')
+          .upsert(inserts, {
+            onConflict: 'application_id,question_order',
+            ignoreDuplicates: true,
+          })
+          .select(
+            'id, question_text, question_order, word_limit, answer_text, answer_source, is_budget_question',
+          )
+
+        questionRows = inserted ?? []
+      } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
+        // Structured: populate from numbered questions
         const inserts = parsedSummary.questions.map((q, idx) => ({
           application_id: id,
           user_id: user.id,
@@ -138,6 +173,7 @@ export default async function Step4Page({ params }: Props) {
     answerText: (row.answer_text as string | null) ?? null,
     answerSource: (row.answer_source as QuestionRow['answerSource']) ?? null,
     isBudgetQuestion: (row.is_budget_question as boolean) ?? false,
+    guidance: guidanceMap[row.question_order as number] ?? null,
   }))
 
   return (
@@ -145,6 +181,8 @@ export default async function Step4Page({ params }: Props) {
       applicationId={id}
       questions={questions}
       funderType={funderType}
+      funderName={funderName}
+      grantName={grantName}
       approachingLimit={approachingLimit}
       limitReached={limitReached}
     />

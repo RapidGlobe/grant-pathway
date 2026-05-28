@@ -37,10 +37,9 @@ export const maxDuration = 90
 const MONTHLY_CAP = 50
 const APPROACHING_LIMIT_THRESHOLD = 40
 
-// Restored to spike value (1500): the four new S6.1 fields (funder_type,
-// funderAiPolicy, supportingDocuments, is_budget_question) add ~200–300 tokens
-// of output; 1200 would be tight for guidelines with many supporting documents.
-const SUMMARY_MAX_TOKENS = 1500
+// Raised to 2000: free_form funders now emit a "sections" array with guidance
+// text per section (~80 tokens each × up to 8 sections ≈ 640 extra tokens).
+const SUMMARY_MAX_TOKENS = 2000
 
 export async function POST(request: NextRequest) {
   // ── 1. Authenticate ────────────────────────────────────────────────────────
@@ -248,7 +247,11 @@ export async function POST(request: NextRequest) {
   })
 
   // ── 10. Return response ────────────────────────────────────────────────────
-  const questionsFound = Array.isArray(summary.questions) && summary.questions.length > 0
+  const questionsFound =
+    (Array.isArray(summary.questions) && summary.questions.length > 0) ||
+    (summary.funder_type === 'free_form' &&
+      Array.isArray(summary.sections) &&
+      summary.sections.length > 0)
 
   return NextResponse.json({
     summary,
@@ -268,6 +271,14 @@ export type AiSummaryQuestion = {
   is_budget_question: boolean
 }
 
+export type AiSummarySection = {
+  number: number
+  title: string
+  guidance: string
+  wordLimit?: number
+  is_budget_section: boolean
+}
+
 export type AiSummaryData = {
   funder_type: 'structured' | 'free_form'
   aboutGrant: string
@@ -275,6 +286,7 @@ export type AiSummaryData = {
   whoCanApply: string[]
   lookingFor: string[]
   questions: AiSummaryQuestion[]
+  sections?: AiSummarySection[]
   keyRequirements: string[]
   funderAiPolicy?: string | null
   supportingDocuments?: string[]

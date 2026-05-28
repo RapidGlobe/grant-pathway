@@ -535,14 +535,31 @@ export async function assembleAndAdvance(
     (r) => typeof r.answer_text === 'string' && r.answer_text.trim() !== '',
   )
 
+  // ── Detect funder type for assembly format ────────────────────────────────
+  let funderType: 'structured' | 'free_form' = 'structured'
+  if (typeof appRow.ai_summary === 'string' && appRow.ai_summary) {
+    try {
+      const parsed = JSON.parse(appRow.ai_summary) as { funder_type?: string }
+      if (parsed.funder_type === 'free_form') funderType = 'free_form'
+    } catch {
+      // parse failed — default to structured
+    }
+  }
+
   // ── Format assembled_draft ────────────────────────────────────────────────
+  // free_form: section title then answer (no number prefix — narrative flow)
+  // structured: numbered Q&A pairs
   let assembledDraft: string
 
   if (answered.length === 0) {
     assembledDraft = ''
   } else {
     assembledDraft = answered
-      .map((r) => `${r.question_order}. ${r.question_text}\n\n${r.answer_text}`)
+      .map((r) =>
+        funderType === 'free_form'
+          ? `${r.question_text}\n\n${r.answer_text}`
+          : `${r.question_order}. ${r.question_text}\n\n${r.answer_text}`,
+      )
       .join('\n\n---\n\n')
   }
 
