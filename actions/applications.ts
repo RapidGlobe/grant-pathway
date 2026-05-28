@@ -267,16 +267,25 @@ export async function advanceToStep4(
   try {
     const { data: existing } = await supabase
       .from('applications')
-      .select('current_step')
+      .select('current_step, draft_status')
       .eq('id', applicationId)
       .eq('user_id', user.id)
       .single()
 
     const newStep = Math.max(existing?.current_step ?? 3, 4)
 
+    // If the user has already confirmed the prep checklist (draft_status =
+    // 'in_progress') but navigates back to Step 3 and continues again, reset
+    // to 'not_started' so the checklist is shown on the next visit to Step 4.
+    // Do not reset if further along (ready_to_assemble / assembled).
+    const updates: Record<string, unknown> = { current_step: newStep }
+    if (existing?.draft_status === 'in_progress') {
+      updates.draft_status = 'not_started'
+    }
+
     const { error } = await supabase
       .from('applications')
-      .update({ current_step: newStep })
+      .update(updates)
       .eq('id', applicationId)
       .eq('user_id', user.id)
 
