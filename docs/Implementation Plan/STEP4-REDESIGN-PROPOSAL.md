@@ -18,7 +18,7 @@ implications for Grant Pathway's Step 4 (draft generation).
 |---|---|---|
 | National Lottery Heritage Fund | `heritage-fund-application-guidance.pdf` | Structured online form with discrete questions + up to 11 categories of mandatory supporting documents |
 | Garfield Weston Foundation | `Garfield Weston Application-guidelines-1.pdf` | Free-form typed proposal, max 10 A4 pages — NO discrete questions, thematic sections only |
-| TNL Community Fund | `tnl-community-fund-application-form-2025.docx` | **NOT a grant application** — this is a public appointment application for a board/committee role at TNL Community Fund Wales. Needs replacing with an actual NLCF grant application as a test fixture. |
+| Stony Stratford Town Council | `Stony-Stratford-Town-Council-Grant-Scheme-2026-27-adopted-FC0226.docx` + `Stony Stratford Grant-Application-Form-2026.docx` | Small local council grant (typical £100–£1,000, max £5,000). Structured form with 13 numbered questions submitted as a Word document by email. Includes a budget table (income + expenditure), a supporting documents checklist (7 categories), and requires countersignature by the treasurer. Third distinct funder format: downloadable form, not an online portal or free-form narrative. |
 
 ### Key design implications from the guidelines review
 
@@ -27,20 +27,29 @@ implications for Grant Pathway's Step 4 (draft generation).
    The current `AiSummaryData.questions` array will be empty for ~half the market.
 
 2. **Supporting documents are not captured anywhere.** Heritage Fund requires up to 11 document
-   categories, some mandatory, and will not begin assessment until all are received. Grant Pathway
-   currently has no mechanism to surface, list, or track supporting document requirements.
+   categories, some mandatory, and will not begin assessment until all are received. Stony Stratford
+   requires 7 categories (accounts, constitution, AGM minutes, board approval minutes, business plan,
+   equality policy, safeguarding policy where applicable). Grant Pathway currently has no mechanism
+   to surface, list, or track supporting document requirements.
 
 3. **Financial tables are not narrative answers.** Garfield Weston requires two detailed financial
    tables (projected income, planned expenditure) plus a budget summary and income plan narrative.
+   Stony Stratford requires a per-line income/expenditure table plus a balance outstanding figure.
    AI must never generate the financial figures — these must come from the charity.
 
 4. **Two-stage application processes exist.** Garfield Weston Major Grants (over £100k) require an
    Expression of Interest before a full proposal is invited. Minor concern at current stage but
    worth noting for the roadmap.
 
-5. **Application output format differs.** Heritage Fund = answers submitted to an online portal
-   (one answer per question). Garfield Weston = a single Word/PDF document. The assembled output
-   shape must differ by funder type.
+5. **Application output format differs across three types.** Heritage Fund = answers submitted to an
+   online portal (one answer per question). Garfield Weston = a single Word/PDF document. Stony
+   Stratford = a Word form emailed to the council clerk. The assembled output shape must differ by
+   funder type.
+
+6. **Senior countersignature is a real requirement.** Stony Stratford requires the application to be
+   signed by the applicant AND countersigned by the treasurer. This validates the Stage 3 senior
+   review prompt in the redesign model — it is not just best practice, it is a mandatory condition
+   for at least some funders.
 
 ---
 
@@ -284,8 +293,10 @@ The Q&A model is fundamentally multi-session. The auto-save behaviour is critica
 
 ## Open questions before implementation begins
 
-1. **Replace TNL test fixture** — obtain a real National Lottery Community Fund grant application
-   form (e.g. Awards for All guidance) to replace the public appointment document.
+1. ~~**Replace TNL test fixture**~~ — **Resolved 2026-05-28.** Replaced with Stony Stratford Town
+   Council grant scheme guidelines + application form. Three representative fixture types now in
+   `docs/test-fixtures/`: Heritage Fund (structured online portal), Garfield Weston (free-form
+   narrative), Stony Stratford (structured Word form submitted by email).
 
 2. **Monthly cap model** — decide on the per-application credits approach before implementing
    Step 4 usage tracking.

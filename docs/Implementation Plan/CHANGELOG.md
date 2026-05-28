@@ -6,6 +6,23 @@
 
 ---
 
+## 2026-05-28 — Test fixture updated: TNL replaced with Stony Stratford Town Council
+
+**What changed:**
+- `docs/test-fixtures/tnl-community-fund-application-form-2025.docx` retired as a test fixture (it was a public appointment form, not a grant application — never a valid fixture).
+- Replaced with two Stony Stratford Town Council documents: `Stony-Stratford-Town-Council-Grant-Scheme-2026-27-adopted-FC0226.docx` (scheme guidelines) and `Stony Stratford Grant-Application-Form-2026.docx` (application form).
+- `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md` updated: fixture table corrected; design implications expanded to include Stony Stratford findings (supporting documents, budget table, countersignature requirement, third output format type); open question 1 marked resolved.
+
+**Why:**
+The TNL document was identified in the 2026-05-26 design review as a public appointment form for a board role at TNL Community Fund Wales — not a grant application. It provided no useful design signal. The Stony Stratford fixture is a genuine small local council grant (typical £100–£1,000) with discrete numbered questions, a budget table, a seven-category supporting documents checklist, and a mandatory treasurer countersignature. It adds a third distinct funder format to the test set and validates several design decisions in the Step 4 redesign proposal (budget question handling, supporting documents display, senior review prompt).
+
+**Test fixture set now covers three distinct formats:**
+- Heritage Fund: structured online portal, discrete questions + word limits, 11 supporting document categories
+- Garfield Weston: free-form 10-page narrative, no discrete questions, financial tables required
+- Stony Stratford: downloadable Word form submitted by email, 13 discrete questions, budget table, 7 supporting document categories, treasurer countersignature required
+
+---
+
 ## 2026-05-26 — S1 testing: profile edit redirects to dashboard; beta feedback noted
 
 **What changed:**
