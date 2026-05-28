@@ -144,6 +144,47 @@ ${guidelinesText}`
 }
 
 // ---------------------------------------------------------------------------
+// Refine answer prompt (Step 4 — S6.6)
+// ---------------------------------------------------------------------------
+
+/**
+ * Builds the user-turn message for refining a single grant application answer.
+ *
+ * Constraint: structure and clarity improvement ONLY. The prompt explicitly
+ * forbids adding information, changing facts, or altering claims. Budget
+ * questions are blocked at the UI level and verified server-side — this
+ * function is never called for them.
+ *
+ * Returns JSON `{ "refinedText": "..." }` for consistency with other AI routes.
+ *
+ * @param questionText  The application question being answered.
+ * @param answerText    The charity's original answer (user-written).
+ * @param wordLimit     Word limit from the funder's guidelines, or null.
+ */
+export function buildRefinePrompt(
+  questionText: string,
+  answerText: string,
+  wordLimit: number | null,
+): string {
+  const limitInstruction = wordLimit
+    ? `The refined answer must not exceed ${wordLimit} words.`
+    : 'Keep the refined answer a similar length to the original.'
+
+  return `A UK charity is writing a grant application. Improve the structure, flow, and clarity of their answer below. You must not add any information that is not already in the answer. Do not change facts, dates, figures, names, or the claims being made. Maintain their first-person plural voice ("we", "our", "us").
+
+${limitInstruction}
+
+Return a JSON object with exactly this field:
+{ "refinedText": "the improved answer text" }
+
+QUESTION:
+${questionText}
+
+ORIGINAL ANSWER:
+${answerText}`
+}
+
+// ---------------------------------------------------------------------------
 // Draft answers prompt (Step 4 — S6.2)
 // ---------------------------------------------------------------------------
 
