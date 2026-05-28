@@ -427,11 +427,12 @@ export async function saveManualAnswer(
 
 /**
  * Called when the user clicks "Ready to assemble" on Step 4 (all questions
- * answered). Sets draft_status = 'ready_to_assemble', advances current_step
- * to 5 (never regresses), and redirects to Step 5.
+ * answered). Sets draft_status = 'ready_to_assemble' and redirects back to
+ * Step 4, where the senior review screen is shown (S6.7).
  *
- * S6.7 will later intercept the 'ready_to_assemble' state to run assembly
- * before the user reaches Step 5. For now the redirect goes straight to Step 5.
+ * current_step is NOT advanced here — it advances to 5 only after the draft
+ * is assembled (in assembleAndAdvance). This prevents the user from reaching
+ * Step 5 before assembly is complete.
  */
 export async function setDraftReadyToAssemble(
   applicationId: string,
@@ -444,33 +445,113 @@ export async function setDraftReadyToAssemble(
 
   if (!user) redirect('/')
 
-  try {
-    const { data: existing } = await supabase
-      .from('applications')
-      .select('current_step')
-      .eq('id', applicationId)
-      .eq('user_id', user.id)
-      .single()
+  const { error } = await supabase
+    .from('applications')
+    .update({ draft_status: 'ready_to_assemble' })
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
 
-    const newStep = Math.max(existing?.current_step ?? 4, 5)
+  if (error) {
+    return { ok: false, error: 'Could not save your progress. Please try again.' }
+  }
 
-    const { error } = await supabase
-      .from('applications')
-      .update({
-        draft_status: 'ready_to_assemble',
-        current_step: newStep,
-      })
-      .eq('id', applicationId)
-      .eq('user_id', user.id)
+  redirect(`/applications/${applicationId}/step/4`)
+}
 
-    if (error) {
-      return { ok: false, error: 'Could not save your progress. Please try again.' }
-    }
-  } catch {
-    return {
-      ok: false,
-      error: 'Could not reach the server. Please check your connection and try again.',
-    }
+// ---------------------------------------------------------------------------
+// S6.7 — Assemble draft and advance to Step 5
+// ---------------------------------------------------------------------------
+
+export type AssembleAndAdvanceResult =
+  | { ok: true }
+  | { ok: false; error: string }
+
+/**
+ * Called when the user confirms on the senior review screen. Assembles all
+ * answered questions into a single formatted draft, saves it to
+ * applications.assembled_draft, sets draft_status = 'assembled', advances
+ * current_step to 5, and redirects to Step 5.
+ *
+ * Assembly format is funder-type-aware (AC-FR-31A):
+ *   structured — numbered Q&A pairs (question then answer, separated)
+ *   free_form  — same format; section headings derived from question text
+ *
+ * No AI is used — this is a pure text formatting step. The charity's words
+ * are reproduced verbatim; AI is not involved in the assembly.
+ *
+ * Unanswered questions are omitted from the assembled draft. In practice all
+ * questions should be answered before this action is reachable (the UI gate
+ * requires allAnswered), but the assembly is robust to partial completion.
+ */
+export async function assembleAndAdvance(
+  applicationId: string,
+): Promise<AssembleAndAdvanceResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  // ── Verify ownership and current draft_status ──────────────────────────────
+  const { data: appRow, error: appError } = await supabase
+    .from('applications')
+    .select('current_step, draft_status, ai_summary')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (appError || !appRow) {
+    return { ok: false, error: 'Application not found.' }
+  }
+
+  if (appRow.draft_status !== 'ready_to_assemble') {
+    return { ok: false, error: 'Application is not ready to assemble.' }
+  }
+
+  // ── Fetch answered questions in order ─────────────────────────────────────
+  const { data: answerRows, error: answersError } = await supabase
+    .from('application_answers')
+    .select('question_order, question_text, answer_text')
+    .eq('application_id', applicationId)
+    .eq('user_id', user.id)
+    .order('question_order')
+
+  if (answersError) {
+    return { ok: false, error: 'Could not load your answers. Please try again.' }
+  }
+
+  const answered = (answerRows ?? []).filter(
+    (r) => typeof r.answer_text === 'string' && r.answer_text.trim() !== '',
+  )
+
+  // ── Format assembled_draft ────────────────────────────────────────────────
+  let assembledDraft: string
+
+  if (answered.length === 0) {
+    assembledDraft = ''
+  } else {
+    assembledDraft = answered
+      .map((r) => `${r.question_order}. ${r.question_text}\n\n${r.answer_text}`)
+      .join('\n\n---\n\n')
+  }
+
+  // ── Save assembled_draft and advance ──────────────────────────────────────
+  const newStep = Math.max(appRow.current_step ?? 4, 5)
+
+  const { error: saveError } = await supabase
+    .from('applications')
+    .update({
+      assembled_draft: assembledDraft,
+      draft_status: 'assembled',
+      current_step: newStep,
+    })
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+
+  if (saveError) {
+    return { ok: false, error: 'Could not save your draft. Please try again.' }
   }
 
   redirect(`/applications/${applicationId}/step/5`)

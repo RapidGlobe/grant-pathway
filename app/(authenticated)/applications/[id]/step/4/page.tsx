@@ -1,6 +1,8 @@
+import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { ApplicationStep4Draft, type QuestionRow } from '@/components/application-step4-draft'
 import { ApplicationStep4PrepChecklist } from '@/components/application-step4-prep-checklist'
+import { ApplicationStep4SeniorReview } from '@/components/application-step4-senior-review'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
@@ -36,6 +38,16 @@ export default async function Step4Page({ params }: Props) {
   // S6.4 — Show preparation checklist on first visit (AC-FR-28-01)
   if (draftStatus === 'not_started') {
     return <ApplicationStep4PrepChecklist applicationId={id} />
+  }
+
+  // S6.7 — Show senior review confirmation before assembly
+  if (draftStatus === 'ready_to_assemble') {
+    return <ApplicationStep4SeniorReview applicationId={id} />
+  }
+
+  // S6.7 — Draft already assembled; send user straight to Step 5
+  if (draftStatus === 'assembled') {
+    redirect(`/applications/${id}/step/5`)
   }
 
   const supabase = await createClient()
