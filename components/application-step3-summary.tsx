@@ -437,30 +437,6 @@ export function ApplicationStep3Summary({
         </div>
       )}
 
-      {/* Supporting documents aide-memoire (S6.2) */}
-      {summary.supportingDocuments && summary.supportingDocuments.length > 0 && (
-        <div className="mb-6 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
-          <p className="mb-2 text-[13px] font-semibold text-[#1E293B]">
-            Documents you will need to submit with this application
-          </p>
-          <ul className="mb-2 space-y-1">
-            {summary.supportingDocuments.map((doc, i) => (
-              <li key={i} className="flex items-start gap-2 text-[13px] text-[#374151]">
-                <span
-                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#64748B]"
-                  aria-hidden="true"
-                />
-                {doc}
-              </li>
-            ))}
-          </ul>
-          <p className="text-[12px] text-[#64748B]">
-            Gather these before you begin Step 4. Grant Pathway does not submit documents on your
-            behalf.
-          </p>
-        </div>
-      )}
-
       {/* Questions extracted / not found note */}
       {questionsFound ? (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
@@ -546,7 +522,7 @@ export function ApplicationStep3Summary({
 
 function CardTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-2 text-[13px] font-semibold uppercase tracking-wide text-[#64748B]">
+    <h2 className="mb-3 border-l-4 border-[#0D6E6E] pl-3 text-[15px] font-semibold text-[#1E293B]">
       {children}
     </h2>
   );
