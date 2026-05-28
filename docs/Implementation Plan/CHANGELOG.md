@@ -6,6 +6,39 @@
 
 ---
 
+## 2026-05-28 — Step 4 redesign: auto-generation replaced with Q&A interview model
+
+**What changed:**
+- `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md` — all open questions resolved; final decisions documented; database design updated from JSONB column to table extension.
+- `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` — Slice 6 (Step 4) replaced in its entirety. Old 4 tasks (generate draft on load, editable textareas, regenerate all) removed. New 8 tasks (S6.1–S6.8) cover: extending the Step 3 prompt, Step 3 UI additions, database migration, preparation checklist, Q&A interface, per-question refine-answer API, senior review + assembly API, and Step 5 export update. Monthly AI cap updated from 20 to 50 throughout.
+- `docs/PRD inputs/acceptance-criteria.md` — Section 9.6 rewritten. FR-28 (auto-generation on load) replaced with preparation checklist + user-authored answers. FR-29 (user-specified word limits) updated to auto-extracted word limits. FR-30 (AI draft inputs) updated to per-question assist + assembly. FR-31 (AI draft word limit warning) replaced with budget question flagging. FR-31A added (senior review prompt + funder-type-aware assembly). FR-34 (editable AI text) updated to user writes from scratch. FR-35 (discard/regenerate) updated to reflect that writing from scratch is the default.
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — Summary table updated: Phase 4 grows from 36 to 40 tasks; 4 old S6 tasks removed from "done" count; 8 new tasks added as "not started". Phase 4→5 gate remains open pending S6 redesign completion.
+
+**Why:**
+Review of three real funder guidelines documents (Heritage Fund, Garfield Weston, Stony Stratford Town Council) and explicit AI policy statements from two major UK funders (Henry Smith Foundation, National Lottery Community Fund) established a clear finding: AI-generated draft answers actively disadvantage charities.
+
+Both reviewed funders stated explicitly:
+- Henry Smith: *"Your application should reflect your voice and experience"* / *"Applications written in your own words give a much better insight into your work"*
+- NLCF: *"AI supported applications do not tell the unique story of your community"* / *"Being too generic in content may disadvantage your application"*
+
+Funders score for specificity, community insight, and authentic voice — none of which appear in AI-generated boilerplate. The original design would have produced applications that are identifiable as AI-generated and weaker than manually written alternatives.
+
+The new model aligns with Henry Smith's explicit guidance: "AI for structure not content." Grant Pathway uses AI to identify the right questions, assist with clarity and structure on request, and assemble the charity's own words into the required format. The charity writes the content.
+
+**Architectural consequences:**
+- `/api/generate-draft` route removed
+- `application_answers` table: two new columns (`ai_refined_answer`, `is_budget_question`)
+- `applications` table: two new columns (`assembled_draft`, `draft_status`)
+- New API route: `POST /api/refine-answer` (structure/clarity only; AI assist disabled on budget questions)
+- New API route: `POST /api/assemble-draft` (funder-type-aware; writes to `assembled_draft`)
+- Step 5 export reads from `assembled_draft` (not assembled from individual answer rows)
+- `funder_type: 'structured' | 'free_form'` extracted in Step 3; drives assembly format
+- Monthly AI cap: 20 → 50; approaching-limit threshold: 16 → 40
+
+**Full design record:** `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md`
+
+---
+
 ## 2026-05-28 — Test fixture updated: TNL replaced with Stony Stratford Town Council
 
 **What changed:**

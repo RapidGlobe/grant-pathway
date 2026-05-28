@@ -213,11 +213,9 @@ Under Q&A model, one application consumes approximately:
 A charity working on 3 applications in a month could consume ~21 calls and hit the cap mid-way
 through their second application. The current cap was designed for a 1-call-per-step model.
 
-**Recommendation:** Rethink cap as per-application credit budget, not a raw monthly call count:
-- Each application gets a fixed allowance (e.g., 10 AI credits)
-- Step 3 = 1 credit; each per-question assist = 1 credit; final assembly = 1 credit
-- Monthly limit becomes something like "3 active applications per month"
-- More predictable and meaningful for the user
+**Decision (2026-05-28):** Raise the monthly cap from 20 to 50 and monitor. Per-application
+credit budgeting remains on the roadmap but is not implemented in this phase. A flat cap of 50
+calls is simple to implement with no change to the existing `ai_usage` tracking logic.
 
 ### Storage impact
 
@@ -235,29 +233,29 @@ Negligible. No storage cost concern at current or projected scale.
 
 ## Database changes required
 
-Additions to the `applications` table:
+**Decision (2026-05-28):** Extend the existing `application_answers` table rather than adding a
+JSONB column to `applications`. This keeps individual answers as discrete rows (better for
+partial saves, progress tracking, and future querying) and avoids the overhead of deserialising
+a large JSONB blob on every read.
+
+### `application_answers` table — two new columns
 
 ```sql
-draft_answers    JSONB    -- array of answer objects (see structure below)
-assembled_draft  TEXT     -- final assembled application text
+ai_refined_answer  TEXT     -- AI-improved version of the user's answer (NULL if not requested)
+is_budget_question BOOLEAN  NOT NULL DEFAULT false  -- disables AI assist on this question
+```
+
+### `applications` table — two new columns
+
+```sql
+assembled_draft  TEXT     -- final assembled application text (written by assembly API)
 draft_status     TEXT     -- 'not_started' | 'in_progress' |
                           --   'ready_to_assemble' | 'assembled' | 'exported'
 ```
 
-Answer object structure within `draft_answers`:
-```json
-{
-  "question_index": 1,
-  "question_text": "What heritage does your project focus on?",
-  "user_answer": "...",
-  "ai_refined_answer": "...",
-  "is_complete": true,
-  "is_budget_question": false,
-  "updated_at": "2026-05-27T09:00:00Z"
-}
-```
-
-No new tables required at this stage — JSONB column keeps the migration simple.
+The existing `application_answers` row structure (one row per question, with `question_index`,
+`question_text`, `user_answer`, `is_complete`, `updated_at`) is unchanged. The two new columns
+are additive — no data migration required.
 
 ---
 
@@ -298,21 +296,44 @@ The Q&A model is fundamentally multi-session. The auto-save behaviour is critica
    `docs/test-fixtures/`: Heritage Fund (structured online portal), Garfield Weston (free-form
    narrative), Stony Stratford (structured Word form submitted by email).
 
-2. **Monthly cap model** — decide on the per-application credits approach before implementing
-   Step 4 usage tracking.
+2. ~~**Monthly cap model**~~ — **Resolved 2026-05-28.** Raise monthly cap from 20 to 50 and
+   monitor. Per-application credit budgeting deferred to a later phase. No change to the
+   existing `ai_usage` tracking logic is required for this release.
 
-3. **Assembly output format** — for free-form document funders (Garfield Weston), the assembled
-   draft should be exportable as a Word document. Confirm whether this is in Step 4 scope or
-   a later phase.
+3. ~~**Assembly output format**~~ — **Resolved 2026-05-28.** The assembly API writes to
+   `applications.assembled_draft`. Step 5 export reads from that single column — it does not
+   reassemble from individual answer rows. Word document export for free-form funders
+   (Garfield Weston) is in scope for Step 5 (S6.8), not a later phase.
 
-4. **Supporting documents checklist** — decide whether `supportingDocuments` surfaces in Step 3
-   as read-only information, or becomes an interactive checklist the charity ticks off.
+4. ~~**Supporting documents checklist**~~ — **Resolved 2026-05-28.** `supportingDocuments`
+   surfaces in Step 3 as a read-only aide-memoire ("Documents you will need to submit"). No
+   interactive ticking. Grant Pathway does not track whether documents have been gathered —
+   that is the charity's responsibility.
 
-5. **`funderAiPolicy` field** — if found in guidelines, how prominent should this be in the UI?
-   An info banner? A modal? Inline in the summary?
+5. ~~**`funderAiPolicy` field**~~ — **Resolved 2026-05-28.** Display as an info banner in Step 3,
+   below the main summary and above the "Proceed to Step 4" button. Prominent enough to be
+   seen before the charity starts writing; not a blocking modal.
+
+---
+
+---
+
+## Final decisions summary (2026-05-28)
+
+All open questions resolved. Decisions recorded here for traceability before implementation begins.
+
+| # | Decision |
+|---|---|
+| 1 | Extend `application_answers` table (add `ai_refined_answer`, `is_budget_question`); no JSONB column on `applications` |
+| 2 | Monthly cap raised from 20 → 50; per-application credit model deferred |
+| 3 | Assembly writes to `applications.assembled_draft`; Step 5 export reads from that column; Word doc export for free-form funders is in S6.8 scope |
+| 4 | Preparation checklist is a separate screen shown once (on first entry to Step 4) |
+| 5 | `supportingDocuments` = read-only aide-memoire in Step 3; no interactive tracking |
+| 6 | `funderAiPolicy` = info banner in Step 3, below summary, above "Proceed to Step 4" button |
 
 ---
 
 *Notes prepared: 2026-05-26*
-*Status: Under review — no implementation has begun*
-*Next action: Review these notes, resolve open questions, then update IMPLEMENTATION-PLAN.md*
+*Open questions resolved: 2026-05-28*
+*Status: Design approved — implementation in progress*
+*Next action: See IMPLEMENTATION-PLAN.md S6 tasks*

@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-26 (ADR-DATA-005 decided; P5.4 checklist updated; S0 E2E testing — 4 defects found and fixed)
+**Last updated:** 2026-05-28 (Step 4 redesign — Q&A model adopted; S6 tasks replaced; S6.1–S6.4 superseded; 8 new S6 tasks added)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -54,7 +54,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P3.11 — Health endpoint | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18) | 1 | 1 | ✅ Complete |
 | **Phase 3 → Phase 4 Gate** | — | — | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices** | **36** | **36** | **✅ Complete** |
+| **Phase 4 — Vertical Slices** | **40** | **32** | **In progress** |
 | &nbsp;&nbsp;**Slice 0 — Authentication** | **6** | **6** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification | 1 | 1 | ✅ Complete |
@@ -87,11 +87,15 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;**Slice 6 — Step 4: Draft Answers** | **4** | **4** | **✅ Complete** |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Questions pre-populated | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Generate draft API route | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Editable textareas and auto-save | 1 | 1 | ✅ Complete |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Continue to Step 5 | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** *(redesigned 2026-05-28)* | **8** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Database migration (4 new columns) | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Preparation checklist screen | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.6 — Per-question refine-answer API route | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.7 — Senior review prompt + assembly API route | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.8 — Step 5 export updated (read from assembled_draft) | 1 | 0 | Not started |
 | &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export** | **3** | **3** | **✅ Complete** |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export | 1 | 1 | ✅ Complete |
@@ -100,7 +104,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 1 | ✅ Complete |
-| **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off |
+| **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off (held open pending S6 redesign completion) |
 | **Phase 5 — Pre-Launch** | **6** | **0** | Not started |
 | &nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
@@ -108,11 +112,33 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
 | &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **78** | **47** | |
+| **Total** | **82** | **47** | |
 
 ---
 
 ## Notes
+
+### 2026-05-28 — Step 4 redesign: Q&A model adopted; S6 tasks replaced
+
+**Decision:** The original Step 4 "auto-generation" model (AI writes all answers on load) has been replaced with a Q&A interview model. The old S6.1–S6.4 tasks are superseded; 8 new S6 tasks replace them.
+
+**Rationale:** Review of real funder guidelines (Heritage Fund, Garfield Weston, Stony Stratford Town Council) and explicit funder AI policy statements (Henry Smith Foundation, National Lottery Community Fund) established that AI-generated content actively disadvantages charities. Funders score for specificity, community insight, and authentic voice — all of which are absent from AI-generated text. Both reviewed funders explicitly state that generic AI content weakens applications.
+
+**New model:** The charity writes all answer content. AI assists with structure and clarity only, on request and per-question. A final assembly step formats the charity's words into the funder's required output (Q&A list for structured funders; flowing narrative for free-form funders). Budget questions are flagged and AI assist is disabled for them.
+
+**Key decisions recorded:**
+- `application_answers` table extended (not a new JSONB column) — adds `ai_refined_answer` and `is_budget_question`
+- `applications` table extended — adds `assembled_draft` and `draft_status`
+- Monthly AI cap raised from 20 → 50; approaching-limit threshold updated to 40/50
+- Supporting documents (`supportingDocuments`) = read-only aide-memoire in Step 3
+- `funderAiPolicy` extracted from guidelines and shown as info banner in Step 3
+- `funder_type: 'structured' | 'free_form'` extracted in Step 3; controls assembly format
+
+Full rationale and decisions: `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md`
+
+**Impact on task counts:** Phase 4 grows from 36 to 40 tasks; 4 old S6 tasks removed from "done" count; 8 new S6 tasks added as "not started". Phase 4 total: 40 tasks, 32 done. Phase 4→5 gate remains open until new S6 is complete.
+
+---
 
 ### 2026-05-26 — Slice 0 E2E testing: four defects found and fixed
 

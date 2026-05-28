@@ -1064,7 +1064,7 @@ Prompt instructs the model to produce a structured summary covering: what the gr
 export const maxDuration = 90;
 ```
 - Verify auth
-- Check monthly AI usage count (20 req/user/month cap)
+- Check monthly AI usage count (50 req/user/month cap)
 - Apply rate limit (5 req / 60 sec via Upstash)
 - Read `guidelines_text` from POST body
 - Fetch charity profile from Supabase
@@ -1082,7 +1082,7 @@ export const maxDuration = 90;
 #### Display
 - Questions extracted note: "We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."
 - Questions not found note (if no questions extracted): "We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."
-- Approaching limit banner: shown when the user has used **16 or more** of their 20 monthly AI requests
+- Approaching limit banner: shown when the user has used **40 or more** of their 50 monthly AI requests
 - **Regenerate summary** link (secondary; counts as one AI request against monthly allowance)
 - Continue button: "This looks right — continue"
 
@@ -1091,47 +1091,187 @@ export const maxDuration = 90;
 
 ---
 
-### Slice 6 — Step 4: Draft Answers
+### Slice 6 — Step 4: Q&A Interview
 
-**Estimated time:** 2–3 days
-**Functional requirements:** FR-28 to FR-36
+**Estimated time:** 5–7 days
+**Functional requirements:** FR-28 to FR-36 (revised — see `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md`)
+**Design decision:** 2026-05-28 — replaces auto-generation model with charity-authored Q&A model
 
-Per screen requirements (D7): Step 4 shows all draft answers in editable text areas. There is no per-question approval in this step — approval happens in Step 5.
+> The old `/api/generate-draft` route is **removed** in this slice. New model: the charity writes
+> their own answers, AI assists with structure/clarity only, and a final assembly step formats the
+> charity's words into the required funder output format.
 
-#### Auto-generation on load (AC-FR-28-01)
-- Draft generation begins **automatically when the user arrives at Step 4** (after clicking "This looks right — continue" from Step 3) — no button press required
-- The loading state is shown immediately; the content state appears when generation completes
-- If answers already exist for this application (e.g. user navigated back), show the content state directly without regenerating
+#### S6.1 — Extend Step 3 AI prompt and AiSummaryData type
 
-#### Question population
-- Questions extracted from the AI summary in Step 3 are pre-populated as `application_answers` rows
-- If no questions were extracted: user sees a manual entry field to add questions before generating answers
+Estimated time: 0.5 days
 
-#### AI draft generation (`/api/generate-draft`)
+Add four new fields to the Step 3 Bedrock prompt output and the `AiSummaryData` TypeScript type:
+
 ```typescript
-export const maxDuration = 90;
+funder_type: 'structured' | 'free_form'
+  // 'structured': funder uses discrete questions (Heritage Fund, Stony Stratford)
+  // 'free_form': funder uses narrative sections only — no numbered questions (Garfield Weston)
+
+funderAiPolicy?: string
+  // extracted verbatim from guidelines if present; null if not mentioned
+
+supportingDocuments?: string[]
+  // list of supporting document categories the funder requires or recommends
+
+questions: Array<{
+  question_text: string
+  word_limit?: number
+  is_budget_question: boolean  // NEW — true for financial/budget questions
+}>
 ```
-- Inputs: AI summary (from `applications.ai_summary`), charity profile, all questions
-- Output: JSON array of `{ questionId, answer }` pairs — generates all answers in one call
-- JSON parse failure: one automatic retry before surfacing error
-- First failure: "We couldn't generate your draft right now. This is usually temporary — please try again." + **Try again** button
-- Persistent failure (retry also fails): "If this keeps happening, please try again later. Your work has been saved." (PDR-UI-006)
 
-Per-route usage and rate limiting (same pattern as Slice 5).
+Prompt classification instructions:
+- `funder_type = 'structured'` if guidelines contain a numbered list of questions or a form with discrete fields
+- `funder_type = 'free_form'` if guidelines specify themes/sections for a narrative document with no numbered questions
+- `is_budget_question = true` for any question asking for budget, income, expenditure, financial projections, or funding breakdown
+- `funderAiPolicy`: extract any statement about AI use (verbatim or close paraphrase); null if none found
+- `supportingDocuments`: list all document categories the funder requires or recommends submitting alongside the application
 
-#### Editable answers
-- Each answer rendered in an editable textarea; user edits directly
-- Auto-save: debounced `saveAnswer()` Server Action (300–500ms after typing stops); silent background save every 60 seconds
-- `answer_source` set to `ai_generated` when AI creates the answer; updated to `user_edited` when the user modifies an AI-generated answer; `user_written` for answers entered without AI generation
+#### S6.2 — Step 3 UI: funderAiPolicy banner and supportingDocuments aide-memoire
 
-#### Regenerate all answers
-- **Regenerate all answers** link (secondary action): re-calls `/api/generate-draft`; counts as one AI request against monthly allowance
-- Approaching limit banner: shown when user has used **16 or more** of their 20 monthly AI requests: "You've used most of your monthly AI allowance."
-- Limit reached: "You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch." — generate and regenerate buttons disabled
+Estimated time: 0.5 days
 
-#### Continue button
-- Text: "I've reviewed my answers — continue"
-- Advances `current_step` to 5 and redirects to Step 5
+Two additions to the Step 3 display, shown after the main summary:
+
+1. **`funderAiPolicy` banner** — if non-null, show a blue info banner below the summary and above the "Continue" button:
+   - Heading: "This funder's guidance on AI"
+   - Body: the extracted `funderAiPolicy` text
+   - Not a warning; not a modal — informational only
+
+2. **`supportingDocuments` aide-memoire** — if non-empty, show a read-only section:
+   - Heading: "Documents you will need to submit with this application"
+   - Bullet list of document names
+   - Subtext: "Gather these before you begin Step 4. Grant Pathway does not submit documents on your behalf."
+   - No checkboxes; no tracking; read-only
+
+Monthly cap threshold for "approaching limit" banner across all AI routes: **40 of 50** requests (raised from 16/20 — cap raised from 20 to 50 per 2026-05-28 decision).
+
+#### S6.3 — Database migration
+
+Estimated time: 0.5 days
+
+One Supabase migration covering all four new columns:
+
+```sql
+-- application_answers: two new columns
+ALTER TABLE application_answers
+  ADD COLUMN ai_refined_answer  TEXT,
+  ADD COLUMN is_budget_question BOOLEAN NOT NULL DEFAULT false;
+
+-- applications: two new columns
+ALTER TABLE applications
+  ADD COLUMN assembled_draft  TEXT,
+  ADD COLUMN draft_status     TEXT NOT NULL DEFAULT 'not_started';
+```
+
+No new RLS policies required — `application_answers` inherits the existing user-scoped check via the `applications` join; new `applications` columns are covered by existing RLS.
+
+#### S6.4 — Preparation checklist screen
+
+Estimated time: 0.5 days
+
+Shown once when `draft_status = 'not_started'` and the user arrives at Step 4 for the first time.
+
+Content:
+- Heading: "Before you begin writing"
+- Body: "The financial sections of this application cannot be completed by AI. Before you start, gather:"
+  - Most recent annual accounts or financial statements
+  - Projected budget for the grant period (income and planned expenditure)
+  - Details of other funding secured or applied for
+  - Input from your treasurer, finance lead, or a trustee who understands the budget
+- Note: "It is worth involving a senior colleague before reaching the financial questions."
+- Button: "I have what I need — start writing" → sets `draft_status = 'in_progress'`; shows Q&A interface
+
+If `draft_status` is already `in_progress`, `ready_to_assemble`, `assembled`, or `exported`: skip preparation screen and go directly to the Q&A interface.
+
+#### S6.5 — Q&A interface
+
+Estimated time: 2 days
+
+Complete rewrite of the Step 4 draft component.
+
+**For `funder_type = 'structured'`** (discrete questions):
+- Each `application_answers` row rendered as a card with question text, optional word limit, and a textarea for `user_answer` (user writes from scratch)
+- Character/word counter on each textarea
+- **Budget questions** (`is_budget_question = true`): amber card background, "£" badge, AI assist button **disabled** with label: "This section requires your actual financial data — do not use AI-generated figures"
+- **Non-budget questions**: optional "Help me improve this" button (calls S6.6 route)
+- Status indicator per card: complete (green), partial (amber), not started (grey)
+- Auto-save on field blur (focus leaves textarea): single `UPDATE` on `application_answers` — no AI involved
+- Progress bar: questions answered / total
+- On re-entry: restores existing answers with their status indicators
+
+**For `funder_type = 'free_form'`** (narrative sections):
+- Named text areas per section (e.g., "About your organisation", "Project description", "Budget narrative")
+- Same auto-save, budget distinction, and AI assist rules apply
+- Note: "This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."
+
+**"Ready to assemble" button**: enabled when all non-budget questions have a `user_answer`. Budget questions must also be filled; if empty, show: "Please enter your actual budget figures before assembling." Clicking sets `draft_status = 'ready_to_assemble'` and advances to senior review prompt (S6.7).
+
+#### S6.6 — Per-question refine-answer API route
+
+Estimated time: 1 day
+
+`POST /api/refine-answer`
+
+```typescript
+export const maxDuration = 30;
+```
+
+Request body: `{ applicationId: string, questionIndex: number, userAnswer: string }`
+
+Bedrock prompt instructions:
+- Improve **structure and clarity** of the provided answer only
+- Do **not** add facts, statistics, or claims not present in the original
+- Do **not** change the meaning, emphasis, or specific examples in the original
+- Preserve the charity's voice and specific language choices
+- Return the refined answer only — no commentary
+
+On success: save to `application_answers.ai_refined_answer`; insert into `ai_usage_log`; return to client. Client shows both versions with "Use this version" / "Keep my original" toggle.
+
+Rate limiting: same pattern as `/api/generate-summary` (5 req / 60 sec via Upstash; 50 req/user/month cap). Approaching limit banner at **40 of 50** requests.
+
+#### S6.7 — Senior review prompt and assembly API route
+
+Estimated time: 1 day
+
+**Senior review prompt** (shown when `draft_status = 'ready_to_assemble'`):
+
+> *Before assembling your final draft, we recommend checking with your CEO, treasurer, or a trustee that:*
+> - *The budget figures are accurate and approved*
+> - *The project description reflects your current priorities*
+> - *You have authority to submit this application*
+
+Button: "I've reviewed this — assemble my draft"
+
+`POST /api/assemble-draft`
+
+```typescript
+export const maxDuration = 60;
+```
+
+Inputs: all `application_answers` rows + `applications.ai_summary` + `funder_type`
+
+Bedrock prompt varies by `funder_type`:
+- **`structured`**: assemble answers into clean, well-formatted responses for each question — correct grammar, consistent tense, appropriate length for word limit. Do not add content.
+- **`free_form`**: weave section answers into a coherent flowing narrative — appropriate transitions, logical structure, consistent voice. Do not add facts. Respect page limit if present in summary.
+
+On success: save assembled text to `applications.assembled_draft`; set `draft_status = 'assembled'`; insert into `ai_usage_log`; redirect to Step 5.
+
+#### S6.8 — Step 5 export (updated)
+
+Estimated time: 0.5 days
+
+Update `GET /api/export/[applicationId]`:
+- Read `applications.assembled_draft` as the source — do not reassemble from `application_answers` rows
+- **Structured funder** (existing format): title page, Q&A pairs with bold headings, disclaimer
+- **Free-form funder**: title page + continuous narrative body — no Q&A heading structure imposed
+- Set `draft_status = 'exported'` on first download (alongside existing `status = exported`)
+- `docx` library already installed; no new dependencies required
 
 ---
 

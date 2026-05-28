@@ -1153,174 +1153,248 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ---
 
-## 9.6 AI Draft Answer Generation
+## 9.6 Q&A Interview and Application Assembly
+
+**Redesigned 2026-05-28.** The auto-generation model (AI writes everything on load) has been
+replaced with a Q&A interview model. The charity writes all answer content; AI assists with
+structure and clarity only on request. A final assembly step formats the charity's words into
+the funder's required output. The old `/api/generate-draft` route is removed. See
+`docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md` for the full design rationale.
 
 ---
 
 ### FR-28 — Must Have
 
-**Requirement:** On user request, the system shall generate a draft answer for a selected application question.
+**Requirement:** On arriving at Step 4 for the first time, the user shall see a preparation checklist before beginning the Q&A interview.
 
 ---
 
-**AC-FR-28-01 — Draft generation begins on arriving at Step 4**
+**AC-FR-28-01 — Preparation checklist shown on first entry to Step 4**
 
-- **Given** I have completed Step 3 with an AI summary containing extracted questions
-- **When** I click *"This looks right — continue"* to advance to Step 4
-- **Then** the AI draft generation begins automatically for all extracted questions
-- **And** a staged progress indicator is shown while processing is underway
-
----
-
-**AC-FR-28-02 — Each question displayed with its draft answer**
-
-- **Given** the AI draft has been generated on Step 4
-- **When** I view the page
-- **Then** each application question is shown as a bold heading
-- **And** each question has an AI-generated draft answer displayed in an editable textarea directly below it
+- **Given** I have completed Step 3 and clicked *"This looks right — continue"*
+- **When** I arrive at Step 4 for the first time
+- **Then** I see a preparation checklist before any questions are shown
+- **And** the screen lists the financial documents I should gather before starting
+- **And** there is a note: *"The financial sections cannot be completed by AI. It is worth involving a senior colleague before reaching the financial questions."*
 
 ---
 
-**AC-FR-28-03 — Manual question entry when no questions were extracted**
+**AC-FR-28-02 — Preparation checklist bypassed on return visits**
 
-- **Given** the AI summary on Step 3 found no application questions
-- **When** I arrive at Step 4
-- **Then** I see a manual question entry field
-- **And** I can enter my own questions before generating draft answers
+- **Given** I have previously passed the preparation checklist and started writing answers
+- **When** I return to Step 4 (e.g. after navigating away and coming back)
+- **Then** I go directly to the Q&A interface — the preparation checklist is not shown again
 
 ---
 
-**AC-FR-28-04 — Regenerate all answers available**
+**AC-FR-28-03 — Q&A interface shows all questions from the Step 3 summary**
 
-- **Given** draft answers are displayed on Step 4
-- **When** I click *"Regenerate all answers"*
-- **Then** new draft answers are generated for all questions
-- **And** this regeneration counts as one AI request against my monthly allowance
+- **Given** I have clicked *"I have what I need — start writing"* on the preparation checklist
+- **When** I view the Q&A interface
+- **Then** all questions extracted from the funder guidelines in Step 3 are shown
+- **And** each question has an empty textarea where I can write my own answer from scratch
+
+---
+
+**AC-FR-28-04 — Free-form funder shows narrative sections instead of discrete questions**
+
+- **Given** the Step 3 summary identified the funder as a free-form narrative funder (no numbered questions)
+- **When** I view the Q&A interface
+- **Then** I see named narrative sections (e.g., "About your organisation", "Project description")
+- **And** each section has a textarea for my own answer
+- **And** a note is displayed: *"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."*
 
 ---
 
 **AC-FR-28-05 — Monthly limit warning shown when approaching limit**
 
-- **Given** I have used 16 or more of my 20 monthly AI requests
+- **Given** I have used 40 or more of my 50 monthly AI requests
 - **When** I am on Step 4
 - **Then** I see the soft warning banner: *"You've used most of your monthly AI allowance."*
 
 ---
 
-**AC-FR-28-06 — Generation blocked when monthly limit is reached**
+**AC-FR-28-06 — AI assist blocked when monthly limit is reached**
 
-- **Given** I have used all 20 of my monthly AI requests
+- **Given** I have used all 50 of my monthly AI requests
 - **When** I am on Step 4
-- **Then** the generate and regenerate buttons are disabled
+- **Then** all "Help me improve this" buttons are disabled
 - **And** I see the message: *"You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch."*
+- **And** I can still write and save my own answers without restriction
 
 ---
 
-**AC-FR-28-07 — API error during draft generation — error message shown**
+**AC-FR-28-07 — Answers auto-saved on field blur**
 
-- **Given** I am on Step 4 and draft generation is underway
-- **When** the Claude API returns an error or times out
-- **Then** I see the error message: *"We couldn't generate your draft right now. This is usually temporary — please try again."*
-- **And** I see a "Try again" button
-- **And** no application data is lost
+- **Given** I am writing an answer on Step 4
+- **When** I move focus away from the textarea (field blur)
+- **Then** my answer is automatically saved to the database
+- **And** no AI call is made — this is a pure database write
+
+---
+
+**AC-FR-28-08 — Progress indicators show answer status per question**
+
+- **Given** I have started writing some answers but not all
+- **When** I view the Q&A interface
+- **Then** questions with a complete answer are shown in green
+- **And** questions with a partial answer are shown in amber
+- **And** questions not yet started are shown in grey
 
 ---
 
 ### FR-29 — Should Have
 
-**Requirement:** Before generating a draft, the user shall be able to specify a word limit for the answer.
+**Requirement:** Word limits extracted from the funder guidelines shall be displayed alongside each question, and answers shall display a word/character counter.
 
-*These criteria apply only if FR-29 is implemented in v1.*
-
----
-
-**AC-FR-29-01 — Word limit field available for each question**
-
-- **Given** I am on Step 4 and draft answers are ready to be generated
-- **When** I view the question interface
-- **Then** I can see an optional word limit field for each question
+*Word limits are extracted automatically from the guidelines in Step 3 — they are not manually entered by the user.*
 
 ---
 
-**AC-FR-29-02 — Specified word limit passed to AI generation**
+**AC-FR-29-01 — Word limit shown for each question that has one**
 
-- **Given** I have entered a word limit for a question
-- **When** the draft answer for that question is generated
-- **Then** the AI attempts to produce an answer within the specified word limit
+- **Given** a question has a word limit extracted from the funder guidelines
+- **When** I view that question card on Step 4
+- **Then** the word limit is displayed (e.g., "Max 300 words")
 
 ---
 
-**AC-FR-29-03 — Word limit is optional — omitting it does not block generation**
+**AC-FR-29-02 — Word counter shown on each textarea**
 
-- **Given** I am on Step 4
-- **When** I generate draft answers without specifying a word limit for any question
-- **Then** answers are generated without restriction
-- **And** no error is shown for leaving word limit fields empty
+- **Given** I am writing an answer on Step 4
+- **When** I type in a textarea
+- **Then** a word or character counter is displayed and updates as I type
+
+---
+
+**AC-FR-29-03 — Questions without word limits do not show a counter**
+
+- **Given** a question has no word limit in the funder guidelines
+- **When** I view that question card
+- **Then** no word limit label is shown
 
 ---
 
 ### FR-30 — Must Have
 
-**Requirement:** AI draft generation shall use the application question, word limit (if specified), funder summary, and charity profile as inputs to the Claude API.
+**Requirement:** The AI assist feature ("Help me improve this") shall improve the structure and clarity of the user's written answer without adding facts or changing the meaning.
 
 ---
 
-**AC-FR-30-01 — Draft answers are specific to each question**
+**AC-FR-30-01 — "Help me improve this" button available on non-budget questions**
 
-- **Given** I am on Step 4 with multiple application questions
-- **When** the draft answers are generated
-- **Then** each draft answer is clearly tailored to its corresponding question
-- **And** answers for different questions are distinct from one another
-
----
-
-**AC-FR-30-02 — Draft answers reflect the funder's priorities from the summary**
-
-- **Given** the AI summary in Step 3 identified specific funder priorities and requirements
-- **When** draft answers are generated in Step 4
-- **Then** the draft content addresses the funder's stated priorities and requirements
+- **Given** I am viewing a non-budget question on Step 4
+- **When** I view the question card
+- **Then** I see a "Help me improve this" button
 
 ---
 
-**AC-FR-30-03 — Draft answers reflect the charity's profile**
+**AC-FR-30-02 — AI assist returns a structurally improved version of my answer**
 
-- **Given** I have a completed charity profile
-- **When** draft answers are generated
-- **Then** the draft content uses the charity's own information — what it does, who it helps, and where it works
-
----
-
-**AC-FR-30-04 — Draft answers differ when charity profile differs**
-
-- **Given** two user accounts with different charity profiles working on identical funder guidelines and the same questions
-- **When** each account generates draft answers
-- **Then** the draft answers are personalised to their respective charity profiles rather than being identical
+- **Given** I have written an answer and clicked "Help me improve this"
+- **When** the AI assist call completes
+- **Then** I am shown a refined version of my answer alongside my original
+- **And** the refined version does not contain facts, statistics, or claims not present in my original answer
 
 ---
 
-### FR-31 — Should Have
+**AC-FR-30-03 — I can choose to use the refined answer or keep my original**
 
-**Requirement:** If the generated draft significantly exceeds the specified word limit, the system shall flag this prominently to the user.
-
-*These criteria apply only if FR-29 and FR-31 are implemented in v1.*
-
----
-
-**AC-FR-31-01 — Prominent warning shown when draft significantly exceeds word limit**
-
-- **Given** I have specified a word limit for a question
-- **And** the generated draft answer significantly exceeds that limit
-- **When** the draft is displayed
-- **Then** a prominent warning is shown indicating the draft exceeds the specified word limit
+- **Given** I have received a refined answer from the AI assist
+- **When** I view the result
+- **Then** I see both my original answer and the refined version
+- **And** I can click "Use this version" to replace my answer with the refined text
+- **And** I can click "Keep my original" to discard the refined version
 
 ---
 
-**AC-FR-31-02 — No warning shown when draft is within the word limit**
+**AC-FR-30-04 — Using the AI assist counts as one AI request**
 
-- **Given** I have specified a word limit for a question
-- **And** the generated draft answer is within or close to the specified limit
-- **When** the draft is displayed
-- **Then** no word count warning is shown
+- **Given** I click "Help me improve this" for a question
+- **When** the request completes successfully
+- **Then** one AI request is added to my monthly usage count
+
+---
+
+**AC-FR-30-05 — Assembly formats the charity's answers without adding content**
+
+- **Given** I have completed all questions and confirmed the senior review
+- **When** the assembly API runs
+- **Then** the assembled draft contains my words (or my AI-refined words where I chose to use them)
+- **And** the assembly does not add facts, statistics, or claims not present in my answers
+
+---
+
+### FR-31 — Must Have
+
+**Requirement:** Budget questions shall be visually distinct and the AI assist shall be disabled for them.
+
+---
+
+**AC-FR-31-01 — Budget questions are visually distinct**
+
+- **Given** a question is identified as a budget or financial question
+- **When** I view that question card on Step 4
+- **Then** the card has a distinct visual style (e.g., amber background, "£" badge) that differentiates it from non-budget questions
+
+---
+
+**AC-FR-31-02 — AI assist disabled on budget questions**
+
+- **Given** I am viewing a budget question on Step 4
+- **When** I look at the AI assist area on that card
+- **Then** the "Help me improve this" button is not present
+- **And** a label is displayed: *"This section requires your actual financial data — do not use AI-generated figures"*
+
+---
+
+**AC-FR-31-03 — Budget questions require a user answer before assembly**
+
+- **Given** I have not filled in a budget question
+- **When** I attempt to click "Ready to assemble"
+- **Then** I cannot proceed
+- **And** I see the message: *"Please enter your actual budget figures before assembling"*
+
+---
+
+### FR-31A — Must Have
+
+**Requirement:** Before the final assembly, the user shall see a senior review prompt recommending they check the budget figures and project description with a senior colleague.
+
+---
+
+**AC-FR-31A-01 — Senior review prompt shown before assembly**
+
+- **Given** all questions are answered and I have clicked "Ready to assemble"
+- **When** I view the next screen
+- **Then** I see a prompt recommending I check with my CEO, treasurer, or a trustee that:
+  - *"The budget figures are accurate and approved"*
+  - *"The project description reflects your current priorities"*
+  - *"You have authority to submit this application"*
+
+---
+
+**AC-FR-31A-02 — Assembly begins only after senior review confirmation**
+
+- **Given** I am viewing the senior review prompt
+- **When** I click *"I've reviewed this — assemble my draft"*
+- **Then** the assembly API is called and the assembled draft is saved to the application
+
+---
+
+**AC-FR-31A-03 — Structured funder assembly produces a Q&A formatted draft**
+
+- **Given** the funder is a structured funder (discrete questions)
+- **When** the assembly API completes
+- **Then** the assembled draft contains each answer formatted under its question heading
+
+---
+
+**AC-FR-31A-04 — Free-form assembly produces a flowing narrative**
+
+- **Given** the funder is a free-form narrative funder
+- **When** the assembly API completes
+- **Then** the assembled draft is a coherent flowing narrative — not a Q&A list
 
 ---
 
@@ -1400,65 +1474,68 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ### FR-34 — Must Have
 
-**Requirement:** The user shall be able to edit the draft text directly within the review interface before approving.
+**Requirement:** The user shall write their own answers in textareas on Step 4; writing does not consume AI credits.
+
+*Note: Under the Q&A model, textareas start empty — the user writes from scratch. There is no AI-generated draft to edit. The "Help me improve this" AI assist (FR-30) is a separate optional action.*
 
 ---
 
-**AC-FR-34-01 — Draft answers are editable on Step 4**
+**AC-FR-34-01 — Answer textareas start empty**
 
-- **Given** draft answers have been generated on Step 4
-- **When** I view the answer for any question
-- **Then** the answer text is displayed in an editable textarea
-- **And** I can modify the text directly in place
-
----
-
-**AC-FR-34-02 — Edited text carried forward to Step 5**
-
-- **Given** I have edited a draft answer on Step 4
-- **When** I click *"I've reviewed my answers — continue"* to advance to Step 5
-- **Then** the edited version of the answer is shown in the Step 5 review — not the original AI-generated text
+- **Given** I have passed the preparation checklist and am on the Q&A interface
+- **When** I view a question card for the first time
+- **Then** the textarea is empty — there is no pre-filled AI-generated text
 
 ---
 
-**AC-FR-34-03 — Manually editing text does not consume an AI request**
+**AC-FR-34-02 — Written answers auto-saved and carried forward**
 
-- **Given** I am on Step 4 with draft answers displayed
-- **When** I manually edit the text in one or more answer textareas
+- **Given** I have written an answer on Step 4
+- **When** the answer is auto-saved (on blur) and I later advance to Step 5
+- **Then** the assembled draft reflects my written content
+
+---
+
+**AC-FR-34-03 — Writing answers does not consume an AI request**
+
+- **Given** I am on Step 4
+- **When** I type in any textarea and the answer is auto-saved
 - **Then** this does not count as an AI request against my monthly allowance
 
 ---
 
 ### FR-35 — Must Have
 
-**Requirement:** The user shall be able to discard a generated draft and either regenerate a new draft or write their own answer.
+**Requirement:** The user shall be able to clear and rewrite any answer at any time before assembly.
+
+*Note: The "Regenerate all answers" action no longer exists. Users write their own content from scratch; there is no AI-generated content to regenerate.*
 
 ---
 
-**AC-FR-35-01 — User can clear a draft and write their own answer**
+**AC-FR-35-01 — User can clear and rewrite any answer**
 
-- **Given** a draft answer has been generated for a question on Step 4
-- **When** I clear the textarea and type my own answer
-- **Then** my written answer replaces the AI-generated text
-- **And** my answer is used when I advance to Step 5
-
----
-
-**AC-FR-35-02 — Regenerate all answers replaces all existing drafts**
-
-- **Given** draft answers are displayed on Step 4
-- **When** I click *"Regenerate all answers"*
-- **Then** all previously generated draft answers are replaced with newly generated answers
-- **And** this counts as one AI request against my monthly allowance
+- **Given** I have written an answer for a question on Step 4
+- **When** I clear the textarea and type a new answer
+- **Then** my new answer replaces the previous text
+- **And** the updated answer is saved on blur
 
 ---
 
-**AC-FR-35-03 — User-written answers treated the same as AI-generated answers in review**
+**AC-FR-35-02 — Answers can be updated any number of times before assembly**
 
-- **Given** I have replaced one or more generated drafts with my own written answers
-- **When** I advance to Step 5 and review the application
-- **Then** my written answers are shown alongside any AI-generated answers
-- **And** the application can be approved and exported regardless of whether answers were AI-generated or written manually
+- **Given** I have saved an answer for a question
+- **When** I return to Step 4 before triggering assembly
+- **Then** I can edit or replace my previous answer
+- **And** the latest saved version is used for assembly
+
+---
+
+**AC-FR-35-03 — All answers (written or AI-assisted) treated equally at assembly**
+
+- **Given** some of my answers were improved using the AI assist and some were not
+- **When** I trigger assembly
+- **Then** the assembly uses whichever version I chose (my original or the AI-refined version) for each question
+- **And** there is no distinction in the assembled output between assisted and unassisted answers
 
 ---
 
