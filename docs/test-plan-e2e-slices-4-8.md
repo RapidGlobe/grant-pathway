@@ -1,6 +1,6 @@
 # Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.3  
+**Version:** 1.4  
 **Date:** 2026-05-22  
 **Last updated:** 2026-05-29  
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
@@ -21,8 +21,8 @@ Complete this table after running all tests.
 | Positive (S2) | 5 | | | | |
 | Positive (S3) | 2 | | | | |
 | Positive (S4) | 6 | | | | |
-| Positive (S5) | 6 | | | | |
-| Positive (S6) | 6 | | | | |
+| Positive (S5) | 7 | | | | |
+| Positive (S6) | 7 | | | | |
 | Positive (S7) | 6 | | | | |
 | Positive (S8) | 3 | | | | |
 | Negative (S0) | 9 | | | | |
@@ -36,7 +36,7 @@ Complete this table after running all tests.
 | Negative (S8) | 7 | | | | |
 | Non-Functional | 13 | | | | |
 | Usability / Flow | 12 | | | | |
-| **Total** | **114** | | | | |
+| **Total** | **116** | | | | |
 
 ---
 
@@ -55,13 +55,28 @@ Log any failures that are NOT in the known expected failures list below.
 
 ## Test Fixtures
 
-The following real funder guideline files are available in `docs/test-fixtures/`:
+The canonical list of 12 target funders (10 structured, 2 narrative) is in [`docs/target-funder-list.md`](../target-funder-list.md). Guidelines for all 12 funders should be sourced from the URLs in that document before running a full test cycle.
 
-| File | Format | Notes |
-|------|--------|-------|
-| `tnl-community-fund-application-form-2025.docx` | DOCX | National Lottery Community Fund — medium length, has named questions |
-| `heritage-fund-application-guidance.pdf` | PDF | Historic England / National Lottery Heritage Fund — structured guidance |
-| `Garfield Weston Application-guidelines-1.pdf` | PDF | Garfield Weston Foundation — longer document, multi-section |
+The following real funder guideline files are currently available in `docs/test-fixtures/`:
+
+| File | Format | Funder type | Notes |
+|------|--------|-------------|-------|
+| `tnl-community-fund-application-form-2025.docx` | DOCX | Structured | National Lottery Community Fund — medium length, has named questions with word limits |
+| `heritage-fund-application-guidance.pdf` | PDF | Structured | National Lottery Heritage Fund — structured guidance with discrete questions |
+| `Garfield Weston Application-guidelines-1.pdf` | PDF | Narrative (free_form) | Garfield Weston Foundation — 10-page narrative proposal; no discrete questions; primary test for free_form path |
+
+**Missing fixtures (source from `docs/target-funder-list.md` before full test run):**
+- Idlewild Trust — Word question set (structured)
+- A B Charitable Trust — PDF question set (structured)
+- Clothworkers' Foundation — online guidelines (structured)
+- Henry Smith Foundation — Stage 1 questions (structured)
+- Wolfson Foundation — Stage 1 questions with per-question word limits (structured)
+- Lloyds Bank Foundation CI — PDF Advice Note (structured)
+- Foyle Foundation — sector-specific guidance PDF (structured)
+- Walton Charity — guidelines PDF (structured)
+- Nationwide Building Society Community Grants — guidance and FAQ PDF (structured)
+- Motability Foundation — guidance PDFs (structured)
+- City Bridge Foundation — Word sample form (narrative / free_form)
 
 You will need to create additional files to test error states:
 
@@ -594,17 +609,37 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 
 ---
 
-### S5-P-02 — Summary content is accurate and structured
+### S5-P-02 — Summary content is accurate and structured (structured funder)
 
-**Preconditions:** Summary generated using `tnl-community-fund-application-form-2025.docx`.
+**Preconditions:** Summary generated using `tnl-community-fund-application-form-2025.docx` (structured funder).
 
-1. Review the summary card displayed on Step 3.
+1. Review the summary displayed on Step 3.
 
 **Expected result:**
-- Summary includes relevant sections visible in the source document (funder name, grant name, amount, eligibility, key requirements).
+- Summary is displayed as individual cards in a responsive two-column grid (side-by-side on desktop, stacked on mobile).
+- "About this grant" card spans full width.
+- "Grant amount" and "Who can apply" cards sit side-by-side (Grant amount expands to full width if Who can apply is absent).
+- Each card heading has a teal left border highlight.
+- An "Application questions" card is shown (not "Application sections").
+- Green confirmation note reads "X questions found" (not "X sections to complete").
 - Extracted questions reflect questions present in the DOCX.
-- Green "questions found" note is shown.
 - Word limits are displayed alongside questions where specified in the source document.
+- No "Documents you will need to submit" card is shown.
+
+---
+
+### S5-P-02b — Summary content for a free_form (narrative) funder
+
+**Preconditions:** Summary generated using `Garfield Weston Application-guidelines-1.pdf` (free_form funder).
+
+1. Review the summary displayed on Step 3.
+
+**Expected result:**
+- Two-column card layout as above.
+- An "Application sections" card is shown (not "Application questions").
+- Green confirmation note reads "X sections to complete".
+- Sections reflect the narrative headings in the Garfield Weston guidelines (e.g. "About your organisation", "Your project").
+- No numbered questions are listed.
 
 ---
 
@@ -707,6 +742,21 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 **Expected result:**
 - The preparation checklist is NOT shown.
 - The Q&A interface loads immediately with any previously saved answers intact.
+
+---
+
+### S6-P-03b — Returning via Step 3 does not reset advanced draft states
+
+**Preconditions:** Application where `draft_status` is `'ready_to_assemble'` or `'assembled'` (user has already completed writing or assembled the draft).
+
+1. Navigate back to Step 3 (e.g. using the step indicator or Back link).
+2. Click **Continue** on Step 3 to advance to Step 4 again.
+
+**Expected result:**
+- `draft_status` is NOT reset to `'not_started'`.
+- The preparation checklist is NOT shown.
+- The Q&A interface loads with all previously saved answers intact.
+- The progress bar reflects the previously completed sections/questions.
 
 ---
 
@@ -1483,15 +1533,18 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 
 ---
 
-### NF-02 — AI draft generation response time
+### NF-02 — AI refine-answer response time
 
-**Target:** ≤60 seconds from page load to all draft answers populated.
+**Target:** ≤15 seconds from clicking "Help me improve this" to refined answer appearing.
 
-1. Note the time when Step 4 page loads.
-2. Note the time when all draft answers are populated.
-3. Calculate elapsed time.
+**Note:** Step 4 no longer auto-generates answers on page load (the old auto-generation model was replaced by the charity-authored Q&A model in the 2026-05-28 redesign). The only AI call in Step 4 is the optional per-question refine-answer request.
 
-**Expected result:** ≤60 seconds. Record actual time. Results may vary with Garfield Weston (longer doc) vs TNL (shorter doc) — test both.
+1. Navigate to Step 4 with at least one non-budget question/section that has a saved answer.
+2. Note the time when you click **"Help me improve this"** on a non-budget answer.
+3. Note the time when the refined answer replaces the original text.
+4. Calculate elapsed time.
+
+**Expected result:** ≤15 seconds from click to refined answer displayed. Record actual time. Test with both a short answer (~50 words) and a longer answer (~200 words) and note any difference.
 
 ---
 
@@ -1818,7 +1871,8 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | 1.1 | 2026-05-26 | Rapidglobe Ltd | Added D-001 to D-004 to defect log (sign-out, password reset, same-password, recovery session bugs fixed during testing) |
 | 1.2 | 2026-05-29 | Rapidglobe Ltd | Complete rewrite of S6 positive tests to reflect charity-authored Q&A model (preparation checklist gate, section-by-section/structured Q&A interface, auto-save on blur, budget section indicators, assemble and advance); rewrote S6-N-01 (refine-answer failure replaces draft generation failure); fixed S5-P-03, S5-P-05, S5-N-03 to use 50-request cap and 40-request approaching-limit threshold; updated S5-P-06 button text ("Continue" not "This looks right — continue"); updated cross-browser smoke test header; added document history table |
 | 1.3 | 2026-05-29 | Rapidglobe Ltd | Updated "Manual Maintenance" section to reflect Vercel Pro upgrade — all cron jobs now running; manual guidelines-temp cleanup no longer required during testing |
+| 1.4 | 2026-05-29 | Rapidglobe Ltd | Test Fixtures section updated: pointer to `docs/target-funder-list.md` (12 consolidated funders); missing fixture files listed per funder. S5-P-02 updated for Step 3 two-column card layout redesign and removal of supporting documents card; S5-P-02b added (free_form funder summary — "Application sections" card, "X sections to complete" confirmation). S6-P-03b added (advanceToStep4 bug fix — confirms `ready_to_assemble`/`assembled` states are preserved when returning via Step 3). NF-02 rewritten: old "AI draft generation response time" test removed (auto-generation model no longer exists); replaced with refine-answer API response time test (target ≤15s). Summary table updated: S5 positive 6 → 7, S6 positive 6 → 7, total 114 → 116. |
 
 ---
 
-_Test plan v1.3 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
+_Test plan v1.4 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._

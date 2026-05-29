@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-05-29 — Test plan updated to v1.4
+
+**What changed:**
+- `docs/test-plan-e2e-slices-4-8.md` — Version 1.3 → 1.4. Four areas updated:
+  1. **Test Fixtures** — pointer added to `docs/target-funder-list.md`; all 12 consolidated funders listed; missing fixture files identified per funder.
+  2. **S5-P-02** — rewritten to reflect Step 3 two-column card layout redesign; S5-P-02b added (free_form funder summary — "Application sections" card, "X sections to complete" note).
+  3. **S6-P-03b** — new test covering `advanceToStep4` bug fix: confirms `ready_to_assemble`/`assembled` states are not reset to `not_started` when user returns via Step 3.
+  4. **NF-02** — rewritten: old auto-generation response time test removed (model no longer exists); replaced with refine-answer API response time test (≤15 seconds target).
+- Summary table: total 114 → 116.
+
+**Why:** Test plan had not been updated to reflect the Step 3 layout redesign, the advanceToStep4 bug fix, or the removal of the Step 4 auto-generation model. NF-02 was actively misleading — it described a test that could no longer pass because the behaviour it tested had been removed.
+
+---
+
 ## 2026-05-29 — Consolidated target funder list documented; AGENTS.md audit trail rule strengthened
 
 **What changed:**
