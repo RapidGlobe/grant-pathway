@@ -1,6 +1,6 @@
 # Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.2  
+**Version:** 1.3  
 **Date:** 2026-05-22  
 **Last updated:** 2026-05-29  
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
@@ -99,28 +99,25 @@ Each account must have:
 
 ---
 
-## Manual Maintenance During Testing
+## Cron Job Status During Testing
 
-> ⚠️ **Known limitation — Vercel free tier (2 cron job maximum):** All three cron jobs defined in `vercel.json` require Vercel Pro to run reliably. The free Hobby plan caps at 2 cron jobs and does not support sub-daily schedules. None of the three cron jobs should be relied upon during this testing period. All will be fully operational after the P5.4 upgrade to Vercel Pro.
+> ✅ **Vercel Pro plan is active.** All three cron jobs are running normally.
 
-| Cron job | Schedule | Free tier status | Impact during testing |
+| Cron job | Schedule | Status | Impact during testing |
 |---|---|---|---|
-| `cleanup-guidelines` | Every 30 min | ❌ Not running — interval too frequent + job limit | Orphan files accumulate in `guidelines-temp` — **manual cleanup required** (see below) |
-| `inactivity-warning` | Daily 08:00 UTC | ❌ Not running — exceeds 2-job limit | No impact — requires 23 months of inactivity, will not trigger during testing |
-| `inactivity-deletion` | Daily 09:00 UTC | ❌ Not running — exceeds 2-job limit | No impact — requires 24 months of inactivity, will not trigger during testing |
+| `cleanup-guidelines` | Every 30 min | ✅ Running | Orphaned files in `guidelines-temp` are cleaned up automatically within 30 minutes — no manual action required |
+| `inactivity-warning` | Daily 08:00 UTC | ✅ Running | No impact during testing — requires 23 months of inactivity to trigger |
+| `inactivity-deletion` | Daily 09:00 UTC | ✅ Running | No impact during testing — requires 24 months of inactivity to trigger |
 
-### Manual cleanup — `guidelines-temp` bucket
+### Optional manual cleanup — `guidelines-temp` bucket
 
-After each test session (or at minimum before starting a new round of file upload tests):
+Manual cleanup is not required during normal testing. However, if you need an immediate cleanup between tests (e.g. to verify storage behaviour), you can do so manually:
 
 1. Log in to [supabase.com](https://supabase.com) → select the **grant-pathway-dev** project
 2. Go to **Storage** → **guidelines-temp** bucket
-3. Select all files in the bucket root
-4. Click **Delete** to remove them
+3. Select all files in the bucket root and click **Delete**
 
-There is no risk to application data — the `guidelines-temp` bucket holds only in-flight upload files. All extracted text is stored in `sessionStorage` in the browser. Deleting files from this bucket does not affect any application or user record.
-
-If you notice Step 3 (AI Summary) failing with a storage error during testing, an orphaned file from a previous failed upload may be the cause — run the cleanup procedure above and retry.
+There is no risk to application data — the `guidelines-temp` bucket holds only in-flight upload files. Deleting files does not affect any application or user record.
 
 ---
 
@@ -1820,7 +1817,8 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | 1.0 | 2026-05-22 | Rapidglobe Ltd | Initial test plan — Slices 0–8 positive, negative, non-functional, and usability tests |
 | 1.1 | 2026-05-26 | Rapidglobe Ltd | Added D-001 to D-004 to defect log (sign-out, password reset, same-password, recovery session bugs fixed during testing) |
 | 1.2 | 2026-05-29 | Rapidglobe Ltd | Complete rewrite of S6 positive tests to reflect charity-authored Q&A model (preparation checklist gate, section-by-section/structured Q&A interface, auto-save on blur, budget section indicators, assemble and advance); rewrote S6-N-01 (refine-answer failure replaces draft generation failure); fixed S5-P-03, S5-P-05, S5-N-03 to use 50-request cap and 40-request approaching-limit threshold; updated S5-P-06 button text ("Continue" not "This looks right — continue"); updated cross-browser smoke test header; added document history table |
+| 1.3 | 2026-05-29 | Rapidglobe Ltd | Updated "Manual Maintenance" section to reflect Vercel Pro upgrade — all cron jobs now running; manual guidelines-temp cleanup no longer required during testing |
 
 ---
 
-_Test plan v1.2 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
+_Test plan v1.3 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
