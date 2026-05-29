@@ -6,6 +6,16 @@
 
 ---
 
+## 2026-05-29 — Vercel function region set to London (eu-west-2 / lhr1)
+
+**What changed:**
+- Vercel project → Settings → Function Regions: London, United Kingdom (eu-west-2 / lhr1) selected and saved. Redeployment triggered.
+
+**Why:**
+AWS Bedrock is configured for `eu-west-2` (London). Vercel functions were previously executing from the default `iad1` region (Virginia, USA) — no European region had been explicitly configured. Every AI call was making a transatlantic round trip (Virginia → AWS London → Virginia), adding significant latency and contributing to timeout risk on large documents. Aligning Vercel and Bedrock in the same region reduces call latency, lowers timeout risk, and improves data residency (all processing stays in UK).
+
+---
+
 ## 2026-05-29 — generate-summary parse_error fixed for large structured documents (D-011)
 
 **What changed:**
