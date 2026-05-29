@@ -6,6 +6,16 @@
 
 ---
 
+## 2026-05-29 — Dashboard AI cap display corrected from 20 to 50 (D-010)
+
+**What changed:**
+- `components/dashboard-populated.tsx` — `AI_REQUESTS_LIMIT` constant updated from `20` to `50`. The display showed "14 of 20 AI requests used this month" — the enforced cap in the API routes was correctly 50 but the constant driving the UI was never updated when the cap was raised. The under-display (20 vs 50) was misleading users into thinking they were closer to the limit than they were.
+
+**Why:**
+Discovered during testing session 2026-05-29. User dashboard showed 14 of 20. API routes (`generate-summary/route.ts`, `refine-answer/route.ts`) both use `MONTHLY_CAP = 50` correctly — only the display was wrong.
+
+---
+
 ## 2026-05-29 — GAP-27 and GAP-28 raised: character limits and non-text questions
 
 **What changed:**

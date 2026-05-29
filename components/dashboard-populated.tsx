@@ -21,7 +21,7 @@ import {
 } from "@/actions/applications";
 import type { ApplicationSummary, ApplicationStatus } from "@/actions/applications";
 
-const AI_REQUESTS_LIMIT = 20;
+const AI_REQUESTS_LIMIT = 50;
 
 const STATUS_CONFIG: Record<
   ApplicationStatus,
