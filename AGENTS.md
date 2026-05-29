@@ -4,20 +4,6 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-<!-- BEGIN:phase1-approval-rules -->
-# Phase 1 — Mandatory stop-and-approve workflow
-
-When working on any Phase 1 task (P1.1 through P1.15):
-
-1. **Complete one task at a time.** Do not start the next task until explicitly told to proceed.
-2. **After completing each task**, do all of the following before stopping:
-   - Update `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`: mark the task `[x]`, update its row in the Summary table (Done: 0 → 1, Status: Not started → ✅ Complete), and update the **Last updated** date.
-   - Update the Phase 1 sub-total row in the Summary table to reflect the new Done count.
-   - Report to the user: what was built, any deviations from the plan, and anything that needs attention.
-3. **Wait for explicit approval** ("continue", "proceed", "go ahead", or similar) before starting the next task. Do not assume approval.
-4. This rule applies even if the next task seems straightforward.
-<!-- END:phase1-approval-rules -->
-
 <!-- BEGIN:adr-consequences-rules -->
 # ADR Consequences — Mandatory pre-task check
 
@@ -27,7 +13,7 @@ Before starting any implementation task:
 
 1. **Identify every ADR relevant to that task area.** Read the full Consequences section of each one.
 2. **For each consequence bullet, confirm there is a specific step in the current task that covers it.** If there is not, add the step before writing any code.
-3. **Before starting a new Phase, do a full ADR consequences sweep.** Walk all 42 ADRs. For every consequence that does not map to a completed or planned task, add a task to the implementation plan. Get this sign-off documented in `IMPLEMENTATION-STATUS.md` before the first task of the new phase begins.
+3. **Before starting a new Phase, do a full ADR consequences sweep.** Walk all ADRs in `docs/Technical Decision and Design/`. For every consequence that does not map to a completed or planned task, add a task to the implementation plan. Get this sign-off documented in `IMPLEMENTATION-STATUS.md` before the first task of the new phase begins.
 4. **This rule applies to all phases going forward.** It is not optional and cannot be skipped even if the task seems straightforward.
 
 **Why this rule exists:** Implementation tasks are written feature-first ("what does the app need to run?"). ADR consequences are spec-first ("what does the architecture require?"). Without an explicit check, the gap between the two is invisible until something breaks or a compliance review finds it after the fact.
@@ -50,7 +36,9 @@ This project requires a complete audit trail of all decisions, design changes, a
 
 ## Where to document it
 
-All implementation documentation lives in `docs/Implementation Plan/`. After completing any task, check each of the four documents in that folder and update as appropriate:
+Use the table below to identify the right document(s) for every change. Multiple documents may need updating for a single change — work through the full list.
+
+### Implementation Plan documents (`docs/Implementation Plan/`)
 
 | Document | Update when |
 |----------|-------------|
@@ -59,13 +47,23 @@ All implementation documentation lives in `docs/Implementation Plan/`. After com
 | `ADR-TRACEABILITY.md` | When a GAP item is resolved — update the Task column and change status from ⚠️ to ✅; also update the phase gate sign-off table when a gate is passed |
 | `IMPLEMENTATION-PLAN.md` | When the approach for a future task changes during implementation — update the task spec so it reflects current intent |
 
-For product-level decisions (funder lists, feature scope, personas, UX research findings), create or update the relevant file in `docs/` directly. If no suitable file exists, create one and cross-reference it from the CHANGELOG.
+### Product and design documents (`docs/`)
+
+| Document | Update when |
+|----------|-------------|
+| `docs/decisions/` (DR-\* files) | Any business or product decision is made or revised — create a new DR file or update the relevant existing one; update `DECISIONS-INDEX.md` |
+| `docs/Technical Decision and Design/` (ADR-\* files) | Any architectural or technical decision is made or revised — create a new ADR file or update the relevant existing one; update `ADR-INDEX.md` |
+| `docs/Technical Decision and Design/technical-design.md` | Any change to system architecture, data model, API contracts, or component design |
+| `docs/user-personas-journeys-and-use-cases.md` | Any change to target users, user goals, pain points, journeys, or use cases |
+| `docs/information-architecture-and-navigation.md` | Any change to page structure, navigation, routing, or information hierarchy |
+| `docs/moscow-feature-register.md` | Any feature added, removed, promoted, or demoted between Must/Should/Could/Won't |
+| `docs/technology-stack.md` | Any change to the technology choices, libraries, services, or infrastructure (if applicable) |
+| `docs/test-plan-e2e-slices-4-8.md` | Any change to test coverage, E2E slice scope, or acceptance criteria that affects the test plan (if applicable) |
+| `docs/target-funder-list.md` | Any change to the set of target grant-giving organisations or their classification |
 
 ## When in doubt — ask before proceeding
 
 If it is not obvious where a decision or change should be documented, **stop and ask the user before proceeding**. Do not proceed on the assumption that it will be captured later. The cost of a 30-second question is far lower than the cost of a lost decision that has to be reconstructed weeks later.
-
-**The rule:** One folder, one check. After any task, open `docs/Implementation Plan/` mentally and ask: does each of these four documents reflect what just happened? If not, update before committing.
 
 **Why this matters:** Teammates and future AI sessions rely on these documents to understand the current state of the project. An update missed here means someone works from stale information. The changelog in particular captures *why* decisions were made — that context is lost if it is not recorded at the time.
 <!-- END:implementation-docs-rules -->
