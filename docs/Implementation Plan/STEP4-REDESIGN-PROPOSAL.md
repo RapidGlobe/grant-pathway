@@ -335,5 +335,74 @@ All open questions resolved. Decisions recorded here for traceability before imp
 
 *Notes prepared: 2026-05-26*
 *Open questions resolved: 2026-05-28*
-*Status: Design approved — implementation in progress*
-*Next action: See IMPLEMENTATION-PLAN.md S6 tasks*
+*Status: Implementation complete — 2026-05-29*
+
+---
+
+## Implementation update — 2026-05-29
+
+### Section-by-section interface for free_form funders
+
+The Q&A design (Stages 2–4 above) was implemented in two releases:
+
+**Release 1 (2026-05-28):** Structured funders only. The `application_answers` table stores one row per numbered question. Step 4 shows each question as a labelled card with a textarea. Budget questions flagged in amber. AI refine button for non-budget questions. Prep checklist gate. Senior review prompt. Assembly API.
+
+**Release 2 (2026-05-29):** Free_form funder support. The AI (Step 3 prompt) now extracts **sections** as well as questions. For free_form funders, `sections` is populated (with title, guidance text, word limit, budget flag per section); `questions` is empty. For structured funders, `questions` is populated; `sections` is empty.
+
+#### New type: `AiSummarySection`
+
+```typescript
+export type AiSummarySection = {
+  number: number
+  title: string          // e.g. "About your organisation"
+  guidance: string       // 2–3 sentences from funder instructions ("what to include")
+  wordLimit?: number     // only if funder specifies explicitly
+  is_budget_section: boolean
+}
+
+// Added to AiSummaryData:
+sections?: AiSummarySection[]
+```
+
+#### Step 4 interface: free_form mode
+
+When `funder_type === 'free_form'`, Step 4 shows:
+- **Funder context bar** — teal banner identifying the funder and grant name
+- **Sticky progress bar** — "X of N sections completed" — remains visible as the user scrolls through long applications
+- **Section cards** — one card per extracted section, in order. Each card shows:
+  - Section title (no number prefix — section titles are the natural headings)
+  - Guidance text in muted type below the title (derived from funder's own instructions)
+  - Textarea (8 rows, auto-saved on blur)
+  - Word count (with over-limit warning if `wordLimit` is set)
+  - "Help me improve this" AI refine button (disabled on budget sections)
+- **Budget sections** — amber background, no AI assist, explicit warning to enter own figures
+
+#### Step 4 interface: both modes
+
+Both free_form and structured modes now share:
+- `max-w-[960px]` wider layout (was 640px)
+- Funder context bar (teal)
+- Sticky progress bar (top-0, z-10, shadow)
+- "sections completed" label for free_form; "questions answered" label for structured
+
+#### Assembly format
+
+`assembleAndAdvance` detects `funder_type` from the `ai_summary` JSON and formats accordingly:
+- **free_form:** `section_title\n\nanswer_text` (no number prefix — suits narrative Word document)
+- **structured:** `N. question_text\n\nanswer_text` (number prefix matches form structure)
+
+Both formats join sections with `\n\n---\n\n` separator, unchanged.
+
+#### Bug fix: advanceToStep4 reset
+
+`advanceToStep4` now resets `draft_status` to `not_started` only when the current status is `in_progress`. States `ready_to_assemble` and `assembled` are preserved. Previously, any return to Step 3 followed by Continue would reset the status and re-show the prep checklist — even for applications already through the senior review stage.
+
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-05-26 | Rapidglobe Ltd | Initial design notes from guidelines review session |
+| 1.1 | 2026-05-28 | Rapidglobe Ltd | All open questions resolved; final decisions documented; database design confirmed |
+| 1.2 | 2026-05-29 | Rapidglobe Ltd | Implementation update added: section-by-section interface for free_form funders, AiSummarySection type, assembly format, bug fix. Document history table added. |

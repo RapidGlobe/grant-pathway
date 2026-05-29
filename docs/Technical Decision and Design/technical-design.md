@@ -1,9 +1,9 @@
 ﻿# Grant Pathway — Technical Design Document
 
-**Version:** 1.1
+**Version:** 1.3
 **Date:** 2026-04-21
-**Last updated:** 2026-05-26
-**Status:** Approved — all 44 architectural decisions decided
+**Last updated:** 2026-05-29
+**Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
 ---
@@ -39,12 +39,15 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 
 ### What Grant Pathway does
 
-1. A charity worker registers and creates a charity profile (name, mission, beneficiaries, programmes, impact)
-2. They create a grant application, upload or paste funder guidelines
-3. The AI reads the guidelines and produces a structured summary
-4. The AI writes draft answers to each application question using the charity profile and summary
-5. The user reviews and edits the draft answers
-6. The user exports the completed application as a Word document
+1. A charity worker registers and creates a charity profile (name, what the charity does, who it helps, where it works)
+2. They create a grant application and enter the funder name and grant name (Step 1)
+3. They upload or paste the funder's guidelines PDF or Word document (Step 2)
+4. The AI reads the guidelines and produces a structured plain-English summary including funder priorities, eligibility, grant amount, extracted questions/sections, and any AI usage policy (Step 3)
+5. The charity **writes their own draft answers** to each question or section; AI can help improve the structure and clarity of a written answer on request but does not generate content from scratch (Step 4, "AI assisted and not AI generated")
+6. For **structured funders** (numbered questions): Q&A interview — one card per question
+7. For **free_form funders** (narrative sections): section-by-section writing — one card per section with guidance notes from the funder's own instructions
+8. A senior review prompt encourages checking budget figures and trustee sign-off before assembly
+9. The application is assembled and the user exports as a Word document (Step 5)
 
 ### Primary persona
 
@@ -282,12 +285,12 @@ All tables are in the `public` schema. RLS is enabled on all tables with default
 | `id` | `uuid` | PK, default `gen_random_uuid()` |
 | `user_id` | `uuid` | FK → `user_profiles(id)` |
 | `funder_name` | `text` | Not null |
-| `fund_name` | `text` | |
-| `deadline` | `date` | Nullable |
-| `amount_sought` | `integer` | Nullable |
-| `status` | `text` | `draft`, `in_progress`, `complete` |
+| `grant_name` | `text` | |
+| `status` | `text` | `not_started \| in_progress \| approved \| exported` |
 | `current_step` | `integer` | 1–5, default 1 |
-| `ai_summary` | `text` | Nullable, populated in Step 3 |
+| `ai_summary` | `text` | Nullable — JSON string, populated in Step 3 |
+| `assembled_draft` | `text` | Nullable — final formatted draft text, written in Step 4 assembly |
+| `draft_status` | `text` | `not_started \| in_progress \| ready_to_assemble \| assembled \| exported` |
 | `created_at` | `timestamptz` | Default `now()` |
 | `updated_at` | `timestamptz` | Default `now()` |
 
@@ -297,19 +300,25 @@ All tables are in the `public` schema. RLS is enabled on all tables with default
 | `id` | `uuid` | PK, default `gen_random_uuid()` |
 | `application_id` | `uuid` | FK → `applications(id)` |
 | `user_id` | `uuid` | FK → `user_profiles(id)` (denormalised for RLS) |
-| `question_text` | `text` | Not null |
-| `answer_text` | `text` | Nullable |
-| `word_limit` | `integer` | Nullable |
+| `question_text` | `text` | Not null — stores question text (structured) or section title (free_form) |
+| `question_order` | `integer` | Not null — ordering index; unique per `(application_id, question_order)` |
+| `answer_text` | `text` | Nullable — the charity's written answer |
+| `answer_source` | `text` | `user_written \| user_edited \| ai_generated` |
+| `word_limit` | `integer` | Nullable — extracted from guidelines by AI |
+| `is_budget_question` | `boolean` | Not null, default false — disables AI assist on this row |
 | `created_at` | `timestamptz` | Default `now()` |
 | `updated_at` | `timestamptz` | Default `now()` |
+
+**Note on free_form funders:** For narrative (free_form) funders, `question_text` stores the section title (e.g. "About your organisation"). Section guidance text is **not** stored in `application_answers` — it is re-derived on each Step 4 page load from `applications.ai_summary.sections[i].guidance`, matched by `question_order`. This avoids data duplication and keeps guidance in sync with the AI summary.
 
 #### `ai_usage_log`
 | Column | Type | Constraints |
 |---|---|---|
 | `id` | `uuid` | PK, default `gen_random_uuid()` |
 | `user_id` | `uuid` | FK → `user_profiles(id)` |
-| `request_type` | `text` | `summary` or `draft` |
+| `request_type` | `text` | `guideline_summary`, `refine_answer` |
 | `application_id` | `uuid` | Nullable |
+| `token_count` | `integer` | Nullable — tokens consumed by this request |
 | `created_at` | `timestamptz` | Default `now()` — used for monthly count |
 
 ### Row Level Security policies
@@ -430,9 +439,9 @@ Server Actions handle all data mutations. Defined in `app/actions/` with the `"u
 
 | Action file | Functions |
 |---|---|
-| `actions/profile.ts` | `saveCharityProfile(data)` |
-| `actions/applications.ts` | `createApplication(data)`, `updateApplication(id, data)`, `deleteApplication(id)`, `updateApplicationStatus(id, status)` |
-| `actions/answers.ts` | `saveAnswer(applicationId, questionId, answerText)` |
+| `actions/auth.ts` | Auth actions: sign in, register, reset password, change password, sign out |
+| `actions/charity.ts` | `saveCharityProfile(data)` |
+| `actions/applications.ts` | `createApplication`, `updateStep1`, `deleteApplication`, `advanceToStep4`, `saveAnswer`, `saveManualAnswer`, `setDraftReadyToAssemble`, `assembleAndAdvance` |
 
 ### API Routes
 
@@ -441,11 +450,16 @@ Explicit API routes handle long-running operations, file handling, export, and s
 | Route | Method | Purpose | Config |
 |---|---|---|---|
 | `/api/generate-summary` | POST | Step 3: AI summary generation | `maxDuration = 90` |
-| `/api/generate-draft` | POST | Step 4: Draft answer generation | `maxDuration = 90` |
+| `/api/refine-answer` | POST | Step 4: Per-answer structure/clarity improvement (non-budget only) | Default timeout |
 | `/api/upload/signed-url` | POST | Request Supabase Storage signed URL | Default timeout |
-| `/api/upload/process` | POST | Extract text + call AI after upload | Default timeout |
+| `/api/upload/process` | POST | Extract text after upload; store in sessionStorage | Default timeout |
 | `/api/export/[id]` | GET | Generate and stream Word document | Default timeout |
-| `/api/cron/cleanup-storage` | GET | Delete orphaned Storage objects | Default timeout |
+| `/api/cron/cleanup-guidelines` | GET | Delete orphaned Storage objects | Cron: daily 02:00 UTC |
+| `/api/cron/inactivity-warning` | GET | Send inactivity warning emails | Cron: 08:00 UTC daily |
+| `/api/cron/inactivity-deletion` | GET | Delete inactive accounts ≥24 months | Cron: 09:00 UTC daily |
+| `/api/account/delete` | POST | Cascade-delete user account and all data | Default timeout |
+
+**Removed routes (v1.0):** `/api/generate-draft` — removed in 2026-05-28 Q&A redesign. Draft generation is replaced by the charity-authored Q&A model; only refine-answer (per-question, on request) remains.
 
 ### Zod validation pattern
 
@@ -552,32 +566,53 @@ All prompts are defined in `lib/prompts.ts`. AI routes import from this file —
 // lib/prompts.ts
 export const MODEL = 'anthropic.claude-sonnet-4-6'; // Bedrock In-Region model ID
 
-export const SUMMARY_SYSTEM_PROMPT = `You are an expert grant writer helping UK charities...`;
+// Step 3: extract structured summary from funder guidelines
+export const buildSummaryPrompt = (guidelinesText: string, charity: CharityContext | null): string => `...`
+// Returns JSON: { funder_type, aboutGrant, amount, whoCanApply, lookingFor,
+//                 questions[], sections[], keyRequirements, funderAiPolicy, supportingDocuments }
 
-export const buildSummaryPrompt = (guidelinesText: string): string => `
-<guidelines>
-${guidelinesText}
-</guidelines>
-
-Summarise these funder guidelines under the following headings:
-- Who can apply
-- What they fund
-- What they don't fund
-- Key priorities
-- Word limits and format requirements
-- Deadline and submission notes
-...`;
-
-export const DRAFT_SYSTEM_PROMPT = `You are an expert grant writer...`;
-
-export const buildDraftPrompt = (
-  summary: string,
-  charityProfile: CharityProfile,
-  questions: Question[]
-): string => `...`;
+// Step 4: improve structure/clarity of a written answer (non-budget only)
+export const buildRefinePrompt = (questionText: string, answerText: string, wordLimit: number | null): string => `...`
+// Returns JSON: { "refinedText": "..." }
 ```
 
-Prompts use XML-tagged structured inputs and explicit JSON output format for Step 4. (ADR-AI-004)
+**`AiSummaryData` TypeScript type** (defined in `app/api/generate-summary/route.ts`):
+
+```typescript
+export type AiSummaryQuestion = {
+  number: number
+  text: string
+  wordLimit?: number
+  is_budget_question: boolean
+}
+
+export type AiSummarySection = {         // new — 2026-05-29
+  number: number
+  title: string                          // e.g. "About your organisation"
+  guidance: string                       // 2–3 sentences from funder's instructions
+  wordLimit?: number
+  is_budget_section: boolean
+}
+
+export type AiSummaryData = {
+  funder_type: 'structured' | 'free_form'
+  aboutGrant: string
+  amount: string
+  whoCanApply: string[]
+  lookingFor: string[]
+  questions: AiSummaryQuestion[]         // populated for structured funders; [] for free_form
+  sections?: AiSummarySection[]          // populated for free_form funders; [] for structured
+  keyRequirements: string[]
+  funderAiPolicy?: string | null
+  supportingDocuments?: string[]
+}
+```
+
+**Funder type routing:**
+- `structured` funders → Step 4 Q&A interview (numbered questions, one textarea per question)
+- `free_form` funders → Step 4 section-by-section writing (section title + guidance, one textarea per section)
+
+Prompts use explicit JSON output format. (ADR-AI-004)
 
 **Note:** Prompt wording is an initial implementation to be validated during testing. Changes to `lib/prompts.ts` are treated as first-class code changes and reviewed accordingly.
 
@@ -592,7 +627,7 @@ const { count } = await supabase
   .eq('user_id', userId)
   .gte('created_at', startOfMonth);
 
-if (count >= 20) {
+if (count >= 50) {
   return { error: 'USAGE_LIMIT_REACHED', resetDate: endOfMonth };
 }
 ```
@@ -606,7 +641,7 @@ Per-user sliding window rate limiting via Upstash Redis (`@upstash/ratelimit`) i
 | Route | Limit |
 |---|---|
 | `/api/generate-summary` | 5 requests per 60 seconds per user |
-| `/api/generate-draft` | 5 requests per 60 seconds per user |
+| `/api/refine-answer` | 5 requests per 60 seconds per user |
 
 Rate limit exceeded → HTTP 429 with message: *"Too many requests. Please wait a moment before trying again."*
 
@@ -628,7 +663,7 @@ All Bedrock Claude API calls go through `lib/ai-error-handler.ts`. (ADR-AI-009)
 | Bad request | "We couldn't process your request. Please check your inputs and try again." |
 | Timeout | "AI generation is taking longer than expected. Please try again." |
 | JSON parse failure (after retry) | "We had trouble formatting your draft answers. Please try again." |
-| Usage limit | "You've used all 20 of your AI requests this month. Your allowance resets on [date]." |
+| Usage limit | "You've used all 50 of your AI requests this month. Your allowance resets on [date]." |
 
 ### Loading state (Steps 3 and 4)
 
@@ -642,16 +677,11 @@ A teal progress bar with staged text messages is shown during AI generation. The
 | 60% | "Almost there..." |
 | 100% | Content appears |
 
-**Step 4 stages:**
+**Step 4 — per-question refine:**
 
-| Bar | Message |
-|---|---|
-| 0% | "Reviewing your guidelines and charity profile..." |
-| 35% | "Writing your draft answers..." |
-| 75% | "Almost there..." |
-| 100% | Content appears |
+Step 4 no longer has a page-level AI loading state. The `/api/generate-draft` route was removed in the 2026-05-28 Q&A redesign. The charity writes their own answers; the optional "Help me improve this" button (Step 4, non-budget questions) triggers the `/api/refine-answer` route which displays a per-question inline loading state — not a page-level progress bar.
 
-If the API responds before the bar reaches 100%, it jumps to 100% immediately. If the API is slow, the bar holds at ~90% until the response arrives. On error, the bar stops and an inline error message with a "Try again" button replaces the progress indicator.
+If the API responds before the bar reaches 100%, it jumps to 100% immediately. If the API is slow, the bar holds at ~90% until the response arrives. On error, the bar stops and an inline error message with a "Try again" button replaces the progress indicator. (Applies to Step 3 only from v1.0.)
 
 ---
 
@@ -730,7 +760,7 @@ A `.env.example` file with placeholder values is committed to the repository. `.
 | Server-side only secrets | `SUPABASE_SERVICE_ROLE_KEY` and AWS credentials never reach the browser |
 | Zod validation | All inputs validated before processing |
 | Rate limiting | Upstash prevents rapid-fire AI route abuse |
-| Usage cap | 20 AI requests/user/month hard limit |
+| Usage cap | 50 AI requests/user/month hard limit |
 | Security headers | CSP, HSTS, X-Frame-Options protect against client-side attacks |
 
 ---
@@ -881,7 +911,7 @@ SENTRY_DSN=
 The following one-time tasks must be completed before the first production deployment. Full details are in ADR-OPS-002.
 
 - [ ] Activate Vercel Pro and confirm billing
-- [ ] Add `export const maxDuration = 90` to `/api/generate-summary/route.ts` and `/api/generate-draft/route.ts`
+- [ ] Add `export const maxDuration = 90` to `/api/generate-summary/route.ts`
 - [ ] Create Resend account, verify sending domain (SPF + DKIM DNS records)
 - [ ] Configure Supabase Auth SMTP with Resend credentials
 - [ ] Customise Supabase Auth email templates (verification + password reset) — must reference "Grant Pathway", follow tone and voice guide, use teal CTA buttons
@@ -894,6 +924,19 @@ The following one-time tasks must be completed before the first production deplo
 - [ ] Apply initial database migrations to the production Supabase project
 - [ ] Run a full manual test of the five-step flow on the production deployment
 - [ ] Run Lighthouse accessibility audit on key pages (target 95+)
+
+---
+
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-04-21 | Rapidglobe Ltd | Initial document — full technical design covering all 16 sections |
+| 1.1 | 2026-05-07 | Rapidglobe Ltd | Updated database schema (assembled_draft, draft_status columns; corrected status values; renamed fund_name → grant_name); corrected application_answers schema (question_order, answer_source, is_budget_question); updated ai_usage_log schema (token_count, request_type values) |
+| 1.2 | 2026-05-20 | Rapidglobe Ltd | Updated Server Actions table and API Routes table to reflect current implementations; added GAP notes from Phase 3 → Phase 4 gate sweep |
+| 1.3 | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to AiSummaryData; updated funder type routing description (structured vs free_form paths); removed /api/generate-draft from API routes table (replaced by /api/refine-answer); updated AI usage cap from 20 to 50 requests/user/month throughout; removed Step 4 page-level loading stages (no longer applicable after Q&A redesign); added document history table |
 
 ---
 

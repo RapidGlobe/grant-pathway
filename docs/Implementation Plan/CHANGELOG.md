@@ -6,6 +6,70 @@
 
 ---
 
+## 2026-05-29 — Step 4: section-by-section mode for narrative funders; advanceToStep4 bug fix
+
+**What changed:**
+- `app/api/generate-summary/route.ts` — New `AiSummarySection` type (`{ number, title, guidance, wordLimit?, is_budget_section }`); `sections?: AiSummarySection[]` field added to `AiSummaryData`; `questionsFound` response now returns `true` for free_form funders with sections; `SUMMARY_MAX_TOKENS` raised from 1500 → 2000 to accommodate sections guidance text.
+- `lib/prompts.ts` — `buildSummaryPrompt` updated: `sections` array added to the JSON schema (populated for free_form funders only, with title + 2–3 sentence guidance + word limit + budget flag per section); `questions` array restricted to structured funders only (the two fields are mutually exclusive). Rule added: number sections sequentially starting at 1.
+- `components/application-step3-summary.tsx` — "Application sections" card added for free_form funders, replacing "Application questions" card. `questionsFound` state init handles both cases. Green confirmation note reads "X sections to complete" for free_form, "X questions found" for structured.
+- `app/(authenticated)/applications/[id]/step/4/page.tsx` — `funderName` and `grantName` destructured from `getApplicationOrRedirect`. Free_form path populates `application_answers` from `parsedSummary.sections` (section title → `question_text`, wordLimit, is_budget_section). Guidance map built from sections keyed by `question_order`. `guidance` passed per row to component.
+- `components/application-step4-draft.tsx` — **Complete rebuild.** Wider layout (`max-w-[960px]`). Teal funder context bar showing funder name and grant name. Sticky progress bar (`sticky top-0 z-10`) showing "X of N sections/questions completed". Free_form mode: section title as header (no number prefix), guidance text shown below title, budget section warning copy updated. Structured mode: numbered Q&A with `q.questionOrder. q.questionText` header. Both modes share: word count, AI refine button, auto-save, 60-second sweep.
+- `actions/applications.ts` — `assembleAndAdvance` updated: detects `funder_type` from `ai_summary` JSON; free_form format is `section_title\n\nanswer` (no number prefix, narrative flow); structured format is `N. question\n\nanswer` (unchanged).
+- **Bug fix** (same release): `advanceToStep4` in `actions/applications.ts` reset `draft_status` to `not_started` whenever the user navigated forward from Step 3. Previously, if a user had started writing (`draft_status = in_progress`) and then returned to Step 3, clicking Continue again would skip the prep checklist gate. Fix: reset only when `draft_status = 'in_progress'`; states `ready_to_assemble` and `assembled` are preserved.
+
+**Why:**
+The 2026-05-28 Q&A redesign established a two-path model: structured funders (numbered questions → Q&A) vs free_form funders (narrative sections → open textarea). Only the structured path was implemented. This release completes the model:
+
+For free_form funders (e.g. Garfield Weston), the AI now extracts the narrative sections from the guidelines (section title + guidance for the applicant), stores them as `application_answers` rows, and presents them as a section-by-section writing interface. Each section shows a guidance note derived from the funder's own instructions ("what to include in this section"). This matches how narrative funders expect content to be structured — not a list of Q&A pairs but a flowing document with discrete sections. The assembled draft format is `Title\n\nContent` (no number prefixes), suitable for flowing into a Word document at Step 5.
+
+The sticky progress bar and funder context bar were specifically requested during mockup review and are present in both modes — they improve usability significantly on longer applications.
+
+**Architectural consequences:**
+- `AiSummaryData.sections[]` is optional (backwards compatible with existing saved summaries that lack this field)
+- `application_answers` stores section titles as `question_text` — no DB schema change required
+- Guidance text is re-derived from `ai_summary.sections[i].guidance` on each Step 4 page load, matched by `question_order` — not stored in DB (avoids duplication)
+- `assembleAndAdvance` is now funder-type-aware — single source of truth for format
+
+---
+
+## 2026-05-29 — Step 3 summary redesigned: two-column card layout, highlighted section headings, supporting documents removed
+
+**What changed:**
+- `components/application-step3-summary.tsx`:
+  - Single summary card replaced with individual cards in a responsive two-column grid (`md:grid-cols-2`)
+  - Max-width widened: `max-w-[640px]` → `max-w-[960px]`
+  - "About this grant" spans full width; "Grant amount" and "Who can apply" sit side-by-side; "Grant amount" auto-expands to full width if "Who can apply" is absent
+  - Section headings highlighted: `CardTitle` sub-component adds a teal left border (`border-l-4 border-[#0D6E6E]`) to each card heading
+  - "Documents you will need to submit" card removed from this step — supporting document requirements are noted in funder guidelines and do not need a separate card in the Step 3 summary
+  - Button text changed: "This looks right — continue" → "Continue"
+
+**Why:**
+During testing, the single-card summary was described as "too busy" and hard to scan. Breaking information into separate cards reduces visual density and makes it easier to locate specific information (e.g. "How much can I apply for?" is now an immediately visible card, not a paragraph buried in a wall of text). The wider two-column layout makes better use of modern screen widths. The section heading highlights add visual anchoring without colour-coding the content itself. Supporting documents were removed because they add friction at the review step — the user has already read the guidelines and doesn't need a re-list of documents at this point.
+
+---
+
+## 2026-05-29 — Strategic pivot: Grant Pathway targets a curated set of UK funders with published guidelines
+
+**What changed:**
+- Product positioning: Grant Pathway is now explicitly designed for UK grant funders that publish accessible, downloadable application guidelines (structured Q&A or narrative). Funders that use online portals without downloadable guidelines, or that require a quiz to identify fund type, are out of scope for v1.
+- Research conducted: ~12 target funders identified across structured (form-based) and free_form (narrative) categories with accessible guidelines and appropriate grant ranges for small/mid-size charities.
+- No code changes in this release — this is a product scope decision. Future onboarding copy and help text will reference this scope.
+
+**Target funder profile (v1):**
+- Published downloadable guidelines (PDF or Word) or accessible online guidelines
+- Applications reviewed on merit (not exclusively online portal input)
+- Grant ranges broadly £5,000–£200,000
+- No absolute AI prohibition in guidelines (a small number of funders explicitly ban AI tools — these are noted but outside scope)
+
+**Example funders in scope (non-exhaustive):**
+- Structured: A B Charitable Trust, Foyle Foundation (Main Grants), Walton Charity, Nationwide Building Society Community Grants, Garfield Weston Foundation (small grants), Bletchley & Fenny Stratford Town Council
+- Free_form / narrative: Garfield Weston Foundation (larger grants), City Bridge Foundation
+
+**Why:**
+Grant funding authorities vary enormously in their application processes: some require a quiz to route applicants, some use locked online portals, some generate forms per-applicant, and some require multi-stage expressions of interest. There is no generalised API or extraction route that works across all types. By targeting funders with published, accessible guidelines, Grant Pathway can reliably extract structured data (questions, sections, word limits, eligibility criteria) and produce correctly formatted output. This constraint removes a category of support failure and makes the product significantly easier to test, demo, and explain to prospective users.
+
+---
+
 ## 2026-05-28 — Step 4 redesign: auto-generation replaced with Q&A interview model
 
 **What changed:**
