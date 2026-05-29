@@ -1,0 +1,67 @@
+# Grant Pathway — Change Log Mark Two
+
+**Purpose:** This log records every significant change to the Grant Pathway product design from Mark Two onwards — decisions made, rationale, and what changed. It is the audit trail for the Mark Two BRD and all subsequent design evolution.
+
+**Scope:** Covers product and design decisions only. Code-level changes are recorded in `CHANGELOG.md`. This document is the business-level companion to that technical log.
+
+**Note:** This file is temporarily stored in `docs/Implementation Plan/`. It will be moved to a more appropriate location in a future session.
+
+**Authoritative source:** When this log refers to a BRD section, the full requirement lives in `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.1.md`.
+
+---
+
+## 2026-05-29 — Mark Two BRD v0.1 created
+
+**Document:** `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.1.md`
+
+**Supersedes:** `docs/BRD-Grant-Pathway-v0.2.md` (Mark One)
+
+### Why Mark Two was needed
+
+Testing in May 2026 against the consolidated 12-funder target list revealed that the assumptions in the Mark One BRD did not hold across the real range of UK grant-giving organisations:
+
+1. Most funders use proprietary online portals — Grant Pathway cannot submit applications and Mark One did not make this sufficiently clear.
+2. The majority of questions on many funder forms are non-narrative (data-entry, financial, dropdown, file upload) — the AI can only genuinely help with narrative text answers.
+3. The structured/narrative funder-type model was too coarse — AB Charitable Trust has 33 questions of which only 3 are narrative; classifying it as "structured" overstated Grant Pathway's value for that funder.
+4. Character limits are more common than word limits across UK funders — the Mark One data model and UI only handled word limits (GAP-27).
+
+### Seven business-level decisions made (2026-05-29)
+
+All decisions agreed with WJ Okhia in the design review session. See Section 10 of the BRD for the full log.
+
+| Decision | Summary |
+|----------|---------|
+| BD-01 | Grant Pathway is a **preparation tool**, not a submission platform |
+| BD-02 | Charity profile is **thick** — stores full org data including financials, contact details, employee data |
+| BD-03 | Non-narrative questions are **pre-filled from profile** where possible; shown as reminders otherwise |
+| BD-04 | **Question-level typing** replaces funder-level type as the primary classification for question handling |
+| BD-05 | Both **character limits and word limits** are supported |
+| BD-06 | Multi-stage applications are **separate records** with no automated linkage in v1 |
+| BD-07 | Funders marketed at the **coverage tier they genuinely support** (Full / Partial / Guidance) |
+
+### Key new concepts in Mark Two
+
+**Three-tier funder coverage model:**
+- Tier 1 (Full): Narrative questions with limits; full Q&A assistance
+- Tier 2 (Partial): Portal-based mixed forms; narrative subset only; pre-fill for data-entry fields
+- Tier 3 (Guidance): Free-form narrative document; section-by-section canvas
+
+**Question-level typing:**
+Each extracted question carries a type: `narrative | data_entry | financial | dropdown | date | file_upload`. The product handles each type differently — only `narrative` questions get a writing textarea and AI assist; `data_entry` and `financial` are pre-filled from the charity profile; the rest are shown as completion reminders.
+
+**Thick charity profile:**
+Profile expanded from 4 fields (name, what it does, who it helps, where it works) to ~30 fields covering legal identity, registered address, contact details, financial snapshot (from latest accounts), people data, and supporting document status flags.
+
+**Limit handling:**
+`word_limit` (integer) replaced by `limit_value` (integer) + `limit_type` (`words | characters | none`). Counter in Step 4 displays "120 / 800 characters" or "85 / 200 words" as appropriate.
+
+**Per-question copy export:**
+New export option for Tier 2 funders: individual copy-to-clipboard button per question, optimised for pasting into portal fields one at a time.
+
+### What is explicitly out of scope (confirmed)
+
+Direct portal submission, funder discovery, eligibility screening, supporting document storage, deadline tracking, post-award reporting, multi-user collaboration, Stage 1→2 auto-population.
+
+---
+
+*Change Log Mark Two — created 2026-05-29. To be moved from `docs/Implementation Plan/` to a permanent location in a future session.*
