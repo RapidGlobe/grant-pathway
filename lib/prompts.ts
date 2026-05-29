@@ -139,13 +139,15 @@ Rules:
 - "aboutGrant": 2–3 sentences maximum; include the funder name and grant programme name if present
 - "whoCanApply": short bullet-point phrases; extract from eligibility criteria sections
 - "lookingFor": short bullet-point phrases; extract from priorities, themes, or funding focus sections
-- "questions": ONLY populate for structured funders; return an empty array [] for free_form funders. Extract questions EXACTLY as written; include "wordLimit" only if an explicit word count is stated; set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown
+- "questions": ONLY populate for structured funders; return an empty array [] for free_form funders. Only extract questions that require a NARRATIVE TEXT answer (i.e. questions the charity must write a prose answer to). DO NOT include: data-entry fields (name, address, phone, email, website, charity number, dates, postcode), dropdown/selection questions (region, category, organisation type), number fields (income, expenditure, employee count, salary, grant amount), file upload instructions, or yes/no consent questions. Extract questions EXACTLY as written; include "wordLimit" only if an explicit word count or character limit is stated (convert character limits to approximate word counts: 800 chars ≈ 120 words, 1600 chars ≈ 250 words); set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown
 - "sections": ONLY populate for free_form funders; return an empty array [] for structured funders. For each narrative theme or section heading the funder asks applicants to cover, provide: "title" (as stated in the guidelines or a clear paraphrase), "guidance" (2–3 sentences telling the applicant what to include, derived from the funder's instructions), "wordLimit" only if explicitly stated, and "is_budget_section": true if the section covers budget, finances, income, expenditure, or funding breakdown. Number sections sequentially starting at 1.
 - "keyRequirements": important restrictions, deadlines, geographic limits, exclusions
 - "funderAiPolicy": extract any statement the funder makes about AI tool usage (verbatim or very close paraphrase); return null if no AI policy statement is found
 - "supportingDocuments": list all supporting document categories the funder requires or recommends submitting alongside the application (e.g. "Most recent annual accounts", "Governing document / constitution"); return an empty array [] if none are mentioned
 - Use UK English spelling throughout
 - All arrays must have at least one item except "questions", "sections", and "supportingDocuments" which may be empty
+
+Respond with ONLY the JSON object — no preamble, no explanation, no markdown fencing, no code blocks. Start your response with { and end with }.
 
 ${charitySection}
 

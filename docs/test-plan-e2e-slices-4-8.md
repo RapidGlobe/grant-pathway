@@ -1,6 +1,6 @@
 # Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.8  
+**Version:** 1.9  
 **Date:** 2026-05-22  
 **Last updated:** 2026-05-29  
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
@@ -55,6 +55,7 @@ Log any failures that are NOT in the known expected failures list below.
 | D-007 | S5-P-02b | Typo in Step 3 free_form confirmation message: "11 sectionsto complete" (missing space). Caused by JSX whitespace stripping the newline between text `section` and expression `{"s"}`. Fixed by rewriting as a template literal in `components/application-step3-summary.tsx` (2026-05-29). | Low | Fixed |
 | D-008 | S6-N-01 | `parse_error` returned by `/api/refine-answer` when "Help me improve this" clicked on sections with very short answers (e.g. 1–2 words). AI returns a conversational response ("Your answer is too short...") instead of the expected `{ "refinedText": "..." }` JSON, causing `JSON.parse` to fail. Fixed by strengthening `buildRefinePrompt` in `lib/prompts.ts`: added explicit instruction to return JSON only (no preamble, no markdown), and to return the answer unchanged if too short to improve (2026-05-29). | Medium | Fixed |
 | D-009 | S6-N-03 | `rate_limited` returned by `/api/refine-answer` when "Help me improve this" clicked on multiple sections in quick succession. Upstash sliding window limit is 5 requests per 60 seconds — correct production behaviour but surfaced during testing. Not a bug. Stale comment in `lib/rate-limit.ts` referenced old 20 req/month cap (cap is 50). Fixed by updating the comment (2026-05-29). | Low | Fixed |
+| D-011 | S5-P-01 | `[generate-summary] JSON parse failed after retry` — POST 500 on `/api/generate-summary` for A B Charitable Trust document (33 questions across 4 sections). `SUMMARY_MAX_TOKENS = 2000` was insufficient for large question sets; response truncated mid-JSON, producing invalid JSON on both the first attempt and the retry. Fixed by raising `SUMMARY_MAX_TOKENS` to 4000 in `app/api/generate-summary/route.ts` and strengthening `buildSummaryPrompt` in `lib/prompts.ts`: (a) explicit JSON-only instruction added to end of user prompt; (b) AI instructed to skip non-text questions (dropdowns, dates, numbers, file uploads, yes/no fields) — partial fix for GAP-28 (2026-05-29). | High | Fixed |
 | D-010 | S5-P-03 | Dashboard AI usage counter displayed "14 of 20 AI requests used this month" — cap shown as 20 instead of 50. `AI_REQUESTS_LIMIT` constant in `components/dashboard-populated.tsx` was never updated when the monthly cap was raised from 20 to 50. Only the display was wrong; the actual enforcement in the API routes correctly uses 50. Fixed by updating the constant (2026-05-29). | Medium | Fixed |
 
 ---
@@ -1884,7 +1885,8 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | 1.6 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-008 (parse_error on refine-answer with short answers — fixed via prompt strengthening), D-009 (rate_limited on rapid refine-answer clicks — expected behaviour; stale comment fixed). Version bump. |
 | 1.7 | 2026-05-29 | Rapidglobe Ltd | Three Idlewild Trust PDFs added to `docs/test-fixtures/` (Arts question set, Conservation question set, Funding Guidelines). GAP-27 and GAP-28 raised and added to Known Expected Failures. Idlewild fixture note updated to warn against use until gaps resolved. |
 | 1.8 | 2026-05-29 | Rapidglobe Ltd | D-010 raised and fixed: dashboard AI usage counter displayed "of 20" instead of "of 50" — `AI_REQUESTS_LIMIT` constant in `dashboard-populated.tsx` not updated when cap was raised. |
+| 1.9 | 2026-05-29 | Rapidglobe Ltd | D-011 raised and fixed: `parse_error` on generate-summary for large structured documents (A B Charitable Trust, 33 questions). `SUMMARY_MAX_TOKENS` raised 2000 → 4000; prompt strengthened with JSON-only instruction and filter to skip non-text questions (partial GAP-28 fix). |
 
 ---
 
-_Test plan v1.8 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
+_Test plan v1.9 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._

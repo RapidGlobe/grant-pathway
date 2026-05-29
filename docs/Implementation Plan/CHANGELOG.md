@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-29 — generate-summary parse_error fixed for large structured documents (D-011)
+
+**What changed:**
+- `app/api/generate-summary/route.ts` — `SUMMARY_MAX_TOKENS` raised from 2000 to 4000. Documents with large question sets (e.g. A B Charitable Trust: 33 questions across 4 labelled sections) were truncating the AI response mid-JSON, causing `JSON parse failed after retry` on both attempts and returning a 500 error.
+- `lib/prompts.ts` — `buildSummaryPrompt` updated: (a) explicit JSON-only instruction added at end of user prompt ("Respond with ONLY the JSON object — no preamble, no explanation, no markdown fencing. Start your response with { and end with }."); (b) "questions" rule extended to instruct the AI to skip non-text question types (dropdowns, dates, numbers, file uploads, yes/no consent fields) — only narrative text questions should be extracted. This also partially resolves GAP-28.
+
+**Why:**
+Verified via Vercel function logs: three consecutive `[generate-summary] JSON parse failed after retry` entries (14:28, 14:29, 14:34) all for the same application. A B Charitable Trust document has 33 numbered questions but only ~5 require narrative text answers — the remaining 28 are data-entry, financial, or file upload fields. Extracting all 33 into JSON exceeded the 2000 token limit, truncating the response. Raising to 4000 and filtering to narrative-only questions eliminates both failure modes.
+
+---
+
 ## 2026-05-29 — Dashboard AI cap display corrected from 20 to 50 (D-010)
 
 **What changed:**

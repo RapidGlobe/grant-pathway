@@ -37,9 +37,11 @@ export const maxDuration = 90
 const MONTHLY_CAP = 50
 const APPROACHING_LIMIT_THRESHOLD = 40
 
-// Raised to 2000: free_form funders now emit a "sections" array with guidance
-// text per section (~80 tokens each × up to 8 sections ≈ 640 extra tokens).
-const SUMMARY_MAX_TOKENS = 2000
+// Raised to 4000: complex structured documents (e.g. AB Charitable Trust with
+// 33 questions across 4 sections) were truncating at 2000 tokens, producing
+// invalid JSON. 4000 gives headroom for large question sets while remaining
+// well within Claude's output limits.
+const SUMMARY_MAX_TOKENS = 4000
 
 export async function POST(request: NextRequest) {
   // ── 1. Authenticate ────────────────────────────────────────────────────────
