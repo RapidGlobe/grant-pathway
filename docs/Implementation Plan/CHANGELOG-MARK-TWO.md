@@ -127,4 +127,20 @@ Added introductory note explaining that Charity Commission financial data comes 
 
 ---
 
+## 2026-05-29 — BRD Mark Two v0.4: UK register coverage policy clarified
+
+**Document:** `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.4.md`
+
+### What changed
+
+**Context:** Testing confirmed that the existing charity profile lookup uses `api.charitycommission.gov.uk` (England and Wales) only. No OSCR (Scotland) or CCNI (Northern Ireland) integration exists in the codebase. The v0.3 BRD overstated this by implying all-three-register support was a v1 feature.
+
+**Policy decision:** Grant Pathway is built for the whole of the United Kingdom. The absence of OSCR and CCNI lookup in v1 is a technical sequencing decision, not an exclusion. Scottish and Northern Irish charities are fully welcome and can use the full product by entering their profile details manually. OSCR and CCNI integration is planned with the strong intention to deliver before general release.
+
+**Sections updated:**
+- **Section 4.2 Identity** — Register coverage note rewritten: England and Wales Charity Commission confirmed as v1 scope; OSCR (~24,000 Scottish charities) and CCNI (~7,000 NI charities) documented as planned; manual profile entry available for Scottish and NI charities in v1; table updated with v1 source and planned source columns.
+- **Section 3.2 Tier 1** — Updated to note that the Charity Commission → profile → pre-fill flow applies to E&W charities in v1; Scottish and NI charities use manual profile entry in v1 with lookup planned before release.
+
+---
+
 *Change Log Mark Two — created 2026-05-29. To be moved from `docs/Implementation Plan/` to a permanent location in a future session.*

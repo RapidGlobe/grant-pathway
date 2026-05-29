@@ -1,6 +1,6 @@
 # Grant Pathway — Business Requirements Document Mark Two
 
-**Version:** 0.3
+**Version:** 0.4
 **Date:** 2026-05-29
 **Status:** Draft — awaiting review and sign-off
 **Author:** Rapidglobe Ltd / WJ Okhia
@@ -117,10 +117,12 @@ The funder publishes narrative questions with explicit word or character limits.
 
 Data-entry fields (charity name, registration number, address, financial figures, staff counts) are pre-filled automatically from the charity profile. Where the charity profile was itself populated from the Charity Commission register (see Section 4.2), this creates a seamless flow: Charity Commission → profile → application pre-fill, with the charity reviewing and confirming each value.
 
+For charities registered in Scotland (OSCR) or Northern Ireland (CCNI), the same pre-fill flow applies once their profile is complete — they enter their details manually in v1, with register lookup planned before general release (see Section 4.2).
+
 **Characteristics:**
 - Published question set (PDF, Word, or accessible web page)
 - Narrative text questions with stated limits
-- Non-narrative fields pre-fillable from charity profile (sourced from Charity Commission register)
+- Non-narrative fields pre-fillable from charity profile (England and Wales: auto-populated from Charity Commission register; Scotland and NI: manual profile entry in v1, register lookup planned)
 
 **Examples:** Henry Smith Foundation (Stage 1), Wolfson Foundation (Stage 1), Lloyds Bank Foundation CI
 
@@ -186,20 +188,26 @@ The charity profile is the organisation's permanent data store within Grant Path
 
 #### Identity
 
-**Primary data source: Charity Commission register (and OSCR / CCNI equivalents)**
+**Primary data source: Charity Commission for England and Wales (v1); OSCR and CCNI planned**
 
-The Charity Commission for England and Wales publishes a publicly accessible register of all UK registered charities. Grant Pathway already integrates with this register via the charity profile lookup (the charity searches by name or registration number on the profile page). The register provides: registered name, registration number, date of registration, registered address, and charity type. The charity confirms and may edit these values after lookup — the register is the starting point, not the final word.
+The Charity Commission for England and Wales publishes a publicly accessible register of all UK registered charities. Grant Pathway currently integrates with this register via the charity profile lookup (the charity searches by name or registration number on the profile page). The register provides: registered name, registration number, date of registration, registered address, and charity type. The charity confirms and may edit these values after lookup — the register is the starting point, not the final word.
 
-Charities registered in Scotland use OSCR (oscr.org.uk); those in Northern Ireland use the Charity Commission NI (charitycommissionni.org.uk). Grant Pathway's lookup should support all three registers in the full build; England and Wales (Charity Commission) is the priority for v1.
+**UK-wide register coverage — current position and roadmap:**
 
-| Field | Type | Source | Notes |
-|-------|------|--------|-------|
-| Charity name (common name) | Text | Charity Commission lookup | Name known by / brand name |
-| Full legal name | Text | Charity Commission lookup | As registered; may differ from common name |
-| Charity Commission registration number | Number | Charity Commission lookup | England & Wales; or OSCR / CCNI equivalent |
-| Organisation type | Select | Charity Commission lookup | UK Registered Charity / UK Publicly Exempt Charity |
-| Year established | Year | Charity Commission lookup | Derived from registration date |
-| Website | URL | Charity Commission lookup / manual | Register may hold this; charity confirms |
+Grant Pathway is built for the whole of the United Kingdom. Charities registered in Scotland use the OSCR register (oscr.org.uk — approximately 24,000 charities); those in Northern Ireland use the Charity Commission NI (charitycommissionni.org.uk — approximately 7,000 charities). These are independent registers with their own APIs, separate from the England and Wales Charity Commission.
+
+The v1 build integrates the England and Wales Charity Commission only. This is a technical sequencing decision, not a policy of exclusion. Scottish and Northern Irish charities are fully welcome to use Grant Pathway — they can create a profile by entering their details manually, and the full application workflow is available to them without restriction.
+
+**OSCR (Scotland) and CCNI (Northern Ireland) lookup integration is planned and the strong intention is to deliver this before general release,** so that charities across the whole of the UK benefit from the same seamless register-lookup experience at profile setup. This will be scoped as a pre-launch task in the implementation plan.
+
+| Field | Type | Source (v1) | Source (planned) | Notes |
+|-------|------|-------------|------------------|-------|
+| Charity name (common name) | Text | Charity Commission lookup (E&W) | + OSCR (Scotland) + CCNI (NI) | Name known by / brand name |
+| Full legal name | Text | Charity Commission lookup (E&W) | + OSCR + CCNI | As registered; may differ from common name |
+| Registration number | Number | Charity Commission lookup (E&W) | + OSCR + CCNI | England & Wales, Scottish, or NI number as appropriate |
+| Organisation type | Select | Charity Commission lookup (E&W) | + OSCR + CCNI | UK Registered Charity / UK Publicly Exempt Charity |
+| Year established | Year | Charity Commission lookup (E&W) | + OSCR + CCNI | Derived from registration date |
+| Website | URL | Charity Commission lookup / manual | + OSCR + CCNI | Register may hold this; charity confirms |
 
 #### Address and contact
 | Field | Type | Notes |
@@ -460,3 +468,4 @@ The following decisions were made in the design session of 2026-05-29 and underp
 | 0.1 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Initial draft — Mark Two BRD. Supersedes BRD-Grant-Pathway-v0.2.md. Based on testing session of May 2026 and seven business-level decisions agreed with WJ Okhia. |
 | 0.2 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Section 1.1 updated: AI assists, not generates — added as explicit product principle with reinforcement throughout. Section 1.4 substantially expanded: deep research (104 agents, 22 verified claims) identified 10 additional UK funders with published AI policies — Lloyds Bank Foundation, Paul Hamlyn Foundation, Arts Council England, BFI, Esmée Fairbairn, London Community Foundation, UKRI, RGS, Wellcome joint statement — all added with verbatim quotes and source URLs. Section 1.3 updated. Section 5.4 AI assistance paragraph strengthened. |
 | 0.3 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Section 2.1 bullet 4 reworded: pain point clarified as capacity and time, not lack of knowledge. Section 2.2 strengthened: senior staff involvement for financial sections stated as mandatory; treasurer/finance lead sign-off requirement made explicit. Section 3.2 Tier 1: Charity Commission pre-fill flow (register → profile → application) added. Section 4.2 Identity: Charity Commission as primary data source documented; OSCR/CCNI noted; source column added to table. Section 4.2 Financial: Charity Commission annual returns as starting-point source documented; 12–18 month data lag warning added; mandatory verification by treasurer/finance lead stated; source column added to table. |
+| 0.4 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Section 4.2 Identity and Section 3.2 Tier 1: UK register coverage policy clarified. v1 integrates England and Wales Charity Commission only — this is a technical sequencing decision, not a policy of exclusion. Scottish (OSCR) and Northern Irish (CCNI) charities are fully welcome to use Grant Pathway and can create a profile manually in v1. OSCR and CCNI lookup integration is planned with the strong intention to deliver before general release. Register coverage table updated with v1 and planned columns. Section 3.2 Tier 1 updated to reflect Scottish and NI manual-entry path in v1 with lookup planned. |
