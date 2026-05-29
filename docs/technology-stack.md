@@ -1,4 +1,5 @@
 # Technology Stack — AI Grant Accelerator v1
+**Version:** 1.1
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
 
@@ -131,5 +132,11 @@ The domain **Grantpathway.org.uk** has been registered and is likely to inform t
 
 ---
 
-*Last updated: 2026-04-13*
-*Sources: BRD Information Gathering Checklist items 36–40; constraints-and-assumptions.md (C4, C13, C15, C17, C18); DR-BM-002, DR-DP-002, DR-DP-003, DR-LC-003*
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-04-13 | Rapidglobe Ltd | Initial version |
+| 1.1 | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development |

@@ -1,4 +1,5 @@
 # User Personas, Journeys & Use Cases — AI Grant Accelerator v1
+**Version:** 1.1
 
 ---
 
@@ -131,8 +132,8 @@ Two end-to-end journeys are mapped: one for a first-time user (Margaret) and one
 | 6 | New application | Clicks "Start New Application", enters the grant name and funder name | *"Simple enough."* | — |
 | 7 | Guidelines input | Prompted to paste or upload the funder's guidelines; pastes the text from the PDF she downloaded | *"Good — I was going to read this anyway."* | Structured approach to reading guidelines |
 | 8 | AI summarisation | App generates a plain-English summary of the funder's priorities, what they fund, and what each question is asking | *"That's exactly what I needed — I never understood what 'additionality' meant until now."* | Demystifies funder language for non-specialists |
-| 9 | Question drafting | Selects the first application question; app generates a draft answer using the charity profile and funder summary | *"This is better than I would have written — but I want to check it."* | Reduces blank-page anxiety; accelerates writing |
-| 10 | Review step | Prompted to review the draft with three specific questions: Is it accurate? Are the figures correct? Does it answer what was asked? | *"I hadn't noticed the word count was over — good job it flagged that."* | Mandatory human review (DR-AI-003) |
+| 9 | Question drafting | Writes her answers section by section (narrative funders) or responds to each numbered question in turn (structured funders); AI can help improve a written answer on request | *"I just write what I know about us — and I can ask the AI to help tidy it up if I need to."* | Reduces blank-page anxiety; keeps charity in control of content |
+| 10 | Review step | Prompted to review her written content with three specific questions: Is it accurate? Are the figures correct? Does it answer what was asked? | *"I hadn't noticed the word count was over — good job it flagged that."* | Mandatory human review (DR-AI-003) |
 | 11 | Edit and approve | Edits one sentence and approves the content | *"I feel confident this is ready."* | User remains in control |
 | 12 | Saves progress | Clicks Save; told the application is saved to her account | *"Great — I can come back to this tomorrow."* | Persistent application history (DR-DP-001) |
 | 13 | Returns next day | Logs back in, finds application where she left it, continues with remaining questions | *"This is so much easier than opening a dozen Word documents."* | Time-saving across sessions |
@@ -153,7 +154,7 @@ Two end-to-end journeys are mapped: one for a first-time user (Margaret) and one
 | 3 | New application | Clicks Start New Application; profile is already populated — no re-entry needed | *"This saves me 30 minutes straight away."* | Reuse of existing charity profile |
 | 4 | Guidelines upload | Uploads the funder's PDF guidelines directly | *"Better than copy-paste — the whole document is in."* | Document handling |
 | 5 | AI summarisation | Receives a summary tailored to his charity type; notices it has correctly identified the funder's focus on early intervention | *"It's picked up the most relevant parts for us."* | Relevant, charity-aware summaries |
-| 6 | Batch drafting | Works through each question systematically; generates a draft for each, reviewing as he goes | *"I'd normally spend a whole evening on this — I've done three questions in 20 minutes."* | Significant time saving |
+| 6 | Answering questions | Works through each question systematically; writes his answers section by section (narrative funders) or responds to each numbered question in turn (structured funders); uses AI on request to help improve a written answer | *"I'd normally spend a whole evening on this — I've done three questions in 20 minutes."* | Significant time saving |
 | 7 | Consistency check | Notices the AI has used the same mission statement phrasing as his previous application | *"Good — that's the version I want to use."* | Consistency across applications |
 | 8 | Saves for later | Runs out of time; saves progress and closes the app | *"I'll finish this on Thursday."* | Persistent drafts |
 | 9 | Returns and completes | Returns two days later; completes remaining questions; reviews and approves all content | *"Much less painful than usual."* | — |
@@ -318,35 +319,34 @@ Use cases define the specific interactions between users and the system. Each us
 
 ---
 
-### UC-08 — Generate Draft Answer for an Application Question
+### UC-08 — Write Draft Answer for an Application Question
 
 | Field | Detail |
 |-------|--------|
 | **Actor** | Registered user |
 | **Precondition** | Funder summary generated (UC-07); charity profile complete |
-| **Trigger** | User selects a question and clicks "Generate Draft" |
+| **Trigger** | User begins writing their answer for a section or question |
 
 **Main Flow**
-1. User selects or enters the application question
-2. User optionally specifies a word limit
-3. System sends the question, word limit, funder summary, and charity profile to Amazon Bedrock
-4. System generates a draft answer
-5. Draft is displayed to the user alongside the mandatory review prompt (UC-09)
+1. User selects the current section or question (word limit displayed if extracted from guidelines)
+2. User writes their answer in the text area (section by section for narrative funders; numbered Q&A for structured funders)
+3. User optionally clicks "Help me improve this" to request AI assistance with structure or clarity — AI refines the charity's own text and may not add facts or change claims
+4. Draft is displayed to the user alongside the mandatory review prompt (UC-09)
 
 **Alternative Flows**
-- API timeout or error → plain-language error message; user prompted to retry
-- Draft significantly exceeds word limit → system flags this prominently
+- API timeout or error on AI assist request → plain-language error message; user prompted to retry; user's own text is preserved
+- Answer exceeds word limit → system displays word count and flags excess
 
-**Postcondition:** A draft answer is generated and presented for mandatory human review.
+**Postcondition:** A charity-authored draft answer is ready for mandatory human review. All content originates from the charity; AI has only refined it on request.
 
 ---
 
-### UC-09 — Review and Approve AI-Generated Content
+### UC-09 — Review and Approve Written Content
 
 | Field | Detail |
 |-------|--------|
 | **Actor** | Registered user |
-| **Precondition** | AI draft generated (UC-08) |
+| **Precondition** | Charity-authored draft written (UC-08) |
 | **Trigger** | Draft is displayed with the mandatory review prompt |
 
 **Main Flow**
@@ -484,4 +484,11 @@ Use cases define the specific interactions between users and the system. Each us
 | Part 2 — User Journeys | Items 13, 14, 15, 16, 17, 18, 19, 20, 21 |
 | Part 3 — Use Cases | Items 22, 23, 24, 25, 26, 27, 28, 29 |
 
-*Last updated: 2026-04-13*
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
+| 1.1 | 2026-05-29 | Rapidglobe Ltd | Step 4 journey description updated to reflect charity-authored Q&A model (section-by-section for narrative funders, numbered Q&A for structured funders). Document history table added. |

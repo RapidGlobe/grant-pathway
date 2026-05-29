@@ -1,4 +1,5 @@
 # MoSCoW Feature Register — Grant Pathway v1
+**Version:** 1.2
 
 This document consolidates the MoSCoW priority for all 44 functional requirements in Grant Pathway v1. It is the single authoritative reference for feature scope and is used directly by the PRD.
 
@@ -10,8 +11,8 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 | Priority | Count | FRs |
 |----------|-------|-----|
-| Must Have | 39 | FR-01–06, FR-09–28, FR-30, FR-32–37, FR-39–43 |
-| Should Have | 5 | FR-07, FR-08, FR-29, FR-38, FR-44 |
+| Must Have | 39 | FR-01–06, FR-09–31, FR-32–37, FR-39–43 |
+| Should Have | 3 | FR-07, FR-08, FR-38, FR-44 |
 | Could Have | 0 | — |
 | Won't Have (v1) | 0 | All Won't Have items are recorded in `business/v1-out-of-scope.md` |
 
@@ -83,10 +84,10 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 | Ref | Requirement (summary) | Priority | Notes |
 |-----|----------------------|----------|-------|
-| FR-28 | Generate draft answer for each application question | **Must Have** | |
-| FR-29 | User can specify a word limit before draft generation | **Should Have** | Not present in screen requirements for Step 4; deferred if time-constrained |
-| FR-30 | Draft generation uses question, word limit (if set), funder summary, and charity profile | **Must Have** | Word limit input conditional on FR-29 being built |
-| FR-31 | Flag prominently if draft significantly exceeds word limit | **Should Have** | Depends on FR-29; only relevant if FR-29 is implemented |
+| FR-28 | Charity writes draft answers section by section; AI assists with structure and clarity on request only | **Must Have** | **Revised 2026-05-28.** Original requirement was "generate draft answers automatically". Replaced with charity-authored Q&A model: the charity writes all content; AI may improve structure/clarity of a written answer on request ("Help me improve this"). AI never generates answers from scratch. See STEP4-REDESIGN-PROPOSAL.md |
+| FR-29 | Word limits auto-extracted from funder guidelines; displayed alongside each section/question | **Must Have** | **Revised 2026-05-28.** Original "Should Have" for user-specified word limits. Now auto-extracted from guidelines by AI in Step 3 and displayed in Step 4. |
+| FR-30 | Per-section AI refine uses the charity's own answer text; may not add facts or change claims | **Must Have** | Replaces old "draft generation uses question + charity profile". AI only refines a written answer — it does not write from scratch |
+| FR-31 | Budget sections/questions flagged in amber; AI assist disabled on budget sections | **Must Have** | **Revised 2026-05-28.** Original "flag draft exceeding word limit". Now: budget questions/sections are visually distinct; AI assist is disabled; user enters own figures |
 
 ---
 
@@ -126,14 +127,12 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 ## Should Have — Build Conditions
 
-The five Should Have requirements and their build conditions are summarised below.
+The three remaining Should Have requirements and their build conditions are summarised below.
 
 | Ref | Requirement | Build condition |
 |-----|-------------|----------------|
 | FR-07 | Optional MFA | Build if authentication roadmap supports it; does not affect core user journey |
 | FR-08 | Feedback opt-in at registration | Build if the feedback interview programme is confirmed as active at launch |
-| FR-29 | Word limit input on draft generation | Build if time permits; low complexity addition to Step 4 |
-| FR-31 | Flag draft exceeding word limit | Build only if FR-29 is built; depends entirely on FR-29 |
 | FR-38 | Plain text (.txt) export | Build if time permits; low complexity addition to Step 5 export options |
 | FR-44 | Deletion confirmation email | Build if transactional email service is confirmed as in scope; depends on FR-40–43 being complete |
 
@@ -151,5 +150,24 @@ The following requirements have implementation details that differ from the BRD.
 
 ---
 
-*Last updated: 2026-04-16*
-*Status: Complete*
+---
+
+## Revisions since initial publication
+
+| Ref | Original requirement | Revised to | Date | Reason |
+|-----|---------------------|------------|------|--------|
+| FR-28 | Generate draft answers automatically using AI | Charity writes answers; AI assists on request | 2026-05-28 | Funder AI guidance research (Henry Smith, NLCF) showed AI-generated answers disadvantage charities; charity-authored model produces better applications |
+| FR-29 | User specifies word limit before generation (Should Have) | Word limits auto-extracted from guidelines (Must Have) | 2026-05-28 | AI already extracts questions with word limits in Step 3; no user input required |
+| FR-31 | Flag draft exceeding word limit (Should Have) | Budget sections flagged; AI assist disabled on budget (Must Have) | 2026-05-28 | The real risk is inaccurate financial figures, not over-length narrative |
+
+*Status: Current — reflects 2026-05-29 implementation*
+
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
+| 1.1 | 2026-05-28 | Rapidglobe Ltd | FR-28, FR-29, FR-31 revised to reflect Q&A model; FR-29 and FR-31 promoted to Must Have; revisions table added |
+| 1.2 | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development |

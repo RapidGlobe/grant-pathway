@@ -1,4 +1,5 @@
 # Information Architecture & Navigation -- Grant Pathway v1
+**Version:** 1.2
 
 This document defines the complete information architecture, URL structure, navigation components, access control rules, and page-level navigation for Grant Pathway v1. It is a reference for design, development, and testing.
 
@@ -140,7 +141,7 @@ The five-step application journey is contained within `/applications/new` (Step 
 | 1 | Application Details | Enter funder name and grant name |
 | 2 | Funder Guidelines | Upload or paste funder guidelines |
 | 3 | AI Summary | Review AI-generated plain-English summary |
-| 4 | Draft Answers | Review and edit AI-generated draft answers |
+| 4 | Draft Answers | Write your answers section by section (free_form funders) or respond to numbered questions (structured funders). All content written by the charity; AI assists on request only |
 | 5 | Approve & Export | Approve application and download Word document |
 
 ### 6.2 Step Indicator
@@ -234,12 +235,21 @@ When a user opens an in-progress application from the dashboard, they are taken 
 | Email verified | `/verify-email` (verified state) | "Your account is now active. Let's get started." with Go to dashboard button |
 | Password reset complete | `/` | "Your password has been updated." |
 | Charity profile saved (first time) | `/profile` (stays on page) | "Your charity profile has been saved. You're ready to start your first application." |
-| Charity profile updated | `/profile` (stays on page) | "Your changes have been saved." |
+| Charity profile updated | `/dashboard` (redirect) | None (redirect is the confirmation) |
 | Password changed in account settings | `/account` (stays on page) | "Your password has been updated." |
 | Account deleted | `/` | "Your account has been deleted." |
 | Application deleted from dashboard | `/dashboard` (stays on page) | Application card removed; no page redirect |
 
 ---
 
-*Last updated: 2026-04-16*
 *Status: Complete*
+
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
+| 1.1 | 2026-05-26 | Rapidglobe Ltd | Post-action redirect for charity profile update changed from stay-on-page to redirect to dashboard (2026-05-26 testing decision) |
+| 1.2 | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect section-by-section mode for narrative funders and Q&A mode for structured funders. Document history table added. |
