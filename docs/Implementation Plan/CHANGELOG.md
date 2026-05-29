@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-29 — Step 4: sticky progress bar fixed; Back link added to funder context bar; typo fixed
+
+**What changed:**
+- `components/application-step4-draft.tsx` — Sticky progress bar changed from `top-0` to `top-16` to offset correctly below the authenticated nav header (`h-16`, `sticky top-0 z-[100]`). Previously the bar was sticking behind the nav and not visible. Back link added to the funder context bar (top-right, white text) so users can navigate to Step 3 without scrolling to the bottom of long applications.
+- `components/application-step3-summary.tsx` — Typo fixed: "sectionsto complete" → "sections to complete". Caused by JSX whitespace stripping the newline between `section` and `{"s"}`. Replaced with a template literal to guarantee correct spacing.
+
+**Why:**
+The sticky progress bar was requested and implemented in yesterday's session but was not visible in the deployed service because the `top-0` offset placed it directly behind the sticky nav. The Back button was only at the bottom of the page — inaccessible without scrolling through all sections on a long free_form application.
+
+---
+
 ## 2026-05-29 — Test plan updated to v1.4
 
 **What changed:**

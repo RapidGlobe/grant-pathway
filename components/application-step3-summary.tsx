@@ -471,9 +471,7 @@ export function ApplicationStep3Summary({
           <p className="text-[13px] text-[#065F46]">
             {summary.funder_type === "free_form" ? (
               <>
-                We identified {summary.sections?.length ?? 0} section
-                {(summary.sections?.length ?? 0) === 1 ? "" : "s"} to complete. In the next step,
-                you&apos;ll write your content section by section.
+                {`We identified ${summary.sections?.length ?? 0} ${(summary.sections?.length ?? 0) === 1 ? "section" : "sections"} to complete. In the next step, you'll write your content section by section.`}
               </>
             ) : (
               <>

@@ -340,18 +340,24 @@ export function ApplicationStep4Draft({
     <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={4} />
 
-      {/* Funder context bar */}
-      <div className="mb-4 rounded-lg bg-[#0D6E6E] px-4 py-3">
+      {/* Funder context bar — Back link + funder name */}
+      <div className="mb-4 flex items-center justify-between rounded-lg bg-[#0D6E6E] px-4 py-3">
         <p className="text-[13px] font-medium text-white">
           {funderName}
           {grantName && grantName !== funderName && (
             <span className="ml-2 font-normal opacity-80">&middot; {grantName}</span>
           )}
         </p>
+        <Link
+          href={`/applications/${applicationId}/step/3`}
+          className="text-[13px] text-white opacity-80 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
+        >
+          ← Back
+        </Link>
       </div>
 
-      {/* Sticky progress bar */}
-      <div className="sticky top-0 z-10 -mx-4 mb-6 border-b border-[#E2E8F0] bg-white px-4 py-3 shadow-sm sm:-mx-6 sm:px-6">
+      {/* Sticky progress bar — offset by nav height (h-16 = 64px) */}
+      <div className="sticky top-16 z-10 -mx-4 mb-6 border-b border-[#E2E8F0] bg-white px-4 py-3 shadow-sm sm:-mx-6 sm:px-6">
         <div className="mx-auto max-w-[960px]">
           <div className="mb-1.5 flex items-center justify-between">
             <span className="text-[13px] text-[#64748B]">
