@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-05-29 — GAP-27 and GAP-28 raised: character limits and non-text questions
+
+**What changed:**
+- `docs/test-fixtures/` — Three Idlewild Trust PDFs added: `idlewild-arts-application-questions-dec2025.pdf`, `idlewild-conservation-application-questions-dec2025.pdf`, `idlewild-funding-guidelines-dec2025.pdf`. Sourced from `idlewildtrust.org.uk` ahead of Round One 2026 (opens 8 June 2026).
+- `docs/test-plan-e2e-slices-4-8.md` v1.7 — GAP-27 and GAP-28 added to Known Expected Failures. Idlewild fixture note updated.
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — GAP-27 and GAP-28 recorded.
+
+**GAP-27 — Character limits not supported (Medium)**
+Idlewild Trust question sets use character limits (800 chars, 1600 chars), not word limits. Grant Pathway's AI prompt extracts `wordLimit` only and the `word_limit` column in `application_answers` stores word counts. Character limits will either be missed entirely or incorrectly converted to word counts by the AI. Affects all funders whose published guidelines specify character limits rather than word limits. Fix: extend `AiSummaryData.questions` and `AiSummarySection` to carry a `limitType: 'words' | 'characters'` field; update the AI prompt to extract limit type; update the word count display in Step 4 to show "X / 800 characters" or "X / 200 words" as appropriate.
+
+**GAP-28 — Non-text questions extracted as text (Medium)**
+Idlewild Trust question sets include non-text question types: Yes/No (consent, ownership), dropdown (region, org status), date fields (start/end dates), number fields (grant amount), budget tables (cost breakdown, income raised, pending), and file uploads (accounts, safeguarding policy, photos). The AI has no way to distinguish question type from a PDF reference document and will extract all questions as text fields, showing them as textareas in Step 4. Budget table questions will be flagged as `is_budget_question` but will still appear as textareas rather than being excluded. Fix: extend the AI prompt to extract `questionType` for each question; filter non-text types (Yes/No, dropdown, date, number, table, file) from the Step 4 Q&A interface or display them as read-only aide-memoire items.
+
+**Why:**
+Discovered during pre-test review of Idlewild Arts and Conservation question set PDFs (2026-05-29). These gaps affect all structured funders that use portal-based forms with character limits and mixed question types. They do not affect the current passing test fixtures (TNL, Heritage Fund, Garfield Weston) which are narrative/free-form or simpler structured formats.
+
+---
+
 ## 2026-05-29 — refine-answer: parse_error fix and stale rate-limit comment corrected
 
 **What changed:**

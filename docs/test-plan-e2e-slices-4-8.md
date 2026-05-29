@@ -1,6 +1,6 @@
 # Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.6  
+**Version:** 1.7  
 **Date:** 2026-05-22  
 **Last updated:** 2026-05-29  
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
@@ -71,7 +71,7 @@ The following real funder guideline files are currently available in `docs/test-
 | `Garfield Weston Application-guidelines-1.pdf` | PDF | Narrative (free_form) | Garfield Weston Foundation — 10-page narrative proposal; no discrete questions; primary test for free_form path |
 
 **Missing fixtures (source from `docs/target-funder-list.md` before full test run):**
-- Idlewild Trust — Word question set (structured)
+- Idlewild Trust — Arts and Conservation question set PDFs now in `docs/test-fixtures/` — **do not use for full structured-path testing until GAP-27 and GAP-28 are resolved** (character limits not supported; non-text questions extracted as text)
 - A B Charitable Trust — PDF question set (structured)
 - Clothworkers' Foundation — online guidelines (structured)
 - Henry Smith Foundation — Stage 1 questions (structured)
@@ -1863,6 +1863,8 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | UX-06 | GAP-26 | `applications/[id]` shows stub, not redirect |
 | S7-P-03 | GAP-24 | Disclaimer wording differs from PDR-DH-003 spec |
 | NF-06 | GAP-22 | No inactivity message shown after session timeout |
+| S5-P-02 (Idlewild) | GAP-27 | Character limits (e.g. 800 chars, 1600 chars) in Idlewild question sets are not supported — Grant Pathway only handles word limits. The AI may miss these limits entirely or convert them incorrectly to word counts. Affected funders: Idlewild Trust (Arts and Conservation). Fix required before Idlewild can be used as a production test fixture. |
+| S6-P-02 (Idlewild) | GAP-28 | Non-text questions in Idlewild form (Yes/No consent, dropdown region/org-type, date fields, number fields, budget tables, file upload fields) will be extracted by the AI as if they were narrative text questions and shown as empty textareas in Step 4. The AI has no way to distinguish question type from a PDF reference document. These questions should either be filtered out or clearly flagged as non-applicable. Fix required before Idlewild can be used as a production test fixture. |
 
 ---
 
@@ -1879,7 +1881,8 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | 1.4 | 2026-05-29 | Rapidglobe Ltd | Test Fixtures section updated: pointer to `docs/target-funder-list.md` (12 consolidated funders); missing fixture files listed per funder. S5-P-02 updated for Step 3 two-column card layout redesign and removal of supporting documents card; S5-P-02b added (free_form funder summary — "Application sections" card, "X sections to complete" confirmation). S6-P-03b added (advanceToStep4 bug fix — confirms `ready_to_assemble`/`assembled` states are preserved when returning via Step 3). NF-02 rewritten: old "AI draft generation response time" test removed (auto-generation model no longer exists); replaced with refine-answer API response time test (target ≤15s). Summary table updated: S5 positive 6 → 7, S6 positive 6 → 7, total 114 → 116. |
 | 1.5 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-005 (sticky progress bar hidden behind nav — fixed), D-006 (Back button only at bottom of Step 4 — fixed), D-007 (typo "sectionsto complete" in Step 3 free_form confirmation — fixed). Version bump. |
 | 1.6 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-008 (parse_error on refine-answer with short answers — fixed via prompt strengthening), D-009 (rate_limited on rapid refine-answer clicks — expected behaviour; stale comment fixed). Version bump. |
+| 1.7 | 2026-05-29 | Rapidglobe Ltd | Three Idlewild Trust PDFs added to `docs/test-fixtures/` (Arts question set, Conservation question set, Funding Guidelines). GAP-27 and GAP-28 raised and added to Known Expected Failures. Idlewild fixture note updated to warn against use until gaps resolved. |
 
 ---
 
-_Test plan v1.6 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
+_Test plan v1.7 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
