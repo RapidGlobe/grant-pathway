@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-05-29 — Consolidated target funder list documented; AGENTS.md audit trail rule strengthened
+
+**What changed:**
+- `docs/target-funder-list.md` — **New file.** Canonical consolidated list of 12 target grant-giving organisations (10 structured, 2 narrative) used to design and test Grant Pathway's Step 4 Q&A model and Step 5 assembly/export. Supersedes the 3-funder test fixture table that had been the only documented reference. Includes funder name, type, grant range, rationale for inclusion, and guidelines/apply URL.
+- `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md` — Note added to the 3-funder test fixture table marking it as superseded and pointing to `docs/target-funder-list.md`.
+- `docs/Implementation Plan/CHANGELOG.md` (this file) — Superseded note added to the earlier partial funder list entry (2026-05-27).
+- `AGENTS.md` — Documentation rule (`implementation-docs-rules` section) substantially strengthened. Now explicitly requires: (a) all changes documented without exception, (b) product-level decisions (funder lists, research findings, scope) documented in `docs/` not just code comments, (c) agent must ask the user before proceeding if it is unclear where something should be documented. Motivated by the gap discovered this session.
+
+**Why:**
+The consolidated funder list was researched in a prior working session and used as the basis for the Step 4 redesign, but was never written to any file. It existed only in session context. This created an audit gap: the canonical list underpinning a fundamental product decision was not recoverable from the repository. This entry closes that gap and adds an explicit rule to AGENTS.md to prevent recurrence.
+
+---
+
 ## 2026-05-29 — Step 4: section-by-section mode for narrative funders; advanceToStep4 bug fix
 
 **What changed:**
@@ -64,6 +77,8 @@ During testing, the single-card summary was described as "too busy" and hard to 
 **Example funders in scope (non-exhaustive):**
 - Structured: A B Charitable Trust, Foyle Foundation (Main Grants), Walton Charity, Nationwide Building Society Community Grants, Garfield Weston Foundation (small grants), Bletchley & Fenny Stratford Town Council
 - Free_form / narrative: Garfield Weston Foundation (larger grants), City Bridge Foundation
+
+> **Superseded (2026-05-29):** The above example funder lists were a working approximation. The canonical consolidated target funder list (12 funders) is now documented in [`docs/target-funder-list.md`](../target-funder-list.md). All future funder references should use that document.
 
 **Why:**
 Grant funding authorities vary enormously in their application processes: some require a quiz to route applicants, some use locked online portals, some generate forms per-applicant, and some require multi-stage expressions of interest. There is no generalised API or extraction route that works across all types. By targeting funders with published, accessible guidelines, Grant Pathway can reliably extract structured data (questions, sections, word limits, eligibility criteria) and produce correctly formatted output. This constraint removes a category of support failure and makes the product significantly easier to test, demo, and explain to prospective users.

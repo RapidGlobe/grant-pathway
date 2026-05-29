@@ -34,7 +34,21 @@ Before starting any implementation task:
 <!-- END:adr-consequences-rules -->
 
 <!-- BEGIN:implementation-docs-rules -->
-# Implementation Plan folder — update all relevant docs after every change
+# Documentation — mandatory audit trail. No exceptions.
+
+**Every change must be documented. This is not optional.**
+
+This project requires a complete audit trail of all decisions, design changes, and product evolution. A change that is not documented did not happen as far as any future session, team member, or review is concerned. Missing documentation has already caused rework (e.g. the consolidated funder list that was researched but never written down, 2026-05-29). Do not let this happen again.
+
+## What must be documented
+
+- Any new product or design decision, including research findings, funder lists, scope changes, or feature decisions — even if no code changes
+- Any change to how the product works, looks, or behaves
+- Any deviation from the implementation plan
+- Any architectural decision, data model change, or API change
+- Any resolved question or open issue that gets closed
+
+## Where to document it
 
 All implementation documentation lives in `docs/Implementation Plan/`. After completing any task, check each of the four documents in that folder and update as appropriate:
 
@@ -45,9 +59,15 @@ All implementation documentation lives in `docs/Implementation Plan/`. After com
 | `ADR-TRACEABILITY.md` | When a GAP item is resolved — update the Task column and change status from ⚠️ to ✅; also update the phase gate sign-off table when a gate is passed |
 | `IMPLEMENTATION-PLAN.md` | When the approach for a future task changes during implementation — update the task spec so it reflects current intent |
 
+For product-level decisions (funder lists, feature scope, personas, UX research findings), create or update the relevant file in `docs/` directly. If no suitable file exists, create one and cross-reference it from the CHANGELOG.
+
+## When in doubt — ask before proceeding
+
+If it is not obvious where a decision or change should be documented, **stop and ask the user before proceeding**. Do not proceed on the assumption that it will be captured later. The cost of a 30-second question is far lower than the cost of a lost decision that has to be reconstructed weeks later.
+
 **The rule:** One folder, one check. After any task, open `docs/Implementation Plan/` mentally and ask: does each of these four documents reflect what just happened? If not, update before committing.
 
-**Why this matters for a team:** Teammates and future AI sessions rely on these documents to understand the current state of the project. An update missed here means someone works from stale information. The changelog in particular captures *why* decisions were made — that context is lost if it is not recorded at the time.
+**Why this matters:** Teammates and future AI sessions rely on these documents to understand the current state of the project. An update missed here means someone works from stale information. The changelog in particular captures *why* decisions were made — that context is lost if it is not recorded at the time.
 <!-- END:implementation-docs-rules -->
 
 <!-- BEGIN:github-commit-rules -->

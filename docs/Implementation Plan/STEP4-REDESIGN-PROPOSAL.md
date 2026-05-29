@@ -14,6 +14,8 @@ implications for Grant Pathway's Step 4 (draft generation).
 
 ### Test fixture findings
 
+> **Note (2026-05-29):** The 3-funder table below was the original test fixture used to trigger the redesign. It has been superseded by the consolidated 12-funder target list, which is now the canonical reference. See [`docs/target-funder-list.md`](../target-funder-list.md).
+
 | Funder | Document | Key finding |
 |---|---|---|
 | National Lottery Heritage Fund | `heritage-fund-application-guidance.pdf` | Structured online form with discrete questions + up to 11 categories of mandatory supporting documents |
