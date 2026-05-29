@@ -1,7 +1,8 @@
 # Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Date:** 2026-05-22  
+**Last updated:** 2026-05-29  
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
 **Environment:** Staging (Vercel preview) or local dev with Supabase + Bedrock credentials  
 **Tester:**  
@@ -21,7 +22,7 @@ Complete this table after running all tests.
 | Positive (S3) | 2 | | | | |
 | Positive (S4) | 6 | | | | |
 | Positive (S5) | 6 | | | | |
-| Positive (S6) | 5 | | | | |
+| Positive (S6) | 6 | | | | |
 | Positive (S7) | 6 | | | | |
 | Positive (S8) | 3 | | | | |
 | Negative (S0) | 9 | | | | |
@@ -35,7 +36,7 @@ Complete this table after running all tests.
 | Negative (S8) | 7 | | | | |
 | Non-Functional | 13 | | | | |
 | Usability / Flow | 12 | | | | |
-| **Total** | **113** | | | | |
+| **Total** | **114** | | | | |
 
 ---
 
@@ -612,13 +613,13 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 
 ### S5-P-03 — AI usage counter increments
 
-**Preconditions:** Note the current AI usage count from the dashboard before starting (e.g. "3 of 20 AI requests used this month").
+**Preconditions:** Note the current AI usage count from the dashboard before starting (e.g. "3 of 50 AI requests used this month").
 
 1. Complete the Step 3 summary generation (S5-P-01).
 2. Navigate to the dashboard.
 3. Check the AI usage indicator.
 
-**Expected result:** Usage count has incremented by 1 (e.g. "4 of 20 AI requests used this month").
+**Expected result:** Usage count has incremented by 1 (e.g. "4 of 50 AI requests used this month").
 
 ---
 
@@ -639,11 +640,11 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 
 ### S5-P-05 — Approaching AI usage limit banner
 
-**Preconditions:** AI usage count is at 16 or above (test account with 16 uses already consumed, or manually insert rows into `ai_usage_log` via Supabase dashboard for the current month).
+**Preconditions:** AI usage count is at 40 or above (test account with 40 uses already consumed, or manually insert rows into `ai_usage_log` via Supabase dashboard for the current month).
 
 1. Navigate to Step 3 and trigger summary generation.
 
-**Expected result:** Amber approaching-limit banner is shown on the Step 3 page alongside the summary: "You've used N of 20 AI requests this month."
+**Expected result:** Amber approaching-limit banner is shown on the Step 3 page alongside the summary: "You've used N of 50 AI requests this month."
 
 ---
 
@@ -651,7 +652,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 
 **Preconditions:** Step 3 with a summary successfully displayed.
 
-1. Click **This looks right — continue**.
+1. Click **Continue**.
 
 **Expected result:**
 - Browser navigates to Step 4 (`/applications/[id]/step/4`).
@@ -661,76 +662,99 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 
 ---
 
-## Slice 6 — Step 4: Draft Answers
+## Slice 6 — Step 4: Q&A Interview (charity-authored model)
 
-### S6-P-01 — Draft answers auto-generate on page load
+> **Design model (2026-05-28):** Step 4 uses a charity-authored model — the charity writes all answers from scratch. AI does NOT auto-generate answers on page load. The optional "Help me improve this" button (non-budget questions only) calls `/api/refine-answer` to improve structure and clarity without adding facts. The preparation checklist gate appears once when `draft_status = 'not_started'`.
 
-**Preconditions:** Application at Step 4; questions extracted in Step 3.
+### S6-P-01 — Preparation checklist shown on first visit
+
+**Preconditions:** Application at Step 4 for the first time (`draft_status = 'not_started'`).
 
 1. Navigate to `/applications/[id]/step/4`.
-2. Observe the loading state.
+2. Observe the page.
 
 **Expected result:**
-- Loading state auto-appears with staged messages ("Reviewing your guidelines and charity profile…" → "Writing your draft answers…" → "Almost there…").
-- Progress bar advances.
-- Draft answers are populated in editable textareas — one per extracted question.
-- Questions are shown as bold headings above each textarea.
-- AI usage counter increments by 1.
+- No AI loading state appears.
+- A preparation checklist is shown with heading "Before you begin writing".
+- The checklist lists financial items to gather (annual accounts, projected budget, other funding, treasurer input).
+- A note: "It is worth involving a senior colleague before reaching the financial questions."
+- A **"I have what I need — start writing"** button is visible.
+- No Q&A interface or textareas are visible yet.
 
 ---
 
-### S6-P-02 — Word count tracks live
+### S6-P-02 — Preparation checklist dismissed; Q&A interface shown
 
-**Preconditions:** Step 4 with draft answers populated.
+**Preconditions:** S6-P-01 complete. On the preparation checklist.
 
-1. Click into one of the answer textareas.
-2. Type additional text or delete some words.
+1. Click **"I have what I need — start writing"**.
+2. Observe the page.
 
 **Expected result:**
-- Word count displayed below the textarea updates in real time as you type.
-- If the answer has a word limit (from the extracted question), an over-limit warning appears when exceeded and disappears when back within limit.
+- `draft_status` is set to `'in_progress'` in the database.
+- The Q&A interface is shown immediately (no page reload required).
+- **For structured funders:** Questions are shown as numbered headings (e.g. "1. Tell us about your organisation") with an empty editable textarea below each.
+- **For free_form funders:** Section titles are shown as unnumbered headings (e.g. "About your organisation") with a guidance note beneath the title and an empty editable textarea below.
+- A teal funder context bar is shown near the top with the funder name and grant name.
+- A sticky progress bar shows "0 of N sections/questions completed".
 
 ---
 
-### S6-P-03 — Auto-save triggers on typing
+### S6-P-03 — Returning to Step 4 skips preparation checklist
 
-**Preconditions:** Step 4 with draft answers populated.
+**Preconditions:** `draft_status` is `'in_progress'` (preparation checklist already dismissed).
 
-1. Edit any answer textarea (add or change a few words).
-2. Stop typing and wait ~400ms.
-3. Do NOT click any button.
+1. Navigate away from Step 4 (e.g. to Step 3 or dashboard).
+2. Navigate back to Step 4.
+
+**Expected result:**
+- The preparation checklist is NOT shown.
+- The Q&A interface loads immediately with any previously saved answers intact.
+
+---
+
+### S6-P-04 — Auto-save on blur and word count
+
+**Preconditions:** S6-P-02 complete. Q&A interface visible.
+
+1. Click into a textarea and type or paste a multi-sentence answer (at least 50 words).
+2. Click outside the textarea (trigger blur).
+3. Observe the progress bar and any character/word counter.
 4. Refresh the page.
 
 **Expected result:**
-- After the refresh, the edited answer is still present (saved to database via auto-save debounce).
-- No data is lost.
+- After the blur, the answer is saved to the database automatically (no button press needed).
+- If a word limit is shown for that question/section, a word counter is visible.
+- After page refresh, the saved answer is still present.
+- The progress bar updates to reflect the completed section/question (green indicator).
 
 ---
 
-### S6-P-04 — Edit an answer manually and save
+### S6-P-05 — Budget section shown with amber background and AI disabled
 
-**Preconditions:** Step 4 with draft answers populated.
+**Preconditions:** Application using a structured or free_form funder that has a budget question/section.
 
-1. Completely clear one answer textarea.
-2. Type a manually written answer.
-3. Stop typing and wait for auto-save.
-4. Navigate away (e.g. dashboard) and return to Step 4.
+1. Locate the budget question or section on Step 4 (should have amber/yellow background).
+2. Observe the AI button state for that section.
 
 **Expected result:**
-- The manually written answer is preserved on return.
-- `answer_source` for that answer should be `'manual'` (verify via Supabase dashboard if needed).
+- Budget question/section has a visually distinct amber background.
+- The AI assist button (if present) is **disabled** for this section with a label indicating it cannot be used for financial data.
+- Non-budget sections have the AI assist button enabled (or a "Help me improve this" link active).
 
 ---
 
-### S6-P-05 — Continue to Step 5
+### S6-P-06 — "Assemble and advance" moves to Step 5
 
-**Preconditions:** Step 4 with at least one answer filled.
+**Preconditions:** All questions/sections have a saved answer (or at minimum the required fields). Q&A interface on Step 4.
 
-1. Click **I've reviewed my answers — continue**.
+1. Click the button to proceed (e.g. **"Review and assemble"** or equivalent final action on Step 4).
+2. Confirm in any confirmation prompt that appears.
 
 **Expected result:**
-- Browser navigates to Step 5.
-- `current_step` updated to 5 in the database.
+- Browser navigates to Step 5 (`/applications/[id]/step/5`).
+- `current_step` is updated to 5 in the database.
+- `assembled_draft` is populated in the `applications` table (verify via Supabase dashboard if needed).
 
 ---
 
@@ -1231,7 +1255,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 
 ### S5-N-03 — AI usage limit reached
 
-**Preconditions:** AI usage for the test account is at 20/20 for the current month. (Insert 20 rows into `ai_usage_log` for this user via Supabase for the current month to set this up.)
+**Preconditions:** AI usage for the test account is at 50/50 for the current month. (Insert 50 rows into `ai_usage_log` for this user via Supabase for the current month to set this up.)
 
 1. Navigate to Step 3.
 
@@ -1260,42 +1284,47 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 
 ## Slice 6 — Draft Answers Errors
 
-### S6-N-01 — AI failure on draft generation
+### S6-N-01 — AI refine-answer failure (transient)
 
-**Preconditions:** Step 4 with questions loaded. API is broken (same approach as S5-N-01).
+**Preconditions:** Step 4; Q&A interface visible; at least one non-budget answer entered. API is broken (same approach as S5-N-01) or temporarily set an invalid AWS key.
 
-1. Navigate to Step 4 (auto-triggers generation).
-2. Wait for error state.
+1. Click the **"Help me improve this"** button on a non-budget question.
+2. Wait for the error state.
 
-**Expected result:** Transient error banner with **Try again** button. Existing answers in the database (if any from a prior run) are still shown in textareas.
+**Expected result:**
+- Per-question inline error appears: "We couldn't improve this right now. Please try again."
+- A **Try again** button is visible.
+- The original answer text is NOT lost or overwritten.
+- Other questions/sections on the page are unaffected.
 
 ---
 
 ### S6-N-02 — Answer over word limit warning
 
-**Preconditions:** Step 4. Application generated from `tnl-community-fund-application-form-2025.docx` which should extract word-limited questions.
+**Preconditions:** Step 4. Application from `tnl-community-fund-application-form-2025.docx` which should extract word-limited questions.
 
-1. Find a question with a word limit.
+1. Find a question with a word limit shown.
 2. Clear the textarea and type a very long answer well in excess of the limit.
 
 **Expected result:**
 - Word count display turns red (or warning colour).
 - Over-limit warning text appears below the textarea.
 - The answer is NOT blocked — the user can still type and save.
-- The Continue button is still active (over-limit is a warning, not a hard block).
+- The proceed/assemble button is still active (over-limit is a warning, not a hard block).
 
 ---
 
-### S6-N-03 — Usage limit reached on draft generation
+### S6-N-03 — Usage limit reached on refine-answer
 
-**Preconditions:** AI usage at 20/20 (as S5-N-03).
+**Preconditions:** AI usage at 50/50 (manually insert 50 rows into `ai_usage_log` for the current month, as per S5-N-03 approach, but using the 50-request cap).
 
-1. Navigate to Step 4.
+1. Navigate to Step 4 and attempt to click **"Help me improve this"** on any non-budget answer.
 
 **Expected result:**
-- Limit-reached state is shown.
-- "Regenerate all answers" link is disabled.
-- Any answers already in the database from a previous run are still displayed and editable.
+- Usage limit banner is shown (or the refine button is disabled with a limit-reached message).
+- The `/api/refine-answer` route is not called.
+- Any answers already saved in the database are still displayed and editable.
+- The Q&A interface remains fully functional for typing new answers.
 
 ---
 
@@ -1744,8 +1773,8 @@ _Practical approach:_ Verify via code review that `SessionTimeoutProvider` fires
 
 Run the complete happy path (Steps 2 → 3 → 4 → 5 → Export) in each browser:
 
-| Browser | Version | Step 2 upload | Step 3 AI | Step 4 AI | Export .docx | Export .txt | Pass/Fail |
-|---------|---------|--------------|-----------|-----------|-------------|------------|-----------|
+| Browser | Version | Step 2 upload | Step 3 AI | Step 4 write | Export .docx | Export .txt | Pass/Fail |
+|---------|---------|--------------|-----------|-------------|-------------|------------|-----------|
 | Chrome (desktop) | | | | | | | |
 | Edge (desktop) | | | | | | | |
 | Firefox (desktop) | | | | | | | |
@@ -1782,4 +1811,16 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 
 ---
 
-_Test plan created 2026-05-22. Review and update after each test run._
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-05-22 | Rapidglobe Ltd | Initial test plan — Slices 0–8 positive, negative, non-functional, and usability tests |
+| 1.1 | 2026-05-26 | Rapidglobe Ltd | Added D-001 to D-004 to defect log (sign-out, password reset, same-password, recovery session bugs fixed during testing) |
+| 1.2 | 2026-05-29 | Rapidglobe Ltd | Complete rewrite of S6 positive tests to reflect charity-authored Q&A model (preparation checklist gate, section-by-section/structured Q&A interface, auto-save on blur, budget section indicators, assemble and advance); rewrote S6-N-01 (refine-answer failure replaces draft generation failure); fixed S5-P-03, S5-P-05, S5-N-03 to use 50-request cap and 40-request approaching-limit threshold; updated S5-P-06 button text ("Continue" not "This looks right — continue"); updated cross-browser smoke test header; added document history table |
+
+---
+
+_Test plan v1.2 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._

@@ -1,7 +1,8 @@
 # Grant Pathway v1 — Implementation Plan
 
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2026-05-07
+**Last updated:** 2026-05-29
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -339,7 +340,7 @@ Two states, toggled in the static shell:
 **Populated state (one or more applications):**
 - Heading: "My Applications"
 - Summary strip: "[n] applications — [n] not started · [n] in progress · [n] approved · [n] exported" (all four counts shown even when zero)
-- AI usage indicator (per ADR-AI-008): "[n] of 20 AI requests used this month" — shown on the dashboard so users can track their allowance before starting a new application
+- AI usage indicator (per ADR-AI-008): "[n] of 50 AI requests used this month" — shown on the dashboard so users can track their allowance before starting a new application
 - **+ New Application** button (teal, top right)
 - Charity profile incomplete banner (shown if profile is incomplete — same as above)
 - Application cards sorted by most recently updated first
@@ -982,7 +983,7 @@ Note: `annual income band`, `registered address`, and separate `mission statemen
 
 - Fetch applications for the current user from `applications` table (Server Component, SSR), sorted by `updated_at` descending
 - Empty state: heading "Welcome to Grant Pathway, [first name]"; profile incomplete banner; three-step explainer; disabled start button with tooltip when no profile
-- Populated state: heading "My Applications"; summary strip showing counts for all four statuses; AI usage indicator ("n of 20 AI requests used this month") fetched from `ai_usage_log` current-month count (ADR-AI-008); application cards with funder name first (bold), then grant name, status pill, formatted date, Continue/View button
+- Populated state: heading "My Applications"; summary strip showing counts for all four statuses; AI usage indicator ("n of 50 AI requests used this month") fetched from `ai_usage_log` current-month count (ADR-AI-008); application cards with funder name first (bold), then grant name, status pill, formatted date, Continue/View button
 - Status pills use values `not_started, in_progress, approved, exported` with correct colours (slate/amber/green/teal)
 - **+ New Application** button → `/applications/new` (FR-15)
 - Click application card → `/applications/[id]` (redirects to `current_step`) (FR-17)
@@ -1105,7 +1106,7 @@ export const maxDuration = 90;
 
 Estimated time: 0.5 days
 
-Add four new fields to the Step 3 Bedrock prompt output and the `AiSummaryData` TypeScript type:
+Add five new fields to the Step 3 Bedrock prompt output and the `AiSummaryData` TypeScript type, plus a new `AiSummarySection` type for free_form funders:
 
 ```typescript
 funder_type: 'structured' | 'free_form'
@@ -1121,16 +1122,30 @@ supportingDocuments?: string[]
 questions: Array<{
   question_text: string
   word_limit?: number
-  is_budget_question: boolean  // NEW — true for financial/budget questions
+  is_budget_question: boolean  // true for financial/budget questions
 }>
+  // populated for structured funders; empty [] for free_form
+
+sections?: Array<{             // AiSummarySection type — new 2026-05-29
+  number: number
+  title: string                // e.g. "About your organisation"
+  guidance: string             // 2–3 sentences from funder instructions for this section
+  wordLimit?: number
+  is_budget_section: boolean
+}>
+  // populated for free_form funders; empty [] for structured
+  // mutually exclusive with questions: exactly one of {questions, sections} will be non-empty
 ```
 
 Prompt classification instructions:
 - `funder_type = 'structured'` if guidelines contain a numbered list of questions or a form with discrete fields
 - `funder_type = 'free_form'` if guidelines specify themes/sections for a narrative document with no numbered questions
-- `is_budget_question = true` for any question asking for budget, income, expenditure, financial projections, or funding breakdown
+- `is_budget_question / is_budget_section = true` for any question or section asking for budget, income, expenditure, financial projections, or funding breakdown
 - `funderAiPolicy`: extract any statement about AI use (verbatim or close paraphrase); null if none found
 - `supportingDocuments`: list all document categories the funder requires or recommends submitting alongside the application
+- `sections[].guidance`: derive 2–3 sentences from the funder's own wording to guide the applicant on what to include in each section
+
+**Implementation note (2026-05-29):** `sections?` was added during implementation to support the Step 4 section-by-section interface. The Step 4 page server component derives a `guidanceMap` from `parsedSummary.sections`, keyed by `section.number`, which is passed to `QuestionRow` components as a `guidance` prop — it is not stored in `application_answers`, avoiding duplication.
 
 #### S6.2 — Step 3 UI: funderAiPolicy banner and supportingDocuments aide-memoire
 
@@ -1478,11 +1493,22 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 
 ---
 
-*Implementation Plan v1.5 — Grant Pathway*
-*Created: 2026-05-07 | Updated: 2026-05-07*
-*v1.1 changes: Corrected 13 inconsistencies found during review against screen-requirements.md — see discrepancies table (D1–D7) for resolutions.*
-*v1.2 changes: Corrected 10 inconsistencies found during review against all PRD inputs — see discrepancies table (D8–D10) for resolutions.*
-*v1.3 changes: Corrected 9 inconsistencies found during review against data-model.md, non-functional-requirements.md, v1-out-of-scope.md, user-personas-journeys-and-use-cases.md, and PDR-DH-002/003, PDR-AI-003/005 — see discrepancies table (D11–D19) for resolutions.*
-*v1.4 changes: Corrected 3 inconsistencies found during review against PDR-AI-002, PDR-AI-004, PDR-DH-001, PDR-UI-004/005/006 — see discrepancies table (D20–D22) for resolutions.*
-*v1.5 changes: Corrected 8 inconsistencies found during full review of all 42 ADRs and technical-design.md — see discrepancies table (D23–D30) for resolutions. Key changes: ADR threshold/PRD precedence documented; responsive strategy reconciled (desktop-first + 320px min); explicit protected routes list added to P3.4; inactivity deletion authority documented; AI usage count display added to dashboard (P1.6 and Slice 2); ADR-SEC-006 incomplete env vars noted in P3.2; user_profiles schema authority documented.*
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-05-07 | Rapidglobe Ltd | Initial plan — phases 0–5 with route reference, discrepancy table (D1–D7), and all slice specifications |
+| 1.1 | 2026-05-07 | Rapidglobe Ltd | Corrected 13 inconsistencies against screen-requirements.md (D1–D7) |
+| 1.2 | 2026-05-07 | Rapidglobe Ltd | Corrected 10 inconsistencies against PRD inputs (D8–D10) |
+| 1.3 | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19) |
+| 1.4 | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22) |
+| 1.5 | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions |
+| 1.6 | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table |
+
+---
+
+*Implementation Plan v1.6 — Grant Pathway*
+*Created: 2026-05-07 | Last updated: 2026-05-29*
 *Verified against: BRD v0.2, PRD v0.2, all 42 ADRs, technical-design.md, Screen Requirements, Application Status Model, Email Notifications, Acceptance Criteria, Success Metrics, Data Model, Non-Functional Requirements, Out-of-Scope Document, User Personas & Use Cases, all 17 PDR decisions, MoSCoW Feature Register, Information Architecture, Constraints & Assumptions*
