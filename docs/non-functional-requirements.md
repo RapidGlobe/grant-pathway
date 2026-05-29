@@ -10,9 +10,11 @@ This document captures the agreed non-functional requirements for the v1 build. 
 |--------|--------|
 | Page loads and navigation | Under 3 seconds |
 | AI guideline summarisation | Under 30 seconds |
-| AI draft answer generation | Under 60 seconds |
+| AI answer refine (per question) | Under 15 seconds |
 
-**Notes:** Grant writing is not a real-time task. Users will tolerate a longer wait for a full AI-drafted answer provided a clear progress indicator is shown (e.g. "Generating your draft…"). These targets are realistic for Amazon Bedrock Claude API under normal load.
+**Notes:** Grant writing is not a real-time task. Users will tolerate a short wait for AI-assisted refinement provided a clear progress indicator is shown. These targets are realistic for Amazon Bedrock Claude API under normal load.
+
+**Vercel function region (2026-05-29):** Vercel function region was set to London (eu-west-2 / lhr1) to match AWS Bedrock (eu-west-2). This eliminates the transatlantic round trip that previously occurred with the default iad1 (Virginia) region, reducing AI call latency and lowering timeout risk on large guideline documents.
 
 ---
 
@@ -101,5 +103,5 @@ WCAG 2.2 Level AA compliance is a design-in requirement from day one (C15). An i
 
 ---
 
-*Last updated: 2026-04-16*
+*Last updated: 2026-05-29*
 *Sources: BRD Information Gathering Checklist items 30–35; constraints-and-assumptions.md (C15, C16, C17); DR-LC-003; PDR-UI-003 (desktop-primary decision)*

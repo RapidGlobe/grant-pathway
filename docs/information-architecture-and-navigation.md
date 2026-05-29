@@ -1,5 +1,6 @@
 # Information Architecture & Navigation -- Grant Pathway v1
-**Version:** 1.2
+**Version:** 1.3
+**Last updated:** 2026-05-29
 
 This document defines the complete information architecture, URL structure, navigation components, access control rules, and page-level navigation for Grant Pathway v1. It is a reference for design, development, and testing.
 
@@ -141,7 +142,7 @@ The five-step application journey is contained within `/applications/new` (Step 
 | 1 | Application Details | Enter funder name and grant name |
 | 2 | Funder Guidelines | Upload or paste funder guidelines |
 | 3 | AI Summary | Review AI-generated plain-English summary |
-| 4 | Draft Answers | Write your answers section by section (free_form funders) or respond to numbered questions (structured funders). All content written by the charity; AI assists on request only |
+| 4 | Draft Answers | Write answers section by section (Tier 3 / free_form funders) or respond to numbered questions (Tier 1 / Tier 2 structured funders). Every extracted question or section carries a `question_type` (`narrative \| data_entry \| financial \| dropdown \| date \| file_upload`). Narrative questions show a writing card with textarea, word/character counter, and AI assist. Data-entry and financial questions are pre-filled from the charity profile. Dropdown, date, and file_upload questions are shown as reminders only. All substantive content is written by the charity; AI assists on request only |
 | 5 | Approve & Export | Approve application and download Word document |
 
 ### 6.2 Step Indicator
@@ -253,3 +254,4 @@ When a user opens an in-progress application from the dashboard, they are taken 
 | 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
 | 1.1 | 2026-05-26 | Rapidglobe Ltd | Post-action redirect for charity profile update changed from stay-on-page to redirect to dashboard (2026-05-26 testing decision) |
 | 1.2 | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect section-by-section mode for narrative funders and Q&A mode for structured funders. Document history table added. |
+| 1.3 | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect question-level typing (BD-04): `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`. Tier 1/2/3 funder coverage model referenced. |

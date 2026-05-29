@@ -1,5 +1,6 @@
 # Technology Stack — AI Grant Accelerator v1
-**Version:** 1.1
+**Version:** 1.2
+**Last updated:** 2026-05-29
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
 
@@ -66,13 +67,15 @@ Supabase Auth is included within the Supabase platform at no additional cost, el
 
 | Layer | Platform | Region |
 |-------|----------|--------|
-| Application (Next.js) | Vercel | Global edge network |
+| Application (Next.js) | Vercel | **London, UK (eu-west-2 / lhr1)** — function region explicitly set 2026-05-29 |
 | Data (database, auth, file storage) | Supabase | London, UK |
 
 **Rationale:**
-Vercel is built by the same team as Next.js — deployment is a single command and auto-scaling is handled automatically, requiring no infrastructure management from the developer. All charity data is stored exclusively in Supabase London, satisfying the UK-region data storage requirement (C13, DR-DP-002). Vercel's compute layer processes requests but holds no persistent data. The Privacy Policy will note that the application layer uses a global delivery network while all data is stored in UK region.
+Vercel is built by the same team as Next.js — deployment is a single command and auto-scaling is handled automatically, requiring no infrastructure management from the developer. All charity data is stored exclusively in Supabase London, satisfying the UK-region data storage requirement (C13, DR-DP-002). Vercel's compute layer processes requests but holds no persistent data.
 
-**Fallback:** If the UK data residency interpretation requires the compute layer to also be UK-hosted, AWS eu-west-2 (London) is the alternative hosting platform for the Next.js application. Both AWS and Azure cloud accounts are already in place (see TS-05).
+**Vercel function region — London (eu-west-2 / lhr1):** The Vercel function region was explicitly set to London on 2026-05-29 (Vercel → Settings → Function Regions). This aligns Vercel functions with the AWS Bedrock region (eu-west-2), eliminating the transatlantic round trip that previously occurred when functions defaulted to iad1 (Virginia). All AI processing now executes within the same UK region. This reduces call latency, lowers timeout risk, and ensures all processing remains in UK infrastructure (C13, DR-DP-002).
+
+**Fallback:** If the UK data residency interpretation requires additional assurance, the Vercel function region setting provides explicit evidence that compute also runs in UK/EEA.
 
 ---
 
@@ -111,7 +114,7 @@ The domain **Grantpathway.org.uk** has been registered and is likely to inform t
 | Database | PostgreSQL via Supabase (London) |
 | Authentication | Supabase Auth |
 | File storage | Supabase Storage (London) |
-| App hosting | Vercel |
+| App hosting | Vercel (function region: London, eu-west-2 / lhr1) |
 | AI API | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) |
 | Charity register | Charity Commission for England and Wales public API |
 | Source control | GitHub (public repository) |
@@ -140,3 +143,4 @@ The domain **Grantpathway.org.uk** has been registered and is likely to inform t
 |---------|------|--------|--------------------|
 | 1.0 | 2026-04-13 | Rapidglobe Ltd | Initial version |
 | 1.1 | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development |
+| 1.2 | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2. |

@@ -6,7 +6,7 @@
 
 Every year, thousands of UK charities miss out on funding they deserve — not because their work isn't good enough, but because writing a strong grant application is hard, time-consuming, and often falls to someone who has never been trained to do it.
 
-Grant Pathway is a free online tool that helps charities write better grant applications. It uses artificial intelligence to summarise funder guidelines in plain English and generate a first draft of each application question — tailored to the charity's own story. Every piece of AI-generated content must be reviewed and approved by a real person before it can be used. The charity stays in control. The AI does the heavy lifting.
+Grant Pathway is a free online tool that helps charities write better grant applications. It uses artificial intelligence to summarise funder guidelines in plain English and assist the charity in structuring and expressing their answers — tailored to the charity's own story. The charity writes every substantive answer; AI helps improve clarity and structure on request. Every answer must be reviewed and approved by a real person before it can be used. The charity stays in control. The AI is the assistant.
 
 It is completely free. No subscription. No trial period. No catch.
 
@@ -40,9 +40,9 @@ When they are ready to work on an application, they create a new entry — just 
 
 Grant Pathway reads those guidelines and produces a plain-English summary. Not a copy of the document — a clear, straightforward explanation of what the funder actually cares about, what each question is really asking, and what a good answer might look like. For someone who finds funder language intimidating, this alone can be transformative.
 
-Then, for each question in the application, the charity worker can ask Grant Pathway to generate a draft answer. The tool draws on the funder summary and the charity's own profile to produce something tailored, relevant, and written in plain English. It is not perfect — no AI-generated text is — but it is a strong starting point that reflects the charity's real work and addresses what the funder has asked.
+Then, for each question or section in the application, the charity worker writes their own answer. Grant Pathway provides a guided writing card with the word or character limit displayed, the funder's question clearly presented, and any context extracted from the guidelines. If the charity worker wants help improving what they have written — tightening the structure, clarifying the language, making it more funder-appropriate — they can ask Grant Pathway to assist. The AI refines what the charity has already written; it does not generate answers from scratch. The content reflects the charity's authentic voice and real experience. That is what funders are looking for.
 
-Before any of this content can be saved or used, the person using the tool must review it. Grant Pathway asks three simple questions: Does this accurately describe your charity and project? Are all the figures, dates, and facts correct? Does this answer the question that was asked? Only once the user has considered these questions and given their approval does the content become part of the application. The charity worker is always the author. Grant Pathway is always the assistant.
+Before any answer can be saved or used in the final export, the person using the tool must review it. Grant Pathway asks three simple questions: Does this accurately describe your charity and project? Are all the figures, dates, and facts correct? Does this answer the question that was asked? Only once the user has considered these questions and given their approval does the content become part of the application. The charity worker is always the author. Grant Pathway is always the assistant.
 
 When the application is complete, the charity worker can export everything as a clean Word document, ready to copy into a funder's application form or online portal.
 
@@ -121,4 +121,4 @@ The ambition is simple: to make the grant application process a little less daun
 
 ---
 
-*Last updated: 2026-05-22*
+*Last updated: 2026-05-29 — Elevator pitch and "What Grant Pathway Does" section updated to reflect the AI assists not generates principle (BD-01). Grant Pathway is a preparation tool; charities write every substantive answer; AI refines on request only.*

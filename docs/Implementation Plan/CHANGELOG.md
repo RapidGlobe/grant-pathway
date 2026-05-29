@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-05-29 — Product documents updated to reflect Mark Two BRD decisions
+
+**What changed:**
+- `docs/BRD-Grant-Pathway-v0.2.md` — Superseded notice added at top. Mark Two BRD (`BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.4.md`) is the authoritative reference; Mark One retained for audit only.
+- `docs/vision-statement.md` — Vision updated: "preparation tool" replaces "writing companion" (BD-01); "AI-assisted writing" replaces "AI-powered drafting" to reflect the AI assists not generates principle.
+- `docs/business-overview.md` — Elevator pitch and "What Grant Pathway Does" section updated: AI generates draft answers → AI assists on request; charity writes every substantive answer.
+- `docs/information-architecture-and-navigation.md` v1.3 — Step 4 description updated to reflect question-level typing (BD-04): `narrative | data_entry | financial | dropdown | date | file_upload`; Tier 1/2/3 coverage model referenced.
+- `docs/moscow-feature-register.md` v1.3 — FR-10/11 updated (OSCR/CCNI planned before general release); FR-12 updated (thick profile, BD-02); FR-29 extended (character limits + word limits, BD-05); FR-45 added (question-level typing, BD-04); FR-46 added (three-tier coverage model, BD-07). Summary count 39 → 41 Must Have.
+- `docs/user-personas-journeys-and-use-cases.md` v1.2 — UC-04 updated to reflect thick charity profile fields (BD-02): identity, address/contact, mission/work, financial fields, supporting document status. OSCR/CCNI note added.
+- `docs/data-model.md` v1.1 — `charity_profiles` table replaced with thick profile structure (BD-02): five sub-sections covering identity, address/contact, mission/work, financial fields, and supporting document status. `question_type` and `limit_type`/`word_limit`/`char_limit` fields added to `application_answers` (BD-04, BD-05). `is_budget_question` field added. AI cap corrected 20 → 50 in ai_usage_log constraints. Document history table added.
+- `docs/technology-stack.md` v1.2 — TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table and rationale updated.
+- `docs/constraints-and-assumptions.md` — C8 updated (OSCR/CCNI planned before general release); C13 updated (Vercel function region confirmed as London); A8 revised (funder guidelines do not always yield discrete questions — three-tier coverage model added).
+- `docs/future-phases.md` — FP-07 (OSCR/CCNI register lookup — planned before general release), FP-08 (full question-level typing implementation), and FP-09 (thick profile pre-fill for all funder tiers) added.
+- `docs/non-functional-requirements.md` — NFR-01 updated: "AI draft answer generation" renamed to "AI answer refine (per question)" with ≤15 second target; Vercel function region note added.
+
+**Why:**
+The Mark Two BRD (`BRD-Grant-Pathway-Mark-Two-v0.4.md`) was created on 2026-05-29 following real-funder testing against the 12-funder target list. Key decisions confirmed today (BD-01 through BD-07) changed the product model in ways that were not yet reflected across the supporting documentation. This update brings all product documents into alignment with Mark Two.
+
+---
+
 ## 2026-05-29 — Vercel function region set to London (eu-west-2 / lhr1)
 
 **What changed:**

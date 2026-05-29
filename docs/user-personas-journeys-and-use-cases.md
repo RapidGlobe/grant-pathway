@@ -1,5 +1,6 @@
 # User Personas, Journeys & Use Cases — AI Grant Accelerator v1
-**Version:** 1.1
+**Version:** 1.2
+**Last updated:** 2026-05-29
 
 ---
 
@@ -242,13 +243,14 @@ Use cases define the specific interactions between users and the system. Each us
 | **Trigger** | User is guided through profile setup after registration |
 
 **Main Flow**
-1. User completes or reviews pre-filled registration fields
-2. User adds mission narrative (free text)
-3. User describes beneficiaries (free text or structured fields)
-4. User describes main activities and programmes
-5. User indicates geographic area of operation
-6. User indicates typical annual income band (selected from range)
-7. Profile is saved
+1. User completes or reviews pre-filled identity fields (charity name, registration number, year established, organisation type — from Charity Commission lookup where available)
+2. User confirms or enters address and main contact details
+3. User adds mission narrative fields: what the charity does, who it helps, where it works, aims and objectives
+4. User enters or verifies financial fields from latest signed accounts (income, expenditure, employee count, volunteer count)
+5. User confirms supporting document status (safeguarding policy, annual accounts, governing document)
+6. Profile is saved
+
+**Note:** This is the thick charity profile introduced in Mark Two (BD-02). Financial fields default from Charity Commission annual return data where available but must be reviewed and confirmed by the charity (ideally the treasurer or finance lead) before use in an application. OSCR (Scotland) and CCNI (Northern Ireland) register lookup is planned before general release; Scottish and NI charities enter details manually in v1.
 
 **Alternative Flows**
 - User skips optional fields → profile saved with partial data; AI outputs may be less personalised; user is prompted to complete missing fields before generating content
@@ -492,3 +494,4 @@ Use cases define the specific interactions between users and the system. Each us
 |---------|------|--------|--------------------|
 | 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
 | 1.1 | 2026-05-29 | Rapidglobe Ltd | Step 4 journey description updated to reflect charity-authored Q&A model (section-by-section for narrative funders, numbered Q&A for structured funders). Document history table added. |
+| 1.2 | 2026-05-29 | Rapidglobe Ltd | UC-04 updated to reflect thick charity profile (BD-02): identity, address and contact, mission and work, financial fields, and supporting document status. OSCR/CCNI note added. |

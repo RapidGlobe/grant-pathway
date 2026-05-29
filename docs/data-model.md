@@ -71,26 +71,80 @@ Stores application-level user data that Supabase Auth does not hold natively.
 
 ## 2. charity_profiles
 
-Stores the charity's organisational information. Used as context for all AI-generated content.
+Stores the charity's full organisational information — the "thick profile" introduced in Mark Two (BD-02). Used as context for all AI-generated content and as a pre-fill source for non-narrative fields on funder forms.
+
+### 2.1 Identity
 
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
 | `id` | UUID | Yes | Primary key |
 | `user_id` | UUID | Yes | Foreign key → `auth.users.id`; unique (one charity profile per user) |
-| `charity_name` | String | Yes | Displayed label: *"Charity name"* |
-| `registration_number` | String | No | Charity Commission registration number; may be blank for exempt charities |
+| `charity_name` | String | Yes | Common/brand name. Displayed label: *"Charity name"* |
+| `legal_name` | String | No | Full legal name as registered; may differ from common name |
+| `registration_number` | String | No | Charity Commission (E&W), OSCR (Scotland), or CCNI (NI) number |
+| `organisation_type` | String | No | e.g. UK Registered Charity, UK Exempt Charity |
+| `year_established` | Integer | No | Derived from registration date |
+| `website` | String | No | Charity's website URL |
+| `lookup_source` | String | No | `charity_commission` \| `oscr` \| `ccni` \| `manual`. Records origin of pre-filled data |
+
+### 2.2 Address and contact
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `registered_address` | Text | No | Full address including postcode |
+| `contact_name` | String | No | Title, first name, last name of main contact |
+| `contact_role` | String | No | Job title or role of main contact |
+| `contact_telephone` | String | No | Including dialling code |
+| `contact_email` | String | No | Main contact email |
+
+### 2.3 Mission and work
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
 | `what_charity_does` | Text | Yes | Plain-English description combining charitable objects and main activities. Displayed label: *"What does your charity do?"* |
 | `who_charity_helps` | Text | Yes | Beneficiary description. Displayed label: *"Who does your charity help?"* |
 | `where_charity_works` | String | Yes | Geographic area of operation. Displayed label: *"Where do you work?"* |
-| `lookup_source` | String | No | Records whether data was pre-filled from Charity Commission API (`charity_commission`) or entered manually (`manual`). Informational only |
+| `aims_and_objectives` | Text | No | Used for "outline of org aims" style funder questions |
+
+### 2.4 Financial (from latest signed accounts)
+
+**Note:** Financial fields default from Charity Commission annual return data where available. This data is typically 12–18 months behind the charity's current position. The charity must review and confirm every financial field before using the profile in an application. All financial data must be verified by the charity (ideally the treasurer or finance lead).
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `accounts_date` | Date | No | Date of latest signed accounts; charity confirms |
+| `total_income` | Integer | No | Total income from latest signed accounts (£) |
+| `total_expenditure` | Integer | No | Total expenditure from latest signed accounts (£) |
+| `number_of_employees_fte` | Integer | No | Full-time equivalent employee count |
+| `number_of_volunteers` | Integer | No | Volunteer count (not in Charity Commission data; charity enters directly) |
+| `number_of_trustees` | Integer | No | Trustee count |
+| `average_employee_salary` | Integer | No | Cost of salaries ÷ FTE, excl. employer NI (£) |
+| `top_salary_band` | String | No | e.g. "£40,000–£50,000" |
+| `government_funding` | Integer | No | Government / local authority funding from latest accounts (£) |
+| `main_non_govt_funders` | Text | No | Trust and foundation names; up to 5; charity enters directly |
+
+### 2.5 Supporting document status
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `has_safeguarding_policy` | Boolean | No | Charity confirms they hold a current safeguarding policy |
+| `has_annual_accounts` | Boolean | No | Charity confirms signed accounts are available |
+| `has_management_accounts` | Boolean | No | Charity confirms management accounts available |
+| `has_governing_document` | Boolean | No | Charity confirms governing document / constitution held |
+
+### 2.6 Metadata
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
 | `created_at` | Timestamp | Yes | Set on first save |
 | `updated_at` | Timestamp | Yes | Updated on any field change |
 
 **Key constraints:**
 - `user_id` is unique — one charity profile per user account
-- A completed charity profile (all required fields populated) is required before a new application can be created
+- A completed charity profile (core required fields populated) is required before a new application can be created
+- The profile completeness indicator on the new application screen shows which fields are missing and which funder questions cannot be pre-filled as a result (BD-02)
 
-**Note:** Annual income band was considered and removed. Charitable objects and main activities are merged into the single `what_charity_does` field. See screen requirements for rationale.
+**Register coverage note:** Charity Commission (England and Wales) lookup is live in v1. OSCR (Scotland) and CCNI (Northern Ireland) lookup is planned before general release. Scottish and NI charities use manual entry (`lookup_source = 'manual'`) in v1; the full application workflow is available to them without restriction.
 
 ---
 
@@ -128,9 +182,14 @@ Stores the individual question-and-answer pairs for each application. Each row r
 | `id` | UUID | Yes | Primary key |
 | `application_id` | UUID | Yes | Foreign key → `applications.id` |
 | `question_text` | Text | Yes | The application question — either extracted by AI from guidelines or entered manually |
+| `question_type` | Enum | No | One of: `narrative`, `data_entry`, `financial`, `dropdown`, `date`, `file_upload`. Extracted by AI from guidelines (BD-04). Narrative questions show a writing card; data_entry and financial are pre-filled from profile; dropdown/date/file_upload shown as reminders only. Default: `narrative` for backwards compatibility |
 | `question_order` | Integer | Yes | Display order of the question within the application |
-| `answer_text` | Text | No | The current answer text — may be AI-generated, user-edited, or entirely user-written |
-| `answer_source` | Enum | No | One of: `ai_generated`, `user_edited`, `user_written`. Records the origin of the answer for transparency |
+| `word_limit` | Integer | No | Word limit for this question if `limit_type = 'words'`. Null if no limit |
+| `char_limit` | Integer | No | Character limit for this question if `limit_type = 'characters'`. Null if no limit |
+| `limit_type` | Enum | No | One of: `words`, `characters`, `none`. Extracted by AI from guidelines (BD-05). Controls whether the Step 4 counter displays "X / N words" or "X / N characters" |
+| `answer_text` | Text | No | The current answer text — may be AI-assisted, user-edited, or entirely user-written |
+| `answer_source` | Enum | No | One of: `ai_assisted`, `user_edited`, `user_written`. Records the origin of the answer for transparency |
+| `is_budget_question` | Boolean | Yes | Whether this question covers financial/budget content. Default: `false`. Budget questions are flagged amber; AI assist is disabled |
 | `is_approved` | Boolean | Yes | Whether the answer has passed the mandatory review step. Default: `false` |
 | `created_at` | Timestamp | Yes | Set when the answer record is first created |
 | `updated_at` | Timestamp | Yes | Updated whenever `answer_text` or `is_approved` changes |
@@ -144,7 +203,7 @@ Stores the individual question-and-answer pairs for each application. Each row r
 
 ## 5. ai_usage_log
 
-Tracks every AI API request made by each user. Used to enforce the monthly per-user request limit (20 requests/month) and to monitor running costs (PDR-AI-005).
+Tracks every AI API request made by each user. Used to enforce the monthly per-user request limit (50 requests/month) and to monitor running costs (PDR-AI-005).
 
 | Field | Type | Required | Notes |
 |-------|------|----------|-------|
@@ -157,8 +216,8 @@ Tracks every AI API request made by each user. Used to enforce the monthly per-u
 
 **Key constraints:**
 - Monthly limit is enforced by counting rows where `user_id` matches and `created_at` falls within the current calendar month
-- At 16 requests in the current month (80% of 20), a soft warning is shown to the user
-- At 20 requests in the current month, AI generation is blocked until the month resets
+- At 40 requests in the current month (80% of 50), a soft warning is shown to the user
+- At 50 requests in the current month, AI generation is blocked until the month resets
 - This table is permanently deleted when a user deletes their account (FR-43)
 
 ---
@@ -206,5 +265,14 @@ The following are explicitly **not** stored in the database:
 
 ---
 
-*Last updated: 2026-04-16*
-*Status: Complete*
+---
+
+## Document History
+
+| Version | Date | Author | Summary of changes |
+|---------|------|--------|--------------------|
+| 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
+| 1.1 | 2026-05-29 | Rapidglobe Ltd | Section 2 (charity_profiles) replaced with thick profile structure (BD-02): identity, address/contact, mission/work, financial fields, supporting document status. OSCR/CCNI register coverage note added. `question_type` and `limit_type`/`word_limit`/`char_limit` fields added to `application_answers` (BD-04, BD-05). `is_budget_question` field added. `answer_source` enum updated (`ai_generated` → `ai_assisted`). AI cap corrected 20 → 50 in ai_usage_log constraints. |
+
+*Last updated: 2026-05-29*
+*Status: Updated — reflects Mark Two decisions BD-02, BD-04, BD-05*

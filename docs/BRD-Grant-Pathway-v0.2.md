@@ -1,6 +1,12 @@
 # Business Requirements Document
 # Grant Pathway — Version 1
 
+> **⚠ SUPERSEDED — 2026-05-29**
+> This document (Mark One) has been superseded by the Mark Two BRD.
+> The authoritative business requirements document is now:
+> **`docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.4.md`**
+> Mark Two re-bases the product on decisions confirmed through real-funder testing in May 2026. Where Mark One and Mark Two conflict, Mark Two takes precedence. This file is retained for audit purposes only — do not use it as a reference for implementation.
+
 ---
 
 ## Document Control

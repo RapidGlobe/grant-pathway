@@ -14,6 +14,9 @@ This document records items that are explicitly out of scope for v1 and are to b
 | FP-04 | Satisfaction survey & feedback framework | DR-SM-001, DR-SM-002 | To be confirmed post-launch |
 | FP-05 | Independent accessibility audit | DR-LC-003 | To be confirmed pre-scaling |
 | FP-06 | Liability insurance review | DR-LC-002 | To be confirmed when CIC is established |
+| FP-07 | OSCR (Scotland) and CCNI (NI) register lookup | BD-02 | **Planned before general release** |
+| FP-08 | Full question-level typing implementation (BD-04) | BD-04 | Planned — pre-launch or early post-launch |
+| FP-09 | Thick profile completeness-driven pre-fill for all funder tiers | BD-02, BD-07 | Planned — iterative post-launch |
 
 ---
 
@@ -81,6 +84,34 @@ Liability insurance appropriate for the CIC's activities will be reviewed and ob
 
 ---
 
+---
+
+## FP-07 — OSCR (Scotland) and CCNI (Northern Ireland) Register Lookup
+**Decision record:** BD-02
+**Status:** Planned before general release
+
+The v1 build integrates the Charity Commission for England and Wales only. Charities registered in Scotland (OSCR — approximately 24,000 charities) and Northern Ireland (CCNI — approximately 7,000 charities) use manual profile entry in v1 and have full access to the application workflow.
+
+OSCR and CCNI publish their own public registers with separate APIs. Integrating these before general release ensures that charities across the whole of the UK benefit from the same seamless register-lookup experience at profile setup. This should be scoped as a pre-launch task in the implementation plan.
+
+---
+
+## FP-08 — Full Question-Level Typing Implementation
+**Decision record:** BD-04
+**Status:** Planned — pre-launch or early post-launch
+
+Question-level typing (`question_type: narrative | data_entry | financial | dropdown | date | file_upload`) is defined in Mark Two (BD-04) and the data model includes the `question_type` field. Full implementation — where the AI reliably classifies every extracted question by type and the Step 4 interface renders each type appropriately — is an iterative improvement. In early v1, non-narrative types may be partially handled (as reminders or excluded from the writing interface). Full pre-fill from the charity profile for data-entry and financial types, and accurate classification of dropdown/date/file_upload types, should be completed before general release or in an early post-launch release.
+
+---
+
+## FP-09 — Thick Profile Completeness-Driven Pre-fill for All Funder Tiers
+**Decision record:** BD-02, BD-07
+**Status:** Planned — iterative post-launch
+
+The thick charity profile (BD-02) includes financial fields, contact details, and supporting document status that can pre-fill non-narrative questions across Tier 1 and Tier 2 funders. The completeness indicator on the new application screen (showing which profile fields are missing and which funder questions cannot be pre-filled) will be refined iteratively as more funders are added and the pre-fill mapping between profile fields and funder question types is validated.
+
+---
+
 ## Checklist Coverage
 
 | Checklist Item | Description | Status |
@@ -94,5 +125,5 @@ Liability insurance appropriate for the CIC's activities will be reviewed and ob
 
 ---
 
-*Last updated: 2026-04-13*
-*Sources: BRD Information Gathering Checklist items 48–53; DR-PS-002, DR-IN-002, DR-OD-001, DR-SM-001, DR-SM-002, DR-LC-003, DR-LC-002; v1-out-of-scope.md*
+*Last updated: 2026-05-29*
+*Sources: BRD Information Gathering Checklist items 48–53; DR-PS-002, DR-IN-002, DR-OD-001, DR-SM-001, DR-SM-002, DR-LC-003, DR-LC-002; v1-out-of-scope.md; BRD Mark Two BD-02, BD-04, BD-07*
