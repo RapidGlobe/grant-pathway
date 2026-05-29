@@ -1,6 +1,6 @@
 # Grant Pathway — Business Requirements Document Mark Two
 
-**Version:** 0.1
+**Version:** 0.2
 **Date:** 2026-05-29
 **Status:** Draft — awaiting review and sign-off
 **Author:** Rapidglobe Ltd / WJ Okhia
@@ -25,7 +25,9 @@ Mark Two re-bases the product on what was actually observed, not on what was ass
 
 ### 1.1 What Grant Pathway is
 
-Grant Pathway is a **preparation tool** that helps UK charitable organisations write better grant applications. It guides the charity through understanding a funder's requirements, drafts and refines the narrative answers the funder asks for, and produces copy-ready output that the charity then submits through the funder's own channel.
+Grant Pathway is a **preparation tool** that helps UK charitable organisations write better grant applications. It guides the charity through understanding a funder's requirements, assists with the structure and clarity of the narrative answers the funder asks for, and produces copy-ready output that the charity then submits through the funder's own channel.
+
+**Grant Pathway uses AI to assist the charity in writing — not to generate content on its behalf.** The charity writes every substantive answer. AI helps organise, structure, and clarify what the charity has already said. This distinction matters: the application reflects the charity's authentic voice, specific knowledge, and real community experience — not generic AI output. This is also what funders expect and value (see Section 1.4).
 
 **Grant Pathway is not a submission platform.** It does not submit applications to funders, integrate with funder portals, or manage submission deadlines. These responsibilities remain with the charity.
 
@@ -39,11 +41,39 @@ Grant writing is time-consuming, repetitive, and often opaque. Charities — par
 - A funder database or grant-finding service
 - A compliance checker or eligibility screener
 - A document management system for supporting documents
-- An automated application generator (the charity writes the content; AI assists structure and clarity only)
+- An automated application generator — Grant Pathway uses AI to assist, not to generate. The charity writes every substantive answer.
 
-### 1.4 AI usage principle
+### 1.4 AI usage principle — assist, not generate
 
-Grant Pathway uses AI to extract structure from funder guidelines, assist with clarity and flow, and assemble the charity's own words into the required format. The charity writes the substantive content. This approach aligns with the explicit guidance of major UK funders including Henry Smith Foundation ("AI for structure not content") and National Lottery Community Fund.
+**Grant Pathway uses AI to assist, not to generate.** This principle is stated explicitly throughout the product — in onboarding, in Step 4 guidance, and in the export disclaimer — and is not negotiable. It is not merely a design preference; it reflects what UK funders consistently require and what produces better application outcomes for charities.
+
+Research conducted in May 2026 confirmed that at least ten major UK grant-giving organisations have published formal AI guidance. The dominant position across all of them is identical: **permissive with conditions** — AI use is permitted, but over-reliance on AI produces generic content that actively disadvantages applications. Authentic voice, specific community knowledge, and real organisational experience are what funders assess.
+
+#### Verified UK funder AI policies (research confirmed May 2026)
+
+| Funder | Position | Key quote | Source |
+|--------|----------|-----------|--------|
+| **Henry Smith Foundation** | Cautious — structure only | *"If you use AI, let it help structure your application rather than the content. Your application should reflect your voice and experience. Applications written in your own words give a much better insight into your work."* | henrysmith.foundation |
+| **National Lottery Community Fund** | Permissive — warns against generic content | *"You can use AI tools to help write your funding application. We will not reject an application just because AI was used. AI supported applications do not tell the unique story of your community."* | tnlcommunityfund.org.uk |
+| **Lloyds Bank Foundation** | Permissive — warns about over-reliance | *"We read every single funding and job application we receive and do not use AI in any part of our decision making. It is often noticeable when AI has been over-relied on and, in many cases, this is not giving applicants the best chance of success. These applications are often generic, and do not bring out your own voice or uniqueness."* | lloydsbankfoundation.org.uk/about-us/ai-position-statement |
+| **Paul Hamlyn Foundation** | Permissive — warns about distinctiveness | *"Using AI tools alone will not disadvantage your application. But be careful of how it is used. This can make it more difficult to understand what is different or special about an applicant, or the work they are describing. We do not use AI to assess grant applications or job applications."* | phf.org.uk/using-ai-in-your-work-with-us |
+| **Arts Council England** | Permissive — applicants accountable | *"While generative AI can be useful for drafting applications and organising reporting material, applicants and grantholders are accountable for what they submit."* ACE also advises caution around bias, transparency, data protection, and the moral and legal rights of creators. | artscouncil.org.uk |
+| **British Film Institute** | Permissive — transparency required | *"We do not prohibit the use of AI in funding applications, or in the projects we support, but we do require applicants to be transparent about the use of any AI. Using AI in your project, or to complete your application, could result in a project or application that looks remarkably similar to others. Losing the creative uniqueness of your project or application may mean it is less likely to stand out within the context of a competitive fund."* | bfi.org.uk |
+| **Esmée Fairbairn Foundation** | No formal policy — applicant discretion | *"This is a decision for individual organisations to take and we have no preference."* Expects applications to honestly reflect the applicant's work. | esmeefairbairn.org.uk |
+| **London Community Foundation** | Exploratory — content must be owned by applicant | *"We do not currently have formal AI guidelines, as we are still in the exploratory phase. The content included in your application or report, and the proposed or delivered activity, must be owned by you as the applicant doing the work."* | londoncf.org.uk/guidance-on-artificial-intelligence |
+| **UKRI** | Permissive — transparency expected | *"Applicants and applications are expected to be transparent where they have used generative AI tools in the development of an application. This information will not affect the assessment process."* | ukri.org |
+| **Royal Geographical Society** | Disclose use; prohibit AI in review | *"Disclose any use of generative AI tools. AI tools should not be used as part of the review process — for reasons of academic rigour and confidentiality."* | rgs.org |
+| **Wellcome Trust + joint statement** | Cross-funder consensus (September 2023) | Co-signed by UKRI, Cancer Research UK, NIHR, British Heart Foundation, Royal Academy of Engineering, Royal Society, and Association of Medical Research Charities. Established shared position that AI use in application preparation must be cited and acknowledged, and that AI must not be used in peer review. | wellcome.org |
+
+#### What this means for Grant Pathway
+
+Every funder policy above — regardless of how permissive or cautious — points to the same conclusion: **AI-generated content that lacks the charity's authentic voice and specific knowledge produces weaker applications.** Grant Pathway is designed to prevent exactly this. The charity's real experience and voice are the inputs; AI structures and refines the output. This is what funders permit, what funders value, and what produces better outcomes.
+
+This principle is reinforced at every step of the Grant Pathway workflow:
+- **Step 1:** Framing copy explains Grant Pathway helps you write, not writes for you
+- **Step 3:** AI Summary extracts the funder's requirements — it does not draft answers
+- **Step 4:** The charity writes every answer from scratch; AI assist is optional and refines only
+- **Step 5:** The export disclaimer states that answers were written by the charity and reviewed before export
 
 ---
 
@@ -279,9 +309,11 @@ Every narrative question carries a `limit_value` (integer) and `limit_type` (`wo
 
 Limits come from the guidelines. Where limits are not stated, no counter is shown.
 
-#### AI assistance
+#### AI assistance — assist, not generate
 
-The "Help me improve this" button is available on all `narrative` questions. It is disabled on `financial` questions. It refines structure, flow, and clarity without adding information. It cannot be used on `data_entry`, `dropdown`, `date`, or `file_upload` types.
+The "Help me improve this" button is available on all `narrative` questions. It is disabled on `financial` questions. **It refines structure, flow, and clarity — it does not add, invent, or generate new information.** The charity's words and facts remain the foundation; AI only improves how they are expressed. This means the application continues to reflect the charity's authentic voice — which is what funders assess and value.
+
+It cannot be used on `data_entry`, `dropdown`, `date`, or `file_upload` types.
 
 #### Preparation checklist
 
@@ -408,3 +440,4 @@ The following decisions were made in the design session of 2026-05-29 and underp
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 0.1 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Initial draft — Mark Two BRD. Supersedes BRD-Grant-Pathway-v0.2.md. Based on testing session of May 2026 and seven business-level decisions agreed with WJ Okhia. |
+| 0.2 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Section 1.1 updated: AI assists, not generates — added as explicit product principle with reinforcement throughout. Section 1.4 substantially expanded: deep research (104 agents, 22 verified claims) identified 10 additional UK funders with published AI policies — Lloyds Bank Foundation, Paul Hamlyn Foundation, Arts Council England, BFI, Esmée Fairbairn, London Community Foundation, UKRI, RGS, Wellcome joint statement — all added with verbatim quotes and source URLs. Section 1.3 updated. Section 5.4 AI assistance paragraph strengthened. |

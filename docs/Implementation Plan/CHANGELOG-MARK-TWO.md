@@ -64,4 +64,44 @@ Direct portal submission, funder discovery, eligibility screening, supporting do
 
 ---
 
+## 2026-05-29 — BRD Mark Two v0.2: AI usage principle expanded; funder AI policies added
+
+**Document:** `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.2.md`
+
+### What changed
+
+**Section 1.1 — "AI to assist, not generate" stated as explicit product principle**
+
+The Mark Two BRD now opens with a clear, unambiguous statement of how Grant Pathway uses AI. Added paragraph:
+
+> *"Grant Pathway uses AI to assist the charity in writing — not to generate content on its behalf. The charity writes every substantive answer. AI helps organise, structure, and clarify what the charity has already said."*
+
+This phrase is reinforced in Sections 1.3 (what it is not), 1.4 (AI usage principle), and 5.4 (AI assistance in Step 4). It should also be reflected in product copy, onboarding, and export disclaimers.
+
+**Section 1.4 — AI usage principle substantially expanded**
+
+Deep research (104 agents, 21 sources fetched, 25 claims verified, 22 confirmed) identified 10 confirmed UK grant-giving organisations with published AI policies beyond the two already known. Full table with verbatim quotes and source URLs added to the BRD.
+
+### Confirmed UK funder AI policies (all verified May 2026)
+
+| Funder | One-line position |
+|--------|-------------------|
+| Henry Smith Foundation | Cautious — "use AI for structure not content" |
+| National Lottery Community Fund | Permissive — won't reject AI applications but warns against generic content |
+| Lloyds Bank Foundation | Permissive — warns AI applications are "often generic and do not bring out your own voice" |
+| Paul Hamlyn Foundation | Permissive — "Using AI tools alone will not disadvantage your application. But be careful." |
+| Arts Council England | Permissive — applicants "accountable for what they submit"; warns about bias and creative rights |
+| British Film Institute | Permissive + transparency required — warns AI applications "look remarkably similar to others" |
+| Esmée Fairbairn Foundation | No formal policy — "a decision for individual organisations to take" |
+| London Community Foundation | Exploratory — "still in the exploratory phase"; content "must be owned by you" |
+| UKRI | Permissive + transparency expected — disclosure "will not affect the assessment process" |
+| Royal Geographical Society | Disclose AI use; AI "should not be used as part of the review process" |
+| Wellcome Trust + co-signatories | Cross-funder joint statement (Sept 2023): AI use must be cited; AI must not be used in peer review |
+
+### Dominant finding across all funders
+
+Every policy — regardless of how permissive — warns that generic AI content disadvantages applications. Authentic voice, specific community knowledge, and real organisational experience are what funders assess. Grant Pathway's "assist not generate" principle directly addresses this.
+
+---
+
 *Change Log Mark Two — created 2026-05-29. To be moved from `docs/Implementation Plan/` to a permanent location in a future session.*
