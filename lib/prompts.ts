@@ -184,7 +184,9 @@ export function buildRefinePrompt(
 
 ${limitInstruction}
 
-Return a JSON object with exactly this field:
+If the answer is too short or unclear to meaningfully improve, return it unchanged.
+
+Respond with ONLY a JSON object — no preamble, no explanation, no markdown fencing. Exactly this shape:
 { "refinedText": "the improved answer text" }
 
 QUESTION:

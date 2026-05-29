@@ -1,6 +1,6 @@
 # Grant Pathway — End-to-End Test Plan: Slices 0–8
 
-**Version:** 1.5  
+**Version:** 1.6  
 **Date:** 2026-05-22  
 **Last updated:** 2026-05-29  
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
@@ -53,6 +53,8 @@ Log any failures that are NOT in the known expected failures list below.
 | D-005 | S6-P-02 | Sticky progress bar not visible when scrolling through Step 4 sections. `sticky top-0` placed the bar directly behind the authenticated nav header (`sticky top-0 z-[100]`, `h-16`), hiding it. Fixed by changing to `top-16` in `components/application-step4-draft.tsx` (2026-05-29). | Medium | Fixed |
 | D-006 | S6-P-02 | Back button only present at the bottom of Step 4. On long free_form applications (e.g. 11 sections) users had no way to navigate back to Step 3 without scrolling past all sections. Fixed by adding a ← Back link to the top-right of the funder context bar in `components/application-step4-draft.tsx` (2026-05-29). | Medium | Fixed |
 | D-007 | S5-P-02b | Typo in Step 3 free_form confirmation message: "11 sectionsto complete" (missing space). Caused by JSX whitespace stripping the newline between text `section` and expression `{"s"}`. Fixed by rewriting as a template literal in `components/application-step3-summary.tsx` (2026-05-29). | Low | Fixed |
+| D-008 | S6-N-01 | `parse_error` returned by `/api/refine-answer` when "Help me improve this" clicked on sections with very short answers (e.g. 1–2 words). AI returns a conversational response ("Your answer is too short...") instead of the expected `{ "refinedText": "..." }` JSON, causing `JSON.parse` to fail. Fixed by strengthening `buildRefinePrompt` in `lib/prompts.ts`: added explicit instruction to return JSON only (no preamble, no markdown), and to return the answer unchanged if too short to improve (2026-05-29). | Medium | Fixed |
+| D-009 | S6-N-03 | `rate_limited` returned by `/api/refine-answer` when "Help me improve this" clicked on multiple sections in quick succession. Upstash sliding window limit is 5 requests per 60 seconds — correct production behaviour but surfaced during testing. Not a bug. Stale comment in `lib/rate-limit.ts` referenced old 20 req/month cap (cap is 50). Fixed by updating the comment (2026-05-29). | Low | Fixed |
 
 ---
 
@@ -1876,7 +1878,8 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 | 1.3 | 2026-05-29 | Rapidglobe Ltd | Updated "Manual Maintenance" section to reflect Vercel Pro upgrade — all cron jobs now running; manual guidelines-temp cleanup no longer required during testing |
 | 1.4 | 2026-05-29 | Rapidglobe Ltd | Test Fixtures section updated: pointer to `docs/target-funder-list.md` (12 consolidated funders); missing fixture files listed per funder. S5-P-02 updated for Step 3 two-column card layout redesign and removal of supporting documents card; S5-P-02b added (free_form funder summary — "Application sections" card, "X sections to complete" confirmation). S6-P-03b added (advanceToStep4 bug fix — confirms `ready_to_assemble`/`assembled` states are preserved when returning via Step 3). NF-02 rewritten: old "AI draft generation response time" test removed (auto-generation model no longer exists); replaced with refine-answer API response time test (target ≤15s). Summary table updated: S5 positive 6 → 7, S6 positive 6 → 7, total 114 → 116. |
 | 1.5 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-005 (sticky progress bar hidden behind nav — fixed), D-006 (Back button only at bottom of Step 4 — fixed), D-007 (typo "sectionsto complete" in Step 3 free_form confirmation — fixed). Version bump. |
+| 1.6 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-008 (parse_error on refine-answer with short answers — fixed via prompt strengthening), D-009 (rate_limited on rapid refine-answer clicks — expected behaviour; stale comment fixed). Version bump. |
 
 ---
 
-_Test plan v1.5 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._
+_Test plan v1.6 — created 2026-05-22, last updated 2026-05-29. Review and update after each test run._

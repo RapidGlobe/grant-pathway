@@ -6,9 +6,9 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 })
 
-// 5 requests per 60 seconds per user — applied to both AI routes
-// (generate-summary and generate-draft). This is the burst control layer;
-// the monthly 20 req/month cap is enforced via ai_usage_log.
+// 5 requests per 60 seconds per user — applied to all AI routes
+// (generate-summary and refine-answer). This is the burst control layer;
+// the monthly 50 req/month cap is enforced via ai_usage_log.
 export const aiRatelimit = new Ratelimit({
   redis,
   limiter: Ratelimit.slidingWindow(5, '60 s'),

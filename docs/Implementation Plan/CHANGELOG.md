@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-05-29 — refine-answer: parse_error fix and stale rate-limit comment corrected
+
+**What changed:**
+- `lib/prompts.ts` — `buildRefinePrompt` strengthened: added explicit instruction to respond with JSON only (no preamble, no explanation, no markdown fencing); added fallback instruction to return the answer unchanged if too short to meaningfully improve. Fixes `parse_error` returned when the AI received a very short answer and returned a conversational response instead of JSON.
+- `lib/rate-limit.ts` — Stale comment updated: "20 req/month" → "50 req/month" to match the current cap in `refine-answer/route.ts` and `generate-summary/route.ts`.
+
+**Why:**
+During free_form testing (Garfield Weston), clicking "Help me improve this" on sections with 1–2 word answers returned `parse_error` (D-008). The AI was responding with a natural language explanation rather than the required JSON object. The `rate_limited` error (D-009) on rapid successive clicks is expected production behaviour (5 req/60s burst limit) — no code change needed, but the stale comment was corrected.
+
+---
+
 ## 2026-05-29 — Step 4: sticky progress bar fixed; Back link added to funder context bar; typo fixed
 
 **What changed:**
