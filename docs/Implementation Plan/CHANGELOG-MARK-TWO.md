@@ -104,4 +104,27 @@ Every policy — regardless of how permissive — warns that generic AI content 
 
 ---
 
+## 2026-05-29 — BRD Mark Two v0.3: five editorial updates from WJ Okhia review
+
+**Document:** `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.3.md`
+
+### What changed
+
+**Section 2.1 — Primary user pain point reworded**
+The original bullet "Pain point: time to write, not knowledge of their own organisation" was ambiguous. Reworded to: *"Core pain point: the capacity and time to produce well-structured, compelling applications across multiple funders — not lack of knowledge about their own work. They know their organisation deeply; Grant Pathway helps them express it in the language and format each funder requires."*
+
+**Section 2.2 — Senior staff financial role made explicit and mandatory**
+Added paragraph making clear that senior involvement for financial sections is not optional. The treasurer, finance lead, or trustee with financial oversight must verify all financial figures. Grant Pathway surfaces this requirement at the preparation checklist and senior review prompt.
+
+**Section 3.2 Tier 1 — Charity Commission pre-fill flow documented**
+Added explanation of the Charity Commission → profile → application pre-fill chain for Tier 1 funders. Identity and financial data flows from the register into the profile, and from the profile into application data-entry fields.
+
+**Section 4.2 Identity — Charity Commission as primary data source**
+Added introductory note explaining the Charity Commission register as the primary source for identity fields. OSCR (Scotland) and CCNI (Northern Ireland) noted. Source column added to the field table. England and Wales Charity Commission prioritised for v1.
+
+**Section 4.2 Financial — Charity Commission annual returns as starting point; data lag warning**
+Added introductory note explaining that Charity Commission financial data comes from submitted annual returns and is typically 12–18 months behind. Charity must review and verify all financial fields against latest signed accounts. Mandatory verification by treasurer/finance lead stated. Source column added; fields not available from the register (volunteers, average salary, top salary band, government funding, main funders) flagged as manual entry.
+
+---
+
 *Change Log Mark Two — created 2026-05-29. To be moved from `docs/Implementation Plan/` to a permanent location in a future session.*

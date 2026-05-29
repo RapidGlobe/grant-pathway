@@ -1,6 +1,6 @@
 # Grant Pathway — Business Requirements Document Mark Two
 
-**Version:** 0.2
+**Version:** 0.3
 **Date:** 2026-05-29
 **Status:** Draft — awaiting review and sign-off
 **Author:** Rapidglobe Ltd / WJ Okhia
@@ -85,11 +85,13 @@ This principle is reinforced at every step of the Grant Pathway workflow:
 - Income band: £50,000 – £2,000,000 per annum
 - Team size: 1–10 people; fundraising often shared across roles
 - Technical literacy: moderate — comfortable with web applications, not developers
-- Pain point: time to write, not knowledge of their own organisation
+- Core pain point: the capacity and time to produce well-structured, compelling applications across multiple funders — not lack of knowledge about their own work. They know their organisation deeply; Grant Pathway helps them express it in the language and format each funder requires
 
 ### 2.2 Secondary users
 
 **Senior staff and trustees** who review and approve applications before submission. Grant Pathway's senior review prompt and approval step are designed with this role in mind.
+
+Senior involvement is particularly important — and should be treated as mandatory — for any application section covering financial information. The treasurer, finance lead, or a trustee with financial oversight must review and verify all financial figures before the application is submitted. No AI-assisted tool can substitute for the senior financial sign-off that funders expect and that protects the charity's integrity. Grant Pathway surfaces this requirement explicitly at the preparation checklist stage and again at the senior review prompt before assembly.
 
 ### 2.3 Who Grant Pathway is not designed for
 
@@ -113,10 +115,12 @@ Every funder supported by Grant Pathway is assigned a coverage level that is dis
 
 The funder publishes narrative questions with explicit word or character limits. Grant Pathway extracts all narrative questions, pre-fills data-entry answers from the charity profile, presents each narrative question as a guided writing card, and produces copy-ready output for every answer.
 
+Data-entry fields (charity name, registration number, address, financial figures, staff counts) are pre-filled automatically from the charity profile. Where the charity profile was itself populated from the Charity Commission register (see Section 4.2), this creates a seamless flow: Charity Commission → profile → application pre-fill, with the charity reviewing and confirming each value.
+
 **Characteristics:**
 - Published question set (PDF, Word, or accessible web page)
 - Narrative text questions with stated limits
-- Relatively few non-narrative fields (or non-narrative fields are minor)
+- Non-narrative fields pre-fillable from charity profile (sourced from Charity Commission register)
 
 **Examples:** Henry Smith Foundation (Stage 1), Wolfson Foundation (Stage 1), Lloyds Bank Foundation CI
 
@@ -181,14 +185,21 @@ The charity profile is the organisation's permanent data store within Grant Path
 ### 4.2 Profile fields
 
 #### Identity
-| Field | Type | Notes |
-|-------|------|-------|
-| Charity name (common name) | Text | Name known by / brand name |
-| Full legal name | Text | As registered; may differ from common name |
-| Charity Commission registration number | Number | England & Wales; or OSCR / CCNI equivalent |
-| Organisation type | Select | UK Registered Charity / UK Publicly Exempt Charity |
-| Year established | Year | |
-| Website | URL | |
+
+**Primary data source: Charity Commission register (and OSCR / CCNI equivalents)**
+
+The Charity Commission for England and Wales publishes a publicly accessible register of all UK registered charities. Grant Pathway already integrates with this register via the charity profile lookup (the charity searches by name or registration number on the profile page). The register provides: registered name, registration number, date of registration, registered address, and charity type. The charity confirms and may edit these values after lookup — the register is the starting point, not the final word.
+
+Charities registered in Scotland use OSCR (oscr.org.uk); those in Northern Ireland use the Charity Commission NI (charitycommissionni.org.uk). Grant Pathway's lookup should support all three registers in the full build; England and Wales (Charity Commission) is the priority for v1.
+
+| Field | Type | Source | Notes |
+|-------|------|--------|-------|
+| Charity name (common name) | Text | Charity Commission lookup | Name known by / brand name |
+| Full legal name | Text | Charity Commission lookup | As registered; may differ from common name |
+| Charity Commission registration number | Number | Charity Commission lookup | England & Wales; or OSCR / CCNI equivalent |
+| Organisation type | Select | Charity Commission lookup | UK Registered Charity / UK Publicly Exempt Charity |
+| Year established | Year | Charity Commission lookup | Derived from registration date |
+| Website | URL | Charity Commission lookup / manual | Register may hold this; charity confirms |
 
 #### Address and contact
 | Field | Type | Notes |
@@ -208,19 +219,26 @@ The charity profile is the organisation's permanent data store within Grant Path
 | Aims and objectives summary | Long text | Used for Q9-style "outline of org aims" questions |
 
 #### Financial (from latest signed accounts)
-| Field | Type | Notes |
-|-------|------|-------|
-| Latest accounts date | Date | |
-| Total income | Currency | From latest accounts |
-| Total expenditure | Currency | From latest accounts |
-| Surplus / deficit | Currency | Auto-calculated or entered |
-| Number of employees (FTE) | Number | Full-time equivalent |
-| Number of volunteers | Number | |
-| Number of trustees | Number | |
-| Average employee salary | Currency | Excluding employer NI |
-| Top salary band | Text | e.g. £40,000–£50,000 |
-| Government / local authority funding | Currency | From latest accounts |
-| Main non-government funders | Repeating text (up to 5) | Trust and foundation names |
+
+**Primary data source: Charity Commission annual return submissions**
+
+UK registered charities submit annual accounts and financial returns to the Charity Commission, which publishes summary financial data (income, expenditure, assets, employee count) on the public register. Grant Pathway can pre-populate financial fields by reading this published data at the point of profile setup. **However, this data is typically 12–18 months behind the charity's current position** — Charity Commission data reflects the last submitted accounts, not the current financial year.
+
+The charity must therefore review and update every financial field against their latest signed accounts before using Grant Pathway for an application. The profile should prompt the charity to confirm the accounts date and flag if the Charity Commission data appears out of date. **All financial data in Grant Pathway must be verified and confirmed by the charity — ideally by the treasurer or finance lead.** The Charity Commission is a convenient starting point, not a source of truth for live financial figures.
+
+| Field | Type | Source | Notes |
+|-------|------|--------|-------|
+| Latest accounts date | Date | Charity Commission / manual | Charity confirms this is the correct reporting period |
+| Total income | Currency | Charity Commission / manual | From latest signed accounts; charity must verify |
+| Total expenditure | Currency | Charity Commission / manual | From latest signed accounts; charity must verify |
+| Surplus / deficit | Currency | Auto-calculated or entered | Grant Pathway auto-calculates; charity confirms |
+| Number of employees (FTE) | Number | Charity Commission / manual | Full-time equivalent; charity must verify |
+| Number of volunteers | Number | Manual | Not in Charity Commission data; charity enters directly |
+| Number of trustees | Number | Charity Commission / manual | Charity confirms |
+| Average employee salary | Currency | Manual | Not in Charity Commission data; calculated by charity (cost of salaries ÷ FTE, excl. employer NI) |
+| Top salary band | Text | Manual | e.g. £40,000–£50,000; charity enters directly |
+| Government / local authority funding | Currency | Manual | From latest accounts; charity enters directly |
+| Main non-government funders | Repeating text (up to 5) | Manual | Trust and foundation names; charity enters directly |
 
 #### Supporting document status
 | Field | Type | Notes |
@@ -441,3 +459,4 @@ The following decisions were made in the design session of 2026-05-29 and underp
 |---------|------|--------|---------|
 | 0.1 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Initial draft — Mark Two BRD. Supersedes BRD-Grant-Pathway-v0.2.md. Based on testing session of May 2026 and seven business-level decisions agreed with WJ Okhia. |
 | 0.2 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Section 1.1 updated: AI assists, not generates — added as explicit product principle with reinforcement throughout. Section 1.4 substantially expanded: deep research (104 agents, 22 verified claims) identified 10 additional UK funders with published AI policies — Lloyds Bank Foundation, Paul Hamlyn Foundation, Arts Council England, BFI, Esmée Fairbairn, London Community Foundation, UKRI, RGS, Wellcome joint statement — all added with verbatim quotes and source URLs. Section 1.3 updated. Section 5.4 AI assistance paragraph strengthened. |
+| 0.3 | 2026-05-29 | Rapidglobe Ltd / WJ Okhia | Section 2.1 bullet 4 reworded: pain point clarified as capacity and time, not lack of knowledge. Section 2.2 strengthened: senior staff involvement for financial sections stated as mandatory; treasurer/finance lead sign-off requirement made explicit. Section 3.2 Tier 1: Charity Commission pre-fill flow (register → profile → application) added. Section 4.2 Identity: Charity Commission as primary data source documented; OSCR/CCNI noted; source column added to table. Section 4.2 Financial: Charity Commission annual returns as starting-point source documented; 12–18 month data lag warning added; mandatory verification by treasurer/finance lead stated; source column added to table. |
