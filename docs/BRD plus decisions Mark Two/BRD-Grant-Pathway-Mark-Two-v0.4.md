@@ -3,7 +3,7 @@
 **Version:** 0.4
 **Date:** 2026-05-29
 **Status:** Draft — awaiting review and sign-off
-**Author:** Rapidglobe Ltd / WJ Okhia
+**Author:** Rapidglobe Ltd / WJokhia
 **Supersedes:** BRD-Grant-Pathway-v0.2.md (Mark One)
 
 ---
