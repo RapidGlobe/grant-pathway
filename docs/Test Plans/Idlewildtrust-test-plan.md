@@ -58,14 +58,14 @@ Complete after running all tests.
 |---------|-----------|-----------|-------------------|-----------------|--------|-------|
 | IT-01 | Account registration and charity profile | Both | No | N/A | ✅ Pass | |
 | IT-02 | Idlewild Trust funder picker | Both | Yes | N/A | ✅ Pass | |
-| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | | |
-| IT-04 | AI eligibility mismatch detection | Arts | Yes | N/A | | |
-| IT-05 | Character limit extraction and display | Arts | Yes | N/A | | |
-| IT-06 | Non-narrative question handling | Arts | Yes | N/A | | |
-| IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | | |
+| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | ✅ Pass | Prep checklist screen confirmed |
+| IT-04 | AI eligibility mismatch detection | Arts | Yes | N/A | ✅ Pass | Arts sector eligibility clearly stated in summary |
+| IT-05 | Character limit extraction and display | Arts | Yes | N/A | ❌ Fail | D-IT-01: AI returned no questions — Tier 3 fallback shown instead of structured Q&A |
+| IT-06 | Non-narrative question handling | Arts | Yes | N/A | ❌ Fail | D-IT-01: Blocked by same defect as IT-05 |
+| IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | ⛔ Blocked | Blocked by D-IT-01 |
 | IT-08 | Conservation guidelines PDF upload and AI summary | Conservation | Yes | TBC | | |
 | IT-09 | Conservation knowledge-sharing requirement identified | Conservation | Yes | N/A | | |
-| IT-10 | Word document export — structure and content | Arts | No | N/A | | |
+| IT-10 | Word document export — structure and content | Arts | No | N/A | ⛔ Blocked | Blocked by D-IT-01 |
 
 ---
 
@@ -75,7 +75,7 @@ Log any failures not listed in Known Expected Behaviours above.
 
 | ID | Test | Description | Severity | Status |
 |----|------|-------------|----------|--------|
-| | | | | |
+| D-IT-01 | IT-05, IT-06, IT-07, IT-10 | AI failed to extract structured questions from the Idlewild Arts PDF question set. The document is published as a multi-column table (question number, question text, type, help text, mandatory, character limits) rather than a simple narrative list. The AI returned an empty questions array, causing the app to fall back to the Tier 3 free-form interface ("No specific questions were found"). The 9 narrative questions (Q9, Q19–Q23, Q28–Q30) with their character limits (800 or 1,600 chars) were not extracted. Root cause: the AI extraction prompt is not designed to parse table-formatted question set documents. This is an extension of GAP-28. IT-05, IT-06, IT-07 and IT-10 are blocked until fixed. | High | Open |
 
 ---
 
