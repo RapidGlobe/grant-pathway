@@ -16,9 +16,11 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 
 | Factor | Idlewild Trust | A B Charitable Trust |
 |--------|---------------|----------------------|
-| Question document format | Multi-column table (caused D-IT-01) | Numbered list / narrative — expected to extract cleanly |
-| Charity eligibility | Arts sector only — Harry's Rainbow not eligible | Broad causes — Harry's Rainbow IS eligible |
-| Limit type | Character limits (GAP-27) | Word limits expected |
+| Question document format | Multi-column table (caused D-IT-01) | Numbered list (A1–D8) — expected to extract cleanly |
+| Charity eligibility | Arts sector only — Harry's Rainbow not eligible | Social justice / human rights focus — Harry's Rainbow likely NOT eligible |
+| Narrative questions | 9 (all character-limited) | 2–3 only (B3, B4, C11) — rest are data-entry, financial, or file uploads |
+| Key unique limit | Character limits (GAP-27) | B4: **15-word limit** — very tight and specific |
+| D5 — proposal document | N/A | File upload (Word/PDF 2–2½ pages) — NOT a text field; must not appear as a writing card |
 | Previous test result | D-IT-01 open | First live test of fixed extraction prompt |
 
 **Application window:** Next deadline **31 July 2026** — decisions expected October 2026. Applications are currently open.
@@ -64,7 +66,9 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 
 | Ref | Description |
 |-----|-------------|
-| Prior test | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). The document has 33 numbered questions but only approximately 5 require narrative text answers — the remaining 28 are data-entry, financial, dropdown, date, or file upload fields. Step 4 should show only the ~5 narrative questions. |
+| Prior test | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). Document has sections A–D. Only 2–3 questions require narrative prose (B3, B4, possibly C11). D5 is a file upload instruction (Word/PDF proposal, 2–2½ pages) — must NOT appear as a text writing card. |
+| B4 word limit | B4 asks for a summary in "no more than 15 words" — the tightest word limit of any funder tested. Counter should show "X / 15 words". |
+| Grant amount | AB does not ask applicants to specify a grant amount. Open Programme range is £10,000–£30,000 pa. |
 | No file indicator | The Step 3 summary page does not currently show which guidelines file was uploaded. This is a known limitation logged as a product improvement. |
 
 ---
@@ -78,10 +82,10 @@ Complete after running all tests.
 | ABC-01 | Account registration and charity profile | No | N/A | | |
 | ABC-02 | A B Charitable Trust funder picker | No | N/A | | |
 | ABC-03 | PDF upload, AI summary and prep checklist | Yes — timing, prep checklist | TBC | | |
-| ABC-04 | AI eligibility match — Harry's Rainbow IS eligible | Yes — eligibility check | N/A | | |
+| ABC-04 | AI eligibility mismatch — Harry's Rainbow NOT eligible | Yes — social justice focus vs bereavement charity | N/A | | |
 | ABC-05 | AI summary content accuracy | No | N/A | | |
-| ABC-06 | Narrative question extraction — only ~5 expected, not all 33 | Yes — non-narrative filtering | N/A | | |
-| ABC-07 | Word limit extraction and counter display | Yes — limit type correct | N/A | | |
+| ABC-06 | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering | N/A | | |
+| ABC-07 | Word limit extraction — B4 is 15 words (tightest limit tested) | Yes — limit type correct | N/A | | |
 | ABC-08 | Narrative answer writing and AI assist | No | N/A | | |
 | ABC-09 | Answer approval and Step 5 navigation | No | N/A | | |
 | ABC-10 | Word document export — structure and content | No | N/A | | |
@@ -197,26 +201,29 @@ Complete after running all tests.
 
 ---
 
-### ABC-04 — AI Eligibility Match — Harry's Rainbow IS Eligible
+### ABC-04 — AI Eligibility Mismatch — Harry's Rainbow Likely NOT Eligible
 
-**Idlewild lesson applied:** Yes — Idlewild IT-04 tested for a mismatch; this tests the opposite (positive match)
+**Idlewild lesson applied:** Yes — same pattern as IT-04. AB Charitable Trust funds specific social justice causes; Harry's Rainbow does not operate in these areas
 **Prerequisite:** ABC-03 complete (AI summary generated)
+
+**Background:** AB Charitable Trust funds organisations working in: Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform (these are the categories in the B1 dropdown). Harry's Rainbow provides bereavement support to children — this does not fall within these categories.
 
 **Steps:**
 1. Review the AI summary generated in ABC-03
-2. Check the "Who can apply" section for eligibility criteria
-3. Assess whether the criteria match Harry's Rainbow's profile:
-   - Harry's Rainbow is a UK Registered Charity ✅
-   - They support children and families (broad social causes) ✅
-   - They are based in the UK ✅
-   - They are not a grant-making body ✅
-4. Check whether the summary flags any concern or mismatch with Harry's Rainbow
+2. Check the "Who can apply" and "What the funder is looking for" sections
+3. Confirm the summary correctly identifies AB Charitable Trust's social justice / human rights focus:
+   - Access to Justice
+   - Human Rights
+   - Migrants and Refugees
+   - The Justice System and Penal Reform
+4. Assess whether the summary flags a potential mismatch with Harry's Rainbow's bereavement focus
+5. Note whether the AI surfaces the category restriction (B1) as an eligibility consideration
 
 **Expected result:**
-- "Who can apply" criteria are clearly listed
-- The eligibility criteria match Harry's Rainbow's profile — no mismatch should be flagged
-- The summary does NOT raise a concern about Harry's Rainbow's suitability (unlike the Idlewild Arts test)
-- This confirms the AI correctly surfaces relevant criteria without inventing mismatches
+- Summary clearly identifies the social justice / human rights funding focus
+- A user reading the summary would immediately recognise that Harry's Rainbow's bereavement work does not align with AB's categories
+- Ideally the AI flags the mismatch explicitly — this is an observation, not a mandatory pass criterion
+- Grant Pathway does not block the user from proceeding (eligibility is the charity's responsibility)
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -252,25 +259,33 @@ Complete after running all tests.
 
 ---
 
-### ABC-06 — Narrative Question Extraction — Only ~5 Expected, Not All 33
+### ABC-06 — Narrative Question Extraction — Only 2–3 Expected
 
-**Idlewild lesson applied:** Yes — this directly tests the non-narrative question filtering that was previously causing problems
+**Idlewild lesson applied:** Yes — directly tests non-narrative question filtering
 **Prerequisite:** ABC-03 complete (Q&A interface entered)
 
-**Background:** The A B Charitable Trust application has approximately 33 numbered questions in total. However, most are data-entry fields (name, address, charity number), financial fields (income, expenditure), dropdown selections, date fields, and file uploads. Only approximately 5 questions require a narrative prose answer. Grant Pathway should extract and display only the narrative questions.
+**Background:** The A B Charitable Trust document has questions across four sections (A, B, C, D). The vast majority are data-entry, financial, dropdown, or file upload fields. Only 2–3 require a narrative prose answer:
+
+| Question | Text | Expected |
+|----------|------|----------|
+| B3 | How does your organisation reflect the communities that you work with? | ✅ Should appear — narrative, no explicit word limit |
+| B4 | Summarise your work or your project in no more than 15 words | ✅ Should appear — narrative, **15-word limit** |
+| C11 | If you would like to give us any additional information, please use this box | May appear — optional narrative |
+| D5 | Please provide an overview of your work/funding proposal | ❌ Should NOT appear as a writing card — this is a file upload (Word/PDF document, 2–2½ pages) |
 
 **Steps:**
 1. In the Step 4 Q&A interface, count the number of questions displayed
-2. Review each question shown and confirm it requires a **written prose answer**
-3. Confirm there are **no** data-entry fields shown (e.g. "Enter your charity registration number", "What is your annual income?")
-4. Confirm there are **no** dropdown selections, date fields, or file upload reminders shown as writing tasks
-5. Record the exact number of questions shown and their text in the Notes field below
+2. Confirm B3 and B4 are both present
+3. Confirm D5 ("Please provide an overview of your work/funding proposal") does **NOT** appear as a text writing card — it is a document upload instruction
+4. Confirm none of the following appear as writing cards: A1–A10 (org details), B1–B2 (dropdowns), C1–C10 (financial figures), D1–D4 (file uploads), D6–D8 (further file uploads)
+5. Record the exact number and text of all questions shown
 
 **Expected result:**
-- Approximately 5 questions are displayed (not 33)
-- All displayed questions require a narrative prose response
-- No data-entry, financial, dropdown, date, or file upload fields are shown as writing cards
-- *(If more than 10 questions are shown, this is likely a regression — log as a defect)*
+- 2–3 questions displayed (B3, B4, and possibly C11)
+- B4 shows a **15-word limit** badge — the tightest limit in any funder tested so far
+- D5 does not appear as a text writing card
+- No data-entry, financial, dropdown, or standard file upload questions shown
+- *(If more than 5 questions shown, investigate — log as defect if non-narrative fields included)*
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -280,28 +295,25 @@ Complete after running all tests.
 
 ### ABC-07 — Word Limit Extraction and Counter Display
 
-**Idlewild lesson applied:** Yes — Idlewild used character limits (GAP-27); AB is expected to use word limits; this confirms the correct limit type is extracted and displayed
+**Idlewild lesson applied:** Yes — Idlewild used character limits; AB uses word limits. Also tests B4's unique 15-word limit — the tightest tested so far
 **Prerequisite:** ABC-06 complete
 
 **Steps:**
-1. Review each narrative question card in Step 4
-2. For each question, note:
-   - Whether a limit badge is shown (e.g. "400 words" or "800 characters")
-   - The limit type displayed (words or characters)
-   - The limit value shown
-3. Click into one question's answer field and begin typing
-4. Observe the counter updating in real time
-5. Confirm the counter format:
-   - If word limit: **"X / 400 words"**
-   - If character limit: **"X / 800 characters"**
-6. Type enough text to reach approximately 90% of the limit and confirm the counter changes colour or highlights
+1. On the B4 question card ("Summarise your work or your project in no more than 15 words"):
+   - Confirm a **"15 words"** limit badge is displayed
+   - Type a short answer and confirm the counter shows **"X / 15 words"**
+   - Type more than 15 words and confirm the counter highlights as over-limit
+2. On the B3 question card ("How does your organisation reflect the communities..."):
+   - Confirm whether a limit badge is shown (B3 has guidance text but no explicit word count — AI may or may not extract a limit)
+   - Record what the counter shows
+3. Confirm counter format throughout uses **"words"** not "characters"
 
 **Expected result:**
-- Limit badges shown on all questions that have a stated limit
-- Counter updates in real time as text is typed
-- Counter format correctly shows "words" or "characters" (not mixed)
-- Near-limit visual indicator triggers at approximately 90% of the limit
-- *(If limits show as wrong type — e.g. character limit shown as word limit — log as a defect)*
+- B4 shows **"15 words"** badge and **"X / 15 words"** counter
+- Counter highlights or changes colour when the 15-word limit is exceeded on B4
+- B3 may or may not show a limit (guidance text only — acceptable either way)
+- All counters show "words" not "characters" — confirming limit type extraction is correct for this funder
+- *(If B4 shows "15 characters" instead of "15 words" — log as a defect)*
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
