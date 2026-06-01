@@ -179,7 +179,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const grantName = application.grant_name as string
   const assembledDraft = (application.assembled_draft as string | null) ?? null
 
-  const disclaimer = `Disclaimer: This application was drafted with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`
+  const disclaimer = `Disclaimer: This application was prepared with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`
   const safeName = grantName.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '_')
 
   // ── Plain text export ──────────────────────────────────────────────────────
