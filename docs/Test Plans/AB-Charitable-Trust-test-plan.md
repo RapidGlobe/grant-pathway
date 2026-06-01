@@ -79,16 +79,16 @@ Complete after running all tests.
 
 | Test ID | Test Name | Idlewild Lesson Applied | AI Summary Time | Result | Notes |
 |---------|-----------|------------------------|-----------------|--------|-------|
-| ABC-01 | Account registration and charity profile | No | N/A | | |
-| ABC-02 | A B Charitable Trust funder picker | No | N/A | | |
-| ABC-03 | PDF upload, AI summary and prep checklist | Yes — timing, prep checklist | TBC | | |
-| ABC-04 | AI eligibility mismatch — Harry's Rainbow NOT eligible | Yes — social justice focus vs bereavement charity | N/A | | |
-| ABC-05 | AI summary content accuracy | No | N/A | | |
-| ABC-06 | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering | N/A | | |
-| ABC-07 | Word limit extraction — B4 is 15 words (tightest limit tested) | Yes — limit type correct | N/A | | |
-| ABC-08 | Narrative answer writing and AI assist | No | N/A | | |
-| ABC-09 | Answer approval and Step 5 navigation | No | N/A | | |
-| ABC-10 | Word document export — structure and content | No | N/A | | |
+| ABC-01 | Account registration and charity profile | No | N/A | ✅ Pass | |
+| ABC-02 | A B Charitable Trust funder picker | No | N/A | ✅ Pass | |
+| ABC-03 | PDF upload, AI summary and prep checklist | Yes — timing, prep checklist | Not recorded | ✅ Pass | Paste text used; PDF extraction issue (D-IT-01) still open |
+| ABC-04 | AI eligibility mismatch — Harry's Rainbow NOT eligible | Yes — social justice focus vs bereavement charity | N/A | ✅ Pass | Summary clearly states social justice categories required |
+| ABC-05 | AI summary content accuracy | No | N/A | ✅ Pass | All sections accurate; grant amount correct |
+| ABC-06 | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering | N/A | ✅ Pass | 3 questions shown (B3, B4, C11); D5 absent |
+| ABC-07 | Word limit extraction — B4 is 15 words (tightest limit tested) | Yes — limit type correct | N/A | ✅ Pass | "15 words" badge and "0 / 15 words" counter correct |
+| ABC-08 | Narrative answer writing and AI assist | No | N/A | ✅ Pass | AI assist working; spelling correction fix applied mid-test |
+| ABC-09 | Answer approval and Step 5 navigation | No | N/A | ✅ Pass | Senior review screen; Step 5 review checkboxes and approval modal |
+| ABC-10 | Word document export — structure and content | No | N/A | ✅ Pass | Both .docx and .txt downloaded; all content correct |
 
 ---
 
