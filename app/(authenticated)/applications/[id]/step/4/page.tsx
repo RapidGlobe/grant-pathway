@@ -75,7 +75,7 @@ export default async function Step4Page({ params }: Props) {
   const { data: existingRows } = await supabase
     .from('application_answers')
     .select(
-      'id, question_text, question_order, word_limit, answer_text, answer_source, is_budget_question',
+      'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
@@ -106,6 +106,8 @@ export default async function Step4Page({ params }: Props) {
           question_text: s.title,
           question_order: s.number,
           word_limit: s.wordLimit ?? null,
+          char_limit: null,
+          limit_type: s.wordLimit ? 'words' : null,
           is_budget_question: s.is_budget_section ?? false,
         }))
 
@@ -116,7 +118,7 @@ export default async function Step4Page({ params }: Props) {
             ignoreDuplicates: true,
           })
           .select(
-            'id, question_text, question_order, word_limit, answer_text, answer_source, is_budget_question',
+            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question',
           )
 
         questionRows = inserted ?? []
@@ -128,6 +130,8 @@ export default async function Step4Page({ params }: Props) {
           question_text: q.text,
           question_order: q.number ?? idx + 1,
           word_limit: q.wordLimit ?? null,
+          char_limit: q.charLimit ?? null,
+          limit_type: q.limitType ?? null,
           is_budget_question: q.is_budget_question ?? false,
         }))
 
@@ -139,7 +143,7 @@ export default async function Step4Page({ params }: Props) {
             ignoreDuplicates: true,
           })
           .select(
-            'id, question_text, question_order, word_limit, answer_text, answer_source, is_budget_question',
+            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question',
           )
 
         questionRows = inserted ?? []
@@ -170,6 +174,8 @@ export default async function Step4Page({ params }: Props) {
     questionText: row.question_text as string,
     questionOrder: row.question_order as number,
     wordLimit: (row.word_limit as number | null) ?? null,
+    charLimit: (row.char_limit as number | null) ?? null,
+    limitType: (row.limit_type as QuestionRow['limitType']) ?? null,
     answerText: (row.answer_text as string | null) ?? null,
     answerSource: (row.answer_source as QuestionRow['answerSource']) ?? null,
     isBudgetQuestion: (row.is_budget_question as boolean) ?? false,

@@ -110,7 +110,9 @@ Where they work: ${charity.whereCharityWorks}`
     {
       "number": 1,
       "text": "Exact question text as written in the guidelines",
-      "wordLimit": 400,
+      "wordLimit": null,
+      "charLimit": 800,
+      "limitType": "characters",
       "is_budget_question": false
     }
   ],
@@ -135,11 +137,11 @@ Where they work: ${charity.whereCharityWorks}`
 }
 
 Rules:
-- "funder_type": set to "structured" if the guidelines contain a numbered list of questions or a downloadable form with discrete labelled fields; set to "free_form" if the guidelines ask applicants to write a narrative document covering specified themes with no numbered questions
+- "funder_type": set to "structured" if the guidelines contain a numbered list of questions, a downloadable form with discrete labelled fields, OR a table of questions with columns such as "Question", "Type of question", "Character limits", "Mandatory"; set to "free_form" if the guidelines ask applicants to write a narrative document covering specified themes with no numbered questions
 - "aboutGrant": 2–3 sentences maximum; include the funder name and grant programme name if present
 - "whoCanApply": short bullet-point phrases; extract from eligibility criteria sections
 - "lookingFor": short bullet-point phrases; extract from priorities, themes, or funding focus sections
-- "questions": ONLY populate for structured funders; return an empty array [] for free_form funders. Only extract questions that require a NARRATIVE TEXT answer (i.e. questions the charity must write a prose answer to). DO NOT include: data-entry fields (name, address, phone, email, website, charity number, dates, postcode), dropdown/selection questions (region, category, organisation type), number fields (income, expenditure, employee count, salary, grant amount), file upload instructions, or yes/no consent questions. Extract questions EXACTLY as written; include "wordLimit" only if an explicit word count or character limit is stated (convert character limits to approximate word counts: 800 chars ≈ 120 words, 1600 chars ≈ 250 words); set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown
+- "questions": ONLY populate for structured funders; return an empty array [] for free_form funders. Only extract questions that require a NARRATIVE TEXT answer — i.e. questions the charity must write a prose answer to. DO NOT include: data-entry fields (name, address, phone, email, website, charity number, dates, postcode), dropdown/selection questions (region, category, organisation type), number fields (income, expenditure, employee count, salary, grant amount), file upload instructions, or yes/no consent questions. TABLE FORMAT: if questions are presented in a table with a "Type of question" column, extract only rows where the type is "Long free text box", "Medium free text box", "Long free text field", "Medium free text field", or similar narrative text types — skip rows with types "Yes/No", "Short free text box" (for data fields), "Short free text field" (for data fields), "Drop-down list", "Date field dropdown", "Short numerical field", "Address fields", "File upload". Extract question text EXACTLY as written in the "Question" column. CHARACTER VS WORD LIMITS: read the limit directly from the guidelines — do NOT convert or approximate. If the limit is stated in characters (e.g. "800 characters", "1600 characters including spaces"), set "charLimit" to that number, set "limitType" to "characters", and set "wordLimit" to null. If the limit is stated in words (e.g. "400 words"), set "wordLimit" to that number, set "limitType" to "words", and set "charLimit" to null. If no limit is stated, set "limitType" to "none" and both "wordLimit" and "charLimit" to null. Set "is_budget_question" to true for any question about budget, income, expenditure, financial projections, or funding breakdown
 - "sections": ONLY populate for free_form funders; return an empty array [] for structured funders. For each narrative theme or section heading the funder asks applicants to cover, provide: "title" (as stated in the guidelines or a clear paraphrase), "guidance" (2–3 sentences telling the applicant what to include, derived from the funder's instructions), "wordLimit" only if explicitly stated, and "is_budget_section": true if the section covers budget, finances, income, expenditure, or funding breakdown. Number sections sequentially starting at 1.
 - "keyRequirements": important restrictions, deadlines, geographic limits, exclusions
 - "funderAiPolicy": extract any statement the funder makes about AI tool usage (verbatim or very close paraphrase); return null if no AI policy statement is found

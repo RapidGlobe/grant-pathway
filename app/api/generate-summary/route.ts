@@ -269,7 +269,9 @@ export async function POST(request: NextRequest) {
 export type AiSummaryQuestion = {
   number: number
   text: string
-  wordLimit?: number
+  wordLimit?: number | null
+  charLimit?: number | null
+  limitType?: 'words' | 'characters' | 'none' | null
   is_budget_question: boolean
 }
 

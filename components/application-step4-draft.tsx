@@ -32,6 +32,8 @@ export type QuestionRow = {
   questionText: string
   questionOrder: number
   wordLimit: number | null
+  charLimit: number | null
+  limitType: 'words' | 'characters' | 'none' | null
   answerText: string | null
   answerSource: 'ai_generated' | 'user_edited' | 'user_written' | null
   isBudgetQuestion: boolean
@@ -288,7 +290,7 @@ export function ApplicationStep4Draft({
               className="text-[14px]"
             />
             <p className="mt-1 text-right text-[12px] text-[#94A3B8]">
-              {countWords(manualAnswer)} words
+              {countWords(manualAnswer)} {countWords(manualAnswer) === 1 ? 'word' : 'words'}
             </p>
           </div>
         </div>
@@ -422,8 +424,12 @@ export function ApplicationStep4Draft({
         {questions.map((q) => {
           const text = answers[q.id] ?? ''
           const words = countWords(text)
-          const isOver = q.wordLimit != null && words > q.wordLimit
-          const isNear = q.wordLimit != null && !isOver && words > q.wordLimit * 0.9
+          const chars = text.length
+          const useChars = q.limitType === 'characters'
+          const limit = useChars ? q.charLimit : q.wordLimit
+          const count = useChars ? chars : words
+          const isOver = limit != null && count > limit
+          const isNear = limit != null && !isOver && count > limit * 0.9
           const refineState = refineStates[q.id] ?? ({ status: 'idle' } as RefineState)
           const isEmpty = text.trim() === ''
 
@@ -445,9 +451,9 @@ export function ApplicationStep4Draft({
                   {q.questionText}
                 </p>
                 <div className="flex shrink-0 items-center gap-2">
-                  {q.wordLimit && (
+                  {limit && (
                     <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]">
-                      {q.wordLimit}&nbsp;words
+                      {limit}&nbsp;{useChars ? 'characters' : 'words'}
                     </span>
                   )}
                   {q.isBudgetQuestion && (
@@ -505,7 +511,9 @@ export function ApplicationStep4Draft({
                 }`}
                 aria-live="polite"
               >
-                {q.wordLimit ? `${words} / ${q.wordLimit} words` : `${words} words`}
+                {limit
+                  ? `${count} / ${limit} ${useChars ? 'characters' : 'words'}`
+                  : `${words} words`}
               </p>
 
               {/* Refine answer — non-budget only */}
