@@ -184,7 +184,7 @@ export function buildRefinePrompt(
     ? `The refined answer must not exceed ${wordLimit} words.`
     : 'Keep the refined answer a similar length to the original.'
 
-  return `A UK charity is writing a grant application. Improve the structure, flow, and clarity of their answer below. You must not add any information that is not already in the answer. Do not change facts, dates, figures, names, or the claims being made. Maintain their first-person plural voice ("we", "our", "us").
+  return `A UK charity is writing a grant application. Improve the structure, flow, and clarity of their answer below. Correct any spelling errors and grammatical mistakes. You must not add any information that is not already in the answer. Do not change facts, dates, figures, names, or the claims being made. Maintain their first-person plural voice ("we", "our", "us").
 
 ${limitInstruction}
 
