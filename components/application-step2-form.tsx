@@ -41,6 +41,8 @@ type UploadError = "format" | "size" | "scanned" | "server" | null;
 
 interface ApplicationStep2FormProps {
   applicationId: string;
+  funderName: string;
+  grantName: string;
   /** Current step from the database — used to show re-upload advisory (GAP-19) */
   currentStep: number;
   initialError?: UploadError;
@@ -63,6 +65,8 @@ const UPLOAD_ERROR_MESSAGES: Record<Exclude<UploadError, null>, string> = {
 
 export function ApplicationStep2Form({
   applicationId,
+  funderName,
+  grantName,
   currentStep,
   initialError = null,
   showLargeWarning = false,
@@ -225,9 +229,15 @@ export function ApplicationStep2Form({
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
       <StepIndicator currentStep={2} />
 
-      <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
         Add the funder&apos;s guidelines
       </h1>
+      <p className="mb-1 text-[14px] font-medium text-[#0D6E6E]">
+        {funderName}
+        {grantName && grantName !== funderName && (
+          <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
+        )}
+      </p>
       <p className="mb-6 text-[15px] text-[#64748B]">
         Upload the funder&apos;s guidelines document, or paste the text directly below.
       </p>

@@ -240,8 +240,11 @@ export function ApplicationStep5Approve({
       <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
         Review and approve your application
       </h1>
-      <p className="mb-6 text-[14px] text-[#64748B]">
-        Prepared for: {funderName} — {grantName}
+      <p className="mb-6 text-[14px] font-medium text-[#0D6E6E]">
+        {funderName}
+        {grantName && grantName !== funderName && (
+          <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
+        )}
       </p>
 
       {/* ── Approval status banner ─────────────────────────────────────────── */}

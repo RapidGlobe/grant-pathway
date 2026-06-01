@@ -27,7 +27,7 @@ export default async function Step2Page({ params, searchParams }: Props) {
   // Step locking: redirects to Step 1 if current_step < 2
   // currentStep tells the form whether the user has been past Step 2 before
   // so it can show the re-upload advisory when no sessionStorage entry exists (GAP-19).
-  const { currentStep } = await getApplicationOrRedirect(id, 2);
+  const { funderName, grantName, currentStep } = await getApplicationOrRedirect(id, 2);
 
   const errorMap: Record<string, UploadError> = {
     format: "format",
@@ -41,6 +41,8 @@ export default async function Step2Page({ params, searchParams }: Props) {
   return (
     <ApplicationStep2Form
       applicationId={id}
+      funderName={funderName}
+      grantName={grantName}
       currentStep={currentStep}
       initialError={initialError}
       showLargeWarning={showLargeWarning}

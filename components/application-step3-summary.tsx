@@ -45,6 +45,8 @@ type DisplayState =
 
 interface ApplicationStep3SummaryProps {
   applicationId: string;
+  funderName: string;
+  grantName: string;
   /** Existing summary JSON string from the database. If non-null, skip generation. */
   existingSummary: string | null;
 }
@@ -57,6 +59,8 @@ const LOADING_MESSAGES = [
 
 export function ApplicationStep3Summary({
   applicationId,
+  funderName,
+  grantName,
   existingSummary,
 }: ApplicationStep3SummaryProps) {
   // ── State ──────────────────────────────────────────────────────────────────
@@ -344,9 +348,15 @@ export function ApplicationStep3Summary({
     <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={3} />
 
-      <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
         Your funder guidelines — summary
       </h1>
+      <p className="mb-6 text-[14px] font-medium text-[#0D6E6E]">
+        {funderName}
+        {grantName && grantName !== funderName && (
+          <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
+        )}
+      </p>
 
       {/* Approaching limit banner */}
       {approachingLimit && (

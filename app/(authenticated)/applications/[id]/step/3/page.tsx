@@ -25,11 +25,13 @@ export default async function Step3Page({ params }: Props) {
   const { id } = await params;
 
   // Step locking: redirects to current step if current_step < 3
-  const { aiSummary } = await getApplicationOrRedirect(id, 3);
+  const { funderName, grantName, aiSummary } = await getApplicationOrRedirect(id, 3);
 
   return (
     <ApplicationStep3Summary
       applicationId={id}
+      funderName={funderName}
+      grantName={grantName}
       existingSummary={aiSummary}
     />
   );
