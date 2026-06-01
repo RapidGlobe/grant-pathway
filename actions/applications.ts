@@ -121,12 +121,47 @@ export async function deleteApplication(
 }
 
 // ---------------------------------------------------------------------------
+// P5.FD4 — Fetch approved funder list for Step 1 picker
+// ---------------------------------------------------------------------------
+
+export type FunderOption = {
+  id: string
+  name: string
+  funderType: 'structured' | 'narrative'
+}
+
+/**
+ * Returns all active funders from the approved directory, ordered
+ * alphabetically. Used to populate the searchable picker on Step 1.
+ *
+ * Called server-side in the Step 1 page component so the list is
+ * available on first render with no client-side fetch.
+ */
+export async function getActiveFunders(): Promise<FunderOption[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('funders')
+    .select('id, name, funder_type')
+    .eq('is_active', true)
+    .order('name', { ascending: true })
+
+  if (error || !data) return []
+
+  return data.map((f) => ({
+    id: f.id,
+    name: f.name,
+    funderType: f.funder_type as 'structured' | 'narrative',
+  }))
+}
+
+// ---------------------------------------------------------------------------
 // S3.1 / S3.2 — Save Step 1 (Application Details)
 // ---------------------------------------------------------------------------
 
 /**
- * Saves funder_name and grant_name for an existing application and
- * redirects to Step 2.
+ * Saves funder_id, funder_name, and grant_name for an existing application
+ * and redirects to Step 2.
  *
  * current_step advances to 2 on first save (new application). If the
  * user returns to Step 1 later (current_step already >= 2), current_step
@@ -137,6 +172,7 @@ export async function deleteApplication(
  */
 export async function saveApplicationStep1(
   applicationId: string,
+  funderId: string,
   funderName: string,
   grantName: string,
 ): Promise<{ ok: false; error: string }> {
@@ -162,6 +198,7 @@ export async function saveApplicationStep1(
     const { error } = await supabase
       .from('applications')
       .update({
+        funder_id: funderId,
         funder_name: funderName,
         grant_name: grantName,
         current_step: newStep,

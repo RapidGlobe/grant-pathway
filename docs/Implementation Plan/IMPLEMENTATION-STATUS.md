@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-01 (Funder directory model decided — DR-FD-001; Phase 5 funder directory tasks added; FR-15 revised in MoSCoW register)
+**Last updated:** 2026-06-01 (P5.FD1–FD6 complete — funders table, RLS, seed data, funder_id FK migration, Step 1 picker component, request escape hatch)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -107,12 +107,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off |
 | **Phase 5 — Pre-Launch** | **12** | **0** | Not started |
 | &nbsp;&nbsp;**Funder Directory (DR-FD-001)** | **6** | **0** | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD1 — Create `funders` Supabase table and RLS policy | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD2 — Seed `funders` table with 12 approved orgs from target funder list | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD3 — Add nullable `funder_id` FK column to `applications` table (migration) | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker component | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD5 — Add "My funder isn't listed — request it" link below picker (mailto or Tally v1) | 1 | 0 | Not started |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD6 — Wire funder request notification to Rapidglobe | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD1 — Create `funders` Supabase table and RLS policy | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD2 — Seed `funders` table with 12 approved orgs from target funder list | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD3 — Add nullable `funder_id` FK column to `applications` table (migration) | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker component | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD5 — Add "My funder isn't listed — request it" link below picker (mailto or Tally v1) | 1 | 1 | ✅ Complete |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD6 — Wire funder request notification to Rapidglobe | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;**Pre-Launch** | **6** | **0** | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
