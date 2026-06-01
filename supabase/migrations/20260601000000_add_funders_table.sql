@@ -43,6 +43,16 @@ create policy "funders: select active"
 -- for all roles except the service role (which bypasses RLS).
 
 -- ---------------------------------------------------------------------------
+-- 3. Table-level grant
+-- ---------------------------------------------------------------------------
+-- Tables created via SQL migration do not automatically receive table-level
+-- GRANTs (see 20260521000000_grant_table_permissions.sql). Without this grant
+-- PostgreSQL blocks the query before RLS even runs (error 42501).
+-- funders is read-only for authenticated users — SELECT only, no write grants.
+
+grant select on public.funders to authenticated;
+
+-- ---------------------------------------------------------------------------
 -- 3. Add funder_id FK to applications
 -- ---------------------------------------------------------------------------
 -- Nullable for migration safety — existing records are unaffected.
