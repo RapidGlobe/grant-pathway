@@ -75,7 +75,7 @@ export default async function Step4Page({ params }: Props) {
   const { data: existingRows } = await supabase
     .from('application_answers')
     .select(
-      'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question',
+      'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
@@ -118,7 +118,7 @@ export default async function Step4Page({ params }: Props) {
             ignoreDuplicates: true,
           })
           .select(
-            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question',
+            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
           )
 
         questionRows = inserted ?? []
@@ -143,7 +143,7 @@ export default async function Step4Page({ params }: Props) {
             ignoreDuplicates: true,
           })
           .select(
-            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question',
+            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
           )
 
         questionRows = inserted ?? []
@@ -180,6 +180,7 @@ export default async function Step4Page({ params }: Props) {
     answerSource: (row.answer_source as QuestionRow['answerSource']) ?? null,
     isBudgetQuestion: (row.is_budget_question as boolean) ?? false,
     guidance: guidanceMap[row.question_order as number] ?? null,
+    isApproved: (row.is_approved as boolean) ?? false,
   }))
 
   return (

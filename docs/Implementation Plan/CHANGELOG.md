@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-01 — FR-32/FR-33 per-question approval step added to Step 4
+
+**What changed:**
+- `components/application-step4-draft.tsx` — Per-question approval flow added. Each question card now shows three plain-language review prompts (FR-32: "Does this accurately describe your charity and project?", "Are all figures, dates, and facts correct?", "Does this answer the question that was asked?") whenever an answer is non-empty and not yet approved. An "Approve this answer" button (FR-33) saves approval to the database. Editing text or accepting an AI refinement clears approval and requires re-review. Progress bar and "Ready to assemble" gate now use approved count, not answered count. Approved cards render with a green border and confirmation stamp.
+- `actions/applications.ts` — New `approveAnswer(answerId)` Server Action added; sets `is_approved = true` on the `application_answers` row with `user_id` ownership check.
+- `app/(authenticated)/applications/[id]/step/4/page.tsx` — `is_approved` added to the `application_answers` DB select (existing rows and both upsert paths); mapped to new `QuestionRow.isApproved` field.
+
+**Why:**
+AB Charitable Trust testing (2026-06-01) found that FR-32 (three plain-language review prompts alongside each draft) and FR-33 (explicit per-question approval before content is saved to the assembly queue) were missing from the Mark Two charity-authored Q&A interface. These requirements were present in the original Step 4 design but were not carried forward into the 2026-05-28 redesign. The fix brings the implementation into full compliance with the Must Have acceptance criteria.
+
+---
+
 ## 2026-06-01 — Funder directory and access control model decided (DR-FD-001)
 
 **What changed:**

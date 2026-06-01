@@ -423,6 +423,40 @@ export async function saveAnswer(
   return { ok: true }
 }
 
+// ---------------------------------------------------------------------------
+// FR-33 — Approve answer (per-question explicit approval step)
+// ---------------------------------------------------------------------------
+
+/**
+ * Sets is_approved = true on a single application_answers row.
+ * Called from Step 4 when the user clicks "Approve this answer" after
+ * reviewing all three FR-32 review prompts. Resets to false if the user
+ * subsequently edits the answer (handled client-side via unapproveAnswer).
+ */
+export async function approveAnswer(
+  answerId: string,
+): Promise<SaveAnswerResult> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  const { error } = await supabase
+    .from('application_answers')
+    .update({ is_approved: true })
+    .eq('id', answerId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { ok: false, error: 'Could not approve your answer. Please try again.' }
+  }
+
+  return { ok: true }
+}
+
 /**
  * Upserts a single manually-entered question + answer.
  * Used when no questions were extracted from the guidelines.

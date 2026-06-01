@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-01 (P5.FD1–FD6 complete — funders table, RLS, seed data, funder_id FK migration, Step 1 picker component, request escape hatch)
+**Last updated:** 2026-06-01 (S6.FR32/FR33 — per-question approval step added to Step 4 Q&A interface)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -568,6 +568,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
   - `actions/applications.ts` — `saveAnswer()`, `saveManualAnswer()`, `advanceToStep5()` Server Actions added
 - [x] **S6.3** `components/application-step4-draft.tsx` fully rewritten: `QuestionRow` type exported (used by page); 5 display states (`loading`, `content`, `failure`, `persistent-failure`, `no-questions`); auto-generates on mount when `!hasExistingAnswers`; returning users skip AI call and go straight to content; debounced auto-save (400ms) via `saveAnswer()` SA; 60-second background save for unsaved dirty answers; `aiGeneratedIdsRef` tracks which IDs were AI-generated for correct `answer_source` on save; per-answer word count display with amber/red colour at 90%/100% of limit; `isRetryRef` controls persistent failure; Regenerate resets retry counter
 - [x] **S6.4** `advanceToStep5()` Server Action advances `current_step` to `max(current, 5)` and redirects to step/5; wired to Continue button via `useTransition`; `no-questions` path saves manual entry via `saveManualAnswer()` before advancing
+- [x] **S6.FR32/FR33** Per-question approval step added (identified during AB Charitable Trust testing 2026-06-01): three plain-language review prompts (FR-32) rendered inside each question card whenever an answer is non-empty and not yet approved; "Approve this answer" button (FR-33) calls new `approveAnswer()` Server Action which sets `is_approved = true` on the `application_answers` row; editing text or accepting an AI refinement clears the per-question approval so the user must re-review; progress bar and "Ready to assemble" gate now count approved answers (not just non-empty answers); approved card rendered with green border and confirmation stamp; `is_approved` added to DB select in step 4 page and mapped to `QuestionRow.isApproved`
 
 ### Slice 7 — Step 5: Approve & Export
 

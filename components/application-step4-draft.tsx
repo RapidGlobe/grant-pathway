@@ -15,13 +15,13 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, AlertCircle, Sparkles } from 'lucide-react'
+import { AlertTriangle, AlertCircle, Sparkles, CheckCircle2, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { StepIndicator } from '@/components/step-indicator'
-import { saveAnswer, saveManualAnswer, setDraftReadyToAssemble } from '@/actions/applications'
+import { saveAnswer, approveAnswer, saveManualAnswer, setDraftReadyToAssemble } from '@/actions/applications'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -38,6 +38,7 @@ export type QuestionRow = {
   answerSource: 'ai_generated' | 'user_edited' | 'user_written' | null
   isBudgetQuestion: boolean
   guidance: string | null
+  isApproved: boolean
 }
 
 type RefineState =
@@ -81,6 +82,14 @@ export function ApplicationStep4Draft({
     () => Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
   )
 
+  // FR-33: per-question approval state (initialised from DB is_approved)
+  const [approved, setApproved] = useState<Record<string, boolean>>(
+    () => Object.fromEntries(questions.map((q) => [q.id, q.isApproved])),
+  )
+  // Tracks whether server approval call is in flight per question
+  const [approvingId, setApprovingId] = useState<string | null>(null)
+  const [approveErrors, setApproveErrors] = useState<Record<string, string>>({})
+
   const [refineStates, setRefineStates] = useState<Record<string, RefineState>>(
     () => Object.fromEntries(questions.map((q) => [q.id, { status: 'idle' } as RefineState])),
   )
@@ -103,7 +112,9 @@ export function ApplicationStep4Draft({
   const pendingSaves = useRef(0)
 
   const answeredCount = questions.filter((q) => (answers[q.id] ?? '').trim() !== '').length
-  const allAnswered = questions.length > 0 && answeredCount === questions.length
+  // FR-32/FR-33: progress bar and gate use approved count, not just answered count
+  const approvedCount = questions.filter((q) => approved[q.id]).length
+  const allApproved = questions.length > 0 && approvedCount === questions.length
 
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
   const itemLabelPlural = funderType === 'free_form' ? 'sections' : 'questions'
@@ -130,6 +141,8 @@ export function ApplicationStep4Draft({
   function handleAnswerChange(answerId: string, text: string) {
     setAnswers((prev) => ({ ...prev, [answerId]: text }))
     dirtyRef.current.add(answerId)
+    // Editing clears approval — the user must re-approve after any change (FR-33)
+    if (approved[answerId]) setApproved((prev) => ({ ...prev, [answerId]: false }))
   }
 
   function handleAnswerBlur(answerId: string) {
@@ -197,6 +210,8 @@ export function ApplicationStep4Draft({
   function handleUseRefined(answerId: string, refinedText: string) {
     setAnswers((prev) => ({ ...prev, [answerId]: refinedText }))
     setRefineStates((prev) => ({ ...prev, [answerId]: { status: 'idle' } }))
+    // Replacing text with AI refinement clears approval — re-review required (FR-33)
+    setApproved((prev) => ({ ...prev, [answerId]: false }))
     void doSave(answerId, refinedText, 'user_edited')
   }
 
@@ -206,6 +221,25 @@ export function ApplicationStep4Draft({
 
   function dismissRefineError(answerId: string) {
     setRefineStates((prev) => ({ ...prev, [answerId]: { status: 'idle' } }))
+  }
+
+  // ── Approve answer (FR-33) ────────────────────────────────────────────────
+
+  async function handleApprove(answerId: string) {
+    // Flush any unsaved text first so the approved answer matches what's stored
+    if (dirtyRef.current.has(answerId)) {
+      dirtyRef.current.delete(answerId)
+      await doSave(answerId, latestAnswers.current[answerId] ?? '')
+    }
+    setApprovingId(answerId)
+    setApproveErrors((prev) => ({ ...prev, [answerId]: '' }))
+    const result = await approveAnswer(answerId)
+    setApprovingId(null)
+    if (!result.ok) {
+      setApproveErrors((prev) => ({ ...prev, [answerId]: result.error }))
+    } else {
+      setApproved((prev) => ({ ...prev, [answerId]: true }))
+    }
   }
 
   // ── Ready to assemble ─────────────────────────────────────────────────────
@@ -363,8 +397,8 @@ export function ApplicationStep4Draft({
         <div className="mx-auto max-w-[960px]">
           <div className="mb-1.5 flex items-center justify-between">
             <span className="text-[13px] text-[#64748B]">
-              {answeredCount} of {questions.length}{' '}
-              {answeredCount === 1 ? itemLabel : itemLabelPlural} completed
+              {approvedCount} of {questions.length}{' '}
+              {approvedCount === 1 ? itemLabel : itemLabelPlural} approved
             </span>
             {isSaving && (
               <span className="text-[12px] text-[#94A3B8]" aria-live="polite">
@@ -375,12 +409,12 @@ export function ApplicationStep4Draft({
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
             <div
               className="h-full rounded-full bg-[#0D6E6E] transition-all duration-300"
-              style={{ width: `${(answeredCount / questions.length) * 100}%` }}
+              style={{ width: `${(approvedCount / questions.length) * 100}%` }}
               role="progressbar"
-              aria-valuenow={answeredCount}
+              aria-valuenow={approvedCount}
               aria-valuemin={0}
               aria-valuemax={questions.length}
-              aria-label={funderType === 'free_form' ? 'Sections completed' : 'Questions answered'}
+              aria-label={funderType === 'free_form' ? 'Sections approved' : 'Questions approved'}
             />
           </div>
         </div>
@@ -433,13 +467,19 @@ export function ApplicationStep4Draft({
           const refineState = refineStates[q.id] ?? ({ status: 'idle' } as RefineState)
           const isEmpty = text.trim() === ''
 
+          const isApprovedQ = approved[q.id] ?? false
+          const isApprovingQ = approvingId === q.id
+          const approveError = approveErrors[q.id] ?? ''
+
           return (
             <div
               key={q.id}
               className={`rounded-xl border p-5 ${
-                q.isBudgetQuestion
-                  ? 'border-[#FDE68A] bg-[#FFFBEB]'
-                  : 'border-[#E2E8F0] bg-white'
+                isApprovedQ
+                  ? 'border-[#6EE7B7] bg-[#F0FDF4]'
+                  : q.isBudgetQuestion
+                    ? 'border-[#FDE68A] bg-[#FFFBEB]'
+                    : 'border-[#E2E8F0] bg-white'
               }`}
             >
               {/* Card header */}
@@ -523,7 +563,7 @@ export function ApplicationStep4Draft({
                     <button
                       type="button"
                       onClick={() => void handleRefine(q)}
-                      disabled={isEmpty || limitReached}
+                      disabled={isEmpty || limitReached || isApprovedQ}
                       className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                     >
                       <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
@@ -576,6 +616,52 @@ export function ApplicationStep4Draft({
                   )}
                 </div>
               )}
+
+              {/* FR-32 / FR-33 — Review prompts and approval step */}
+              {!isEmpty && !isApprovedQ && refineState.status !== 'showing' && (
+                <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
+                  <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
+                    Before you approve, check:
+                  </p>
+                  <ul className="mb-4 space-y-2">
+                    <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
+                      Does this accurately describe your charity and project?
+                    </li>
+                    <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
+                      Are all figures, dates, and facts correct?
+                    </li>
+                    <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
+                      Does this answer the question that was asked?
+                    </li>
+                  </ul>
+                  {approveError && (
+                    <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
+                      {approveError}
+                    </p>
+                  )}
+                  <Button
+                    type="button"
+                    onClick={() => void handleApprove(q.id)}
+                    disabled={isApprovingQ}
+                    className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+                  >
+                    {isApprovingQ ? 'Approving…' : 'Approve this answer'}
+                  </Button>
+                </div>
+              )}
+
+              {/* Approved confirmation banner */}
+              {isApprovedQ && (
+                <div className="mt-4 flex items-center gap-2">
+                  <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
+                  <span className="text-[13px] font-medium text-[#059669]">
+                    Answer approved — edit above to revise
+                  </span>
+                </div>
+              )}
             </div>
           )
         })}
@@ -603,10 +689,10 @@ export function ApplicationStep4Draft({
         <Button
           type="button"
           onClick={handleReadyToAssemble}
-          disabled={!allAnswered || isAssembling}
+          disabled={!allApproved || isAssembling}
           title={
-            !allAnswered
-              ? `Complete all ${questions.length} ${itemLabelPlural} to continue`
+            !allApproved
+              ? `Approve all ${questions.length} ${itemLabelPlural} to continue`
               : undefined
           }
           className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
