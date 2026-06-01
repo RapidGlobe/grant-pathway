@@ -78,16 +78,16 @@ function sourceBadge(
 const REVIEW_ITEMS = [
   {
     id: 'read',
-    label: 'I have read through every answer and am satisfied with the content.',
+    label: 'I have reviewed all responses in full and am satisfied with their content.',
   },
   {
     id: 'accurate',
-    label: 'I confirm the information is accurate and true to the best of my knowledge.',
+    label: 'The information provided is accurate and complete to the best of my knowledge.',
   },
   {
     id: 'responsibility',
     label:
-      'I understand this application was drafted with AI assistance, and I take responsibility for everything submitted.',
+      'I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted.',
   },
 ]
 
