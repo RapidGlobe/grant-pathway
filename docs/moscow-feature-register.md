@@ -1,6 +1,6 @@
 # MoSCoW Feature Register — Grant Pathway v1
-**Version:** 1.3
-**Last updated:** 2026-05-29
+**Version:** 1.4
+**Last updated:** 2026-06-01
 
 This document consolidates the MoSCoW priority for all 44 functional requirements in Grant Pathway v1. It is the single authoritative reference for feature scope and is used directly by the PRD.
 
@@ -51,7 +51,7 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 | Ref | Requirement (summary) | Priority | Notes |
 |-----|----------------------|----------|-------|
-| FR-15 | Create a new application with grant name and funder name | **Must Have** | BRD also mentions optional application deadline; this field is not included in the screen requirements and is deferred |
+| FR-15 | Create a new application with grant name and funder selected from approved directory | **Must Have** | **Revised 2026-06-01 (DR-FD-001).** Funder is selected from a searchable curated picker (seeded from `funders` DB table) rather than free-text entry. A "My funder isn't listed — request it" escape hatch is displayed below the picker. BRD also mentions optional application deadline; this field is not included in the screen requirements and is deferred. |
 | FR-16 | Display all saved applications on the dashboard | **Must Have** | |
 | FR-17 | Open and continue any saved application from the dashboard | **Must Have** | |
 | FR-18 | Auto-save at regular intervals; manual save also available | **Must Have** | Auto-save: on Continue + every 60 seconds in background (silent) |

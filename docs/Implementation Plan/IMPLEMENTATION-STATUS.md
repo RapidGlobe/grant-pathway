@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-05-28 (Step 4 section-by-section redesign: AiSummarySection type + sections[] field; sections extracted by AI for free_form funders; Step 3 shows Application Sections card; Step 4 rebuilt with wider layout, teal funder context bar, sticky progress bar, guidance notes per section; assembleAndAdvance format is funder-type-aware)
+**Last updated:** 2026-06-01 (Funder directory model decided — DR-FD-001; Phase 5 funder directory tasks added; FR-15 revised in MoSCoW register)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -105,14 +105,36 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion | 1 | 1 | ✅ Complete |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion | 1 | 1 | ✅ Complete |
 | **Phase 4 → Phase 5 Gate** | — | — | Gate check complete — pending WJ sign-off |
-| **Phase 5 — Pre-Launch** | **6** | **0** | Not started |
-| &nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
-| &nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
-| &nbsp;&nbsp;P5.3 — Accessibility | 1 | 0 | Not started |
-| &nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
-| &nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
-| &nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
-| **Total** | **82** | **55** | |
+| **Phase 5 — Pre-Launch** | **12** | **0** | Not started |
+| &nbsp;&nbsp;**Funder Directory (DR-FD-001)** | **6** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD1 — Create `funders` Supabase table and RLS policy | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD2 — Seed `funders` table with 12 approved orgs from target funder list | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD3 — Add nullable `funder_id` FK column to `applications` table (migration) | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker component | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD5 — Add "My funder isn't listed — request it" link below picker (mailto or Tally v1) | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD6 — Wire funder request notification to Rapidglobe | 1 | 0 | Not started |
+| &nbsp;&nbsp;**Pre-Launch** | **6** | **0** | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.1 — Compliance | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.2 — Security review | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.3 — Accessibility | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.4 — Production infrastructure | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.5 — Final testing | 1 | 0 | Not started |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.6 — DNS | 1 | 0 | Not started |
+| **Total** | **88** | **76** | |
+
+---
+
+## Notes
+
+### 2026-06-01 — Funder directory model decided (DR-FD-001)
+
+**Decision:** Hybrid curated funder directory + "Request a Funder" escape hatch adopted (Option 5 of 5 evaluated). Users select a funder from a DB-seeded picker at Step 1; a request link handles funders not yet on the approved list.
+
+**Rationale:** Testing with a temporary workaround (invite gating, free-text entry) would produce results that don't reflect the real user experience. Decision taken to implement the near-final product model before testing begins, starting with Idlewild Trust (Round 1 2026, opens 8 June 2026).
+
+**Impact:** FR-15 revised in `moscow-feature-register.md` v1.4. Six new Phase 5 tasks added (P5.FD1–FD6). `applications` table will require a `funder_id` FK column (nullable, migration-safe). Step 1 UI requires funder text input → picker replacement.
+
+**Full decision record:** `docs/decisions/DR-FD-001-funder-directory-model.md`
 
 ---
 

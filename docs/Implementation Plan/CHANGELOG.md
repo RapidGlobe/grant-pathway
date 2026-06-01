@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-01 — Funder directory and access control model decided (DR-FD-001)
+
+**What changed:**
+- `docs/decisions/DR-FD-001-funder-directory-model.md` — New decision record created. Hybrid curated funder directory + "Request a Funder" escape hatch adopted as the funder access control model.
+- `docs/decisions/DECISIONS-INDEX.md` — DR-FD-001 added under new "Funder Directory" section; total count updated to 29; revision history entry added.
+- `docs/moscow-feature-register.md` v1.4 — FR-15 revised: funder selection is now via searchable curated picker (not free-text entry); "Request a Funder" escape hatch noted.
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — Phase 5 build tasks added for funder directory implementation.
+
+**Why:**
+Grant Pathway's AI extraction and Q&A interface has only been validated against 12 specific funders (see `docs/Test Plans/target-funder-list.md`). Allowing users to freely enter any funder name would let untested combinations enter the system, producing degraded or misleading output with no warning. Five options were evaluated; the hybrid model (Option 5) was selected because it maintains a hard gate on untested funders while converting user frustration (unlisted funder = dead end) into a demand signal via the request form. The decision was taken to implement the near-final product model now so that all test activity — starting with Idlewild Trust (Round 1 2026, opens 8 June 2026) — reflects the real user experience rather than a temporary workaround.
+
+**Build scope (Phase 5):**
+1. `funders` Supabase table — seeded with 12 approved orgs from target funder list
+2. RLS policy — authenticated users read; service role writes
+3. `applications.funder_id` FK column — nullable migration-safe
+4. Step 1 funder picker UI component — replaces free-text funder name input
+5. "Request a Funder" link — mailto or Tally form in v1
+6. Request notification to Rapidglobe
+
+---
+
 ## 2026-05-29 — Product documents updated to reflect Mark Two BRD decisions
 
 **What changed:**
