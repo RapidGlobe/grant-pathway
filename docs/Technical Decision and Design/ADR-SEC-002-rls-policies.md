@@ -10,7 +10,7 @@ status: Decided
 
 Grant Pathway uses Supabase PostgreSQL with Row Level Security (RLS) enabled (ADR-STACK-002). RLS policies ensure that users can only access their own data. Without correctly defined RLS policies, the application is vulnerable to horizontal privilege escalation — one user accessing another user's charity profile, applications, or answers.
 
-The data model includes: `user_profiles`, `charity_profiles`, `applications`, `application_answers`, `ai_usage_log`.
+The data model includes: `funders`, `user_profiles`, `charity_profiles`, `applications`, `application_answers`, `ai_usage_log`. Note: `funders` is a global reference table (not user-scoped) and requires a different RLS pattern — read-all-authenticated, write-service-role-only (DR-FD-001, ADR-DATA-001).
 
 ## Options Considered
 
@@ -39,6 +39,7 @@ RLS is enabled on all five tables with default-deny (no access unless explicitly
 
 | Table | SELECT | INSERT | UPDATE | DELETE |
 |---|---|---|---|---|
+| `funders` | All active rows (any authenticated user) | ✗ Service role only | ✗ Service role only | ✗ Service role only |
 | `user_profiles` | Own rows | Own rows | Own rows | Own rows |
 | `charity_profiles` | Own rows | Own rows | Own rows | Own rows |
 | `applications` | Own rows | Own rows | Own rows | Own rows |
@@ -46,6 +47,7 @@ RLS is enabled on all five tables with default-deny (no access unless explicitly
 | `ai_usage_log` | Own rows | Own rows | ✗ Denied | ✗ Denied |
 
 "Own rows" = `user_id = auth.uid()`.
+"All active rows" = `is_active = true` — any authenticated user may read the approved funder list; no user may insert, update, or delete funder records (service role only).
 
 The Supabase service role key bypasses all RLS policies. It is used server-side only for admin operations: account deletion cascade (ADR-DATA-003) and any scheduled maintenance tasks. It must never appear in client-side code (ADR-SEC-006).
 
@@ -64,3 +66,9 @@ ADR-STACK-002, ADR-DATA-001, BRD Section 9 (Data Privacy & Security).
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date | Change |
+|------|--------|
+| 2026-06-01 | `funders` table added to context and policy matrix (DR-FD-001). Non-user-scoped pattern documented: SELECT all active rows for any authenticated user; INSERT/UPDATE/DELETE restricted to service role only. |

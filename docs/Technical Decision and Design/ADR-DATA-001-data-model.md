@@ -20,7 +20,18 @@ Grant Pathway stores user accounts, charity profile information, grant applicati
 
 **Option B — Normalised model with a separate `application_answers` table.**
 
-The data model comprises five tables:
+The data model comprises six tables:
+
+### `funders`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | uuid (PK) | |
+| `name` | text | Unique. Full name of the grant-giving organisation |
+| `funder_type` | text | `structured` or `narrative` — determines Step 4 routing |
+| `grant_range` | text | Nullable. Display string only (e.g. "£10k–£30k") |
+| `guidelines_url` | text | Nullable. URL to funder's apply/guidelines page |
+| `is_active` | boolean | Default: `true`. Only active funders shown in Step 1 picker |
+| `created_at` | timestamptz | |
 
 ### `user_profiles`
 | Column | Type | Notes |
@@ -50,7 +61,8 @@ The data model comprises five tables:
 |---|---|---|
 | `id` | uuid (PK) | |
 | `user_id` | uuid (FK → user_profiles) | |
-| `funder_name` | text | |
+| `funder_id` | uuid (FK → funders, nullable) | Nullable for migration safety. Set when user selects from the approved funder picker (DR-FD-001) |
+| `funder_name` | text | Retained for display/export. Populated from `funders.name` on selection |
 | `fund_name` | text | |
 | `deadline` | date | Nullable |
 | `amount_sought` | integer | In pence or £ (TBD) |
@@ -87,10 +99,11 @@ The data model comprises five tables:
 - `user_id` is denormalised onto `application_answers` to allow straightforward RLS policies (`user_id = auth.uid()`) without requiring joins.
 - `ai_summary` is stored on `applications` (not as an answer row) because it is generated content, not a question-answer pair.
 - JSONB was rejected because individual answer querying and indexing is cleaner with normalised rows.
+- `funders` is a global reference table (not user-scoped) — RLS allows all authenticated users to read active funders but only the service role may write (DR-FD-001).
 
 ## Consequences
 
-- RLS policies (ADR-SEC-002) must be defined for all five tables.
+- RLS policies (ADR-SEC-002) must be defined for all six tables, including the non-user-scoped `funders` table.
 - `current_step` on `applications` drives the resume-flow logic (ADR-ARCH-004).
 - `ai_usage_log.created_at` is used to count monthly usage (`WHERE created_at >= date_trunc('month', now())`).
 - Funder guidelines text is intentionally absent from the data model — it is not stored (ADR-DATA-002).
@@ -102,3 +115,9 @@ FR-06 to FR-22, PDR-AI-005, BRD Section 9.
 ## Date Decided
 
 2026-04-17
+
+## Revision History
+
+| Date | Change |
+|------|--------|
+| 2026-06-01 | `funders` table added (DR-FD-001) — approved funder directory, global/non-user-scoped. `funder_id` nullable FK added to `applications`. Table count updated 5 → 6. RLS consequence updated. |

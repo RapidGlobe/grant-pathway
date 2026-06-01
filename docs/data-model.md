@@ -21,12 +21,14 @@ All data is stored in PostgreSQL via Supabase (London region). Authentication is
 ## Entity Overview
 
 ```
+funders                        (approved funder directory — global, not user-scoped)
+
 users (Supabase Auth)
   │
   ├──< charity_profiles        (one per user)
   │
   ├──< applications            (many per user)
-  │       │
+  │       │    └── funder_id → funders
   │       └──< application_answers   (many per application)
   │
   └──< ai_usage_log            (many per user)
@@ -148,6 +150,27 @@ Stores the charity's full organisational information — the "thick profile" int
 
 ---
 
+## 2a. funders
+
+The approved funder directory. This table is **not user-scoped** — it is a global reference table seeded and maintained by Rapidglobe. Users cannot insert or modify rows; they can only read active funders to populate the Step 1 picker.
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `id` | UUID | Yes | Primary key |
+| `name` | String | Yes | Full name of the grant-giving organisation (e.g. "Idlewild Trust") |
+| `funder_type` | Enum | Yes | One of: `structured`, `narrative`. Determines Step 4 routing |
+| `grant_range` | String | No | Display string (e.g. "£10k–£30k"). For UI display only |
+| `guidelines_url` | String | No | URL to the funder's guidelines or apply page |
+| `is_active` | Boolean | Yes | Only active funders appear in the Step 1 picker. Default: `true` |
+| `created_at` | Timestamp | Yes | Set when the record is added |
+
+**Key constraints:**
+- `name` is unique — no duplicate funder names
+- RLS: authenticated users can SELECT where `is_active = true`; INSERT/UPDATE/DELETE restricted to service role only
+- Seeded with the 12 approved funders from `docs/Test Plans/target-funder-list.md`
+
+---
+
 ## 3. applications
 
 Stores the grant application record. Each application belongs to one user and tracks the status of the full application journey.
@@ -156,7 +179,8 @@ Stores the grant application record. Each application belongs to one user and tr
 |-------|------|----------|-------|
 | `id` | UUID | Yes | Primary key |
 | `user_id` | UUID | Yes | Foreign key → `auth.users.id` |
-| `funder_name` | String | Yes | Name of the grant-giving organisation. Collected at Step 1 |
+| `funder_id` | UUID | No | Foreign key → `funders.id`. Nullable for migration safety (existing records). Set when user selects a funder from the picker at Step 1 (DR-FD-001) |
+| `funder_name` | String | Yes | Name of the grant-giving organisation. Retained for display and export; populated from `funders.name` on selection |
 | `grant_name` | String | Yes | Name of the specific grant. Collected at Step 1 |
 | `status` | Enum | Yes | One of: `not_started`, `in_progress`, `approved`, `exported`. See application status model |
 | `current_step` | Integer | Yes | The step (1–5) the user last reached; used to restore position on return. Default: `1` |
@@ -260,6 +284,7 @@ The following are explicitly **not** stored in the database:
 | `auth.users` → `charity_profiles` | One-to-one | One charity profile per user account |
 | `auth.users` → `applications` | One-to-many | A user may have multiple applications |
 | `auth.users` → `ai_usage_log` | One-to-many | Many AI requests per user over time |
+| `funders` → `applications` | One-to-many | Each application references one approved funder; a funder may have many applications across users |
 | `applications` → `application_answers` | One-to-many | Each application has multiple question-answer pairs |
 | `applications` → `ai_usage_log` | One-to-many | Each AI call is linked to the application that triggered it |
 
@@ -273,6 +298,7 @@ The following are explicitly **not** stored in the database:
 |---------|------|--------|--------------------|
 | 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
 | 1.1 | 2026-05-29 | Rapidglobe Ltd | Section 2 (charity_profiles) replaced with thick profile structure (BD-02): identity, address/contact, mission/work, financial fields, supporting document status. OSCR/CCNI register coverage note added. `question_type` and `limit_type`/`word_limit`/`char_limit` fields added to `application_answers` (BD-04, BD-05). `is_budget_question` field added. `answer_source` enum updated (`ai_generated` → `ai_assisted`). AI cap corrected 20 → 50 in ai_usage_log constraints. |
+| 1.2 | 2026-06-01 | Rapidglobe Ltd | Section 2a added: `funders` table (DR-FD-001) — approved funder directory, global/non-user-scoped, seeded with 12 approved orgs. `funder_id` nullable FK added to `applications`. Entity overview and relationships summary updated. |
 
-*Last updated: 2026-05-29*
-*Status: Updated — reflects Mark Two decisions BD-02, BD-04, BD-05*
+*Last updated: 2026-06-01*
+*Status: Updated — reflects Mark Two decisions BD-02, BD-04, BD-05; funder directory DR-FD-001*

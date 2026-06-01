@@ -369,11 +369,14 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ### Step 1 — Application Details
 
+**Revised 2026-06-01 (DR-FD-001):** Funder is selected from a searchable curated directory, not free-text entry.
+
 | Element | Detail |
 |---------|--------|
 | Page heading (new) | *"Start a new application"* — shown at `/applications/new` |
 | Page heading (existing) | *"Continue your application"* — shown at `/applications/[id]/step/1` when returning to an existing application |
-| Funder name | Text input, required. Label: *"Who is offering this grant?"* Placeholder: *"e.g. National Lottery Community Fund"* |
+| Funder picker | Searchable dropdown/combobox populated from the active `funders` table. Label: *"Who is offering this grant?"* Placeholder: *"Search for a funder…"* Required |
+| "My funder isn't listed" link | Below the picker: *"My funder isn't listed — request it"* — opens funder request form (mailto or Tally in v1) |
 | Grant name | Text input, required. Label: *"What is the grant called?"* Placeholder: *"e.g. Awards for All England"* |
 | Continue button | Primary action — teal. Creates application record (status: `not_started`), advances to Step 2 |
 | Cancel link | *"Cancel"* — returns to `/dashboard` without saving |
@@ -382,7 +385,7 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 | Field | Rule | Error message |
 |-------|------|--------------|
-| Funder name | Required | *"Please enter the funder's name"* |
+| Funder | Required — must be selected from the directory | *"Please select a funder from the list"* |
 | Grant name | Required | *"Please enter the grant name"* |
 
 ---

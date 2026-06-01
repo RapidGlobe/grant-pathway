@@ -622,7 +622,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ### FR-15 — Must Have
 
-**Requirement:** The system shall allow a user to create a new grant application by entering the grant name, funder name, and an optional application deadline.
+**Requirement:** The system shall allow a user to create a new grant application by selecting a funder from the approved directory and entering the grant name. **Revised 2026-06-01 (DR-FD-001):** Funder is selected via searchable picker, not free-text entry.
 
 ---
 
@@ -630,9 +630,11 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am a signed-in user with a completed charity profile
 - **When** I click "+ New Application" or "Start your first application" on `/dashboard`
-- **And** I enter a funder name and a grant name on Step 1
+- **And** I select a funder from the searchable directory picker on Step 1
+- **And** I enter a grant name
 - **And** I click "Continue"
 - **Then** a new application record is created with status `not_started`
+- **And** the record is linked to the selected `funder_id`
 - **And** I am advanced to Step 2 (Funder Guidelines)
 
 ---
@@ -640,11 +642,21 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 **AC-FR-15-02 — Required fields enforced**
 
 - **Given** I am on Step 1 of the application flow
-- **When** I attempt to click "Continue" without entering a funder name or grant name
+- **When** I attempt to click "Continue" without selecting a funder or entering a grant name
 - **Then** inline error messages are shown:
-  - Funder name: *"Please enter the funder's name"*
+  - Funder: *"Please select a funder from the list"*
   - Grant name: *"Please enter the grant name"*
 - **And** no application record is created
+
+---
+
+**AC-FR-15-05 — Unlisted funder request link present**
+
+- **Given** I am on Step 1 of the application flow
+- **When** I look below the funder picker
+- **Then** I see the link *"My funder isn't listed — request it"*
+- **And** clicking the link opens the funder request form
+- **And** I cannot proceed with an unlisted funder name entered as free text
 
 ---
 

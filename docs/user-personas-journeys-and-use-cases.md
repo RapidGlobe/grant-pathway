@@ -1,6 +1,6 @@
 # User Personas, Journeys & Use Cases — AI Grant Accelerator v1
-**Version:** 1.2
-**Last updated:** 2026-05-29
+**Version:** 1.3
+**Last updated:** 2026-06-01
 
 ---
 
@@ -130,7 +130,7 @@ Two end-to-end journeys are mapped: one for a first-time user (Margaret) and one
 | 3 | Feedback opt-in | Sees a simple checkbox: *"Would you be willing to have a short call to help us improve this tool?"* — ticks yes | *"Happy to help if it doesn't take long."* | Enables user interview feedback (DR-SM-002) |
 | 4 | Charity lookup | Prompted to enter her charity's registered number; app looks it up via Charity Commission API and pre-fills name, registered address, and charitable objects | *"Oh — it already knows about us! That's reassuring."* | Reduces data entry; builds trust |
 | 5 | Profile completion | Completes the charity profile — adds mission narrative, beneficiaries, main activities, and typical project budget range | *"This is just describing what we do — I can do this."* | Foundation for personalised AI outputs |
-| 6 | New application | Clicks "Start New Application", enters the grant name and funder name | *"Simple enough."* | — |
+| 6 | New application | Clicks "Start New Application", selects their funder from the searchable approved directory and enters the grant name | *"Oh — I can search for them. Good job they're listed."* | Prevents untested funder combinations; curated list builds trust |
 | 7 | Guidelines input | Prompted to paste or upload the funder's guidelines; pastes the text from the PDF she downloaded | *"Good — I was going to read this anyway."* | Structured approach to reading guidelines |
 | 8 | AI summarisation | App generates a plain-English summary of the funder's priorities, what they fund, and what each question is asking | *"That's exactly what I needed — I never understood what 'additionality' meant until now."* | Demystifies funder language for non-specialists |
 | 9 | Question drafting | Writes her answers section by section (narrative funders) or responds to each numbered question in turn (structured funders); AI can help improve a written answer on request | *"I just write what I know about us — and I can ask the AI to help tidy it up if I need to."* | Reduces blank-page anxiety; keeps charity in control of content |
@@ -152,7 +152,7 @@ Two end-to-end journeys are mapped: one for a first-time user (Margaret) and one
 |------|-------|--------|-------------------|---------------------|
 | 1 | Login | Opens the app, logs in with email and password | *"Quick and familiar."* | — |
 | 2 | Dashboard | Sees his existing applications and a "Start New Application" button | *"Good — I can see my previous work is still here."* | Application history visible |
-| 3 | New application | Clicks Start New Application; profile is already populated — no re-entry needed | *"This saves me 30 minutes straight away."* | Reuse of existing charity profile |
+| 3 | New application | Clicks Start New Application; selects funder from the searchable approved directory; profile is already populated — no re-entry needed | *"This saves me 30 minutes straight away."* | Reuse of existing charity profile |
 | 4 | Guidelines upload | Uploads the funder's PDF guidelines directly | *"Better than copy-paste — the whole document is in."* | Document handling |
 | 5 | AI summarisation | Receives a summary tailored to his charity type; notices it has correctly identified the funder's focus on early intervention | *"It's picked up the most relevant parts for us."* | Relevant, charity-aware summaries |
 | 6 | Answering questions | Works through each question systematically; writes his answers section by section (narrative funders) or responds to each numbered question in turn (structured funders); uses AI on request to help improve a written answer | *"I'd normally spend a whole evening on this — I've done three questions in 20 minutes."* | Significant time saving |
@@ -268,12 +268,16 @@ Use cases define the specific interactions between users and the system. Each us
 | **Trigger** | User clicks "Start New Application" |
 
 **Main Flow**
-1. User enters the name of the grant and the name of the funder
-2. User optionally enters the application deadline
-3. System creates a new application record linked to the charity profile
-4. User is directed to input funder guidelines (UC-06)
+1. User selects the funder from a searchable curated directory (picker populated from the approved `funders` table)
+2. User enters the name of the grant
+3. If the user's funder is not listed, a "My funder isn't listed — request it" link is available below the picker
+4. System creates a new application record linked to the charity profile and the selected funder
+5. User is directed to input funder guidelines (UC-06)
 
-**Postcondition:** A new application record is created and saved to the user's account.
+**Alternative Flows**
+- Funder not in directory → user clicks the request link; submits funder name via a simple form; is informed Rapidglobe will review and add it; cannot proceed with an unlisted funder
+
+**Postcondition:** A new application record is created and saved to the user's account, linked to an approved funder from the directory.
 
 ---
 
@@ -495,3 +499,4 @@ Use cases define the specific interactions between users and the system. Each us
 | 1.0 | 2026-04-16 | Rapidglobe Ltd | Initial version |
 | 1.1 | 2026-05-29 | Rapidglobe Ltd | Step 4 journey description updated to reflect charity-authored Q&A model (section-by-section for narrative funders, numbered Q&A for structured funders). Document history table added. |
 | 1.2 | 2026-05-29 | Rapidglobe Ltd | UC-04 updated to reflect thick charity profile (BD-02): identity, address and contact, mission and work, financial fields, and supporting document status. OSCR/CCNI note added. |
+| 1.3 | 2026-06-01 | Rapidglobe Ltd | UC-05 updated to reflect funder directory model (DR-FD-001): funder is selected from searchable curated picker, not free-text entry. "Request a Funder" escape hatch documented. Journey 1 step 6 and Journey 2 step 3 updated accordingly. |
