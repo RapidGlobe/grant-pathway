@@ -52,18 +52,18 @@ The following behaviours are known limitations at the time of this test. They ar
 
 Complete after running all tests.
 
-| Test ID | Test Name | Programme | Idlewild-Specific | Result | Notes |
-|---------|-----------|-----------|-------------------|--------|-------|
-| IT-01 | Account registration and charity profile | Both | No | | |
-| IT-02 | Idlewild Trust funder picker | Both | Yes | | |
-| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | | |
-| IT-04 | AI eligibility mismatch detection | Arts | Yes | | |
-| IT-05 | Character limit extraction and display | Arts | Yes | | |
-| IT-06 | Non-narrative question handling | Arts | Yes | | |
-| IT-07 | Narrative answer writing and character counter | Arts | Yes | | |
-| IT-08 | Conservation guidelines PDF upload and AI summary | Conservation | Yes | | |
-| IT-09 | Conservation knowledge-sharing requirement identified | Conservation | Yes | | |
-| IT-10 | Word document export — structure and content | Arts | No | | |
+| Test ID | Test Name | Programme | Idlewild-Specific | AI Summary Time | Result | Notes |
+|---------|-----------|-----------|-------------------|-----------------|--------|-------|
+| IT-01 | Account registration and charity profile | Both | No | N/A | ✅ Pass | |
+| IT-02 | Idlewild Trust funder picker | Both | Yes | N/A | ✅ Pass | |
+| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | | |
+| IT-04 | AI eligibility mismatch detection | Arts | Yes | N/A | | |
+| IT-05 | Character limit extraction and display | Arts | Yes | N/A | | |
+| IT-06 | Non-narrative question handling | Arts | Yes | N/A | | |
+| IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | | |
+| IT-08 | Conservation guidelines PDF upload and AI summary | Conservation | Yes | TBC | | |
+| IT-09 | Conservation knowledge-sharing requirement identified | Conservation | Yes | N/A | | |
+| IT-10 | Word document export — structure and content | Arts | No | N/A | | |
 
 ---
 
