@@ -1,5 +1,5 @@
 # MoSCoW Feature Register — Grant Pathway v1
-**Version:** 1.4
+**Version:** 1.5
 **Last updated:** 2026-06-01
 
 This document consolidates the MoSCoW priority for all 44 functional requirements in Grant Pathway v1. It is the single authoritative reference for feature scope and is used directly by the PRD.
@@ -87,7 +87,7 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 |-----|----------------------|----------|-------|
 | FR-28 | Charity writes draft answers section by section; AI assists with structure and clarity on request only | **Must Have** | **Revised 2026-05-28.** Original requirement was "generate draft answers automatically". Replaced with charity-authored Q&A model: the charity writes all content; AI may improve structure/clarity of a written answer on request ("Help me improve this"). AI never generates answers from scratch. See STEP4-REDESIGN-PROPOSAL.md |
 | FR-29 | Word limits and character limits auto-extracted from funder guidelines; displayed alongside each section/question | **Must Have** | **Revised 2026-05-28; extended 2026-05-29 (BD-05).** Both word limits and character limits are supported (`limit_type: words \| characters \| none`). The AI extracts the limit type and value for each question; the Step 4 counter displays "X / N words" or "X / N characters" as appropriate. |
-| FR-30 | Per-section AI refine uses the charity's own answer text; may not add facts or change claims | **Must Have** | Replaces old "draft generation uses question + charity profile". AI only refines a written answer — it does not write from scratch |
+| FR-30 | Per-section AI refine uses the charity's own answer text; may not add facts or change claims; corrects spelling and grammar | **Must Have** | Replaces old "draft generation uses question + charity profile". AI only refines a written answer — it does not write from scratch. **Updated 2026-06-01:** spelling and grammar correction added to refine prompt. AI assist button disabled when answer exceeds word/character limit. |
 | FR-31 | Budget sections/questions flagged in amber; AI assist disabled on budget sections | **Must Have** | **Revised 2026-05-28.** Original "flag draft exceeding word limit". Now: budget questions/sections are visually distinct; AI assist is disabled; user enters own figures |
 | FR-45 | Question-level typing: each extracted question carries a `question_type` (BD-04) | **Must Have** | Types: `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`. Narrative questions show a writing card. Data-entry and financial questions are pre-filled from the charity profile. Dropdown, date, and file_upload questions are displayed as read-only reminders only. Replaces funder-level type as the mechanism for question handling |
 | FR-46 | Three-tier funder coverage model displayed to the user (BD-07) | **Must Have** | Tier 1 (Full — narrative questions, profile pre-fill), Tier 2 (Partial — narrative subset of a portal form), Tier 3 (Guidance — free-form narrative document). Coverage tier displayed on new application screen, Step 3 summary card, and export screen |
@@ -98,8 +98,8 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 | Ref | Requirement (summary) | Priority | Notes |
 |-----|----------------------|----------|-------|
-| FR-32 | Present three plain-language review prompts alongside each draft | **Must Have** | (1) Does this accurately describe your charity and project? (2) Are all figures, dates, and facts correct? (3) Does this answer the question that was asked? |
-| FR-33 | Require explicit approval before content is saved; cannot be bypassed | **Must Have** | |
+| FR-32 | Present three plain-language review prompts alongside each draft | **Must Have** | **Implemented 2026-06-01.** Three confirmation statements presented at Step 5 (application-level) as mandatory checkboxes before approval: (1) "I have reviewed all responses in full and am satisfied with their content." (2) "The information provided is accurate and complete to the best of my knowledge." (3) "I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted." Per-question approval prompts also added to Step 4 (each question card shows prompts and an Approve button). |
+| FR-33 | Require explicit approval before content is saved; cannot be bypassed | **Must Have** | **Implemented 2026-06-01.** Step 5: all three checkboxes must be ticked before "Approve my application" is active. A confirmation modal names the specific application and requires a final click. Step 4: "Ready to assemble" button gated on approved count (all questions approved), not just answered count. Editing an answer clears its approval and requires re-approval. |
 | FR-34 | User can edit draft text directly before approving | **Must Have** | |
 | FR-35 | User can discard draft and regenerate or write their own answer | **Must Have** | |
 | FR-36 | Approved content visually marked and saved to application record | **Must Have** | |

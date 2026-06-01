@@ -6,6 +6,65 @@
 
 ---
 
+## 2026-06-01 — Step 5 approval wording and export disclaimer improved
+
+**What changed:**
+- `components/application-step5-approve.tsx` — Three confirmation checkboxes updated with more professional, precise language appropriate for a formal grant application context:
+  - "I have read through every answer and am satisfied with the content." → "I have reviewed all responses in full and am satisfied with their content."
+  - "I confirm the information is accurate and true to the best of my knowledge." → "The information provided is accurate and complete to the best of my knowledge."
+  - "I understand this application was drafted with AI assistance..." → "I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted."
+- `app/api/export/[applicationId]/route.ts` — Export disclaimer updated from "drafted with AI assistance" to "prepared with AI assistance" to align with the Step 5 checkbox language.
+
+**Why:**
+Identified during AB Charitable Trust testing (2026-06-01). The original wording was informal and imprecise. "Reviewed" is stronger and more appropriate than "read through". "Accurate and complete" better reflects the scope of the declaration than "accurate and true". "Prepared" is more accurate than "drafted" given the charity-authored model. Disclaimer aligned with checkbox for consistency.
+
+---
+
+## 2026-06-01 — Spelling correction added to AI refine-answer prompt
+
+**What changed:**
+- `lib/prompts.ts` — `buildRefinePrompt` updated: "Correct any spelling errors and grammatical mistakes." added to the refine instruction, before the constraint "You must not add any information that is not already in the answer."
+
+**Why:**
+AB Charitable Trust testing (2026-06-01) showed the AI was returning answers unchanged when they contained only spelling errors, because the original prompt mentioned "structure, flow, and clarity" but did not explicitly include spelling correction. Correcting "oppotunity" → "opportunity" is not changing a fact — it falls under clarity improvement. This is a core part of the AI assist value for non-specialist charity users.
+
+---
+
+## 2026-06-01 — char_limit and limit_type DB columns added; Step 4 pipeline fixed
+
+**What changed:**
+- `supabase/migrations/20260601000002_add_char_limit_and_limit_type.sql` — New migration adds `char_limit integer` and `limit_type text check (words|characters|none)` to `application_answers`. These columns were defined in `data-model.md` (BD-05) and referenced in the Step 4 page code but were never backed by a migration.
+- `app/(authenticated)/applications/[id]/step/4/page.tsx` — SELECT and upsert queries updated to include `char_limit` and `limit_type`.
+- `components/application-step4-draft.tsx` — `QuestionRow` type extended with `charLimit` and `limitType` fields. Counter display updated: shows "X / 800 characters" when `limitType === 'characters'` and "X / 400 words" when `limitType === 'words'`.
+
+**Why:**
+Root cause of D-IT-01 (Step 4 silently showing Tier 3 free-form fallback despite AI summary correctly extracting questions): the `upsert` in `step/4/page.tsx` referenced `char_limit` and `limit_type` columns that did not exist in the database. The upsert failed with a PostgreSQL error that was swallowed by the `try/catch` block, leaving `questionRows` empty and triggering the "no questions found" path. The missing migration was the single root cause of the Step 4 failure across both Idlewild Trust and A B Charitable Trust testing.
+
+---
+
+## 2026-06-01 — AI summary prompt updated for table-format PDFs and character limits
+
+**What changed:**
+- `lib/prompts.ts` — `buildSummaryPrompt` updated with two significant rule changes:
+  1. **Table format recognition**: `funder_type` rule extended — documents presented as a table with columns such as "Question", "Type of question", "Character limits", "Mandatory" are now classified as `structured`. A TABLE FORMAT extraction rule added to the `questions` rule: extract only rows where the "Type of question" column indicates narrative text (Long/Medium free text); skip Yes/No, Short free text (data fields), Drop-down, Date, Number, Address, and File upload rows.
+  2. **Character limit handling**: Removed the incorrect instruction to convert character limits to approximate word counts. New rule: if the limit is in characters, set `charLimit` to the value and `limitType` to `'characters'`; if in words, set `wordLimit` and `limitType` to `'words'`; if no limit, set `limitType` to `'none'`.
+- `app/api/generate-summary/route.ts` — `AiSummaryQuestion` type updated: added `charLimit?: number | null` and `limitType?: 'words' | 'characters' | 'none' | null` fields.
+
+**Why:**
+Idlewild Trust testing (2026-06-01) revealed two extraction failures. (1) The Idlewild Arts question set is published as a multi-column table — the AI could not parse table structure from extracted PDF text and returned an empty questions array. The TABLE FORMAT rule gives the AI explicit instructions for this format. (2) All Idlewild narrative questions use character limits (800 or 1600 chars), but the original prompt converted these to approximate word counts (800 chars ≈ 120 words), losing precision. The fix preserves the original limit type and value so counters show "X / 800 characters" correctly.
+
+---
+
+## 2026-06-01 — "Help me improve this" disabled when answer exceeds word/character limit
+
+**What changed:**
+- `components/application-step4-draft.tsx` — The "Help me improve this" AI assist button is now disabled when `isOver` is true (i.e. the answer exceeds the word or character limit). An inline message — "Your answer is over the limit. Edit it down first, then use AI to improve the structure." — is shown in red beneath the button when this condition applies.
+
+**Why:**
+AB Charitable Trust testing (2026-06-01) identified a design gap: clicking "Help me improve this" when an answer was already over the limit returned the answer unchanged, because the AI cannot remove factual content. This confused testers who expected the AI to help them fit within the limit. Disabling the button with an explanatory message makes the required user action explicit and prevents a silent no-op.
+
+---
+
 ## 2026-06-01 — FR-32/FR-33 per-question approval step added to Step 4
 
 **What changed:**

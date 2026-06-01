@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-01 (S6.FR32/FR33 — per-question approval step added to Step 4 Q&A interface)
+**Last updated:** 2026-06-01 (Testing fixes: char_limit/limit_type migration added; spelling correction in refine prompt; Step 5 wording; FR-32/FR-33 implemented; AI over-limit button disabled; table-format PDF extraction improved)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026

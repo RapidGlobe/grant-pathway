@@ -447,13 +447,17 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ### Step 5 — Approve & Export
 
+**Revised 2026-06-01:** Confirmation checkboxes added (FR-32/FR-33); wording updated.
+
 | Element | Detail |
 |---------|--------|
 | Page heading | *"Review and approve your application"* |
-| Content | Read-only view of all questions and answers for final review |
-| Approve button | **Approve my application** — primary action, teal. Sets status to `approved`. Confirmation prompt: *"Are you sure you want to approve this application? You can re-open it to make changes at any time."* |
-| Export button | **Download as Word document** — enabled only after approval. Sets status to `exported` on first download |
-| Re-export warning | Shown if application has already been exported (PDR-DH-003): *"You exported this application on [date]. If you have already submitted that version to the funder, please contact them to let them know a revised version is being submitted. Funders may treat multiple submissions as separate applications."* Actions: **Download anyway** / **Cancel** |
+| Funder / grant subtitle | *"[Funder name] · [Grant name]"* — displayed below the heading |
+| Assembled draft | Read-only view of all questions and approved answers |
+| Confirmation checkboxes | Three mandatory checkboxes (FR-32) — all must be ticked before the Approve button is active: (1) *"I have reviewed all responses in full and am satisfied with their content."* (2) *"The information provided is accurate and complete to the best of my knowledge."* (3) *"I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted."* |
+| Approve button | **Approve my application** — primary action, teal. Disabled until all three checkboxes are ticked. On click: confirmation modal appears naming the application (*"You are approving your answers for [Grant name] — [Funder name]. You can re-open it to make changes at any time before submission."*). Confirmed click sets status to `approved`. |
+| Export buttons | **Download as Word document (.docx)** and **Download as plain text (.txt)** — both enabled only after approval |
+| Re-export warning | Shown if application has already been exported (PDR-DH-003): *"You exported this application on [date]. If you have already submitted that version to the funder, please contact them to let them know a revised version is being submitted."* |
 | Back link | Returns to Step 4 |
 
 ### Notes
