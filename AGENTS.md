@@ -64,6 +64,24 @@ Use the table below to identify the right document(s) for every change. Multiple
 | `docs/PRD inputs/screen-requirements.md` | Any change to the content, fields, validation rules, or error states of any screen |
 | `docs/PRD inputs/acceptance-criteria.md` | Any change to functional requirements that alters what "done" looks like — revised requirements, new edge cases, or new acceptance criteria |
 
+## Test plans — mandatory coverage rule
+
+Every funder test plan in `docs/Test Plans/` must cover the **complete end-to-end flow** for each application — from login through to export. No step may be omitted on the assumption that it was tested previously or is not specific to that funder. Every step must be verified in the context of the specific funder being tested.
+
+The minimum required steps for every funder test plan are:
+1. Account registration (or login for returning test user)
+2. Charity profile setup or verification
+3. Funder selection from the picker (Step 1)
+4. Grant name entry (Step 1)
+5. Guidelines upload or paste (Step 2)
+6. AI summary generation — including recording the time taken (Step 3)
+7. "Before you begin writing" preparation checklist confirmation (Step 4 gate)
+8. Q&A writing interface — at least one narrative answer written, AI-assisted, and approved (Step 4)
+9. Export as Word document (Step 5)
+10. Any funder-specific tests relevant to that organisation's question set, format, or eligibility criteria
+
+**Why:** Steps that appear generic (e.g. the preparation checklist, the progress bar, the export) may behave differently for different funders due to funder type, question count, or character/word limit handling. Testing them in context catches issues that a generic test would not.
+
 ## When in doubt — ask before proceeding
 
 If it is not obvious where a decision or change should be documented, **stop and ask the user before proceeding**. Do not proceed on the assumption that it will be captured later. The cost of a 30-second question is far lower than the cost of a lost decision that has to be reconstructed weeks later.

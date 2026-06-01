@@ -14,6 +14,8 @@ This test plan covers an end-to-end test of Grant Pathway using Idlewild Trust a
 
 Idlewild Trust is classified as a **Structured** funder. Their question sets use **character limits** (not word limits), and include a significant number of non-narrative question types (Yes/No, dropdown, date, number, budget tables, file uploads). These make Idlewild the primary test case for GAP-27 (character limit handling) and GAP-28 (non-narrative question classification).
 
+**Test coverage principle:** Every test plan covers the complete end-to-end flow for each application — registration, profile, funder selection, guidelines upload, AI summary, preparation checklist, Q&A writing, and export — regardless of whether individual steps are considered "already tested." No step is assumed to work without verification in the context of this specific funder.
+
 ---
 
 ## Test Data
@@ -157,9 +159,13 @@ Log any failures not listed in Known Expected Behaviours above.
 3. Upload `idlewild-arts-application-questions-dec2025.pdf`
 4. Confirm the file is accepted (name displayed, no error)
 5. Click **Continue**
-6. On Step 3, click **Generate summary**
-7. Observe the loading indicator and staged progress messages
-8. Review the generated AI summary
+6. On Step 3, start a stopwatch then click **Generate summary**
+7. Observe the loading indicator and staged progress messages ("Reading your funder guidelines…" → "Almost there…")
+8. Stop the stopwatch when the summary appears — record the time in the results table
+9. Review the generated AI summary
+10. Click **Continue** to proceed to Step 4
+11. Confirm the **"Before you begin writing"** preparation checklist screen appears, listing financial preparation items and the senior colleague advisory note
+12. Click **"I have what I need — start writing"** to enter the Q&A interface
 
 **Expected result:**
 - PDF uploads successfully (no format or size error)
@@ -170,6 +176,10 @@ Log any failures not listed in Known Expected Behaviours above.
   - Application deadline reference
   - Plain-English explanation of the narrative questions (Q9, Q19–Q23, Q28–Q30)
 - Application Sections or Questions card is displayed showing extracted questions
+- Clicking Continue from Step 3 shows the **"Before you begin writing"** preparation checklist screen (Step 4 gate) with:
+  - 4 financial preparation items listed
+  - Advisory note about involving a senior colleague before financial questions
+  - **"I have what I need — start writing"** button to enter the Q&A interface
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -330,8 +340,13 @@ Log any failures not listed in Known Expected Behaviours above.
 1. Open the Conservation application from the dashboard
 2. On Step 2 (Funder Guidelines), upload `idlewild-conservation-application-questions-dec2025.pdf`
 3. Confirm the file is accepted
-4. Click **Continue** and generate the AI summary on Step 3
-5. Review the generated summary
+4. Click **Continue**
+5. On Step 3, start a stopwatch then click **Generate summary** — record the time in the results table
+6. Observe the loading indicator and staged progress messages
+7. Review the generated AI summary
+8. Click **Continue** to proceed to Step 4
+9. Confirm the **"Before you begin writing"** preparation checklist screen appears
+10. Click **"I have what I need — start writing"** to enter the Q&A interface
 
 **Expected result:**
 - PDF uploads successfully
