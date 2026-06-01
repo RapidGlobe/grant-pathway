@@ -88,7 +88,7 @@ Log any failures not listed in Known Expected Behaviours above.
 **Prerequisite:** None
 
 **Steps:**
-1. Go to [grantpathway.org.uk](https://www.grantpathway.org.uk)
+1. Go to [grant-pathway-three.vercel.app](https://grant-pathway-three.vercel.app)
 2. Click **Register**
 3. Enter first name, last name, email `grantpathway+idle1@gmail.com`, password (10+ characters), accept Terms and Privacy Policy
 4. Click **Create account**
