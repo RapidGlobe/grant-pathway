@@ -126,6 +126,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Notes
 
+### 2026-06-02 — Henry Smith funder name corrected in both dev and prod
+
+Migration `20260602000001_fix_henry_smith_name.sql` corrected the funder name from "Henry Smith Charity" to "Henry Smith Foundation" and updated the guidelines URL. Applied to both `grant-pathway-dev` and `grant-pathway-prod` on 2026-06-02. Seed file also updated for future use.
+
+---
+
 ### 2026-06-02 — FR-47 eligibility mismatch: migration status and deployment note
 
 Migration `20260602000000_add_mismatch_status.sql` adds `mismatch` to the `application_status` enum.
