@@ -63,10 +63,10 @@ Complete after running all tests.
 | IT-05 | Character limit extraction and display | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first to get arts-aligned profile) |
 | IT-06 | Non-narrative question handling | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
 | IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
-| IT-08 | Conservation guidelines PDF upload and AI summary | Conservation | Yes | TBC | | |
-| IT-09 | Conservation knowledge-sharing requirement identified | Conservation | Yes | N/A | | |
-| IT-10 | Word document export — structure and content | Arts | No | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
-| IT-11 | Profile correction and reapplication — mismatch resolved | Arts | Yes | N/A | ⏭ Deferred | IT-11 scope revised — Harry's Rainbow cannot be made eligible for Idlewild Arts regardless of profile wording. Escape hatch to be tested with a funder Harry's Rainbow genuinely qualifies for in a future test session. |
+| IT-08 | Conservation guidelines PDF upload and AI summary | Conservation | Yes | Not recorded | ✅ Pass | Eligibility mismatch correctly detected and displayed — Harry's Rainbow has no conservation remit |
+| IT-09 | Conservation knowledge-sharing requirement identified | Conservation | Yes | N/A | N/A | Redundant — mismatch detected before summary content is accessible; Harry's Rainbow cannot qualify for this programme |
+| IT-10 | Word document export — structure and content | Arts | No | N/A | N/A | Redundant — Harry's Rainbow is ineligible for both Idlewild programmes; export cannot be reached |
+| IT-11 | Profile correction and reapplication — mismatch resolved | Arts | Yes | N/A | ⏭ Deferred | Harry's Rainbow cannot be made eligible for Idlewild Arts regardless of profile wording. Escape hatch to be tested with a funder Harry's Rainbow genuinely qualifies for in a future test session. |
 
 ---
 
@@ -352,18 +352,14 @@ Log any failures not listed in Known Expected Behaviours above.
 
 **Expected result:**
 - PDF uploads successfully
-- AI summary generates without error within 30 seconds
-- Summary correctly identifies Conservation programme focus:
-  - Objects and works of art in museums, galleries, historic buildings
-  - Must be accessible to the public
-  - Grant ceiling £7,000
-  - Places of worship are **not** funded (important exclusion)
-  - Requires an independent Conservation Report before applying
-- Questions or sections are extracted and displayed
+- AI summary generates without error
+- A **red eligibility mismatch warning** is displayed — Harry's Rainbow has no conservation remit and does not qualify for this programme
+- The Continue button is absent; acknowledge button present
+- Clicking acknowledge returns to dashboard with red Ineligible badge
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Expected result updated 2026-06-02 — mismatch is the correct outcome for Harry's Rainbow with this funder. IT-09, IT-10, and IT-11 are redundant for this test account as Harry's Rainbow cannot qualify for either Idlewild programme.
 
 ---
 
@@ -474,3 +470,4 @@ Additional checks:
 | 1.0 | 2026-06-01 | Rapidglobe Ltd | Initial test plan — Idlewild Trust Arts and Conservation programmes, Harry's Rainbow test charity, 10 test cases including GAP-27 and GAP-28 observations |
 | 1.1 | 2026-06-02 | Rapidglobe Ltd | IT-03 expected result updated: mismatch warning expected, prep checklist not expected for Harry's Rainbow. IT-04 rewritten: tests FR-47 hard stop (red warning, acknowledge, dashboard redirect, mismatch status badge). IT-11 added: profile correction and reapplication escape hatch. Results summary updated to reflect re-run status. IT-05–IT-07, IT-10 blocked by mismatch (not D-IT-01) until IT-11 passes. |
 | 1.2 | 2026-06-02 | Rapidglobe Ltd | IT-03 ✅, IT-04 ✅ recorded. IT-11 deferred — Harry's Rainbow cannot be made eligible for Idlewild Arts regardless of profile wording; AI correctly rejects arts-therapeutic profile. Escape hatch to be tested with a qualifying funder in a future session. IT-05–IT-07, IT-10 remain blocked pending IT-11. |
+| 1.3 | 2026-06-02 | Rapidglobe Ltd | IT-08 ✅ recorded — mismatch correctly detected for Conservation programme. IT-08 expected result updated to reflect mismatch as the correct outcome. IT-09, IT-10 marked N/A (redundant — Harry's Rainbow ineligible for both Idlewild programmes). IT-11 remains deferred. |
