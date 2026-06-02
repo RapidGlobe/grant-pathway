@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-01 (Testing fixes: char_limit/limit_type migration added; spelling correction in refine prompt; Step 5 wording; FR-32/FR-33 implemented; AI over-limit button disabled; table-format PDF extraction improved)
+**Last updated:** 2026-06-02 (FR-47 eligibility mismatch hard stop implemented and tested; GAP-28 Layer 1 prompt fixes: conditional questions, multi-form PDFs, meta/feedback questions; funderAiPolicy banner removed; AI assist allowed over word limit; question sync bug fixed; spelling correction for short answers; multiple UX wording improvements; Henry Smith funder name corrected in seed; 3 funders now complete in test dashboard)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026

@@ -6,6 +6,72 @@
 
 ---
 
+## 2026-06-02 — AI assist allowed when answer exceeds word limit (FR-30 revised)
+
+**What changed:**
+- `components/application-step4-draft.tsx` — `isOver` removed from the disabled condition on "Help me improve this". AI assist is now available even when the answer exceeds the word limit.
+- `app/api/refine-answer/route.ts` — Server-side word limit rejection removed. Belt-and-braces no longer needed since the refine prompt enforces the limit in the AI output.
+- Over-limit message updated: *"Your answer exceeds the funder's word limit. In your interest, you can use AI to refine, improve the structure and bring it within the limit — or approve this answer as it stands."*
+
+**Why:**
+Idlewild and Henry Smith testing revealed an inconsistency: the over-limit message said "reduce it first" but the Approve button was still available. The two instructions contradicted each other. More importantly, the AI refine prompt already instructs the AI to stay within the word limit — so an over-limit answer is exactly the scenario where AI assist is most useful (the AI will compress to fit). Blocking it forced users to manually reduce first, which is a worse experience. The new message is advisory, not prescriptive, and honestly presents both options.
+
+---
+
+## 2026-06-02 — funderAiPolicy banner removed from Step 3
+
+**What changed:**
+- `components/application-step3-summary.tsx` — The blue AI policy banner (which displayed `summary.funderAiPolicy`) was removed from the Step 3 summary screen. The `funderAiPolicy` field remains in the `AiSummaryData` type and is stored in the database, but is no longer displayed.
+
+**Why:**
+Raised during Henry Smith Holiday Grants testing (IT-HSF-03). The banner added no value because:
+1. Grant Pathway's Q&A model already embodies responsible AI use — the charity writes all content, AI only refines on request, mandatory review before approval, AI disclaimer in every export.
+2. All approved funders are pre-screened by Rapidglobe; funders with explicit AI prohibitions are not listed.
+3. Extraction quality was unreliable — some funder documents only contained a pointer to a website ("You can find AI guidance on our website"), which rendered as a confusing, unactionable banner.
+
+---
+
+## 2026-06-02 — GAP-28 Layer 1: three prompt extraction improvements
+
+**What changed:**
+- `lib/prompts.ts` — Three new exclusion rules added to the question extraction logic:
+  1. **Conditional questions**: Questions prefaced with explicit project-type conditionals (e.g. "only required if applying for a vehicle") are excluded.
+  2. **Multi-form PDFs**: When a document contains multiple application forms (e.g. Small Grants + Large Grants), only the first complete form is extracted.
+  3. **Meta/feedback questions**: Questions asking for feedback about the application process (e.g. "Do you have any feedback for us?", "How long did this take?") are excluded — these are not grant application content.
+
+**Why:**
+Clothworkers and Henry Smith testing surfaced all three issues. The Clothworkers PDF contained both Small and Large Grants forms, causing duplicate questions. Henry Smith's form included "Do you have any feedback for us?" as Q9, which was appearing as a writing card. Conditional project-type questions (vehicle-only, digital infrastructure-only) were appearing for all applicants regardless of project type.
+
+---
+
+## 2026-06-02 — Question sync: Step 4 now syncs with regenerated AI summary
+
+**What changed:**
+- `app/(authenticated)/applications/[id]/step/4/page.tsx` — The `if (questionRows.length === 0)` guard was replaced with an always-run sync. On every Step 4 visit:
+  1. Orphaned rows (question_order no longer in the current AI summary) that are unanswered are deleted.
+  2. New questions from the summary are upserted.
+  3. The DB is re-fetched after the upsert to get the full current set (fixing a Supabase `ignoreDuplicates: true` issue where the upsert return value was empty for existing rows).
+
+**Why:**
+Henry Smith testing (D-HSF-02): after regenerating the AI summary, returning to Step 4 showed "No specific questions were found" because the old question rows remained in the database and the upsert's `ignoreDuplicates: true` returned an empty array — overwriting `questionRows` with nothing. The sync now correctly handles regeneration mid-session without losing any answered content.
+
+---
+
+## 2026-06-02 — FR-47 eligibility mismatch hard stop
+
+**What changed:**
+- New `mismatch` application status added to the `application_status` enum (migration `20260602000000_add_mismatch_status.sql`).
+- `lib/prompts.ts` — AI summary prompt extended with `eligibilityMismatch: boolean` and `mismatchReason: string | null` fields.
+- `app/api/generate-summary/route.ts` — `AiSummaryData` type extended.
+- `actions/applications.ts` — `setApplicationMismatch()` server action added.
+- `components/application-step3-summary.tsx` — Mismatch display state added: red warning card, acknowledge button, redirect to dashboard.
+- `components/dashboard-populated.tsx` — Red "Ineligible" badge for mismatch applications; no Continue/View button.
+
+**Why:**
+Raised during Idlewild Trust IT-04 testing. Harry's Rainbow (bereavement charity) was shown 9 application question cards for an arts-only grant — there is no purpose in a charity writing answers for a grant they clearly cannot receive. The hard stop protects funder relationships (preventing a stream of ineligible applications routed via Grant Pathway) and saves the charity from wasted effort. Full rationale: `docs/decisions/DR-EL-001-eligibility-mismatch-handling.md`.
+
+---
+
 ## 2026-06-01 — Step 5 approval wording and export disclaimer improved
 
 **What changed:**
