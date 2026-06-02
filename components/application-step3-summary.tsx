@@ -115,9 +115,13 @@ export function ApplicationStep3Summary({
   const [continueError, setContinueError] = useState<string | null>(null);
   const [isContinuing, startContinuing] = useTransition();
 
-  // Read filename from sessionStorage on mount (present for new sessions; absent for returning users)
+  // Whether guidelines are still available in sessionStorage (for Regenerate warning)
+  const [guidelinesAvailable, setGuidelinesAvailable] = useState(true);
+
+  // Read filename and guidelines availability from sessionStorage on mount
   useEffect(() => {
     setGuidelinesFilename(getGuidelinesFilename(applicationId));
+    setGuidelinesAvailable(getGuidelines(applicationId) !== null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -602,6 +606,11 @@ export function ApplicationStep3Summary({
           <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           Regenerate summary
         </button>
+        {!guidelinesAvailable && (
+          <p className="mt-1.5 text-[12px] text-[#94A3B8]">
+            You&apos;ll need to re-upload your guidelines to regenerate.
+          </p>
+        )}
       </div>
 
       {/* Server-side continue error */}
