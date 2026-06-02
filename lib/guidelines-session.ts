@@ -1,4 +1,5 @@
 // Guidelines session storage — client-side only (ADR-FILE-004, GAP-09)
+// Exports: setGuidelines, getGuidelines, clearGuidelines, setGuidelinesFilename, getGuidelinesFilename
 //
 // Manages extracted funder guidelines text in sessionStorage.
 // Guidelines are keyed by application ID so multiple open tabs cannot
@@ -15,6 +16,7 @@
 // This keeps the storage key consistent and makes the logic easy to test.
 
 const storageKey = (applicationId: string) => `guidelines_text_${applicationId}`
+const filenameKey = (applicationId: string) => `guidelines_filename_${applicationId}`
 
 /**
  * Stores extracted guidelines text for the given application.
@@ -52,7 +54,32 @@ export function getGuidelines(applicationId: string): string | null {
 export function clearGuidelines(applicationId: string): void {
   try {
     sessionStorage.removeItem(storageKey(applicationId))
+    sessionStorage.removeItem(filenameKey(applicationId))
   } catch {
     // Fail silently — a missing entry has no consequence.
+  }
+}
+
+/**
+ * Stores the guidelines source label for the given application.
+ * Pass the file name for uploads, or "Pasted text" for the paste path.
+ */
+export function setGuidelinesFilename(applicationId: string, filename: string): void {
+  try {
+    sessionStorage.setItem(filenameKey(applicationId), filename)
+  } catch {
+    // Fail silently.
+  }
+}
+
+/**
+ * Retrieves the stored guidelines source label for the given application.
+ * Returns null if no entry exists or sessionStorage is unavailable.
+ */
+export function getGuidelinesFilename(applicationId: string): string | null {
+  try {
+    return sessionStorage.getItem(filenameKey(applicationId))
+  } catch {
+    return null
   }
 }
