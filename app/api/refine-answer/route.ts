@@ -123,21 +123,9 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Word limit guard: reject if answer exceeds the question's word limit (FR-30)
-  // Belt-and-braces: server-side enforcement ensures the client-side disabled state cannot be bypassed.
-  const wordLimit = answerRow.word_limit as number | null
-  if (wordLimit != null) {
-    const wordCount = answerText.trim().split(/\s+/).filter(Boolean).length
-    if (wordCount > wordLimit) {
-      return NextResponse.json(
-        {
-          error: 'invalid_request',
-          message: 'Your answer exceeds the word limit. Please reduce it first, then use AI to refine and improve the structure.',
-        },
-        { status: 400 },
-      )
-    }
-  }
+  // Note: AI assist is intentionally allowed when over the word limit.
+  // The refine prompt instructs the AI to stay within the word limit, actively
+  // compressing the answer — more helpful than blocking the user at this point.
 
   // ── 4. Check monthly usage cap (ADR-AI-008, ADR-SEC-005) ──────────────────
   const startOfMonth = new Date()

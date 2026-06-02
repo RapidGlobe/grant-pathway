@@ -168,11 +168,9 @@ export function ApplicationStep4Draft({
     const text = (latestAnswers.current[q.id] ?? '').trim()
     if (!text) return
 
-    // Belt-and-braces: re-check word/char limit at call time using the latest answer text.
-    // The disabled prop on the button is the primary gate, but React batching can
-    // allow a click to fire before the next render reflects isOver=true.
-    if (q.wordLimit != null && countWords(text) > q.wordLimit) return
-    if (q.charLimit != null && text.length > q.charLimit) return
+    // Note: AI assist is intentionally allowed when over the word limit.
+    // The refine prompt instructs the AI to stay within the word limit, so it
+    // will actively compress the answer — more helpful than blocking the user.
 
     setRefineStates((prev) => ({ ...prev, [q.id]: { status: 'loading' } }))
 
@@ -570,7 +568,7 @@ export function ApplicationStep4Draft({
                       <button
                         type="button"
                         onClick={() => void handleRefine(q)}
-                        disabled={isEmpty || limitReached || isOver || isApprovedQ}
+                        disabled={isEmpty || limitReached || isApprovedQ}
                         className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                       >
                         <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
@@ -578,7 +576,7 @@ export function ApplicationStep4Draft({
                       </button>
                       {isOver && (
                         <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer exceeds the word limit. Please reduce it first, then use AI to refine and improve the structure.
+                          Your answer exceeds the word limit. Please reduce it first, then either use AI to refine and improve the structure, or approve this answer as it stands.
                         </p>
                       )}
                     </>
