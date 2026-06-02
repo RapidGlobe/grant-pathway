@@ -576,7 +576,7 @@ export function ApplicationStep4Draft({
                       </button>
                       {isOver && (
                         <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer exceeds the word limit. Please reduce it first, then either use AI to refine and improve the structure, or approve this answer as it stands.
+                          Your answer exceeds the funder&apos;s word limit. In your interest, you can use AI to refine, improve the structure and bring it within the limit — or approve this answer as it stands.
                         </p>
                       )}
                     </>
