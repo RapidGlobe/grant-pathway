@@ -578,7 +578,7 @@ export function ApplicationStep4Draft({
                       </button>
                       {isOver && (
                         <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer is over the limit. Edit it down first, then use AI to improve the structure.
+                          Your answer exceeds the word limit. Please reduce it first, then use AI to refine and improve the structure.
                         </p>
                       )}
                     </>
