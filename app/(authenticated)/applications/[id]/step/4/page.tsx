@@ -129,17 +129,23 @@ export default async function Step4Page({ params }: Props) {
           is_budget_question: s.is_budget_section ?? false,
         }))
 
-        const { data: inserted } = await supabase
+        // ignoreDuplicates: true only returns newly inserted rows, not existing ones.
+        // Always re-fetch after upsert to get the full current set.
+        await supabase
           .from('application_answers')
           .upsert(inserts, {
             onConflict: 'application_id,question_order',
             ignoreDuplicates: true,
           })
-          .select(
-            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
-          )
 
-        questionRows = inserted ?? []
+        const { data: refreshed } = await supabase
+          .from('application_answers')
+          .select('id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved')
+          .eq('application_id', id)
+          .eq('user_id', user.id)
+          .order('question_order')
+
+        questionRows = refreshed ?? []
       } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
         // Structured: sync from numbered questions
         const summaryOrders = parsedSummary.questions.map((q, idx) => q.number ?? idx + 1)
@@ -167,18 +173,23 @@ export default async function Step4Page({ params }: Props) {
           is_budget_question: q.is_budget_question ?? false,
         }))
 
-        // ignoreDuplicates: true — never overwrite existing answered rows
-        const { data: inserted } = await supabase
+        // ignoreDuplicates: true only returns newly inserted rows, not existing ones.
+        // Always re-fetch after upsert to get the full current set.
+        await supabase
           .from('application_answers')
           .upsert(inserts, {
             onConflict: 'application_id,question_order',
             ignoreDuplicates: true,
           })
-          .select(
-            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
-          )
 
-        questionRows = inserted ?? []
+        const { data: refreshed } = await supabase
+          .from('application_answers')
+          .select('id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved')
+          .eq('application_id', id)
+          .eq('user_id', user.id)
+          .order('question_order')
+
+        questionRows = refreshed ?? []
       }
     } catch {
       // sync failed — questionRows stays as fetched (manual entry path)
