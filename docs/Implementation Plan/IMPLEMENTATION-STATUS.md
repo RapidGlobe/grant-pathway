@@ -126,16 +126,18 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Notes
 
-### 2026-06-02 — FR-47 eligibility mismatch: migration applied to dev only — prod pending test sign-off
+### 2026-06-02 — FR-47 eligibility mismatch: migration status and deployment note
 
 Migration `20260602000000_add_mismatch_status.sql` adds `mismatch` to the `application_status` enum.
 
-**Action required before prod deployment:**
-- [ ] Apply migration to `grant-pathway-dev` (Supabase SQL editor: `ALTER TYPE public.application_status ADD VALUE IF NOT EXISTS 'mismatch';`)
-- [ ] Run IT-03, IT-04, IT-11 against dev to confirm FR-47 behaviour is correct
-- [ ] Apply same migration to `grant-pathway-prod` only after IT-03, IT-04, IT-11 pass on dev
+**Migration status:**
+- [x] Applied to `grant-pathway-dev` (stanwaejdvlvremtffkf)
+- [x] Applied to `grant-pathway-prod` (mvmjryipieepvsjudche) — applied 2026-06-02 after accidental prod deployment (see note below)
 
-Do **not** apply to prod until dev testing is signed off. The Vercel deployment serves prod — if the prod enum is missing `mismatch`, any application that reaches the mismatch state will fail to save.
+**Testing status:**
+- [ ] IT-03, IT-04, IT-11 to be run against dev preview URL to confirm FR-47 behaviour
+
+**Deployment note:** The FR-47 code was accidentally promoted to production before dev testing was complete. The `--force` redeploy to clear the Vercel cache defaulted to a preview build, which was then manually promoted to production via `vercel promote`. The correct process for future features is: push to GitHub → test against the Vercel **preview URL** (uses Preview env vars → dev Supabase) → promote to production only after testing passes. The preview URL pattern is `grant-pathway-[hash]-rapidglobes-projects.vercel.app`.
 
 **Full decision record:** `docs/decisions/DR-EL-001-eligibility-mismatch-handling.md`
 
