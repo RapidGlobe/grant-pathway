@@ -126,6 +126,21 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Notes
 
+### 2026-06-02 — FR-47 eligibility mismatch: migration applied to dev only — prod pending test sign-off
+
+Migration `20260602000000_add_mismatch_status.sql` adds `mismatch` to the `application_status` enum.
+
+**Action required before prod deployment:**
+- [ ] Apply migration to `grant-pathway-dev` (Supabase SQL editor: `ALTER TYPE public.application_status ADD VALUE IF NOT EXISTS 'mismatch';`)
+- [ ] Run IT-03, IT-04, IT-11 against dev to confirm FR-47 behaviour is correct
+- [ ] Apply same migration to `grant-pathway-prod` only after IT-03, IT-04, IT-11 pass on dev
+
+Do **not** apply to prod until dev testing is signed off. The Vercel deployment serves prod — if the prod enum is missing `mismatch`, any application that reaches the mismatch state will fail to save.
+
+**Full decision record:** `docs/decisions/DR-EL-001-eligibility-mismatch-handling.md`
+
+---
+
 ### 2026-06-01 — Funder directory model decided (DR-FD-001)
 
 **Decision:** Hybrid curated funder directory + "Request a Funder" escape hatch adopted (Option 5 of 5 evaluated). Users select a funder from a DB-seeded picker at Step 1; a request link handles funders not yet on the approved list.
