@@ -294,4 +294,6 @@ export type AiSummaryData = {
   keyRequirements: string[]
   funderAiPolicy?: string | null
   supportingDocuments?: string[]
+  eligibilityMismatch?: boolean
+  mismatchReason?: string | null
 }

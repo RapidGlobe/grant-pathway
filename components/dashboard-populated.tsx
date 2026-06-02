@@ -31,6 +31,7 @@ const STATUS_CONFIG: Record<
   in_progress: { label: "In progress", bg: "#FEF3C7", text: "#D97706" },
   approved:    { label: "Approved",    bg: "#DCFCE7", text: "#16A34A" },
   exported:    { label: "Exported",    bg: "#E6F4F4", text: "#0D6E6E" },
+  mismatch:    { label: "Ineligible",  bg: "#FEF2F2", text: "#DC2626" },
 };
 
 function deleteModalText(status: ApplicationStatus): string {
@@ -174,6 +175,7 @@ export function DashboardPopulated({
         {applications.map((app) => {
           const pill = STATUS_CONFIG[app.status];
           const isViewMode = app.status === "approved" || app.status === "exported";
+          const isMismatch = app.status === "mismatch";
           // Display fallback for applications that were created but Step 1 not yet saved
           const displayFunder = app.funderName || "New application";
           const displayGrant  = app.grantName  || "—";
@@ -217,7 +219,7 @@ export function DashboardPopulated({
                   Delete
                 </button>
 
-                {isViewMode ? (
+                {isMismatch ? null : isViewMode ? (
                   // View button opens re-open confirmation (S2.3)
                   <Button
                     type="button"

@@ -16,6 +16,7 @@ export type ApplicationStatus =
   | 'in_progress'
   | 'approved'
   | 'exported'
+  | 'mismatch'
 
 /**
  * Lightweight application summary used by the dashboard list.
@@ -337,6 +338,41 @@ export async function advanceToStep4(
   }
 
   redirect(`/applications/${applicationId}/step/4`)
+}
+
+// ---------------------------------------------------------------------------
+// FR-47 — Set application status to 'mismatch' (eligibility hard stop)
+// ---------------------------------------------------------------------------
+
+/**
+ * Called when the user acknowledges the eligibility mismatch warning on Step 3.
+ * Sets status = 'mismatch' and redirects to the dashboard.
+ *
+ * Applications in mismatch state cannot be advanced to Step 4. The user must
+ * correct their charity profile and create a new application (DR-EL-001).
+ */
+export async function setApplicationMismatch(
+  applicationId: string,
+): Promise<{ ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  const { error } = await supabase
+    .from('applications')
+    .update({ status: 'mismatch' })
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    return { ok: false, error: 'Could not update application status. Please try again.' }
+  }
+
+  redirect('/dashboard')
 }
 
 // ---------------------------------------------------------------------------

@@ -29,16 +29,17 @@
 
 import { useState, useEffect, useRef, useTransition } from "react";
 import Link from "next/link";
-import { RefreshCw, AlertCircle, AlertTriangle, Info } from "lucide-react";
+import { RefreshCw, AlertCircle, AlertTriangle, Info, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepIndicator } from "@/components/step-indicator";
-import { getGuidelines, clearGuidelines } from "@/lib/guidelines-session";
-import { advanceToStep4 } from "@/actions/applications";
+import { getGuidelines, clearGuidelines, getGuidelinesFilename } from "@/lib/guidelines-session";
+import { advanceToStep4, setApplicationMismatch } from "@/actions/applications";
 import type { AiSummaryData } from "@/app/api/generate-summary/route";
 
 type DisplayState =
   | "loading"
   | "content"
+  | "mismatch"
   | "failure"
   | "persistent-failure"
   | "no-guidelines";
@@ -65,8 +66,15 @@ export function ApplicationStep3Summary({
 }: ApplicationStep3SummaryProps) {
   // ── State ──────────────────────────────────────────────────────────────────
   const [displayState, setDisplayState] = useState<DisplayState>(() => {
-    // If the DB already has a summary, show it immediately without loading
-    if (existingSummary) return "content";
+    if (existingSummary) {
+      try {
+        const parsed = JSON.parse(existingSummary) as AiSummaryData;
+        if (parsed.eligibilityMismatch) return "mismatch";
+      } catch {
+        // fall through to content
+      }
+      return "content";
+    }
     return "loading";
   });
 
@@ -93,6 +101,7 @@ export function ApplicationStep3Summary({
   });
 
   const [approachingLimit, setApproachingLimit] = useState(false);
+  const [guidelinesFilename, setGuidelinesFilename] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0].text);
 
@@ -105,6 +114,12 @@ export function ApplicationStep3Summary({
 
   const [continueError, setContinueError] = useState<string | null>(null);
   const [isContinuing, startContinuing] = useTransition();
+
+  // Read filename from sessionStorage on mount (present for new sessions; absent for returning users)
+  useEffect(() => {
+    setGuidelinesFilename(getGuidelinesFilename(applicationId));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Progress bar timer (GAP-02) ────────────────────────────────────────────
   // Advances asymptotically towards 89% — never reaches 90% on its own.
@@ -182,11 +197,16 @@ export function ApplicationStep3Summary({
         setQuestionsFound(data.questionsFound ?? false);
         setApproachingLimit(data.approachingLimit ?? false);
 
+        // Capture the filename label before clearing (it's cleared alongside text)
+        setGuidelinesFilename(getGuidelinesFilename(applicationId));
+
         // Clear guidelines from sessionStorage (GAP-10, ADR-FILE-004)
         clearGuidelines(applicationId);
 
         setTimeout(() => {
-          if (!cancelled) setDisplayState("content");
+          if (!cancelled) {
+            setDisplayState(data.summary!.eligibilityMismatch ? "mismatch" : "content");
+          }
         }, 300);
       } catch {
         if (cancelled) return;
@@ -221,6 +241,13 @@ export function ApplicationStep3Summary({
     startContinuing(async () => {
       const result = await advanceToStep4(applicationId);
       setContinueError(result.error);
+    });
+  }
+
+  function handleAcknowledgeMismatch() {
+    startContinuing(async () => {
+      await setApplicationMismatch(applicationId);
+      // setApplicationMismatch redirects server-side; this is a fallback
     });
   }
 
@@ -339,6 +366,49 @@ export function ApplicationStep3Summary({
     );
   }
 
+  // ── Eligibility mismatch state (FR-47, DR-EL-001) ──────────────────────────
+  // Hard stop: the AI detected a clear mismatch between the charity profile and
+  // the funder's eligibility criteria. No path to Step 4 — user must acknowledge
+  // and return to dashboard. The application is set to 'mismatch' status.
+  if (displayState === "mismatch") {
+    const reason =
+      summary?.mismatchReason ??
+      "Your charity's focus does not appear to meet this funder's eligibility criteria.";
+    return (
+      <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
+        <StepIndicator currentStep={3} />
+        <div
+          role="alert"
+          className="rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] p-6"
+        >
+          <div className="mb-4 flex items-start gap-3">
+            <XCircle
+              className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]"
+              aria-hidden="true"
+            />
+            <h2 className="text-[16px] font-semibold text-[#991B1B]">
+              Eligibility mismatch — this application cannot proceed
+            </h2>
+          </div>
+          <p className="mb-4 text-[14px] text-[#991B1B]">{reason}</p>
+          <p className="mb-6 text-[14px] text-[#991B1B]">
+            To apply for this grant, your charity profile must accurately reflect
+            work that aligns with this funder&apos;s eligibility criteria. Please
+            update your charity profile and start a new application.
+          </p>
+          <Button
+            type="button"
+            disabled={isContinuing}
+            onClick={handleAcknowledgeMismatch}
+            className="h-10 bg-[#DC2626] px-6 text-[15px] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-70"
+          >
+            {isContinuing ? "Saving…" : "I understand — return to my dashboard"}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   // ── Content state ───────────────────────────────────────────────────────────
   // summary is always non-null here: either parsed from existingSummary or from
   // a successful API response. The null fallback is a safety guard only.
@@ -351,12 +421,18 @@ export function ApplicationStep3Summary({
       <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
         Your funder guidelines — summary
       </h1>
-      <p className="mb-6 text-[14px] font-medium text-[#0D6E6E]">
+      <p className="mb-1 text-[14px] font-medium text-[#0D6E6E]">
         {funderName}
         {grantName && grantName !== funderName && (
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
         )}
       </p>
+      {guidelinesFilename && (
+        <p className="mb-6 text-[13px] text-[#64748B]">
+          Guidelines loaded: {guidelinesFilename}
+        </p>
+      )}
+      {!guidelinesFilename && <div className="mb-6" />}
 
       {/* Approaching limit banner */}
       {approachingLimit && (

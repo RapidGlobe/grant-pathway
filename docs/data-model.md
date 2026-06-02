@@ -182,7 +182,7 @@ Stores the grant application record. Each application belongs to one user and tr
 | `funder_id` | UUID | No | Foreign key → `funders.id`. Nullable for migration safety (existing records). Set when user selects a funder from the picker at Step 1 (DR-FD-001) |
 | `funder_name` | String | Yes | Name of the grant-giving organisation. Retained for display and export; populated from `funders.name` on selection |
 | `grant_name` | String | Yes | Name of the specific grant. Collected at Step 1 |
-| `status` | Enum | Yes | One of: `not_started`, `in_progress`, `approved`, `exported`. See application status model |
+| `status` | Enum | Yes | One of: `not_started`, `in_progress`, `approved`, `exported`, `mismatch`. See application status model |
 | `current_step` | Integer | Yes | The step (1–5) the user last reached; used to restore position on return. Default: `1` |
 | `ai_summary` | Text | No | The AI-generated plain-English summary of the funder guidelines (Step 3 output). Stored so the user can return to Step 3 without regenerating |
 | `last_exported_at` | Timestamp | No | Timestamp of the most recent Word document export. Null until first export. Used in the re-export warning |
@@ -190,8 +190,9 @@ Stores the grant application record. Each application belongs to one user and tr
 | `updated_at` | Timestamp | Yes | Updated on any change to the application or its answers |
 
 **Key constraints:**
-- `status` must be one of the four defined enum values
+- `status` must be one of the five defined enum values
 - `status` transitions follow the rules defined in the application status model
+- `mismatch` is a terminal state — no transitions to steps 4 or 5 are permitted from this state (FR-47, DR-EL-001)
 - `last_exported_at` is updated on every export, not just the first
 - Funder guidelines (uploaded file or pasted text) are **not** stored — they are used for AI processing within the session only (FR-22)
 

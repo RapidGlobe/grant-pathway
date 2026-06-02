@@ -133,7 +133,9 @@ Where they work: ${charity.whereCharityWorks}`
   "supportingDocuments": [
     "Document category 1",
     "Document category 2"
-  ]
+  ],
+  "eligibilityMismatch": false,
+  "mismatchReason": null
 }
 
 Rules:
@@ -146,6 +148,8 @@ Rules:
 - "keyRequirements": important restrictions, deadlines, geographic limits, exclusions
 - "funderAiPolicy": extract any statement the funder makes about AI tool usage (verbatim or very close paraphrase); return null if no AI policy statement is found
 - "supportingDocuments": list all supporting document categories the funder requires or recommends submitting alongside the application (e.g. "Most recent annual accounts", "Governing document / constitution"); return an empty array [] if none are mentioned
+- "eligibilityMismatch": set to true ONLY if a charity profile was provided AND there is a clear, unambiguous mismatch between the charity's stated work and the funder's eligibility criteria — for example, a funder that exclusively funds arts organisations but the charity has no arts remit whatsoever, or a funder that only funds environmental projects but the charity works in healthcare. Do NOT set to true for borderline cases, partial alignment, or where the charity might plausibly qualify. If no charity profile was provided, always set to false
+- "mismatchReason": if eligibilityMismatch is true, write 1–2 sentences in plain English explaining why the charity is unlikely to be eligible — reference both the funder's requirement and the charity's stated focus. This text is shown directly to the user. If eligibilityMismatch is false, set to null
 - Use UK English spelling throughout
 - All arrays must have at least one item except "questions", "sections", and "supportingDocuments" which may be empty
 

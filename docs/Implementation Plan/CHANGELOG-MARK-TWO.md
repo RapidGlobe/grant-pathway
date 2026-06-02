@@ -10,6 +10,29 @@
 
 ---
 
+## 2026-06-02 — Eligibility mismatch hard stop introduced (DR-EL-001, FR-47)
+
+**Raised during:** Idlewild Trust IT-04 testing (IT-04: AI eligibility mismatch detection)
+
+**Decision:** When the AI detects a clear mismatch between the charity's profile and the funder's eligibility criteria, Grant Pathway will show a **red hard-stop warning** on Step 3. The user must acknowledge the warning. On acknowledgement, the application is set to `mismatch` status and the user is returned to the dashboard. There is no override and no path to Step 4.
+
+**Rationale:** Grant-giving organisations receiving a stream of ineligible applications via Grant Pathway would represent a serious reputational risk. Harry's Rainbow (children's bereavement charity) with the Idlewild Trust Arts grant (arts organisations only) was the triggering test case. The app showed 9 application question cards despite a fundamental eligibility mismatch — there is no purpose in a user writing 9 answers for a grant they cannot receive.
+
+**Why red, not amber:** An amber warning implies the user may proceed with caution. An eligibility mismatch is not a caution — it is a clear indication the application should not be submitted. Red and hard stop is the appropriate response.
+
+**Escape hatch:** The user may update their charity profile to accurately reflect work that aligns with the funder's criteria, then create a new application from the dashboard.
+
+**Changes:**
+- New DR: `docs/decisions/DR-EL-001-eligibility-mismatch-handling.md`
+- FR-47 added to `docs/moscow-feature-register.md` (Must Have)
+- `mismatch` status added to `application_status` enum (migration `20260602000000_add_mismatch_status.sql`)
+- AI summary prompt extended: `eligibilityMismatch` (boolean) and `mismatchReason` (string | null) fields
+- Step 3 UI: mismatch state added — red warning card, acknowledge button, redirect to dashboard
+- Dashboard: `mismatch` status shown as red "Ineligible" badge
+- IT-04 and IT-11 test cases updated in `docs/Test Plans/Idlewildtrust-test-plan.md`
+
+---
+
 ## 2026-05-29 — Mark Two BRD v0.1 created
 
 **Document:** `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-Mark-Two-v0.1.md`

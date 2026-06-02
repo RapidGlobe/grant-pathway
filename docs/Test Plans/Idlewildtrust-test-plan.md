@@ -58,14 +58,15 @@ Complete after running all tests.
 |---------|-----------|-----------|-------------------|-----------------|--------|-------|
 | IT-01 | Account registration and charity profile | Both | No | N/A | ✅ Pass | |
 | IT-02 | Idlewild Trust funder picker | Both | Yes | N/A | ✅ Pass | |
-| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | ✅ Pass | Prep checklist screen confirmed |
-| IT-04 | AI eligibility mismatch detection | Arts | Yes | N/A | ✅ Pass | Arts sector eligibility clearly stated in summary |
-| IT-05 | Character limit extraction and display | Arts | Yes | N/A | ❌ Fail | D-IT-01: AI returned no questions — Tier 3 fallback shown instead of structured Q&A |
-| IT-06 | Non-narrative question handling | Arts | Yes | N/A | ❌ Fail | D-IT-01: Blocked by same defect as IT-05 |
-| IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | ⛔ Blocked | Blocked by D-IT-01 |
+| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | ⬜ Re-run | Re-run required — FR-47 changes expected result (mismatch warning expected, not prep checklist) |
+| IT-04 | AI eligibility mismatch hard stop | Arts | Yes | N/A | ⬜ Re-run | Re-run required — FR-47 implemented; verify red warning, acknowledge, dashboard redirect, mismatch status |
+| IT-05 | Character limit extraction and display | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first to get arts-aligned profile) |
+| IT-06 | Non-narrative question handling | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
+| IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
 | IT-08 | Conservation guidelines PDF upload and AI summary | Conservation | Yes | TBC | | |
 | IT-09 | Conservation knowledge-sharing requirement identified | Conservation | Yes | N/A | | |
-| IT-10 | Word document export — structure and content | Arts | No | N/A | ⛔ Blocked | Blocked by D-IT-01 |
+| IT-10 | Word document export — structure and content | Arts | No | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
+| IT-11 | Profile correction and reapplication — mismatch resolved | Arts | Yes | N/A | | Prerequisite for IT-05 through IT-10 |
 
 ---
 
@@ -170,16 +171,11 @@ Log any failures not listed in Known Expected Behaviours above.
 **Expected result:**
 - PDF uploads successfully (no format or size error)
 - AI summary generates without error within 30 seconds
-- Summary includes:
-  - Funder priorities (arts sector, early-stage professionals, performing and visual arts)
-  - Grant ceiling (£7,000)
-  - Application deadline reference
-  - Plain-English explanation of the narrative questions (Q9, Q19–Q23, Q28–Q30)
-- Application Sections or Questions card is displayed showing extracted questions
-- Clicking Continue from Step 3 shows the **"Before you begin writing"** preparation checklist screen (Step 4 gate) with:
-  - 4 financial preparation items listed
-  - Advisory note about involving a senior colleague before financial questions
-  - **"I have what I need — start writing"** button to enter the Q&A interface
+- Summary cards display correctly (About this grant, Grant amount, Who can apply, What the funder is looking for, Application questions, Key requirements)
+- 9 narrative questions extracted and displayed
+- A **red eligibility mismatch warning card** is displayed prominently above or instead of the Continue button (FR-47) — Harry's Rainbow is a bereavement charity; Idlewild Arts funds arts sector organisations only
+- The Continue button to Step 4 is **not visible** — replaced by an acknowledge button
+- The preparation checklist screen does **not** appear for this charity/funder combination
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -187,25 +183,31 @@ Log any failures not listed in Known Expected Behaviours above.
 
 ---
 
-### IT-04 — AI Eligibility Mismatch Detection
+### IT-04 — AI Eligibility Mismatch Hard Stop
 
 **Programme:** Arts
-**Idlewild-specific:** Yes — Idlewild Arts funds arts sector organisations supporting early-stage arts professionals. Harry's Rainbow is a children's bereavement charity with no arts remit. The AI summary should surface this potential mismatch.
-**Prerequisite:** IT-03 complete
+**Idlewild-specific:** Yes — Idlewild Arts funds arts sector organisations supporting early-stage arts professionals. Harry's Rainbow is a children's bereavement charity with no arts remit. This test verifies the FR-47 hard stop behaviour.
+**Prerequisite:** IT-03 complete (mismatch warning visible on Step 3)
 
 **Steps:**
-1. Review the AI summary generated in IT-03
-2. Check whether the summary includes any of the following eligibility signals:
-   - Idlewild Arts requires the applicant to be an **arts sector UK Registered Charity**
-   - The programme supports professionals in performing, fine and applied arts — musicians, dancers, writers, artists, composers, theatre-makers
-   - Participants must be aged **18 or over** and have completed education to the highest level in their discipline
-   - The funder **does not fund** educational institutions, schools, or administration/management skills projects
-3. Note whether the summary flags any potential eligibility concern given Harry's Rainbow's bereavement focus
+1. On the Step 3 summary screen (from IT-03), locate the red eligibility mismatch warning card
+2. Verify the warning card:
+   - Is displayed in red (not amber)
+   - Contains a plain-English explanation of why Harry's Rainbow may not be eligible for this grant
+   - Has an acknowledge button (e.g. "I understand, return to my dashboard")
+3. Verify the **Continue button is not visible** — there is no path to Step 4
+4. Click the acknowledge button
+5. Confirm the app returns to the dashboard
+6. On the dashboard, locate the Arts application
+7. Verify the application shows a red **"Ineligible"** status badge (not "In progress")
 
 **Expected result:**
-- AI summary clearly states the arts sector eligibility requirement
-- Summary identifies that the programme is for arts organisations, not general charities
-- Ideally: summary flags or implies that the applying charity's profile (bereavement charity) may not align with Idlewild's arts focus — this is an **observation**, not a mandatory pass criterion
+- Red mismatch warning card is displayed prominently on Step 3
+- Warning text references the arts sector eligibility requirement and/or the bereavement charity mismatch
+- Continue button is absent — replaced by acknowledge button only
+- Clicking acknowledge returns to dashboard
+- Application status on dashboard is "Ineligible" (red badge)
+- No path to Step 4 exists from the dashboard for this application
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -424,8 +426,50 @@ Additional checks:
 
 ---
 
+### IT-11 — Profile Correction and Reapplication — Mismatch Resolved
+
+**Programme:** Arts
+**Idlewild-specific:** Yes — tests the escape hatch introduced in FR-47: correcting the charity profile to accurately reflect an arts remit removes the mismatch flag and allows the application to proceed
+**Prerequisite:** IT-04 complete (application in mismatch state on dashboard)
+
+**Test data — updated charity profile:**
+
+| Field | Updated value |
+|-------|--------------|
+| What does your charity do | Harry's Rainbow provides children's bereavement support and arts-based therapeutic programmes for children aged 0–25 who have been bereaved of a parent or sibling, including music, visual arts, and creative writing workshops in Milton Keynes and surrounding areas |
+
+**Steps:**
+1. From the dashboard, click **Charity Profile** in the navigation
+2. Edit the **"What does your charity do?"** field to include an arts-based therapeutic programme description (use the updated value above)
+3. Click **Save changes**
+4. Confirm the profile saves successfully
+5. From the dashboard, click **+ New Application**
+6. Select **Idlewild Trust** from the funder picker
+7. Enter grant name: **"Arts Grant 2026 — Early-Stage Professionals (Reapplication)"**
+8. Click **Continue**
+9. On Step 2, upload `idlewild-arts-application-questions-dec2025.pdf`
+10. Click **Continue**
+11. On Step 3, click **Generate summary** and wait for the summary to appear
+12. Observe whether a red eligibility mismatch warning card appears
+
+**Expected result:**
+- Charity profile saves successfully with the updated arts-focus description
+- New Arts application is created
+- AI summary generates without error
+- **No red eligibility mismatch warning card appears** — the updated profile's arts focus satisfies the funder's eligibility criteria
+- The **Continue button is visible** (not replaced by an acknowledge button)
+- Clicking Continue shows the **"Before you begin writing"** preparation checklist screen
+- This application can proceed to Step 4 (Q&A interface)
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
 ## Document History
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-06-01 | Rapidglobe Ltd | Initial test plan — Idlewild Trust Arts and Conservation programmes, Harry's Rainbow test charity, 10 test cases including GAP-27 and GAP-28 observations |
+| 1.1 | 2026-06-02 | Rapidglobe Ltd | IT-03 expected result updated: mismatch warning expected, prep checklist not expected for Harry's Rainbow. IT-04 rewritten: tests FR-47 hard stop (red warning, acknowledge, dashboard redirect, mismatch status badge). IT-11 added: profile correction and reapplication escape hatch. Results summary updated to reflect re-run status. IT-05–IT-07, IT-10 blocked by mismatch (not D-IT-01) until IT-11 passes. |

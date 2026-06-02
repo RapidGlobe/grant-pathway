@@ -112,13 +112,22 @@ This index lists all business and idea-level decisions that must be made before 
 
 ---
 
+## Eligibility & Safety
+
+| ID | Question | Status |
+|----|----------|--------|
+| [DR-EL-001](DR-EL-001-eligibility-mismatch-handling.md) | How should Grant Pathway handle cases where the AI detects a clear mismatch between the charity's profile and the funder's eligibility criteria? | Decided ✓ |
+
+---
+
 ## Revision History
 
 | Date | Records Revised | Summary |
 |------|----------------|---------|
 | 2026-05-07 | DR-AI-002, DR-DP-002, DR-DP-003 | AI inference layer changed from Anthropic direct API (US) to Amazon Bedrock Claude Sonnet 4.6 (eu-west-2, In-Region) to achieve UK data residency. EU Geo routing established as operational fallback within 7 EEA regions. Anthropic DPA/SCC requirement removed. No-training commitment unchanged; contractual mechanism updated to AWS Bedrock arrangement. |
 | 2026-06-01 | DR-FD-001 (new) | Funder directory and access control model decided. Hybrid curated directory + "Request a Funder" escape hatch adopted. Users select from a DB-seeded approved funder list; unlisted funders can be requested via a simple form. Prevents untested funder combinations entering the system while preserving user experience. |
+| 2026-06-02 | DR-EL-001 (new) | Eligibility mismatch handling decided. Red hard-stop warning on Step 3 when AI detects clear charity/funder mismatch; user must acknowledge; application set to `mismatch` status and user returned to dashboard. No override. Escape hatch: correct charity profile and start a new application. Raised during Idlewild Trust IT-04 testing. |
 
 ---
 
-_Total decisions: 29 · Decided: 23 · Revised: 3 · Deferred: 3 · Pending: 0_
+_Total decisions: 30 · Decided: 24 · Revised: 3 · Deferred: 3 · Pending: 0_

@@ -1,6 +1,6 @@
 # MoSCoW Feature Register — Grant Pathway v1
-**Version:** 1.5
-**Last updated:** 2026-06-01
+**Version:** 1.6
+**Last updated:** 2026-06-02
 
 This document consolidates the MoSCoW priority for all 44 functional requirements in Grant Pathway v1. It is the single authoritative reference for feature scope and is used directly by the PRD.
 
@@ -12,7 +12,7 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 | Priority | Count | FRs |
 |----------|-------|-----|
-| Must Have | 41 | FR-01–06, FR-09–31, FR-32–37, FR-39–43, FR-45–46 |
+| Must Have | 42 | FR-01–06, FR-09–31, FR-32–37, FR-39–43, FR-45–47 |
 | Should Have | 4 | FR-07, FR-08, FR-38, FR-44 |
 | Could Have | 0 | — |
 | Won't Have (v1) | 0 | All Won't Have items are recorded in `business/v1-out-of-scope.md` |
@@ -91,6 +91,7 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 | FR-31 | Budget sections/questions flagged in amber; AI assist disabled on budget sections | **Must Have** | **Revised 2026-05-28.** Original "flag draft exceeding word limit". Now: budget questions/sections are visually distinct; AI assist is disabled; user enters own figures |
 | FR-45 | Question-level typing: each extracted question carries a `question_type` (BD-04) | **Must Have** | Types: `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`. Narrative questions show a writing card. Data-entry and financial questions are pre-filled from the charity profile. Dropdown, date, and file_upload questions are displayed as read-only reminders only. Replaces funder-level type as the mechanism for question handling |
 | FR-46 | Three-tier funder coverage model displayed to the user (BD-07) | **Must Have** | Tier 1 (Full — narrative questions, profile pre-fill), Tier 2 (Partial — narrative subset of a portal form), Tier 3 (Guidance — free-form narrative document). Coverage tier displayed on new application screen, Step 3 summary card, and export screen |
+| FR-47 | Eligibility mismatch detection — hard stop on Step 3 when AI detects clear charity/funder mismatch (DR-EL-001) | **Must Have** | **Added 2026-06-02.** If the AI detects that the charity's profile clearly does not meet the funder's eligibility criteria, a red warning card is shown prominently on Step 3. The Continue button is hidden. The user must acknowledge the warning, which sets the application status to `mismatch` and returns them to the dashboard. No override path exists. Escape hatch: user corrects their charity profile and creates a new application. |
 
 ---
 
@@ -175,3 +176,6 @@ The following requirements have implementation details that differ from the BRD.
 | 1.1 | 2026-05-28 | Rapidglobe Ltd | FR-28, FR-29, FR-31 revised to reflect Q&A model; FR-29 and FR-31 promoted to Must Have; revisions table added |
 | 1.2 | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development |
 | 1.3 | 2026-05-29 | Rapidglobe Ltd | FR-10/11 updated: OSCR/CCNI planned before general release (BD-02). FR-12 updated: thick profile description (BD-02). FR-29 extended: character limits supported alongside word limits (`limit_type`, BD-05). FR-45 added: question-level typing (BD-04). FR-46 added: three-tier funder coverage model (BD-07). Summary table updated (39 → 41 Must Have). |
+| 1.4 | 2026-06-01 | Rapidglobe Ltd | FR-15 revised: funder selected from curated picker (DR-FD-001). FR-30 updated: spelling/grammar correction added to refine prompt; AI assist button disabled when answer exceeds limit. FR-32/33 updated: implementation notes added. Summary updated (41 → 41 Must Have, no count change). |
+| 1.5 | 2026-06-01 | Rapidglobe Ltd | (Version already published — no new FRs.) |
+| 1.6 | 2026-06-02 | Rapidglobe Ltd | FR-47 added: eligibility mismatch detection hard stop (DR-EL-001). Summary updated (41 → 42 Must Have). |
