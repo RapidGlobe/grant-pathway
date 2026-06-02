@@ -58,8 +58,8 @@ Complete after running all tests.
 |---------|-----------|-----------|-------------------|-----------------|--------|-------|
 | IT-01 | Account registration and charity profile | Both | No | N/A | ✅ Pass | |
 | IT-02 | Idlewild Trust funder picker | Both | Yes | N/A | ✅ Pass | |
-| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | ⬜ Re-run | Re-run required — FR-47 changes expected result (mismatch warning expected, not prep checklist) |
-| IT-04 | AI eligibility mismatch hard stop | Arts | Yes | N/A | ⬜ Re-run | Re-run required — FR-47 implemented; verify red warning, acknowledge, dashboard redirect, mismatch status |
+| IT-03 | Arts guidelines PDF upload and AI summary | Arts | Yes | Not recorded | ✅ Pass | 9 questions extracted; red mismatch warning shown; no Continue button |
+| IT-04 | AI eligibility mismatch hard stop | Arts | Yes | N/A | ✅ Pass | Red warning, acknowledge button, redirected to dashboard; red Ineligible badge shown |
 | IT-05 | Character limit extraction and display | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first to get arts-aligned profile) |
 | IT-06 | Non-narrative question handling | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
 | IT-07 | Narrative answer writing and character counter | Arts | Yes | N/A | ⛔ Blocked | Blocked by mismatch (IT-11 must pass first) |
