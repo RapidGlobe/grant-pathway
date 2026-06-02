@@ -168,6 +168,12 @@ export function ApplicationStep4Draft({
     const text = (latestAnswers.current[q.id] ?? '').trim()
     if (!text) return
 
+    // Guard: re-check word/char limit at call time using the latest answer text.
+    // The disabled prop on the button is the primary gate, but React batching can
+    // allow a click to fire before the next render reflects isOver=true.
+    if (q.wordLimit != null && countWords(text) > q.wordLimit) return
+    if (q.charLimit != null && text.length > q.charLimit) return
+
     setRefineStates((prev) => ({ ...prev, [q.id]: { status: 'loading' } }))
 
     try {
@@ -560,15 +566,22 @@ export function ApplicationStep4Draft({
               {!q.isBudgetQuestion && (
                 <div className="mt-3">
                   {refineState.status === 'idle' && (
-                    <button
-                      type="button"
-                      onClick={() => void handleRefine(q)}
-                      disabled={isEmpty || limitReached || isApprovedQ}
-                      className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                      Help me improve this
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => void handleRefine(q)}
+                        disabled={isEmpty || limitReached || isOver || isApprovedQ}
+                        className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                      >
+                        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                        Help me improve this
+                      </button>
+                      {isOver && (
+                        <p className="mt-1 text-[12px] text-[#DC2626]">
+                          Your answer is over the limit. Edit it down first, then use AI to improve the structure.
+                        </p>
+                      )}
+                    </>
                   )}
 
                   {refineState.status === 'loading' && (

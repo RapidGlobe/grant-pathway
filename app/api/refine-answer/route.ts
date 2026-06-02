@@ -123,6 +123,22 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Word limit guard: reject if answer exceeds the question's word limit (FR-30)
+  // Server-side enforcement ensures the client-side disabled state cannot be bypassed.
+  const wordLimit = answerRow.word_limit as number | null
+  if (wordLimit != null) {
+    const wordCount = answerText.trim().split(/\s+/).filter(Boolean).length
+    if (wordCount > wordLimit) {
+      return NextResponse.json(
+        {
+          error: 'invalid_request',
+          message: `Your answer is ${wordCount} words, which exceeds the ${wordLimit}-word limit. Edit it down first, then use AI to improve the structure.`,
+        },
+        { status: 400 },
+      )
+    }
+  }
+
   // ── 4. Check monthly usage cap (ADR-AI-008, ADR-SEC-005) ──────────────────
   const startOfMonth = new Date()
   startOfMonth.setDate(1)
@@ -159,8 +175,8 @@ export async function POST(request: NextRequest) {
     awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
   })
 
-  const wordLimit = typeof answerRow.word_limit === 'number' ? answerRow.word_limit : null
-  const prompt = buildRefinePrompt(questionText, answerText, wordLimit)
+  const refineWordLimit = typeof answerRow.word_limit === 'number' ? answerRow.word_limit : null
+  const prompt = buildRefinePrompt(questionText, answerText, refineWordLimit)
 
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {
