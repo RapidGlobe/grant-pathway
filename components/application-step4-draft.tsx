@@ -168,7 +168,7 @@ export function ApplicationStep4Draft({
     const text = (latestAnswers.current[q.id] ?? '').trim()
     if (!text) return
 
-    // Guard: re-check word/char limit at call time using the latest answer text.
+    // Belt-and-braces: re-check word/char limit at call time using the latest answer text.
     // The disabled prop on the button is the primary gate, but React batching can
     // allow a click to fire before the next render reflects isOver=true.
     if (q.wordLimit != null && countWords(text) > q.wordLimit) return

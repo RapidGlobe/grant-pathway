@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Word limit guard: reject if answer exceeds the question's word limit (FR-30)
-  // Server-side enforcement ensures the client-side disabled state cannot be bypassed.
+  // Belt-and-braces: server-side enforcement ensures the client-side disabled state cannot be bypassed.
   const wordLimit = answerRow.word_limit as number | null
   if (wordLimit != null) {
     const wordCount = answerText.trim().split(/\s+/).filter(Boolean).length
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'invalid_request',
-          message: `Your answer is ${wordCount} words, which exceeds the ${wordLimit}-word limit. Edit it down first, then use AI to improve the structure.`,
+          message: 'Your answer exceeds the word limit. Please reduce it first, then use AI to refine and improve the structure.',
         },
         { status: 400 },
       )
