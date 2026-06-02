@@ -78,16 +78,16 @@ Complete after running all tests.
 
 | Test ID | Test Name | Clothworkers-Specific | AI Summary Time | Result | Notes |
 |---------|-----------|-----------------------|-----------------|--------|-------|
-| IT-CW-01 | Account registration and charity profile | No | N/A | | |
-| IT-CW-02 | Clothworkers' Foundation funder picker | Yes | N/A | | |
-| IT-CW-03 | PDF upload, AI summary, and prep checklist | Yes | TBC | | |
-| IT-CW-04 | Eligibility check — Bridge Support MK passes | Yes | N/A | | |
-| IT-CW-05 | AI summary content accuracy | Yes | N/A | | |
-| IT-CW-06 | Narrative question extraction with "approx." word limits | Yes | N/A | | |
-| IT-CW-07 | Budget and non-narrative question handling | Yes | N/A | | |
-| IT-CW-08 | Narrative answer writing and AI assist | No | N/A | | |
-| IT-CW-09 | Answer approval and Step 5 navigation | No | N/A | | |
-| IT-CW-10 | Word document export — structure and content | No | N/A | | |
+| IT-CW-01 | Account registration and charity profile | No | N/A | ✅ Pass | |
+| IT-CW-02 | Clothworkers' Foundation funder picker | Yes | N/A | ✅ Pass | |
+| IT-CW-03 | PDF upload, AI summary, and prep checklist | Yes | 40–47s | ✅ Pass | Load time exceeds NFR-01 30s target — large PDF (1.1MB, 30 pages). Prompt fixes required during test (see defect log). |
+| IT-CW-04 | Eligibility check — Bridge Support MK passes | Yes | N/A | ✅ Pass | No mismatch warning — FR-47 correctly did not flag Bridge Support MK |
+| IT-CW-05 | AI summary content accuracy | Yes | N/A | ✅ Pass | All key content accurate — capital-only, programme areas, grant tiers, exclusions |
+| IT-CW-06 | Narrative question extraction with "approx." word limits | Yes | N/A | ✅ Pass | 11 questions extracted after prompt fixes; "approx." limits correctly extracted as numbers; faith affiliation Q1 still extracted (GAP-28 Layer 2 — open) |
+| IT-CW-07 | Budget and non-narrative question handling | Yes | N/A | ✅ Pass | Q7, Q8, Q10 amber with Budget badge and AI assist disabled; non-narrative questions correctly absent from Step 4 |
+| IT-CW-08 | Narrative answer writing and AI assist | No | N/A | ✅ Pass | Word counter correct; AI assist blocked over word limit (D-CW-01 found and fixed during test) |
+| IT-CW-09 | Answer approval and Step 5 navigation | No | N/A | ✅ Pass | Assembly and Step 5 approval flow correct |
+| IT-CW-10 | Word document export — structure and content | No | N/A | ✅ Pass | Both .docx and .txt exported; all required sections present; clean and readable |
 
 ---
 
@@ -95,6 +95,7 @@ Complete after running all tests.
 
 | ID | Test | Description | Severity | Status |
 |----|------|-------------|----------|--------|
+| D-CW-01 | IT-CW-08 | AI assist ("Help me improve this") not disabled when answer exceeded the word limit. Client-side `isOver` flag was not reliably preventing the button click due to React rendering timing. Server-side word limit guard added to `/api/refine-answer`; client-side early-return guard added to `handleRefine`. Both layers now enforce the word limit. | Medium | Fixed |
 
 ---
 
@@ -421,3 +422,4 @@ Additional checks:
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Clothworkers' Foundation Small Grants Programme, Bridge Support MK test charity, 10 test cases including GAP-27 ("approx." word limit) and GAP-28 observations |
+| 1.1 | 2026-06-02 | Rapidglobe Ltd | All 10 tests completed — 10/10 Pass. D-CW-01 found and fixed during test. Defect log, results, and observations recorded. |
