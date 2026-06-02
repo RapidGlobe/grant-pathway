@@ -192,7 +192,7 @@ export function buildRefinePrompt(
 
 ${limitInstruction}
 
-If the answer is too short or unclear to meaningfully improve, return it unchanged.
+Always correct any spelling errors and grammatical mistakes, even if the answer is very short. If the answer is too short or unclear to meaningfully improve in terms of structure or flow, make only spelling and grammar corrections and return the answer without other changes.
 
 Respond with ONLY a JSON object — no preamble, no explanation, no markdown fencing. Exactly this shape:
 { "refinedText": "the improved answer text" }
