@@ -29,7 +29,7 @@
 
 import { useState, useEffect, useRef, useTransition } from "react";
 import Link from "next/link";
-import { RefreshCw, AlertCircle, AlertTriangle, Info, XCircle } from "lucide-react";
+import { RefreshCw, AlertCircle, AlertTriangle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StepIndicator } from "@/components/step-indicator";
 import { getGuidelines, clearGuidelines, getGuidelinesFilename } from "@/lib/guidelines-session";
@@ -533,21 +533,11 @@ export function ApplicationStep3Summary({
         )}
       </div>
 
-      {/* Funder AI policy banner (S6.2) */}
-      {summary.funderAiPolicy && (
-        <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4">
-          <Info
-            className="mt-0.5 h-4 w-4 shrink-0 text-[#1D4ED8]"
-            aria-hidden="true"
-          />
-          <div>
-            <p className="mb-1 text-[13px] font-semibold text-[#1E40AF]">
-              This funder&apos;s guidance on AI
-            </p>
-            <p className="text-[13px] text-[#1E40AF]">{summary.funderAiPolicy}</p>
-          </div>
-        </div>
-      )}
+      {/* funderAiPolicy is stored in the DB for reference but not displayed —
+          Grant Pathway's Q&A model already embodies responsible AI use (charity
+          writes all content, AI refines only on request, mandatory review before
+          approval). All approved funders are pre-screened; displaying extracted
+          policy text adds noise without value. */}
 
       {/* Questions / sections extracted note */}
       {questionsFound ? (
@@ -566,8 +556,7 @@ export function ApplicationStep3Summary({
             ) : (
               <>
                 We found {summary.questions.length} application question
-                {summary.questions.length === 1 ? "" : "s"} in these guidelines. You&apos;ll
-                answer each one in the next step.
+                {summary.questions.length === 1 ? "" : "s"} in these guidelines. You&apos;ll answer each one in the next step.
               </>
             )}
           </p>

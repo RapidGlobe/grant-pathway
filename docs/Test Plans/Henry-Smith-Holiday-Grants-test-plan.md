@@ -77,7 +77,7 @@ Universal (non-conditional) narrative questions from the application template:
 |---------|-----------|--------------|-----------------|--------|-------|
 | IT-HSF-01 | Sign in and verify Harry's Rainbow profile | No | N/A | | |
 | IT-HSF-02 | Henry Smith Foundation funder picker | Yes | N/A | | |
-| IT-HSF-03 | DOCX upload, AI summary, and AI policy banner | Yes | TBC | | |
+| IT-HSF-03 | DOCX upload and AI summary | Yes | TBC | | |
 | IT-HSF-04 | Eligibility check — observe outcome; IT-11 escape hatch if mismatch | Yes | N/A | | |
 | IT-HSF-05 | AI summary content accuracy | Yes | N/A | | |
 | IT-HSF-06 | Narrative question extraction — exact 300-word limits and conditional filtering | Yes | N/A | | |
@@ -149,9 +149,9 @@ Universal (non-conditional) narrative questions from the application template:
 
 ---
 
-### IT-HSF-03 — DOCX Upload, AI Summary, and AI Policy Banner
+### IT-HSF-03 — DOCX Upload and AI Summary
 
-**HSF-specific:** Yes — Henry Smith has a published AI policy that should appear as a blue banner on Step 3
+**HSF-specific:** Yes — tests DOCX upload path with the application template
 **Prerequisite:** IT-HSF-02 complete
 
 **Steps:**
@@ -159,19 +159,18 @@ Universal (non-conditional) narrative questions from the application template:
 2. Confirm file accepted, click **Continue**
 3. Start a stopwatch, click **Generate summary**, stop when summary appears — record time
 4. Review the summary cards
-5. Check for the **blue AI policy banner** — Henry Smith's policy should be extracted: something about AI being welcome but recommending own voice and checking accuracy
-6. Note whether a red eligibility mismatch warning appears (record outcome for IT-HSF-04)
-7. Click **Continue** → verify preparation checklist or mismatch state
+5. Note whether a red eligibility mismatch warning appears (record outcome for IT-HSF-04)
+6. Click **Continue** → verify preparation checklist or mismatch state
 
 **Expected result:**
 - DOCX uploads successfully
 - AI summary generates without error
-- Blue AI policy banner present with Henry Smith's AI statement
+- No AI policy banner (removed — Grant Pathway's own AI safeguards are sufficient; approved funders are pre-screened)
 - Outcome of eligibility check recorded (pass or mismatch)
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record AI policy banner text, summary time, and eligibility outcome):**
+**Notes (record summary time and eligibility outcome):**
 
 ---
 
@@ -218,7 +217,7 @@ If a red mismatch warning appeared in IT-HSF-03:
 
 **Verify the summary includes:**
 - Programme purpose: recreational trips for children aged 13 and under
-- Grant range: £500–£3,000
+- Grant range: £500–£3,000 *(Note: the application template does not state the grant range explicitly — "Not specified" is an acceptable result; the funding guidelines document would capture this)*
 - Eligibility: 20% most deprived areas OR children facing financial/systemic challenges; income under £2m
 - Trip requirements: UK only, 1–7 days, recreational (no educational or religious aims)
 - One application per calendar year
