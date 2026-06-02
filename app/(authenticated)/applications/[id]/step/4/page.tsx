@@ -91,15 +91,33 @@ export default async function Step4Page({ params }: Props) {
     }
   }
 
-  // ── S6.1: Populate from ai_summary if no rows exist yet ──────────────────
-  if (questionRows.length === 0 && parsedSummary) {
+  // ── S6.1: Sync application_answers with current ai_summary ──────────────────
+  // Always sync — not just on first visit — so that regenerating the summary
+  // on Step 3 correctly removes questions that the new extraction dropped.
+  // Unanswered orphaned rows (question_order no longer in the summary) are
+  // deleted. Answered rows are preserved even if orphaned, to avoid data loss.
+  if (parsedSummary) {
     try {
       if (
         funderType === 'free_form' &&
         Array.isArray(parsedSummary.sections) &&
         parsedSummary.sections.length > 0
       ) {
-        // Free_form: populate from narrative sections
+        // Free_form: sync from narrative sections
+        const summaryOrders = parsedSummary.sections.map((s) => s.number)
+        const orphaned = questionRows
+          .filter((r) => !summaryOrders.includes(r.question_order) && !r.answer_text)
+          .map((r) => r.question_order)
+
+        if (orphaned.length > 0) {
+          await supabase
+            .from('application_answers')
+            .delete()
+            .eq('application_id', id)
+            .eq('user_id', user.id)
+            .in('question_order', orphaned)
+        }
+
         const inserts = parsedSummary.sections.map((s) => ({
           application_id: id,
           user_id: user.id,
@@ -123,7 +141,21 @@ export default async function Step4Page({ params }: Props) {
 
         questionRows = inserted ?? []
       } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
-        // Structured: populate from numbered questions
+        // Structured: sync from numbered questions
+        const summaryOrders = parsedSummary.questions.map((q, idx) => q.number ?? idx + 1)
+        const orphaned = questionRows
+          .filter((r) => !summaryOrders.includes(r.question_order) && !r.answer_text)
+          .map((r) => r.question_order)
+
+        if (orphaned.length > 0) {
+          await supabase
+            .from('application_answers')
+            .delete()
+            .eq('application_id', id)
+            .eq('user_id', user.id)
+            .in('question_order', orphaned)
+        }
+
         const inserts = parsedSummary.questions.map((q, idx) => ({
           application_id: id,
           user_id: user.id,
@@ -135,7 +167,7 @@ export default async function Step4Page({ params }: Props) {
           is_budget_question: q.is_budget_question ?? false,
         }))
 
-        // ON CONFLICT DO NOTHING — returning to Step 4 never overwrites rows
+        // ignoreDuplicates: true — never overwrite existing answered rows
         const { data: inserted } = await supabase
           .from('application_answers')
           .upsert(inserts, {
@@ -149,7 +181,7 @@ export default async function Step4Page({ params }: Props) {
         questionRows = inserted ?? []
       }
     } catch {
-      // question population failed — questionRows stays empty (manual entry path)
+      // sync failed — questionRows stays as fetched (manual entry path)
     }
   }
 
