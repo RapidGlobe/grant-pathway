@@ -555,8 +555,7 @@ export function ApplicationStep3Summary({
               </>
             ) : (
               <>
-                We found {summary.questions.length} application question
-                {summary.questions.length === 1 ? "" : "s"} in these guidelines. You&apos;ll answer each one in the next step.
+                {`We found ${summary.questions.length} application ${summary.questions.length === 1 ? "question" : "questions"} in these guidelines. You'll answer each one in the next step.`}
               </>
             )}
           </p>
