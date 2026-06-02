@@ -34,10 +34,10 @@ values
     true
   ),
   (
-    'Henry Smith Charity',
+    'Henry Smith Foundation',
     'structured',
     '£10k–£100k',
-    'https://www.henrysmith.org/grants',
+    'https://henrysmith.foundation/grants/',
     true
   ),
   (
