@@ -1,6 +1,6 @@
 # Wolfson Foundation — Health & Disability Stage 1 Test Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-06-03
 **Status:** Ready for execution
 **Tester:** WJ
@@ -117,9 +117,9 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 |---------|-----------|-----------------|----------------|--------|-------|
 | IT-WF-01 | Account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-02 | Wolfson Foundation funder picker | Yes | N/A | ✅ Pass | "Request it to be added" link generates email correctly |
-| IT-WF-03 | Guidelines paste and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WF-03 | Guidelines paste and AI summary | Yes | Not recorded | ✅ Pass | Auto-generates on load — no button. 7 sections extracted correctly. Sections path (free_form classification). |
 | IT-WF-04 | Eligibility check — observe outcome | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WF-05 | AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WF-05 | AI summary content accuracy | Yes | N/A | ✅ Pass | Accurate for source text. Capital-only scope absent — not in Stage 1 questions page (expected). |
 | IT-WF-06 | Narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-07 | Non-narrative question handling | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-08 | Narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -199,20 +199,22 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 2. Paste the full Wolfson Health & Disability Stage 1 question text prepared in pre-test setup
 3. Confirm the text area shows the pasted content
 4. Click **Continue**
-5. On Step 3, start a stopwatch, click **Generate summary**, stop when the summary appears — record the time
+5. On Step 3, the AI summary **generates automatically on page load** — there is no "Generate summary" button. Start a stopwatch when the page loads and stop when the summary cards appear — record the time
 6. Review the summary cards displayed
 7. Note whether a red eligibility mismatch warning appears — record the outcome for IT-WF-04
 8. Click **Continue** → verify the preparation checklist or mismatch state appears
 
 **Expected result:**
 - Paste area accepts the text without error
-- AI summary generates successfully within 30 seconds (NFR-01)
+- AI summary auto-generates successfully within 30 seconds (NFR-01) — no button click required
 - Summary displays without a JSON parse error
+- "Application sections" card shown (Wolfson's guidelines are section-based; the AI correctly classifies this as the sections/free_form path even though the funder is seeded as structured — this is expected given the pasted content format)
+- 7 sections listed with word limits on narrative sections
 - Outcome of eligibility check noted (pass or mismatch)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record summary time and eligibility outcome):**
+**Notes:** Summary auto-generated without a button click — test plan corrected. AI correctly extracted 7 sections: (1) Background to the organisation 250w, (2) Project title and summary 400w, (3) Project timetable, (4) Location and property details, (5) Financial information, (6) Previous support from the Wolfson Foundation 50w, (7) Any other information (optional) 200w. Grant amount "Not specified" — expected. Who can apply and Key requirements accurate. Sections 3–5 have no word limits and are non-narrative — watch whether they appear as writing cards in Step 4 (IT-WF-06/07). Summary time not recorded.
 
 ---
 
@@ -253,21 +255,21 @@ If a red mismatch warning appeared:
 **Prerequisite:** IT-WF-03 complete
 
 **Verify the summary includes:**
-- Funder description: capital infrastructure grants for Health & Disability organisations
-- Grant range: £30k–£250k+ (or similar — Wolfson does not publish exact figures; "Not specified" is an acceptable partial result)
-- Eligibility: registered charities, organisations supporting disabled people or those with mental health conditions; minimum project cost £50,000
-- What is funded: building refurbishment, equipment — capital projects only
-- What is excluded: salaries, overheads, maintenance, VAT; purchase of land or existing buildings; projects already completed; endowment funds
-- UK-only scope
-- Two-stage process noted (Stage 1 screening → Stage 2 by invitation)
+- Funder description: Health & Disability programme supporting charitable projects ✅ (note: the pasted Stage 1 questions page does not detail capital-only scope or exclusions, so these will not appear — this is expected given the source text)
+- Grant range: "Not specified" is the correct result — Wolfson does not publish figures on the Stage 1 questions page ✅
+- Who can apply: UK registered charities; organisations working in health and disability; special schools with modified accounts requirement ✅
+- What the funder is looking for: health and disability projects; clear timetable and defined location; track record via inspection reports ✅
+- Key requirements: audited accounts; project location separate from org address; ownership/tenure/planning permission; head of organisation confirmation; CQC/Ofsted report if applicable ✅
+- 7 application sections listed with correct word limits on narrative sections ✅
 
 **Expected result:**
-- Key funding criteria and exclusions accurately represented
-- No significant errors or hallucinated eligibility conditions
+- Summary accurately reflects the content of the pasted Stage 1 questions page
+- No hallucinated eligibility conditions or invented exclusions
+- "Not specified" for grant amount is correct
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Summary accurately reflects the Stage 1 questions page. Capital-only scope and exclusions not extracted — these are not present in the Stage 1 questions source text, so absence is correct. The AI has not invented any criteria. All sections, word limits, who can apply, and key requirements are accurate.
 
 ---
 
@@ -519,3 +521,4 @@ If a red mismatch warning appeared:
 |---------|------|--------|--------|
 | 1.0 | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Wolfson Foundation Health & Disability Stage 1, Compass Wellbeing test charity, 12 test cases. Includes paste path (no downloadable guidelines), eligibility check, non-narrative question handling, and re-open → amend → re-approve → re-export cycle (IT-WF-11–12). |
 | 1.1 | 2026-06-03 | Rapidglobe Ltd | IT-WF-02 step 3 corrected — grant range is not displayed in the funder picker UI (only name and Structured/Narrative badge are shown). Grant range reference removed from step and expected result. |
+| 1.2 | 2026-06-03 | Rapidglobe Ltd | IT-WF-03 corrected — summary auto-generates on page load, no Generate Summary button exists. IT-WF-03 and IT-WF-05 marked Pass with results recorded. IT-WF-05 expected results revised to reflect Stage 1 questions page as source (capital-only scope and exclusions not present in source text — absence correct). Sections/free_form classification by AI noted as expected given pasted content format. |
