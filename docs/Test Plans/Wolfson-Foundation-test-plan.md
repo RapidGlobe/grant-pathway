@@ -125,7 +125,7 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 | IT-WF-08 | Narrative answer writing and AI assist | No | N/A | ✅ Pass | AI assist corrected spelling and improved tone. Approval flow correct. D-WF-01 found (optional section). |
 | IT-WF-09 | Answer approval and Step 5 navigation | No | N/A | ✅ Pass | Senior review confirmation screen correct. Assembly and Step 5 approval modal correct. |
 | IT-WF-10 | Word document export — structure and content | No | N/A | ✅ Pass | .docx and .txt both downloaded correctly. All sections, disclaimer, footer present. Re-export warning correct. |
-| IT-WF-11 | Re-open approved application, amend answer, re-approve | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WF-11 | Re-open approved application, amend answer, re-approve | No | N/A | ✅ Pass | Re-open dialog correct. All approvals cleared on re-open (D-WF-03 — Low, deferred). Amendment saved. All 7 re-approved and assembled. |
 | IT-WF-12 | Re-export after amendment — verify re-export warning and updated content | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 
 ---
