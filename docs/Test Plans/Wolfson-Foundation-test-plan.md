@@ -142,6 +142,7 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 
 | ID | Test | Description | Severity | Status |
 |----|------|-------------|----------|--------|
+| D-WF-01 | IT-WF-08 | "Ready to assemble" button remains disabled when 6 of 7 sections are approved and the unapproved section ("Any other information") is marked optional. The `allApproved` gate in `application-step4-draft.tsx` requires `approvedCount === questions.length` — it has no concept of optional sections. Optional sections are stored as `application_answers` rows like any other section and count toward the total. **Workaround:** approve the optional section blank (write nothing and approve) to unblock assembly. **Fix required:** add `is_optional` field to `application_answers`; exclude unanswered optional sections from the `allApproved` count. | Medium | Open |
 
 ---
 
