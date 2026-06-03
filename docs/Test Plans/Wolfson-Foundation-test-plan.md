@@ -395,10 +395,17 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 **Prerequisite:** IT-WF-08 complete
 
 **Steps:**
-1. Approve any remaining unapproved question cards (skip "Any other information" if it appeared — it is optional and may be left blank to test what happens when an optional question is unanswered)
-2. Verify the progress bar reaches "Ready to assemble" once all mandatory questions are approved
+1. Approve any remaining unapproved question cards
+2. Verify the progress bar reaches "Ready to assemble" once all sections are approved
 3. Click **Ready to assemble**
-4. Verify assembly completes and Step 5 is displayed
+4. Verify the **"Before we put it together"** senior review confirmation screen appears — verify it shows:
+   - Heading: "Before we put it together"
+   - Message confirming answers have been saved and requesting senior colleague review of budget answers (CEO / treasurer / trustee)
+   - Explanation that inaccurate budget answers are a common reason applications are unsuccessful
+   - **"Yes — assemble my draft"** button
+   - **"Back to editing"** link
+5. Click **Yes — assemble my draft**
+6. Verify assembly completes and Step 5 is displayed
 5. On Step 5, review the read-only Q&A view — verify:
    - All approved answers appear
    - Source badges display correctly (AI-assisted vs. written by user)
@@ -410,7 +417,8 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 7. Click **Approve my application** and confirm the modal dialog (verify grant name and funder are shown in the dialog)
 
 **Expected result:**
-- Assembly completes without error
+- Senior review confirmation screen displayed with correct wording before assembly
+- Assembly completes without error after confirmation
 - All approved answers present in Step 5 read-only view
 - All three checkboxes must be ticked before Approve button activates
 - Confirmation modal shows correct application details
