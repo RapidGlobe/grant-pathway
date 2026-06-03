@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-02 (FR-47 eligibility mismatch hard stop implemented and tested; GAP-28 Layer 1 prompt fixes: conditional questions, multi-form PDFs, meta/feedback questions; funderAiPolicy banner removed; AI assist allowed over word limit; question sync bug fixed; spelling correction for short answers; multiple UX wording improvements; Henry Smith funder name corrected in seed; 3 funders now complete in test dashboard)
+**Last updated:** 2026-06-03 (Wolfson Foundation test plan created — Health & Disability Stage 1, 12 test cases, paste path, re-open/amend/re-approve/re-export cycle; Wolfson Foundation confirmed in prod seed and funder picker)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -125,6 +125,12 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-06-03 — Wolfson Foundation test plan created
+
+`docs/Test Plans/Wolfson-Foundation-test-plan.md` created (v1.0). 12 test cases covering the full end-to-end flow for Wolfson Foundation Health & Disability Stage 1, using a new test charity (Compass Wellbeing). Notable test coverage: paste input path (Stage 1 guidelines are online-only — no downloadable file), sector-specific question extraction with short word limits (50-word and 25-word fields), and the re-open → amend → re-approve → re-export cycle (IT-WF-11 and IT-WF-12). Wolfson Foundation confirmed present in the prod seed (`20260601000001_seed_funders.sql`) and will appear in the funder picker. New test account `grantpathway+wf1@gmail.com` required — profile setup instructions in the test plan.
+
+---
 
 ### 2026-06-02 — Henry Smith funder name corrected in both dev and prod
 

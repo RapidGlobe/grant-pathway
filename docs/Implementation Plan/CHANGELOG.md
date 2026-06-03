@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-03 — Wolfson Foundation test plan created (Health & Disability Stage 1)
+
+**What changed:**
+- `docs/Test Plans/Wolfson-Foundation-test-plan.md` (v1.0, new) — 12-case end-to-end test plan for the Wolfson Foundation Health & Disability Stage 1 programme.
+
+**Key test coverage decisions:**
+- **Paste path tested.** Wolfson Stage 1 guidelines are published online only — there is no downloadable PDF or Word file. The test therefore exercises the Step 2 text-paste input rather than file upload. This is the first test plan to use the paste path as the primary input method.
+- **New test charity: Compass Wellbeing.** A new test account (`grantpathway+wf1@gmail.com`) with a fictional South London mental health/brain injury charity is used, rather than reusing Harry's Rainbow. Compass Wellbeing is a clear fit for Wolfson's Health & Disability capital criteria, reducing mismatch risk and making the eligibility test meaningful.
+- **Re-open → amend → re-approve → re-export cycle (IT-WF-11 and IT-WF-12).** This is the first test plan to explicitly cover the full re-opening flow: after a first export, the tester re-opens the application, amends one answer (Project summary), re-approves only that card, reassembles, re-approves the whole application, and re-exports. IT-WF-12 verifies the re-export warning dialog shows the correct prior export timestamp, and the downloaded document contains the amended answer.
+- **Short word limit fields.** The 50-word "previous support" and 25-word "project title" fields are unusual — shorter than any question seen in previous test cycles. These are recorded as observation points: the AI may extract them as narrative cards or skip them as too short to be textareas.
+
+**Why Wolfson Foundation next:**
+Idlewild Trust Round 1 2026 (opens 8 June) is not being targeted in this cycle. Wolfson is a well-characterised structured funder with publicly listed questions and word limits, is already seeded in the funder picker, and exercises a paste-path test scenario not yet covered by any existing test plan.
+
+---
+
 ## 2026-06-02 — AI assist allowed when answer exceeds word limit (FR-30 revised)
 
 **What changed:**
