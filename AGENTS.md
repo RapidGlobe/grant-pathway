@@ -60,6 +60,7 @@ Use the table below to identify the right document(s) for every change. Multiple
 | `docs/technology-stack.md` | Any change to the technology choices, libraries, services, or infrastructure (if applicable) |
 | `docs/test-plan-e2e-slices-4-8.md` | Any change to test coverage, E2E slice scope, or acceptance criteria that affects the test plan (if applicable) |
 | `docs/target-funder-list.md` | Any change to the set of target grant-giving organisations or their classification |
+| `docs/Test Plans/TEST-DASHBOARD.md` | After every funder test session — update the funder row (passed/failed counts, RAG status, notes), update the summary counts, bump the version, and add a document history entry. Also update when a new funder test plan is created (add the row in 🟡 status). |
 | `docs/data-model.md` | Any change to the database schema, table definitions, field types, constraints, or entity relationships |
 | `docs/PRD inputs/screen-requirements.md` | Any change to the content, fields, validation rules, or error states of any screen |
 | `docs/PRD inputs/acceptance-criteria.md` | Any change to functional requirements that alters what "done" looks like — revised requirements, new edge cases, or new acceptance criteria |
