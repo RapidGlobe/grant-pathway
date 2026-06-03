@@ -48,10 +48,10 @@ values
     true
   ),
   (
-    'Lloyds Bank Foundation CI',
+    'Lloyds Bank Foundation',
     'structured',
-    '£5k–£50k',
-    'https://www.lloydsbankfoundationci.org.uk/grants',
+    '£25k–£75k',
+    'https://www.lloydsbankfoundation.org.uk/funding',
     true
   ),
   (

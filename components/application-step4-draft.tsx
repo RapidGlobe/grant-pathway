@@ -114,7 +114,16 @@ export function ApplicationStep4Draft({
   const answeredCount = questions.filter((q) => (answers[q.id] ?? '').trim() !== '').length
   // FR-32/FR-33: progress bar and gate use approved count, not just answered count
   const approvedCount = questions.filter((q) => approved[q.id]).length
-  const allApproved = questions.length > 0 && approvedCount === questions.length
+  // A section/question is optional if its title contains "(optional)" (case-insensitive).
+  // Optional sections that are unanswered do not block the assembly gate.
+  const allApproved =
+    questions.length > 0 &&
+    questions.every(
+      (q) =>
+        approved[q.id] ||
+        (q.questionText.toLowerCase().includes('(optional)') &&
+          (answers[q.id] ?? '').trim() === ''),
+    )
 
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
   const itemLabelPlural = funderType === 'free_form' ? 'sections' : 'questions'
@@ -628,8 +637,10 @@ export function ApplicationStep4Draft({
                 </div>
               )}
 
-              {/* FR-32 / FR-33 — Review prompts and approval step */}
-              {!isEmpty && !isApprovedQ && refineState.status !== 'showing' && (
+              {/* FR-32 / FR-33 — Review prompts and approval step.
+                  Show when: answer is non-empty OR section is optional (optional
+                  sections may be left blank and still approved/skipped). */}
+              {(!isEmpty || q.questionText.toLowerCase().includes('(optional)')) && !isApprovedQ && refineState.status !== 'showing' && (
                 <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
                   <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
                     Before you approve, check:

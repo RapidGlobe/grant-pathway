@@ -224,7 +224,10 @@ export function ApplicationStep5Approve({
   }
 
   function handleDownloadClick(format: 'docx' | 'txt') {
-    if (isExported) {
+    // Show re-export warning if a prior export exists (last_exported_at in DB),
+    // regardless of current approval status. This covers the re-open → re-approve
+    // → download cycle where isExported resets to false but a prior export exists.
+    if (lastExported) {
       setPendingFormat(format)
       setShowReExportDialog(true)
     } else {

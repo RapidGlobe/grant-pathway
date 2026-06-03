@@ -45,13 +45,21 @@ import { createClient } from '@/lib/supabase/server'
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Format a Date as "DD Month YYYY" */
+/** Format a Date as "DD Month YYYY, HH:MM" (24-hour, London time) */
 function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-GB', {
+  const datePart = date.toLocaleDateString('en-GB', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
+    timeZone: 'Europe/London',
   })
+  const timePart = date.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/London',
+  })
+  return `${datePart}, ${timePart}`
 }
 
 /** Convert points to half-points (docx size unit) */
