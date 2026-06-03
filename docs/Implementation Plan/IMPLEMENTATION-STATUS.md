@@ -134,7 +134,7 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 - **D-WF-05 (Low):** Export date had no time component. Fixed by updating `formatDate` in the export route to include HH:MM in Europe/London timezone.
 - **D-WF-03 (Low):** Re-open clears all approvals — retained by design decision, deferred to user feedback.
 
-**Lloyds Bank Foundation CI → England & Wales:** Funder directory updated. Migration `20260603000000_update_lloyds_funder_to_england_wales.sql` written. ⚠️ **Manual application required** — apply via Supabase dashboard SQL editor to both dev (`stanwaejdvlvremtffkf`) and prod (`mvmjryipieepvsjudche`). SQL: `update public.funders set name = 'Lloyds Bank Foundation', grant_range = '£25k–£75k', guidelines_url = 'https://www.lloydsbankfoundation.org.uk/funding' where name = 'Lloyds Bank Foundation CI';`
+**Lloyds Bank Foundation CI → England & Wales:** Funder directory updated. Migration `20260603000000_update_lloyds_funder_to_england_wales.sql` applied to both `grant-pathway-dev` (stanwaejdvlvremtffkf) and `grant-pathway-prod` (mvmjryipieepvsjudche) on 2026-06-03 via Supabase dashboard SQL editor. ✅
 
 **Lloyds Bank Foundation test plan:** `docs/Test Plans/Lloyds-Bank-Foundation-test-plan.md` created (v1.0). 13 test cases. Two accounts: Harry's Rainbow (eligibility mismatch test) + New Leaf (happy path, new fictional care leavers charity). Tests DOCX upload path, D-WF-01/04/05 fixes. New test account `grantpathway+lloyds1@gmail.com` required.
 
