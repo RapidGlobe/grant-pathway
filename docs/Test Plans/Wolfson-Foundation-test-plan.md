@@ -143,6 +143,7 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 | ID | Test | Description | Severity | Status |
 |----|------|-------------|----------|--------|
 | D-WF-02 | IT-WF-10 | Initial report: plain text download appeared not to save a file after the re-export warning dialog appeared. **Closed — not a defect.** The re-export warning dialog appeared correctly (by design) when clicking txt after the docx had already been downloaded. The first attempt may have been cancelled. On confirmation ("Download anyway") the `.txt` file downloaded successfully with correct content. Both `.docx` and `.txt` exports confirmed working. | — | Closed — Not a defect |
+| D-WF-03 | IT-WF-11 | Re-opening an approved application clears **all** individual answer approvals, not just the edited section. After re-opening, progress bar shows "0 of 7 sections approved" and every section must be re-approved before assembly can be triggered — even sections the user did not touch. The re-open dialog says "will remove your approval" which is technically accurate but the user reasonably expects only their edited answer to need re-review. **Impact:** high friction — changing one answer requires re-approving all sections. **Fix required:** on re-open, set `is_approved = false` only on answers edited after the re-open timestamp (or alternatively, only clear the application-level approval and preserve individual answer approvals, clearing them individually when the user edits). | Medium | Open |
 | D-WF-01 | IT-WF-08 | Two related issues on optional sections: (1) "Ready to assemble" button remains disabled when the only unapproved section is optional — `allApproved` gate requires `approvedCount === questions.length` with no concept of optional sections. (2) "Approve this answer" button does not appear on an empty optional section — the approval block renders only when `!isEmpty` (line 632 of `application-step4-draft.tsx`). Combined effect: an optional section left blank cannot be approved, and the assembly gate cannot be unlocked. **Workaround used:** tester typed placeholder text, clicked "Help me improve this" — AI correctly returned "N/A" as the suggested improvement (recognising the content was placeholder/null). Tester used "N/A" version and approved. **Fix required:** (a) pass `is_optional` flag through from AI summary to `application_answers`; (b) render approve button regardless of `isEmpty` when section is optional; (c) exclude unanswered optional sections from the `allApproved` count. | Medium | Open |
 
 ---
@@ -484,17 +485,17 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
    - "Are all figures, dates, and facts correct?"
    - "Does this answer the question that was asked?"
 10. Click **Approve this answer** — verify green border returns
-11. Verify all other previously-approved answers remain approved (editing one question should not clear approval on others)
+11. Note: re-opening clears **all** answer approvals, not just the edited section — "0 of 7 sections approved" will be shown. Re-approve all remaining sections to proceed (see D-WF-03)
 12. Click **Ready to assemble**
 13. Verify assembly completes with the amended answer included
 14. On Step 5, tick all three review checkboxes again
 15. Click **Approve my application** and confirm the modal
 
 **Expected result:**
-- Re-open dialog appears with clear warning about approval being removed
-- Re-opening redirects to Step 4 correctly
-- Editing one answer clears only that answer's approval — not all answers
-- All other answers remain approved and do not require re-approval
+- Re-open dialog appears with clear warning about approval being removed ✅
+- Re-opening redirects to Step 4 correctly ✅
+- All answer approvals are cleared (0 of 7 approved) — see D-WF-03 for UX concern
+- All sections require re-approval before assembly
 - Re-assembly includes the amended answer
 - Re-approval completes successfully
 - Application status returns to Approved
