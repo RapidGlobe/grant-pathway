@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-03 (Wolfson Foundation test plan created — Health & Disability Stage 1, 12 test cases, paste path, re-open/amend/re-approve/re-export cycle; Wolfson Foundation confirmed in prod seed and funder picker)
+**Last updated:** 2026-06-03 (Wolfson Foundation testing complete — 11 pass, 1 partial pass, 3 defects found; D-WF-01/04/05 fixed; Lloyds Bank Foundation CI replaced with E&W in funder directory; Lloyds E&W test plan created)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -125,6 +125,20 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-06-03 — Wolfson Foundation testing complete; three defects fixed; Lloyds funder updated; Lloyds test plan created
+
+**Wolfson Foundation testing (12 tests):** 11 Pass, 1 Partial Pass (IT-WF-12 re-export warning). Three defects found and fixed in the same session:
+- **D-WF-01 (Medium):** Optional sections blocked assembly gate and showed no approve button when empty. Fixed by deriving `isOptional` from question text in `application-step4-draft.tsx`; approve button now shown for empty optional sections; `allApproved` gate excludes unanswered optional sections.
+- **D-WF-04 (Medium):** Re-export warning suppressed after re-open/re-approve cycle. Fixed by checking `lastExported` (DB history) instead of `isExported` (session state) in `handleDownloadClick`.
+- **D-WF-05 (Low):** Export date had no time component. Fixed by updating `formatDate` in the export route to include HH:MM in Europe/London timezone.
+- **D-WF-03 (Low):** Re-open clears all approvals — retained by design decision, deferred to user feedback.
+
+**Lloyds Bank Foundation CI → England & Wales:** Funder directory updated. Migration `20260603000000_update_lloyds_funder_to_england_wales.sql` written. ⚠️ **Manual application required** — apply via Supabase dashboard SQL editor to both dev (`stanwaejdvlvremtffkf`) and prod (`mvmjryipieepvsjudche`). SQL: `update public.funders set name = 'Lloyds Bank Foundation', grant_range = '£25k–£75k', guidelines_url = 'https://www.lloydsbankfoundation.org.uk/funding' where name = 'Lloyds Bank Foundation CI';`
+
+**Lloyds Bank Foundation test plan:** `docs/Test Plans/Lloyds-Bank-Foundation-test-plan.md` created (v1.0). 13 test cases. Two accounts: Harry's Rainbow (eligibility mismatch test) + New Leaf (happy path, new fictional care leavers charity). Tests DOCX upload path, D-WF-01/04/05 fixes. New test account `grantpathway+lloyds1@gmail.com` required.
+
+---
 
 ### 2026-06-03 — Wolfson Foundation test plan created
 

@@ -16,7 +16,7 @@ This is the canonical reference list of grant-giving organisations used to desig
 | Clothworkers' Foundation | Structured | Up to £15k+ | Clear word limits; broad causes; widely used by smaller charities | clothworkersfoundation.org.uk/apply-for-a-grant |
 | Henry Smith Foundation | Structured | £10k–£100k | Two-stage with explicit Stage 1 questions and word limits; large grants; broad remit | henrysmith.foundation/grants |
 | Wolfson Foundation | Structured | £30k–£250k+ | Stage 1 questions publicly listed with per-question word limits (50–600 words) | wolfson.org.uk/funding/application-guidance |
-| Lloyds Bank Foundation CI | Structured | £5k–£50k | PDF Advice Note lists every question with exact word limits — textbook fit | lloydsbankfoundationci.org.uk/grants |
+| Lloyds Bank Foundation | Structured | £25k–£75k | Downloadable Word example application form; 13 narrative questions with 50–500 word limits; Specialist Programme for complex social issues | lloydsbankfoundation.org.uk/funding |
 | Foyle Foundation — Main Grants | Structured | £10k–£75k | Sector-specific guidance PDFs (Arts, Libraries etc.); narrative case for support; good structure | foylefoundation.org.uk |
 | Walton Charity — Community Grants | Structured | Up to £10k (small); larger considered | Guidelines PDF + narrative request form; clear structure; tests smaller community grant tier | waltoncharity.org.uk/applying-for-a-grant |
 | Nationwide Building Society — Community Grants | Structured | £10k–£60k | Strong guidance and FAQ PDF; 1–2 year project grants; broad community causes | actiontogether.org.uk/nationwide |

@@ -6,6 +6,27 @@
 
 ---
 
+## 2026-06-03 — Three testing defects fixed; Lloyds funder corrected; Lloyds test plan created
+
+**What changed:**
+- `components/application-step4-draft.tsx` — D-WF-01 fix: optional sections (question text contains "(optional)") now show the "Approve this answer" button even when the textarea is empty; `allApproved` gate updated to exclude unanswered optional sections from the required count.
+- `components/application-step5-approve.tsx` — D-WF-04 fix: `handleDownloadClick` now checks `lastExported` (DB-sourced prior export history) rather than `isExported` (current session state) to trigger the re-export warning dialog. The warning now correctly appears after a re-open → re-approve → download cycle.
+- `app/api/export/[applicationId]/route.ts` — D-WF-05 fix: `formatDate` updated to include HH:MM in Europe/London timezone (e.g. "03 June 2026, 17:35"). Allows users to distinguish between multiple exports on the same day.
+- `supabase/migrations/20260603000000_update_lloyds_funder_to_england_wales.sql` — New migration replacing "Lloyds Bank Foundation CI" (Channel Islands) with "Lloyds Bank Foundation" (England & Wales) in the funder directory. ⚠️ Requires manual application to dev and prod via Supabase dashboard.
+- `supabase/migrations/20260601000001_seed_funders.sql` — Seed file updated to reflect E&W foundation for future resets.
+- `docs/Test Plans/Lloyds-Bank-Foundation-test-plan.md` — New test plan (v1.0, 13 cases).
+- `docs/target-funder-list.md` — Lloyds CI replaced with Lloyds E&W.
+
+**Why:**
+Wolfson Foundation testing (12 tests, 2026-06-03) surfaced three defects:
+- D-WF-01: Optional sections could not be approved when blank, blocking the assembly gate entirely — a UX dead-end requiring a workaround.
+- D-WF-04: The re-export warning (protecting funders from receiving multiple versions) was bypassed after re-opening and re-approving an application — a meaningful safeguard gap.
+- D-WF-05: Without a time component in the export date, two exports on the same day were indistinguishable in the downloaded document.
+
+The Lloyds Bank Foundation CI was identified as unsuitable for Grant Pathway: Channel Islands-only geographic restriction, AI use discouraged, and the online form is currently offline. Replaced with the main England & Wales foundation which has a downloadable Word example form, permits AI use with conditions, and has a broad UK-wide remit appropriate for Grant Pathway's target charities.
+
+---
+
 ## 2026-06-03 — Wolfson Foundation test plan created (Health & Disability Stage 1)
 
 **What changed:**
