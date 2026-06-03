@@ -1,6 +1,6 @@
 # Wolfson Foundation — Health & Disability Stage 1 Test Plan
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-06-03
 **Status:** Ready for execution
 **Tester:** WJ
@@ -173,13 +173,13 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 **Steps:**
 1. From the dashboard, click **+ New Application**
 2. Type **"Wolfson"** in the funder picker search box
-3. Confirm **Wolfson Foundation** appears in the results with a **Structured** badge and grant range **£30k–£250k+**
+3. Confirm **Wolfson Foundation** appears in the results with a **Structured** badge
 4. Select **Wolfson Foundation**
 5. Enter grant name: **"Health & Disability — Sensory Therapy Room Refurbishment 2026"**
 6. Click **Continue**
 
 **Expected result:**
-- Wolfson Foundation appears in the picker with correct badge and grant range
+- Wolfson Foundation appears in the picker with a Structured badge
 - Application is created and Step 2 is displayed
 - Application appears on dashboard when navigating back (not tested here — proceed to IT-WF-03)
 
@@ -518,3 +518,4 @@ If a red mismatch warning appeared:
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Wolfson Foundation Health & Disability Stage 1, Compass Wellbeing test charity, 12 test cases. Includes paste path (no downloadable guidelines), eligibility check, non-narrative question handling, and re-open → amend → re-approve → re-export cycle (IT-WF-11–12). |
+| 1.1 | 2026-06-03 | Rapidglobe Ltd | IT-WF-02 step 3 corrected — grant range is not displayed in the funder picker UI (only name and Structured/Narrative badge are shown). Grant range reference removed from step and expected result. |
