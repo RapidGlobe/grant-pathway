@@ -1,6 +1,6 @@
 # Wolfson Foundation — Health & Disability Stage 1 Test Plan
 
-**Version:** 1.2
+**Version:** 1.3
 **Date:** 2026-06-03
 **Status:** Ready for execution
 **Tester:** WJ
@@ -118,7 +118,7 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 | IT-WF-01 | Account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-02 | Wolfson Foundation funder picker | Yes | N/A | ✅ Pass | "Request it to be added" link generates email correctly |
 | IT-WF-03 | Guidelines paste and AI summary | Yes | Not recorded | ✅ Pass | Auto-generates on load — no button. 7 sections extracted correctly. Sections path (free_form classification). |
-| IT-WF-04 | Eligibility check — observe outcome | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WF-04 | Eligibility check and preparation checklist | Yes | N/A | ✅ Pass | Branch A — no mismatch. Checklist displayed correctly with financial advisory. |
 | IT-WF-05 | AI summary content accuracy | Yes | N/A | ✅ Pass | Accurate for source text. Capital-only scope absent — not in Stage 1 questions page (expected). |
 | IT-WF-06 | Narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-07 | Non-narrative question handling | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -223,29 +223,36 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 **Wolfson-specific:** Yes — Compass Wellbeing should be a strong fit for Health & Disability; a mismatch would indicate a prompt issue
 **Prerequisite:** IT-WF-03 complete
 
+> **Where to look for the eligibility warning:** The red mismatch warning appears on **Step 3 (AI Summary page)**, replacing the normal summary cards entirely. It shows a red warning card with the mismatch reason and an "I understand — return to my dashboard" button. If you reached the normal summary cards and were able to click Continue, eligibility passed — you will never see a mismatch warning on the preparation checklist page.
+
 #### Branch A — No mismatch (Compass Wellbeing passes)
 
-If no red mismatch warning appeared in IT-WF-03:
+If the normal summary cards appeared on Step 3 and you clicked Continue successfully:
 
-1. Confirm the preparation checklist screen appeared on clicking Continue
-2. Note that Compass Wellbeing passed — mental health and acquired brain injury services are squarely within Wolfson's Health & Disability remit
-3. Record as Pass and proceed to IT-WF-05
+1. Confirm the **"Before you begin writing"** preparation checklist screen appears
+2. Verify the checklist displays:
+   - A note that financial sections cannot be completed by AI
+   - Four items to gather: annual accounts, projected budget, other funding details, treasurer/finance lead input
+   - An amber advisory: "It is worth involving a senior colleague — such as your CEO, treasurer, or a trustee — before reaching the financial questions"
+   - An **"I have what I need — start writing"** button
+3. Click **"I have what I need — start writing"** to proceed to the Q&A interface
+4. Note that Compass Wellbeing passed eligibility — mental health and acquired brain injury services are within Wolfson's Health & Disability remit
 
 #### Branch B — Mismatch detected (unexpected)
 
-If a red mismatch warning appeared:
+If a red mismatch warning appeared on Step 3 instead of the normal summary cards:
 
 1. Record the mismatch reason displayed
 2. Review whether the reason is plausible (e.g. the AI incorrectly identified an exclusion)
 3. Log as a defect if the mismatch is clearly wrong given Compass Wellbeing's profile
-4. If the mismatch reason reflects a genuine profile gap, update the profile description accordingly and create a new application
+4. If the mismatch reason reflects a genuine profile gap, update the profile description and create a new application
 5. Report the defect and revised steps in the notes
 
-**Expected result (Branch A):** Compass Wellbeing passes — proceed to IT-WF-05
+**Expected result (Branch A):** No mismatch — preparation checklist displayed correctly — "I have what I need — start writing" navigates to Step 4 Q&A
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass — Branch A
 
-**Notes (record which branch and the eligibility reason if mismatch):**
+**Notes:** No eligibility mismatch. Preparation checklist displayed as expected with financial advisory and four checklist items. "I have what I need — start writing" button present and functional.
 
 ---
 
@@ -522,3 +529,4 @@ If a red mismatch warning appeared:
 | 1.0 | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Wolfson Foundation Health & Disability Stage 1, Compass Wellbeing test charity, 12 test cases. Includes paste path (no downloadable guidelines), eligibility check, non-narrative question handling, and re-open → amend → re-approve → re-export cycle (IT-WF-11–12). |
 | 1.1 | 2026-06-03 | Rapidglobe Ltd | IT-WF-02 step 3 corrected — grant range is not displayed in the funder picker UI (only name and Structured/Narrative badge are shown). Grant range reference removed from step and expected result. |
 | 1.2 | 2026-06-03 | Rapidglobe Ltd | IT-WF-03 corrected — summary auto-generates on page load, no Generate Summary button exists. IT-WF-03 and IT-WF-05 marked Pass with results recorded. IT-WF-05 expected results revised to reflect Stage 1 questions page as source (capital-only scope and exclusions not present in source text — absence correct). Sections/free_form classification by AI noted as expected given pasted content format. |
+| 1.3 | 2026-06-03 | Rapidglobe Ltd | IT-WF-04 expanded — clarified that eligibility warning appears on Step 3 (AI Summary), not on the preparation checklist. Added explicit verification steps for the "Before you begin writing" checklist (financial advisory, four checklist items, "I have what I need" button). IT-WF-04 marked Pass (Branch A). Test case renamed to reflect checklist coverage. |
