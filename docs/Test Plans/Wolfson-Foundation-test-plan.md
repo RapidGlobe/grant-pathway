@@ -116,7 +116,7 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 | Test ID | Test Name | Wolfson-specific | AI Summary Time | Result | Notes |
 |---------|-----------|-----------------|----------------|--------|-------|
 | IT-WF-01 | Account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WF-02 | Wolfson Foundation funder picker | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WF-02 | Wolfson Foundation funder picker | Yes | N/A | ✅ Pass | "Request it to be added" link generates email correctly |
 | IT-WF-03 | Guidelines paste and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-04 | Eligibility check — observe outcome | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-05 | AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -183,9 +183,9 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 - Application is created and Step 2 is displayed
 - Application appears on dashboard when navigating back (not tested here — proceed to IT-WF-03)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** "Can't find your funder? Request it to be added" link observed at the bottom of the picker. Clicked — email generated correctly. ✅
 
 ---
 
