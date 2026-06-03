@@ -130,6 +130,14 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 
 ---
 
+## Incidental Observations
+
+| Ref | During | Description | Verdict |
+|-----|--------|-------------|---------|
+| OBS-01 | IT-WF-08 | Session timeout triggered naturally after tester was away for lunch (>60 minutes). App redirected to the sign-in page. Tester signed back in and was able to resume the application from Step 4 with previously approved answers intact. | ✅ FR-06 session timeout working correctly |
+
+---
+
 ## Defect Log
 
 | ID | Test | Description | Severity | Status |
