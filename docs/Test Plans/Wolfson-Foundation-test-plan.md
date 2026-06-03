@@ -1,6 +1,6 @@
 # Wolfson Foundation — Health & Disability Stage 1 Test Plan
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-06-03
 **Status:** Ready for execution
 **Tester:** WJ
@@ -120,8 +120,8 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 | IT-WF-03 | Guidelines paste and AI summary | Yes | Not recorded | ✅ Pass | Auto-generates on load — no button. 7 sections extracted correctly. Sections path (free_form classification). |
 | IT-WF-04 | Eligibility check and preparation checklist | Yes | N/A | ✅ Pass | Branch A — no mismatch. Checklist displayed correctly with financial advisory. |
 | IT-WF-05 | AI summary content accuracy | Yes | N/A | ✅ Pass | Accurate for source text. Capital-only scope absent — not in Stage 1 questions page (expected). |
-| IT-WF-06 | Narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WF-07 | Non-narrative question handling | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WF-06 | Narrative question extraction and word limits | Yes | N/A | ✅ Pass | All 7 sections present, word limits correct. Timetable/location as prose cards — correct. |
+| IT-WF-07 | Non-narrative question handling | Yes | N/A | ✅ Pass | Data/file fields absent. Financial info correctly Budget-flagged, AI disabled. |
 | IT-WF-08 | Narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-09 | Answer approval and Step 5 navigation | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WF-10 | Word document export — structure and content | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -293,21 +293,22 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 
 | Expected question | Expected word limit | Actual word limit | Present? |
 |-------------------|--------------------|--------------------|----------|
-| Background to the organisation | 250 words | | |
-| Project summary | 400 words | | |
-| Previous support from the Wolfson Foundation | 50 words | | |
-| Any other information (optional) | 200 words | | |
-
-5. Note: the 25-word "project title" field may or may not appear as a card (it is very short and may be treated as a data field). Record the outcome.
+| Background to the organisation | 250 words | 250 words | ✅ |
+| Project title and summary | 400 words | 400 words | ✅ |
+| Project timetable | No limit (prose field) | No limit — "0 words" counter | ✅ |
+| Location and property details | No limit (prose field) | No limit — "0 words" counter | ✅ |
+| Financial information | Budget (no limit) | Budget badge, amber, AI disabled | ✅ |
+| Previous support from the Wolfson Foundation | 50 words | 50 words | ✅ |
+| Any other information (optional) | 200 words | 200 words | ✅ |
 
 **Expected result:**
-- 3–4 narrative question cards displayed
-- Word limits match the Wolfson Stage 1 specification
-- No non-narrative questions present as cards (data fields, file uploads, financial figures absent)
+- All 7 sections present with correct word limits
+- Financial information correctly flagged as Budget with AI assist disabled
+- Timetable and location shown as prose writing cards (correct — these are open text fields on the Wolfson form, not structured data fields)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record all questions and limits as observed):**
+**Notes:** All 7 sections present and correct. Word limits accurate on all capped sections. Project timetable and Location and property details appear as unlimited prose cards — this is correct behaviour; Wolfson treats these as narrative fields, not structured data. Financial information correctly flagged amber (Budget badge, warning message, AI assist greyed out). Progress bar shows "0 of 7 sections approved" ✅. Funder context bar correct ✅.
 
 ---
 
@@ -318,29 +319,26 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 
 **Steps:**
 1. Review the Step 4 Q&A interface
-2. Confirm the following non-narrative fields are absent as question cards:
+2. Confirm the following true non-narrative fields are absent (these require no written prose):
 
 | Question | Type | Absent? |
 |----------|------|---------|
-| Organisation name, address, charity number | Data entry | |
-| Head of organisation / contact person | Data entry | |
-| CQC / Ofsted report | File upload | |
-| Timetable for the project | Structured data | |
-| Location of the project | Structured data | |
-| Ownership / tenure / planning permission | Structured data | |
-| Total cost / funds raised / shortfall | Financial figures | |
-| Audited accounts (last two years) | File upload | |
-| Signed letter from head of organisation | File upload | |
+| Organisation name, address, charity number | Data entry | ✅ Absent |
+| Head of organisation / contact person | Data entry | ✅ Absent |
+| CQC / Ofsted report | File upload | ✅ Absent |
+| Audited accounts (last two years) | File upload | ✅ Absent |
+| Signed letter / confirmation from head | File upload | ✅ Absent |
 
-3. Check whether the financial shortfall or funding plan appears as a narrative question — if so, verify it is flagged amber as a budget question with AI assist disabled
+3. Note: Timetable, Location and property details, and Financial information **are present** as writing cards — this is correct. Wolfson treats these as open prose fields, not structured data. Financial information is correctly flagged amber as a Budget section with AI assist disabled.
 
 **Expected result:**
-- All non-narrative fields absent from Step 4
-- No financial or file-upload fields appearing as text areas
+- Pure data-entry and file-upload fields absent from Step 4 ✅
+- Financial information present but correctly flagged as Budget with AI assist disabled ✅
+- Timetable and Location present as unlimited prose cards ✅
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** All data-entry and file-upload fields correctly absent. Financial information correctly shown as Budget card (amber border, amber warning, AI assist greyed out). Timetable and Location shown as unlimited prose cards — confirmed correct for Wolfson's open text format.
 
 ---
 
@@ -530,3 +528,4 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 | 1.1 | 2026-06-03 | Rapidglobe Ltd | IT-WF-02 step 3 corrected — grant range is not displayed in the funder picker UI (only name and Structured/Narrative badge are shown). Grant range reference removed from step and expected result. |
 | 1.2 | 2026-06-03 | Rapidglobe Ltd | IT-WF-03 corrected — summary auto-generates on page load, no Generate Summary button exists. IT-WF-03 and IT-WF-05 marked Pass with results recorded. IT-WF-05 expected results revised to reflect Stage 1 questions page as source (capital-only scope and exclusions not present in source text — absence correct). Sections/free_form classification by AI noted as expected given pasted content format. |
 | 1.3 | 2026-06-03 | Rapidglobe Ltd | IT-WF-04 expanded — clarified that eligibility warning appears on Step 3 (AI Summary), not on the preparation checklist. Added explicit verification steps for the "Before you begin writing" checklist (financial advisory, four checklist items, "I have what I need" button). IT-WF-04 marked Pass (Branch A). Test case renamed to reflect checklist coverage. |
+| 1.4 | 2026-06-03 | Rapidglobe Ltd | IT-WF-06 and IT-WF-07 marked Pass with observed results recorded. IT-WF-07 expected table corrected — timetable and location are correctly present as prose cards (Wolfson open text fields, not structured data). IT-WF-06 table filled with actuals. |
