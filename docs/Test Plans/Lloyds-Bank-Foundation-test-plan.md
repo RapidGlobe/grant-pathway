@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.4
+**Version:** 1.5
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -153,7 +153,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed | Yes | N/A | ✅ Pass | Ineligible badge shown on dashboard; FR-47 hard stop confirmed |
 | IT-LBF-04 | New Leaf account registration and profile setup | No | N/A | ✅ Pass | Registration number omitted (optional field) — profile saved successfully without it |
 | IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ✅ Pass | |
-| IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | 24s | ✅ Pass | 10 questions extracted. Question set differs from test plan expectation — actual form has 500/600-word narrative questions. IT-LBF-09 table updated to reflect actual questions. Q3 (quality marks, 150 words) borderline — monitor in IT-LBF-10. |
 | IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -324,9 +324,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - No JSON parse error
 - New Leaf's profile aligns with Lloyds E&W criteria — no mismatch expected
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record summary time and eligibility outcome):**
+**Notes:** Summary generated in 24 seconds (within NFR-01 30s target). 10 questions extracted. Summary content accurate — grant amount, eligibility criteria, eight themes, and key requirements all correctly reflected. Question set differs from test plan expectation: actual form uses 500/600-word narrative questions rather than the anticipated 50/250-word set. IT-LBF-09 table updated accordingly. Q3 (quality marks, 150 words) borderline non-narrative — monitor in IT-LBF-10.
 
 ---
 
@@ -392,22 +392,22 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Steps:**
 1. On Step 4, record the total number of question/section cards displayed
 2. For each card, record: question text and displayed word limit
-3. Verify the following key narrative questions appear with correct limits:
+3. Verify the following questions appear with correct limits (updated from actual form):
 
-| Expected question | Expected word limit | Actual limit | Present? |
-|-------------------|--------------------|--------------| ---------|
-| History and background | 250 words | | |
-| Main activities/benefits | 500 words | | |
-| Lived experience | 250 words | | |
-| Tracking progress | 250 words | | |
-| What the grant will fund | 500 words | | |
-| Track record | 250 words | | |
-| Collaboration | 250 words | | |
-| Gap in services | 250 words | | |
-| Social need and impact | 500 words | | |
-| Sustainability | 50 words | | |
+| Q# | Expected question | Expected word limit | Actual limit | Present? |
+|----|-------------------|--------------------|--------------| ---------|
+| Q1 | Short summary of charity's purpose and aims | 500 words | | |
+| Q2 | Main services your charity provides | 600 words | | |
+| Q3 | Quality marks or standards held and date awarded | 150 words | | |
+| Q4 | What changes are you working towards with people you support | 500 words | | |
+| Q5 | How does your organisation approach equity, diversity and inclusion | 500 words | | |
+| Q6 | How are people with lived experience involved in how your charity is run | 500 words | | |
+| Q7 | How do you support people who have experienced trauma | 500 words | | |
+| Q8 | Strengths of and opportunities for your organisation | 500 words | | |
+| Q9 | Most pressing areas for further development and how identified | 500 words | | |
+| Q10 | Anything further in support of your application (optional) | 400 words | | |
 
-4. Note: outcome questions (Q6, Q25) have 50-word limits — short limits test similar to Wolfson's 50-word "previous support" field
+4. Note: Q3 (quality marks, 150 words) is borderline non-narrative — verify whether it appears as a writing card or is absent from Step 4 (covered in IT-LBF-10)
 
 **Expected result:**
 - Narrative questions extracted with correct word limits
@@ -552,3 +552,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-02 and IT-LBF-03 passed — DOCX upload confirmed, eligibility mismatch hard stop (FR-47) verified for Harry's Rainbow. Ineligible badge shown on dashboard. |
 | 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-04 passed — New Leaf account registered and profile saved. Registration number omitted (optional field) — no issue. |
 | 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-05 passed — Lloyds Bank Foundation appears in funder picker with Structured badge. No issues. |
+| 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed — DOCX upload and AI summary complete in 24s. 10 questions extracted. Question set differs from test plan expectation; IT-LBF-09 table updated to reflect actual form questions. Q3 (quality marks, 150 words) flagged for monitoring in IT-LBF-10. |
