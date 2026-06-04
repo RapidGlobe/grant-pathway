@@ -1,6 +1,6 @@
 # Garfield Weston Foundation — Regular Grants Test Plan
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -126,7 +126,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 | Test ID | Test Name | GWF-specific | AI Summary Time | Result | Notes |
 |---------|-----------|-------------|----------------|--------|-------|
-| IT-GWF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-GWF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
 | IT-GWF-02 | Harry's Rainbow — Garfield Weston funder picker and guidelines upload | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-GWF-03 | Harry's Rainbow — eligibility passes (no false-positive mismatch) | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-GWF-04 | Greenfield Community Trust account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -166,7 +166,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Expected result:** Sign in succeeds; original Harry's Rainbow profile confirmed.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes:**
 
@@ -472,3 +472,4 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Garfield Weston Foundation Regular Grants. First test of the free-form/narrative path. Two accounts: Harry's Rainbow (broad eligibility pass — no false-positive mismatch expected) and Greenfield Community Trust (happy path, community welfare, Sunderland). 13 test cases. Guidelines PDF April 2026 edition. No AI policy; no per-section word limits; 10-page total limit; rolling open all year. |
+| 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-01 passed — Harry's Rainbow sign in and profile verified. |
