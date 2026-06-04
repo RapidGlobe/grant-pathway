@@ -1,6 +1,6 @@
 # Garfield Weston Foundation — Regular Grants Test Plan
 
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -138,7 +138,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | IT-GWF-10 | Greenfield Community Trust — non-narrative content handling; finance sections | Yes | N/A | ✅ Pass | No financial table cards. Budget sections are free-text with Budget badge. No AI assist button on budget sections. Ready to assemble correctly greyed until all 11 approved. |
 | IT-GWF-11 | Greenfield Community Trust — section writing and AI assist | No | N/A | ✅ Pass | AI assist working on narrative sections. Budget sections correctly have no AI assist button. All 11 sections written and approved. |
 | IT-GWF-12 | Greenfield Community Trust — section approval and Step 5 navigation | No | N/A | ✅ Pass | Assembly and approval flow completed correctly. |
-| IT-GWF-13 | Greenfield Community Trust — export; timestamp; re-export warning | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-GWF-13 | Greenfield Community Trust — export; timestamp; re-export warning | No | N/A | ✅ Pass | Timestamp "04 June 2026, 17:05" confirmed. Narrative format verified — sections flow as Title → Content → separator, not numbered Q&A. All 11 sections present. Footer present. |
 
 ---
 
@@ -462,9 +462,9 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 - Plain text file downloads ✅
 - Exported document formatted as a narrative proposal, not a Q&A list
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record export timestamps and comment on document formatting):**
+**Notes:** Word doc and plain text both downloaded successfully. Timestamp "04 June 2026, 17:05" confirmed in both. Narrative format correct — sections presented as Title → Content → "---" separator throughout, not numbered Q&A. All 11 sections present including budget sections. Footer "Prepared using Grant Pathway v1 — grantpathway.org.uk" present. Re-export dialog confirmed with HH:MM timestamp.
 
 ---
 
@@ -478,3 +478,4 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-04 and IT-GWF-05 passed. Greenfield Community Trust registered and funder picker confirmed. |
 | 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-07, 08, 09 passed. D-GWF-01 raised and fixed (revalidatePath on step/4 redirects). All 11 sections confirmed. Budget wording improved. 9/13 complete. |
 | 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-10, 11, 12 passed. No financial table cards. No AI assist on budget sections. Assembly and approval complete. 12/13 complete. |
+| 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-13 passed. Testing complete — 13/13. Narrative export format confirmed (Title → Content → separator). Timestamp HH:MM confirmed. D-GWF-01 only defect, already fixed. |
