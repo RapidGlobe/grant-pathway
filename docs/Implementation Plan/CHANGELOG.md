@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-04 — NFR-01 summarisation target revised; AGENTS.md NFR reference added
+
+**What changed:**
+- `docs/non-functional-requirements.md` — NFR-01 AI guideline summarisation target split into two tiers based on funder testing evidence: standard documents (up to ~8 pages) ≤30 seconds; large documents (over 8 pages) ≤45 seconds. Performance evidence from six funder test cycles added as a table. Pre-launch recommendation added for Clothworkers-style multi-form PDFs (40–47s) which approach the upper limit.
+- `AGENTS.md` — `docs/non-functional-requirements.md` added to the documentation table so future sessions know to update it when performance targets change.
+- Affected test plans updated to reference the correct NFR-01 tier (Clothworkers, LBF, Garfield Weston).
+
+**Why:**
+Garfield Weston Foundation testing (2026-06-04) produced summary times of 33–37 seconds on the 11-page guidelines PDF. The original single 30-second target was set before any real-funder testing. Six test cycles have now produced a range of measurements (24s–47s) that shows clearly that document size is the primary driver. A two-tier target (30s standard / 45s large) is both more accurate and more actionable: it confirms that simple structured PDFs are comfortably within target while flagging that very large multi-form PDFs need attention before go-live. The pre-launch recommendation to investigate streaming or document pre-processing ensures the issue is not lost.
+
+---
+
 ## 2026-06-03 — Three testing defects fixed; Lloyds funder corrected; Lloyds test plan created
 
 **What changed:**

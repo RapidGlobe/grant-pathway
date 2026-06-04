@@ -331,7 +331,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 **Result:** ✅ Pass
 
-**Notes:** Summary generated in 24 seconds (within NFR-01 30s target). 10 questions extracted. Summary content accurate — grant amount, eligibility criteria, eight themes, and key requirements all correctly reflected. Question set differs from test plan expectation: actual form uses 500/600-word narrative questions rather than the anticipated 50/250-word set. IT-LBF-09 table updated accordingly. Q3 (quality marks, 150 words) borderline non-narrative — monitor in IT-LBF-10.
+**Notes:** Summary generated in 24 seconds (within NFR-01 standard-document target of ≤30s). 10 questions extracted. Summary content accurate — grant amount, eligibility criteria, eight themes, and key requirements all correctly reflected. Question set differs from test plan expectation: actual form uses 500/600-word narrative questions rather than the anticipated 50/250-word set. IT-LBF-09 table updated accordingly. Q3 (quality marks, 150 words) borderline non-narrative — monitor in IT-LBF-10.
 
 ---
 

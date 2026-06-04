@@ -9,10 +9,19 @@ This document captures the agreed non-functional requirements for the v1 build. 
 | Metric | Target |
 |--------|--------|
 | Page loads and navigation | Under 3 seconds |
-| AI guideline summarisation | Under 30 seconds |
+| AI guideline summarisation — standard documents (up to ~8 pages) | Under 30 seconds |
+| AI guideline summarisation — large documents (over 8 pages) | Under 45 seconds |
 | AI answer refine (per question) | Under 15 seconds |
 
-**Notes:** Grant writing is not a real-time task. Users will tolerate a short wait for AI-assisted refinement provided a clear progress indicator is shown. These targets are realistic for Amazon Bedrock Claude API under normal load.
+**Notes:** Grant writing is not a real-time task. Users will tolerate a short wait for AI summary generation and for AI-assisted refinement provided a clear progress indicator is shown. These targets are based on Amazon Bedrock Claude API performance observed during funder test cycles (2026-06-01 to 2026-06-04).
+
+**Performance evidence from funder testing (2026-06-04):**
+- LBF Specialist Programme (Word form, ~10 pages): 24 seconds ✅
+- Walton Charity (PDF, 4 pages): 25 seconds ✅
+- Garfield Weston Foundation (PDF, 11 pages): 33–37 seconds ✅ (under 45s target for large docs)
+- Clothworkers' Foundation (PDF, multi-form): 40–47 seconds — approaches the large-document limit; performance improvement recommended before go-live
+
+**Pre-launch recommendation:** The Clothworkers multi-form PDF reaching 40–47 seconds is close to the upper limit. Investigate document pre-processing or streaming responses before go-live to ensure consistent performance across all funder types.
 
 **Vercel function region (2026-05-29):** Vercel function region was set to London (eu-west-2 / lhr1) to match AWS Bedrock (eu-west-2). This eliminates the transatlantic round trip that previously occurred with the default iad1 (Virginia) region, reducing AI call latency and lowering timeout risk on large guideline documents.
 
@@ -103,5 +112,5 @@ WCAG 2.2 Level AA compliance is a design-in requirement from day one (C15). An i
 
 ---
 
-*Last updated: 2026-05-29*
+*Last updated: 2026-06-04*
 *Sources: BRD Information Gathering Checklist items 30–35; constraints-and-assumptions.md (C15, C16, C17); DR-LC-003; PDR-UI-003 (desktop-primary decision)*

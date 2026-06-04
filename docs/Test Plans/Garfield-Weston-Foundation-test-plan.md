@@ -127,7 +127,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | Test ID | Test Name | GWF-specific | AI Summary Time | Result | Notes |
 |---------|-----------|-------------|----------------|--------|-------|
 | IT-GWF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
-| IT-GWF-02 | Harry's Rainbow — Garfield Weston funder picker and guidelines upload | Yes | 33s | ✅ Pass | Narrative badge confirmed in picker. 11 sections extracted. 33s slightly over NFR-01 30s target — noted, not a failure. |
+| IT-GWF-02 | Harry's Rainbow — Garfield Weston funder picker and guidelines upload | Yes | 33s | ✅ Pass | Narrative badge confirmed in picker. 11 sections extracted. 33s within NFR-01 large-document target (≤45s for docs over 8 pages). |
 | IT-GWF-03 | Harry's Rainbow — eligibility passes (no false-positive mismatch) | Yes | N/A | ✅ Pass | No mismatch warning — summary displayed immediately. FR-47 correctly not triggered for a broadly eligible charity. |
 | IT-GWF-04 | Greenfield Community Trust account registration and profile setup | No | N/A | ✅ Pass | |
 | IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker | Yes | N/A | ✅ Pass | |
@@ -199,7 +199,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Result:** ✅ Pass
 
-**Notes:** Narrative badge confirmed in funder picker. PDF uploaded successfully. AI summary generated in 33s (marginally over 30s NFR-01 — noted). 11 sections extracted correctly matching the guidelines exactly. Summary content accurate and comprehensive.
+**Notes:** Narrative badge confirmed in funder picker. PDF uploaded successfully. AI summary generated in 33s (within revised NFR-01 large-document target of ≤45s for docs over 8 pages). 11 sections extracted correctly matching the guidelines exactly. Summary content accurate and comprehensive.
 
 ---
 

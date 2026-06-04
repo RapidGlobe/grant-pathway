@@ -64,6 +64,7 @@ Use the table below to identify the right document(s) for every change. Multiple
 | `docs/data-model.md` | Any change to the database schema, table definitions, field types, constraints, or entity relationships |
 | `docs/PRD inputs/screen-requirements.md` | Any change to the content, fields, validation rules, or error states of any screen |
 | `docs/PRD inputs/acceptance-criteria.md` | Any change to functional requirements that alters what "done" looks like — revised requirements, new edge cases, or new acceptance criteria |
+| `docs/non-functional-requirements.md` | Any change to performance targets, availability, scalability, security, browser support, or accessibility testing approach — update the relevant NFR row and bump the Last updated date |
 
 ## Test plans — mandatory coverage rule
 
