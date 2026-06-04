@@ -114,15 +114,19 @@ export function ApplicationStep4Draft({
   const answeredCount = questions.filter((q) => (answers[q.id] ?? '').trim() !== '').length
   // FR-32/FR-33: progress bar and gate use approved count, not just answered count
   const approvedCount = questions.filter((q) => approved[q.id]).length
-  // A section/question is optional if its title contains "(optional)" (case-insensitive).
-  // Optional sections that are unanswered do not block the assembly gate.
+  // A question is optional if its text contains "(optional)" or starts with
+  // "this question is optional" (e.g. Lloyds Bank Foundation Q10).
+  // Optional questions that are unanswered do not block the assembly gate.
+  const isOptionalQ = (text: string) =>
+    text.toLowerCase().includes('(optional)') ||
+    text.toLowerCase().startsWith('this question is optional')
+
   const allApproved =
     questions.length > 0 &&
     questions.every(
       (q) =>
         approved[q.id] ||
-        (q.questionText.toLowerCase().includes('(optional)') &&
-          (answers[q.id] ?? '').trim() === ''),
+        (isOptionalQ(q.questionText) && (answers[q.id] ?? '').trim() === ''),
     )
 
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
@@ -585,7 +589,7 @@ export function ApplicationStep4Draft({
                       </button>
                       {isOver && (
                         <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer exceeds the funder&apos;s word limit. In your interest, you can use AI to refine, improve the structure and bring it within the limit — or approve this answer as it stands.
+                          Your answer exceeds the funder&apos;s word limit. Please trim it or use AI to bring it within the limit before approving.
                         </p>
                       )}
                     </>
@@ -640,7 +644,7 @@ export function ApplicationStep4Draft({
               {/* FR-32 / FR-33 — Review prompts and approval step.
                   Show when: answer is non-empty OR section is optional (optional
                   sections may be left blank and still approved/skipped). */}
-              {(!isEmpty || q.questionText.toLowerCase().includes('(optional)')) && !isApprovedQ && refineState.status !== 'showing' && (
+              {(!isEmpty || isOptionalQ(q.questionText)) && !isOver && !isApprovedQ && refineState.status !== 'showing' && (
                 <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
                   <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
                     Before you approve, check:

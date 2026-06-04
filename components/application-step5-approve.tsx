@@ -49,11 +49,18 @@ function countWords(text: string): number {
 }
 
 function formatExportDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-GB', {
+  const d = new Date(iso)
+  const datePart = d.toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   })
+  const timePart = d.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+  return `${datePart}, ${timePart}`
 }
 
 function sourceBadge(
@@ -176,11 +183,14 @@ export function ApplicationStep5Approve({
   }
 
   // ── Download action ────────────────────────────────────────────────────────
-  const [isDownloading, setIsDownloading] = useState(false)
+  const [isDownloadingDocx, setIsDownloadingDocx] = useState(false)
+  const [isDownloadingTxt, setIsDownloadingTxt] = useState(false)
+  const isDownloading = isDownloadingDocx || isDownloadingTxt
   const [downloadError, setDownloadError] = useState<string | null>(null)
 
   async function doDownload(format: 'docx' | 'txt') {
-    setIsDownloading(true)
+    const setLoading = format === 'docx' ? setIsDownloadingDocx : setIsDownloadingTxt
+    setLoading(true)
     setDownloadError(null)
     try {
       const res = await fetch(
@@ -218,7 +228,7 @@ export function ApplicationStep5Approve({
     } catch {
       setDownloadError('Download failed. Please try again.')
     } finally {
-      setIsDownloading(false)
+      setLoading(false)
       setShowReExportDialog(false)
     }
   }
@@ -407,7 +417,7 @@ export function ApplicationStep5Approve({
           className="h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-          {isDownloading ? 'Downloading…' : 'Download as Word document (.docx)'}
+          {isDownloadingDocx ? 'Downloading…' : 'Download as Word document (.docx)'}
         </Button>
 
         {/* Download as plain text */}
@@ -419,7 +429,7 @@ export function ApplicationStep5Approve({
           className="h-10 w-full border-[#CBD5E1] text-[15px] font-semibold text-[#475569] hover:bg-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
-          {isDownloading ? 'Downloading…' : 'Download as plain text (.txt)'}
+          {isDownloadingTxt ? 'Downloading…' : 'Download as plain text (.txt)'}
         </Button>
       </div>
 
