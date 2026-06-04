@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.6
+**Version:** 1.7
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -155,8 +155,8 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ✅ Pass | |
 | IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | 24s | ✅ Pass | 10 questions extracted. Question set differs from test plan expectation — actual form has 500/600-word narrative questions. IT-LBF-09 table updated to reflect actual questions. Q3 (quality marks, 150 words) borderline — monitor in IT-LBF-10. |
 | IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ✅ Pass | Preparation checklist appeared correctly |
-| IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ✅ Pass | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected |
+| IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ✅ Pass | All 10 questions present with correct word limits. Q3 (quality marks, 150 words) included as writing card — borderline but acceptable as form assigns word limit |
 | IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01) | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-11 | New Leaf — narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-12 | New Leaf — answer approval and Step 5 navigation | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -378,9 +378,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - No hallucinated conditions
 - Word limits extracted correctly for narrative questions
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Grant amount (£75k/3 years), eight specialist themes, eligibility criteria, "what the funder is looking for", and key requirements all correctly reflected. No hallucinated conditions observed.
 
 ---
 
@@ -396,16 +396,16 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 | Q# | Expected question | Expected word limit | Actual limit | Present? |
 |----|-------------------|--------------------|--------------| ---------|
-| Q1 | Short summary of charity's purpose and aims | 500 words | | |
-| Q2 | Main services your charity provides | 600 words | | |
-| Q3 | Quality marks or standards held and date awarded | 150 words | | |
-| Q4 | What changes are you working towards with people you support | 500 words | | |
-| Q5 | How does your organisation approach equity, diversity and inclusion | 500 words | | |
-| Q6 | How are people with lived experience involved in how your charity is run | 500 words | | |
-| Q7 | How do you support people who have experienced trauma | 500 words | | |
-| Q8 | Strengths of and opportunities for your organisation | 500 words | | |
-| Q9 | Most pressing areas for further development and how identified | 500 words | | |
-| Q10 | Anything further in support of your application (optional) | 400 words | | |
+| Q1 | Short summary of charity's purpose and aims | 500 words | 500 words | ✅ |
+| Q2 | Main services your charity provides | 600 words | 600 words | ✅ |
+| Q3 | Quality marks or standards held and date awarded | 150 words | 150 words | ✅ (borderline non-narrative — included as word limit assigned) |
+| Q4 | What changes are you working towards with people you support | 500 words | 500 words | ✅ |
+| Q5 | How does your organisation approach equity, diversity and inclusion | 500 words | 500 words | ✅ |
+| Q6 | How are people with lived experience involved in how your charity is run | 500 words | 500 words | ✅ |
+| Q7 | How do you support people who have experienced trauma | 500 words | 500 words | ✅ |
+| Q8 | Strengths of and opportunities for your organisation | 500 words | 500 words | ✅ |
+| Q9 | Most pressing areas for further development and how identified | 500 words | 500 words | ✅ |
+| Q10 | Anything further in support of your application (optional) | 400 words | 400 words | ✅ |
 
 4. Note: Q3 (quality marks, 150 words) is borderline non-narrative — verify whether it appears as a writing card or is absent from Step 4 (covered in IT-LBF-10)
 
@@ -413,9 +413,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Narrative questions extracted with correct word limits
 - Mix of 50/250/500-word limits all handled correctly
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record all questions and limits as observed):**
+**Notes:** All 10 questions present with correct word limits. Q3 (quality marks, 150 words) confirmed present as writing card — borderline non-narrative but acceptable given form assigns a word limit. All other questions are clearly narrative. Word counters displayed correctly across 150/400/500/600-word variants.
 
 ---
 
@@ -554,3 +554,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-05 passed — Lloyds Bank Foundation appears in funder picker with Structured badge. No issues. |
 | 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed — DOCX upload and AI summary complete in 24s. 10 questions extracted. Question set differs from test plan expectation; IT-LBF-09 table updated to reflect actual form questions. Q3 (quality marks, 150 words) flagged for monitoring in IT-LBF-10. |
 | 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed — eligibility check passed for New Leaf, preparation checklist appeared correctly. |
+| 1.7 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-08 and IT-LBF-09 passed — AI summary accurate; all 10 questions extracted with correct word limits. Q3 (quality marks, 150 words) confirmed present as writing card — borderline but acceptable. IT-LBF-09 table completed with observed values. |
