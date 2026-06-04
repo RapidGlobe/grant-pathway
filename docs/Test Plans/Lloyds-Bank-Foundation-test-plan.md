@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.10
+**Version:** 1.11
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -170,6 +170,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 |----|------|-------------|----------|--------|
 | D-LBF-01 | IT-LBF-10 | Optional question label not visible as a card badge. Q10's optional nature is buried in the question text ("This question is optional. You can use this space..."). Users may miss it and feel obligated to fill it in. Suggested fix: surface "(Optional)" as a visible badge or label on the card header, consistent with how optional sections are treated elsewhere. | Low | Open |
 | D-LBF-02 | IT-LBF-11 | Over-limit answers can be approved. When word count exceeds the funder limit the system warns but still allows approval. A charity could paste an over-limit answer into a grant portal and have it rejected. Proposed fix: hard stop — hide/disable the approval button when the answer is over the word limit; display a red message: "Your answer is over the word limit. Please trim it or use AI to bring it within the limit before approving." Approval button reappears only when count is at or under the limit. | Medium | Open |
+| D-LBF-03 | IT-LBF-11 | D-WF-01 regression — assembly gate blocked by unapproved Q10 even though it is optional. "Ready to assemble" button is greyed out when Q10 is left empty and unapproved. Root cause: Q10's optional nature is declared in the question text ("This question is optional...") rather than as an explicit optional flag, so the system does not recognise it as optional and treats it as mandatory for the assembly gate. Likely same root cause as D-LBF-01. Fix: detect "optional" in question text and apply optional flag, or surface as card label — then exclude from assembly gate check. | Medium | Open |
 
 ---
 
@@ -560,3 +561,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.8 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-10 passed — no financial questions in Step 4, D-WF-01 fix confirmed (Ready to assemble visible with Q10 empty). D-LBF-01 raised: optional label buried in Q10 question text, not visible as card badge. |
 | 1.9 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11 steps updated to reflect actual form questions — replaced non-existent History/Grant fund/50-word questions with Q1 (500w), Q2 (600w), Q3 (150w). |
 | 1.10 | 2026-06-04 | Rapidglobe Ltd | D-LBF-02 raised — over-limit answers can be approved (warn-and-allow). Decision made to change to hard stop: approval button hidden when word count exceeded, red message to trim or use AI. Overrides previous design decision to allow. |
+| 1.11 | 2026-06-04 | Rapidglobe Ltd | D-LBF-03 raised — D-WF-01 regression. Ready to assemble greyed out when Q10 (optional) left empty. System not detecting optional from question text. Same root cause as D-LBF-01. Workaround: fill Q10 briefly to unblock testing. |
