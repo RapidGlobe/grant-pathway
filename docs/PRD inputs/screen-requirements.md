@@ -430,18 +430,25 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ### Step 4 — Draft Answers
 
+**Revised 2026-05-28 (Q&A model); updated 2026-06-04 (over-limit hard stop, optional gate, budget wording).**
+
 | Element | Detail |
 |---------|--------|
 | Page heading | *"Your draft answers"* |
-| Progress indicator | Staged messages: *"Reviewing your guidelines and charity profile…"* → *"Writing your draft answers…"* → *"Almost there…"* |
-| Draft content | Each extracted question shown as a bold heading with the AI-generated answer in an editable text area below. User can edit answers directly |
-| Manual question entry | If no questions were extracted in Step 3, user sees a manual entry field to add questions before generating answers |
-| Regenerate link | *"Regenerate all answers"* — secondary action. Counts as one AI request against monthly allowance (PDR-AI-005) |
-| Continue button | *"I've reviewed my answers — continue"* — primary action, advances to Step 5 |
-| Back link | Returns to Step 3 |
-| API failure state | *"We couldn't generate your draft right now. This is usually temporary — please try again."* with a **Try again** button (PDR-UI-006) |
-| Approaching limit warning | Soft banner: *"You've used most of your monthly AI allowance."* (PDR-AI-005) |
-| Limit reached | *"You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch."* — generate and regenerate buttons disabled |
+| Sub-heading | *"Answer each question below. Your work is saved automatically as you type."* (structured) or *"Write your content for each section below. Your work is saved automatically as you type."* (free-form) |
+| Progress bar | Sticky bar at top: *"X of N questions/sections approved"* |
+| Funder context bar | Teal bar showing funder name, grant name, and Back link |
+| Question/section cards | Each extracted question (structured) or section (free-form) displayed as a card. Structured: numbered heading + question text. Free-form: section title + guidance text below. |
+| Word/character counter | Displayed below each textarea. Shows "X / N words" or "X / N characters" for questions with limits. Shows "X words" only for sections with no limit (e.g. Garfield Weston). |
+| Over-limit hard stop | When answer exceeds word/character limit: approve panel hidden; red message displayed: *"Your answer exceeds the funder's word limit. Please trim it or use AI to bring it within the limit before approving."* *(Added 2026-06-04, D-LBF-02)* |
+| AI assist button | *"Help me improve this"* — shown on non-budget questions/sections when answer is non-empty. Disabled on budget sections. |
+| Budget section treatment | Budget questions/sections shown with amber border and "Budget" badge. Warning: *"Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding."* AI assist button absent. *(Wording updated 2026-06-04)* |
+| Approval panel | "Before you approve, check:" with three review prompts and "Approve this answer" button. Shown when answer is non-empty (or question is optional and empty). Hidden when answer is over-limit. |
+| Optional questions | Questions containing "(optional)" or beginning "This question is optional" show the approve panel even when empty, allowing the user to skip them. These questions are excluded from the assembly gate. *(Added 2026-06-04, D-LBF-01/03)* |
+| Approved state | Card shown with green border and *"Answer approved — edit above to revise"* confirmation. |
+| Ready to assemble | Button active when all mandatory questions/sections are approved. Greyed when any mandatory question is unapproved. Optional questions do not block the gate. |
+| Manual entry fallback | If no questions/sections were extracted in Step 3, user sees a manual entry field to add a question and write their answer. *"No specific questions were found in the funder's guidelines."* |
+| Back link | Returns to Step 3 (via funder context bar or bottom of page) |
 
 ---
 

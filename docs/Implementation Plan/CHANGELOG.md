@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-04 — Step 4 stale cache fix; free-form path first test (Garfield Weston)
+
+**What changed:**
+- `actions/applications.ts` — `revalidatePath()` added before `redirect()` to step/4 in all three locations (`advanceToStep4`, `setDraftInProgress`, `reopenApplication`). Without this, Next.js App Router could serve a stale cached version of Step 4 after a Server Action redirect, causing the "No specific questions found" fallback to appear even though sections were correctly stored in the database.
+- `components/application-step4-draft.tsx` — Budget section warning wording updated: "AI cannot generate these for you" → "AI cannot assist you with this". Applies to both free_form sections and structured questions.
+
+**Why:**
+Garfield Weston Foundation testing (2026-06-04) — first test of the free-form/narrative path. Step 4 showed the manual entry fallback immediately after the prep checklist. Database inspection confirmed all 11 sections were correctly stored; the issue was Next.js serving cached HTML after the Server Action redirect. `revalidatePath()` is the standard Next.js fix. Budget wording change was a user UX improvement identified during the same test session — "AI cannot assist you" is more accurate than "AI cannot generate these" because the distinction is about assistance, not just generation.
+
+---
+
+## 2026-06-04 — LBF defects D-LBF-01 to D-LBF-05 fixed; Foyle Foundation removed
+
+**What changed:**
+- `components/application-step4-draft.tsx`:
+  - **D-LBF-01/03:** `isOptionalQ()` helper added. Detects optional questions matching either `"(optional)"` (existing pattern) or `"this question is optional..."` (Lloyds Bank Foundation Q10 pattern). Used in both the `allApproved` assembly gate and the approve section visibility condition. Fixes D-WF-01 regression where Lloyds Q10 (phrased as optional in the question text) was blocking the assembly gate.
+  - **D-LBF-02:** Over-limit hard stop. `!isOver` added to the approve section condition — the "Approve this answer" panel is now hidden entirely when the answer exceeds the word/character limit. Over-limit message updated to "Please trim it or use AI to bring it within the limit before approving." This replaces the previous "warn but allow" behaviour.
+- `components/application-step5-approve.tsx`:
+  - **D-LBF-04:** `formatExportDate()` updated to include HH:MM time so re-export warning dialog shows full timestamp (e.g. "4 June 2026, 09:57") matching the format in the exported document.
+  - **D-LBF-05:** `isDownloading` split into `isDownloadingDocx` and `isDownloadingTxt`. Each download button now shows its own loading state independently. Previously a shared state caused both buttons to show "Downloading…" when only one was active.
+- `docs/target-funder-list.md` — Foyle Foundation struck through and annotated as permanently closed December 2025.
+- `docs/Test Plans/TEST-DASHBOARD.md` — Foyle Foundation marked ❌; Nationwide, Motability Foundation, and City Bridge Foundation marked ⏸️ (offline/closed); Garfield Weston flagged as next active funder.
+
+**Why:**
+All five defects surfaced during Lloyds Bank Foundation testing (2026-06-04). D-LBF-02 (over-limit hard stop) was a deliberate product decision: grant portal systems uniformly reject over-limit answers, so allowing approval would give false confidence. D-LBF-01/03 shared a root cause — the optional detection relied on "(optional)" in parentheses, missing the Lloyds-style "This question is optional..." phrasing. D-LBF-04 and D-LBF-05 were minor polish items improving timestamp accuracy and loading state UX.
+
+Foyle Foundation removed after research confirmed the foundation permanently closed its grant programme December 2025 — no new applications being accepted. Three other funders (Nationwide, Motability, City Bridge) parked as all currently offline or between rounds.
+
+---
+
 ## 2026-06-04 — NFR-01 summarisation target revised; AGENTS.md NFR reference added
 
 **What changed:**

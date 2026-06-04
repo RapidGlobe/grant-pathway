@@ -1287,6 +1287,25 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
+**AC-FR-29-04 — Approve button hidden when answer exceeds word/character limit** *(Added 2026-06-04, D-LBF-02)*
+
+- **Given** a question has a word or character limit
+- **When** my answer exceeds that limit
+- **Then** the "Approve this answer" panel and button are hidden
+- **And** a red message is displayed: "Your answer exceeds the funder's word limit. Please trim it or use AI to bring it within the limit before approving."
+- **And** the approve panel reappears as soon as the answer is brought back within the limit
+
+---
+
+**AC-FR-29-05 — Optional questions are excluded from the assembly gate** *(Added 2026-06-04, D-LBF-01/03)*
+
+- **Given** a question is marked as optional — either by containing "(optional)" in its text or by beginning with "This question is optional"
+- **When** I leave that question unanswered and unapproved
+- **Then** the "Ready to assemble" button remains active (not greyed out)
+- **And** the optional question shows an "Approve this answer" button even when empty, allowing the user to explicitly skip it
+
+---
+
 ### FR-30 — Must Have
 
 **Requirement:** The AI assist feature ("Help me improve this") shall improve the structure and clarity of the user's written answer without adding facts or changing the meaning.
@@ -1934,5 +1953,5 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-*Last updated: 2026-04-16*
-*Status: Complete — all 9 sections done*
+*Last updated: 2026-06-04*
+*Status: Complete — all 9 sections done; AC-FR-29-04 (over-limit hard stop) and AC-FR-29-05 (optional question gate) added 2026-06-04*

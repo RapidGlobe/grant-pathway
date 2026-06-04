@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-03 (Wolfson Foundation testing complete — 11 pass, 1 partial pass, 3 defects found; D-WF-01/04/05 fixed; Lloyds Bank Foundation CI replaced with E&W in funder directory; Lloyds E&W test plan created)
+**Last updated:** 2026-06-04 (LBF/Walton/Garfield Weston testing complete — 7 funders tested in total; 5 LBF defects fixed; D-GWF-01 fixed; NFR-01 revised; Foyle Foundation removed; budget wording updated)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -125,6 +125,27 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-06-04 — LBF/Walton/Garfield Weston testing complete; 6 defects fixed; NFR-01 revised; Foyle Foundation removed
+
+**Lloyds Bank Foundation testing (13 tests):** 13 Pass. Five defects found and fixed:
+- **D-LBF-01/D-LBF-03 (Medium):** Optional question detection extended from `"(optional)"` to also match `"this question is optional..."` via `isOptionalQ()` helper in `application-step4-draft.tsx`. Assembly gate now correctly excludes Lloyds-style optional questions (e.g. Q10). Both the approve button visibility and the `allApproved` gate use the same helper.
+- **D-LBF-02 (Medium):** Over-limit hard stop — `Approve this answer` button now hidden when answer exceeds the word/character limit (`!isOver` added to approve section condition). Over-limit message updated to "Please trim it or use AI to bring it within the limit before approving." Decision: mandatory to prevent charities submitting over-limit answers to funders.
+- **D-LBF-04 (Low):** Re-export warning dialog now shows full HH:MM timestamp. `formatExportDate()` in `application-step5-approve.tsx` updated to include time component.
+- **D-LBF-05 (Medium):** Plain text and Word download buttons now have independent loading states (`isDownloadingDocx` / `isDownloadingTxt`) in `application-step5-approve.tsx`. Previously a single shared state caused both buttons to show "Downloading…" when only one was in progress.
+
+**Walton Charity Community Grants testing (13 tests):** 13 Pass. No defects. Key finding: Walton Charity guidelines PDF does not contain application questions — paste from the application guidance page is required for correct question extraction.
+
+**Garfield Weston Foundation testing (13 tests):** 13 Pass. One defect found and fixed:
+- **D-GWF-01 (Medium):** Step 4 served stale cached page after prep checklist redirect — free-form sections were in the database but the page showed the "No specific questions found" fallback. Root cause: Next.js App Router serving cached HTML after Server Action redirect. Fixed by adding `revalidatePath()` before all `redirect()` calls to step/4 in `actions/applications.ts` (three locations: `advanceToStep4`, `setDraftInProgress`, `reopenApplication`). This is the first test of the free-form/narrative path — 11 sections extracted correctly.
+
+**Budget section wording:** "AI cannot generate these for you" → "AI cannot assist you with this" in `application-step4-draft.tsx`. Applies to both free_form sections and structured questions.
+
+**Foyle Foundation removed:** Foundation permanently closed December 2025. Removed from `docs/Test Plans/TEST-DASHBOARD.md` and `docs/target-funder-list.md`. Nationwide Building Society, Motability Foundation, and City Bridge Foundation also parked (all offline/closed). Garfield Weston Foundation confirmed as next active test funder.
+
+**NFR-01 revised:** AI guideline summarisation target split into two tiers: standard documents (≤8 pages) ≤30s; large documents (>8 pages) ≤45s. Based on evidence from 6 funder test cycles. Pre-launch recommendation added for large multi-form PDFs.
+
+---
 
 ### 2026-06-03 — Wolfson Foundation testing complete; three defects fixed; Lloyds funder updated; Lloyds test plan created
 
