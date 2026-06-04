@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-05 (SCHEDULED) — Linting and code quality infrastructure — ADR-OPS-008
+
+⚠️ **This work is scheduled for 2026-06-05. No implementation has been done yet.** The decision is recorded in `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
+
+**What to implement (four phases, in order):**
+
+**Phase 1 — Scripts and Prettier (~30 min):**
+- `npm install --save-dev prettier eslint-config-prettier`
+- Create `.prettierrc` and `.prettierignore`
+- Add `eslint-config-prettier` to `eslint.config.mjs`
+- Update `package.json` scripts: `lint` (add `. --max-warnings 0`), add `lint:fix`, `format`, `format:check`, `type-check`
+
+**Phase 2 — Pre-commit hooks (~30 min):**
+- `npm install --save-dev husky lint-staged && npx husky init`
+- Configure `.husky/pre-commit` to run `lint-staged`
+- Add `lint-staged` config to `package.json`
+
+**Phase 3 — GitHub Actions CI (~1 hour):**
+- Create `.github/workflows/ci.yml` — runs `type-check`, `lint`, `format:check` on every push and PR
+
+**Phase 4 — TypeScript tightening (~1–2 hours, review required):**
+- Add `noImplicitReturns`, `noFallthroughCasesInSwitch` to `tsconfig.json`
+- Evaluate `noUncheckedIndexedAccess` — may surface existing issues
+
+**Why this matters:** AI-assisted development dramatically increases the speed at which inconsistencies accumulate. Pre-commit hooks (Phase 2) are the most critical gap — currently all AI-generated code can be committed without any automated check.
+
+**Full decision record:** `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`
+
+---
+
 ## 2026-06-04 — Step 4 stale cache fix; free-form path first test (Garfield Weston)
 
 **What changed:**

@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-05-26
+**Last updated:** 2026-06-04
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -131,6 +131,7 @@ Infrastructure, deployment, and operational decisions.
 | ADR-OPS-005 | Error Tracking and Monitoring | ✅ Decided | [ADR-OPS-005-error-tracking.md](ADR-OPS-005-error-tracking.md) |
 | ADR-OPS-006 | Accessibility Testing | ✅ Decided | [ADR-OPS-006-accessibility-testing.md](ADR-OPS-006-accessibility-testing.md) |
 | ADR-OPS-007 | Uptime Monitoring and Application Health | ✅ Decided | [ADR-OPS-007-uptime-monitoring.md](ADR-OPS-007-uptime-monitoring.md) |
+| ADR-OPS-008 | Linting and Code Quality Infrastructure | ✅ Decided — implement 2026-06-05 | [ADR-OPS-008-linting-and-code-quality.md](ADR-OPS-008-linting-and-code-quality.md) |
 
 ---
 
