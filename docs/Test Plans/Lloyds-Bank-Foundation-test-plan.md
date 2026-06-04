@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.11
+**Version:** 1.12
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -158,9 +158,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ✅ Pass | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected |
 | IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ✅ Pass | All 10 questions present with correct word limits. Q3 (quality marks, 150 words) included as writing card — borderline but acceptable as form assigns word limit |
 | IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01) | Yes | N/A | ✅ Pass | No financial questions displayed. Ready to assemble visible with Q10 empty — D-WF-01 fix confirmed. D-LBF-01 raised: optional label buried in Q10 question text, not visible as a card badge |
-| IT-LBF-11 | New Leaf — narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-LBF-12 | New Leaf — answer approval and Step 5 navigation | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-LBF-13 | New Leaf — export; timestamp fix (D-WF-05); re-export warning fix (D-WF-04) | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-11 | New Leaf — narrative answer writing and AI assist | No | N/A | ✅ Pass | D-LBF-02 (over-limit approval) and D-LBF-03 (optional Q10 blocks assembly) found during this test |
+| IT-LBF-12 | New Leaf — answer approval and Step 5 navigation | No | N/A | ✅ Pass | Funder, grant name, checkboxes, and assembled draft all correct |
+| IT-LBF-13 | New Leaf — export; timestamp fix (D-WF-05); re-export warning fix (D-WF-04) | No | N/A | ✅ Pass (2 defects) | D-WF-05 ✅ timestamp in doc. D-WF-04 ✅ re-export warning appears inc. after re-open/re-approve. D-LBF-04: re-export dialog shows date only, missing HH:MM. D-LBF-05: plain text download produces no file. |
 
 ---
 
@@ -171,6 +171,8 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | D-LBF-01 | IT-LBF-10 | Optional question label not visible as a card badge. Q10's optional nature is buried in the question text ("This question is optional. You can use this space..."). Users may miss it and feel obligated to fill it in. Suggested fix: surface "(Optional)" as a visible badge or label on the card header, consistent with how optional sections are treated elsewhere. | Low | Open |
 | D-LBF-02 | IT-LBF-11 | Over-limit answers can be approved. When word count exceeds the funder limit the system warns but still allows approval. A charity could paste an over-limit answer into a grant portal and have it rejected. Proposed fix: hard stop — hide/disable the approval button when the answer is over the word limit; display a red message: "Your answer is over the word limit. Please trim it or use AI to bring it within the limit before approving." Approval button reappears only when count is at or under the limit. | Medium | Open |
 | D-LBF-03 | IT-LBF-11 | D-WF-01 regression — assembly gate blocked by unapproved Q10 even though it is optional. "Ready to assemble" button is greyed out when Q10 is left empty and unapproved. Root cause: Q10's optional nature is declared in the question text ("This question is optional...") rather than as an explicit optional flag, so the system does not recognise it as optional and treats it as mandatory for the assembly gate. Likely same root cause as D-LBF-01. Fix: detect "optional" in question text and apply optional flag, or surface as card label — then exclude from assembly gate check. | Medium | Open |
+| D-LBF-04 | IT-LBF-13 | Re-export warning dialog shows date only, missing HH:MM time. Dialog reads "You last exported this application on 4 June 2026" — the time is absent. The exported Word document correctly shows the full timestamp (e.g. "04 June 2026, 08:36") per D-WF-05 fix, but the re-export dialog does not. On a day with multiple exports this leaves the user unable to identify which version was previously sent. Fix: include HH:MM in the re-export dialog timestamp to match the format used in the exported document. | Low | Open |
+| D-LBF-05 | IT-LBF-13 | Plain text download button appears on Step 5 but produces no file when clicked. The Word document download works correctly. The plain text option shows a download interaction but no file is delivered to the user. | Medium | Open |
 
 ---
 
@@ -474,9 +476,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - 150-word field (shortest in this form) enforces limit correctly
 - All approval prompts displayed before each approval
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Word counters correct for 150, 500, and 600-word fields. AI assist worked on Q1 (500 words). Q3 approved within 150-word limit. D-LBF-02 found (over-limit approval not blocked). D-LBF-03 found (Q10 optional blocks assembly gate).
 
 ---
 
@@ -501,9 +503,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Assembly and approval flow completes correctly
 - Step 5 content correct
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Funder (Lloyds Bank Foundation) and grant name (Specialist Programme — Care Leavers Support 2026) correct. Three confirmation checkboxes present. Assembled draft displayed correctly.
 
 ---
 
@@ -540,9 +542,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Re-export warning appears after re-open/re-approve cycle ✅ (D-WF-04)
 - Amended content present in final document ✅
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass (2 defects)
 
-**Notes (record export timestamps for comparison):**
+**Notes:** D-WF-05 ✅ — export doc shows "04 June 2026, 08:36" and "04 June 2026, 08:39" on second export. D-WF-04 ✅ — re-export warning dialog appeared on second download and after re-open/re-approve cycle. D-LBF-04: re-export dialog shows date only ("4 June 2026"), missing HH:MM — should match the full timestamp in the exported document. D-LBF-05: plain text download button appears but produces no file.
 
 ---
 
@@ -562,3 +564,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.9 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11 steps updated to reflect actual form questions — replaced non-existent History/Grant fund/50-word questions with Q1 (500w), Q2 (600w), Q3 (150w). |
 | 1.10 | 2026-06-04 | Rapidglobe Ltd | D-LBF-02 raised — over-limit answers can be approved (warn-and-allow). Decision made to change to hard stop: approval button hidden when word count exceeded, red message to trim or use AI. Overrides previous design decision to allow. |
 | 1.11 | 2026-06-04 | Rapidglobe Ltd | D-LBF-03 raised — D-WF-01 regression. Ready to assemble greyed out when Q10 (optional) left empty. System not detecting optional from question text. Same root cause as D-LBF-01. Workaround: fill Q10 briefly to unblock testing. |
+| 1.12 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11, IT-LBF-12, IT-LBF-13 complete. All 13 tests passed. D-LBF-04 (re-export dialog missing HH:MM) and D-LBF-05 (plain text download produces no file) raised. Testing complete — 5 defects open: D-LBF-01 through D-LBF-05. |
