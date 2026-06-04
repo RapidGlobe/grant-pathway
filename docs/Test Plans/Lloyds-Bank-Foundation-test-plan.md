@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.7
+**Version:** 1.8
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -157,7 +157,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ✅ Pass | Preparation checklist appeared correctly |
 | IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ✅ Pass | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected |
 | IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ✅ Pass | All 10 questions present with correct word limits. Q3 (quality marks, 150 words) included as writing card — borderline but acceptable as form assigns word limit |
-| IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01) | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01) | Yes | N/A | ✅ Pass | No financial questions displayed. Ready to assemble visible with Q10 empty — D-WF-01 fix confirmed. D-LBF-01 raised: optional label buried in Q10 question text, not visible as a card badge |
 | IT-LBF-11 | New Leaf — narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-12 | New Leaf — answer approval and Step 5 navigation | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-13 | New Leaf — export; timestamp fix (D-WF-05); re-export warning fix (D-WF-04) | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -168,6 +168,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 | ID | Test | Description | Severity | Status |
 |----|------|-------------|----------|--------|
+| D-LBF-01 | IT-LBF-10 | Optional question label not visible as a card badge. Q10's optional nature is buried in the question text ("This question is optional. You can use this space..."). Users may miss it and feel obligated to fill it in. Suggested fix: surface "(Optional)" as a visible badge or label on the card header, consistent with how optional sections are treated elsewhere. | Low | Open |
 
 ---
 
@@ -437,9 +438,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Optional sections show approve button when empty ✅ (D-WF-01 fixed)
 - Assembly gate does not require optional sections to be answered ✅ (D-WF-01 fixed)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** No financial questions present in Step 4. Q3 (quality marks) is the only borderline case — included as writing card due to 150-word limit, acceptable. "Ready to assemble" button visible with Q10 empty — D-WF-01 fix confirmed working. D-LBF-01 raised: Q10's optional nature is buried in the question text ("This question is optional. You can use this space...") rather than surfaced as a visible card badge. Suggested fix: add "(Optional)" as a visible label on the card header.
 
 ---
 
@@ -555,3 +556,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed — DOCX upload and AI summary complete in 24s. 10 questions extracted. Question set differs from test plan expectation; IT-LBF-09 table updated to reflect actual form questions. Q3 (quality marks, 150 words) flagged for monitoring in IT-LBF-10. |
 | 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed — eligibility check passed for New Leaf, preparation checklist appeared correctly. |
 | 1.7 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-08 and IT-LBF-09 passed — AI summary accurate; all 10 questions extracted with correct word limits. Q3 (quality marks, 150 words) confirmed present as writing card — borderline but acceptable. IT-LBF-09 table completed with observed values. |
+| 1.8 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-10 passed — no financial questions in Step 4, D-WF-01 fix confirmed (Ready to assemble visible with Q10 empty). D-LBF-01 raised: optional label buried in Q10 question text, not visible as card badge. |

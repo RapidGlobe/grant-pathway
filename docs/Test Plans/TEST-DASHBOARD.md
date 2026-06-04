@@ -1,6 +1,6 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.13
+**Version:** 1.14
 **Last updated:** 2026-06-04
 **Status:** Live — updated after each test session
 
@@ -15,7 +15,7 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | Clothworkers' Foundation | [Clothworkers-Foundation-test-plan.md](Clothworkers-Foundation-test-plan.md) | 10 | 0 | 🟢 | All 10 tests passed. D-CW-01 (AI assist over word limit) found and fixed during testing. Prompt fixes required for multi-form PDFs and conditional questions. Load time 40–47s exceeds NFR-01. GAP-28 Layer 2 (faith affiliation conditional question) remains open. |
 | Henry Smith Foundation | [Henry-Smith-Holiday-Grants-test-plan.md](Henry-Smith-Holiday-Grants-test-plan.md) | 10 | 0 | 🟢 | All 10 tests passed. D-HSF-01 (funder name seed error) and D-HSF-02 (question sync bug) found and fixed. Significant UX/prompt improvements made during this session. Proud Homes (two-stage) deferred. |
 | Wolfson Foundation | [Wolfson-Foundation-test-plan.md](Wolfson-Foundation-test-plan.md) | 11 | 0 (1 partial) | 🟢 | 11/12 Pass, IT-WF-12 partial pass. D-WF-01 (optional sections block assembly), D-WF-04 (re-export warning after re-open), D-WF-05 (no timestamp in export) — all three fixed same session. D-WF-03 (re-open clears all approvals) deferred by design decision. Paste path tested for first time. |
-| Lloyds Bank Foundation | [Lloyds-Bank-Foundation-test-plan.md](Lloyds-Bank-Foundation-test-plan.md) | 9 | — | 🟡 | Testing in progress. IT-LBF-01–09 passed. All 10 questions extracted with correct word limits (150/400/500/600-word variants). Q3 (quality marks, 150w) included as writing card — borderline but acceptable. Moving to Q&A writing. |
+| Lloyds Bank Foundation | [Lloyds-Bank-Foundation-test-plan.md](Lloyds-Bank-Foundation-test-plan.md) | 10 | — | 🟡 | Testing in progress. IT-LBF-01–10 passed. D-WF-01 fix confirmed. D-LBF-01 raised: optional label buried in Q10 question text. Moving to Q&A writing and export. |
 | Foyle Foundation — Main Grants | — | — | — | 🟡 | No test plan created yet. |
 | Walton Charity — Community Grants | — | — | — | 🟡 | No test plan created yet. |
 | Nationwide Building Society — Community Grants | — | — | — | 🟡 | No test plan created yet. |
@@ -53,3 +53,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.11 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed. DOCX upload and AI summary confirmed (24s). 10 questions extracted; IT-LBF-09 table updated to reflect actual form questions. 6/13 tests complete. |
 | 1.12 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed. New Leaf eligibility check passed, preparation checklist confirmed. 7/13 tests complete. |
 | 1.13 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-08 and IT-LBF-09 passed. AI summary accurate; all 10 questions present with correct word limits. 9/13 tests complete. |
+| 1.14 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-10 passed. D-WF-01 fix confirmed. D-LBF-01 raised (optional label not visible as card badge on Q10). 10/13 tests complete. |
