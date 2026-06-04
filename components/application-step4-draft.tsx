@@ -535,8 +535,8 @@ export function ApplicationStep4Draft({
                   />
                   <p className="text-[12px] text-[#78350F]">
                     {funderType === 'free_form'
-                      ? 'Budget sections must be completed using your own figures, as AI cannot generate these for you. Please ensure all numbers are accurate before proceeding.'
-                      : 'Budget questions must be completed using your own figures, as AI cannot generate these for you. Please ensure all numbers are accurate before proceeding.'}
+                      ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
+                      : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
                   </p>
                 </div>
               )}
