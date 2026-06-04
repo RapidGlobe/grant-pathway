@@ -1,6 +1,6 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.24
+**Version:** 1.25
 **Last updated:** 2026-06-04
 **Status:** Live — updated after each test session
 
@@ -20,7 +20,7 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | Walton Charity — Community Grants | [Walton-Charity-test-plan.md](Walton-Charity-test-plan.md) | 13 | 0 | 🟢 | All 13 tests passed. No defects. Key finding: PDF guidelines don't contain questions — paste from guidance page required. D-LBF-02/04/05 fixes all confirmed. |
 | Nationwide Building Society — Community Grants | [Nationwide-Building-Society-test-plan.md](Nationwide-Building-Society-test-plan.md) | — | — | ⏸️ | Parked — programme offline, last open round May 2023, no reopening date announced. Test plan built (v1.0) and criteria PDF in Grant Org Guidelines. Resume when programme reopens. |
 | Motability Foundation | — | — | — | ⏸️ | Parked — programme closed ("no organisation grants available at the moment"). Resume when reopens. |
-| Garfield Weston Foundation | — | — | — | 🟡 | Next to test. Open year-round, no deadlines. Guidelines PDF available. Narrative (free-form) funder — first test of the free-form path. |
+| Garfield Weston Foundation | [Garfield-Weston-Foundation-test-plan.md](Garfield-Weston-Foundation-test-plan.md) | — | — | 🟡 | Test plan created (v1.0, 13 cases). Harry's Rainbow — broad eligibility pass test (no false-positive mismatch expected). Greenfield Community Trust — happy path (community welfare, Sunderland). First test of the free-form/narrative path. Guidelines PDF April 2026 downloaded. |
 | City Bridge Foundation | — | — | — | ⏸️ | Parked — all main grant rounds currently closed; some reopening in 2026 but dates unconfirmed. Resume when a round opens. |
 
 ---
@@ -64,3 +64,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.22 | 2026-06-04 | Rapidglobe Ltd | Walton Charity testing complete — 13/13 passed, no defects, marked 🟢. Summary: 6 complete, 5 in progress/not started. |
 | 1.23 | 2026-06-04 | Rapidglobe Ltd | Nationwide Building Society test plan created (v1.0, 13 cases). Third-party criteria PDF downloaded. Programme status uncertain — confirm before testing. |
 | 1.24 | 2026-06-04 | Rapidglobe Ltd | Nationwide and Motability Foundation parked (both offline, no reopening dates). City Bridge parked (rounds closed). Garfield Weston confirmed open — next funder to test. |
+| 1.25 | 2026-06-04 | Rapidglobe Ltd | Garfield Weston Foundation test plan created (v1.0, 13 cases). Guidelines PDF downloaded. First free-form path test. |
