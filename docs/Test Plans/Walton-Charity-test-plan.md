@@ -1,6 +1,6 @@
 # Walton Charity — Community Grants Test Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -135,7 +135,7 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | IT-WC-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
 | IT-WC-02 | Harry's Rainbow — Walton Charity funder picker and guidelines upload | Yes | | ✅ Pass | |
 | IT-WC-03 | Harry's Rainbow — geographic eligibility mismatch confirmed | Yes | N/A | ✅ Pass | AI cited both geographic (Milton Keynes outside Elmbridge) and thematic (bereavement not linked to poverty) disqualifiers. Ineligible badge on dashboard. |
-| IT-WC-04 | Elmbridge Families Together account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WC-04 | Elmbridge Families Together account registration and profile setup | No | N/A | ✅ Pass | |
 | IT-WC-05 | Elmbridge Families Together — Walton Charity funder picker | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WC-06 | Elmbridge Families Together — PDF upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WC-07 | Elmbridge Families Together — eligibility check passes; preparation checklist | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -259,7 +259,7 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Charity profile saves successfully
 - Dashboard shows profile complete
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes:**
 
@@ -518,3 +518,4 @@ Questions from the Walton Charity application guidance page (word counts are sug
 |---------|------|--------|--------|
 | 1.0 | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Walton Charity Community Grants. Two test accounts: Harry's Rainbow (geographic mismatch — Milton Keynes outside Elmbridge) and Elmbridge Families Together (happy path, poverty alleviation charity in Walton-on-Thames). 13 test cases. Notes: word limits are suggested not hard; no AI policy published; application form is online-only (issued after enquiry). All lessons from LBF cycle incorporated. |
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-WC-01, IT-WC-02, IT-WC-03 passed. AI cited both geographic and thematic disqualifiers for Harry's Rainbow. Ineligible badge confirmed. |
+| 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-WC-04 passed — Elmbridge Families Together account registered and profile saved. |
