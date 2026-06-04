@@ -1,6 +1,6 @@
 # Walton Charity — Community Grants Test Plan
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -140,11 +140,11 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | IT-WC-06 | Elmbridge Families Together — PDF upload and AI summary | Yes | 25s (PDF) | ✅ Pass | PDF upload alone extracts only section headings — not specific questions. Paste from application guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) + explicit questions required for correct extraction. 5 questions extracted with correct word limits. |
 | IT-WC-07 | Elmbridge Families Together — eligibility check passes; preparation checklist | Yes | N/A | ✅ Pass | Eligibility passed. Preparation checklist displayed correctly. |
 | IT-WC-08 | Elmbridge Families Together — AI summary content accuracy | Yes | N/A | ✅ Pass | Summary accurate — Elmbridge restriction, poverty focus, grant amount, income limits, Who can apply, key requirements all correct. No AI policy flagged (absent from Walton Charity guidelines — handled gracefully). |
-| IT-WC-09 | Elmbridge Families Together — narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-10 | Elmbridge Families Together — non-narrative question handling; optional question behaviour | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-11 | Elmbridge Families Together — narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-12 | Elmbridge Families Together — answer approval and Step 5 navigation | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-13 | Elmbridge Families Together — export; timestamp in doc; re-export warning | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WC-09 | Elmbridge Families Together — narrative question extraction and word limits | Yes | N/A | ✅ Pass | All 5 questions present with correct word limits. D-LBF-02 fix confirmed at 500/500w boundary. |
+| IT-WC-10 | Elmbridge Families Together — non-narrative question handling; optional question behaviour | Yes | N/A | ✅ Pass | No non-narrative fields in Step 4. Q5 treated as mandatory — answered and approved. Ready to assemble active at 5/5. |
+| IT-WC-11 | Elmbridge Families Together — narrative answer writing and AI assist | No | N/A | ✅ Pass | Answers written across 300 and 500-word fields. Approve button correct at word limit. |
+| IT-WC-12 | Elmbridge Families Together — answer approval and Step 5 navigation | No | N/A | ✅ Pass | Approval dialog shows correct funder and grant name. |
+| IT-WC-13 | Elmbridge Families Together — export; timestamp in doc; re-export warning | No | N/A | ✅ Pass | Word doc timestamp "04 June 2026, 13:21" ✅. Re-export dialog "4 June 2026, 13:21" ✅. Plain text downloaded with timestamp ✅. Note: UI buttons say "Download as Word document (.docx)" / "Download as plain text (.txt)" — test plan wording updated to match. |
 
 ---
 
@@ -393,7 +393,7 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Mix of 300 and 500-word limits handled correctly
 - If questions missing — record as observation and note input method used
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes (record all questions and limits as observed):**
 
@@ -415,9 +415,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Optional questions (if any) show approve button when empty
 - Assembly gate not blocked by unanswered optional questions
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** No non-narrative fields present. Q5 treated as mandatory — answered and approved. Ready to assemble active at 5/5.
 
 ---
 
@@ -448,9 +448,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Hard stop confirmed for over-limit text (D-LBF-02)
 - All approval prompts displayed before each approval
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** D-LBF-02 fix confirmed — approve button correct at 500/500w boundary. 300 and 500-word fields handled correctly.
 
 ---
 
@@ -475,9 +475,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Assembly and approval flow completes correctly
 - Step 5 content correct for Walton Charity
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Approval dialog showed correct funder (Walton Charity — Community Grants) and grant name (Community Pantry and Financial Crisis Support 2026).
 
 ---
 
@@ -487,14 +487,14 @@ Questions from the Walton Charity application guidance page (word counts are sug
 **Prerequisite:** IT-WC-12 complete
 
 **Steps:**
-1. Click **Export as Word document**
+1. Click **Download as Word document (.docx)**
 2. Open the downloaded .docx file and verify:
    - Title: **"Community Pantry and Financial Crisis Support 2026"**
    - Funder: **"Walton Charity"**
    - Export date includes time — e.g. **"04 June 2026, 10:30"** (D-WF-05 fix)
    - AI disclaimer present and correctly worded
    - All approved answers present
-3. Click **Export as Word document** again
+3. Click **Download as Word document (.docx)** again
 4. Verify the **re-export warning dialog** appears showing the prior export timestamp with HH:MM (D-LBF-04 fix)
 5. Cancel — do not re-export
 6. Click **Download as plain text (.txt)**
@@ -506,9 +506,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Re-export warning shows full timestamp with time ✅ (D-LBF-04)
 - Plain text download delivers a file ✅ (D-LBF-05)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record export timestamps):**
+**Notes:** Word doc timestamp "04 June 2026, 13:21" ✅. Re-export dialog "4 June 2026, 13:21" with HH:MM ✅. Plain text downloaded with timestamp "04 June 2026, 13:23" ✅. Button labels confirmed: "Download as Word document (.docx)" and "Download as plain text (.txt)" — test plan wording corrected to match.
 
 ---
 
@@ -520,3 +520,4 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-WC-01, IT-WC-02, IT-WC-03 passed. AI cited both geographic and thematic disqualifiers for Harry's Rainbow. Ineligible badge confirmed. |
 | 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-WC-04 passed — Elmbridge Families Together account registered and profile saved. |
 | 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-WC-05–08 passed. Key finding: Walton Charity PDF guidelines do not contain application questions — paste from guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) required. 5 questions extracted with correct word limits. Eligibility passed, summary accurate. |
+| 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-WC-09–13 passed. Testing complete — 13/13. No defects found. D-LBF-02/04/05 fixes all confirmed working. Button label corrected to "Download as Word document (.docx)" / "Download as plain text (.txt)". |
