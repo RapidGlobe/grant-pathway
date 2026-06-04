@@ -1,8 +1,8 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-03
-**Status:** Ready for execution
+**Version:** 1.1
+**Date:** 2026-06-04
+**Status:** In progress
 **Tester:** WJ
 **Test accounts:** grantpathway+idle1@gmail.com (Harry's Rainbow — eligibility mismatch test) · grantpathway+lloyds1@gmail.com (New Leaf — happy path, new account)
 
@@ -148,7 +148,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 | Test ID | Test Name | LBF-specific | AI Summary Time | Result | Notes |
 |---------|-----------|-------------|----------------|--------|-------|
-| IT-LBF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
 | IT-LBF-02 | Harry's Rainbow — Lloyds funder picker and guidelines upload | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-04 | New Leaf account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -195,7 +195,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Profile shows the original Harry's Rainbow description
 - Dashboard accessible
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes:**
 
@@ -548,3 +548,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Lloyds Bank Foundation (England & Wales) Specialist Programme. Two test accounts: Harry's Rainbow (eligibility mismatch) and New Leaf (happy path, new charity, care leavers). 13 test cases. Verifies D-WF-01, D-WF-04, D-WF-05 fixes. DOCX upload path tested. |
+| 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-01 passed — Harry's Rainbow sign in and profile verification complete. |
