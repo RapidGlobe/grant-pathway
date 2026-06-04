@@ -1,6 +1,6 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.17
+**Version:** 1.18
 **Last updated:** 2026-06-04
 **Status:** Live — updated after each test session
 
@@ -17,7 +17,7 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | Wolfson Foundation | [Wolfson-Foundation-test-plan.md](Wolfson-Foundation-test-plan.md) | 11 | 0 (1 partial) | 🟢 | 11/12 Pass, IT-WF-12 partial pass. D-WF-01 (optional sections block assembly), D-WF-04 (re-export warning after re-open), D-WF-05 (no timestamp in export) — all three fixed same session. D-WF-03 (re-open clears all approvals) deferred by design decision. Paste path tested for first time. |
 | Lloyds Bank Foundation | [Lloyds-Bank-Foundation-test-plan.md](Lloyds-Bank-Foundation-test-plan.md) | 13 | 0 | 🟢 | All 13 tests passed. All 5 defects (D-LBF-01 to D-LBF-05) fixed and verified. DOCX upload path tested. Minor observation: re-export dialog appears when switching between docx and txt formats — wording improvement desirable but not a defect. |
 | Foyle Foundation — Main Grants | — | — | — | ❌ | Removed — foundation permanently closed December 2025; no new applications accepted. Replaced by Walton Charity as next test funder. |
-| Walton Charity — Community Grants | — | — | — | 🟡 | No test plan created yet. |
+| Walton Charity — Community Grants | [Walton-Charity-test-plan.md](Walton-Charity-test-plan.md) | — | — | 🟡 | Test plan created (v1.0, 13 cases). Harry's Rainbow — geographic mismatch (Milton Keynes outside Elmbridge). Elmbridge Families Together — happy path. Guidelines PDF to download before testing. Note: word limits suggested not hard; no AI policy published. |
 | Nationwide Building Society — Community Grants | — | — | — | 🟡 | No test plan created yet. |
 | Motability Foundation | — | — | — | 🟡 | No test plan created yet. |
 | Garfield Weston Foundation | — | — | — | 🟡 | No test plan created yet. Narrative (free-form) funder — primary test for the free-form path. |
@@ -57,3 +57,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.15 | 2026-06-04 | Rapidglobe Ltd | Lloyds Bank Foundation testing complete — 13/13 passed, marked 🟢. 5 defects open (D-LBF-01 to D-LBF-05). Summary count: 5 complete, 7 in progress/not started. |
 | 1.16 | 2026-06-04 | Rapidglobe Ltd | All 5 LBF defects verified fixed in retest. Lloyds Bank Foundation fully closed out. |
 | 1.17 | 2026-06-04 | Rapidglobe Ltd | Foyle Foundation removed — permanently closed December 2025. Walton Charity is next test funder. Summary: 5 complete, 6 in progress/not started. |
+| 1.18 | 2026-06-04 | Rapidglobe Ltd | Walton Charity test plan created (v1.0, 13 cases). Geographic mismatch test (Harry's Rainbow — Milton Keynes). Happy path: Elmbridge Families Together. Download guidelines PDF before testing. |
