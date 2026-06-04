@@ -1,6 +1,6 @@
 # Garfield Weston Foundation — Regular Grants Test Plan
 
-**Version:** 1.2
+**Version:** 1.3
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -129,8 +129,8 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | IT-GWF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
 | IT-GWF-02 | Harry's Rainbow — Garfield Weston funder picker and guidelines upload | Yes | 33s | ✅ Pass | Narrative badge confirmed in picker. 11 sections extracted. 33s slightly over NFR-01 30s target — noted, not a failure. |
 | IT-GWF-03 | Harry's Rainbow — eligibility passes (no false-positive mismatch) | Yes | N/A | ✅ Pass | No mismatch warning — summary displayed immediately. FR-47 correctly not triggered for a broadly eligible charity. |
-| IT-GWF-04 | Greenfield Community Trust account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-GWF-04 | Greenfield Community Trust account registration and profile setup | No | N/A | ✅ Pass | |
+| IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker | Yes | N/A | ✅ Pass | |
 | IT-GWF-06 | Greenfield Community Trust — PDF upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-GWF-07 | Greenfield Community Trust — eligibility check passes; preparation checklist | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-GWF-08 | Greenfield Community Trust — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -238,7 +238,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Expected result:** Registration completes; profile saves; dashboard accessible.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes:**
 
@@ -258,7 +258,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Expected result:** Funder appears; application created; Step 2 displayed.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes:**
 
@@ -474,3 +474,4 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | 1.0 | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Garfield Weston Foundation Regular Grants. First test of the free-form/narrative path. Two accounts: Harry's Rainbow (broad eligibility pass — no false-positive mismatch expected) and Greenfield Community Trust (happy path, community welfare, Sunderland). 13 test cases. Guidelines PDF April 2026 edition. No AI policy; no per-section word limits; 10-page total limit; rolling open all year. |
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-01 passed — Harry's Rainbow sign in and profile verified. |
 | 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-02 and IT-GWF-03 passed. Narrative badge confirmed. 11 sections extracted correctly. Summary accurate. Harry's Rainbow passed eligibility — no false-positive mismatch for broadly inclusive funder. |
+| 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-04 and IT-GWF-05 passed. Greenfield Community Trust registered and funder picker confirmed. |
