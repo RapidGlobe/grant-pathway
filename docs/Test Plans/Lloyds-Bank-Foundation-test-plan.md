@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -154,7 +154,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-04 | New Leaf account registration and profile setup | No | N/A | ✅ Pass | Registration number omitted (optional field) — profile saved successfully without it |
 | IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ✅ Pass | |
 | IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | 24s | ✅ Pass | 10 questions extracted. Question set differs from test plan expectation — actual form has 500/600-word narrative questions. IT-LBF-09 table updated to reflect actual questions. Q3 (quality marks, 150 words) borderline — monitor in IT-LBF-10. |
-| IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ✅ Pass | Preparation checklist appeared correctly |
 | IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01) | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -354,9 +354,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Record the mismatch reason as a defect
 - Log and investigate before proceeding
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record which branch taken):**
+**Notes:** Preparation checklist appeared correctly after Continue on Step 3. Eligibility passed — no mismatch for New Leaf.
 
 ---
 
@@ -553,3 +553,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-04 passed — New Leaf account registered and profile saved. Registration number omitted (optional field) — no issue. |
 | 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-05 passed — Lloyds Bank Foundation appears in funder picker with Structured badge. No issues. |
 | 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed — DOCX upload and AI summary complete in 24s. 10 questions extracted. Question set differs from test plan expectation; IT-LBF-09 table updated to reflect actual form questions. Q3 (quality marks, 150 words) flagged for monitoring in IT-LBF-10. |
+| 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed — eligibility check passed for New Leaf, preparation checklist appeared correctly. |
