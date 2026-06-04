@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -152,7 +152,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-02 | Harry's Rainbow — Lloyds funder picker and guidelines upload | Yes | | ✅ Pass | |
 | IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed | Yes | N/A | ✅ Pass | Ineligible badge shown on dashboard; FR-47 hard stop confirmed |
 | IT-LBF-04 | New Leaf account registration and profile setup | No | N/A | ✅ Pass | Registration number omitted (optional field) — profile saved successfully without it |
-| IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ✅ Pass | |
 | IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -297,9 +297,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Lloyds Bank Foundation appears with Structured badge
 - Application created and Step 2 displayed
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** No issues.
 
 ---
 
@@ -551,3 +551,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-01 passed — Harry's Rainbow sign in and profile verification complete. |
 | 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-02 and IT-LBF-03 passed — DOCX upload confirmed, eligibility mismatch hard stop (FR-47) verified for Harry's Rainbow. Ineligible badge shown on dashboard. |
 | 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-04 passed — New Leaf account registered and profile saved. Registration number omitted (optional field) — no issue. |
+| 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-05 passed — Lloyds Bank Foundation appears in funder picker with Structured badge. No issues. |
