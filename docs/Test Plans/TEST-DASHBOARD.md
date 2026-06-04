@@ -1,6 +1,6 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.20
+**Version:** 1.21
 **Last updated:** 2026-06-04
 **Status:** Live — updated after each test session
 
@@ -17,7 +17,7 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | Wolfson Foundation | [Wolfson-Foundation-test-plan.md](Wolfson-Foundation-test-plan.md) | 11 | 0 (1 partial) | 🟢 | 11/12 Pass, IT-WF-12 partial pass. D-WF-01 (optional sections block assembly), D-WF-04 (re-export warning after re-open), D-WF-05 (no timestamp in export) — all three fixed same session. D-WF-03 (re-open clears all approvals) deferred by design decision. Paste path tested for first time. |
 | Lloyds Bank Foundation | [Lloyds-Bank-Foundation-test-plan.md](Lloyds-Bank-Foundation-test-plan.md) | 13 | 0 | 🟢 | All 13 tests passed. All 5 defects (D-LBF-01 to D-LBF-05) fixed and verified. DOCX upload path tested. Minor observation: re-export dialog appears when switching between docx and txt formats — wording improvement desirable but not a defect. |
 | Foyle Foundation — Main Grants | — | — | — | ❌ | Removed — foundation permanently closed December 2025; no new applications accepted. Replaced by Walton Charity as next test funder. |
-| Walton Charity — Community Grants | [Walton-Charity-test-plan.md](Walton-Charity-test-plan.md) | 4 | — | 🟡 | Testing in progress. IT-WC-01–04 passed. Elmbridge Families Together account registered. Moving to funder picker and PDF upload. |
+| Walton Charity — Community Grants | [Walton-Charity-test-plan.md](Walton-Charity-test-plan.md) | 8 | — | 🟡 | Testing in progress. IT-WC-01–08 passed. Key finding: PDF guidelines don't contain questions — paste from application guidance page required. 5 questions extracted. Moving to Q&A writing. |
 | Nationwide Building Society — Community Grants | — | — | — | 🟡 | No test plan created yet. |
 | Motability Foundation | — | — | — | 🟡 | No test plan created yet. |
 | Garfield Weston Foundation | — | — | — | 🟡 | No test plan created yet. Narrative (free-form) funder — primary test for the free-form path. |
@@ -60,3 +60,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.18 | 2026-06-04 | Rapidglobe Ltd | Walton Charity test plan created (v1.0, 13 cases). Geographic mismatch test (Harry's Rainbow — Milton Keynes). Happy path: Elmbridge Families Together. Download guidelines PDF before testing. |
 | 1.19 | 2026-06-04 | Rapidglobe Ltd | Walton Charity IT-WC-01–03 passed. Strong mismatch — AI cited both geographic and thematic disqualifiers. 3/13 complete. |
 | 1.20 | 2026-06-04 | Rapidglobe Ltd | IT-WC-04 passed. Elmbridge Families Together account registered. 4/13 complete. |
+| 1.21 | 2026-06-04 | Rapidglobe Ltd | IT-WC-05–08 passed. PDF upload yields section headings only; paste from guidance page yields 5 questions with word limits. 8/13 complete. |

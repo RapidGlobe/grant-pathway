@@ -1,6 +1,6 @@
 # Walton Charity — Community Grants Test Plan
 
-**Version:** 1.2
+**Version:** 1.3
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -136,10 +136,10 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | IT-WC-02 | Harry's Rainbow — Walton Charity funder picker and guidelines upload | Yes | | ✅ Pass | |
 | IT-WC-03 | Harry's Rainbow — geographic eligibility mismatch confirmed | Yes | N/A | ✅ Pass | AI cited both geographic (Milton Keynes outside Elmbridge) and thematic (bereavement not linked to poverty) disqualifiers. Ineligible badge on dashboard. |
 | IT-WC-04 | Elmbridge Families Together account registration and profile setup | No | N/A | ✅ Pass | |
-| IT-WC-05 | Elmbridge Families Together — Walton Charity funder picker | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-06 | Elmbridge Families Together — PDF upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-07 | Elmbridge Families Together — eligibility check passes; preparation checklist | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-WC-08 | Elmbridge Families Together — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-WC-05 | Elmbridge Families Together — Walton Charity funder picker | Yes | N/A | ✅ Pass | |
+| IT-WC-06 | Elmbridge Families Together — PDF upload and AI summary | Yes | 25s (PDF) | ✅ Pass | PDF upload alone extracts only section headings — not specific questions. Paste from application guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) + explicit questions required for correct extraction. 5 questions extracted with correct word limits. |
+| IT-WC-07 | Elmbridge Families Together — eligibility check passes; preparation checklist | Yes | N/A | ✅ Pass | Eligibility passed. Preparation checklist displayed correctly. |
+| IT-WC-08 | Elmbridge Families Together — AI summary content accuracy | Yes | N/A | ✅ Pass | Summary accurate — Elmbridge restriction, poverty focus, grant amount, income limits, Who can apply, key requirements all correct. No AI policy flagged (absent from Walton Charity guidelines — handled gracefully). |
 | IT-WC-09 | Elmbridge Families Together — narrative question extraction and word limits | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WC-10 | Elmbridge Families Together — non-narrative question handling; optional question behaviour | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-WC-11 | Elmbridge Families Together — narrative answer writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -282,7 +282,7 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Walton Charity appears with Structured badge
 - Application created and Step 2 displayed
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes:**
 
@@ -311,9 +311,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - Summary reflects Elmbridge, Surrey geographic restriction, poverty alleviation priorities, and small grants programme
 - Elmbridge Families Together should pass eligibility
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record summary time, input method used, and whether questions were extracted):**
+**Notes:** PDF upload alone (25s) extracted only 5 broad section headings — no specific questions or word limits. Paste from application guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) with explicit 5 questions appended yielded correct extraction. Key finding: for Walton Charity, paste from guidance page is required — PDF guidelines do not contain application questions.
 
 ---
 
@@ -335,9 +335,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 **If mismatch appears (unexpected):**
 - Record the mismatch reason as a defect and investigate before proceeding
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record which branch taken):**
+**Notes:** Eligibility passed. Preparation checklist displayed correctly.
 
 ---
 
@@ -361,9 +361,9 @@ Questions from the Walton Charity application guidance page (word counts are sug
 - No hallucinated conditions
 - AI policy absence handled gracefully
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Summary accurate — Elmbridge restriction, poverty focus, grant amount (up to £10k), both income thresholds (£200k small / £5m general), Who can apply, key requirements all correct. No AI policy present in Walton Charity guidelines — handled gracefully (no fabrication).
 
 ---
 
@@ -519,3 +519,4 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | 1.0 | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Walton Charity Community Grants. Two test accounts: Harry's Rainbow (geographic mismatch — Milton Keynes outside Elmbridge) and Elmbridge Families Together (happy path, poverty alleviation charity in Walton-on-Thames). 13 test cases. Notes: word limits are suggested not hard; no AI policy published; application form is online-only (issued after enquiry). All lessons from LBF cycle incorporated. |
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-WC-01, IT-WC-02, IT-WC-03 passed. AI cited both geographic and thematic disqualifiers for Harry's Rainbow. Ineligible badge confirmed. |
 | 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-WC-04 passed — Elmbridge Families Together account registered and profile saved. |
+| 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-WC-05–08 passed. Key finding: Walton Charity PDF guidelines do not contain application questions — paste from guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) required. 5 questions extracted with correct word limits. Eligibility passed, summary accurate. |
