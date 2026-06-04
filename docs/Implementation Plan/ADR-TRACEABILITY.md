@@ -7,8 +7,8 @@
 - When a new task is added to cover a gap, update the Task column and change status to ✅ or 🔵.
 - When a task is completed, no change needed here — the task status lives in IMPLEMENTATION-STATUS.md.
 
-**Last updated:** 2026-05-26  
-**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26
+**Last updated:** 2026-06-04  
+**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article)
 
 ## Status key
 
@@ -165,6 +165,13 @@
 | ADR-OPS-007 | `app/api/health/route.ts` created | P3.11 | ✅ |
 | ADR-OPS-007 | `/api/health` added to public routes matcher in `proxy.ts` | P3.11 | ✅ |
 | ADR-OPS-007 | UptimeRobot account created and monitor configured | P5.4 | 🔵 |
+| ADR-OPS-008 | Prettier installed and `.prettierrc` + `.prettierignore` configured | — | ⚠️ GAP-29 |
+| ADR-OPS-008 | `eslint-config-prettier` added to `eslint.config.mjs` to prevent ESLint/Prettier conflict | — | ⚠️ GAP-29 |
+| ADR-OPS-008 | `package.json` scripts updated: `lint` (add `. --max-warnings 0`), `lint:fix`, `format`, `format:check`, `type-check` | — | ⚠️ GAP-29 |
+| ADR-OPS-008 | Husky + lint-staged installed; `pre-commit` hook configured to run lint-staged | — | ⚠️ GAP-29 |
+| ADR-OPS-008 | `.github/workflows/ci.yml` created: type-check + lint + format:check on every push/PR | — | ⚠️ GAP-29 |
+| ADR-OPS-008 | `noImplicitReturns` and `noFallthroughCasesInSwitch` added to `tsconfig.json` | — | ⚠️ GAP-29 |
+| ADR-OPS-008 | `noUncheckedIndexedAccess` evaluated and applied (may require targeted fixes) | — | ⚠️ GAP-29 |
 
 ---
 
@@ -249,6 +256,9 @@ All ⚠️ rows consolidated here for easy triage. Update this table as gaps are
 | GAP-24 | PDR-DH-003 | Export disclaimer wording deviates from spec — spec: "Please review carefully before submitting to the funder." — implementation: "All content has been checked for accuracy before submission." | Low | Fix in S7.2 patch | |
 | GAP-25 | ADR-ARCH-003 | Zod validation absent from `actions/applications.ts` and `actions/auth.ts`; ADR-ARCH-003 requires Zod on all Server Actions; only `actions/charity.ts` imports Zod | Medium | Add to P5.3 sweep | |
 | GAP-26 | PDR-UI-004 | `app/(authenticated)/applications/[id]/page.tsx` is a stub — does not redirect to `/applications/[id]/step/[current_step]` as specified in technical design and PDR-UI-004 | High | Fix as standalone task before P5.5 testing | |
+| GAP-27 | ADR-OPS-005, ADR-OPS-007 | No performance observability beyond Sentry error capture. AI route latency (25–47s summary times observed in testing), success/failure rates, and approaching-timeout events are not tracked as metrics. No alerting thresholds or operational dashboard exist. Identified 2026-06-04 via Knox "Production Thinking" review — production readiness pillar: Observability from day one. | Medium | Add structured latency logging to `generate-summary` and `refine-answer` routes (P5.3). Configure Sentry performance monitoring at P5.4 (requires Vercel Pro production baseline). | |
+| GAP-28 | ADR-OPS-002 | No documented rollback procedure for production deployments. GAP-12 covers Git release tagging but there is no written procedure for: when to trigger a rollback, how to do it in Vercel (one-click deployment revert), and what to check before re-deploying. Currently all pushes to `master` auto-deploy directly to production. Identified 2026-06-04 via Knox "Production Thinking" review — production readiness pillar: Safe deployment. | Medium | Document rollback procedure in pre-launch checklist (P5.4). Add rule: only push to `master` during business hours unless emergency. | |
+| GAP-29 | ADR-OPS-008 | Full linting infrastructure not implemented. No Prettier, no pre-commit hooks, no CI lint gate, no `type-check` script, lint script has no `--max-warnings 0`. All seven ADR-OPS-008 consequences are uncovered. Identified 2026-06-04 via project linting audit. Implementation scheduled 2026-06-05 (four phases, full detail in ADR-OPS-008). | High | Implement ADR-OPS-008 Phases 1–4 on 2026-06-05. | |
 
 ---
 
