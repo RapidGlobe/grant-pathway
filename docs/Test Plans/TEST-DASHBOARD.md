@@ -1,6 +1,6 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.23
+**Version:** 1.24
 **Last updated:** 2026-06-04
 **Status:** Live — updated after each test session
 
@@ -18,10 +18,10 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | Lloyds Bank Foundation | [Lloyds-Bank-Foundation-test-plan.md](Lloyds-Bank-Foundation-test-plan.md) | 13 | 0 | 🟢 | All 13 tests passed. All 5 defects (D-LBF-01 to D-LBF-05) fixed and verified. DOCX upload path tested. Minor observation: re-export dialog appears when switching between docx and txt formats — wording improvement desirable but not a defect. |
 | Foyle Foundation — Main Grants | — | — | — | ❌ | Removed — foundation permanently closed December 2025; no new applications accepted. Replaced by Walton Charity as next test funder. |
 | Walton Charity — Community Grants | [Walton-Charity-test-plan.md](Walton-Charity-test-plan.md) | 13 | 0 | 🟢 | All 13 tests passed. No defects. Key finding: PDF guidelines don't contain questions — paste from guidance page required. D-LBF-02/04/05 fixes all confirmed. |
-| Nationwide Building Society — Community Grants | [Nationwide-Building-Society-test-plan.md](Nationwide-Building-Society-test-plan.md) | — | — | 🟡 | Test plan created (v1.0, 13 cases). Harry's Rainbow — thematic mismatch (bereavement vs housing). Homehaven Oldham — happy path (floating support, Oldham). Note: no downloadable application form; third-party criteria PDF used. Programme may be between rounds — confirm before testing. |
-| Motability Foundation | — | — | — | 🟡 | No test plan created yet. |
-| Garfield Weston Foundation | — | — | — | 🟡 | No test plan created yet. Narrative (free-form) funder — primary test for the free-form path. |
-| City Bridge Foundation | — | — | — | 🟡 | No test plan created yet. Narrative (free-form) funder — secondary test for proposal-upload path. |
+| Nationwide Building Society — Community Grants | [Nationwide-Building-Society-test-plan.md](Nationwide-Building-Society-test-plan.md) | — | — | ⏸️ | Parked — programme offline, last open round May 2023, no reopening date announced. Test plan built (v1.0) and criteria PDF in Grant Org Guidelines. Resume when programme reopens. |
+| Motability Foundation | — | — | — | ⏸️ | Parked — programme closed ("no organisation grants available at the moment"). Resume when reopens. |
+| Garfield Weston Foundation | — | — | — | 🟡 | Next to test. Open year-round, no deadlines. Guidelines PDF available. Narrative (free-form) funder — first test of the free-form path. |
+| City Bridge Foundation | — | — | — | ⏸️ | Parked — all main grant rounds currently closed; some reopening in 2026 but dates unconfirmed. Resume when a round opens. |
 
 ---
 
@@ -63,3 +63,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.21 | 2026-06-04 | Rapidglobe Ltd | IT-WC-05–08 passed. PDF upload yields section headings only; paste from guidance page yields 5 questions with word limits. 8/13 complete. |
 | 1.22 | 2026-06-04 | Rapidglobe Ltd | Walton Charity testing complete — 13/13 passed, no defects, marked 🟢. Summary: 6 complete, 5 in progress/not started. |
 | 1.23 | 2026-06-04 | Rapidglobe Ltd | Nationwide Building Society test plan created (v1.0, 13 cases). Third-party criteria PDF downloaded. Programme status uncertain — confirm before testing. |
+| 1.24 | 2026-06-04 | Rapidglobe Ltd | Nationwide and Motability Foundation parked (both offline, no reopening dates). City Bridge parked (rounds closed). Garfield Weston confirmed open — next funder to test. |
