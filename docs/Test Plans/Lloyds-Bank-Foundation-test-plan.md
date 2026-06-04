@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.8
+**Version:** 1.9
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -450,26 +450,26 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-09 complete
 
 **Steps:**
-1. Navigate to **History and background** (250 words)
-2. Write an answer about New Leaf — founding, programme of key worker support and peer mentoring for care leavers, Greater Manchester focus
-3. Verify counter shows "X / 250 words"
+1. Navigate to **Q1 — Please provide a short summary of your charity's purpose and aims** (500 words)
+2. Write an answer about New Leaf — founding, key worker support and peer mentoring for care leavers, Greater Manchester focus
+3. Verify counter shows "X / 500 words"
 4. Click **Help me improve this** — verify the refined answer:
    - Corrects any spelling/grammar
-   - Stays within 250 words
+   - Stays within 500 words
    - Does not add invented facts
 5. Use the refined version and approve
-6. Navigate to **What the grant will fund** (500 words)
-7. Write an answer about the core operating costs: key worker salaries, peer mentoring programme, housing liaison role
-8. Approve without AI assist (tests user-authored path on a 500-word field)
-9. Navigate to a **50-word outcome question** (Q6 or Q25 equivalent)
-10. Write a concise outcome statement (e.g. *"Young care leavers maintain stable housing and avoid reoffending in the 12 months following our support."*)
-11. Verify the counter shows "X / 50 words"
+6. Navigate to **Q2 — What are the main services your charity provides?** (600 words)
+7. Write an answer about New Leaf's services: one-to-one key worker support, peer mentoring, housing liaison, employment support
+8. Approve without AI assist (tests user-authored path on a 600-word field)
+9. Navigate to **Q3 — Please list any quality marks or standards your charity currently holds and the date they were awarded** (150 words)
+10. Write a short list (e.g. *"Investors in People — Silver (2023). SafeGuarding Assured (2024)."*)
+11. Verify the counter shows "X / 150 words"
 12. Approve
 
 **Expected result:**
-- Word counters correct across all limit types (50, 250, 500 words)
-- AI assist works on 250-word field
-- 50-word field enforces limit correctly
+- Word counters correct across all limit types (150, 500, 600 words)
+- AI assist works on 500-word field
+- 150-word field (shortest in this form) enforces limit correctly
 - All approval prompts displayed before each approval
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -557,3 +557,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed — eligibility check passed for New Leaf, preparation checklist appeared correctly. |
 | 1.7 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-08 and IT-LBF-09 passed — AI summary accurate; all 10 questions extracted with correct word limits. Q3 (quality marks, 150 words) confirmed present as writing card — borderline but acceptable. IT-LBF-09 table completed with observed values. |
 | 1.8 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-10 passed — no financial questions in Step 4, D-WF-01 fix confirmed (Ready to assemble visible with Q10 empty). D-LBF-01 raised: optional label buried in Q10 question text, not visible as card badge. |
+| 1.9 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11 steps updated to reflect actual form questions — replaced non-existent History/Grant fund/50-word questions with Q1 (500w), Q2 (600w), Q3 (150w). |
