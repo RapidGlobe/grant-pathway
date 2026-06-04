@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -149,8 +149,8 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | Test ID | Test Name | LBF-specific | AI Summary Time | Result | Notes |
 |---------|-----------|-------------|----------------|--------|-------|
 | IT-LBF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
-| IT-LBF-02 | Harry's Rainbow — Lloyds funder picker and guidelines upload | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-LBF-02 | Harry's Rainbow — Lloyds funder picker and guidelines upload | Yes | | ✅ Pass | |
+| IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed | Yes | N/A | ✅ Pass | Ineligible badge shown on dashboard; FR-47 hard stop confirmed |
 | IT-LBF-04 | New Leaf account registration and profile setup | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -223,7 +223,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - DOCX uploads successfully (tests Word upload path)
 - AI summary generates without error
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
 **Notes (record summary time and whether mismatch warning appears):**
 
@@ -251,9 +251,9 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Application marked Ineligible on dashboard
 - FR-47 hard stop confirmed for Lloyds E&W
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record mismatch reason shown by AI):**
+**Notes:** Ineligible badge confirmed on dashboard. FR-47 hard stop working correctly for Lloyds E&W Specialist Programme.
 
 ---
 
@@ -549,3 +549,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 |---------|------|--------|--------|
 | 1.0 | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Lloyds Bank Foundation (England & Wales) Specialist Programme. Two test accounts: Harry's Rainbow (eligibility mismatch) and New Leaf (happy path, new charity, care leavers). 13 test cases. Verifies D-WF-01, D-WF-04, D-WF-05 fixes. DOCX upload path tested. |
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-01 passed — Harry's Rainbow sign in and profile verification complete. |
+| 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-02 and IT-LBF-03 passed — DOCX upload confirmed, eligibility mismatch hard stop (FR-47) verified for Harry's Rainbow. Ineligible badge shown on dashboard. |
