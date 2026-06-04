@@ -1,6 +1,6 @@
 # Garfield Weston Foundation — Regular Grants Test Plan
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-06-04
 **Status:** Ready for execution
 **Tester:** WJ
@@ -132,9 +132,9 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | IT-GWF-04 | Greenfield Community Trust account registration and profile setup | No | N/A | ✅ Pass | |
 | IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker | Yes | N/A | ✅ Pass | |
 | IT-GWF-06 | Greenfield Community Trust — PDF upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-GWF-07 | Greenfield Community Trust — eligibility check passes; preparation checklist | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-GWF-08 | Greenfield Community Trust — AI summary content accuracy | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-GWF-09 | Greenfield Community Trust — section extraction and free-form interface | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
+| IT-GWF-07 | Greenfield Community Trust — eligibility check passes; preparation checklist | Yes | N/A | ✅ Pass | D-GWF-01 raised: Step 4 served stale cached page after prep checklist — Ctrl+Shift+R required as workaround. Fixed: revalidatePath() added to all step/4 redirects. |
+| IT-GWF-08 | Greenfield Community Trust — AI summary content accuracy | Yes | N/A | ✅ Pass | Summary accurate and comprehensive. AI policy absence handled gracefully. Budget section wording updated: "AI cannot generate these" → "AI cannot assist you with this". |
+| IT-GWF-09 | Greenfield Community Trust — section extraction and free-form interface | Yes | N/A | ✅ Pass | All 11 sections present in correct order with correct guidance text. No word limits shown (correct). Budget sections 8 and 9 correctly flagged amber with Budget badge. Free-form interface confirmed (no numbered Q cards). |
 | IT-GWF-10 | Greenfield Community Trust — non-narrative content handling; finance sections | Yes | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-GWF-11 | Greenfield Community Trust — section writing and AI assist | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
 | IT-GWF-12 | Greenfield Community Trust — section approval and Step 5 navigation | No | N/A | ☐ Pass ☐ Fail ☐ Blocked | |
@@ -146,6 +146,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 | ID | Test | Description | Severity | Status |
 |----|------|-------------|----------|--------|
+| D-GWF-01 | IT-GWF-07 | Step 4 served stale cached page after prep checklist redirect — free-form sections were in the database but the page showed the "No specific questions found" fallback. Ctrl+Shift+R (hard refresh) resolved it. Root cause: Next.js App Router serving cached HTML after Server Action redirect. Fixed by adding revalidatePath() before all redirect() calls to step/4 in actions/applications.ts. | Medium | Fixed |
 
 ---
 
@@ -302,9 +303,9 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Expected result:** Greenfield Community Trust passes — community welfare charity in Welfare sector is a clear fit. Preparation checklist displayed correctly.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Eligibility passed. Preparation checklist appeared correctly. D-GWF-01 raised — Step 4 showed stale cached page (free-form fallback) after clicking "I have what I need". Ctrl+Shift+R resolved it. Fix deployed: revalidatePath() added to all step/4 redirects.
 
 ---
 
@@ -329,9 +330,9 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Expected result:** Summary accurately reflects Garfield Weston guidelines. No hallucinated conditions.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes:**
+**Notes:** Summary accurate — sectors, grant amounts, 10-page limit, no deadlines, eligibility, exclusions, 12-month reapplication bar, Major Grant thresholds all correct. No AI policy flagged as absent. Budget section wording improved during this test.
 
 ---
 
@@ -361,9 +362,9 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 **Expected result:** Section-by-section interface appears. Sections broadly match the guidelines headings. No per-section word limits. Free-form interface confirmed.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ✅ Pass
 
-**Notes (record all sections and any limits as observed):**
+**Notes:** All 11 sections present in correct order. Section titles and guidance text match guidelines exactly. No word limit badges — counter shows "0 words" only (correct, no per-section limits). Budget badge on sections 8 (Your Finances) and 9 (Income Plan). Section-by-section interface confirmed — no numbered question cards. "Ready to assemble" button visible — clickability to be verified in IT-GWF-10.
 
 ---
 
@@ -475,3 +476,4 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-01 passed — Harry's Rainbow sign in and profile verified. |
 | 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-02 and IT-GWF-03 passed. Narrative badge confirmed. 11 sections extracted correctly. Summary accurate. Harry's Rainbow passed eligibility — no false-positive mismatch for broadly inclusive funder. |
 | 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-04 and IT-GWF-05 passed. Greenfield Community Trust registered and funder picker confirmed. |
+| 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-07, 08, 09 passed. D-GWF-01 raised and fixed (revalidatePath on step/4 redirects). All 11 sections confirmed. Budget wording improved. 9/13 complete. |

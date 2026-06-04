@@ -1,6 +1,6 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.27
+**Version:** 1.28
 **Last updated:** 2026-06-04
 **Status:** Live — updated after each test session
 
@@ -20,7 +20,7 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | Walton Charity — Community Grants | [Walton-Charity-test-plan.md](Walton-Charity-test-plan.md) | 13 | 0 | 🟢 | All 13 tests passed. No defects. Key finding: PDF guidelines don't contain questions — paste from guidance page required. D-LBF-02/04/05 fixes all confirmed. |
 | Nationwide Building Society — Community Grants | [Nationwide-Building-Society-test-plan.md](Nationwide-Building-Society-test-plan.md) | — | — | ⏸️ | Parked — programme offline, last open round May 2023, no reopening date announced. Test plan built (v1.0) and criteria PDF in Grant Org Guidelines. Resume when programme reopens. |
 | Motability Foundation | — | — | — | ⏸️ | Parked — programme closed ("no organisation grants available at the moment"). Resume when reopens. |
-| Garfield Weston Foundation | [Garfield-Weston-Foundation-test-plan.md](Garfield-Weston-Foundation-test-plan.md) | 5 | — | 🟡 | Testing in progress. IT-GWF-01–05 passed. Greenfield Community Trust registered. Moving to PDF upload and AI summary. |
+| Garfield Weston Foundation | [Garfield-Weston-Foundation-test-plan.md](Garfield-Weston-Foundation-test-plan.md) | 9 | — | 🟡 | Testing in progress. IT-GWF-01–09 passed. D-GWF-01 raised and fixed (Step 4 stale cache). 11 sections confirmed. Free-form interface verified. Moving to writing and export. |
 | City Bridge Foundation | — | — | — | ⏸️ | Parked — all main grant rounds currently closed; some reopening in 2026 but dates unconfirmed. Resume when a round opens. |
 
 ---
@@ -67,3 +67,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.25 | 2026-06-04 | Rapidglobe Ltd | Garfield Weston Foundation test plan created (v1.0, 13 cases). Guidelines PDF downloaded. First free-form path test. |
 | 1.26 | 2026-06-04 | Rapidglobe Ltd | GWF IT-GWF-01–03 passed. Narrative path confirmed. 11 sections extracted. No false-positive mismatch for Harry's Rainbow. 3/13 complete. |
 | 1.27 | 2026-06-04 | Rapidglobe Ltd | GWF IT-GWF-04–05 passed. Greenfield Community Trust registered; funder picker confirmed. 5/13 complete. |
+| 1.28 | 2026-06-04 | Rapidglobe Ltd | GWF IT-GWF-07–09 passed. D-GWF-01 raised and fixed. 11 sections confirmed. Budget wording improved. 9/13 complete. |
