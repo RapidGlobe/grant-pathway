@@ -5,6 +5,7 @@
 // here so dashboard components and page routes stay thin.
 
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 
 // ---------------------------------------------------------------------------
@@ -337,6 +338,7 @@ export async function advanceToStep4(
     }
   }
 
+  revalidatePath(`/applications/${applicationId}/step/4`)
   redirect(`/applications/${applicationId}/step/4`)
 }
 
@@ -408,6 +410,7 @@ export async function setDraftInProgress(
     return { ok: false, error: 'Could not save your progress. Please try again.' }
   }
 
+  revalidatePath(`/applications/${applicationId}/step/4`)
   redirect(`/applications/${applicationId}/step/4`)
 }
 
@@ -571,6 +574,7 @@ export async function setDraftReadyToAssemble(
     return { ok: false, error: 'Could not save your progress. Please try again.' }
   }
 
+  revalidatePath(`/applications/${applicationId}/step/4`)
   redirect(`/applications/${applicationId}/step/4`)
 }
 
