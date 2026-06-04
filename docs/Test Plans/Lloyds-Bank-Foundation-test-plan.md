@@ -1,6 +1,6 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.13
+**Version:** 1.14
 **Date:** 2026-06-04
 **Status:** In progress
 **Tester:** WJ
@@ -566,3 +566,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.11 | 2026-06-04 | Rapidglobe Ltd | D-LBF-03 raised — D-WF-01 regression. Ready to assemble greyed out when Q10 (optional) left empty. System not detecting optional from question text. Same root cause as D-LBF-01. Workaround: fill Q10 briefly to unblock testing. |
 | 1.12 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11, IT-LBF-12, IT-LBF-13 complete. All 13 tests passed. D-LBF-04 (re-export dialog missing HH:MM) and D-LBF-05 (plain text download produces no file) raised. Testing complete — 5 defects open: D-LBF-01 through D-LBF-05. |
 | 1.13 | 2026-06-04 | Rapidglobe Ltd | All 5 defects fixed: D-LBF-01/03 optional detection (isOptionalQ covers both patterns), D-LBF-02 hard stop for over-limit answers, D-LBF-04 formatExportDate includes HH:MM, D-LBF-05 per-format download state. Full retest cycle to follow. |
+| 1.14 | 2026-06-04 | Rapidglobe Ltd | All 5 defects verified fixed in retest. D-LBF-02 hard stop confirmed (approve hidden at 505/500w). D-LBF-01/03 confirmed (Q10 empty — approve section visible, Ready to assemble active at 9/10). D-LBF-04 confirmed (re-export dialog shows "4 June 2026, 09:57"). D-LBF-05 confirmed (.txt file downloads with timestamp). Note: re-export dialog also appears when switching from docx to txt — minor wording improvement desirable but not a defect. |
