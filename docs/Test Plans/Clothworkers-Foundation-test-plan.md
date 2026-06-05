@@ -1,7 +1,7 @@
 # Clothworkers' Foundation Test Plan — Small Grants Programme
 
-**Version:** 1.0
-**Date:** 2026-06-02
+**Version:** 1.2
+**Date:** 2026-06-05
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+cloth1@gmail.com

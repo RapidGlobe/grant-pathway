@@ -6,6 +6,21 @@
 
 ---
 
+## 2026-06-05 — D-CWF-01 fixed — faith/religion conditional question exclusion
+
+**What changed:**
+
+- `lib/prompts.ts` — FAITH AND RELIGION QUESTIONS rule added to the `buildSummaryPrompt()` questions extraction clause. Questions asking primarily about an organisation's religious affiliation, the role of faith in its activities or governance, or whether staff/trustees are required to be of a particular religion are now excluded from extraction — they are treated as inherently conditional and must not appear as writing cards for non-faith-based organisations.
+
+**Why the existing rule didn't catch it:**
+The existing CONDITIONAL QUESTIONS rule requires the conditional qualifier to be explicitly stated in the surrounding text (e.g. "only required if applying for a vehicle"). For Clothworkers Q1, the qualifier ("If your organisation has a religious affiliation") sits on the preceding yes/no question, which is correctly excluded as a non-narrative field. This leaves the narrative follow-up question appearing as a universal question in isolation — the AI had no context that it was conditional. The new rule detects these questions by their subject matter rather than relying on the surrounding conditional text.
+
+**Retest required:** Clothworkers must be retested to confirm Q1 no longer appears. Expected outcome: 9 questions (previously 10 with faith Q at position 1).
+
+**Defect record:** D-CWF-01 in `docs/Test Plans/Clothworkers-Foundation-test-plan.md` — status updated to Fixed, retest required.
+
+---
+
 ## 2026-06-05 — ADR-AI-010 testing complete; ceiling raised to 50,000; two defects logged
 
 **Testing results — all seven required funders validated:**
