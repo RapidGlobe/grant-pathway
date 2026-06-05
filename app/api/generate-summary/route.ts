@@ -28,6 +28,7 @@ import {
   aiErrorBody,
 } from '@/lib/ai-error-handler'
 import { MODEL, AI_SYSTEM_PROMPT, buildSummaryPrompt, type CharityContext } from '@/lib/prompts'
+import { preprocessText, DEFAULT_CHAR_CEILING } from '@/lib/preprocess-text'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const maxDuration = 90
@@ -143,14 +144,44 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ── 6. Call Bedrock with retry ─────────────────────────────────────────────
+  // ── 6. Pre-process guidelines text (ADR-AI-010) ───────────────────────────
+  // Reduce input tokens by 15–25% before the Bedrock call. Strips PDF
+  // artefacts, repeated header/footer lines, boilerplate sections, and
+  // excess whitespace. Applies a character ceiling as a safety net for
+  // very large multi-form PDFs (e.g. Clothworkers).
+  // Disable entirely with DISABLE_TEXT_PREPROCESSING=true.
+  // Override the ceiling with PREPROCESS_CHAR_CEILING=<number>.
+  const skipPreprocessing = process.env.DISABLE_TEXT_PREPROCESSING === 'true'
+  const charCeiling = process.env.PREPROCESS_CHAR_CEILING
+    ? parseInt(process.env.PREPROCESS_CHAR_CEILING, 10)
+    : DEFAULT_CHAR_CEILING
+
+  let textForPrompt = guidelinesText
+  if (!skipPreprocessing) {
+    const { text, wasTruncated, originalLength, processedLength } = preprocessText(
+      guidelinesText,
+      charCeiling,
+    )
+    textForPrompt = text
+    console.log(
+      `[generate-summary] pre-processing: ${originalLength} → ${processedLength} chars` +
+        (wasTruncated ? ` (truncated at ${charCeiling})` : ''),
+    )
+    if (wasTruncated) {
+      console.warn(
+        `[generate-summary] text truncated: original ${originalLength} chars exceeded ceiling ${charCeiling}`,
+      )
+    }
+  }
+
+  // ── 7. Call Bedrock with retry ─────────────────────────────────────────────
   const client = new AnthropicBedrock({
     awsAccessKey: process.env.AWS_ACCESS_KEY_ID!,
     awsSecretKey: process.env.AWS_SECRET_ACCESS_KEY!,
     awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
   })
 
-  const prompt = buildSummaryPrompt(guidelinesText, charity)
+  const prompt = buildSummaryPrompt(textForPrompt, charity)
 
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {

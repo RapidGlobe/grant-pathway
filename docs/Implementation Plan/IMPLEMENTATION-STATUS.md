@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-04 (LBF/Walton/Garfield Weston testing complete — 7 funders tested in total; 5 LBF defects fixed; D-GWF-01 fixed; NFR-01 revised; Foyle Foundation removed; budget wording updated)
+**Last updated:** 2026-06-05 (ADR-OPS-008 linting stack implemented; all Dependabot PRs merged; ADR-AI-010 Phase 1 document pre-processing implemented)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -105,14 +105,16 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion                                                                   | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion                                                                | 1      | 1      | ✅ Complete                               |
 | **Phase 4 → Phase 5 Gate**                                                                                        | —      | —      | Gate check complete — pending WJ sign-off |
-| **Phase 5 — Pre-Launch**                                                                                          | **12** | **0**  | Not started                               |
-| &nbsp;&nbsp;**Funder Directory (DR-FD-001)**                                                                      | **6**  | **0**  | Not started                               |
+| **Phase 5 — Pre-Launch**                                                                                          | **13** | **7**  | In progress                               |
+| &nbsp;&nbsp;**Funder Directory (DR-FD-001)**                                                                      | **6**  | **6**  | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.FD1 — Create `funders` Supabase table and RLS policy                                   | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.FD2 — Seed `funders` table with 12 approved orgs from target funder list               | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.FD3 — Add nullable `funder_id` FK column to `applications` table (migration)           | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker component   | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.FD5 — Add "My funder isn't listed — request it" link below picker (mailto or Tally v1) | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.FD6 — Wire funder request notification to Rapidglobe                                   | 1      | 1      | ✅ Complete                               |
+| &nbsp;&nbsp;**Performance (ADR-AI-010)**                                                                          | **1**  | **1**  | ✅ Complete                               |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.PERF1 — Document pre-processing (`lib/preprocess-text.ts`) in `generate-summary`       | 1      | 1      | ✅ Complete                               |
 | &nbsp;&nbsp;**Pre-Launch**                                                                                        | **6**  | **0**  | Not started                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.1 — Compliance                                                                         | 1      | 0      | Not started                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.2 — Security review                                                                    | 1      | 0      | Not started                               |
@@ -120,11 +122,19 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.4 — Production infrastructure                                                          | 1      | 0      | Not started                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.5 — Final testing                                                                      | 1      | 0      | Not started                               |
 | &nbsp;&nbsp;&nbsp;&nbsp;P5.6 — DNS                                                                                | 1      | 0      | Not started                               |
-| **Total**                                                                                                         | **88** | **76** |                                           |
+| **Total**                                                                                                         | **89** | **83** |                                           |
 
 ---
 
 ## Notes
+
+### 2026-06-05 — ADR-OPS-008 linting stack + ADR-AI-010 pre-processing implemented
+
+**ADR-OPS-008 — Linting and code quality infrastructure:** Full four-phase stack implemented. Prettier installed, ESLint downgraded to v9 (Next.js 16 compatibility), pre-commit hooks (Husky + lint-staged), GitHub Actions CI (`type-check → lint → format:check` on push/PR), `noImplicitReturns` and `noFallthroughCasesInSwitch` added to tsconfig. 14 pre-existing lint issues fixed. All three scripts pass cleanly.
+
+**ADR-AI-010 Phase 1 — Document pre-processing:** `lib/preprocess-text.ts` created and wired into `app/api/generate-summary/route.ts`. Pre-processing runs before every Bedrock call and logs char reduction. Feature flag `DISABLE_TEXT_PREPROCESSING=true` available. Ceiling configurable via `PREPROCESS_CHAR_CEILING`. **Testing still required** against all scheduled funder fixtures before production deployment — see CHANGELOG for fixture list.
+
+---
 
 ### 2026-06-04 — LBF/Walton/Garfield Weston testing complete; 6 defects fixed; NFR-01 revised; Foyle Foundation removed
 

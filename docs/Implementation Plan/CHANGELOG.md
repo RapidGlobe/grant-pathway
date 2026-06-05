@@ -6,6 +6,36 @@
 
 ---
 
+## 2026-06-05 — Document pre-processing implemented — ADR-AI-010 Phase 1
+
+**What changed:**
+
+- `lib/preprocess-text.ts` — new module. Pure function `preprocessText(raw, charCeiling?)` that:
+  - Strips PDF artefacts: form feed characters, null bytes, CRLF normalisation
+  - Removes page number lines (`1`, `Page 1 of 5`, `- 1 -`)
+  - Removes repeated header/footer lines (identical short lines appearing 3+ times across the document)
+  - Strips boilerplate sections by heading pattern: Contact Us, Privacy Policy, Data Protection, Accessibility, Equality & Diversity, Complaints, Freedom of Information, About Us, About the Foundation/Trust/Fund, Our History/Story, Disclaimer, Copyright, Website Terms. Each pattern is conservative and anchored — only exact section headings match, not headings that happen to contain those words.
+  - Collapses 3+ consecutive blank lines to 2
+  - Trims trailing whitespace per line
+  - Applies a configurable character ceiling (default 20,000) as a safety net for very large multi-form PDFs; snaps to last newline within the final 10% to avoid mid-sentence cuts
+  - Returns `{ text, wasTruncated, originalLength, processedLength }`
+- `app/api/generate-summary/route.ts` — new step 6 inserted before the Bedrock call:
+  - Calls `preprocessText(guidelinesText, charCeiling)` unless `DISABLE_TEXT_PREPROCESSING=true`
+  - Ceiling configurable via `PREPROCESS_CHAR_CEILING` env var (defaults to 20,000)
+  - Logs `[generate-summary] pre-processing: N → M chars` on every call
+  - Logs an additional `console.warn` if truncation occurs
+  - `textForPrompt` (processed) replaces `guidelinesText` in `buildSummaryPrompt()`
+
+**Why:** NFR-01 large-document tier ceiling is 45 seconds. Garfield Weston (11-page PDF) already measures 33–37s. A projected Clothworkers 3-form PDF pack could reach 40–47s. Pre-processing reduces input tokens by 15–25% by removing content that never informs the AI summary, creating headroom before the ceiling without changing the API contract, client, or UI.
+
+**Feature flag:** Set `DISABLE_TEXT_PREPROCESSING=true` in Vercel environment variables to disable preprocessing entirely if a quality regression is found. Set `PREPROCESS_CHAR_CEILING=<n>` to adjust the ceiling.
+
+**Testing required before production:** Validate summary quality is unchanged (or improved) against all scheduled funder fixtures: Garfield Weston, Clothworkers, AB Charitable Trust, Idlewild, Walton, Henry Smith, Wolfson. If any funder's summary degrades, exclude the relevant boilerplate pattern and re-test.
+
+**Full decision record:** `docs/Technical Decision and Design/ADR-AI-010-summary-performance-strategy.md`
+
+---
+
 ## 2026-06-05 — AI summary performance strategy documented — ADR-AI-010
 
 **What changed:**

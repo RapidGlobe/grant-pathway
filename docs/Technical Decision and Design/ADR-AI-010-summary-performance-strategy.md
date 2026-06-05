@@ -1,7 +1,7 @@
 ---
 id: ADR-AI-010
 category: AI Integration
-status: Decided — Phase 1 (pre-processing) pre-launch; streaming deferred post-v1
+status: Phase 1 implemented 2026-06-05 — testing required against all funder fixtures; streaming deferred post-v1
 ---
 
 # ADR-AI-010 — AI Summary Performance Strategy
