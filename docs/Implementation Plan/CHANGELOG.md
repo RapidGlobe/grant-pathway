@@ -6,6 +6,37 @@
 
 ---
 
+## 2026-06-05 — ADR-AI-010 testing complete; ceiling raised to 50,000; two defects logged
+
+**Testing results — all seven required funders validated:**
+
+| Funder                     | Time | Path        | Result                                             |
+| -------------------------- | ---- | ----------- | -------------------------------------------------- |
+| Garfield Weston Foundation | 34s  | PDF upload  | ✅ Pass — 3s saving vs 37s pre-preprocessing       |
+| Clothworkers' Foundation   | 30s  | PDF upload  | ✅ Pass — ceiling raised to 50,000 (see below)     |
+| AB Charitable Trust        | 17s  | PDF upload  | ✅ Pass — eligibility mismatch correct             |
+| Idlewild Trust             | ~21s | PDF upload  | ✅ Pass — two eligibility mismatches expected      |
+| Henry Smith Foundation     | 21s  | DOCX upload | ✅ Pass — IT-11 escape hatch verified (Branch B)   |
+| Wolfson Foundation         | 18s  | DOCX upload | ✅ Pass — 7 sections extracted                     |
+| Walton Charity             | 18s  | Paste       | ✅ Pass — 4 sections; also tested PDF upload (24s) |
+
+All funders within NFR-01 (≤30s standard, ≤45s large document).
+
+**PREPROCESS_CHAR_CEILING raised from 20,000 → 50,000:**
+Clothworkers' PDF extracted at 97,906 characters — the 20,000 ceiling truncated the document before the application questions were reached, producing "No specific questions found" on first run. Ceiling raised to 50,000 via Vercel environment variable. Second run extracted all 9 questions in 30 seconds. The ceiling is now set as a Vercel production environment variable (`PREPROCESS_CHAR_CEILING=50000`) and does not require a code change to adjust further.
+
+**Defects found during testing:**
+
+- **D-CWF-01 (Medium, Open)** — Clothworkers Q1 (faith affiliation) extracted as a standard writing card for all charities. It is a conditional question applying only to faith-based organisations. The existing conditional exclusion rule in `lib/prompts.ts` does not detect this pattern. Fix: extend the prompt rule to skip faith/religious affiliation conditionals.
+- **D-HSF-03 (Medium, Open)** — Step 4 shows "No specific questions found" on first load after multi-pass Step 3 flows (mismatch → profile fix → regeneration, or truncation → ceiling raised → regeneration). Sections appear correctly on second load after going Back and regenerating. Same root cause as D-HSF-02 and D-GWF-01 — Step 4 sync is fragile when `application_answers` rows exist from a prior failed/truncated summary generation. Workaround confirmed working.
+
+**IT-11 escape hatch — first verified execution:**
+Henry Smith IT-HSF-04 Branch B was executed for the first time — mismatch detected for Harry's Rainbow, profile corrected with age range and deprivation area language, reapplication passed eligibility. This was the IT-11 test deferred from Idlewild testing.
+
+**Full decision record:** `docs/Technical Decision and Design/ADR-AI-010-summary-performance-strategy.md`
+
+---
+
 ## 2026-06-05 — Document pre-processing implemented — ADR-AI-010 Phase 1
 
 **What changed:**

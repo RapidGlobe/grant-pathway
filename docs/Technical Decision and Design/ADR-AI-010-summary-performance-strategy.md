@@ -1,7 +1,7 @@
 ---
 id: ADR-AI-010
 category: AI Integration
-status: Phase 1 implemented 2026-06-05 — testing required against all funder fixtures; streaming deferred post-v1
+status: Phase 1 implemented and validated 2026-06-05 — all 7 funder fixtures tested, all within NFR-01; PREPROCESS_CHAR_CEILING raised to 50,000 in production; streaming deferred post-v1
 ---
 
 # ADR-AI-010 — AI Summary Performance Strategy
