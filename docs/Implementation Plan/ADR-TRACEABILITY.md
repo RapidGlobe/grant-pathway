@@ -7,8 +7,8 @@
 - When a new task is added to cover a gap, update the Task column and change status to ✅ or 🔵.
 - When a task is completed, no change needed here — the task status lives in IMPLEMENTATION-STATUS.md.
 
-**Last updated:** 2026-06-04  
-**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article)
+**Last updated:** 2026-06-05  
+**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article); ADR-AI-010 added 2026-06-05 (summary performance strategy — pre-processing pre-launch, streaming post-v1)
 
 ## Status key
 
@@ -41,6 +41,11 @@
 | ADR-AI-005 | Client awaits API route response with `fetch` | S5.2, S6.2 | ✅ |
 | ADR-AI-005 | Progress bar advances on a timer independently of API response | P1.10, P1.11 | ✅ |
 | ADR-AI-005 | Bar holds at ~90% if API is slow; snaps to 100% immediately if API returns early | S5.2, S6.2 | ⚠️ GAP-02 |
+| ADR-AI-010 | `lib/preprocess-text.ts` created and inserted into `/api/generate-summary` before Bedrock call | — | ⚠️ GAP-30 |
+| ADR-AI-010 | Pre-processing strips PDF artefacts, detectable boilerplate, enforces 20,000-char ceiling with logged warning on truncation | — | ⚠️ GAP-30 |
+| ADR-AI-010 | `DISABLE_TEXT_PREPROCESSING=true` env flag available as escape hatch | — | ⚠️ GAP-30 |
+| ADR-AI-010 | Pre-processing tested against all scheduled funders before production deployment | — | ⚠️ GAP-30 |
+| ADR-AI-010 | Streaming evaluation deferred to post-v1; requires design change (progress bar → incremental text render) | Post-v1 backlog | 🔵 |
 | ADR-AI-006 | Vercel Pro plan activated before production deployment | P5.4 | 🔵 |
 | ADR-AI-006 | Only AI generation routes have `export const maxDuration = 90` | S5.2, S6.2 | ✅ |
 | ADR-AI-006 | Monitoring alert configured if AI routes approach 90-second timeout | — | ⚠️ GAP-03 |
@@ -256,9 +261,10 @@ All ⚠️ rows consolidated here for easy triage. Update this table as gaps are
 | GAP-24 | PDR-DH-003 | Export disclaimer wording deviates from spec — spec: "Please review carefully before submitting to the funder." — implementation: "All content has been checked for accuracy before submission." | Low | Fix in S7.2 patch | |
 | GAP-25 | ADR-ARCH-003 | Zod validation absent from `actions/applications.ts` and `actions/auth.ts`; ADR-ARCH-003 requires Zod on all Server Actions; only `actions/charity.ts` imports Zod | Medium | Add to P5.3 sweep | |
 | GAP-26 | PDR-UI-004 | `app/(authenticated)/applications/[id]/page.tsx` is a stub — does not redirect to `/applications/[id]/step/[current_step]` as specified in technical design and PDR-UI-004 | High | Fix as standalone task before P5.5 testing | |
-| GAP-27 | ADR-OPS-005, ADR-OPS-007 | No performance observability beyond Sentry error capture. AI route latency (25–47s summary times observed in testing), success/failure rates, and approaching-timeout events are not tracked as metrics. No alerting thresholds or operational dashboard exist. Identified 2026-06-04 via Knox "Production Thinking" review — production readiness pillar: Observability from day one. | Medium | Add structured latency logging to `generate-summary` and `refine-answer` routes (P5.3). Configure Sentry performance monitoring at P5.4 (requires Vercel Pro production baseline). | |
+| GAP-27 | ADR-OPS-005, ADR-OPS-007, ADR-AI-010 | No performance observability beyond Sentry error capture. AI route latency (25–47s summary times observed in testing), success/failure rates, and approaching-timeout events are not tracked as metrics. No alerting thresholds or operational dashboard exist. Identified 2026-06-04 via Knox "Production Thinking" review — production readiness pillar: Observability from day one. See also ADR-AI-010 (pre-processing pre-launch to build headroom; streaming post-v1). | Medium | Add structured latency logging to `generate-summary` and `refine-answer` routes (P5.3). Configure Sentry performance monitoring at P5.4 (requires Vercel Pro production baseline). | |
 | GAP-28 | ADR-OPS-002 | No documented rollback procedure for production deployments. GAP-12 covers Git release tagging but there is no written procedure for: when to trigger a rollback, how to do it in Vercel (one-click deployment revert), and what to check before re-deploying. Currently all pushes to `master` auto-deploy directly to production. Identified 2026-06-04 via Knox "Production Thinking" review — production readiness pillar: Safe deployment. | Medium | Document rollback procedure in pre-launch checklist (P5.4). Add rule: only push to `master` during business hours unless emergency. | |
 | GAP-29 | ADR-OPS-008 | Full linting infrastructure not implemented. No Prettier, no pre-commit hooks, no CI lint gate, no `type-check` script, lint script has no `--max-warnings 0`. All seven ADR-OPS-008 consequences are uncovered. Identified 2026-06-04 via project linting audit. Implementation scheduled 2026-06-05 (four phases, full detail in ADR-OPS-008). | High | Implement ADR-OPS-008 Phases 1–4 on 2026-06-05. | |
+| GAP-30 | ADR-AI-010 | Document pre-processing not implemented. `/api/generate-summary` passes full extracted text to Bedrock with no cleaning. `lib/preprocess-text.ts` is not yet created. NFR-01 large-document tier has no headroom for multi-PDF funder packs (projected 40–47s for Clothworkers). Identified 2026-06-05 via ADR-AI-010 decision. | Medium | Create `lib/preprocess-text.ts` and wire into `generate-summary` route pre-launch. Test against all scheduled funders. | |
 
 ---
 

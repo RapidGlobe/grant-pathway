@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-06-04
+**Last updated:** 2026-06-05
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -104,6 +104,7 @@ AI provider, model, prompt, and reliability decisions.
 | ADR-AI-007 | Context Window Management | ✅ Decided | [ADR-AI-007-context-window-management.md](ADR-AI-007-context-window-management.md) |
 | ADR-AI-008 | AI Usage Tracking and Cost Controls | ✅ Decided | [ADR-AI-008-usage-tracking-and-cost-controls.md](ADR-AI-008-usage-tracking-and-cost-controls.md) |
 | ADR-AI-009 | Claude API Error Handling | ✅ Decided | [ADR-AI-009-claude-api-error-handling.md](ADR-AI-009-claude-api-error-handling.md) |
+| ADR-AI-010 | AI Summary Performance Strategy | ✅ Decided — pre-processing pre-launch; streaming post-v1 | [ADR-AI-010-summary-performance-strategy.md](ADR-AI-010-summary-performance-strategy.md) |
 
 ---
 
@@ -144,10 +145,10 @@ Infrastructure, deployment, and operational decisions.
 | Security | 6 | 6 | 0 | 0 |
 | Data | 5 | 5 | 0 | 0 |
 | File Handling | 4 | 4 | 0 | 0 |
-| AI Integration | 9 | 9 | 0 | 0 |
+| AI Integration | 10 | 10 | 0 | 0 |
 | Export | 2 | 2 | 0 | 0 |
-| Operations | 7 | 7 | 0 | 0 |
-| **Total** | **44** | **44** | **0** | **0** |
+| Operations | 8 | 8 | 0 | 0 |
+| **Total** | **45** | **45** | **0** | **0** |
 
 ---
 

@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-05 — AI summary performance strategy documented — ADR-AI-010
+
+**What changed:**
+- New ADR created: `docs/Technical Decision and Design/ADR-AI-010-summary-performance-strategy.md`
+- ADR-INDEX.md updated: ADR-AI-010 added to Group 6 (AI Integration); total ADR count updated to 45
+- ADR-TRACEABILITY.md updated: GAP-27 refined to reference ADR-AI-010; ADR-AI-010 consequences added
+
+**Decision summary:**
+The streaming vs document pre-processing investigation (conducted 2026-06-04 during funder testing) is formally recorded as ADR-AI-010. The decision is a hybrid, phased approach:
+- **Pre-v1 (pre-launch):** Implement document pre-processing (`lib/preprocess-text.ts`) in `/api/generate-summary` to reduce input tokens by ~15–25% and build headroom before the NFR-01 large-document tier ceiling.
+- **Post-v1:** Evaluate streaming responses as a quality-of-life improvement once the batch pipeline is stable.
+
+**Why:** Real performance data from testing (LBF: 24s, Walton: 25s, Garfield Weston: 33–37s) confirmed NFR-01 is currently met. However, a projected Clothworkers multi-PDF pack could reach 40–47s — close to the 45s ceiling. Pre-processing is low-risk and additive. Streaming requires a UI redesign (replace progress bar with incremental text render) and Supabase save-on-stream complexity; it is deferred to post-v1 when it can be implemented coherently across both AI routes simultaneously.
+
+**ADR-AI-005 status:** Unchanged — batch mode remains the v1 decision. ADR-AI-010 is an optimisation strategy within the batch architecture, not a replacement of it.
+
+---
+
 ## 2026-06-05 (SCHEDULED) — Linting and code quality infrastructure — ADR-OPS-008
 
 ⚠️ **This work is scheduled for 2026-06-05. No implementation has been done yet.** The decision is recorded in `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
