@@ -58,7 +58,7 @@ The Supabase Pro plan will be activated on the production project before go-live
 
 ## Rationale
 
-- The upgrade from free to Pro tier was always anticipated. ADR-STACK-002 explicitly states: *"Free tier covers the development and early launch phases; paid tier scales predictably."* Backups are an included benefit of that upgrade, not an additional cost line.
+- The upgrade from free to Pro tier was always anticipated. ADR-STACK-002 explicitly states: _"Free tier covers the development and early launch phases; paid tier scales predictably."_ Backups are an included benefit of that upgrade, not an additional cost line.
 - At ~£20/month, the cost sits comfortably within the C1 operating budget. Total committed monthly costs rise from ~£16/month (Vercel Pro only) to ~£36/month — leaving ~£64/month for Amazon Bedrock API usage.
 - Daily backups with 7-day retention address all three risk scenarios provided the incident is detected within the retention window. For an active user base with regular logins this is a realistic assumption.
 - Zero implementation effort removes the need for a new development task in the implementation plan.
@@ -75,6 +75,7 @@ Supabase Pro's automated daily backups introduce a distinction between logical d
 - Supabase's automated backup copies will retain a snapshot of this data until those backup files age out of the 7-day retention cycle.
 
 This distinction is a GDPR-relevant disclosure under the Right to Erasure (Article 17 UK GDPR). The privacy policy must be updated to accurately reflect that:
+
 - Deletion is immediate from live systems
 - Automated backup copies are permanently removed within 7 days as part of standard backup rotation
 

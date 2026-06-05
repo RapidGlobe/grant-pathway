@@ -1,4 +1,5 @@
 # Step 4 Redesign Proposal
+
 ## Session notes — 2026-05-26
 
 These notes capture the design review and recommendations from the 2026-05-26 working session.
@@ -16,11 +17,11 @@ implications for Grant Pathway's Step 4 (draft generation).
 
 > **Note (2026-05-29):** The 3-funder table below was the original test fixture used to trigger the redesign. It has been superseded by the consolidated 12-funder target list, which is now the canonical reference. See [`docs/target-funder-list.md`](../target-funder-list.md).
 
-| Funder | Document | Key finding |
-|---|---|---|
-| National Lottery Heritage Fund | `heritage-fund-application-guidance.pdf` | Structured online form with discrete questions + up to 11 categories of mandatory supporting documents |
-| Garfield Weston Foundation | `Garfield Weston Application-guidelines-1.pdf` | Free-form typed proposal, max 10 A4 pages — NO discrete questions, thematic sections only |
-| Stony Stratford Town Council | `Stony-Stratford-Town-Council-Grant-Scheme-2026-27-adopted-FC0226.docx` + `Stony Stratford Grant-Application-Form-2026.docx` | Small local council grant (typical £100–£1,000, max £5,000). Structured form with 13 numbered questions submitted as a Word document by email. Includes a budget table (income + expenditure), a supporting documents checklist (7 categories), and requires countersignature by the treasurer. Third distinct funder format: downloadable form, not an online portal or free-form narrative. |
+| Funder                         | Document                                                                                                                     | Key finding                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| National Lottery Heritage Fund | `heritage-fund-application-guidance.pdf`                                                                                     | Structured online form with discrete questions + up to 11 categories of mandatory supporting documents                                                                                                                                                                                                                                                                                        |
+| Garfield Weston Foundation     | `Garfield Weston Application-guidelines-1.pdf`                                                                               | Free-form typed proposal, max 10 A4 pages — NO discrete questions, thematic sections only                                                                                                                                                                                                                                                                                                     |
+| Stony Stratford Town Council   | `Stony-Stratford-Town-Council-Grant-Scheme-2026-27-adopted-FC0226.docx` + `Stony Stratford Grant-Application-Form-2026.docx` | Small local council grant (typical £100–£1,000, max £5,000). Structured form with 13 numbered questions submitted as a Word document by email. Includes a budget table (income + expenditure), a supporting documents checklist (7 categories), and requires countersignature by the treasurer. Third distinct funder format: downloadable form, not an online portal or free-form narrative. |
 
 ### Key design implications from the guidelines review
 
@@ -112,22 +113,24 @@ applications and removes the risk of AI-detectable generic content disadvantagin
 **Stage 1 — Preparation checklist (one-time, before Q&A begins)**
 
 Display a "Before you begin" screen prompting Margaret to gather:
+
 - Most recent annual accounts or financial statements
 - Projected budget for the grant period (income and planned expenditure)
 - Details of other funding secured or applied for
 - Input from the treasurer, finance lead, or a trustee who understands the budget
 
-Explicit message: *"The financial sections cannot be completed by AI. You will need your actual figures.
-It is worth involving a senior colleague before reaching the financial questions."*
+Explicit message: _"The financial sections cannot be completed by AI. You will need your actual figures.
+It is worth involving a senior colleague before reaching the financial questions."_
 
 **Stage 2 — Q&A interview (multi-session, persistent)**
 
 For each question/section identified in the Step 3 summary:
+
 - The charity types their own answer in a text area
 - Answers auto-save on field blur (no AI involved — pure database write)
 - Budget/financial questions are visually distinct (amber highlight, "£" badge)
 - Budget questions have the AI assist button disabled with explicit label:
-  *"This section requires your actual financial data — do not estimate or use AI-generated figures"*
+  _"This section requires your actual financial data — do not estimate or use AI-generated figures"_
 - Non-budget questions have an optional "Help me improve this" button that takes the charity's
   draft answer and refines structure/clarity — it does NOT add factual content
 
@@ -135,14 +138,16 @@ For each question/section identified in the Step 3 summary:
 
 Before triggering the final Bedrock assembly call, display:
 
-> *Before assembling your final draft, we recommend checking with your CEO, treasurer, or a trustee that:*
-> - *The budget figures are accurate and approved*
-> - *The project description reflects your current priorities*
-> - *You have authority to submit this application*
+> _Before assembling your final draft, we recommend checking with your CEO, treasurer, or a trustee that:_
+>
+> - _The budget figures are accurate and approved_
+> - _The project description reflects your current priorities_
+> - _You have authority to submit this application_
 
 **Stage 4 — Final assembly (one Bedrock call)**
 
 Takes all Q&A pairs and assembles them into the funder's required format:
+
 - Structured form funders (Heritage Fund): answer-per-question output
 - Free-form document funders (Garfield Weston): coherent flowing narrative, respecting page limits
 
@@ -156,9 +161,9 @@ Copy section by section (for portal submission) or download as Word document (fo
 
 Grant Pathway's guidance to users at the point of export should reflect the funder-facing spirit:
 
-> *"This application was built using Grant Pathway's guided process. The responses reflect
+> _"This application was built using Grant Pathway's guided process. The responses reflect
 > your organisation's own answers to structured questions, reviewed and formatted for this
-> funder's requirements."*
+> funder's requirements."_
 
 ---
 
@@ -193,12 +198,12 @@ gather them before starting the Q&A.
 
 ### Bedrock call pattern
 
-| Call | Trigger | Approx tokens | Notes |
-|---|---|---|---|
-| Step 3 summary | Unchanged | ~3,200 total | No change |
-| Generate question set | Once on entering Step 4 | Likely eliminable | Questions already in `ai_summary` — derive deterministically |
-| Per-question assist | Optional, on demand per question | ~1,200 total | User chooses; disabled on budget questions |
-| Final assembly | Once, all answers complete | ~5,000 total | Comparable to current single draft-generation call |
+| Call                  | Trigger                          | Approx tokens     | Notes                                                        |
+| --------------------- | -------------------------------- | ----------------- | ------------------------------------------------------------ |
+| Step 3 summary        | Unchanged                        | ~3,200 total      | No change                                                    |
+| Generate question set | Once on entering Step 4          | Likely eliminable | Questions already in `ai_summary` — derive deterministically |
+| Per-question assist   | Optional, on demand per question | ~1,200 total      | User chooses; disabled on budget questions                   |
+| Final assembly        | Once, all answers complete       | ~5,000 total      | Comparable to current single draft-generation call           |
 
 Net effect per application: roughly 1.5–2× current Bedrock spend. Not an order-of-magnitude change.
 
@@ -207,6 +212,7 @@ Net effect per application: roughly 1.5–2× current Bedrock spend. Not an orde
 Current: 20 AI calls per user per month.
 
 Under Q&A model, one application consumes approximately:
+
 - Step 3 summary: 1 call
 - Per-question assists (optional, typically 3–5): up to 5 calls
 - Final assembly: 1 call
@@ -221,13 +227,13 @@ calls is simple to implement with no change to the existing `ai_usage` tracking 
 
 ### Storage impact
 
-| Item | Estimate per application |
-|---|---|
-| 8–10 Q&A answers (~300 words each) | ~25 KB |
-| AI-refined versions (where requested) | ~15 KB |
-| Assembled final draft | ~20 KB |
-| Step 3 summary (already stored) | ~5 KB |
-| **Total** | **~65 KB** |
+| Item                                  | Estimate per application |
+| ------------------------------------- | ------------------------ |
+| 8–10 Q&A answers (~300 words each)    | ~25 KB                   |
+| AI-refined versions (where requested) | ~15 KB                   |
+| Assembled final draft                 | ~20 KB                   |
+| Step 3 summary (already stored)       | ~5 KB                    |
+| **Total**                             | **~65 KB**               |
 
 Negligible. No storage cost concern at current or projected scale.
 
@@ -277,17 +283,17 @@ The Q&A model is fundamentally multi-session. The auto-save behaviour is critica
 
 ## Summary of what changes vs what stays the same
 
-| Area | Status |
-|---|---|
-| Steps 1, 2, 3 | **Unchanged** |
-| Bedrock infrastructure, rate limiting, usage logging | **Unchanged** |
-| Charity profile | **Unchanged** |
-| Application persistence (applications table) | **Extended** — three new columns |
-| AiSummaryData type | **Extended** — add `funderAiPolicy`, `supportingDocuments` |
-| Step 4 UI | **Redesigned** — Q&A interface replaces single "Generate" button |
-| Step 4 Bedrock call | **Repositioned** — assembly of charity's words, not generation from scratch |
-| Monthly AI cap logic | **Needs rethinking** — per-application credits vs raw call count |
-| Budget handling | **New constraint** — financial questions flagged; AI assist disabled; senior involvement prompted |
+| Area                                                 | Status                                                                                            |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Steps 1, 2, 3                                        | **Unchanged**                                                                                     |
+| Bedrock infrastructure, rate limiting, usage logging | **Unchanged**                                                                                     |
+| Charity profile                                      | **Unchanged**                                                                                     |
+| Application persistence (applications table)         | **Extended** — three new columns                                                                  |
+| AiSummaryData type                                   | **Extended** — add `funderAiPolicy`, `supportingDocuments`                                        |
+| Step 4 UI                                            | **Redesigned** — Q&A interface replaces single "Generate" button                                  |
+| Step 4 Bedrock call                                  | **Repositioned** — assembly of charity's words, not generation from scratch                       |
+| Monthly AI cap logic                                 | **Needs rethinking** — per-application credits vs raw call count                                  |
+| Budget handling                                      | **New constraint** — financial questions flagged; AI assist disabled; senior involvement prompted |
 
 ---
 
@@ -324,20 +330,20 @@ The Q&A model is fundamentally multi-session. The auto-save behaviour is critica
 
 All open questions resolved. Decisions recorded here for traceability before implementation begins.
 
-| # | Decision |
-|---|---|
-| 1 | Extend `application_answers` table (add `ai_refined_answer`, `is_budget_question`); no JSONB column on `applications` |
-| 2 | Monthly cap raised from 20 → 50; per-application credit model deferred |
-| 3 | Assembly writes to `applications.assembled_draft`; Step 5 export reads from that column; Word doc export for free-form funders is in S6.8 scope |
-| 4 | Preparation checklist is a separate screen shown once (on first entry to Step 4) |
-| 5 | `supportingDocuments` = read-only aide-memoire in Step 3; no interactive tracking |
-| 6 | `funderAiPolicy` = info banner in Step 3, below summary, above "Proceed to Step 4" button |
+| #   | Decision                                                                                                                                        |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Extend `application_answers` table (add `ai_refined_answer`, `is_budget_question`); no JSONB column on `applications`                           |
+| 2   | Monthly cap raised from 20 → 50; per-application credit model deferred                                                                          |
+| 3   | Assembly writes to `applications.assembled_draft`; Step 5 export reads from that column; Word doc export for free-form funders is in S6.8 scope |
+| 4   | Preparation checklist is a separate screen shown once (on first entry to Step 4)                                                                |
+| 5   | `supportingDocuments` = read-only aide-memoire in Step 3; no interactive tracking                                                               |
+| 6   | `funderAiPolicy` = info banner in Step 3, below summary, above "Proceed to Step 4" button                                                       |
 
 ---
 
-*Notes prepared: 2026-05-26*
-*Open questions resolved: 2026-05-28*
-*Status: Implementation complete — 2026-05-29*
+_Notes prepared: 2026-05-26_
+_Open questions resolved: 2026-05-28_
+_Status: Implementation complete — 2026-05-29_
 
 ---
 
@@ -369,6 +375,7 @@ sections?: AiSummarySection[]
 #### Step 4 interface: free_form mode
 
 When `funder_type === 'free_form'`, Step 4 shows:
+
 - **Funder context bar** — teal banner identifying the funder and grant name
 - **Sticky progress bar** — "X of N sections completed" — remains visible as the user scrolls through long applications
 - **Section cards** — one card per extracted section, in order. Each card shows:
@@ -382,6 +389,7 @@ When `funder_type === 'free_form'`, Step 4 shows:
 #### Step 4 interface: both modes
 
 Both free_form and structured modes now share:
+
 - `max-w-[960px]` wider layout (was 640px)
 - Funder context bar (teal)
 - Sticky progress bar (top-0, z-10, shadow)
@@ -390,6 +398,7 @@ Both free_form and structured modes now share:
 #### Assembly format
 
 `assembleAndAdvance` detects `funder_type` from the `ai_summary` JSON and formats accordingly:
+
 - **free_form:** `section_title\n\nanswer_text` (no number prefix — suits narrative Word document)
 - **structured:** `N. question_text\n\nanswer_text` (number prefix matches form structure)
 
@@ -403,8 +412,8 @@ Both formats join sections with `\n\n---\n\n` separator, unchanged.
 
 ## Document History
 
-| Version | Date | Author | Summary of changes |
-|---------|------|--------|--------------------|
-| 1.0 | 2026-05-26 | Rapidglobe Ltd | Initial design notes from guidelines review session |
-| 1.1 | 2026-05-28 | Rapidglobe Ltd | All open questions resolved; final decisions documented; database design confirmed |
-| 1.2 | 2026-05-29 | Rapidglobe Ltd | Implementation update added: section-by-section interface for free_form funders, AiSummarySection type, assembly format, bug fix. Document history table added. |
+| Version | Date       | Author         | Summary of changes                                                                                                                                              |
+| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-05-26 | Rapidglobe Ltd | Initial design notes from guidelines review session                                                                                                             |
+| 1.1     | 2026-05-28 | Rapidglobe Ltd | All open questions resolved; final decisions documented; database design confirmed                                                                              |
+| 1.2     | 2026-05-29 | Rapidglobe Ltd | Implementation update added: section-by-section interface for free_form funders, AiSummarySection type, assembly format, bug fix. Document history table added. |

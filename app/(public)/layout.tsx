@@ -1,11 +1,7 @@
-import { NavPublic } from "@/components/nav-public";
-import { SiteFooter } from "@/components/site-footer";
+import { NavPublic } from '@/components/nav-public'
+import { SiteFooter } from '@/components/site-footer'
 
-export default function PublicLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <NavPublic />
@@ -16,5 +12,5 @@ export default function PublicLayout({
 
       <SiteFooter />
     </>
-  );
+  )
 }

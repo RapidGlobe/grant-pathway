@@ -14,14 +14,14 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 
 **Key differences from the Idlewild Trust test:**
 
-| Factor | Idlewild Trust | A B Charitable Trust |
-|--------|---------------|----------------------|
-| Question document format | Multi-column table (caused D-IT-01) | Numbered list (A1–D8) — expected to extract cleanly |
-| Charity eligibility | Arts sector only — Harry's Rainbow not eligible | Social justice / human rights focus — Harry's Rainbow likely NOT eligible |
-| Narrative questions | 9 (all character-limited) | 2–3 only (B3, B4, C11) — rest are data-entry, financial, or file uploads |
-| Key unique limit | Character limits (GAP-27) | B4: **15-word limit** — very tight and specific |
-| D5 — proposal document | N/A | File upload (Word/PDF 2–2½ pages) — NOT a text field; must not appear as a writing card |
-| Previous test result | D-IT-01 open | First live test of fixed extraction prompt |
+| Factor                   | Idlewild Trust                                  | A B Charitable Trust                                                                    |
+| ------------------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Question document format | Multi-column table (caused D-IT-01)             | Numbered list (A1–D8) — expected to extract cleanly                                     |
+| Charity eligibility      | Arts sector only — Harry's Rainbow not eligible | Social justice / human rights focus — Harry's Rainbow likely NOT eligible               |
+| Narrative questions      | 9 (all character-limited)                       | 2–3 only (B3, B4, C11) — rest are data-entry, financial, or file uploads                |
+| Key unique limit         | Character limits (GAP-27)                       | B4: **15-word limit** — very tight and specific                                         |
+| D5 — proposal document   | N/A                                             | File upload (Word/PDF 2–2½ pages) — NOT a text field; must not appear as a writing card |
+| Previous test result     | D-IT-01 open                                    | First live test of fixed extraction prompt                                              |
 
 **Application window:** Next deadline **31 July 2026** — decisions expected October 2026. Applications are currently open.
 
@@ -31,45 +31,45 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 
 ## Test Data
 
-| Item | Value |
-|------|-------|
-| Test user email | grantpathway+ABC@gmail.com |
-| Test user password | (set by tester at registration) |
-| Charity name | Harry's Rainbow |
-| Charity registration number | 1194917 |
-| Charity type | UK Registered Charity |
-| Charity focus | Children's bereavement support, Milton Keynes |
-| Funder | A B Charitable Trust |
-| Grant range | £10k–£40k/yr |
-| Application type | Single stage |
-| Application deadline | 31 July 2026 |
-| Guidelines file | AB Charitable Trust application questions PDF (from `docs/Grant Org Guidelines/`) |
-| Guidelines input method | PDF upload (primary); paste text (fallback if extraction fails) |
+| Item                        | Value                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------- |
+| Test user email             | grantpathway+ABC@gmail.com                                                        |
+| Test user password          | (set by tester at registration)                                                   |
+| Charity name                | Harry's Rainbow                                                                   |
+| Charity registration number | 1194917                                                                           |
+| Charity type                | UK Registered Charity                                                             |
+| Charity focus               | Children's bereavement support, Milton Keynes                                     |
+| Funder                      | A B Charitable Trust                                                              |
+| Grant range                 | £10k–£40k/yr                                                                      |
+| Application type            | Single stage                                                                      |
+| Application deadline        | 31 July 2026                                                                      |
+| Guidelines file             | AB Charitable Trust application questions PDF (from `docs/Grant Org Guidelines/`) |
+| Guidelines input method     | PDF upload (primary); paste text (fallback if extraction fails)                   |
 
 ---
 
 ## Lessons Applied from Idlewild Trust Testing
 
-| Lesson | Applied in this plan |
-|--------|---------------------|
-| Complete end-to-end flow mandatory | All steps 1–5 covered including prep checklist |
-| Record AI summary timing | Stopwatch step included in ABC-03 |
-| Prep checklist must be explicitly confirmed | Step included in ABC-03 |
+| Lesson                                               | Applied in this plan                                                            |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Complete end-to-end flow mandatory                   | All steps 1–5 covered including prep checklist                                  |
+| Record AI summary timing                             | Stopwatch step included in ABC-03                                               |
+| Prep checklist must be explicitly confirmed          | Step included in ABC-03                                                         |
 | PDF table format causes extraction failure (D-IT-01) | AB format is numbered list — expect clean extraction; paste fallback documented |
-| No indication of which file was loaded | Known limitation — noted in ABC-03 expected result |
-| Eligibility mismatch should be surfaced | ABC-04 tests for POSITIVE eligibility match (Harry's Rainbow IS eligible) |
-| Non-narrative questions should not appear in Step 4 | ABC-06 explicitly verifies only narrative questions shown |
+| No indication of which file was loaded               | Known limitation — noted in ABC-03 expected result                              |
+| Eligibility mismatch should be surfaced              | ABC-04 tests for POSITIVE eligibility match (Harry's Rainbow IS eligible)       |
+| Non-narrative questions should not appear in Step 4  | ABC-06 explicitly verifies only narrative questions shown                       |
 
 ---
 
 ## Known Expected Behaviours
 
-| Ref | Description |
-|-----|-------------|
-| Prior test | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). Document has sections A–D. Only 2–3 questions require narrative prose (B3, B4, possibly C11). D5 is a file upload instruction (Word/PDF proposal, 2–2½ pages) — must NOT appear as a text writing card. |
-| B4 word limit | B4 asks for a summary in "no more than 15 words" — the tightest word limit of any funder tested. Counter should show "X / 15 words". |
-| Grant amount | AB does not ask applicants to specify a grant amount. Open Programme range is £10,000–£30,000 pa. |
-| No file indicator | The Step 3 summary page does not currently show which guidelines file was uploaded. This is a known limitation logged as a product improvement. |
+| Ref               | Description                                                                                                                                                                                                                                                                                         |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prior test        | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). Document has sections A–D. Only 2–3 questions require narrative prose (B3, B4, possibly C11). D5 is a file upload instruction (Word/PDF proposal, 2–2½ pages) — must NOT appear as a text writing card. |
+| B4 word limit     | B4 asks for a summary in "no more than 15 words" — the tightest word limit of any funder tested. Counter should show "X / 15 words".                                                                                                                                                                |
+| Grant amount      | AB does not ask applicants to specify a grant amount. Open Programme range is £10,000–£30,000 pa.                                                                                                                                                                                                   |
+| No file indicator | The Step 3 summary page does not currently show which guidelines file was uploaded. This is a known limitation logged as a product improvement.                                                                                                                                                     |
 
 ---
 
@@ -77,26 +77,26 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 
 Complete after running all tests.
 
-| Test ID | Test Name | Idlewild Lesson Applied | AI Summary Time | Result | Notes |
-|---------|-----------|------------------------|-----------------|--------|-------|
-| ABC-01 | Account registration and charity profile | No | N/A | ✅ Pass | |
-| ABC-02 | A B Charitable Trust funder picker | No | N/A | ✅ Pass | |
-| ABC-03 | PDF upload, AI summary and prep checklist | Yes — timing, prep checklist | Not recorded | ✅ Pass | Paste text used; PDF extraction issue (D-IT-01) still open |
-| ABC-04 | AI eligibility mismatch — Harry's Rainbow NOT eligible | Yes — social justice focus vs bereavement charity | N/A | ✅ Pass | Summary clearly states social justice categories required |
-| ABC-05 | AI summary content accuracy | No | N/A | ✅ Pass | All sections accurate; grant amount correct |
-| ABC-06 | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering | N/A | ✅ Pass | 3 questions shown (B3, B4, C11); D5 absent |
-| ABC-07 | Word limit extraction — B4 is 15 words (tightest limit tested) | Yes — limit type correct | N/A | ✅ Pass | "15 words" badge and "0 / 15 words" counter correct |
-| ABC-08 | Narrative answer writing and AI assist | No | N/A | ✅ Pass | AI assist working; spelling correction fix applied mid-test |
-| ABC-09 | Answer approval and Step 5 navigation | No | N/A | ✅ Pass | Senior review screen; Step 5 review checkboxes and approval modal |
-| ABC-10 | Word document export — structure and content | No | N/A | ✅ Pass | Both .docx and .txt downloaded; all content correct |
+| Test ID | Test Name                                                        | Idlewild Lesson Applied                           | AI Summary Time | Result  | Notes                                                             |
+| ------- | ---------------------------------------------------------------- | ------------------------------------------------- | --------------- | ------- | ----------------------------------------------------------------- |
+| ABC-01  | Account registration and charity profile                         | No                                                | N/A             | ✅ Pass |                                                                   |
+| ABC-02  | A B Charitable Trust funder picker                               | No                                                | N/A             | ✅ Pass |                                                                   |
+| ABC-03  | PDF upload, AI summary and prep checklist                        | Yes — timing, prep checklist                      | Not recorded    | ✅ Pass | Paste text used; PDF extraction issue (D-IT-01) still open        |
+| ABC-04  | AI eligibility mismatch — Harry's Rainbow NOT eligible           | Yes — social justice focus vs bereavement charity | N/A             | ✅ Pass | Summary clearly states social justice categories required         |
+| ABC-05  | AI summary content accuracy                                      | No                                                | N/A             | ✅ Pass | All sections accurate; grant amount correct                       |
+| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering                     | N/A             | ✅ Pass | 3 questions shown (B3, B4, C11); D5 absent                        |
+| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | Yes — limit type correct                          | N/A             | ✅ Pass | "15 words" badge and "0 / 15 words" counter correct               |
+| ABC-08  | Narrative answer writing and AI assist                           | No                                                | N/A             | ✅ Pass | AI assist working; spelling correction fix applied mid-test       |
+| ABC-09  | Answer approval and Step 5 navigation                            | No                                                | N/A             | ✅ Pass | Senior review screen; Step 5 review checkboxes and approval modal |
+| ABC-10  | Word document export — structure and content                     | No                                                | N/A             | ✅ Pass | Both .docx and .txt downloaded; all content correct               |
 
 ---
 
 ## Defect Log
 
-| ID | Test | Description | Severity | Status |
-|----|------|-------------|----------|--------|
-| | | | | |
+| ID  | Test | Description | Severity | Status |
+| --- | ---- | ----------- | -------- | ------ |
+|     |      |             |          |        |
 
 ---
 
@@ -110,6 +110,7 @@ Complete after running all tests.
 **Prerequisite:** None
 
 **Steps:**
+
 1. Go to [grant-pathway-three.vercel.app](https://grant-pathway-three.vercel.app)
 2. Click **Register**
 3. Enter first name, last name, email `grantpathway+ABC@gmail.com`, password (10+ characters), accept Terms and Privacy Policy
@@ -126,6 +127,7 @@ Complete after running all tests.
 10. Complete any remaining required fields and click **Save**
 
 **Expected result:**
+
 - Account created and email verified without errors
 - Charity Commission lookup returns Harry's Rainbow details and pre-fills name and registration number
 - Profile saves successfully
@@ -143,6 +145,7 @@ Complete after running all tests.
 **Prerequisite:** ABC-01 complete
 
 **Steps:**
+
 1. From the dashboard, click **+ New Application**
 2. On Step 1, click into the funder picker search field
 3. Type **"A B"**
@@ -152,6 +155,7 @@ Complete after running all tests.
 7. Click **Continue**
 
 **Expected result:**
+
 - "A B" search returns A B Charitable Trust in the dropdown
 - **Structured** badge displayed alongside the name
 - Application created and dashboard updated
@@ -169,6 +173,7 @@ Complete after running all tests.
 **Prerequisite:** ABC-02 complete
 
 **Steps:**
+
 1. Open the application from the dashboard
 2. On Step 2 (Funder Guidelines), select **Upload a file**
 3. Upload the A B Charitable Trust application questions PDF from `docs/Grant Org Guidelines/`
@@ -183,17 +188,19 @@ Complete after running all tests.
 12. Click **"I have what I need — start writing"** to enter the Q&A interface
 
 **If PDF extraction fails (no questions shown in Step 4):**
+
 - Return to Step 2 using the **Back** button
 - Select **paste text** instead
 - Paste the narrative questions directly from the AB Charitable Trust document
 - Regenerate the summary and proceed
 
 **Expected result:**
+
 - PDF uploads successfully (no format or size error — AB document is .pdf)
 - AI summary generates without error within 30 seconds
 - Summary content covers AB Charitable Trust's focus areas, eligibility, and requirements
 - Prep checklist screen confirmed before Q&A interface
-- *(Known limitation: no filename indicator shown on Step 3 — this is expected)*
+- _(Known limitation: no filename indicator shown on Step 3 — this is expected)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -209,6 +216,7 @@ Complete after running all tests.
 **Background:** AB Charitable Trust funds organisations working in: Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform (these are the categories in the B1 dropdown). Harry's Rainbow provides bereavement support to children — this does not fall within these categories.
 
 **Steps:**
+
 1. Review the AI summary generated in ABC-03
 2. Check the "Who can apply" and "What the funder is looking for" sections
 3. Confirm the summary correctly identifies AB Charitable Trust's social justice / human rights focus:
@@ -220,6 +228,7 @@ Complete after running all tests.
 5. Note whether the AI surfaces the category restriction (B1) as an eligibility consideration
 
 **Expected result:**
+
 - Summary clearly identifies the social justice / human rights funding focus
 - A user reading the summary would immediately recognise that Harry's Rainbow's bereavement work does not align with AB's categories
 - Ideally the AI flags the mismatch explicitly — this is an observation, not a mandatory pass criterion
@@ -237,6 +246,7 @@ Complete after running all tests.
 **Prerequisite:** ABC-03 complete
 
 **Steps:**
+
 1. Review the full AI summary
 2. Check each section is present and plausible:
    - **About this grant** — describes AB Charitable Trust and its focus areas
@@ -248,6 +258,7 @@ Complete after running all tests.
 4. Check whether the single-stage nature of the application is noted
 
 **Expected result:**
+
 - All five summary sections are present and populated
 - Grant amount or range is referenced correctly
 - At least one of: deadline, exclusions, or key priorities is accurately captured
@@ -266,14 +277,15 @@ Complete after running all tests.
 
 **Background:** The A B Charitable Trust document has questions across four sections (A, B, C, D). The vast majority are data-entry, financial, dropdown, or file upload fields. Only 2–3 require a narrative prose answer:
 
-| Question | Text | Expected |
-|----------|------|----------|
-| B3 | How does your organisation reflect the communities that you work with? | ✅ Should appear — narrative, no explicit word limit |
-| B4 | Summarise your work or your project in no more than 15 words | ✅ Should appear — narrative, **15-word limit** |
-| C11 | If you would like to give us any additional information, please use this box | May appear — optional narrative |
-| D5 | Please provide an overview of your work/funding proposal | ❌ Should NOT appear as a writing card — this is a file upload (Word/PDF document, 2–2½ pages) |
+| Question | Text                                                                         | Expected                                                                                       |
+| -------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| B3       | How does your organisation reflect the communities that you work with?       | ✅ Should appear — narrative, no explicit word limit                                           |
+| B4       | Summarise your work or your project in no more than 15 words                 | ✅ Should appear — narrative, **15-word limit**                                                |
+| C11      | If you would like to give us any additional information, please use this box | May appear — optional narrative                                                                |
+| D5       | Please provide an overview of your work/funding proposal                     | ❌ Should NOT appear as a writing card — this is a file upload (Word/PDF document, 2–2½ pages) |
 
 **Steps:**
+
 1. In the Step 4 Q&A interface, count the number of questions displayed
 2. Confirm B3 and B4 are both present
 3. Confirm D5 ("Please provide an overview of your work/funding proposal") does **NOT** appear as a text writing card — it is a document upload instruction
@@ -281,11 +293,12 @@ Complete after running all tests.
 5. Record the exact number and text of all questions shown
 
 **Expected result:**
+
 - 2–3 questions displayed (B3, B4, and possibly C11)
 - B4 shows a **15-word limit** badge — the tightest limit in any funder tested so far
 - D5 does not appear as a text writing card
 - No data-entry, financial, dropdown, or standard file upload questions shown
-- *(If more than 5 questions shown, investigate — log as defect if non-narrative fields included)*
+- _(If more than 5 questions shown, investigate — log as defect if non-narrative fields included)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -299,6 +312,7 @@ Complete after running all tests.
 **Prerequisite:** ABC-06 complete
 
 **Steps:**
+
 1. On the B4 question card ("Summarise your work or your project in no more than 15 words"):
    - Confirm a **"15 words"** limit badge is displayed
    - Type a short answer and confirm the counter shows **"X / 15 words"**
@@ -309,11 +323,12 @@ Complete after running all tests.
 3. Confirm counter format throughout uses **"words"** not "characters"
 
 **Expected result:**
+
 - B4 shows **"15 words"** badge and **"X / 15 words"** counter
 - Counter highlights or changes colour when the 15-word limit is exceeded on B4
 - B3 may or may not show a limit (guidance text only — acceptable either way)
 - All counters show "words" not "characters" — confirming limit type extraction is correct for this funder
-- *(If B4 shows "15 characters" instead of "15 words" — log as a defect)*
+- _(If B4 shows "15 characters" instead of "15 words" — log as a defect)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -327,6 +342,7 @@ Complete after running all tests.
 **Prerequisite:** ABC-07 complete
 
 **Steps:**
+
 1. Select the first narrative question in Step 4
 2. Write a short answer of approximately 50 words describing Harry's Rainbow's work relevant to the question
 3. Click **"Help me improve this"** (AI assist button)
@@ -343,6 +359,7 @@ Complete after running all tests.
 8. Click **Approve**
 
 **Expected result:**
+
 - Answer text area accepts input without errors
 - AI assist returns a refined answer within 15 seconds
 - Mandatory review prompts displayed before approval is possible
@@ -361,6 +378,7 @@ Complete after running all tests.
 **Prerequisite:** ABC-08 complete (at least one answer approved)
 
 **Steps:**
+
 1. Approve at least one additional narrative question answer (minimum two approved in total)
 2. Click **"Ready to assemble"** at the bottom of Step 4
 3. Confirm the **senior review confirmation screen** appears
@@ -369,6 +387,7 @@ Complete after running all tests.
 6. Confirm the step indicator shows Step 5 as active with Steps 1–4 complete
 
 **Expected result:**
+
 - "Ready to assemble" button is enabled after at least one answer is approved
 - Senior review confirmation screen appears before Step 5
 - Step 5 loads showing approved answers ready for export
@@ -387,20 +406,23 @@ Complete after running all tests.
 **Prerequisite:** ABC-09 complete
 
 **Steps:**
+
 1. On Step 5, click **Export as Word document**
 2. Open the downloaded .docx file
 3. Review the document structure and content
 
 **Expected result:**
 The exported Word document contains, in order:
+
 - Document title and grant name: **"General Grant 2026"**
 - Funder name: **"A B Charitable Trust"**
 - Export date
 - AI disclaimer statement
 - Q&A body — each approved question followed by its approved answer
-- Footer: *"Prepared using Grant Pathway v[version] — grantpathway.org.uk"*
+- Footer: _"Prepared using Grant Pathway v[version] — grantpathway.org.uk"_
 
 Additional checks:
+
 - Only approved answers are included (unapproved questions are absent)
 - Word limits / character limits are not shown in the exported document
 - Document is clean, readable, and free of formatting artefacts
@@ -414,6 +436,6 @@ Additional checks:
 
 ## Document History
 
-| Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 1.0 | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons |
+| Version | Date       | Author         | Change                                                                                                          |
+| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons |

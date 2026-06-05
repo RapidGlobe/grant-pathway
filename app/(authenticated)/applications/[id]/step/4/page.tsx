@@ -131,16 +131,16 @@ export default async function Step4Page({ params }: Props) {
 
         // ignoreDuplicates: true only returns newly inserted rows, not existing ones.
         // Always re-fetch after upsert to get the full current set.
-        await supabase
-          .from('application_answers')
-          .upsert(inserts, {
-            onConflict: 'application_id,question_order',
-            ignoreDuplicates: true,
-          })
+        await supabase.from('application_answers').upsert(inserts, {
+          onConflict: 'application_id,question_order',
+          ignoreDuplicates: true,
+        })
 
         const { data: refreshed } = await supabase
           .from('application_answers')
-          .select('id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved')
+          .select(
+            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+          )
           .eq('application_id', id)
           .eq('user_id', user.id)
           .order('question_order')
@@ -175,16 +175,16 @@ export default async function Step4Page({ params }: Props) {
 
         // ignoreDuplicates: true only returns newly inserted rows, not existing ones.
         // Always re-fetch after upsert to get the full current set.
-        await supabase
-          .from('application_answers')
-          .upsert(inserts, {
-            onConflict: 'application_id,question_order',
-            ignoreDuplicates: true,
-          })
+        await supabase.from('application_answers').upsert(inserts, {
+          onConflict: 'application_id,question_order',
+          ignoreDuplicates: true,
+        })
 
         const { data: refreshed } = await supabase
           .from('application_answers')
-          .select('id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved')
+          .select(
+            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+          )
           .eq('application_id', id)
           .eq('user_id', user.id)
           .order('question_order')

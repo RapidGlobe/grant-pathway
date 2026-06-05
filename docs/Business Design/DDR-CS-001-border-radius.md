@@ -40,5 +40,5 @@ The shadcn/ui `--radius` CSS variable will be set to 6--8px and applied globally
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

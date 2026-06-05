@@ -13,16 +13,19 @@ Grant Pathway must have a reliable, repeatable deployment process. Deployments s
 ## Options Considered
 
 ### Option A — Vercel automatic deployment from Git (main → production, branches → preview)
+
 - **What it is:** Every push to the `main` branch triggers a production deployment. Every branch push creates a preview deployment with a unique URL. This is Vercel's default behaviour.
 - **Strengths:** Zero configuration required. Preview URLs allow testing before merging. Instant rollback by redeploying a previous deployment in the Vercel dashboard. No CI/CD pipeline to maintain.
 - **Weaknesses:** Every push to `main` deploys immediately — no manual approval gate. For a single developer, this is acceptable.
 
 ### Option B — Manual promotion (branch → staging → manual promote to production)
+
 - **What it is:** A `staging` branch auto-deploys to a staging environment. Promotion to production is manual (merge staging → main).
 - **Strengths:** Adds a manual gate before production deployment.
 - **Weaknesses:** More branch management overhead. Preview deployments on Vercel already provide a staging-like environment for each branch.
 
 ### Option C — GitHub Actions CI pipeline + Vercel deployment
+
 - **What it is:** GitHub Actions runs tests and linting on every push. On success, it triggers a Vercel deployment.
 - **Strengths:** Automated quality gates. Tests run before deployment.
 - **Weaknesses:** Requires setting up GitHub Actions. Vercel already runs TypeScript build checks on every deployment — adding a CI layer duplicates some checks. Justified when a test suite exists.
@@ -34,6 +37,7 @@ Grant Pathway must have a reliable, repeatable deployment process. Deployments s
 Every push to `main` deploys to production. Every branch push creates a Vercel preview deployment at a unique URL. This is Vercel's default behaviour, requiring zero CI/CD configuration.
 
 **Branch strategy:**
+
 - `main` → production deployment
 - Feature branches → Vercel preview deployments (unique URL per branch)
 - Branch protection on `main`: Vercel build check must pass before merge (configured in GitHub repository settings)
@@ -43,6 +47,7 @@ Every push to `main` deploys to production. Every branch push creates a Vercel p
 **Upgrade trigger:** GitHub Actions CI (Option C) is added when the first meaningful test suite exists. The workflow will run lint and tests on every push; the Vercel deployment only proceeds on success.
 
 **Pre-launch checklist (one-time tasks before first production deployment):**
+
 1. Activate Vercel Pro and set `maxDuration = 90` on AI routes (ADR-AI-006)
 2. Configure Resend SMTP in Supabase Auth dashboard (ADR-OPS-003)
 3. Customise Supabase Auth email templates — verification and password reset must reference "Grant Pathway", not "Supabase". Follow tone and voice guide in design-requirements.md (ADR-OPS-003)
@@ -54,6 +59,7 @@ Every push to `main` deploys to production. Every branch push creates a Vercel p
 9. Add `CRON_SECRET` environment variable to Vercel and verify the Storage cleanup cron job is active (ADR-OPS-004)
 
 **Per-release deployment checklist:**
+
 1. Apply any pending migrations to the production Supabase project: `supabase db push --db-url [prod-url]`
 2. Verify the feature branch preview deployment
 3. Merge to `main`

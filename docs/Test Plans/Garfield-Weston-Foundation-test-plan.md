@@ -25,6 +25,7 @@ This test plan covers an end-to-end test of Grant Pathway using the **Garfield W
 **AI policy:** None stated in the April 2026 guidelines. No mention of AI anywhere in the document. The summary should flag the absence rather than fabricating a policy.
 
 **Key characteristics of the free-form path:**
+
 - Proposal is a single document, maximum 10 pages A4, minimum 11pt font
 - No appendices permitted — all content within the proposal
 - Sections suggested but not mandatory — the AI should extract them as writing sections
@@ -37,25 +38,28 @@ This test plan covers an end-to-end test of Grant Pathway using the **Garfield W
 ## Pre-Test Setup
 
 ### Guidelines file — already downloaded
+
 File: `docs/Grant Org Guidelines/garfield-weston-foundation-application-guidelines-2026.pdf`
 Source: https://garfieldweston.org/wp-content/uploads/2026/04/Application-guidelines.pdf
 
 ### Account 1 — Harry's Rainbow (existing)
+
 - Email: `grantpathway+idle1@gmail.com`
 - Verify the original Harry's Rainbow profile is in place. Revert if modified.
 
 ### Account 2 — Greenfield Community Trust (new account to create)
+
 Register `grantpathway+garfield1@gmail.com` and set up the following charity profile:
 
-| Field | Value |
-|-------|-------|
-| First name | Priya |
-| Last name | Sharma |
-| Charity name | Greenfield Community Trust |
-| Registration number | (leave blank — optional) |
-| What does your charity do? | Greenfield Community Trust provides welfare support, food assistance, and social activities for older people and families experiencing poverty in Sunderland. We run a community hub offering a hot meal service, welfare benefits advice, digital inclusion classes, and a befriending programme for isolated older residents. Since 2015 we have supported over 800 people each year across three community venues in South Sunderland. |
-| Who does your charity help? | Older people and families experiencing poverty, social isolation, or financial hardship in Sunderland. Around 60% of our beneficiaries are aged 65 or over; 40% are working-age adults and families on low incomes. |
-| Where do you work? | Sunderland, North East England |
+| Field                       | Value                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First name                  | Priya                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Last name                   | Sharma                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Charity name                | Greenfield Community Trust                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Registration number         | (leave blank — optional)                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| What does your charity do?  | Greenfield Community Trust provides welfare support, food assistance, and social activities for older people and families experiencing poverty in Sunderland. We run a community hub offering a hot meal service, welfare benefits advice, digital inclusion classes, and a befriending programme for isolated older residents. Since 2015 we have supported over 800 people each year across three community venues in South Sunderland. |
+| Who does your charity help? | Older people and families experiencing poverty, social isolation, or financial hardship in Sunderland. Around 60% of our beneficiaries are aged 65 or over; 40% are working-age adults and families on low incomes.                                                                                                                                                                                                                       |
+| Where do you work?          | Sunderland, North East England                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ---
 
@@ -63,41 +67,41 @@ Register `grantpathway+garfield1@gmail.com` and set up the following charity pro
 
 ### Account 1 — Harry's Rainbow (broad eligibility pass test)
 
-| Item | Value |
-|------|-------|
-| Test user email | grantpathway+idle1@gmail.com |
-| Charity name | Harry's Rainbow |
-| Funder | Garfield Weston Foundation |
-| Grant name | Welfare Support Grant 2026 |
-| Guidelines file | garfield-weston-foundation-application-guidelines-2026.pdf |
+| Item                         | Value                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| Test user email              | grantpathway+idle1@gmail.com                                                            |
+| Charity name                 | Harry's Rainbow                                                                         |
+| Funder                       | Garfield Weston Foundation                                                              |
+| Grant name                   | Welfare Support Grant 2026                                                              |
+| Guidelines file              | garfield-weston-foundation-application-guidelines-2026.pdf                              |
 | Expected eligibility outcome | **Pass** (Garfield Weston funds Welfare/Health broadly — bereavement support qualifies) |
 
 ### Account 2 — Greenfield Community Trust (happy path)
 
-| Item | Value |
-|------|-------|
-| Test user email | grantpathway+garfield1@gmail.com |
-| Charity name | Greenfield Community Trust |
-| Funder | Garfield Weston Foundation |
-| Grant name | Community Hub Core Costs 2026 |
-| Grant amount | ~£50,000 (core costs, ~14% of £350,000 annual income — within 10–20% guideline) |
-| Guidelines file | garfield-weston-foundation-application-guidelines-2026.pdf |
-| Guidelines input method | File upload (PDF) |
-| Expected eligibility outcome | Pass |
+| Item                         | Value                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------- |
+| Test user email              | grantpathway+garfield1@gmail.com                                                |
+| Charity name                 | Greenfield Community Trust                                                      |
+| Funder                       | Garfield Weston Foundation                                                      |
+| Grant name                   | Community Hub Core Costs 2026                                                   |
+| Grant amount                 | ~£50,000 (core costs, ~14% of £350,000 annual income — within 10–20% guideline) |
+| Guidelines file              | garfield-weston-foundation-application-guidelines-2026.pdf                      |
+| Guidelines input method      | File upload (PDF)                                                               |
+| Expected eligibility outcome | Pass                                                                            |
 
 ---
 
 ## Known Expected Behaviours
 
-| Ref | Description |
-|-----|-------------|
-| IT-GWF-02 | Harry's Rainbow is **not** expected to trigger a mismatch. Garfield Weston funds Welfare and Health broadly — bereavement support for children is within scope. If a mismatch is triggered, record as a defect (false positive). |
-| Free-form path | Step 4 shows a section-by-section interface, not numbered question cards. This is the first test of the narrative path. The number and names of sections depend on what the AI extracts from the PDF. |
-| No per-section word limits | Garfield Weston specifies no word limits per section — only a 10-page overall limit. The app should not show word limit badges on section cards, or may show a general page-count advisory. |
-| Finance sections | Sections covering projected income tables, expenditure breakdown, and income narrative may appear as budget/financial sections or may be absent from writing cards (non-narrative data). Record what appears. |
-| No AI policy | Not published by Garfield Weston. Summary should flag absence. |
-| No specific amount required | Garfield Weston does not require applicants to specify a grant amount. Trustees decide. The summary should reflect this. |
-| Reapplication bar | Must wait 12 months after any outcome before reapplying. Verify this appears in key requirements. |
+| Ref                         | Description                                                                                                                                                                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-GWF-02                   | Harry's Rainbow is **not** expected to trigger a mismatch. Garfield Weston funds Welfare and Health broadly — bereavement support for children is within scope. If a mismatch is triggered, record as a defect (false positive). |
+| Free-form path              | Step 4 shows a section-by-section interface, not numbered question cards. This is the first test of the narrative path. The number and names of sections depend on what the AI extracts from the PDF.                            |
+| No per-section word limits  | Garfield Weston specifies no word limits per section — only a 10-page overall limit. The app should not show word limit badges on section cards, or may show a general page-count advisory.                                      |
+| Finance sections            | Sections covering projected income tables, expenditure breakdown, and income narrative may appear as budget/financial sections or may be absent from writing cards (non-narrative data). Record what appears.                    |
+| No AI policy                | Not published by Garfield Weston. Summary should flag absence.                                                                                                                                                                   |
+| No specific amount required | Garfield Weston does not require applicants to specify a grant amount. Trustees decide. The summary should reflect this.                                                                                                         |
+| Reapplication bar           | Must wait 12 months after any outcome before reapplying. Verify this appears in key requirements.                                                                                                                                |
 
 ---
 
@@ -105,18 +109,19 @@ Register `grantpathway+garfield1@gmail.com` and set up the following charity pro
 
 Based on the published guidelines. The AI may extract all, some, or variations of these. The table will be updated with actual observed values after IT-GWF-06.
 
-| # | Section | Suggested content | Word limit | Expected? |
-|---|---------|-------------------|------------|-----------|
-| 1 | Executive Summary | Organisation overview, need, location, reach, difference made, request | None stated | Yes |
-| 2 | Your Work — Need | What need is addressed; why it matters; what services are delivered | None stated | Yes |
-| 3 | Your Work — Reach and Impact | Impact and difference made; who benefits; how many people | None stated | Yes |
-| 4 | Your Work — Equity, Diversity and Inclusion | EDI approach; how it informs the work | None stated | Yes |
-| 5 | Your Work — Partnerships | Collaborations and partner organisations | None stated | Possibly |
-| 6 | Your People | Senior team experience; Trustee skills | None stated | Yes |
-| 7 | Your Finances | Income plan, expenditure, Plan B narrative | None stated | Yes (may be budget section) |
-| 8 | Your Request | Financial need and shortfall; amount optional | None stated | Yes |
+| #   | Section                                     | Suggested content                                                      | Word limit  | Expected?                   |
+| --- | ------------------------------------------- | ---------------------------------------------------------------------- | ----------- | --------------------------- |
+| 1   | Executive Summary                           | Organisation overview, need, location, reach, difference made, request | None stated | Yes                         |
+| 2   | Your Work — Need                            | What need is addressed; why it matters; what services are delivered    | None stated | Yes                         |
+| 3   | Your Work — Reach and Impact                | Impact and difference made; who benefits; how many people              | None stated | Yes                         |
+| 4   | Your Work — Equity, Diversity and Inclusion | EDI approach; how it informs the work                                  | None stated | Yes                         |
+| 5   | Your Work — Partnerships                    | Collaborations and partner organisations                               | None stated | Possibly                    |
+| 6   | Your People                                 | Senior team experience; Trustee skills                                 | None stated | Yes                         |
+| 7   | Your Finances                               | Income plan, expenditure, Plan B narrative                             | None stated | Yes (may be budget section) |
+| 8   | Your Request                                | Financial need and shortfall; amount optional                          | None stated | Yes                         |
 
 **Non-narrative financial content expected to be absent from writing cards:**
+
 - Projected income table (Source / Anticipated / Confirmed / Notes)
 - Planned expenditure table (Salaries / Training / Activity / Office / Building / Legal / Governance)
 
@@ -124,29 +129,29 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 ## Test Results Summary
 
-| Test ID | Test Name | GWF-specific | AI Summary Time | Result | Notes |
-|---------|-----------|-------------|----------------|--------|-------|
-| IT-GWF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
-| IT-GWF-02 | Harry's Rainbow — Garfield Weston funder picker and guidelines upload | Yes | 33s | ✅ Pass | Narrative badge confirmed in picker. 11 sections extracted. 33s within NFR-01 large-document target (≤45s for docs over 8 pages). |
-| IT-GWF-03 | Harry's Rainbow — eligibility passes (no false-positive mismatch) | Yes | N/A | ✅ Pass | No mismatch warning — summary displayed immediately. FR-47 correctly not triggered for a broadly eligible charity. |
-| IT-GWF-04 | Greenfield Community Trust account registration and profile setup | No | N/A | ✅ Pass | |
-| IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker | Yes | N/A | ✅ Pass | |
-| IT-GWF-06 | Greenfield Community Trust — PDF upload and AI summary | Yes | | ☐ Pass ☐ Fail ☐ Blocked | |
-| IT-GWF-07 | Greenfield Community Trust — eligibility check passes; preparation checklist | Yes | N/A | ✅ Pass | D-GWF-01 raised: Step 4 served stale cached page after prep checklist — Ctrl+Shift+R required as workaround. Fixed: revalidatePath() added to all step/4 redirects. |
-| IT-GWF-08 | Greenfield Community Trust — AI summary content accuracy | Yes | N/A | ✅ Pass | Summary accurate and comprehensive. AI policy absence handled gracefully. Budget section wording updated: "AI cannot generate these" → "AI cannot assist you with this". |
-| IT-GWF-09 | Greenfield Community Trust — section extraction and free-form interface | Yes | N/A | ✅ Pass | All 11 sections present in correct order with correct guidance text. No word limits shown (correct). Budget sections 8 and 9 correctly flagged amber with Budget badge. Free-form interface confirmed (no numbered Q cards). |
-| IT-GWF-10 | Greenfield Community Trust — non-narrative content handling; finance sections | Yes | N/A | ✅ Pass | No financial table cards. Budget sections are free-text with Budget badge. No AI assist button on budget sections. Ready to assemble correctly greyed until all 11 approved. |
-| IT-GWF-11 | Greenfield Community Trust — section writing and AI assist | No | N/A | ✅ Pass | AI assist working on narrative sections. Budget sections correctly have no AI assist button. All 11 sections written and approved. |
-| IT-GWF-12 | Greenfield Community Trust — section approval and Step 5 navigation | No | N/A | ✅ Pass | Assembly and approval flow completed correctly. |
-| IT-GWF-13 | Greenfield Community Trust — export; timestamp; re-export warning | No | N/A | ✅ Pass | Timestamp "04 June 2026, 17:05" confirmed. Narrative format verified — sections flow as Title → Content → separator, not numbered Q&A. All 11 sections present. Footer present. |
+| Test ID   | Test Name                                                                     | GWF-specific | AI Summary Time | Result                  | Notes                                                                                                                                                                                                                        |
+| --------- | ----------------------------------------------------------------------------- | ------------ | --------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-GWF-01 | Harry's Rainbow sign in and profile verification                              | No           | N/A             | ✅ Pass                 |                                                                                                                                                                                                                              |
+| IT-GWF-02 | Harry's Rainbow — Garfield Weston funder picker and guidelines upload         | Yes          | 33s             | ✅ Pass                 | Narrative badge confirmed in picker. 11 sections extracted. 33s within NFR-01 large-document target (≤45s for docs over 8 pages).                                                                                            |
+| IT-GWF-03 | Harry's Rainbow — eligibility passes (no false-positive mismatch)             | Yes          | N/A             | ✅ Pass                 | No mismatch warning — summary displayed immediately. FR-47 correctly not triggered for a broadly eligible charity.                                                                                                           |
+| IT-GWF-04 | Greenfield Community Trust account registration and profile setup             | No           | N/A             | ✅ Pass                 |                                                                                                                                                                                                                              |
+| IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker                    | Yes          | N/A             | ✅ Pass                 |                                                                                                                                                                                                                              |
+| IT-GWF-06 | Greenfield Community Trust — PDF upload and AI summary                        | Yes          |                 | ☐ Pass ☐ Fail ☐ Blocked |                                                                                                                                                                                                                              |
+| IT-GWF-07 | Greenfield Community Trust — eligibility check passes; preparation checklist  | Yes          | N/A             | ✅ Pass                 | D-GWF-01 raised: Step 4 served stale cached page after prep checklist — Ctrl+Shift+R required as workaround. Fixed: revalidatePath() added to all step/4 redirects.                                                          |
+| IT-GWF-08 | Greenfield Community Trust — AI summary content accuracy                      | Yes          | N/A             | ✅ Pass                 | Summary accurate and comprehensive. AI policy absence handled gracefully. Budget section wording updated: "AI cannot generate these" → "AI cannot assist you with this".                                                     |
+| IT-GWF-09 | Greenfield Community Trust — section extraction and free-form interface       | Yes          | N/A             | ✅ Pass                 | All 11 sections present in correct order with correct guidance text. No word limits shown (correct). Budget sections 8 and 9 correctly flagged amber with Budget badge. Free-form interface confirmed (no numbered Q cards). |
+| IT-GWF-10 | Greenfield Community Trust — non-narrative content handling; finance sections | Yes          | N/A             | ✅ Pass                 | No financial table cards. Budget sections are free-text with Budget badge. No AI assist button on budget sections. Ready to assemble correctly greyed until all 11 approved.                                                 |
+| IT-GWF-11 | Greenfield Community Trust — section writing and AI assist                    | No           | N/A             | ✅ Pass                 | AI assist working on narrative sections. Budget sections correctly have no AI assist button. All 11 sections written and approved.                                                                                           |
+| IT-GWF-12 | Greenfield Community Trust — section approval and Step 5 navigation           | No           | N/A             | ✅ Pass                 | Assembly and approval flow completed correctly.                                                                                                                                                                              |
+| IT-GWF-13 | Greenfield Community Trust — export; timestamp; re-export warning             | No           | N/A             | ✅ Pass                 | Timestamp "04 June 2026, 17:05" confirmed. Narrative format verified — sections flow as Title → Content → separator, not numbered Q&A. All 11 sections present. Footer present.                                              |
 
 ---
 
 ## Defect Log
 
-| ID | Test | Description | Severity | Status |
-|----|------|-------------|----------|--------|
-| D-GWF-01 | IT-GWF-07 | Step 4 served stale cached page after prep checklist redirect — free-form sections were in the database but the page showed the "No specific questions found" fallback. Ctrl+Shift+R (hard refresh) resolved it. Root cause: Next.js App Router serving cached HTML after Server Action redirect. Fixed by adding revalidatePath() before all redirect() calls to step/4 in actions/applications.ts. | Medium | Fixed |
+| ID       | Test      | Description                                                                                                                                                                                                                                                                                                                                                                                          | Severity | Status |
+| -------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ |
+| D-GWF-01 | IT-GWF-07 | Step 4 served stale cached page after prep checklist redirect — free-form sections were in the database but the page showed the "No specific questions found" fallback. Ctrl+Shift+R (hard refresh) resolved it. Root cause: Next.js App Router serving cached HTML after Server Action redirect. Fixed by adding revalidatePath() before all redirect() calls to step/4 in actions/applications.ts. | Medium   | Fixed  |
 
 ---
 
@@ -160,6 +165,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** None
 
 **Steps:**
+
 1. Go to [grant-pathway-three.vercel.app](https://grant-pathway-three.vercel.app)
 2. Sign in as `grantpathway+idle1@gmail.com`
 3. Verify the original Harry's Rainbow profile (bereavement charity, Milton Keynes)
@@ -179,6 +185,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-01 complete
 
 **Steps:**
+
 1. From the dashboard, click **+ New Application**
 2. Type **"Garfield"** in the funder picker
 3. Confirm **Garfield Weston Foundation** appears — note the badge type (Structured or Narrative/Free-form)
@@ -190,6 +197,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 9. Note whether a red eligibility mismatch warning appears
 
 **Expected result:**
+
 - Garfield Weston Foundation appears in picker
 - PDF uploads successfully
 - AI summary generates without error
@@ -209,6 +217,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-02 complete
 
 **Steps:**
+
 1. Verify normal summary cards are displayed with no red mismatch warning
 2. Confirm the **Continue** button is available (not blocked)
 3. Click **Continue** → confirm the preparation checklist appears
@@ -230,6 +239,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-03 complete
 
 **Steps:**
+
 1. Sign out of Harry's Rainbow account
 2. Register `grantpathway+garfield1@gmail.com` (first name Priya, last name Sharma)
 3. Verify email and click the verification link
@@ -251,6 +261,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-04 complete
 
 **Steps:**
+
 1. Click **Start your first application**
 2. Type **"Garfield"** in the funder picker
 3. Confirm **Garfield Weston Foundation** appears with the correct badge
@@ -271,6 +282,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-05 complete
 
 **Steps:**
+
 1. On Step 2, upload `garfield-weston-foundation-application-guidelines-2026.pdf`
 2. Confirm file accepted; click **Continue**
 3. Start a stopwatch — record time when summary cards appear
@@ -280,6 +292,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 7. Click **Continue**
 
 **Expected result:**
+
 - PDF uploads successfully
 - AI summary generates within 30 seconds (NFR-01)
 - Summary reflects broad sector coverage, free-form proposal format, 10-page limit, no deadlines
@@ -297,6 +310,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-06 complete
 
 **Steps:**
+
 1. Confirm eligibility passed (no red mismatch warning)
 2. Verify the **"Before you begin writing"** preparation checklist appears
 3. Click **"I have what I need — start writing"**
@@ -315,6 +329,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-06 complete
 
 **Verify the summary includes:**
+
 - Sectors funded: Arts, Community, Education, Environment, Faith, Health, Museums and Heritage, Welfare, Youth
 - Grant type: Regular Grants under £100,000; free-format proposal up to 10 pages A4
 - No deadlines — rolling open all year
@@ -342,20 +357,21 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-06 complete; preparation checklist confirmed
 
 **Steps:**
+
 1. On Step 4, confirm the interface shows **sections**, not numbered question cards
 2. Record the total number of section cards displayed
 3. For each section card, record: section title and any word/page limit shown
 4. Check against the expected sections table above and record actual values:
 
-| Expected section | Present? | Actual title shown | Limit shown |
-|-----------------|----------|--------------------|-------------|
-| Executive Summary | | | |
-| Your Work — Need | | | |
-| Your Work — Reach and Impact | | | |
-| Your Work — EDI | | | |
-| Your People | | | |
-| Your Finances | | | |
-| Your Request | | | |
+| Expected section             | Present? | Actual title shown | Limit shown |
+| ---------------------------- | -------- | ------------------ | ----------- |
+| Executive Summary            |          |                    |             |
+| Your Work — Need             |          |                    |             |
+| Your Work — Reach and Impact |          |                    |             |
+| Your Work — EDI              |          |                    |             |
+| Your People                  |          |                    |             |
+| Your Finances                |          |                    |             |
+| Your Request                 |          |                    |             |
 
 5. Note whether any limit badge appears (should be absent or show "10 pages total")
 6. Note whether the "Ready to assemble" button behaviour differs from structured funders
@@ -374,6 +390,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-06 complete
 
 **Steps:**
+
 1. Review Step 4 — confirm projected income/expenditure table requests are absent as writing cards (these are financial tables, not narrative text)
 2. Check how the finances section appears — is it a writing card, a budget card, or absent?
 3. If a finances section appears, note whether it has any special treatment vs other sections
@@ -393,6 +410,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-09 complete
 
 **Steps:**
+
 1. Navigate to the **Executive Summary** section
 2. Write 2 paragraphs about Greenfield Community Trust — what it does, the need addressed, Sunderland location, 800+ people supported, what you're asking for
 3. Verify word counter displays (even without a hard limit, should show count)
@@ -421,6 +439,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-11 complete
 
 **Steps:**
+
 1. Approve all mandatory section cards
 2. Verify progress bar reaches "Ready to assemble"
 3. Click **Ready to assemble** → confirm senior review screen
@@ -445,6 +464,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 **Prerequisite:** IT-GWF-12 complete
 
 **Steps:**
+
 1. Click **Download as Word document (.docx)**
 2. Open the downloaded file and verify:
    - Title: **"Community Hub Core Costs 2026"**
@@ -457,6 +477,7 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 4. Click **Download as plain text (.txt)** — verify re-export dialog appears and .txt file downloads (D-LBF-05)
 
 **Expected result:**
+
 - Export timestamp includes HH:MM ✅
 - Re-export dialog shows full timestamp ✅
 - Plain text file downloads ✅
@@ -470,12 +491,12 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 ## Document History
 
-| Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 1.0 | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Garfield Weston Foundation Regular Grants. First test of the free-form/narrative path. Two accounts: Harry's Rainbow (broad eligibility pass — no false-positive mismatch expected) and Greenfield Community Trust (happy path, community welfare, Sunderland). 13 test cases. Guidelines PDF April 2026 edition. No AI policy; no per-section word limits; 10-page total limit; rolling open all year. |
-| 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-01 passed — Harry's Rainbow sign in and profile verified. |
-| 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-02 and IT-GWF-03 passed. Narrative badge confirmed. 11 sections extracted correctly. Summary accurate. Harry's Rainbow passed eligibility — no false-positive mismatch for broadly inclusive funder. |
-| 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-04 and IT-GWF-05 passed. Greenfield Community Trust registered and funder picker confirmed. |
-| 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-07, 08, 09 passed. D-GWF-01 raised and fixed (revalidatePath on step/4 redirects). All 11 sections confirmed. Budget wording improved. 9/13 complete. |
-| 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-10, 11, 12 passed. No financial table cards. No AI assist on budget sections. Assembly and approval complete. 12/13 complete. |
-| 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-GWF-13 passed. Testing complete — 13/13. Narrative export format confirmed (Title → Content → separator). Timestamp HH:MM confirmed. D-GWF-01 only defect, already fixed. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Garfield Weston Foundation Regular Grants. First test of the free-form/narrative path. Two accounts: Harry's Rainbow (broad eligibility pass — no false-positive mismatch expected) and Greenfield Community Trust (happy path, community welfare, Sunderland). 13 test cases. Guidelines PDF April 2026 edition. No AI policy; no per-section word limits; 10-page total limit; rolling open all year. |
+| 1.1     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-01 passed — Harry's Rainbow sign in and profile verified.                                                                                                                                                                                                                                                                                                                                                            |
+| 1.2     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-02 and IT-GWF-03 passed. Narrative badge confirmed. 11 sections extracted correctly. Summary accurate. Harry's Rainbow passed eligibility — no false-positive mismatch for broadly inclusive funder.                                                                                                                                                                                                                 |
+| 1.3     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-04 and IT-GWF-05 passed. Greenfield Community Trust registered and funder picker confirmed.                                                                                                                                                                                                                                                                                                                          |
+| 1.4     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-07, 08, 09 passed. D-GWF-01 raised and fixed (revalidatePath on step/4 redirects). All 11 sections confirmed. Budget wording improved. 9/13 complete.                                                                                                                                                                                                                                                                |
+| 1.5     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-10, 11, 12 passed. No financial table cards. No AI assist on budget sections. Assembly and approval complete. 12/13 complete.                                                                                                                                                                                                                                                                                        |
+| 1.6     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-13 passed. Testing complete — 13/13. Narrative export format confirmed (Title → Content → separator). Timestamp HH:MM confirmed. D-GWF-01 only defect, already fixed.                                                                                                                                                                                                                                                |

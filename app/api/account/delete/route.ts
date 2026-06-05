@@ -13,15 +13,17 @@
 // deleted and cannot be recovered. The email failure is logged to Sentry.
 
 import { createClient as createServiceClient } from '@supabase/supabase-js'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/emails/send'
 import { buildAccountDeletedByUserEmail } from '@/lib/emails/account-deleted-user'
 
-export async function POST(_request: NextRequest) {
+export async function POST() {
   // 1. Verify the caller is authenticated
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -41,10 +43,7 @@ export async function POST(_request: NextRequest) {
   // 3. Cascade deletion in plan order
 
   // Step 1: application_answers — fetch application IDs first, then delete answers
-  const { data: apps } = await service
-    .from('applications')
-    .select('id')
-    .eq('user_id', userId)
+  const { data: apps } = await service.from('applications').select('id').eq('user_id', userId)
 
   const appIds = apps?.map((a: { id: string }) => a.id) ?? []
 
@@ -61,10 +60,7 @@ export async function POST(_request: NextRequest) {
   }
 
   // Step 2: applications
-  const { error: appsError } = await service
-    .from('applications')
-    .delete()
-    .eq('user_id', userId)
+  const { error: appsError } = await service.from('applications').delete().eq('user_id', userId)
 
   if (appsError) {
     console.error('[delete-account] Failed to delete applications:', appsError)
@@ -83,10 +79,7 @@ export async function POST(_request: NextRequest) {
   }
 
   // Step 4: ai_usage_log (includes rows where application_id is now null)
-  const { error: usageError } = await service
-    .from('ai_usage_log')
-    .delete()
-    .eq('user_id', userId)
+  const { error: usageError } = await service.from('ai_usage_log').delete().eq('user_id', userId)
 
   if (usageError) {
     console.error('[delete-account] Failed to delete ai_usage_log:', usageError)

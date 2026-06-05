@@ -23,6 +23,7 @@ Grant Pathway's final output is a document that the user submits to their funder
 **Microsoft Word (.docx) export as the primary export format. PDF is a secondary nice-to-have for v1.**
 
 The exported Word document includes:
+
 - Cover section: Funder name, fund name, charity name, application date
 - One section per question with the question text as a heading and the draft answer as body text
 - Word counts per answer where word limits were specified

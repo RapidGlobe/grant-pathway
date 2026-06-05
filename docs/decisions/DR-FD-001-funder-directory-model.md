@@ -76,6 +76,6 @@ The `funders` table in Supabase is the authoritative source of approved funders.
 
 ## Document history
 
-| Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 1.0 | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review |
+| Version | Date       | Author         | Change                                                                     |
+| ------- | ---------- | -------------- | -------------------------------------------------------------------------- |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review |

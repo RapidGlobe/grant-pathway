@@ -15,6 +15,7 @@ What are the three distinct visual design directions that the HTML/CSS mockups w
 The plan is to produce three or more mockup variants before selecting a final design direction to develop. Each variant should explore a meaningfully different aesthetic treatment of the same screens and components -- they should not be minor variations of the same style.
 
 The following design elements are fixed across all variants and must not differ between them:
+
 - Colour palette: teal #0D6E6E, soft teal #E6F4F4, amber #D97706, success green #16A34A, slate #1E293B, off-white #F8FAFC, white #FFFFFF (app-name-and-branding.md)
 - Typography: Inter across all text roles (app-name-and-branding.md)
 - Navigation structure and page content (information-architecture-and-navigation.md)
@@ -39,11 +40,11 @@ The following design directions are proposed as candidates. Three should be sele
 
 **Options A, B, and C selected as the three mockup design directions.**
 
-| Variant | Name | Character |
-|---------|------|-----------|
-| Mockup 1 | Minimal & Professional | Predominantly white, teal as accent only, flat components, generous white space, clean and confident |
-| Mockup 2 | Warm & Approachable | Soft teal backgrounds, amber used prominently, rounded corners, card-heavy, friendly and welcoming |
-| Mockup 3 | Modern SaaS | White cards on off-white background, moderate shadows, tighter spacing, strong visual hierarchy, familiar productivity-tool feel |
+| Variant  | Name                   | Character                                                                                                                        |
+| -------- | ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Mockup 1 | Minimal & Professional | Predominantly white, teal as accent only, flat components, generous white space, clean and confident                             |
+| Mockup 2 | Warm & Approachable    | Soft teal backgrounds, amber used prominently, rounded corners, card-heavy, friendly and welcoming                               |
+| Mockup 3 | Modern SaaS            | White cards on off-white background, moderate shadows, tighter spacing, strong visual hierarchy, familiar productivity-tool feel |
 
 Options D (Charity-Sector Warmth) and E (High-Contrast Accessible) were not selected as standalone mockup directions. Option D is considered a refinement of Mockup 2 rather than a distinct direction. Option E is better applied as an accessibility audit lens to the chosen final direction rather than as a separate mockup.
 
@@ -55,5 +56,5 @@ All three mockups cover the same screens for like-for-like comparison. The fixed
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

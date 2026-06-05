@@ -84,9 +84,7 @@ const saveProfileSchema = z.object({
 
 export type SaveProfileInput = z.infer<typeof saveProfileSchema>
 
-export type SaveProfileResult =
-  | { ok: true; isFirstSave: boolean }
-  | { ok: false; error: string }
+export type SaveProfileResult = { ok: true; isFirstSave: boolean } | { ok: false; error: string }
 
 /**
  * Upserts the authenticated user's charity profile.
@@ -97,22 +95,14 @@ export type SaveProfileResult =
  * - INSERT on first save; UPDATE on subsequent saves (conflict on user_id).
  * - RLS on charity_profiles ensures users can only read/write their own row (ADR-DATA-001).
  */
-export async function saveCharityProfile(
-  data: SaveProfileInput,
-): Promise<SaveProfileResult> {
+export async function saveCharityProfile(data: SaveProfileInput): Promise<SaveProfileResult> {
   const parsed = saveProfileSchema.safeParse(data)
   if (!parsed.success) {
     return { ok: false, error: 'Invalid profile data. Please check the form.' }
   }
 
-  const {
-    charityName,
-    registrationNumber,
-    whatDoes,
-    whoHelps,
-    whereWorks,
-    paraphrasedFromLookup,
-  } = parsed.data
+  const { charityName, registrationNumber, whatDoes, whoHelps, whereWorks, paraphrasedFromLookup } =
+    parsed.data
 
   const supabase = await createClient()
 
@@ -325,12 +315,14 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
 
       const message = await Promise.race([messagePromise, timeoutPromise])
 
-      const raw =
-        message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
+      const raw = message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
 
       if (raw) {
         // Strip any markdown code fences the model may have added
-        const cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim()
+        const cleaned = raw
+          .replace(/^```(?:json)?\s*/i, '')
+          .replace(/\s*```$/i, '')
+          .trim()
         const parsed = JSON.parse(cleaned) as { whatDoes?: unknown; whoHelps?: unknown }
         whatDoes = typeof parsed.whatDoes === 'string' ? parsed.whatDoes : ''
         whoHelps = typeof parsed.whoHelps === 'string' ? parsed.whoHelps : ''

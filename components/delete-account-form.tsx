@@ -1,57 +1,57 @@
-"use client";
+'use client'
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { signOut } from "@/actions/auth";
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { signOut } from '@/actions/auth'
 
 const DATA_SUMMARY = [
-  "Your charity profile",
-  "All your grant applications and AI-generated content",
-  "Your account and login details",
-];
+  'Your charity profile',
+  'All your grant applications and AI-generated content',
+  'Your account and login details',
+]
 
 export function DeleteAccountForm() {
-  const router = useRouter();
-  const [confirmText, setConfirmText] = useState("");
-  const [fieldError, setFieldError] = useState("");
-  const [serverError, setServerError] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter()
+  const [confirmText, setConfirmText] = useState('')
+  const [fieldError, setFieldError] = useState('')
+  const [serverError, setServerError] = useState('')
+  const [isPending, startTransition] = useTransition()
 
-  const isConfirmed = confirmText === "DELETE";
+  const isConfirmed = confirmText === 'DELETE'
 
   function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+    e.preventDefault()
     if (!isConfirmed) {
-      setFieldError("Please type DELETE in capitals to confirm.");
-      return;
+      setFieldError('Please type DELETE in capitals to confirm.')
+      return
     }
-    setFieldError("");
-    setServerError("");
+    setFieldError('')
+    setServerError('')
 
     startTransition(async () => {
-      const res = await fetch("/api/account/delete", { method: "POST" });
+      const res = await fetch('/api/account/delete', { method: 'POST' })
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
+        const data = await res.json().catch(() => ({}))
         setServerError(
-          (data as { error?: string }).error ?? "Something went wrong. Please try again.",
-        );
-        return;
+          (data as { error?: string }).error ?? 'Something went wrong. Please try again.',
+        )
+        return
       }
 
       // Clear the session cookie (fire and forget — deletion already succeeded)
       try {
-        await signOut();
+        await signOut()
       } catch {
         // Ignore — the auth user is already deleted server-side
       }
 
-      router.push("/?deleted=true");
-    });
+      router.push('/?deleted=true')
+    })
   }
 
   return (
@@ -60,13 +60,10 @@ export function DeleteAccountForm() {
 
       {/* Warning banner */}
       <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-4">
-        <AlertTriangle
-          className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]"
-          aria-hidden="true"
-        />
+        <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
         <p className="text-[14px] text-[#991B1B]">
-          <span className="font-semibold">This cannot be undone.</span> Deleting your account
-          will permanently remove all your data from Grant Pathway.
+          <span className="font-semibold">This cannot be undone.</span> Deleting your account will
+          permanently remove all your data from Grant Pathway.
         </p>
       </div>
 
@@ -78,7 +75,10 @@ export function DeleteAccountForm() {
         <ul className="space-y-2">
           {DATA_SUMMARY.map((item) => (
             <li key={item} className="flex items-start gap-2 text-[14px] text-[#374151]">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#DC2626]" aria-hidden="true" />
+              <span
+                className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#DC2626]"
+                aria-hidden="true"
+              />
               {item}
             </li>
           ))}
@@ -110,11 +110,11 @@ export function DeleteAccountForm() {
             autoComplete="off"
             value={confirmText}
             onChange={(e) => {
-              setConfirmText(e.target.value);
-              if (fieldError) setFieldError("");
+              setConfirmText(e.target.value)
+              if (fieldError) setFieldError('')
             }}
             aria-invalid={!!fieldError || undefined}
-            aria-describedby={fieldError ? "confirmDelete-error" : undefined}
+            aria-describedby={fieldError ? 'confirmDelete-error' : undefined}
             className="h-10 max-w-[240px] font-mono text-[14px]"
             placeholder="DELETE"
           />
@@ -131,13 +131,13 @@ export function DeleteAccountForm() {
             disabled={isPending}
             className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-60"
           >
-            {isPending ? "Deleting…" : "Permanently delete my account"}
+            {isPending ? 'Deleting…' : 'Permanently delete my account'}
           </Button>
           <Button
             type="button"
             variant="outline"
             disabled={isPending}
-            onClick={() => router.push("/account")}
+            onClick={() => router.push('/account')}
             className="h-10 px-5 text-[14px] font-semibold"
           >
             Cancel
@@ -145,5 +145,5 @@ export function DeleteAccountForm() {
         </div>
       </form>
     </div>
-  );
+  )
 }

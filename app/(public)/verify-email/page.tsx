@@ -1,41 +1,41 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { Mail, CheckCircle, Clock } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { VerifyEmailResendForm } from "@/components/verify-email-resend-form";
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { Mail, CheckCircle, Clock } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
+import { VerifyEmailResendForm } from '@/components/verify-email-resend-form'
 
 export const metadata: Metadata = {
-  title: "Verify your email",
-};
+  title: 'Verify your email',
+}
 
 interface Props {
-  searchParams: Promise<{ state?: string; email?: string }>;
+  searchParams: Promise<{ state?: string; email?: string }>
 }
 
 export default async function VerifyEmailPage({ searchParams }: Props) {
-  const { state, email: emailParam } = await searchParams;
+  const { state, email: emailParam } = await searchParams
 
   // Resolve the user's email address.
   // Priority: ?email= query param (set by registerUser redirect) → session
   // (set when email confirmation is disabled, e.g. local dev) → empty string.
-  let email = emailParam ?? "";
+  let email = emailParam ?? ''
   if (!email) {
-    const supabase = await createClient();
+    const supabase = await createClient()
     const {
       data: { user },
-    } = await supabase.auth.getUser();
-    email = user?.email ?? "";
+    } = await supabase.auth.getUser()
+    email = user?.email ?? ''
   }
 
-  if (state === "verified") {
-    return <VerifiedState />;
+  if (state === 'verified') {
+    return <VerifiedState />
   }
 
-  if (state === "expired") {
-    return <ExpiredState email={email} />;
+  if (state === 'expired') {
+    return <ExpiredState email={email} />
   }
 
-  return <AwaitingState email={email} />;
+  return <AwaitingState email={email} />
 }
 
 // ── State 1: Awaiting verification ──────────────────────────────────────────
@@ -52,12 +52,8 @@ function AwaitingState({ email }: { email: string }) {
 
         <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Check your email</h1>
 
-        <p className="mb-1 text-[15px] text-[#64748B]">
-          We&apos;ve sent a verification link to
-        </p>
-        {email && (
-          <p className="mb-6 text-[15px] font-semibold text-[#1E293B]">{email}</p>
-        )}
+        <p className="mb-1 text-[15px] text-[#64748B]">We&apos;ve sent a verification link to</p>
+        {email && <p className="mb-6 text-[15px] font-semibold text-[#1E293B]">{email}</p>}
         <p className="mb-8 text-[15px] text-[#64748B]">
           Click the link in the email to activate your account.
         </p>
@@ -65,7 +61,7 @@ function AwaitingState({ email }: { email: string }) {
         <VerifyEmailResendForm email={email} mode="awaiting" />
 
         <p className="mt-6 text-[14px] text-[#64748B]">
-          Wrong email address?{" "}
+          Wrong email address?{' '}
           <Link
             href="/"
             className="font-medium text-[#0D6E6E] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 rounded"
@@ -75,7 +71,7 @@ function AwaitingState({ email }: { email: string }) {
         </p>
       </div>
     </div>
-  );
+  )
 }
 
 // ── State 2: Email verified ──────────────────────────────────────────────────
@@ -104,7 +100,7 @@ function VerifiedState() {
         </Link>
       </div>
     </div>
-  );
+  )
 }
 
 // ── State 3: Link expired or invalid ────────────────────────────────────────
@@ -128,5 +124,5 @@ function ExpiredState({ email }: { email: string }) {
         <VerifyEmailResendForm email={email} mode="expired" />
       </div>
     </div>
-  );
+  )
 }

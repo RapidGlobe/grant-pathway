@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function PageSkeleton() {
   return (
@@ -31,5 +31,5 @@ export function PageSkeleton() {
       {/* Action button */}
       <Skeleton className="h-10 w-36" />
     </div>
-  );
+  )
 }

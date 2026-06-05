@@ -12,13 +12,14 @@ ADR-AI-005 chose batch (non-streaming) responses with an animated progress bar f
 
 Funder test cycles (2026-06-01 to 2026-06-04) produced the first real performance data across three funders and document types:
 
-| Test | Funder | Document type | Pages | Summary time |
-|------|--------|---------------|-------|-------------|
-| IT-LBF-06 | Lloyds Bank Foundation | Structured PDF | 3 | 24 s |
-| IT-WC-06 | Walton Charity | Paste (text only) | N/A | 25 s |
-| IT-GWF-06 | Garfield Weston Foundation | Narrative PDF | 11 | 33–37 s |
+| Test      | Funder                     | Document type     | Pages | Summary time |
+| --------- | -------------------------- | ----------------- | ----- | ------------ |
+| IT-LBF-06 | Lloyds Bank Foundation     | Structured PDF    | 3     | 24 s         |
+| IT-WC-06  | Walton Charity             | Paste (text only) | N/A   | 25 s         |
+| IT-GWF-06 | Garfield Weston Foundation | Narrative PDF     | 11    | 33–37 s      |
 
 NFR-01 specifies two tiers of acceptable performance:
+
 - **Standard tier** (≤8 pages): under 30 seconds
 - **Large document tier** (>8 pages): under 45 seconds
 
@@ -78,6 +79,7 @@ Redesign `/api/generate-summary` to stream tokens from Bedrock to the client usi
 **Strengths:** User sees content building immediately — perceived responsiveness is dramatically improved even if total time is unchanged. Aligns with the streaming approach used by most modern AI interfaces.
 
 **Weaknesses:**
+
 - Requires replacing the batch `fetch` in the client with `EventSource` or a streaming `fetch` reader — a non-trivial client change.
 - The asymptotic progress bar (DDR-CS-005) must be replaced with an in-place text render — a design change requiring new UI work.
 - `/api/generate-summary` currently saves the full summary to Supabase (`ai_summary` column) on completion. Streaming complicates this — the route must accumulate the stream, then save, while simultaneously forwarding tokens to the client.

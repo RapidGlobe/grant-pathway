@@ -17,11 +17,11 @@ The model selection must balance output quality against per-request cost, within
 
 ## Options Considered
 
-| Model | Context window | Relative cost | Quality |
-|---|---|---|---|
-| Claude Opus 4.7 | 200K tokens | High | Highest |
-| Claude Sonnet 4.6 | 1M tokens | Medium | High |
-| Claude Haiku 4.5 | 200K tokens | Low | Good |
+| Model             | Context window | Relative cost | Quality |
+| ----------------- | -------------- | ------------- | ------- |
+| Claude Opus 4.7   | 200K tokens    | High          | Highest |
+| Claude Sonnet 4.6 | 1M tokens      | Medium        | High    |
+| Claude Haiku 4.5  | 200K tokens    | Low           | Good    |
 
 - **Option A — Claude Sonnet 4.6 for all tasks:** High quality across both tasks. Moderate cost. 1M token context window. Appropriate for a product focused on output quality.
 - **Option B — Claude Haiku 4.5 for summary, Claude Sonnet 4.6 for draft:** Cost-optimised. Uses the cheaper model for the simpler summarisation task.

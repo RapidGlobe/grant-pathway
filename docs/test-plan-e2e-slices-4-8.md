@@ -6,7 +6,7 @@
 **Scope:** Slices 0 (Authentication), 1 (Charity Profile), 2 (Dashboard), 3 (Application Details), 4 (File Upload), 5 (AI Summary), 6 (Draft Answers), 7 (Approve & Export), 8 (Account Management)  
 **Environment:** Staging (Vercel preview) or local dev with Supabase + Bedrock credentials  
 **Tester:**  
-**Sign-off:**  
+**Sign-off:**
 
 ---
 
@@ -14,29 +14,29 @@
 
 Complete this table after running all tests.
 
-| Section | Total | Pass | Fail | Blocked | Notes |
-|---------|-------|------|------|---------|-------|
-| Positive (S0) | 10 | | | | |
-| Positive (S1) | 6 | | | | |
-| Positive (S2) | 5 | | | | |
-| Positive (S3) | 2 | | | | |
-| Positive (S4) | 6 | | | | |
-| Positive (S5) | 7 | | | | |
-| Positive (S6) | 7 | | | | |
-| Positive (S7) | 6 | | | | |
-| Positive (S8) | 3 | | | | |
-| Negative (S0) | 9 | | | | |
-| Negative (S1) | 3 | | | | |
-| Negative (S2) | 2 | | | | |
-| Negative (S3) | 2 | | | | |
-| Negative (S4) | 5 | | | | |
-| Negative (S5) | 4 | | | | |
-| Negative (S6) | 3 | | | | |
-| Negative (S7) | 4 | | | | |
-| Negative (S8) | 7 | | | | |
-| Non-Functional | 13 | | | | |
-| Usability / Flow | 12 | | | | |
-| **Total** | **116** | | | | |
+| Section          | Total   | Pass | Fail | Blocked | Notes |
+| ---------------- | ------- | ---- | ---- | ------- | ----- |
+| Positive (S0)    | 10      |      |      |         |       |
+| Positive (S1)    | 6       |      |      |         |       |
+| Positive (S2)    | 5       |      |      |         |       |
+| Positive (S3)    | 2       |      |      |         |       |
+| Positive (S4)    | 6       |      |      |         |       |
+| Positive (S5)    | 7       |      |      |         |       |
+| Positive (S6)    | 7       |      |      |         |       |
+| Positive (S7)    | 6       |      |      |         |       |
+| Positive (S8)    | 3       |      |      |         |       |
+| Negative (S0)    | 9       |      |      |         |       |
+| Negative (S1)    | 3       |      |      |         |       |
+| Negative (S2)    | 2       |      |      |         |       |
+| Negative (S3)    | 2       |      |      |         |       |
+| Negative (S4)    | 5       |      |      |         |       |
+| Negative (S5)    | 4       |      |      |         |       |
+| Negative (S6)    | 3       |      |      |         |       |
+| Negative (S7)    | 4       |      |      |         |       |
+| Negative (S8)    | 7       |      |      |         |       |
+| Non-Functional   | 13      |      |      |         |       |
+| Usability / Flow | 12      |      |      |         |       |
+| **Total**        | **116** |      |      |         |       |
 
 ---
 
@@ -44,19 +44,19 @@ Complete this table after running all tests.
 
 Log any failures that are NOT in the known expected failures list below.
 
-| ID | Test case | Description | Severity | Status |
-|----|-----------|-------------|----------|--------|
-| D-001 | S0-P-04 | Sign out button in nav dropdown had no onClick handler — clicking it did nothing and the user remained signed in. Fixed in `components/nav-authenticated.tsx` (2026-05-26). | High | Fixed |
-| D-002 | S0-P-05/06 | Password reset email link landed on "Email verified" instead of "Choose a new password". PKCE code exchange in `/auth/callback` routed all successful exchanges to `verify-email?state=verified`. Fixed by passing `next=reset` in `redirectTo` so the callback can distinguish recovery from email verification (2026-05-26). | High | Fixed |
-| D-003 | S0-P-06 | Setting the same password during reset showed generic "Something went wrong" error. Fixed by detecting Supabase `same_password` error code and returning a specific message (2026-05-26). | Low | Fixed |
-| D-004 | S0-P-06 | After successful password reset, clicking "Sign in" redirected to `/dashboard` instead of the sign-in page. Recovery session remained active after `updateUser`. Fixed by signing out immediately after a successful password update (2026-05-26). | Medium | Fixed |
-| D-005 | S6-P-02 | Sticky progress bar not visible when scrolling through Step 4 sections. `sticky top-0` placed the bar directly behind the authenticated nav header (`sticky top-0 z-[100]`, `h-16`), hiding it. Fixed by changing to `top-16` in `components/application-step4-draft.tsx` (2026-05-29). | Medium | Fixed |
-| D-006 | S6-P-02 | Back button only present at the bottom of Step 4. On long free_form applications (e.g. 11 sections) users had no way to navigate back to Step 3 without scrolling past all sections. Fixed by adding a ← Back link to the top-right of the funder context bar in `components/application-step4-draft.tsx` (2026-05-29). | Medium | Fixed |
-| D-007 | S5-P-02b | Typo in Step 3 free_form confirmation message: "11 sectionsto complete" (missing space). Caused by JSX whitespace stripping the newline between text `section` and expression `{"s"}`. Fixed by rewriting as a template literal in `components/application-step3-summary.tsx` (2026-05-29). | Low | Fixed |
-| D-008 | S6-N-01 | `parse_error` returned by `/api/refine-answer` when "Help me improve this" clicked on sections with very short answers (e.g. 1–2 words). AI returns a conversational response ("Your answer is too short...") instead of the expected `{ "refinedText": "..." }` JSON, causing `JSON.parse` to fail. Fixed by strengthening `buildRefinePrompt` in `lib/prompts.ts`: added explicit instruction to return JSON only (no preamble, no markdown), and to return the answer unchanged if too short to improve (2026-05-29). | Medium | Fixed |
-| D-009 | S6-N-03 | `rate_limited` returned by `/api/refine-answer` when "Help me improve this" clicked on multiple sections in quick succession. Upstash sliding window limit is 5 requests per 60 seconds — correct production behaviour but surfaced during testing. Not a bug. Stale comment in `lib/rate-limit.ts` referenced old 20 req/month cap (cap is 50). Fixed by updating the comment (2026-05-29). | Low | Fixed |
-| D-011 | S5-P-01 | `[generate-summary] JSON parse failed after retry` — POST 500 on `/api/generate-summary` for A B Charitable Trust document (33 questions across 4 sections). `SUMMARY_MAX_TOKENS = 2000` was insufficient for large question sets; response truncated mid-JSON, producing invalid JSON on both the first attempt and the retry. Fixed by raising `SUMMARY_MAX_TOKENS` to 4000 in `app/api/generate-summary/route.ts` and strengthening `buildSummaryPrompt` in `lib/prompts.ts`: (a) explicit JSON-only instruction added to end of user prompt; (b) AI instructed to skip non-text questions (dropdowns, dates, numbers, file uploads, yes/no fields) — partial fix for GAP-28 (2026-05-29). | High | Fixed |
-| D-010 | S5-P-03 | Dashboard AI usage counter displayed "14 of 20 AI requests used this month" — cap shown as 20 instead of 50. `AI_REQUESTS_LIMIT` constant in `components/dashboard-populated.tsx` was never updated when the monthly cap was raised from 20 to 50. Only the display was wrong; the actual enforcement in the API routes correctly uses 50. Fixed by updating the constant (2026-05-29). | Medium | Fixed |
+| ID    | Test case  | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Severity | Status |
+| ----- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------ |
+| D-001 | S0-P-04    | Sign out button in nav dropdown had no onClick handler — clicking it did nothing and the user remained signed in. Fixed in `components/nav-authenticated.tsx` (2026-05-26).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | High     | Fixed  |
+| D-002 | S0-P-05/06 | Password reset email link landed on "Email verified" instead of "Choose a new password". PKCE code exchange in `/auth/callback` routed all successful exchanges to `verify-email?state=verified`. Fixed by passing `next=reset` in `redirectTo` so the callback can distinguish recovery from email verification (2026-05-26).                                                                                                                                                                                                                                                                                                                                                                | High     | Fixed  |
+| D-003 | S0-P-06    | Setting the same password during reset showed generic "Something went wrong" error. Fixed by detecting Supabase `same_password` error code and returning a specific message (2026-05-26).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Low      | Fixed  |
+| D-004 | S0-P-06    | After successful password reset, clicking "Sign in" redirected to `/dashboard` instead of the sign-in page. Recovery session remained active after `updateUser`. Fixed by signing out immediately after a successful password update (2026-05-26).                                                                                                                                                                                                                                                                                                                                                                                                                                            | Medium   | Fixed  |
+| D-005 | S6-P-02    | Sticky progress bar not visible when scrolling through Step 4 sections. `sticky top-0` placed the bar directly behind the authenticated nav header (`sticky top-0 z-[100]`, `h-16`), hiding it. Fixed by changing to `top-16` in `components/application-step4-draft.tsx` (2026-05-29).                                                                                                                                                                                                                                                                                                                                                                                                       | Medium   | Fixed  |
+| D-006 | S6-P-02    | Back button only present at the bottom of Step 4. On long free_form applications (e.g. 11 sections) users had no way to navigate back to Step 3 without scrolling past all sections. Fixed by adding a ← Back link to the top-right of the funder context bar in `components/application-step4-draft.tsx` (2026-05-29).                                                                                                                                                                                                                                                                                                                                                                       | Medium   | Fixed  |
+| D-007 | S5-P-02b   | Typo in Step 3 free_form confirmation message: "11 sectionsto complete" (missing space). Caused by JSX whitespace stripping the newline between text `section` and expression `{"s"}`. Fixed by rewriting as a template literal in `components/application-step3-summary.tsx` (2026-05-29).                                                                                                                                                                                                                                                                                                                                                                                                   | Low      | Fixed  |
+| D-008 | S6-N-01    | `parse_error` returned by `/api/refine-answer` when "Help me improve this" clicked on sections with very short answers (e.g. 1–2 words). AI returns a conversational response ("Your answer is too short...") instead of the expected `{ "refinedText": "..." }` JSON, causing `JSON.parse` to fail. Fixed by strengthening `buildRefinePrompt` in `lib/prompts.ts`: added explicit instruction to return JSON only (no preamble, no markdown), and to return the answer unchanged if too short to improve (2026-05-29).                                                                                                                                                                      | Medium   | Fixed  |
+| D-009 | S6-N-03    | `rate_limited` returned by `/api/refine-answer` when "Help me improve this" clicked on multiple sections in quick succession. Upstash sliding window limit is 5 requests per 60 seconds — correct production behaviour but surfaced during testing. Not a bug. Stale comment in `lib/rate-limit.ts` referenced old 20 req/month cap (cap is 50). Fixed by updating the comment (2026-05-29).                                                                                                                                                                                                                                                                                                  | Low      | Fixed  |
+| D-011 | S5-P-01    | `[generate-summary] JSON parse failed after retry` — POST 500 on `/api/generate-summary` for A B Charitable Trust document (33 questions across 4 sections). `SUMMARY_MAX_TOKENS = 2000` was insufficient for large question sets; response truncated mid-JSON, producing invalid JSON on both the first attempt and the retry. Fixed by raising `SUMMARY_MAX_TOKENS` to 4000 in `app/api/generate-summary/route.ts` and strengthening `buildSummaryPrompt` in `lib/prompts.ts`: (a) explicit JSON-only instruction added to end of user prompt; (b) AI instructed to skip non-text questions (dropdowns, dates, numbers, file uploads, yes/no fields) — partial fix for GAP-28 (2026-05-29). | High     | Fixed  |
+| D-010 | S5-P-03    | Dashboard AI usage counter displayed "14 of 20 AI requests used this month" — cap shown as 20 instead of 50. `AI_REQUESTS_LIMIT` constant in `components/dashboard-populated.tsx` was never updated when the monthly cap was raised from 20 to 50. Only the display was wrong; the actual enforcement in the API routes correctly uses 50. Fixed by updating the constant (2026-05-29).                                                                                                                                                                                                                                                                                                       | Medium   | Fixed  |
 
 ---
 
@@ -66,13 +66,14 @@ The canonical list of 12 target funders (10 structured, 2 narrative) is in [`doc
 
 The following real funder guideline files are currently available in `docs/test-fixtures/`:
 
-| File | Format | Funder type | Notes |
-|------|--------|-------------|-------|
-| `tnl-community-fund-application-form-2025.docx` | DOCX | Structured | National Lottery Community Fund — medium length, has named questions with word limits |
-| `heritage-fund-application-guidance.pdf` | PDF | Structured | National Lottery Heritage Fund — structured guidance with discrete questions |
-| `Garfield Weston Application-guidelines-1.pdf` | PDF | Narrative (free_form) | Garfield Weston Foundation — 10-page narrative proposal; no discrete questions; primary test for free_form path |
+| File                                            | Format | Funder type           | Notes                                                                                                           |
+| ----------------------------------------------- | ------ | --------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `tnl-community-fund-application-form-2025.docx` | DOCX   | Structured            | National Lottery Community Fund — medium length, has named questions with word limits                           |
+| `heritage-fund-application-guidance.pdf`        | PDF    | Structured            | National Lottery Heritage Fund — structured guidance with discrete questions                                    |
+| `Garfield Weston Application-guidelines-1.pdf`  | PDF    | Narrative (free_form) | Garfield Weston Foundation — 10-page narrative proposal; no discrete questions; primary test for free_form path |
 
 **Missing fixtures (source from `docs/target-funder-list.md` before full test run):**
+
 - Idlewild Trust — Arts and Conservation question set PDFs now in `docs/test-fixtures/` — **do not use for full structured-path testing until GAP-27 and GAP-28 are resolved** (character limits not supported; non-text questions extracted as text)
 - A B Charitable Trust — PDF question set (structured)
 - Clothworkers' Foundation — online guidelines (structured)
@@ -87,11 +88,11 @@ The following real funder guideline files are currently available in `docs/test-
 
 You will need to create additional files to test error states:
 
-| Required | How to create |
-|----------|--------------|
-| Oversized file (>10MB) | Copy any PDF and pad it, or use a large stock PDF |
-| Wrong format (e.g. `.jpg`) | Rename any image file |
-| Scanned / image-only PDF | Print-to-PDF with no text layer, or use a scanned document |
+| Required                   | How to create                                              |
+| -------------------------- | ---------------------------------------------------------- |
+| Oversized file (>10MB)     | Copy any PDF and pad it, or use a large stock PDF          |
+| Wrong format (e.g. `.jpg`) | Rename any image file                                      |
+| Scanned / image-only PDF   | Print-to-PDF with no text layer, or use a scanned document |
 
 ---
 
@@ -108,14 +109,15 @@ All four deliver to the same Gmail inbox. Supabase treats each as a distinct ema
 
 > **Note:** The registration tests in Section 1 (S0-P-01 onwards) will create these accounts as part of the test run. You do not need to set them up in advance — work through S0-P-01 four times (once per account) before running any other tests.
 
-| Account | Purpose |
-|---------|---------|
-| **Primary test user** (`yourname+gp1@gmail.com`) | Main happy-path testing |
-| **Secondary test user** (`yourname+gp2@gmail.com`) | Cross-user security tests (RLS) |
-| **Deletion test user** (`yourname+gpdelete@gmail.com`) | Account deletion — expect this to be destroyed |
-| **Password change test user** (`yourname+gppassword@gmail.com`) | Password change tests |
+| Account                                                         | Purpose                                        |
+| --------------------------------------------------------------- | ---------------------------------------------- |
+| **Primary test user** (`yourname+gp1@gmail.com`)                | Main happy-path testing                        |
+| **Secondary test user** (`yourname+gp2@gmail.com`)              | Cross-user security tests (RLS)                |
+| **Deletion test user** (`yourname+gpdelete@gmail.com`)          | Account deletion — expect this to be destroyed |
+| **Password change test user** (`yourname+gppassword@gmail.com`) | Password change tests                          |
 
 Each account must have:
+
 - Email verified (S0-P-02)
 - Charity profile complete (S1-P-03) — required before Step 2 onwards
 
@@ -125,11 +127,11 @@ Each account must have:
 
 > ✅ **Vercel Pro plan is active.** All three cron jobs are running normally.
 
-| Cron job | Schedule | Status | Impact during testing |
-|---|---|---|---|
-| `cleanup-guidelines` | Every 30 min | ✅ Running | Orphaned files in `guidelines-temp` are cleaned up automatically within 30 minutes — no manual action required |
-| `inactivity-warning` | Daily 08:00 UTC | ✅ Running | No impact during testing — requires 23 months of inactivity to trigger |
-| `inactivity-deletion` | Daily 09:00 UTC | ✅ Running | No impact during testing — requires 24 months of inactivity to trigger |
+| Cron job              | Schedule        | Status     | Impact during testing                                                                                          |
+| --------------------- | --------------- | ---------- | -------------------------------------------------------------------------------------------------------------- |
+| `cleanup-guidelines`  | Every 30 min    | ✅ Running | Orphaned files in `guidelines-temp` are cleaned up automatically within 30 minutes — no manual action required |
+| `inactivity-warning`  | Daily 08:00 UTC | ✅ Running | No impact during testing — requires 23 months of inactivity to trigger                                         |
+| `inactivity-deletion` | Daily 09:00 UTC | ✅ Running | No impact during testing — requires 24 months of inactivity to trigger                                         |
 
 ### Optional manual cleanup — `guidelines-temp` bucket
 
@@ -146,6 +148,7 @@ There is no risk to application data — the `guidelines-temp` bucket holds only
 ## How to read this plan
 
 Each test case has:
+
 - **ID** — unique reference (e.g. `S4-P-01`)
 - **Preconditions** — what must be true before you start
 - **Steps** — numbered actions
@@ -178,6 +181,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 5. Click **Create account**.
 
 **Expected result:**
+
 - No inline validation errors appear when all fields are valid.
 - Browser navigates to `/verify-email` showing "Check your email" with the registered address displayed.
 - A verification email arrives at the registered address within 2 minutes (check spam if not in inbox).
@@ -192,6 +196,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click the verification link.
 
 **Expected result:**
+
 - Browser navigates to `/verify-email?state=verified`.
 - Page shows "Email verified" with a green tick icon.
 - A **Go to my dashboard** button is visible.
@@ -210,6 +215,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Sign in**.
 
 **Expected result:**
+
 - Browser navigates to `/dashboard`.
 - The authenticated navigation bar is visible with the user's first name or initials in the account dropdown.
 - No error messages appear.
@@ -224,6 +230,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Sign out** in the dropdown.
 
 **Expected result:**
+
 - Browser navigates to `/` (sign-in page).
 - The unauthenticated navigation bar is shown.
 - Attempting to navigate directly to `/dashboard` redirects back to `/`.
@@ -240,6 +247,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 4. Click **Send reset link**.
 
 **Expected result:**
+
 - Page shows a generic confirmation: "If that address is registered, we've sent a reset link." (or similar — exact wording per design).
 - Confirmation is shown regardless of whether the email is registered (no email enumeration).
 - A password reset email arrives within 2 minutes.
@@ -256,6 +264,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 4. Click **Save new password**.
 
 **Expected result:**
+
 - Page shows a success message with a **Sign in** button.
 - Signing in with the new password succeeds (repeat S0-P-03 with the new password).
 - Signing in with the old password fails (repeat S0-N-07).
@@ -269,6 +278,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Click **Resend verification email**.
 
 **Expected result:**
+
 - A success message confirms the email has been resent.
 - A new verification email arrives.
 - Clicking the new link verifies the account successfully.
@@ -286,6 +296,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 5. Click **Verify**.
 
 **Expected result:**
+
 - MFA status changes to **Enabled**.
 - A **Remove two-factor authentication** link is shown in place of the setup button.
 
@@ -300,6 +311,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Verify**.
 
 **Expected result:**
+
 - Browser navigates to `/dashboard`.
 - Sign-in is successful.
 
@@ -314,6 +326,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Confirm the removal.
 
 **Expected result:**
+
 - MFA status changes to **Not enabled**.
 - **Set up two-factor authentication** button is shown.
 - Next sign-in does NOT prompt for an MFA code.
@@ -330,6 +343,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Look up charity**.
 
 **Expected result:**
+
 - A match result is shown with the charity name and registration number pre-filled.
 - An amber banner prompts you to review the AI-generated descriptions in the "What does it do" and "Who does it help" fields.
 - All pre-filled fields are editable.
@@ -355,6 +369,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Save profile**.
 
 **Expected result:**
+
 - Page replaces the form with a green success card: "Your profile has been saved."
 - A **Go to my dashboard** button is visible.
 - Navigating back to `/profile` shows the edit state with the saved data pre-filled.
@@ -369,6 +384,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Save changes**.
 
 **Expected result:**
+
 - A green success banner appears above the form: "Your changes have been saved."
 - The form remains visible with the updated values.
 - Navigating away and returning to `/profile` shows the updated values.
@@ -382,6 +398,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Navigate to `/dashboard`.
 
 **Expected result:**
+
 - An amber or teal banner is visible prompting the user to set up their charity profile.
 - The **Start** button (to begin a new application) is disabled.
 - Hovering over the Start button shows a tooltip: "Please set up your charity profile first" (or similar).
@@ -395,6 +412,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Navigate to `/dashboard`.
 
 **Expected result:**
+
 - The profile incomplete banner is no longer shown.
 - The **+ New Application** or **Start** button is active.
 
@@ -409,6 +427,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Navigate to `/dashboard`.
 
 **Expected result:**
+
 - A "You don't have any applications yet" message is shown (or similar).
 - A three-step explainer or getting started prompt is visible.
 - A **Start** or **New Application** button is available and active.
@@ -422,6 +441,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Click **+ New Application** (or **Start**).
 
 **Expected result:**
+
 - Browser navigates to `/applications/[id]/step/1`.
 - The page shows "Start a new application" with empty funder name and grant name fields.
 - A step indicator is visible with Step 1 highlighted.
@@ -436,6 +456,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Observe the application card(s).
 
 **Expected result:**
+
 - Each card shows the funder name and grant name.
 - The status pill matches the application's actual status (Not started / In progress / Approved / Exported) in the correct colour.
 - Applications with status `not_started` or `in_progress` show a **Continue** button.
@@ -450,6 +471,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. On the dashboard, click **Continue** on an in-progress application.
 
 **Expected result:**
+
 - Browser navigates directly to the step stored in `current_step` for that application.
 - The correct step page is shown with any previously saved data intact.
 
@@ -464,6 +486,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click the confirm delete button.
 
 **Expected result:**
+
 - The confirmation modal shows text appropriate to the application's status.
 - After confirming, the application card is removed from the dashboard immediately.
 - If it was the only application, the empty state is shown.
@@ -482,6 +505,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Continue**.
 
 **Expected result:**
+
 - Browser navigates to Step 2 (`/applications/[id]/step/2`).
 - The step indicator shows Step 1 as completed (tick) and Step 2 as current.
 - Navigating back to Step 1 shows the funder name and grant name pre-filled.
@@ -496,6 +520,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Navigate to `/applications/[id]/step/1`.
 
 **Expected result:**
+
 - Both the funder name and grant name fields are pre-filled with the previously saved values.
 - Heading reads "Continue your application" (not "Start a new application").
 - Editing and clicking **Continue** saves the updated values correctly.
@@ -515,6 +540,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 5. Click **Continue**.
 
 **Expected result:**
+
 - Upload progress bar appears and advances to 100%.
 - Filename is shown with a remove button.
 - Large-document warning banner does NOT appear (this file is standard size).
@@ -547,6 +573,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 4. Click **Continue**.
 
 **Expected result:**
+
 - Continue button becomes active as soon as text is entered.
 - Browser navigates to Step 3.
 - No upload progress bar is shown.
@@ -562,6 +589,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Observe the page after upload completes.
 
 **Expected result:**
+
 - If the extracted text exceeds the large-document threshold (~100k tokens), an amber advisory banner appears: "This document is very long…" (exact wording per design).
 - Continue button is still active — the warning does not block progression.
 - If the banner does NOT appear, note it as "file too short to trigger" rather than a failure — verify with a manually padded large text file if needed.
@@ -578,6 +606,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 4. Click **Continue**.
 
 **Expected result:**
+
 - Upload area returns to idle/empty state after removal.
 - Continue button becomes disabled again once file is removed.
 - Second file uploads successfully and Continue re-activates.
@@ -607,6 +636,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Observe the loading state immediately.
 
 **Expected result:**
+
 - Loading state appears automatically (no button press needed).
 - Staged messages cycle: "Reading your funder guidelines…" → "Almost there…"
 - Progress bar advances (asymptotic, holds near 90% if API is slow).
@@ -623,6 +653,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Review the summary displayed on Step 3.
 
 **Expected result:**
+
 - Summary is displayed as individual cards in a responsive two-column grid (side-by-side on desktop, stacked on mobile).
 - "About this grant" card spans full width.
 - "Grant amount" and "Who can apply" cards sit side-by-side (Grant amount expands to full width if Who can apply is absent).
@@ -642,6 +673,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Review the summary displayed on Step 3.
 
 **Expected result:**
+
 - Two-column card layout as above.
 - An "Application sections" card is shown (not "Application questions").
 - Green confirmation note reads "X sections to complete".
@@ -671,6 +703,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Wait for the new summary.
 
 **Expected result:**
+
 - Loading state reappears and runs the full generation cycle again.
 - A new (potentially different) summary is displayed.
 - AI usage counter increments by 1 again.
@@ -694,6 +727,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Click **Continue**.
 
 **Expected result:**
+
 - Browser navigates to Step 4 (`/applications/[id]/step/4`).
 - `current_step` is updated to 4 in the database (verify by navigating to dashboard and clicking Continue — it should resume at Step 4).
 
@@ -713,6 +747,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Observe the page.
 
 **Expected result:**
+
 - No AI loading state appears.
 - A preparation checklist is shown with heading "Before you begin writing".
 - The checklist lists financial items to gather (annual accounts, projected budget, other funding, treasurer input).
@@ -730,6 +765,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Observe the page.
 
 **Expected result:**
+
 - `draft_status` is set to `'in_progress'` in the database.
 - The Q&A interface is shown immediately (no page reload required).
 - **For structured funders:** Questions are shown as numbered headings (e.g. "1. Tell us about your organisation") with an empty editable textarea below each.
@@ -747,6 +783,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Navigate back to Step 4.
 
 **Expected result:**
+
 - The preparation checklist is NOT shown.
 - The Q&A interface loads immediately with any previously saved answers intact.
 
@@ -760,6 +797,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Continue** on Step 3 to advance to Step 4 again.
 
 **Expected result:**
+
 - `draft_status` is NOT reset to `'not_started'`.
 - The preparation checklist is NOT shown.
 - The Q&A interface loads with all previously saved answers intact.
@@ -777,6 +815,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 4. Refresh the page.
 
 **Expected result:**
+
 - After the blur, the answer is saved to the database automatically (no button press needed).
 - If a word limit is shown for that question/section, a word counter is visible.
 - After page refresh, the saved answer is still present.
@@ -792,6 +831,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Observe the AI button state for that section.
 
 **Expected result:**
+
 - Budget question/section has a visually distinct amber background.
 - The AI assist button (if present) is **disabled** for this section with a label indicating it cannot be used for financial data.
 - Non-budget sections have the AI assist button enabled (or a "Help me improve this" link active).
@@ -806,6 +846,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Confirm in any confirmation prompt that appears.
 
 **Expected result:**
+
 - Browser navigates to Step 5 (`/applications/[id]/step/5`).
 - `current_step` is updated to 5 in the database.
 - `assembled_draft` is populated in the `applications` table (verify via Supabase dashboard if needed).
@@ -827,6 +868,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 5. Tick all three checkboxes.
 
 **Expected result:**
+
 - Approve button is disabled with 0, 1, or 2 checkboxes ticked.
 - Approve button becomes active only when all three are ticked.
 
@@ -840,6 +882,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Confirm in the confirmation dialog.
 
 **Expected result:**
+
 - Green "Application approved" banner appears.
 - Application status in the database changes to `'approved'`.
 - `is_approved = true` on all `application_answers` rows (verify via Supabase dashboard).
@@ -856,11 +899,12 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Open the downloaded `.docx` file in Microsoft Word (or Google Docs).
 
 **Expected result:**
+
 - File downloads with a sensible filename (e.g. `grant-pathway-export.docx`).
 - Document opens without errors.
 - Document contains: funder name, grant name, today's date.
 - Questions and answers are clearly formatted (question as heading, answer as body text).
-- Disclaimer paragraph is present and reads: *"This draft was generated with AI assistance and reviewed by [your full name]. Please review carefully before submitting to the funder."*
+- Disclaimer paragraph is present and reads: _"This draft was generated with AI assistance and reviewed by [your full name]. Please review carefully before submitting to the funder."_
   - **Note:** Current implementation uses different wording (GAP-24). Record exact wording found vs expected.
 - Attribution footer is present at the end of the document.
 - Font is Calibri; margins are approximately 2.54cm; document is A4.
@@ -876,6 +920,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Open the downloaded `.txt` file in a text editor.
 
 **Expected result:**
+
 - File downloads.
 - Plain text contains funder name, grant name, date, all questions and answers, disclaimer, and attribution.
 - No HTML tags or formatting artefacts present.
@@ -890,6 +935,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. On Step 5, click **Download as Word document** again.
 
 **Expected result:**
+
 - Re-export warning dialog appears (not an immediate download).
 - Dialog shows the real `last_exported_at` date in the correct format (e.g. "22 May 2026").
 - Clicking **Download anyway** triggers the download.
@@ -905,6 +951,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Confirm in the re-open dialog.
 
 **Expected result:**
+
 - Browser navigates to Step 4.
 - Application status in DB reverts to `'in_progress'`.
 - `is_approved = false` on all `application_answers` rows.
@@ -927,6 +974,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 5. Click **Update password**.
 
 **Expected result:**
+
 - Button shows "Updating…" while the server action runs.
 - Green success banner: "Your password has been updated."
 - All three password fields are cleared.
@@ -946,6 +994,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 4. Click **Permanently delete my account**.
 
 **Expected result:**
+
 - Button shows "Deleting…" during the request.
 - Browser navigates to `/` with `?deleted=true` query param.
 - Green "Your account has been deleted. We've sent you a confirmation email." banner is shown on the sign-in page.
@@ -987,6 +1036,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Create account**.
 
 **Expected result:**
+
 - An inline validation error appears beneath the first name field.
 - The form is not submitted.
 - No email is sent.
@@ -1002,6 +1052,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Create account**.
 
 **Expected result:**
+
 - An inline validation error appears beneath the email field ("Enter a valid email address" or similar).
 - The form is not submitted.
 
@@ -1016,6 +1067,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Create account**.
 
 **Expected result:**
+
 - An inline validation error appears: "Password must be at least 10 characters" (or similar).
 - The form is not submitted.
 
@@ -1030,6 +1082,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Fill all other fields correctly and click **Create account**.
 
 **Expected result:**
+
 - An inline validation error appears beneath the confirm password field: "Passwords do not match" (or similar).
 - The form is not submitted.
 
@@ -1044,6 +1097,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Create account**.
 
 **Expected result:**
+
 - An inline validation error appears next to the terms checkbox.
 - The form is not submitted.
 
@@ -1057,6 +1111,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Create account**.
 
 **Expected result:**
+
 - An error message is shown indicating the email is already in use.
 - The form is not submitted and no duplicate account is created.
 - Note: Supabase uses a privacy-preserving approach — the error may be surfaced as a general "account already exists" message rather than a specific email-exists error. Either is acceptable as long as the duplicate account is not created.
@@ -1072,6 +1127,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 3. Click **Sign in**.
 
 **Expected result:**
+
 - An error message appears: "Incorrect email address or password" (or similar generic wording — must not reveal whether the email is registered).
 - The user remains on the sign-in page.
 - No navigation to the dashboard occurs.
@@ -1086,6 +1142,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Sign in**.
 
 **Expected result:**
+
 - An error message or banner appears indicating the email has not been verified.
 - A link or button to resend the verification email is shown.
 - The user is not signed in.
@@ -1099,6 +1156,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Attempt to navigate directly to `/dashboard` by typing the URL in the browser.
 
 **Expected result:**
+
 - Browser redirects to `/` (sign-in page).
 - The dashboard is not accessible.
 - After signing in, the user lands on the dashboard (not a 404 or error page).
@@ -1115,6 +1173,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Look up charity**.
 
 **Expected result:**
+
 - An amber "no match" result is shown.
 - The form fields are not pre-filled.
 - The user can still enter their charity details manually.
@@ -1129,6 +1188,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Save profile** (or **Save changes**).
 
 **Expected result:**
+
 - Inline validation errors appear beneath each empty required field.
 - The form is not submitted.
 - No data is saved to the database.
@@ -1143,6 +1203,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Attempt to click the **Start** or **+ New Application** button.
 
 **Expected result:**
+
 - The button is visually disabled (greyed out or non-clickable).
 - A tooltip appears on hover: "Please set up your charity profile first" (or similar).
 - No new application is created.
@@ -1159,6 +1220,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. When the confirmation modal appears, click **Cancel**.
 
 **Expected result:**
+
 - The modal closes.
 - The application card remains on the dashboard unchanged.
 - No data is deleted.
@@ -1173,6 +1235,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Attempt to navigate directly to `/applications/[id]/step/1` using the application ID that belongs to the primary user.
 
 **Expected result:**
+
 - The page does not display the primary user's application data.
 - The user is redirected to `/dashboard` or shown a "not found" / "access denied" result.
 - Under no circumstances is another user's application data visible.
@@ -1189,6 +1252,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Click **Continue**.
 
 **Expected result:**
+
 - Inline validation errors appear beneath the empty fields.
 - The form is not submitted.
 - The browser does not navigate to Step 2.
@@ -1202,6 +1266,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Manually type the Step 2 URL into the browser address bar: `/applications/[id]/step/2`.
 
 **Expected result:**
+
 - The browser redirects to Step 1 (`/applications/[id]/step/1`).
 - Step 2 is not accessible until Step 1 has been saved and submitted.
 
@@ -1216,6 +1281,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Upload any file with extension `.jpg`, `.png`, `.xlsx`, or `.csv`.
 
 **Expected result:**
+
 - Client-side validation fires immediately (before any network request).
 - Format error state shown: "File must be a PDF or Word document."
 - No upload progress bar appears.
@@ -1230,6 +1296,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Attempt to upload the oversized file.
 
 **Expected result:**
+
 - Client-side size validation fires immediately.
 - Size error state shown: "File must be smaller than 10MB."
 - No upload attempt is made.
@@ -1245,6 +1312,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 2. Wait for upload and extraction to complete.
 
 **Expected result:**
+
 - Upload progress bar completes (upload to Storage succeeds).
 - Extraction error state shown: "We couldn't read this file. Try a different file." (or similar per design).
 - Continue button remains disabled.
@@ -1269,6 +1337,7 @@ Suffix: `P` = Positive, `N` = Negative, `NF` = Non-functional, `UX` = Usability/
 1. Navigate directly to `/applications/[id]/step/2`.
 
 **Expected result:**
+
 - Blue info banner is shown advising the user to re-upload the guidelines.
 - Upload area is empty (sessionStorage entry is gone).
 - User cannot proceed to Step 3 without re-uploading or pasting.
@@ -1289,6 +1358,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 2. Wait for the error state to appear.
 
 **Expected result:**
+
 - Loading state stops.
 - Transient error banner appears: "We couldn't complete that request." with a **Try again** button.
 - Persistent failure state does NOT appear on the first attempt.
@@ -1302,6 +1372,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 1. With the API still broken, click **Try again**.
 
 **Expected result:**
+
 - Loading state runs again.
 - Persistent failure banner replaces the transient error: "If this keeps happening, please try again later. Your work has been saved." — no **Try again** button.
 
@@ -1314,6 +1385,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 1. Navigate to Step 3.
 
 **Expected result:**
+
 - Red limit-reached banner is shown.
 - Generation does not trigger; no Bedrock call is made.
 - "Regenerate summary" link is disabled or absent.
@@ -1328,6 +1400,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 2. Navigate to Step 3.
 
 **Expected result:**
+
 - Summary is generated and displayed.
 - "No questions found" note is shown (grey/neutral, not an error).
 - User can still proceed to Step 4 (Continue button is active).
@@ -1346,6 +1419,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 2. Wait for the error state.
 
 **Expected result:**
+
 - Per-question inline error appears: "We couldn't improve this right now. Please try again."
 - A **Try again** button is visible.
 - The original answer text is NOT lost or overwritten.
@@ -1361,6 +1435,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 2. Clear the textarea and type a very long answer well in excess of the limit.
 
 **Expected result:**
+
 - Word count display turns red (or warning colour).
 - Over-limit warning text appears below the textarea.
 - The answer is NOT blocked — the user can still type and save.
@@ -1375,6 +1450,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 1. Navigate to Step 4 and attempt to click **"Help me improve this"** on any non-budget answer.
 
 **Expected result:**
+
 - Usage limit banner is shown (or the refine button is disabled with a limit-reached message).
 - The `/api/refine-answer` route is not called.
 - Any answers already saved in the database are still displayed and editable.
@@ -1443,6 +1519,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 4. Click **Update password**.
 
 **Expected result:**
+
 - Inline error appears on the Current password field: "Incorrect password." (or similar per design).
 - Password is NOT changed.
 - Success banner does NOT appear.
@@ -1484,6 +1561,7 @@ _Alternatively: If you cannot simulate an AWS error, skip to S5-N-03 and test by
 4. Clear and type `DELET` (incomplete).
 
 **Expected result:**
+
 - In all three cases, the Permanently delete button is disabled or shows a validation error.
 - Account is NOT deleted.
 
@@ -1698,6 +1776,7 @@ _Practical approach:_ Verify via code review that `SessionTimeoutProvider` fires
 1. Navigate through Steps 1 → 2 → 3 → 4 → 5, checking the step indicator at each step.
 
 **Expected result:**
+
 - Current step has a teal filled circle.
 - Completed steps show a tick/checkmark.
 - Future steps are grey.
@@ -1745,6 +1824,7 @@ _Practical approach:_ Verify via code review that `SessionTimeoutProvider` fires
 1. Check the dashboard application cards.
 
 **Expected result:**
+
 - `in_progress` → "In progress" amber pill; **Continue** button.
 - `approved` → "Approved" green pill; **View** button.
 - `exported` → "Exported" teal pill; **View** button.
@@ -1797,6 +1877,7 @@ _Practical approach:_ Verify via code review that `SessionTimeoutProvider` fires
 2. Observe the UI during the wait.
 
 **Expected result:**
+
 - A meaningful loading message or spinner is shown.
 - The triggering button is disabled or shows "Loading…" / "Updating…" / "Deleting…" during the wait.
 - User cannot accidentally trigger the same action twice.
@@ -1830,14 +1911,14 @@ _Practical approach:_ Verify via code review that `SessionTimeoutProvider` fires
 
 Run the complete happy path (Steps 2 → 3 → 4 → 5 → Export) in each browser:
 
-| Browser | Version | Step 2 upload | Step 3 AI | Step 4 write | Export .docx | Export .txt | Pass/Fail |
-|---------|---------|--------------|-----------|-------------|-------------|------------|-----------|
-| Chrome (desktop) | | | | | | | |
-| Edge (desktop) | | | | | | | |
-| Firefox (desktop) | | | | | | | |
-| Safari (desktop) | | | | | | | |
-| Chrome (Android) | | | | | | | |
-| Safari (iOS) | | | | | | | |
+| Browser           | Version | Step 2 upload | Step 3 AI | Step 4 write | Export .docx | Export .txt | Pass/Fail |
+| ----------------- | ------- | ------------- | --------- | ------------ | ------------ | ----------- | --------- |
+| Chrome (desktop)  |         |               |           |              |              |             |           |
+| Edge (desktop)    |         |               |           |              |              |             |           |
+| Firefox (desktop) |         |               |           |              |              |             |           |
+| Safari (desktop)  |         |               |           |              |              |             |           |
+| Chrome (Android)  |         |               |           |              |              |             |           |
+| Safari (iOS)      |         |               |           |              |              |             |           |
 
 ---
 
@@ -1860,13 +1941,13 @@ Run the complete happy path (Steps 2 → 3 → 4 → 5 → Export) in each brows
 
 These tests are expected to fail based on recorded gaps. Record the result and confirm the gap is accurately described — do not re-open new bugs for these unless the behaviour is different from the gap description.
 
-| Test | Related Gap | Expected Failure |
-|------|-------------|-----------------|
-| UX-06 | GAP-26 | `applications/[id]` shows stub, not redirect |
-| S7-P-03 | GAP-24 | Disclaimer wording differs from PDR-DH-003 spec |
-| NF-06 | GAP-22 | No inactivity message shown after session timeout |
-| S5-P-02 (Idlewild) | GAP-27 | Character limits (e.g. 800 chars, 1600 chars) in Idlewild question sets are not supported — Grant Pathway only handles word limits. The AI may miss these limits entirely or convert them incorrectly to word counts. Affected funders: Idlewild Trust (Arts and Conservation). Fix required before Idlewild can be used as a production test fixture. |
-| S6-P-02 (Idlewild) | GAP-28 | Non-text questions in Idlewild form (Yes/No consent, dropdown region/org-type, date fields, number fields, budget tables, file upload fields) will be extracted by the AI as if they were narrative text questions and shown as empty textareas in Step 4. The AI has no way to distinguish question type from a PDF reference document. These questions should either be filtered out or clearly flagged as non-applicable. Fix required before Idlewild can be used as a production test fixture. |
+| Test               | Related Gap | Expected Failure                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------ | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UX-06              | GAP-26      | `applications/[id]` shows stub, not redirect                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| S7-P-03            | GAP-24      | Disclaimer wording differs from PDR-DH-003 spec                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| NF-06              | GAP-22      | No inactivity message shown after session timeout                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| S5-P-02 (Idlewild) | GAP-27      | Character limits (e.g. 800 chars, 1600 chars) in Idlewild question sets are not supported — Grant Pathway only handles word limits. The AI may miss these limits entirely or convert them incorrectly to word counts. Affected funders: Idlewild Trust (Arts and Conservation). Fix required before Idlewild can be used as a production test fixture.                                                                                                                                              |
+| S6-P-02 (Idlewild) | GAP-28      | Non-text questions in Idlewild form (Yes/No consent, dropdown region/org-type, date fields, number fields, budget tables, file upload fields) will be extracted by the AI as if they were narrative text questions and shown as empty textareas in Step 4. The AI has no way to distinguish question type from a PDF reference document. These questions should either be filtered out or clearly flagged as non-applicable. Fix required before Idlewild can be used as a production test fixture. |
 
 ---
 
@@ -1874,18 +1955,18 @@ These tests are expected to fail based on recorded gaps. Record the result and c
 
 ## Document History
 
-| Version | Date | Author | Summary of changes |
-|---------|------|--------|--------------------|
-| 1.0 | 2026-05-22 | Rapidglobe Ltd | Initial test plan — Slices 0–8 positive, negative, non-functional, and usability tests |
-| 1.1 | 2026-05-26 | Rapidglobe Ltd | Added D-001 to D-004 to defect log (sign-out, password reset, same-password, recovery session bugs fixed during testing) |
-| 1.2 | 2026-05-29 | Rapidglobe Ltd | Complete rewrite of S6 positive tests to reflect charity-authored Q&A model (preparation checklist gate, section-by-section/structured Q&A interface, auto-save on blur, budget section indicators, assemble and advance); rewrote S6-N-01 (refine-answer failure replaces draft generation failure); fixed S5-P-03, S5-P-05, S5-N-03 to use 50-request cap and 40-request approaching-limit threshold; updated S5-P-06 button text ("Continue" not "This looks right — continue"); updated cross-browser smoke test header; added document history table |
-| 1.3 | 2026-05-29 | Rapidglobe Ltd | Updated "Manual Maintenance" section to reflect Vercel Pro upgrade — all cron jobs now running; manual guidelines-temp cleanup no longer required during testing |
-| 1.4 | 2026-05-29 | Rapidglobe Ltd | Test Fixtures section updated: pointer to `docs/target-funder-list.md` (12 consolidated funders); missing fixture files listed per funder. S5-P-02 updated for Step 3 two-column card layout redesign and removal of supporting documents card; S5-P-02b added (free_form funder summary — "Application sections" card, "X sections to complete" confirmation). S6-P-03b added (advanceToStep4 bug fix — confirms `ready_to_assemble`/`assembled` states are preserved when returning via Step 3). NF-02 rewritten: old "AI draft generation response time" test removed (auto-generation model no longer exists); replaced with refine-answer API response time test (target ≤15s). Summary table updated: S5 positive 6 → 7, S6 positive 6 → 7, total 114 → 116. |
-| 1.5 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-005 (sticky progress bar hidden behind nav — fixed), D-006 (Back button only at bottom of Step 4 — fixed), D-007 (typo "sectionsto complete" in Step 3 free_form confirmation — fixed). Version bump. |
-| 1.6 | 2026-05-29 | Rapidglobe Ltd | Defect log: D-008 (parse_error on refine-answer with short answers — fixed via prompt strengthening), D-009 (rate_limited on rapid refine-answer clicks — expected behaviour; stale comment fixed). Version bump. |
-| 1.7 | 2026-05-29 | Rapidglobe Ltd | Three Idlewild Trust PDFs added to `docs/test-fixtures/` (Arts question set, Conservation question set, Funding Guidelines). GAP-27 and GAP-28 raised and added to Known Expected Failures. Idlewild fixture note updated to warn against use until gaps resolved. |
-| 1.8 | 2026-05-29 | Rapidglobe Ltd | D-010 raised and fixed: dashboard AI usage counter displayed "of 20" instead of "of 50" — `AI_REQUESTS_LIMIT` constant in `dashboard-populated.tsx` not updated when cap was raised. |
-| 1.9 | 2026-05-29 | Rapidglobe Ltd | D-011 raised and fixed: `parse_error` on generate-summary for large structured documents (A B Charitable Trust, 33 questions). `SUMMARY_MAX_TOKENS` raised 2000 → 4000; prompt strengthened with JSON-only instruction and filter to skip non-text questions (partial GAP-28 fix). |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-05-22 | Rapidglobe Ltd | Initial test plan — Slices 0–8 positive, negative, non-functional, and usability tests                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 1.1     | 2026-05-26 | Rapidglobe Ltd | Added D-001 to D-004 to defect log (sign-out, password reset, same-password, recovery session bugs fixed during testing)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 1.2     | 2026-05-29 | Rapidglobe Ltd | Complete rewrite of S6 positive tests to reflect charity-authored Q&A model (preparation checklist gate, section-by-section/structured Q&A interface, auto-save on blur, budget section indicators, assemble and advance); rewrote S6-N-01 (refine-answer failure replaces draft generation failure); fixed S5-P-03, S5-P-05, S5-N-03 to use 50-request cap and 40-request approaching-limit threshold; updated S5-P-06 button text ("Continue" not "This looks right — continue"); updated cross-browser smoke test header; added document history table                                                                                                                                                                                                          |
+| 1.3     | 2026-05-29 | Rapidglobe Ltd | Updated "Manual Maintenance" section to reflect Vercel Pro upgrade — all cron jobs now running; manual guidelines-temp cleanup no longer required during testing                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 1.4     | 2026-05-29 | Rapidglobe Ltd | Test Fixtures section updated: pointer to `docs/target-funder-list.md` (12 consolidated funders); missing fixture files listed per funder. S5-P-02 updated for Step 3 two-column card layout redesign and removal of supporting documents card; S5-P-02b added (free_form funder summary — "Application sections" card, "X sections to complete" confirmation). S6-P-03b added (advanceToStep4 bug fix — confirms `ready_to_assemble`/`assembled` states are preserved when returning via Step 3). NF-02 rewritten: old "AI draft generation response time" test removed (auto-generation model no longer exists); replaced with refine-answer API response time test (target ≤15s). Summary table updated: S5 positive 6 → 7, S6 positive 6 → 7, total 114 → 116. |
+| 1.5     | 2026-05-29 | Rapidglobe Ltd | Defect log: D-005 (sticky progress bar hidden behind nav — fixed), D-006 (Back button only at bottom of Step 4 — fixed), D-007 (typo "sectionsto complete" in Step 3 free_form confirmation — fixed). Version bump.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 1.6     | 2026-05-29 | Rapidglobe Ltd | Defect log: D-008 (parse_error on refine-answer with short answers — fixed via prompt strengthening), D-009 (rate_limited on rapid refine-answer clicks — expected behaviour; stale comment fixed). Version bump.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 1.7     | 2026-05-29 | Rapidglobe Ltd | Three Idlewild Trust PDFs added to `docs/test-fixtures/` (Arts question set, Conservation question set, Funding Guidelines). GAP-27 and GAP-28 raised and added to Known Expected Failures. Idlewild fixture note updated to warn against use until gaps resolved.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 1.8     | 2026-05-29 | Rapidglobe Ltd | D-010 raised and fixed: dashboard AI usage counter displayed "of 20" instead of "of 50" — `AI_REQUESTS_LIMIT` constant in `dashboard-populated.tsx` not updated when cap was raised.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 1.9     | 2026-05-29 | Rapidglobe Ltd | D-011 raised and fixed: `parse_error` on generate-summary for large structured documents (A B Charitable Trust, 33 questions). `SUMMARY_MAX_TOKENS` raised 2000 → 4000; prompt strengthened with JSON-only instruction and filter to skip non-text questions (partial GAP-28 fix).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 ---
 

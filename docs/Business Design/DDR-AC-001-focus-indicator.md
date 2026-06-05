@@ -17,6 +17,7 @@ WCAG 2.2 introduced a new success criterion at Level AA -- SC 2.4.11 (Focus Appe
 Grant Pathway must achieve WCAG 2.2 Level AA compliance (NFR-06, C15). A custom focus indicator that is visually consistent with the brand and reliably meets SC 2.4.11 is preferable to relying on browser defaults, which vary significantly between Chrome, Firefox, Safari, and Edge.
 
 The focus indicator must be:
+
 - Visible on all interactive elements: buttons, links, form fields, checkboxes, the account dropdown, the step indicator (even though it is read-only)
 - Sufficient area (at least a 2px perimeter around the component, or a defined area per WCAG 2.4.11)
 - Sufficient contrast ratio against both the component background and the adjacent page background
@@ -38,12 +39,14 @@ shadcn/ui (PDR-UI-001) provides a default focus ring via Tailwind's `ring` utili
 A 2px solid amber (#D97706) focus ring with a 2px offset, applied globally via the shadcn/ui `--ring` CSS variable.
 
 **Implementation specification:**
+
 - CSS: `outline: 2px solid #D97706; outline-offset: 2px`
 - Tailwind equivalent: `ring-2 ring-amber-600 ring-offset-2`
 - Applied on `:focus-visible` only (not `:focus`) -- prevents ring appearing on mouse clicks; preserves it for keyboard navigation
 - Implemented via the shadcn/ui `--ring` CSS variable so it applies globally to all Radix UI / shadcn/ui interactive primitives without per-component overrides
 
 **Contrast verification:**
+
 - Amber (#D97706) on white (#FFFFFF): 4.58:1 -- passes WCAG SC 2.4.11 (minimum 3:1) ✓
 - Amber (#D97706) on teal (#0D6E6E): 3.12:1 -- passes WCAG SC 2.4.11 ✓
 - No context-aware fallback required -- single ring colour works on all background colours in the palette
@@ -54,5 +57,5 @@ A 2px solid amber (#D97706) focus ring with a 2px offset, applied globally via t
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

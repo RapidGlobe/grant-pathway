@@ -26,11 +26,11 @@ The escape hatch is: the user may update their charity profile to accurately ref
 
 ## Options Considered
 
-| Option | Description | Outcome |
-|--------|-------------|---------|
-| 1 | Amber warning, user can proceed anyway | Rejected — allows ineligible applications to progress; risks funder relationships; wastes user time |
-| 2 | Red warning, acknowledge, hard stop to dashboard | **Selected** |
-| 3 | No warning (current behaviour) | Rejected — fails to surface a key risk; user wastes time writing answers for a grant they cannot receive |
+| Option | Description                                      | Outcome                                                                                                  |
+| ------ | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| 1      | Amber warning, user can proceed anyway           | Rejected — allows ineligible applications to progress; risks funder relationships; wastes user time      |
+| 2      | Red warning, acknowledge, hard stop to dashboard | **Selected**                                                                                             |
+| 3      | No warning (current behaviour)                   | Rejected — fails to surface a key risk; user wastes time writing answers for a grant they cannot receive |
 
 ---
 
@@ -47,6 +47,7 @@ There is no override. If the AI flags a mismatch, the application cannot reach S
 ## Data Model Impact
 
 A new `mismatch` value is added to the `application_status` PostgreSQL enum. Applications in `mismatch` state:
+
 - Are displayed on the dashboard with a red "Ineligible" status badge
 - Cannot be resumed or continued to Step 4
 - Can be deleted by the user
@@ -58,10 +59,10 @@ A new `mismatch` value is added to the `application_status` PostgreSQL enum. App
 
 The summary prompt is extended to return two new fields in the JSON response:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `eligibilityMismatch` | boolean | `true` if the charity profile clearly does not meet the funder's eligibility criteria; `false` otherwise or if no charity profile was provided |
-| `mismatchReason` | string or null | Plain-English 1–2 sentence explanation of the mismatch (shown to the user); `null` if no mismatch |
+| Field                 | Type           | Description                                                                                                                                    |
+| --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `eligibilityMismatch` | boolean        | `true` if the charity profile clearly does not meet the funder's eligibility criteria; `false` otherwise or if no charity profile was provided |
+| `mismatchReason`      | string or null | Plain-English 1–2 sentence explanation of the mismatch (shown to the user); `null` if no mismatch                                              |
 
 The AI is instructed to set `eligibilityMismatch: true` only for **clear, unambiguous** mismatches — for example, an arts-only funder and a charity with no arts remit. Borderline cases should default to `false`.
 
@@ -88,6 +89,6 @@ The user may correct their charity profile to accurately reflect work that align
 
 ## Document History
 
-| Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 1.0 | 2026-06-02 | Rapidglobe Ltd | Initial decision record — raised during Idlewild Trust IT-04 testing |
+| Version | Date       | Author         | Change                                                               |
+| ------- | ---------- | -------------- | -------------------------------------------------------------------- |
+| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial decision record — raised during Idlewild Trust IT-04 testing |

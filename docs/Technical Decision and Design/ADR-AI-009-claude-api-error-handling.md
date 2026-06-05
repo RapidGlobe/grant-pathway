@@ -13,21 +13,25 @@ AI generation is the critical path in Grant Pathway. The Amazon Bedrock Claude A
 ## Options Considered
 
 ### Option A — Retry with exponential backoff, then user-facing error
+
 - **What it is:** If the API call fails with a transient error (429, 500, 529), the route retries up to 2 times with exponential backoff (1s, 3s delay). If all retries fail, a user-facing error is returned.
 - **Strengths:** Handles transient failures transparently. Most 429 and 500 errors are short-lived.
 - **Weaknesses:** Adds latency on failure (up to 4s of retry delay). Must not retry non-transient errors (400, invalid request).
 
 ### Option B — Single attempt, immediate error on failure
+
 - **What it is:** No retries. If the API call fails, an error is immediately returned to the user.
 - **Strengths:** Simplest. Fastest to surface genuine errors.
 - **Weaknesses:** Transient failures (brief API blip) result in a user-visible error that could have been resolved with a retry.
 
 ### Option C — Client-side retry button (no server retry)
+
 - **What it is:** On failure, the user is shown an error with a "Try again" button. The server does not retry automatically.
 - **Strengths:** User is in control. No hidden retry delay.
 - **Weaknesses:** Requires the user to actively retry, which may be confusing.
 
 ### Option D — Comprehensive error handling with user-specific messages per error type
+
 - **What it is:** Different error messages for different failure types: "Our AI service is busy — please try again in a moment" (429/503), "Something went wrong with your request" (400), "Generation failed — please try again" (500).
 - **Strengths:** Best user experience. Error messages are actionable.
 - **Weaknesses:** More implementation effort. Must map all error types to user messages.
@@ -39,20 +43,21 @@ AI generation is the critical path in Grant Pathway. The Amazon Bedrock Claude A
 A shared utility `lib/ai-error-handler.ts` wraps all Anthropic API calls. AI routes do not implement retry logic inline — they call through this wrapper.
 
 **Retry behaviour:**
+
 - Transient errors (HTTP 429, 500, 529): retry up to 2 times with delays of 1s then 3s
 - Non-transient errors (HTTP 400, authentication errors): no retry — surface immediately
 - Step 4 JSON parse failure: one automatic retry of the full API call before surfacing as an error
 
 **Error message mapping:**
 
-| Error type | User-facing message |
-|---|---|
-| 429 Rate Limit (after retries) | "Our AI service is a little busy right now. Please try again in a few minutes." |
-| 500 / 529 Server Error (after retries) | "Something went wrong with our AI service. Please try again." |
-| 400 Bad Request | "We couldn't process your request. Please check your inputs and try again." |
-| Function timeout | "AI generation is taking longer than expected. Please try again." |
-| JSON parse failure (after retry) | "We had trouble formatting your draft answers. Please try again." |
-| Usage limit reached | "You've used all 20 of your AI requests this month. Your allowance resets on [date]." |
+| Error type                             | User-facing message                                                                   |
+| -------------------------------------- | ------------------------------------------------------------------------------------- |
+| 429 Rate Limit (after retries)         | "Our AI service is a little busy right now. Please try again in a few minutes."       |
+| 500 / 529 Server Error (after retries) | "Something went wrong with our AI service. Please try again."                         |
+| 400 Bad Request                        | "We couldn't process your request. Please check your inputs and try again."           |
+| Function timeout                       | "AI generation is taking longer than expected. Please try again."                     |
+| JSON parse failure (after retry)       | "We had trouble formatting your draft answers. Please try again."                     |
+| Usage limit reached                    | "You've used all 20 of your AI requests this month. Your allowance resets on [date]." |
 
 **Progress bar error state (ADR-AI-005):** On error, the bar stops at its current position. The staged message is replaced by the error message. A "Try again" button appears inline — the user is not sent back to a previous step.
 

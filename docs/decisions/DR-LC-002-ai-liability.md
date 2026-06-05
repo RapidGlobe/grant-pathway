@@ -34,6 +34,7 @@ The worst-case scenario is a rejected grant application — a bad outcome but no
 The following must be stated clearly and prominently in the Terms of Service — in plain language, not legal boilerplate:
 
 **What this app does not do:**
+
 - Guarantee or promise funding
 - Submit applications on behalf of charities
 - Make any representations to funders directly

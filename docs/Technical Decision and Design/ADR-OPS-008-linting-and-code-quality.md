@@ -1,7 +1,7 @@
 ---
 id: ADR-OPS-008
 category: Operations
-status: Decided — implementation deferred to 2026-06-05
+status: Implemented — 2026-06-05
 ---
 
 # ADR-OPS-008 — Linting and Code Quality Infrastructure
@@ -12,30 +12,33 @@ Grant Pathway is developed using AI-assisted coding. As the article "Linting: En
 
 An audit of the project's current linting setup (2026-06-04) found the following gaps:
 
-| Area | Current state |
-|------|--------------|
-| ESLint | Present — flat config with `next/core-web-vitals` + `next/typescript` only |
-| Prettier | Not installed — no formatting enforcer |
-| Pre-commit hooks | None — code can be committed without any automated check |
-| CI lint gate | None — no GitHub Actions workflows |
-| `lint` script | `eslint` with no path and no `--max-warnings 0`; warnings silently swallowed |
-| `type-check` script | Missing — TypeScript errors not separately runnable |
+| Area                      | Current state                                                                |
+| ------------------------- | ---------------------------------------------------------------------------- |
+| ESLint                    | Present — flat config with `next/core-web-vitals` + `next/typescript` only   |
+| Prettier                  | Not installed — no formatting enforcer                                       |
+| Pre-commit hooks          | None — code can be committed without any automated check                     |
+| CI lint gate              | None — no GitHub Actions workflows                                           |
+| `lint` script             | `eslint` with no path and no `--max-warnings 0`; warnings silently swallowed |
+| `type-check` script       | Missing — TypeScript errors not separately runnable                          |
 | TypeScript advanced flags | `strict: true` only; `noUncheckedIndexedAccess`, `noImplicitReturns` not set |
-| Build-time lint | Active — `next build` runs ESLint and fails on errors (good) |
+| Build-time lint           | Active — `next build` runs ESLint and fails on errors (good)                 |
 
 The absence of pre-commit hooks is the most critical gap: every AI-generated commit enters the repository unchecked.
 
 ## Options Considered
 
 **Option A — Minimal: fix the `lint` script only**
+
 - Add `--max-warnings 0` and a target path. No other changes.
 - Weaknesses: No formatting enforcer, no pre-commit gate, no CI. Relies entirely on developer discipline.
 
 **Option B — ESLint + Prettier only (no hooks or CI)**
+
 - Install Prettier, wire it to ESLint, fix scripts.
 - Weaknesses: Still relies on manual `npm run lint` before every commit. One forgotten run means unchecked code.
 
 **Option C — Full stack: Prettier + pre-commit hooks + CI + TypeScript tightening**
+
 - ESLint + Prettier with conflict resolution (`eslint-config-prettier`).
 - Husky + lint-staged for pre-commit automation.
 - GitHub Actions CI for lint + format-check + type-check on every push.
@@ -55,11 +58,13 @@ The goal is a fully automated pipeline where inconsistencies are caught at the e
 ### Phase 1 — Scripts and Prettier (estimated: 30 minutes)
 
 **Packages to install:**
+
 ```bash
 npm install --save-dev prettier eslint-config-prettier
 ```
 
 **`.prettierrc` configuration:**
+
 ```json
 {
   "semi": false,
@@ -72,6 +77,7 @@ npm install --save-dev prettier eslint-config-prettier
 ```
 
 **`.prettierignore`:**
+
 ```
 .next/
 out/
@@ -82,12 +88,14 @@ public/
 ```
 
 **`eslint.config.mjs` — add Prettier conflict resolution:**
+
 ```js
 import prettierConfig from 'eslint-config-prettier'
 // Add prettierConfig to the config array (last, so it overrides style rules)
 ```
 
 **`package.json` scripts — replace/add:**
+
 ```json
 "lint": "eslint . --max-warnings 0",
 "lint:fix": "eslint . --fix",
@@ -101,17 +109,20 @@ import prettierConfig from 'eslint-config-prettier'
 ### Phase 2 — Pre-commit Hooks (estimated: 30 minutes)
 
 **Packages to install:**
+
 ```bash
 npm install --save-dev husky lint-staged
 npx husky init
 ```
 
 **`.husky/pre-commit`:**
+
 ```bash
 npx lint-staged
 ```
 
 **`lint-staged` config in `package.json`:**
+
 ```json
 "lint-staged": {
   "*.{ts,tsx}": [
@@ -163,12 +174,14 @@ jobs:
 ### Phase 4 — TypeScript Tightening (estimated: 1–2 hours, review required)
 
 Add to `tsconfig.json` `compilerOptions`:
+
 ```json
 "noImplicitReturns": true,
 "noFallthroughCasesInSwitch": true
 ```
 
 **Evaluate (may surface existing issues requiring fixes):**
+
 ```json
 "noUncheckedIndexedAccess": true
 ```

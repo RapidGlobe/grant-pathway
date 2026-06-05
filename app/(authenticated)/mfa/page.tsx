@@ -1,11 +1,11 @@
-import { redirect } from "next/navigation";
-import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
-import { MfaChallengeForm } from "@/components/mfa-challenge-form";
+import { redirect } from 'next/navigation'
+import type { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
+import { MfaChallengeForm } from '@/components/mfa-challenge-form'
 
 export const metadata: Metadata = {
-  title: "Two-factor authentication",
-};
+  title: 'Two-factor authentication',
+}
 
 /**
  * MFA challenge page — reached after successful password sign-in when the
@@ -16,18 +16,18 @@ export const metadata: Metadata = {
  * they are redirected to /dashboard.
  */
 export default async function MfaPage() {
-  const supabase = await createClient();
+  const supabase = await createClient()
 
-  const { data } = await supabase.auth.mfa.listFactors();
-  const totpFactor = data?.totp?.[0];
+  const { data } = await supabase.auth.mfa.listFactors()
+  const totpFactor = data?.totp?.[0]
 
   if (!totpFactor) {
-    redirect("/dashboard");
+    redirect('/dashboard')
   }
 
   return (
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <MfaChallengeForm factorId={totpFactor.id} />
     </div>
-  );
+  )
 }

@@ -125,10 +125,10 @@ The ambition is simple: to make the grant application process a little less daun
 
 ---
 
-*Grant Pathway — grantpathway.org.uk*
-*Free for UK charities. Always.*
+_Grant Pathway — grantpathway.org.uk_
+_Free for UK charities. Always._
 
 ---
 
-*Version: 1.1*
-*Last updated: 26 May 2026*
+_Version: 1.1_
+_Last updated: 26 May 2026_

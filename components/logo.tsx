@@ -12,12 +12,12 @@
 //   3. Remove this comment block.
 
 interface LogoProps {
-  className?: string;
+  className?: string
 }
 
 export function Logo({ className }: LogoProps) {
   return (
-    <span className={`flex items-center gap-2 ${className ?? ""}`}>
+    <span className={`flex items-center gap-2 ${className ?? ''}`}>
       {/* ⚠️ Placeholder icon mark — replace with real logo asset (see comment above) */}
       <svg
         width="32"
@@ -47,5 +47,5 @@ export function Logo({ className }: LogoProps) {
         <span className="text-[#1E293B]">Pathway</span>
       </span>
     </span>
-  );
+  )
 }

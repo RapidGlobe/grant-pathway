@@ -94,37 +94,37 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 
 ## 3. Technology Stack
 
-| Layer | Technology | Decision |
-|---|---|---|
-| Framework | Next.js 14+ with TypeScript | ADR-STACK-001 |
-| Database | Supabase PostgreSQL (London, eu-west-2) | ADR-STACK-002 |
-| Authentication | Supabase Auth | ADR-STACK-003 |
-| Hosting | Vercel Pro | ADR-STACK-004, ADR-OPS-001 |
-| Source control | GitHub (private repository) | ADR-STACK-005 |
-| UI components | shadcn/ui + Radix UI + Tailwind CSS | ADR-STACK-006 |
-| Icons | Lucide React (via shadcn/ui) | ADR-STACK-006 |
-| AI provider | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) | ADR-AI-001 |
-| AI model | Claude Sonnet 4.6 | ADR-AI-002 |
-| PDF extraction | `unpdf` | ADR-FILE-003 |
-| Word extraction | `mammoth` | ADR-FILE-003 |
-| Word generation | `docx` | ADR-EXPORT-001 |
-| Rate limiting | Upstash Redis + `@upstash/ratelimit` | ADR-SEC-005 |
-| Email | Resend (via Supabase Auth SMTP) | ADR-OPS-003 |
-| Error tracking | Sentry (EU region) | ADR-OPS-005 |
-| Migrations | Supabase CLI + Docker Desktop | ADR-DATA-004 |
-| Validation | Zod (all API routes and Server Actions) | ADR-ARCH-003 |
+| Layer           | Technology                                                 | Decision                   |
+| --------------- | ---------------------------------------------------------- | -------------------------- |
+| Framework       | Next.js 14+ with TypeScript                                | ADR-STACK-001              |
+| Database        | Supabase PostgreSQL (London, eu-west-2)                    | ADR-STACK-002              |
+| Authentication  | Supabase Auth                                              | ADR-STACK-003              |
+| Hosting         | Vercel Pro                                                 | ADR-STACK-004, ADR-OPS-001 |
+| Source control  | GitHub (private repository)                                | ADR-STACK-005              |
+| UI components   | shadcn/ui + Radix UI + Tailwind CSS                        | ADR-STACK-006              |
+| Icons           | Lucide React (via shadcn/ui)                               | ADR-STACK-006              |
+| AI provider     | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) | ADR-AI-001                 |
+| AI model        | Claude Sonnet 4.6                                          | ADR-AI-002                 |
+| PDF extraction  | `unpdf`                                                    | ADR-FILE-003               |
+| Word extraction | `mammoth`                                                  | ADR-FILE-003               |
+| Word generation | `docx`                                                     | ADR-EXPORT-001             |
+| Rate limiting   | Upstash Redis + `@upstash/ratelimit`                       | ADR-SEC-005                |
+| Email           | Resend (via Supabase Auth SMTP)                            | ADR-OPS-003                |
+| Error tracking  | Sentry (EU region)                                         | ADR-OPS-005                |
+| Migrations      | Supabase CLI + Docker Desktop                              | ADR-DATA-004               |
+| Validation      | Zod (all API routes and Server Actions)                    | ADR-ARCH-003               |
 
 ### Operating costs (monthly)
 
-| Service | Cost |
-|---|---|
-| Vercel Pro | ~£16/month |
-| Supabase Pro | ~£20/month (ADR-DATA-005 — includes daily automated backups) |
-| Amazon Bedrock (Claude) | Usage-based (capped at 20 req/user/month) |
-| Upstash | Free tier |
-| Resend | Free tier (3,000 emails/month) |
-| Sentry | Free tier (5,000 errors/month) |
-| **Total fixed** | **~£36/month** (well within £100/month C1 budget; ~£64/month headroom for Bedrock) |
+| Service                 | Cost                                                                               |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| Vercel Pro              | ~£16/month                                                                         |
+| Supabase Pro            | ~£20/month (ADR-DATA-005 — includes daily automated backups)                       |
+| Amazon Bedrock (Claude) | Usage-based (capped at 20 req/user/month)                                          |
+| Upstash                 | Free tier                                                                          |
+| Resend                  | Free tier (3,000 emails/month)                                                     |
+| Sentry                  | Free tier (5,000 errors/month)                                                     |
+| **Total fixed**         | **~£36/month** (well within £100/month C1 budget; ~£64/month headroom for Bedrock) |
 
 ---
 
@@ -209,18 +209,18 @@ Supabase Auth handles registration, login, email verification, and password rese
 `middleware.ts` at the project root intercepts every request before the page renders, using `createServerClient` from `@supabase/ssr`. (ADR-SEC-001)
 
 **What middleware does:**
+
 1. Reads the Supabase session from request cookies
 2. Refreshes the session token if close to expiry
 3. Redirects unauthenticated requests to protected routes → `/sign-in`
 4. Redirects authenticated requests to `/sign-in` or `/register` → `/dashboard`
 
 **Matcher configuration:**
+
 ```typescript
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
-};
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+}
 ```
 
 **Protected routes:** `/dashboard`, `/profile`, `/application/:path*`, `/account/:path*`
@@ -233,18 +233,18 @@ A 60-minute inactivity timeout is enforced client-side. (ADR-SEC-003)
 
 - Activity tracking monitors `mousemove`, `keydown`, and `click` events
 - A warning modal appears at 55 minutes of inactivity with a "Stay signed in" option
-- If dismissed or ignored, the user is signed out and redirected to `/sign-in` with the message: *"You've been signed out due to inactivity."*
+- If dismissed or ignored, the user is signed out and redirected to `/sign-in` with the message: _"You've been signed out due to inactivity."_
 - Auto-save (Step 4) ensures in-progress answers are saved before the timeout fires
 
 ### Supabase client instances
 
 Three distinct clients are used depending on context:
 
-| Context | Client | File |
-|---|---|---|
-| Server Components, Server Actions | `createServerClient` | `lib/supabase/server.ts` |
-| Client Components | `createBrowserClient` | `lib/supabase/client.ts` |
-| Middleware | `createMiddlewareClient` | `lib/supabase/middleware.ts` |
+| Context                           | Client                   | File                         |
+| --------------------------------- | ------------------------ | ---------------------------- |
+| Server Components, Server Actions | `createServerClient`     | `lib/supabase/server.ts`     |
+| Client Components                 | `createBrowserClient`    | `lib/supabase/client.ts`     |
+| Middleware                        | `createMiddlewareClient` | `lib/supabase/middleware.ts` |
 
 The **service role client** (using `SUPABASE_SERVICE_ROLE_KEY`) is used only in API routes that require bypassing RLS — specifically account deletion and the Storage cleanup cron job. It must never appear in client-side code.
 
@@ -257,79 +257,84 @@ The **service role client** (using `SUPABASE_SERVICE_ROLE_KEY`) is used only in 
 All tables are in the `public` schema. RLS is enabled on all tables with default-deny. (ADR-DATA-001, ADR-SEC-002)
 
 #### `user_profiles`
-| Column | Type | Constraints |
-|---|---|---|
-| `id` | `uuid` | PK, references `auth.users(id)` |
-| `email` | `text` | Not null |
-| `full_name` | `text` | |
-| `created_at` | `timestamptz` | Default `now()` |
-| `updated_at` | `timestamptz` | Default `now()` |
+
+| Column       | Type          | Constraints                     |
+| ------------ | ------------- | ------------------------------- |
+| `id`         | `uuid`        | PK, references `auth.users(id)` |
+| `email`      | `text`        | Not null                        |
+| `full_name`  | `text`        |                                 |
+| `created_at` | `timestamptz` | Default `now()`                 |
+| `updated_at` | `timestamptz` | Default `now()`                 |
 
 #### `charity_profiles`
-| Column | Type | Constraints |
-|---|---|---|
-| `id` | `uuid` | PK, default `gen_random_uuid()` |
-| `user_id` | `uuid` | FK → `user_profiles(id)`, unique |
-| `charity_name` | `text` | |
-| `charity_number` | `text` | |
-| `mission_statement` | `text` | |
-| `beneficiaries` | `text` | |
-| `programmes` | `text` | |
-| `impact` | `text` | |
-| `created_at` | `timestamptz` | Default `now()` |
-| `updated_at` | `timestamptz` | Default `now()` |
+
+| Column              | Type          | Constraints                      |
+| ------------------- | ------------- | -------------------------------- |
+| `id`                | `uuid`        | PK, default `gen_random_uuid()`  |
+| `user_id`           | `uuid`        | FK → `user_profiles(id)`, unique |
+| `charity_name`      | `text`        |                                  |
+| `charity_number`    | `text`        |                                  |
+| `mission_statement` | `text`        |                                  |
+| `beneficiaries`     | `text`        |                                  |
+| `programmes`        | `text`        |                                  |
+| `impact`            | `text`        |                                  |
+| `created_at`        | `timestamptz` | Default `now()`                  |
+| `updated_at`        | `timestamptz` | Default `now()`                  |
 
 #### `applications`
-| Column | Type | Constraints |
-|---|---|---|
-| `id` | `uuid` | PK, default `gen_random_uuid()` |
-| `user_id` | `uuid` | FK → `user_profiles(id)` |
-| `funder_name` | `text` | Not null |
-| `grant_name` | `text` | |
-| `status` | `text` | `not_started \| in_progress \| approved \| exported` |
-| `current_step` | `integer` | 1–5, default 1 |
-| `ai_summary` | `text` | Nullable — JSON string, populated in Step 3 |
-| `assembled_draft` | `text` | Nullable — final formatted draft text, written in Step 4 assembly |
-| `draft_status` | `text` | `not_started \| in_progress \| ready_to_assemble \| assembled \| exported` |
-| `created_at` | `timestamptz` | Default `now()` |
-| `updated_at` | `timestamptz` | Default `now()` |
+
+| Column            | Type          | Constraints                                                                |
+| ----------------- | ------------- | -------------------------------------------------------------------------- |
+| `id`              | `uuid`        | PK, default `gen_random_uuid()`                                            |
+| `user_id`         | `uuid`        | FK → `user_profiles(id)`                                                   |
+| `funder_name`     | `text`        | Not null                                                                   |
+| `grant_name`      | `text`        |                                                                            |
+| `status`          | `text`        | `not_started \| in_progress \| approved \| exported`                       |
+| `current_step`    | `integer`     | 1–5, default 1                                                             |
+| `ai_summary`      | `text`        | Nullable — JSON string, populated in Step 3                                |
+| `assembled_draft` | `text`        | Nullable — final formatted draft text, written in Step 4 assembly          |
+| `draft_status`    | `text`        | `not_started \| in_progress \| ready_to_assemble \| assembled \| exported` |
+| `created_at`      | `timestamptz` | Default `now()`                                                            |
+| `updated_at`      | `timestamptz` | Default `now()`                                                            |
 
 #### `application_answers`
-| Column | Type | Constraints |
-|---|---|---|
-| `id` | `uuid` | PK, default `gen_random_uuid()` |
-| `application_id` | `uuid` | FK → `applications(id)` |
-| `user_id` | `uuid` | FK → `user_profiles(id)` (denormalised for RLS) |
-| `question_text` | `text` | Not null — stores question text (structured) or section title (free_form) |
-| `question_order` | `integer` | Not null — ordering index; unique per `(application_id, question_order)` |
-| `answer_text` | `text` | Nullable — the charity's written answer |
-| `answer_source` | `text` | `user_written \| user_edited \| ai_generated` |
-| `word_limit` | `integer` | Nullable — extracted from guidelines by AI |
-| `is_budget_question` | `boolean` | Not null, default false — disables AI assist on this row |
-| `created_at` | `timestamptz` | Default `now()` |
-| `updated_at` | `timestamptz` | Default `now()` |
+
+| Column               | Type          | Constraints                                                               |
+| -------------------- | ------------- | ------------------------------------------------------------------------- |
+| `id`                 | `uuid`        | PK, default `gen_random_uuid()`                                           |
+| `application_id`     | `uuid`        | FK → `applications(id)`                                                   |
+| `user_id`            | `uuid`        | FK → `user_profiles(id)` (denormalised for RLS)                           |
+| `question_text`      | `text`        | Not null — stores question text (structured) or section title (free_form) |
+| `question_order`     | `integer`     | Not null — ordering index; unique per `(application_id, question_order)`  |
+| `answer_text`        | `text`        | Nullable — the charity's written answer                                   |
+| `answer_source`      | `text`        | `user_written \| user_edited \| ai_generated`                             |
+| `word_limit`         | `integer`     | Nullable — extracted from guidelines by AI                                |
+| `is_budget_question` | `boolean`     | Not null, default false — disables AI assist on this row                  |
+| `created_at`         | `timestamptz` | Default `now()`                                                           |
+| `updated_at`         | `timestamptz` | Default `now()`                                                           |
 
 **Note on free_form funders:** For narrative (free_form) funders, `question_text` stores the section title (e.g. "About your organisation"). Section guidance text is **not** stored in `application_answers` — it is re-derived on each Step 4 page load from `applications.ai_summary.sections[i].guidance`, matched by `question_order`. This avoids data duplication and keeps guidance in sync with the AI summary.
 
 #### `ai_usage_log`
-| Column | Type | Constraints |
-|---|---|---|
-| `id` | `uuid` | PK, default `gen_random_uuid()` |
-| `user_id` | `uuid` | FK → `user_profiles(id)` |
-| `request_type` | `text` | `guideline_summary`, `refine_answer` |
-| `application_id` | `uuid` | Nullable |
-| `token_count` | `integer` | Nullable — tokens consumed by this request |
-| `created_at` | `timestamptz` | Default `now()` — used for monthly count |
+
+| Column           | Type          | Constraints                                |
+| ---------------- | ------------- | ------------------------------------------ |
+| `id`             | `uuid`        | PK, default `gen_random_uuid()`            |
+| `user_id`        | `uuid`        | FK → `user_profiles(id)`                   |
+| `request_type`   | `text`        | `guideline_summary`, `refine_answer`       |
+| `application_id` | `uuid`        | Nullable                                   |
+| `token_count`    | `integer`     | Nullable — tokens consumed by this request |
+| `created_at`     | `timestamptz` | Default `now()` — used for monthly count   |
 
 ### Row Level Security policies
 
-| Table | SELECT | INSERT | UPDATE | DELETE |
-|---|---|---|---|---|
-| `user_profiles` | Own rows | Own rows | Own rows | Own rows |
-| `charity_profiles` | Own rows | Own rows | Own rows | Own rows |
-| `applications` | Own rows | Own rows | Own rows | Own rows |
+| Table                 | SELECT   | INSERT   | UPDATE   | DELETE   |
+| --------------------- | -------- | -------- | -------- | -------- |
+| `user_profiles`       | Own rows | Own rows | Own rows | Own rows |
+| `charity_profiles`    | Own rows | Own rows | Own rows | Own rows |
+| `applications`        | Own rows | Own rows | Own rows | Own rows |
 | `application_answers` | Own rows | Own rows | Own rows | Own rows |
-| `ai_usage_log` | Own rows | Own rows | ✗ Denied | ✗ Denied |
+| `ai_usage_log`        | Own rows | Own rows | ✗ Denied | ✗ Denied |
 
 "Own rows" = `user_id = auth.uid()`.
 
@@ -380,14 +385,14 @@ Two route groups separate public and authenticated pages, sharing different layo
 
 The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 
-| URL | Purpose |
-|---|---|
-| `/application/[id]` | Redirects to `/application/[id]/step/[current_step]` |
-| `/application/[id]/step/1` | Application Details |
-| `/application/[id]/step/2` | Upload Funder Guidelines |
-| `/application/[id]/step/3` | AI Summary |
-| `/application/[id]/step/4` | Draft Answers |
-| `/application/[id]/step/5` | Review & Export |
+| URL                        | Purpose                                              |
+| -------------------------- | ---------------------------------------------------- |
+| `/application/[id]`        | Redirects to `/application/[id]/step/[current_step]` |
+| `/application/[id]/step/1` | Application Details                                  |
+| `/application/[id]/step/2` | Upload Funder Guidelines                             |
+| `/application/[id]/step/3` | AI Summary                                           |
+| `/application/[id]/step/4` | Draft Answers                                        |
+| `/application/[id]/step/5` | Review & Export                                      |
 
 **Step locking:** Users cannot jump ahead to a step whose prerequisites are not met. Accessing `/step/4` before Step 3 is complete redirects to the current step.
 
@@ -395,21 +400,21 @@ The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 
 ### Page inventory
 
-| Route | Type | Data source |
-|---|---|---|
-| `/` | Public, static | None |
-| `/sign-in` | Public, static | None |
-| `/register` | Public, static | None |
-| `/forgot-password` | Public, static | None |
-| `/reset-password` | Public, static | None |
-| `/dashboard` | Authenticated, SSR | `applications` table |
-| `/profile` | Authenticated, SSR | `charity_profiles` table |
-| `/application/[id]/step/1` | Authenticated, SSR | `applications` table |
-| `/application/[id]/step/2` | Authenticated, SSR | `applications` table |
-| `/application/[id]/step/3` | Authenticated, SSR | `applications.ai_summary` |
+| Route                      | Type               | Data source                           |
+| -------------------------- | ------------------ | ------------------------------------- |
+| `/`                        | Public, static     | None                                  |
+| `/sign-in`                 | Public, static     | None                                  |
+| `/register`                | Public, static     | None                                  |
+| `/forgot-password`         | Public, static     | None                                  |
+| `/reset-password`          | Public, static     | None                                  |
+| `/dashboard`               | Authenticated, SSR | `applications` table                  |
+| `/profile`                 | Authenticated, SSR | `charity_profiles` table              |
+| `/application/[id]/step/1` | Authenticated, SSR | `applications` table                  |
+| `/application/[id]/step/2` | Authenticated, SSR | `applications` table                  |
+| `/application/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`             |
 | `/application/[id]/step/4` | Authenticated, SSR | `applications`, `application_answers` |
 | `/application/[id]/step/5` | Authenticated, SSR | `applications`, `application_answers` |
-| `/account` | Authenticated, SSR | `user_profiles` |
+| `/account`                 | Authenticated, SSR | `user_profiles`                       |
 
 ---
 
@@ -417,15 +422,15 @@ The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 
 React Server Components are the default. `"use client"` is added only to components that require browser APIs, React hooks, or event handlers. (ADR-ARCH-002)
 
-| Component | Type | Reason |
-|---|---|---|
+| Component                                    | Type             | Reason                                                 |
+| -------------------------------------------- | ---------------- | ------------------------------------------------------ |
 | Page shells (dashboard, profile, step pages) | Server Component | Fetches data server-side — no loading spinner on mount |
-| Navigation bar | Client Component | Requires auth state and active route highlighting |
-| Charity profile edit form | Client Component | Controlled inputs and form state |
-| Answer text areas (Step 4) | Client Component | Auto-save requires `onChange` and debounce |
-| AI loading state (Steps 3 & 4) | Client Component | Timer-driven progress bar animation |
-| Session timeout modal | Client Component | Timer and user interaction |
-| Delete confirmation modal | Client Component | User interaction |
+| Navigation bar                               | Client Component | Requires auth state and active route highlighting      |
+| Charity profile edit form                    | Client Component | Controlled inputs and form state                       |
+| Answer text areas (Step 4)                   | Client Component | Auto-save requires `onChange` and debounce             |
+| AI loading state (Steps 3 & 4)               | Client Component | Timer-driven progress bar animation                    |
+| Session timeout modal                        | Client Component | Timer and user interaction                             |
+| Delete confirmation modal                    | Client Component | User interaction                                       |
 
 **Loading states:** Next.js `loading.tsx` files provide Suspense-based page-level loading skeletons where server data fetch may be slow.
 
@@ -437,27 +442,27 @@ React Server Components are the default. `"use client"` is added only to compone
 
 Server Actions handle all data mutations. Defined in `app/actions/` with the `"use server"` directive. Called directly from Client Components or Server Components. All inputs validated with Zod. (ADR-ARCH-003)
 
-| Action file | Functions |
-|---|---|
-| `actions/auth.ts` | Auth actions: sign in, register, reset password, change password, sign out |
-| `actions/charity.ts` | `saveCharityProfile(data)` |
+| Action file               | Functions                                                                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `actions/auth.ts`         | Auth actions: sign in, register, reset password, change password, sign out                                                                                   |
+| `actions/charity.ts`      | `saveCharityProfile(data)`                                                                                                                                   |
 | `actions/applications.ts` | `createApplication`, `updateStep1`, `deleteApplication`, `advanceToStep4`, `saveAnswer`, `saveManualAnswer`, `setDraftReadyToAssemble`, `assembleAndAdvance` |
 
 ### API Routes
 
 Explicit API routes handle long-running operations, file handling, export, and scheduled jobs. (ADR-ARCH-003)
 
-| Route | Method | Purpose | Config |
-|---|---|---|---|
-| `/api/generate-summary` | POST | Step 3: AI summary generation | `maxDuration = 90` |
-| `/api/refine-answer` | POST | Step 4: Per-answer structure/clarity improvement (non-budget only) | Default timeout |
-| `/api/upload/signed-url` | POST | Request Supabase Storage signed URL | Default timeout |
-| `/api/upload/process` | POST | Extract text after upload; store in sessionStorage | Default timeout |
-| `/api/export/[id]` | GET | Generate and stream Word document | Default timeout |
-| `/api/cron/cleanup-guidelines` | GET | Delete orphaned Storage objects | Cron: daily 02:00 UTC |
-| `/api/cron/inactivity-warning` | GET | Send inactivity warning emails | Cron: 08:00 UTC daily |
-| `/api/cron/inactivity-deletion` | GET | Delete inactive accounts ≥24 months | Cron: 09:00 UTC daily |
-| `/api/account/delete` | POST | Cascade-delete user account and all data | Default timeout |
+| Route                           | Method | Purpose                                                            | Config                |
+| ------------------------------- | ------ | ------------------------------------------------------------------ | --------------------- |
+| `/api/generate-summary`         | POST   | Step 3: AI summary generation                                      | `maxDuration = 90`    |
+| `/api/refine-answer`            | POST   | Step 4: Per-answer structure/clarity improvement (non-budget only) | Default timeout       |
+| `/api/upload/signed-url`        | POST   | Request Supabase Storage signed URL                                | Default timeout       |
+| `/api/upload/process`           | POST   | Extract text after upload; store in sessionStorage                 | Default timeout       |
+| `/api/export/[id]`              | GET    | Generate and stream Word document                                  | Default timeout       |
+| `/api/cron/cleanup-guidelines`  | GET    | Delete orphaned Storage objects                                    | Cron: daily 02:00 UTC |
+| `/api/cron/inactivity-warning`  | GET    | Send inactivity warning emails                                     | Cron: 08:00 UTC daily |
+| `/api/cron/inactivity-deletion` | GET    | Delete inactive accounts ≥24 months                                | Cron: 09:00 UTC daily |
+| `/api/account/delete`           | POST   | Cascade-delete user account and all data                           | Default timeout       |
 
 **Removed routes (v1.0):** `/api/generate-draft` — removed in 2026-05-28 Q&A redesign. Draft generation is replaced by the charity-authored Q&A model; only refine-answer (per-question, on request) remains.
 
@@ -470,11 +475,11 @@ const schema = z.object({
   applicationId: z.string().uuid(),
   questionText: z.string().min(1).max(2000),
   wordLimit: z.number().int().positive().nullable(),
-});
+})
 
-const result = schema.safeParse(input);
+const result = schema.safeParse(input)
 if (!result.success) {
-  return { error: 'Invalid input' };
+  return { error: 'Invalid input' }
 }
 ```
 
@@ -512,10 +517,10 @@ Step 3: Client notifies server
 
 Both extraction functions live in `lib/extract-text.ts`. (ADR-FILE-003)
 
-| File type | Library | Fallback behaviour |
-|---|---|---|
-| `.pdf` | `unpdf` | If text < 100 chars: "This PDF appears to be scanned — please paste the text instead." |
-| `.docx` | `mammoth` | If extraction throws: user-friendly error message |
+| File type              | Library        | Fallback behaviour                                                                       |
+| ---------------------- | -------------- | ---------------------------------------------------------------------------------------- |
+| `.pdf`                 | `unpdf`        | If text < 100 chars: "This PDF appears to be scanned — please paste the text instead."   |
+| `.docx`                | `mammoth`      | If extraction throws: user-friendly error message                                        |
 | Password-protected PDF | `unpdf` throws | "This PDF is password protected — please remove the password or paste the text instead." |
 
 If extracted text exceeds 100,000 tokens (~75,000 words), a plain-language advisory message is shown before processing. The user may proceed with the full document or upload a trimmed version. No hard truncation is applied — the document is passed to the AI in full (PDR-AI-004, ADR-AI-007).
@@ -533,16 +538,15 @@ After successful text extraction, the guidelines text is stored in `sessionStora
 
 ```typescript
 // lib/guidelines-session.ts
-const key = (applicationId: string) => `guidelines_text_${applicationId}`;
+const key = (applicationId: string) => `guidelines_text_${applicationId}`
 
 export const setGuidelines = (applicationId: string, text: string) =>
-  sessionStorage.setItem(key(applicationId), text);
+  sessionStorage.setItem(key(applicationId), text)
 
-export const getGuidelines = (applicationId: string) =>
-  sessionStorage.getItem(key(applicationId));
+export const getGuidelines = (applicationId: string) => sessionStorage.getItem(key(applicationId))
 
 export const clearGuidelines = (applicationId: string) =>
-  sessionStorage.removeItem(key(applicationId));
+  sessionStorage.removeItem(key(applicationId))
 ```
 
 The `sessionStorage` entry is cleared when Step 3 completes successfully. If the user closes the tab, the browser clears `sessionStorage` automatically — no guidelines data persists across sessions.
@@ -564,15 +568,22 @@ All prompts are defined in `lib/prompts.ts`. AI routes import from this file —
 
 ```typescript
 // lib/prompts.ts
-export const MODEL = 'anthropic.claude-sonnet-4-6'; // Bedrock In-Region model ID
+export const MODEL = 'anthropic.claude-sonnet-4-6' // Bedrock In-Region model ID
 
 // Step 3: extract structured summary from funder guidelines
-export const buildSummaryPrompt = (guidelinesText: string, charity: CharityContext | null): string => `...`
+export const buildSummaryPrompt = (
+  guidelinesText: string,
+  charity: CharityContext | null,
+): string => `...`
 // Returns JSON: { funder_type, aboutGrant, amount, whoCanApply, lookingFor,
 //                 questions[], sections[], keyRequirements, funderAiPolicy, supportingDocuments }
 
 // Step 4: improve structure/clarity of a written answer (non-budget only)
-export const buildRefinePrompt = (questionText: string, answerText: string, wordLimit: number | null): string => `...`
+export const buildRefinePrompt = (
+  questionText: string,
+  answerText: string,
+  wordLimit: number | null,
+): string => `...`
 // Returns JSON: { "refinedText": "..." }
 ```
 
@@ -586,10 +597,11 @@ export type AiSummaryQuestion = {
   is_budget_question: boolean
 }
 
-export type AiSummarySection = {         // new — 2026-05-29
+export type AiSummarySection = {
+  // new — 2026-05-29
   number: number
-  title: string                          // e.g. "About your organisation"
-  guidance: string                       // 2–3 sentences from funder's instructions
+  title: string // e.g. "About your organisation"
+  guidance: string // 2–3 sentences from funder's instructions
   wordLimit?: number
   is_budget_section: boolean
 }
@@ -600,8 +612,8 @@ export type AiSummaryData = {
   amount: string
   whoCanApply: string[]
   lookingFor: string[]
-  questions: AiSummaryQuestion[]         // populated for structured funders; [] for free_form
-  sections?: AiSummarySection[]          // populated for free_form funders; [] for structured
+  questions: AiSummaryQuestion[] // populated for structured funders; [] for free_form
+  sections?: AiSummarySection[] // populated for free_form funders; [] for structured
   keyRequirements: string[]
   funderAiPolicy?: string | null
   supportingDocuments?: string[]
@@ -609,6 +621,7 @@ export type AiSummaryData = {
 ```
 
 **Funder type routing:**
+
 - `structured` funders → Step 4 Q&A interview (numbered questions, one textarea per question)
 - `free_form` funders → Step 4 section-by-section writing (section title + guidance, one textarea per section)
 
@@ -625,10 +638,10 @@ const { count } = await supabase
   .from('ai_usage_log')
   .select('*', { count: 'exact', head: true })
   .eq('user_id', userId)
-  .gte('created_at', startOfMonth);
+  .gte('created_at', startOfMonth)
 
 if (count >= 50) {
-  return { error: 'USAGE_LIMIT_REACHED', resetDate: endOfMonth };
+  return { error: 'USAGE_LIMIT_REACHED', resetDate: endOfMonth }
 }
 ```
 
@@ -638,32 +651,33 @@ On successful AI response, a row is inserted into `ai_usage_log`. A failed reque
 
 Per-user sliding window rate limiting via Upstash Redis (`@upstash/ratelimit`) is applied to both AI routes. (ADR-SEC-005)
 
-| Route | Limit |
-|---|---|
+| Route                   | Limit                              |
+| ----------------------- | ---------------------------------- |
 | `/api/generate-summary` | 5 requests per 60 seconds per user |
-| `/api/refine-answer` | 5 requests per 60 seconds per user |
+| `/api/refine-answer`    | 5 requests per 60 seconds per user |
 
-Rate limit exceeded → HTTP 429 with message: *"Too many requests. Please wait a moment before trying again."*
+Rate limit exceeded → HTTP 429 with message: _"Too many requests. Please wait a moment before trying again."_
 
 ### Error handling
 
 All Bedrock Claude API calls go through `lib/ai-error-handler.ts`. (ADR-AI-009)
 
 **Retry behaviour:**
+
 - Transient errors (429, 500, 529): retry up to 2 times with 1s then 3s delays
 - Non-transient errors (400, auth): no retry — surface immediately
 - Step 4 JSON parse failure: one automatic retry before surfacing as an error
 
 **User-facing error messages:**
 
-| Error | Message |
-|---|---|
-| Rate limit (after retries) | "Our AI service is a little busy right now. Please try again in a few minutes." |
-| Server error (after retries) | "Something went wrong with our AI service. Please try again." |
-| Bad request | "We couldn't process your request. Please check your inputs and try again." |
-| Timeout | "AI generation is taking longer than expected. Please try again." |
-| JSON parse failure (after retry) | "We had trouble formatting your draft answers. Please try again." |
-| Usage limit | "You've used all 50 of your AI requests this month. Your allowance resets on [date]." |
+| Error                            | Message                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------- |
+| Rate limit (after retries)       | "Our AI service is a little busy right now. Please try again in a few minutes."       |
+| Server error (after retries)     | "Something went wrong with our AI service. Please try again."                         |
+| Bad request                      | "We couldn't process your request. Please check your inputs and try again."           |
+| Timeout                          | "AI generation is taking longer than expected. Please try again."                     |
+| JSON parse failure (after retry) | "We had trouble formatting your draft answers. Please try again."                     |
+| Usage limit                      | "You've used all 50 of your AI requests this month. Your allowance resets on [date]." |
 
 ### Loading state (Steps 3 and 4)
 
@@ -671,11 +685,11 @@ A teal progress bar with staged text messages is shown during AI generation. The
 
 **Step 3 stages:**
 
-| Bar | Message |
-|---|---|
-| 0% | "Reading your funder guidelines..." |
-| 60% | "Almost there..." |
-| 100% | Content appears |
+| Bar  | Message                             |
+| ---- | ----------------------------------- |
+| 0%   | "Reading your funder guidelines..." |
+| 60%  | "Almost there..."                   |
+| 100% | Content appears                     |
 
 **Step 4 — per-question refine:**
 
@@ -692,6 +706,7 @@ Step 5 allows the user to download their completed application as a Microsoft Wo
 **Route:** `GET /api/export/[applicationId]`
 
 **Process:**
+
 1. Middleware verifies the user session (unauthenticated → 401)
 2. Route confirms `applications.user_id = auth.uid()` for the given ID (not the owner → 403)
 3. Fetches application details and all `application_answers` rows
@@ -699,12 +714,14 @@ Step 5 allows the user to download their completed application as a Microsoft Wo
 5. Returns the file as a streaming download
 
 **Response headers:**
+
 ```
 Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
 Content-Disposition: attachment; filename="[funder-name-slugified]-application.docx"
 ```
 
 **Document structure:**
+
 - Cover section: funder name, fund name, charity name, export date
 - One section per question: question text as a heading, draft answer as body text, word count where a word limit was specified
 - Unanswered questions included with a blank answer section
@@ -721,14 +738,14 @@ Document generation is fast (milliseconds). No `maxDuration` extension is needed
 
 Configured globally in `next.config.js`. (ADR-SEC-004)
 
-| Header | Value |
-|---|---|
-| `X-Frame-Options` | `DENY` |
-| `X-Content-Type-Options` | `nosniff` |
-| `Referrer-Policy` | `strict-origin-when-cross-origin` |
-| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` |
-| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` |
-| `Content-Security-Policy` | `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'` |
+| Header                      | Value                                                                                                                                                                             |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `X-Frame-Options`           | `DENY`                                                                                                                                                                            |
+| `X-Content-Type-Options`    | `nosniff`                                                                                                                                                                         |
+| `Referrer-Policy`           | `strict-origin-when-cross-origin`                                                                                                                                                 |
+| `Permissions-Policy`        | `camera=(), microphone=(), geolocation=()`                                                                                                                                        |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains`                                                                                                                                             |
+| `Content-Security-Policy`   | `default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.supabase.co; frame-ancestors 'none'` |
 
 After first production deployment, validate at securityheaders.com and tighten the CSP iteratively. If third-party scripts are added, update `script-src`.
 
@@ -736,32 +753,32 @@ After first production deployment, validate at securityheaders.com and tighten t
 
 Environment variables are stored in Vercel (scoped per environment) and in `.env.local` locally. (ADR-SEC-006)
 
-| Variable | Browser accessible | Used in |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Client and server |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Client and server |
-| `SUPABASE_SERVICE_ROLE_KEY` | **No** | API routes only |
-| `AWS_ACCESS_KEY_ID` | **No** | AI API routes only (Amazon Bedrock) |
-| `AWS_SECRET_ACCESS_KEY` | **No** | AI API routes only (Amazon Bedrock) |
-| `AWS_REGION` | **No** | AI API routes only — value: `eu-west-2` |
-| `UPSTASH_REDIS_REST_URL` | **No** | AI API routes only |
-| `UPSTASH_REDIS_REST_TOKEN` | **No** | AI API routes only |
-| `CRON_SECRET` | **No** | Cron route auth |
-| `SENTRY_DSN` | Yes (public DSN) | Client and server |
+| Variable                        | Browser accessible | Used in                                 |
+| ------------------------------- | ------------------ | --------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Yes                | Client and server                       |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes                | Client and server                       |
+| `SUPABASE_SERVICE_ROLE_KEY`     | **No**             | API routes only                         |
+| `AWS_ACCESS_KEY_ID`             | **No**             | AI API routes only (Amazon Bedrock)     |
+| `AWS_SECRET_ACCESS_KEY`         | **No**             | AI API routes only (Amazon Bedrock)     |
+| `AWS_REGION`                    | **No**             | AI API routes only — value: `eu-west-2` |
+| `UPSTASH_REDIS_REST_URL`        | **No**             | AI API routes only                      |
+| `UPSTASH_REDIS_REST_TOKEN`      | **No**             | AI API routes only                      |
+| `CRON_SECRET`                   | **No**             | Cron route auth                         |
+| `SENTRY_DSN`                    | Yes (public DSN)   | Client and server                       |
 
 A `.env.example` file with placeholder values is committed to the repository. `.env.local` is in `.gitignore` and must never be committed.
 
 ### Defence-in-depth summary
 
-| Layer | Protection |
-|---|---|
-| Middleware | Unauthenticated users cannot access any protected route |
-| RLS policies | Database rejects cross-user queries even if application code has a bug |
+| Layer                    | Protection                                                              |
+| ------------------------ | ----------------------------------------------------------------------- |
+| Middleware               | Unauthenticated users cannot access any protected route                 |
+| RLS policies             | Database rejects cross-user queries even if application code has a bug  |
 | Server-side only secrets | `SUPABASE_SERVICE_ROLE_KEY` and AWS credentials never reach the browser |
-| Zod validation | All inputs validated before processing |
-| Rate limiting | Upstash prevents rapid-fire AI route abuse |
-| Usage cap | 50 AI requests/user/month hard limit |
-| Security headers | CSP, HSTS, X-Frame-Options protect against client-side attacks |
+| Zod validation           | All inputs validated before processing                                  |
+| Rate limiting            | Upstash prevents rapid-fire AI route abuse                              |
+| Usage cap                | 50 AI requests/user/month hard limit                                    |
+| Security headers         | CSP, HSTS, X-Frame-Options protect against client-side attacks          |
 
 ---
 
@@ -778,6 +795,7 @@ Vercel automatic Git deployment. (ADR-OPS-002)
 **Always verify the feature branch preview URL before merging to `main`.**
 
 **Per-release deployment process:**
+
 1. Apply pending migrations: `supabase db push --db-url [prod-url]`
 2. Verify the feature branch preview deployment
 3. Merge to `main`
@@ -798,10 +816,12 @@ Vercel Cron Jobs handle application-level scheduled tasks. (ADR-OPS-004)
 ```json
 // vercel.json
 {
-  "crons": [{
-    "path": "/api/cron/cleanup-storage",
-    "schedule": "*/30 * * * *"
-  }]
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-storage",
+      "schedule": "*/30 * * * *"
+    }
+  ]
 }
 ```
 
@@ -814,6 +834,7 @@ Sentry (EU region) captures all unhandled errors on server and client. (ADR-OPS-
 **Two key configuration points:**
 
 1. **PII scrubbing** — `beforeSend` hook strips `user.email` and `user.name` from all events:
+
 ```typescript
 beforeSend(event) {
   if (event.user) { delete event.user.email; delete event.user.username; }
@@ -822,11 +843,12 @@ beforeSend(event) {
 ```
 
 2. **AI route tagging** — errors in AI generation routes are tagged for separate filtering:
+
 ```typescript
 Sentry.withScope((scope) => {
-  scope.setTag('route', 'generate-summary');
-  Sentry.captureException(error);
-});
+  scope.setTag('route', 'generate-summary')
+  Sentry.captureException(error)
+})
 ```
 
 Alert configuration: email on new error types only (not every occurrence).
@@ -894,15 +916,15 @@ SENTRY_DSN=
 
 ### Useful commands
 
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Start development server |
-| `supabase start` | Start local Supabase stack |
-| `supabase stop` | Stop local Supabase stack |
-| `supabase db reset` | Reset local database (applies all migrations + seed) |
-| `supabase db diff --schema public` | Generate migration from dashboard changes |
-| `supabase db push --db-url [url]` | Apply migrations to remote project |
-| `supabase status` | Show local project URLs and keys |
+| Command                            | Purpose                                              |
+| ---------------------------------- | ---------------------------------------------------- |
+| `npm run dev`                      | Start development server                             |
+| `supabase start`                   | Start local Supabase stack                           |
+| `supabase stop`                    | Stop local Supabase stack                            |
+| `supabase db reset`                | Reset local database (applies all migrations + seed) |
+| `supabase db diff --schema public` | Generate migration from dashboard changes            |
+| `supabase db push --db-url [url]`  | Apply migrations to remote project                   |
+| `supabase status`                  | Show local project URLs and keys                     |
 
 ---
 
@@ -931,14 +953,14 @@ The following one-time tasks must be completed before the first production deplo
 
 ## Document History
 
-| Version | Date | Author | Summary of changes |
-|---------|------|--------|--------------------|
-| 1.0 | 2026-04-21 | Rapidglobe Ltd | Initial document — full technical design covering all 16 sections |
-| 1.1 | 2026-05-07 | Rapidglobe Ltd | Updated database schema (assembled_draft, draft_status columns; corrected status values; renamed fund_name → grant_name); corrected application_answers schema (question_order, answer_source, is_budget_question); updated ai_usage_log schema (token_count, request_type values) |
-| 1.2 | 2026-05-20 | Rapidglobe Ltd | Updated Server Actions table and API Routes table to reflect current implementations; added GAP notes from Phase 3 → Phase 4 gate sweep |
-| 1.3 | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to AiSummaryData; updated funder type routing description (structured vs free_form paths); removed /api/generate-draft from API routes table (replaced by /api/refine-answer); updated AI usage cap from 20 to 50 requests/user/month throughout; removed Step 4 page-level loading stages (no longer applicable after Q&A redesign); added document history table |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-04-21 | Rapidglobe Ltd | Initial document — full technical design covering all 16 sections                                                                                                                                                                                                                                                                                                                                                  |
+| 1.1     | 2026-05-07 | Rapidglobe Ltd | Updated database schema (assembled_draft, draft_status columns; corrected status values; renamed fund_name → grant_name); corrected application_answers schema (question_order, answer_source, is_budget_question); updated ai_usage_log schema (token_count, request_type values)                                                                                                                                 |
+| 1.2     | 2026-05-20 | Rapidglobe Ltd | Updated Server Actions table and API Routes table to reflect current implementations; added GAP notes from Phase 3 → Phase 4 gate sweep                                                                                                                                                                                                                                                                            |
+| 1.3     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to AiSummaryData; updated funder type routing description (structured vs free_form paths); removed /api/generate-draft from API routes table (replaced by /api/refine-answer); updated AI usage cap from 20 to 50 requests/user/month throughout; removed Step 4 page-level loading stages (no longer applicable after Q&A redesign); added document history table |
 
 ---
 
-*Technical Design Document — Grant Pathway v1*
-*All 42 architectural decisions recorded in `business/Technical Decision and Design/ADR-*.md`*
+_Technical Design Document — Grant Pathway v1_
+_All 42 architectural decisions recorded in `business/Technical Decision and Design/ADR-_.md`\*

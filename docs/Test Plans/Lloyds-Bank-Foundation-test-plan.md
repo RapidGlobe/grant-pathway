@@ -20,7 +20,7 @@ This test plan covers an end-to-end test of Grant Pathway using the **Lloyds Ban
 
 **Guidelines source:** Lloyds Bank Foundation publishes a downloadable **Word document** example application form. This tests the Word (.docx) upload path — distinct from the PDF upload path used in previous test cycles.
 
-**AI policy:** Lloyds E&W explicitly permits AI use with conditions: *"Use AI for drafting/grammar, then thoroughly customise responses."* Grant Pathway's model (charity writes content, AI refines on request) is compliant. No mismatch expected on AI policy grounds.
+**AI policy:** Lloyds E&W explicitly permits AI use with conditions: _"Use AI for drafting/grammar, then thoroughly customise responses."_ Grant Pathway's model (charity writes content, AI refines on request) is compliant. No mismatch expected on AI policy grounds.
 
 **Note:** The Specialist Programme is currently closed pending summer 2026 reopening. Testing uses the published example application form (Word document). When the programme reopens, this test plan should be re-run against live guidelines.
 
@@ -31,24 +31,28 @@ This test plan covers an end-to-end test of Grant Pathway using the **Lloyds Ban
 ## Pre-Test Setup
 
 ### Account 1 — Harry's Rainbow (existing)
+
 - Email: `grantpathway+idle1@gmail.com`
 - Profile should be set to the **original** Harry's Rainbow description (children's bereavement charity, Milton Keynes). If it was modified during previous testing, revert it before starting.
 
 ### Account 2 — New Leaf (new account to create)
+
 Register `grantpathway+lloyds1@gmail.com` and set up the following charity profile:
 
-| Field | Value |
-|-------|-------|
-| First name | Marcus |
-| Last name | Webb |
-| Charity name | New Leaf |
-| Registration number | 1198342 |
-| What does your charity do? | New Leaf provides intensive, relationship-based support for care leavers and young people leaving the criminal justice system aged 16–25 in Greater Manchester. We offer one-to-one key worker support, peer mentoring, and practical assistance with housing, employment, and life skills. We work closely with local authorities, probation services, and housing providers to prevent homelessness and reoffending among young people making the transition to independent living. |
-| Who does your charity help? | Care leavers and young people aged 16–25 leaving the criminal justice system in Greater Manchester, particularly those at risk of homelessness and reoffending. Approximately 70% of our beneficiaries have experience of both the care and justice systems. |
-| Where do you work? | Greater Manchester (Salford, Wigan, and Bolton) |
+| Field                       | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First name                  | Marcus                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Last name                   | Webb                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Charity name                | New Leaf                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Registration number         | 1198342                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| What does your charity do?  | New Leaf provides intensive, relationship-based support for care leavers and young people leaving the criminal justice system aged 16–25 in Greater Manchester. We offer one-to-one key worker support, peer mentoring, and practical assistance with housing, employment, and life skills. We work closely with local authorities, probation services, and housing providers to prevent homelessness and reoffending among young people making the transition to independent living. |
+| Who does your charity help? | Care leavers and young people aged 16–25 leaving the criminal justice system in Greater Manchester, particularly those at risk of homelessness and reoffending. Approximately 70% of our beneficiaries have experience of both the care and justice systems.                                                                                                                                                                                                                          |
+| Where do you work?          | Greater Manchester (Salford, Wigan, and Bolton)                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 ### Guidelines file
+
 Download the Lloyds Bank Foundation example application form:
+
 - URL: https://www.lloydsbankfoundation.org.uk/media/yytlgce2/example-application-form-specialist-funding-programme-2023-24.docx
 - Save as `docs/Grant Org Guidelines/lloyds-bank-foundation-specialist-programme-example-form.docx`
 - This is a Word (.docx) file — tests the DOCX upload path
@@ -61,41 +65,41 @@ Download the Lloyds Bank Foundation example application form:
 
 ### Account 1 — Harry's Rainbow (mismatch test)
 
-| Item | Value |
-|------|-------|
-| Test user email | grantpathway+idle1@gmail.com |
-| Charity name | Harry's Rainbow |
-| Funder | Lloyds Bank Foundation |
-| Grant programme | Specialist Programme — Bereavement Support 2026 |
-| Guidelines file | lloyds-bank-foundation-specialist-programme-example-form.docx |
+| Item                         | Value                                                                     |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| Test user email              | grantpathway+idle1@gmail.com                                              |
+| Charity name                 | Harry's Rainbow                                                           |
+| Funder                       | Lloyds Bank Foundation                                                    |
+| Grant programme              | Specialist Programme — Bereavement Support 2026                           |
+| Guidelines file              | lloyds-bank-foundation-specialist-programme-example-form.docx             |
 | Expected eligibility outcome | Mismatch (bereavement not in Lloyds E&W's complex social exclusion focus) |
 
 ### Account 2 — New Leaf (happy path)
 
-| Item | Value |
-|------|-------|
-| Test user email | grantpathway+lloyds1@gmail.com |
-| Charity name | New Leaf |
-| Registration number | 1198342 |
-| Funder | Lloyds Bank Foundation |
-| Grant programme | Specialist Programme — Care Leavers Support 2026 |
-| Grant amount | £75,000 over 3 years (unrestricted) |
-| Guidelines file | lloyds-bank-foundation-specialist-programme-example-form.docx |
-| Guidelines input method | File upload (DOCX) |
-| Expected eligibility outcome | Pass |
+| Item                         | Value                                                         |
+| ---------------------------- | ------------------------------------------------------------- |
+| Test user email              | grantpathway+lloyds1@gmail.com                                |
+| Charity name                 | New Leaf                                                      |
+| Registration number          | 1198342                                                       |
+| Funder                       | Lloyds Bank Foundation                                        |
+| Grant programme              | Specialist Programme — Care Leavers Support 2026              |
+| Grant amount                 | £75,000 over 3 years (unrestricted)                           |
+| Guidelines file              | lloyds-bank-foundation-specialist-programme-example-form.docx |
+| Guidelines input method      | File upload (DOCX)                                            |
+| Expected eligibility outcome | Pass                                                          |
 
 ---
 
 ## Known Expected Behaviours
 
-| Ref | Description |
-|-----|-------------|
-| IT-LBF-02 | Harry's Rainbow is expected to trigger an eligibility mismatch. Bereavement support for children is not in Lloyds E&W's focus areas (homelessness, domestic abuse, addiction, care leavers, offending, trafficking). |
-| D-WF-01 (fixed) | Optional sections now show the approve button even when empty, and do not block the assembly gate. Verify the fix is working during IT-LBF-10. |
-| D-WF-04 (fixed) | Re-export warning now appears after re-open/re-approve cycle. Verify during IT-LBF-13. |
-| D-WF-05 (fixed) | Export date now includes HH:MM timestamp. Verify in exported document. |
-| Non-narrative questions | Lloyds form includes many data-entry, dropdown, financial, and file-upload fields. These should be absent from Step 4. Key narrative questions listed below. |
-| DOCX upload path | This is the first test plan to use a DOCX file as the primary guidelines source. Step 2 file upload (not paste) is the input method. |
+| Ref                     | Description                                                                                                                                                                                                          |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-LBF-02               | Harry's Rainbow is expected to trigger an eligibility mismatch. Bereavement support for children is not in Lloyds E&W's focus areas (homelessness, domestic abuse, addiction, care leavers, offending, trafficking). |
+| D-WF-01 (fixed)         | Optional sections now show the approve button even when empty, and do not block the assembly gate. Verify the fix is working during IT-LBF-10.                                                                       |
+| D-WF-04 (fixed)         | Re-export warning now appears after re-open/re-approve cycle. Verify during IT-LBF-13.                                                                                                                               |
+| D-WF-05 (fixed)         | Export date now includes HH:MM timestamp. Verify in exported document.                                                                                                                                               |
+| Non-narrative questions | Lloyds form includes many data-entry, dropdown, financial, and file-upload fields. These should be absent from Step 4. Key narrative questions listed below.                                                         |
+| DOCX upload path        | This is the first test plan to use a DOCX file as the primary guidelines source. Step 2 file upload (not paste) is the input method.                                                                                 |
 
 ---
 
@@ -103,76 +107,76 @@ Download the Lloyds Bank Foundation example application form:
 
 Key narrative questions from the Lloyds Specialist Programme example form:
 
-| # | Question (abbreviated) | Word limit |
-|---|------------------------|------------|
-| Q2 | History and background of the charity | 250 words |
-| Q3 | Main activities and benefits to people supported | 500 words |
-| Q4 | How the charity engages people with lived experience | 250 words |
-| Q5 | How you track an individual person's progress | 250 words |
-| Q6 | Outcomes — differences made to lives of people supported (1–3 outcomes) | 50 words each |
-| Q19 | Key financial information | 250 words |
-| Q21 | What the grant will fund | 500 words |
-| Q25 | Difference the grant will make (outcomes, 1–3) | 50 words each |
-| Q27 | Track record — why you are the right organisation | 250 words |
-| Q28 | Collaboration — unique offer, partners, avoiding duplication | 250 words |
-| Q29 | Gap in services — what would happen without this service | 250 words |
-| Q30 | Social need and impact | 500 words |
-| Q31 | Sustainability — plans beyond funding period | 50 words |
+| #   | Question (abbreviated)                                                  | Word limit    |
+| --- | ----------------------------------------------------------------------- | ------------- |
+| Q2  | History and background of the charity                                   | 250 words     |
+| Q3  | Main activities and benefits to people supported                        | 500 words     |
+| Q4  | How the charity engages people with lived experience                    | 250 words     |
+| Q5  | How you track an individual person's progress                           | 250 words     |
+| Q6  | Outcomes — differences made to lives of people supported (1–3 outcomes) | 50 words each |
+| Q19 | Key financial information                                               | 250 words     |
+| Q21 | What the grant will fund                                                | 500 words     |
+| Q25 | Difference the grant will make (outcomes, 1–3)                          | 50 words each |
+| Q27 | Track record — why you are the right organisation                       | 250 words     |
+| Q28 | Collaboration — unique offer, partners, avoiding duplication            | 250 words     |
+| Q29 | Gap in services — what would happen without this service                | 250 words     |
+| Q30 | Social need and impact                                                  | 500 words     |
+| Q31 | Sustainability — plans beyond funding period                            | 50 words      |
 
 **Non-narrative questions expected to be absent from Step 4:**
 
-| Question | Type |
-|----------|------|
-| Q1 Charity classification | Dropdown |
-| Q7–Q11 Trustees/volunteers/staff numbers | Numbers |
-| Q12 Management structure | Data entry (names and roles) |
-| Q13 Links to national charity | Conditional |
-| Q14 Charity regulator registration | Checkbox |
-| Q15 Data protection registration | Checkbox |
-| Q16 Policies and procedures | Multi-select |
-| Q17 Quality marks | Data entry (names and dates) |
-| Q18 Financial overview (income/expenditure tables) | Financial figures |
-| Q20 Amount requested | Number |
-| Q22 Existing or new work | Dropdown |
-| Q23 Preferred start date | Date |
-| Q24 Number of people benefiting | Number |
-| Q26 Only organisation offering this service | Dropdown |
-| Q32 Total funding required — cost breakdown | Financial table |
-| Q33 Funding secured/pending | Financial data |
-| Q34 Outstanding amount to raise | Number |
-| Supporting documents | File uploads |
+| Question                                           | Type                         |
+| -------------------------------------------------- | ---------------------------- |
+| Q1 Charity classification                          | Dropdown                     |
+| Q7–Q11 Trustees/volunteers/staff numbers           | Numbers                      |
+| Q12 Management structure                           | Data entry (names and roles) |
+| Q13 Links to national charity                      | Conditional                  |
+| Q14 Charity regulator registration                 | Checkbox                     |
+| Q15 Data protection registration                   | Checkbox                     |
+| Q16 Policies and procedures                        | Multi-select                 |
+| Q17 Quality marks                                  | Data entry (names and dates) |
+| Q18 Financial overview (income/expenditure tables) | Financial figures            |
+| Q20 Amount requested                               | Number                       |
+| Q22 Existing or new work                           | Dropdown                     |
+| Q23 Preferred start date                           | Date                         |
+| Q24 Number of people benefiting                    | Number                       |
+| Q26 Only organisation offering this service        | Dropdown                     |
+| Q32 Total funding required — cost breakdown        | Financial table              |
+| Q33 Funding secured/pending                        | Financial data               |
+| Q34 Outstanding amount to raise                    | Number                       |
+| Supporting documents                               | File uploads                 |
 
 ---
 
 ## Test Results Summary
 
-| Test ID | Test Name | LBF-specific | AI Summary Time | Result | Notes |
-|---------|-----------|-------------|----------------|--------|-------|
-| IT-LBF-01 | Harry's Rainbow sign in and profile verification | No | N/A | ✅ Pass | |
-| IT-LBF-02 | Harry's Rainbow — Lloyds funder picker and guidelines upload | Yes | | ✅ Pass | |
-| IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed | Yes | N/A | ✅ Pass | Ineligible badge shown on dashboard; FR-47 hard stop confirmed |
-| IT-LBF-04 | New Leaf account registration and profile setup | No | N/A | ✅ Pass | Registration number omitted (optional field) — profile saved successfully without it |
-| IT-LBF-05 | New Leaf — Lloyds funder picker | Yes | N/A | ✅ Pass | |
-| IT-LBF-06 | New Leaf — DOCX upload and AI summary | Yes | 24s | ✅ Pass | 10 questions extracted. Question set differs from test plan expectation — actual form has 500/600-word narrative questions. IT-LBF-09 table updated to reflect actual questions. Q3 (quality marks, 150 words) borderline — monitor in IT-LBF-10. |
-| IT-LBF-07 | New Leaf — eligibility check passes | Yes | N/A | ✅ Pass | Preparation checklist appeared correctly |
-| IT-LBF-08 | New Leaf — AI summary content accuracy | Yes | N/A | ✅ Pass | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected |
-| IT-LBF-09 | New Leaf — narrative question extraction and word limits | Yes | N/A | ✅ Pass | All 10 questions present with correct word limits. Q3 (quality marks, 150 words) included as writing card — borderline but acceptable as form assigns word limit |
-| IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01) | Yes | N/A | ✅ Pass | No financial questions displayed. Ready to assemble visible with Q10 empty — D-WF-01 fix confirmed. D-LBF-01 raised: optional label buried in Q10 question text, not visible as a card badge |
-| IT-LBF-11 | New Leaf — narrative answer writing and AI assist | No | N/A | ✅ Pass | D-LBF-02 (over-limit approval) and D-LBF-03 (optional Q10 blocks assembly) found during this test |
-| IT-LBF-12 | New Leaf — answer approval and Step 5 navigation | No | N/A | ✅ Pass | Funder, grant name, checkboxes, and assembled draft all correct |
-| IT-LBF-13 | New Leaf — export; timestamp fix (D-WF-05); re-export warning fix (D-WF-04) | No | N/A | ✅ Pass (2 defects) | D-WF-05 ✅ timestamp in doc. D-WF-04 ✅ re-export warning appears inc. after re-open/re-approve. D-LBF-04: re-export dialog shows date only, missing HH:MM. D-LBF-05: plain text download produces no file. |
+| Test ID   | Test Name                                                                   | LBF-specific | AI Summary Time | Result              | Notes                                                                                                                                                                                                                                             |
+| --------- | --------------------------------------------------------------------------- | ------------ | --------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-LBF-01 | Harry's Rainbow sign in and profile verification                            | No           | N/A             | ✅ Pass             |                                                                                                                                                                                                                                                   |
+| IT-LBF-02 | Harry's Rainbow — Lloyds funder picker and guidelines upload                | Yes          |                 | ✅ Pass             |                                                                                                                                                                                                                                                   |
+| IT-LBF-03 | Harry's Rainbow — eligibility mismatch confirmed                            | Yes          | N/A             | ✅ Pass             | Ineligible badge shown on dashboard; FR-47 hard stop confirmed                                                                                                                                                                                    |
+| IT-LBF-04 | New Leaf account registration and profile setup                             | No           | N/A             | ✅ Pass             | Registration number omitted (optional field) — profile saved successfully without it                                                                                                                                                              |
+| IT-LBF-05 | New Leaf — Lloyds funder picker                                             | Yes          | N/A             | ✅ Pass             |                                                                                                                                                                                                                                                   |
+| IT-LBF-06 | New Leaf — DOCX upload and AI summary                                       | Yes          | 24s             | ✅ Pass             | 10 questions extracted. Question set differs from test plan expectation — actual form has 500/600-word narrative questions. IT-LBF-09 table updated to reflect actual questions. Q3 (quality marks, 150 words) borderline — monitor in IT-LBF-10. |
+| IT-LBF-07 | New Leaf — eligibility check passes                                         | Yes          | N/A             | ✅ Pass             | Preparation checklist appeared correctly                                                                                                                                                                                                          |
+| IT-LBF-08 | New Leaf — AI summary content accuracy                                      | Yes          | N/A             | ✅ Pass             | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected                                                                                                                                                     |
+| IT-LBF-09 | New Leaf — narrative question extraction and word limits                    | Yes          | N/A             | ✅ Pass             | All 10 questions present with correct word limits. Q3 (quality marks, 150 words) included as writing card — borderline but acceptable as form assigns word limit                                                                                  |
+| IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01)  | Yes          | N/A             | ✅ Pass             | No financial questions displayed. Ready to assemble visible with Q10 empty — D-WF-01 fix confirmed. D-LBF-01 raised: optional label buried in Q10 question text, not visible as a card badge                                                      |
+| IT-LBF-11 | New Leaf — narrative answer writing and AI assist                           | No           | N/A             | ✅ Pass             | D-LBF-02 (over-limit approval) and D-LBF-03 (optional Q10 blocks assembly) found during this test                                                                                                                                                 |
+| IT-LBF-12 | New Leaf — answer approval and Step 5 navigation                            | No           | N/A             | ✅ Pass             | Funder, grant name, checkboxes, and assembled draft all correct                                                                                                                                                                                   |
+| IT-LBF-13 | New Leaf — export; timestamp fix (D-WF-05); re-export warning fix (D-WF-04) | No           | N/A             | ✅ Pass (2 defects) | D-WF-05 ✅ timestamp in doc. D-WF-04 ✅ re-export warning appears inc. after re-open/re-approve. D-LBF-04: re-export dialog shows date only, missing HH:MM. D-LBF-05: plain text download produces no file.                                       |
 
 ---
 
 ## Defect Log
 
-| ID | Test | Description | Severity | Status |
-|----|------|-------------|----------|--------|
-| D-LBF-01 | IT-LBF-10 | Optional question label not visible as a card badge. Q10's optional nature is buried in the question text ("This question is optional. You can use this space..."). Users may miss it and feel obligated to fill it in. Suggested fix: surface "(Optional)" as a visible badge or label on the card header, consistent with how optional sections are treated elsewhere. | Low | Fixed — optional detection updated to match both "(optional)" and "this question is optional" patterns |
-| D-LBF-02 | IT-LBF-11 | Over-limit answers can be approved. When word count exceeds the funder limit the system warns but still allows approval. A charity could paste an over-limit answer into a grant portal and have it rejected. Proposed fix: hard stop — hide/disable the approval button when the answer is over the word limit; display a red message: "Your answer is over the word limit. Please trim it or use AI to bring it within the limit before approving." Approval button reappears only when count is at or under the limit. | Medium | Fixed — `!isOver` added to approve section condition; over-limit message updated |
-| D-LBF-03 | IT-LBF-11 | D-WF-01 regression — assembly gate blocked by unapproved Q10 even though it is optional. "Ready to assemble" button is greyed out when Q10 is left empty and unapproved. Root cause: Q10's optional nature is declared in the question text ("This question is optional...") rather than as an explicit optional flag, so the system does not recognise it as optional and treats it as mandatory for the assembly gate. Likely same root cause as D-LBF-01. Fix: detect "optional" in question text and apply optional flag, or surface as card label — then exclude from assembly gate check. | Medium | Fixed — same fix as D-LBF-01; isOptionalQ() now covers both patterns |
-| D-LBF-04 | IT-LBF-13 | Re-export warning dialog shows date only, missing HH:MM time. Dialog reads "You last exported this application on 4 June 2026" — the time is absent. The exported Word document correctly shows the full timestamp (e.g. "04 June 2026, 08:36") per D-WF-05 fix, but the re-export dialog does not. On a day with multiple exports this leaves the user unable to identify which version was previously sent. Fix: include HH:MM in the re-export dialog timestamp to match the format used in the exported document. | Low | Fixed — formatExportDate() updated to include HH:MM |
-| D-LBF-05 | IT-LBF-13 | Plain text download button appears on Step 5 but produces no file when clicked. The Word document download works correctly. The plain text option shows a download interaction but no file is delivered to the user. | Medium | Fixed — isDownloading split into per-format states (isDownloadingDocx / isDownloadingTxt); each button now shows its own loading state independently. To be verified in retest. |
+| ID       | Test      | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Severity | Status                                                                                                                                                                          |
+| -------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D-LBF-01 | IT-LBF-10 | Optional question label not visible as a card badge. Q10's optional nature is buried in the question text ("This question is optional. You can use this space..."). Users may miss it and feel obligated to fill it in. Suggested fix: surface "(Optional)" as a visible badge or label on the card header, consistent with how optional sections are treated elsewhere.                                                                                                                                                                                                                        | Low      | Fixed — optional detection updated to match both "(optional)" and "this question is optional" patterns                                                                          |
+| D-LBF-02 | IT-LBF-11 | Over-limit answers can be approved. When word count exceeds the funder limit the system warns but still allows approval. A charity could paste an over-limit answer into a grant portal and have it rejected. Proposed fix: hard stop — hide/disable the approval button when the answer is over the word limit; display a red message: "Your answer is over the word limit. Please trim it or use AI to bring it within the limit before approving." Approval button reappears only when count is at or under the limit.                                                                       | Medium   | Fixed — `!isOver` added to approve section condition; over-limit message updated                                                                                                |
+| D-LBF-03 | IT-LBF-11 | D-WF-01 regression — assembly gate blocked by unapproved Q10 even though it is optional. "Ready to assemble" button is greyed out when Q10 is left empty and unapproved. Root cause: Q10's optional nature is declared in the question text ("This question is optional...") rather than as an explicit optional flag, so the system does not recognise it as optional and treats it as mandatory for the assembly gate. Likely same root cause as D-LBF-01. Fix: detect "optional" in question text and apply optional flag, or surface as card label — then exclude from assembly gate check. | Medium   | Fixed — same fix as D-LBF-01; isOptionalQ() now covers both patterns                                                                                                            |
+| D-LBF-04 | IT-LBF-13 | Re-export warning dialog shows date only, missing HH:MM time. Dialog reads "You last exported this application on 4 June 2026" — the time is absent. The exported Word document correctly shows the full timestamp (e.g. "04 June 2026, 08:36") per D-WF-05 fix, but the re-export dialog does not. On a day with multiple exports this leaves the user unable to identify which version was previously sent. Fix: include HH:MM in the re-export dialog timestamp to match the format used in the exported document.                                                                           | Low      | Fixed — formatExportDate() updated to include HH:MM                                                                                                                             |
+| D-LBF-05 | IT-LBF-13 | Plain text download button appears on Step 5 but produces no file when clicked. The Word document download works correctly. The plain text option shows a download interaction but no file is delivered to the user.                                                                                                                                                                                                                                                                                                                                                                            | Medium   | Fixed — isDownloading split into per-format states (isDownloadingDocx / isDownloadingTxt); each button now shows its own loading state independently. To be verified in retest. |
 
 ---
 
@@ -186,6 +190,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** None
 
 **Steps:**
+
 1. Go to [grant-pathway-three.vercel.app](https://grant-pathway-three.vercel.app)
 2. Sign in as `grantpathway+idle1@gmail.com`
 3. Navigate to **Charity Profile** and verify the profile reads:
@@ -196,6 +201,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 4. If the profile shows a modified version from previous testing, revert it to the above and save
 
 **Expected result:**
+
 - Sign in succeeds
 - Profile shows the original Harry's Rainbow description
 - Dashboard accessible
@@ -212,6 +218,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-01 complete
 
 **Steps:**
+
 1. From the dashboard, click **+ New Application**
 2. Type **"Lloyds"** in the funder picker
 3. Confirm **Lloyds Bank Foundation** appears with a **Structured** badge (note: CI version should no longer appear — confirm migration applied)
@@ -224,6 +231,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 10. Note whether a red eligibility mismatch warning appears
 
 **Expected result:**
+
 - "Lloyds Bank Foundation" (E&W) appears in picker — not CI version
 - DOCX uploads successfully (tests Word upload path)
 - AI summary generates without error
@@ -240,6 +248,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-02 complete
 
 **Steps:**
+
 1. If a red mismatch warning appeared on Step 3, verify it shows:
    - Red warning card with a clear mismatch reason
    - Reference to Lloyds E&W's focus on complex social exclusion/disadvantage
@@ -248,10 +257,12 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 3. Verify the dashboard shows the application with a red **"Ineligible"** badge and no Continue button
 
 **If no mismatch appeared (unexpected):**
+
 - Record as a defect — Harry's Rainbow is not a match for Lloyds E&W criteria
 - Note the AI summary content and the eligibility criteria shown
 
 **Expected result:**
+
 - Red mismatch warning displayed with clear reason
 - Application marked Ineligible on dashboard
 - FR-47 hard stop confirmed for Lloyds E&W
@@ -268,6 +279,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-03 complete (Harry's Rainbow mismatch confirmed)
 
 **Steps:**
+
 1. Sign out of Harry's Rainbow account
 2. Register `grantpathway+lloyds1@gmail.com` (first name Marcus, last name Webb)
 3. Verify the email confirmation and click the verification link
@@ -275,6 +287,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 5. Save the profile and confirm redirect to dashboard
 
 **Expected result:**
+
 - Registration and email verification completes without error
 - Charity profile saves successfully
 - Dashboard shows profile complete (no amber incomplete banner)
@@ -291,6 +304,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-04 complete
 
 **Steps:**
+
 1. From the dashboard, click **+ New Application**
 2. Type **"Lloyds"** in the funder picker
 3. Confirm **Lloyds Bank Foundation** appears with a **Structured** badge
@@ -299,6 +313,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 6. Click **Continue**
 
 **Expected result:**
+
 - Lloyds Bank Foundation appears with Structured badge
 - Application created and Step 2 displayed
 
@@ -314,6 +329,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-05 complete
 
 **Steps:**
+
 1. On Step 2, upload `lloyds-bank-foundation-specialist-programme-example-form.docx`
 2. Confirm the file is accepted
 3. Click **Continue**
@@ -324,6 +340,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 8. Click **Continue**
 
 **Expected result:**
+
 - DOCX uploads successfully
 - AI summary auto-generates within 30 seconds (NFR-01)
 - No JSON parse error
@@ -343,6 +360,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 > **Where the eligibility warning appears:** On Step 3 (AI Summary page), replacing the summary cards entirely. Reaching the preparation checklist confirms no mismatch was detected.
 
 **Steps:**
+
 1. If normal summary cards appeared and Continue was possible — confirm eligibility passed
 2. Verify the **"Before you begin writing"** preparation checklist appears with:
    - Financial sections advisory (CEO/treasurer/trustee review required)
@@ -351,11 +369,13 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 3. Click **"I have what I need — start writing"**
 
 **Expected result (no mismatch):**
+
 - New Leaf passes eligibility — care leavers/homelessness prevention is a clear fit
 - Preparation checklist displays correctly
 - "I have what I need — start writing" navigates to Step 4
 
 **If mismatch appears (unexpected):**
+
 - Record the mismatch reason as a defect
 - Log and investigate before proceeding
 
@@ -371,6 +391,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-06 complete
 
 **Verify the summary includes:**
+
 - Funder description: grants for charities tackling complex social issues / social exclusion and disadvantage
 - Eligibility: charities with annual income £25k–£500k; focus on complex social issues
 - What is funded: core operating costs or specific roles (unrestricted); 3-year funding
@@ -379,6 +400,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 - Application sections listed with word limits
 
 **Expected result:**
+
 - Summary accurately reflects Lloyds E&W Specialist Programme criteria
 - No hallucinated conditions
 - Word limits extracted correctly for narrative questions
@@ -395,26 +417,28 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-06 complete; preparation checklist confirmed
 
 **Steps:**
+
 1. On Step 4, record the total number of question/section cards displayed
 2. For each card, record: question text and displayed word limit
 3. Verify the following questions appear with correct limits (updated from actual form):
 
-| Q# | Expected question | Expected word limit | Actual limit | Present? |
-|----|-------------------|--------------------|--------------| ---------|
-| Q1 | Short summary of charity's purpose and aims | 500 words | 500 words | ✅ |
-| Q2 | Main services your charity provides | 600 words | 600 words | ✅ |
-| Q3 | Quality marks or standards held and date awarded | 150 words | 150 words | ✅ (borderline non-narrative — included as word limit assigned) |
-| Q4 | What changes are you working towards with people you support | 500 words | 500 words | ✅ |
-| Q5 | How does your organisation approach equity, diversity and inclusion | 500 words | 500 words | ✅ |
-| Q6 | How are people with lived experience involved in how your charity is run | 500 words | 500 words | ✅ |
-| Q7 | How do you support people who have experienced trauma | 500 words | 500 words | ✅ |
-| Q8 | Strengths of and opportunities for your organisation | 500 words | 500 words | ✅ |
-| Q9 | Most pressing areas for further development and how identified | 500 words | 500 words | ✅ |
-| Q10 | Anything further in support of your application (optional) | 400 words | 400 words | ✅ |
+| Q#  | Expected question                                                        | Expected word limit | Actual limit | Present?                                                        |
+| --- | ------------------------------------------------------------------------ | ------------------- | ------------ | --------------------------------------------------------------- |
+| Q1  | Short summary of charity's purpose and aims                              | 500 words           | 500 words    | ✅                                                              |
+| Q2  | Main services your charity provides                                      | 600 words           | 600 words    | ✅                                                              |
+| Q3  | Quality marks or standards held and date awarded                         | 150 words           | 150 words    | ✅ (borderline non-narrative — included as word limit assigned) |
+| Q4  | What changes are you working towards with people you support             | 500 words           | 500 words    | ✅                                                              |
+| Q5  | How does your organisation approach equity, diversity and inclusion      | 500 words           | 500 words    | ✅                                                              |
+| Q6  | How are people with lived experience involved in how your charity is run | 500 words           | 500 words    | ✅                                                              |
+| Q7  | How do you support people who have experienced trauma                    | 500 words           | 500 words    | ✅                                                              |
+| Q8  | Strengths of and opportunities for your organisation                     | 500 words           | 500 words    | ✅                                                              |
+| Q9  | Most pressing areas for further development and how identified           | 500 words           | 500 words    | ✅                                                              |
+| Q10 | Anything further in support of your application (optional)               | 400 words           | 400 words    | ✅                                                              |
 
 4. Note: Q3 (quality marks, 150 words) is borderline non-narrative — verify whether it appears as a writing card or is absent from Step 4 (covered in IT-LBF-10)
 
 **Expected result:**
+
 - Narrative questions extracted with correct word limits
 - Mix of 50/250/500-word limits all handled correctly
 
@@ -430,6 +454,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-06 complete
 
 **Steps:**
+
 1. Review Step 4 — confirm data-entry, dropdown, financial, and file-upload fields from the non-narrative list above are absent as writing cards
 2. Confirm financial questions (income/expenditure tables, amounts requested, cost breakdown) are either absent or flagged amber as Budget sections
 3. **D-WF-01 fix verification:** If any section is labelled "(optional)":
@@ -438,6 +463,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
    - Confirm the "Ready to assemble" button activates without requiring the optional section to be filled in
 
 **Expected result:**
+
 - Non-narrative fields absent from Step 4
 - Optional sections show approve button when empty ✅ (D-WF-01 fixed)
 - Assembly gate does not require optional sections to be answered ✅ (D-WF-01 fixed)
@@ -454,6 +480,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-09 complete
 
 **Steps:**
+
 1. Navigate to **Q1 — Please provide a short summary of your charity's purpose and aims** (500 words)
 2. Write an answer about New Leaf — founding, key worker support and peer mentoring for care leavers, Greater Manchester focus
 3. Verify counter shows "X / 500 words"
@@ -466,11 +493,12 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 7. Write an answer about New Leaf's services: one-to-one key worker support, peer mentoring, housing liaison, employment support
 8. Approve without AI assist (tests user-authored path on a 600-word field)
 9. Navigate to **Q3 — Please list any quality marks or standards your charity currently holds and the date they were awarded** (150 words)
-10. Write a short list (e.g. *"Investors in People — Silver (2023). SafeGuarding Assured (2024)."*)
+10. Write a short list (e.g. _"Investors in People — Silver (2023). SafeGuarding Assured (2024)."_)
 11. Verify the counter shows "X / 150 words"
 12. Approve
 
 **Expected result:**
+
 - Word counters correct across all limit types (150, 500, 600 words)
 - AI assist works on 500-word field
 - 150-word field (shortest in this form) enforces limit correctly
@@ -488,6 +516,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-11 complete
 
 **Steps:**
+
 1. Approve all remaining mandatory question cards
 2. Verify the progress bar reaches "Ready to assemble"
 3. Click **Ready to assemble**
@@ -500,6 +529,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 8. Confirm the approval modal shows correct application details
 
 **Expected result:**
+
 - Assembly and approval flow completes correctly
 - Step 5 content correct
 
@@ -515,6 +545,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 **Prerequisite:** IT-LBF-12 complete
 
 **Steps:**
+
 1. Click **Export as Word document**
 2. Open the downloaded .docx file and verify:
    - Title: **"Specialist Programme — Care Leavers Support 2026"**
@@ -537,6 +568,7 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 14. Verify the downloaded document contains the amended answer
 
 **Expected result:**
+
 - Export date includes HH:MM timestamp ✅ (D-WF-05)
 - Re-export warning appears on second download in same session ✅
 - Re-export warning appears after re-open/re-approve cycle ✅ (D-WF-04)
@@ -550,20 +582,20 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 ## Document History
 
-| Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 1.0 | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Lloyds Bank Foundation (England & Wales) Specialist Programme. Two test accounts: Harry's Rainbow (eligibility mismatch) and New Leaf (happy path, new charity, care leavers). 13 test cases. Verifies D-WF-01, D-WF-04, D-WF-05 fixes. DOCX upload path tested. |
-| 1.1 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-01 passed — Harry's Rainbow sign in and profile verification complete. |
-| 1.2 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-02 and IT-LBF-03 passed — DOCX upload confirmed, eligibility mismatch hard stop (FR-47) verified for Harry's Rainbow. Ineligible badge shown on dashboard. |
-| 1.3 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-04 passed — New Leaf account registered and profile saved. Registration number omitted (optional field) — no issue. |
-| 1.4 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-05 passed — Lloyds Bank Foundation appears in funder picker with Structured badge. No issues. |
-| 1.5 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed — DOCX upload and AI summary complete in 24s. 10 questions extracted. Question set differs from test plan expectation; IT-LBF-09 table updated to reflect actual form questions. Q3 (quality marks, 150 words) flagged for monitoring in IT-LBF-10. |
-| 1.6 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed — eligibility check passed for New Leaf, preparation checklist appeared correctly. |
-| 1.7 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-08 and IT-LBF-09 passed — AI summary accurate; all 10 questions extracted with correct word limits. Q3 (quality marks, 150 words) confirmed present as writing card — borderline but acceptable. IT-LBF-09 table completed with observed values. |
-| 1.8 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-10 passed — no financial questions in Step 4, D-WF-01 fix confirmed (Ready to assemble visible with Q10 empty). D-LBF-01 raised: optional label buried in Q10 question text, not visible as card badge. |
-| 1.9 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11 steps updated to reflect actual form questions — replaced non-existent History/Grant fund/50-word questions with Q1 (500w), Q2 (600w), Q3 (150w). |
-| 1.10 | 2026-06-04 | Rapidglobe Ltd | D-LBF-02 raised — over-limit answers can be approved (warn-and-allow). Decision made to change to hard stop: approval button hidden when word count exceeded, red message to trim or use AI. Overrides previous design decision to allow. |
-| 1.11 | 2026-06-04 | Rapidglobe Ltd | D-LBF-03 raised — D-WF-01 regression. Ready to assemble greyed out when Q10 (optional) left empty. System not detecting optional from question text. Same root cause as D-LBF-01. Workaround: fill Q10 briefly to unblock testing. |
-| 1.12 | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11, IT-LBF-12, IT-LBF-13 complete. All 13 tests passed. D-LBF-04 (re-export dialog missing HH:MM) and D-LBF-05 (plain text download produces no file) raised. Testing complete — 5 defects open: D-LBF-01 through D-LBF-05. |
-| 1.13 | 2026-06-04 | Rapidglobe Ltd | All 5 defects fixed: D-LBF-01/03 optional detection (isOptionalQ covers both patterns), D-LBF-02 hard stop for over-limit answers, D-LBF-04 formatExportDate includes HH:MM, D-LBF-05 per-format download state. Full retest cycle to follow. |
-| 1.14 | 2026-06-04 | Rapidglobe Ltd | All 5 defects verified fixed in retest. D-LBF-02 hard stop confirmed (approve hidden at 505/500w). D-LBF-01/03 confirmed (Q10 empty — approve section visible, Ready to assemble active at 9/10). D-LBF-04 confirmed (re-export dialog shows "4 June 2026, 09:57"). D-LBF-05 confirmed (.txt file downloads with timestamp). Note: re-export dialog also appears when switching from docx to txt — minor wording improvement desirable but not a defect. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-03 | Rapidglobe Ltd | Initial test plan — Lloyds Bank Foundation (England & Wales) Specialist Programme. Two test accounts: Harry's Rainbow (eligibility mismatch) and New Leaf (happy path, new charity, care leavers). 13 test cases. Verifies D-WF-01, D-WF-04, D-WF-05 fixes. DOCX upload path tested.                                                                                                                                                                     |
+| 1.1     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-01 passed — Harry's Rainbow sign in and profile verification complete.                                                                                                                                                                                                                                                                                                                                                                            |
+| 1.2     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-02 and IT-LBF-03 passed — DOCX upload confirmed, eligibility mismatch hard stop (FR-47) verified for Harry's Rainbow. Ineligible badge shown on dashboard.                                                                                                                                                                                                                                                                                        |
+| 1.3     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-04 passed — New Leaf account registered and profile saved. Registration number omitted (optional field) — no issue.                                                                                                                                                                                                                                                                                                                               |
+| 1.4     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-05 passed — Lloyds Bank Foundation appears in funder picker with Structured badge. No issues.                                                                                                                                                                                                                                                                                                                                                     |
+| 1.5     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-06 passed — DOCX upload and AI summary complete in 24s. 10 questions extracted. Question set differs from test plan expectation; IT-LBF-09 table updated to reflect actual form questions. Q3 (quality marks, 150 words) flagged for monitoring in IT-LBF-10.                                                                                                                                                                                     |
+| 1.6     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-07 passed — eligibility check passed for New Leaf, preparation checklist appeared correctly.                                                                                                                                                                                                                                                                                                                                                      |
+| 1.7     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-08 and IT-LBF-09 passed — AI summary accurate; all 10 questions extracted with correct word limits. Q3 (quality marks, 150 words) confirmed present as writing card — borderline but acceptable. IT-LBF-09 table completed with observed values.                                                                                                                                                                                                  |
+| 1.8     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-10 passed — no financial questions in Step 4, D-WF-01 fix confirmed (Ready to assemble visible with Q10 empty). D-LBF-01 raised: optional label buried in Q10 question text, not visible as card badge.                                                                                                                                                                                                                                           |
+| 1.9     | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11 steps updated to reflect actual form questions — replaced non-existent History/Grant fund/50-word questions with Q1 (500w), Q2 (600w), Q3 (150w).                                                                                                                                                                                                                                                                                              |
+| 1.10    | 2026-06-04 | Rapidglobe Ltd | D-LBF-02 raised — over-limit answers can be approved (warn-and-allow). Decision made to change to hard stop: approval button hidden when word count exceeded, red message to trim or use AI. Overrides previous design decision to allow.                                                                                                                                                                                                                |
+| 1.11    | 2026-06-04 | Rapidglobe Ltd | D-LBF-03 raised — D-WF-01 regression. Ready to assemble greyed out when Q10 (optional) left empty. System not detecting optional from question text. Same root cause as D-LBF-01. Workaround: fill Q10 briefly to unblock testing.                                                                                                                                                                                                                       |
+| 1.12    | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11, IT-LBF-12, IT-LBF-13 complete. All 13 tests passed. D-LBF-04 (re-export dialog missing HH:MM) and D-LBF-05 (plain text download produces no file) raised. Testing complete — 5 defects open: D-LBF-01 through D-LBF-05.                                                                                                                                                                                                                       |
+| 1.13    | 2026-06-04 | Rapidglobe Ltd | All 5 defects fixed: D-LBF-01/03 optional detection (isOptionalQ covers both patterns), D-LBF-02 hard stop for over-limit answers, D-LBF-04 formatExportDate includes HH:MM, D-LBF-05 per-format download state. Full retest cycle to follow.                                                                                                                                                                                                            |
+| 1.14    | 2026-06-04 | Rapidglobe Ltd | All 5 defects verified fixed in retest. D-LBF-02 hard stop confirmed (approve hidden at 505/500w). D-LBF-01/03 confirmed (Q10 empty — approve section visible, Ready to assemble active at 9/10). D-LBF-04 confirmed (re-export dialog shows "4 June 2026, 09:57"). D-LBF-05 confirmed (.txt file downloads with timestamp). Note: re-export dialog also appears when switching from docx to txt — minor wording improvement desirable but not a defect. |

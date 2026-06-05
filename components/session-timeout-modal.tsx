@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   Dialog,
@@ -6,14 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 
 interface SessionTimeoutModalProps {
-  isOpen: boolean;
-  minutesRemaining?: number;
-  onExtend: () => void;
-  onSignOut: () => void;
+  isOpen: boolean
+  minutesRemaining?: number
+  onExtend: () => void
+  onSignOut: () => void
 }
 
 export function SessionTimeoutModal({
@@ -22,31 +22,23 @@ export function SessionTimeoutModal({
   onExtend,
   onSignOut,
 }: SessionTimeoutModalProps) {
-  const minuteLabel = minutesRemaining === 1 ? "minute" : "minutes";
+  const minuteLabel = minutesRemaining === 1 ? 'minute' : 'minutes'
 
   return (
     <Dialog open={isOpen}>
-      <DialogContent
-        showCloseButton={false}
-        className="max-w-[440px] rounded-xl p-8"
-      >
+      <DialogContent showCloseButton={false} className="max-w-[440px] rounded-xl p-8">
         <DialogHeader>
           <DialogTitle className="text-[18px] font-bold tracking-tight text-[#1E293B]">
             Are you still there?
           </DialogTitle>
           <DialogDescription className="mt-2 text-[14px] leading-relaxed text-[#64748B]">
-            You&apos;ll be signed out in {minutesRemaining} {minuteLabel} due to
-            inactivity. Make sure you&apos;ve saved any work before your session ends.
+            You&apos;ll be signed out in {minutesRemaining} {minuteLabel} due to inactivity. Make
+            sure you&apos;ve saved any work before your session ends.
           </DialogDescription>
         </DialogHeader>
 
         <div className="mt-6 flex items-center justify-end gap-2.5">
-          <Button
-            variant="outline"
-            size="default"
-            onClick={onSignOut}
-            className="text-[14px]"
-          >
+          <Button variant="outline" size="default" onClick={onSignOut} className="text-[14px]">
             Sign out now
           </Button>
           <Button
@@ -59,5 +51,5 @@ export function SessionTimeoutModal({
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

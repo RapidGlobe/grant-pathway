@@ -23,75 +23,81 @@ Grant Pathway stores user accounts, charity profile information, grant applicati
 The data model comprises six tables:
 
 ### `funders`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid (PK) | |
-| `name` | text | Unique. Full name of the grant-giving organisation |
-| `funder_type` | text | `structured` or `narrative` — determines Step 4 routing |
-| `grant_range` | text | Nullable. Display string only (e.g. "£10k–£30k") |
-| `guidelines_url` | text | Nullable. URL to funder's apply/guidelines page |
-| `is_active` | boolean | Default: `true`. Only active funders shown in Step 1 picker |
-| `created_at` | timestamptz | |
+
+| Column           | Type        | Notes                                                       |
+| ---------------- | ----------- | ----------------------------------------------------------- |
+| `id`             | uuid (PK)   |                                                             |
+| `name`           | text        | Unique. Full name of the grant-giving organisation          |
+| `funder_type`    | text        | `structured` or `narrative` — determines Step 4 routing     |
+| `grant_range`    | text        | Nullable. Display string only (e.g. "£10k–£30k")            |
+| `guidelines_url` | text        | Nullable. URL to funder's apply/guidelines page             |
+| `is_active`      | boolean     | Default: `true`. Only active funders shown in Step 1 picker |
+| `created_at`     | timestamptz |                                                             |
 
 ### `user_profiles`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid (PK) | References `auth.users.id` |
-| `email` | text | From Supabase Auth |
-| `full_name` | text | |
-| `created_at` | timestamptz | |
-| `updated_at` | timestamptz | |
+
+| Column       | Type        | Notes                      |
+| ------------ | ----------- | -------------------------- |
+| `id`         | uuid (PK)   | References `auth.users.id` |
+| `email`      | text        | From Supabase Auth         |
+| `full_name`  | text        |                            |
+| `created_at` | timestamptz |                            |
+| `updated_at` | timestamptz |                            |
 
 ### `charity_profiles`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid (PK) | |
-| `user_id` | uuid (FK → user_profiles) | Unique per user |
-| `charity_name` | text | |
-| `charity_number` | text | |
-| `mission_statement` | text | |
-| `beneficiaries` | text | |
-| `programmes` | text | |
-| `impact` | text | |
-| `created_at` | timestamptz | |
-| `updated_at` | timestamptz | |
+
+| Column              | Type                      | Notes           |
+| ------------------- | ------------------------- | --------------- |
+| `id`                | uuid (PK)                 |                 |
+| `user_id`           | uuid (FK → user_profiles) | Unique per user |
+| `charity_name`      | text                      |                 |
+| `charity_number`    | text                      |                 |
+| `mission_statement` | text                      |                 |
+| `beneficiaries`     | text                      |                 |
+| `programmes`        | text                      |                 |
+| `impact`            | text                      |                 |
+| `created_at`        | timestamptz               |                 |
+| `updated_at`        | timestamptz               |                 |
 
 ### `applications`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid (PK) | |
-| `user_id` | uuid (FK → user_profiles) | |
-| `funder_id` | uuid (FK → funders, nullable) | Nullable for migration safety. Set when user selects from the approved funder picker (DR-FD-001) |
-| `funder_name` | text | Retained for display/export. Populated from `funders.name` on selection |
-| `fund_name` | text | |
-| `deadline` | date | Nullable |
-| `amount_sought` | integer | In pence or £ (TBD) |
-| `status` | text | `draft`, `in_progress`, `complete` |
-| `current_step` | integer | 1–5 |
-| `ai_summary` | text | Generated in Step 3 |
-| `created_at` | timestamptz | |
-| `updated_at` | timestamptz | |
+
+| Column          | Type                          | Notes                                                                                            |
+| --------------- | ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `id`            | uuid (PK)                     |                                                                                                  |
+| `user_id`       | uuid (FK → user_profiles)     |                                                                                                  |
+| `funder_id`     | uuid (FK → funders, nullable) | Nullable for migration safety. Set when user selects from the approved funder picker (DR-FD-001) |
+| `funder_name`   | text                          | Retained for display/export. Populated from `funders.name` on selection                          |
+| `fund_name`     | text                          |                                                                                                  |
+| `deadline`      | date                          | Nullable                                                                                         |
+| `amount_sought` | integer                       | In pence or £ (TBD)                                                                              |
+| `status`        | text                          | `draft`, `in_progress`, `complete`                                                               |
+| `current_step`  | integer                       | 1–5                                                                                              |
+| `ai_summary`    | text                          | Generated in Step 3                                                                              |
+| `created_at`    | timestamptz                   |                                                                                                  |
+| `updated_at`    | timestamptz                   |                                                                                                  |
 
 ### `application_answers`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid (PK) | |
-| `application_id` | uuid (FK → applications) | |
-| `user_id` | uuid (FK → user_profiles) | Denormalised for RLS |
-| `question_text` | text | As entered by user |
-| `answer_text` | text | AI-generated, then user-edited |
-| `word_limit` | integer | Nullable |
-| `created_at` | timestamptz | |
-| `updated_at` | timestamptz | |
+
+| Column           | Type                      | Notes                          |
+| ---------------- | ------------------------- | ------------------------------ |
+| `id`             | uuid (PK)                 |                                |
+| `application_id` | uuid (FK → applications)  |                                |
+| `user_id`        | uuid (FK → user_profiles) | Denormalised for RLS           |
+| `question_text`  | text                      | As entered by user             |
+| `answer_text`    | text                      | AI-generated, then user-edited |
+| `word_limit`     | integer                   | Nullable                       |
+| `created_at`     | timestamptz               |                                |
+| `updated_at`     | timestamptz               |                                |
 
 ### `ai_usage_log`
-| Column | Type | Notes |
-|---|---|---|
-| `id` | uuid (PK) | |
-| `user_id` | uuid (FK → user_profiles) | |
-| `request_type` | text | `summary` or `draft` |
-| `application_id` | uuid (FK → applications) | Nullable |
-| `created_at` | timestamptz | Used for monthly count |
+
+| Column           | Type                      | Notes                  |
+| ---------------- | ------------------------- | ---------------------- |
+| `id`             | uuid (PK)                 |                        |
+| `user_id`        | uuid (FK → user_profiles) |                        |
+| `request_type`   | text                      | `summary` or `draft`   |
+| `application_id` | uuid (FK → applications)  | Nullable               |
+| `created_at`     | timestamptz               | Used for monthly count |
 
 ## Rationale
 
@@ -118,6 +124,6 @@ FR-06 to FR-22, PDR-AI-005, BRD Section 9.
 
 ## Revision History
 
-| Date | Change |
-|------|--------|
+| Date       | Change                                                                                                                                                                                      |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-06-01 | `funders` table added (DR-FD-001) — approved funder directory, global/non-user-scoped. `funder_id` nullable FK added to `applications`. Table count updated 5 → 6. RLS consequence updated. |

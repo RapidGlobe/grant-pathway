@@ -8,17 +8,17 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ## Status
 
-| Section | FRs covered | Status |
-|---------|-------------|--------|
-| 9.1 Authentication & Accounts | FR-01 to FR-08 | ✅ Complete |
-| 9.2 Charity Profile | FR-09 to FR-14 | ✅ Complete |
-| 9.3 Application Management | FR-15 to FR-20 | ✅ Complete |
-| 9.4 Funder Guideline Handling | FR-21 to FR-23 | ✅ Complete |
-| 9.5 AI Guideline Summarisation | FR-24 to FR-27 | ✅ Complete |
-| 9.6 AI Draft Answer Generation | FR-28 to FR-31 | ✅ Complete |
+| Section                         | FRs covered    | Status      |
+| ------------------------------- | -------------- | ----------- |
+| 9.1 Authentication & Accounts   | FR-01 to FR-08 | ✅ Complete |
+| 9.2 Charity Profile             | FR-09 to FR-14 | ✅ Complete |
+| 9.3 Application Management      | FR-15 to FR-20 | ✅ Complete |
+| 9.4 Funder Guideline Handling   | FR-21 to FR-23 | ✅ Complete |
+| 9.5 AI Guideline Summarisation  | FR-24 to FR-27 | ✅ Complete |
+| 9.6 AI Draft Answer Generation  | FR-28 to FR-31 | ✅ Complete |
 | 9.7 Mandatory Review & Approval | FR-32 to FR-36 | ✅ Complete |
-| 9.8 Export | FR-37 to FR-39 | ✅ Complete |
-| 9.9 Account Deletion | FR-40 to FR-44 | ✅ Complete |
+| 9.8 Export                      | FR-37 to FR-39 | ✅ Complete |
+| 9.9 Account Deletion            | FR-40 to FR-44 | ✅ Complete |
 
 ---
 
@@ -73,7 +73,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on `/register`
 - **When** I enter an email address in an invalid format (e.g. "notanemail" or "missing@domain")
 - **And** I submit the form
-- **Then** I see the inline error: *"Please enter a valid email address"*
+- **Then** I see the inline error: _"Please enter a valid email address"_
 - **And** my account is not created
 
 ---
@@ -83,7 +83,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on `/register`
 - **When** I enter a password with fewer than 10 characters
 - **And** I submit the form
-- **Then** I see the inline error: *"Your password must be at least 10 characters"*
+- **Then** I see the inline error: _"Your password must be at least 10 characters"_
 - **And** my account is not created
 
 ---
@@ -94,7 +94,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **When** I enter a valid password in the password field
 - **And** I enter a different value in the password confirmation field
 - **And** I submit the form
-- **Then** I see the inline error: *"Your passwords do not match"*
+- **Then** I see the inline error: _"Your passwords do not match"_
 - **And** my account is not created
 
 ---
@@ -103,7 +103,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** an account already exists for a given email address
 - **When** I attempt to register with that same email address
-- **Then** I see the inline error: *"An account with this email address already exists"*
+- **Then** I see the inline error: _"An account with this email address already exists"_
 - **And** no new account is created
 
 ---
@@ -112,7 +112,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on `/register`
 - **When** I submit the form without checking the Terms of Service and Privacy Policy checkbox
-- **Then** I see the inline error: *"Please accept the Terms of Service and Privacy Policy to continue"*
+- **Then** I see the inline error: _"Please accept the Terms of Service and Privacy Policy to continue"_
 - **And** my account is not created
 
 ---
@@ -136,7 +136,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have registered but not yet clicked my verification link
 - **When** I attempt to sign in with my email address and password
-- **Then** I see the message: *"Please verify your email address before signing in."*
+- **Then** I see the message: _"Please verify your email address before signing in."_
 - **And** I am shown a "Resend verification email" link
 - **And** I am not signed in
 
@@ -146,7 +146,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have received my verification email
 - **When** I click the verification link within 24 hours
-- **Then** I am directed to `/verify-email` showing the heading *"Email verified"*
+- **Then** I am directed to `/verify-email` showing the heading _"Email verified"_
 - **And** my account is now active
 - **And** I can sign in with my email address and password
 
@@ -156,8 +156,8 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have received a verification email
 - **When** I click the verification link after 24 hours have passed
-- **Then** I see the heading *"This link has expired"*
-- **And** I see the message: *"Your verification link is no longer valid. Request a new one below."*
+- **Then** I see the heading _"This link has expired"_
+- **And** I see the message: _"Your verification link is no longer valid. Request a new one below."_
 - **And** I am shown a "Send a new verification email" button
 - **And** my account remains inactive
 
@@ -203,7 +203,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on `/`
 - **When** I enter my registered email address with an incorrect password
 - **And** I click "Sign in"
-- **Then** I see the error: *"Your email address or password is incorrect. Please try again."*
+- **Then** I see the error: _"Your email address or password is incorrect. Please try again."_
 - **And** I am not signed in
 
 ---
@@ -213,7 +213,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on `/`
 - **When** I enter an email address that has no registered account
 - **And** I click "Sign in"
-- **Then** I see the same error: *"Your email address or password is incorrect. Please try again."*
+- **Then** I see the same error: _"Your email address or password is incorrect. Please try again."_
 - **And** the response does not confirm or deny whether the email address is registered
 
 ---
@@ -236,7 +236,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on `/forgot-password`
 - **When** I enter my registered email address and submit
-- **Then** I see the confirmation message: *"If an account exists for that email address, you'll receive a reset link shortly. Check your spam folder if it doesn't arrive within a few minutes."*
+- **Then** I see the confirmation message: _"If an account exists for that email address, you'll receive a reset link shortly. Check your spam folder if it doesn't arrive within a few minutes."_
 - **And** a password reset email (Email 2) is sent to my email address
 - **And** the reset link in that email expires after 1 hour
 
@@ -267,7 +267,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **When** I enter a new password of 10 or more characters
 - **And** I enter the same value in the confirm password field
 - **And** I click "Save new password"
-- **Then** I see the confirmation: *"Your password has been updated."*
+- **Then** I see the confirmation: _"Your password has been updated."_
 - **And** I am shown a "Sign in" button linking to `/`
 - **And** I can sign in using my new password
 
@@ -279,7 +279,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **When** I enter a new password
 - **And** I enter a different value in the confirm password field
 - **And** I submit
-- **Then** I see the inline error: *"Your passwords do not match"*
+- **Then** I see the inline error: _"Your passwords do not match"_
 - **And** my password is not changed
 
 ---
@@ -288,7 +288,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have received a password reset email
 - **When** I click the reset link after 1 hour has passed
-- **Then** I see the message: *"This reset link has expired. Please request a new one."*
+- **Then** I see the message: _"This reset link has expired. Please request a new one."_
 - **And** I am shown a "Request a new link" button that takes me back to the reset request form
 - **And** my password is not changed
 
@@ -330,7 +330,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 **Requirement:** The system shall provide optional multi-factor authentication (MFA) as an opt-in feature; MFA shall not be mandatory in v1.
 
-*These criteria apply only if FR-07 is implemented in v1.*
+_These criteria apply only if FR-07 is implemented in v1._
 
 ---
 
@@ -362,7 +362,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 **Requirement:** During registration, the system shall present a plain-language prompt asking the user if they are willing to participate in a feedback interview; the response shall be recorded against the account.
 
-*These criteria apply only if FR-08 is implemented in v1.*
+_These criteria apply only if FR-08 is implemented in v1._
 
 ---
 
@@ -370,7 +370,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on `/register`
 - **When** the page loads
-- **Then** I see an optional checkbox labelled: *"I'm happy to be contacted occasionally to share feedback about Grant Pathway"*
+- **Then** I see an optional checkbox labelled: _"I'm happy to be contacted occasionally to share feedback about Grant Pathway"_
 - **And** the checkbox is unchecked by default
 
 ---
@@ -410,7 +410,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have just verified my email address and my charity profile has not yet been completed
 - **When** I am directed to `/dashboard`
-- **Then** I see the charity profile banner: *"Before you start, add your charity details — we'll use these to personalise your applications."*
+- **Then** I see the charity profile banner: _"Before you start, add your charity details — we'll use these to personalise your applications."_
 - **And** I see a "Set up charity profile" button linking to `/profile`
 
 ---
@@ -437,7 +437,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **And** my charity profile has not been fully saved
 - **When** I view the "Start your first application" button
 - **Then** the button is disabled
-- **And** a tooltip reads: *"Please set up your charity profile first"*
+- **And** a tooltip reads: _"Please set up your charity profile first"_
 
 ---
 
@@ -454,7 +454,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **And** I click the search button
 - **And** the Charity Commission API returns a matching record
 - **Then** the charity name and registration number fields are pre-populated with the returned data
-- **And** I see the note: *"Details retrieved from the Charity Commission register."*
+- **And** I see the note: _"Details retrieved from the Charity Commission register."_
 - **And** all pre-filled fields remain editable
 
 ---
@@ -463,7 +463,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on `/profile`
 - **When** I enter a charity name or registration number that returns no result from the Charity Commission API
-- **Then** I see the message: *"We couldn't find that charity. Please enter your details manually."*
+- **Then** I see the message: _"We couldn't find that charity. Please enter your details manually."_
 - **And** all profile fields remain available for manual entry
 
 ---
@@ -479,7 +479,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on `/profile`
 - **When** I attempt the Charity Commission lookup
 - **And** the API is unavailable or returns an error
-- **Then** I see the message: *"We couldn't reach the Charity Commission right now. Please enter your details manually."*
+- **Then** I see the message: _"We couldn't reach the Charity Commission right now. Please enter your details manually."_
 - **And** all profile fields remain available for manual entry
 - **And** I can save my profile without using the lookup
 
@@ -497,7 +497,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 **Requirement:** The charity profile shall include the following fields: registered charity number, charity name, registered address, charitable objects, mission narrative, beneficiary description, main activities and programmes, geographic area of operation, and annual income band.
 
-*Note: the final set of profile fields was refined during screen requirements. The implemented fields are: charity name, registration number (optional), "What does your charity do?", "Who does your charity help?", and "Where do you work?". Annual income band was removed as it adds no essential AI context and may confuse non-specialist users.*
+_Note: the final set of profile fields was refined during screen requirements. The implemented fields are: charity name, registration number (optional), "What does your charity do?", "Who does your charity help?", and "Where do you work?". Annual income band was removed as it adds no essential AI context and may confuse non-specialist users._
 
 ---
 
@@ -519,10 +519,10 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on `/profile`
 - **When** I attempt to save the profile with one or more required fields empty
 - **Then** inline error messages are shown against each empty required field:
-  - Charity name: *"Please enter your charity name"*
-  - What does your charity do?: *"Please tell us what your charity does"*
-  - Who does your charity help?: *"Please tell us who your charity helps"*
-  - Where do you work?: *"Please tell us where your charity works"*
+  - Charity name: _"Please enter your charity name"_
+  - What does your charity do?: _"Please tell us what your charity does"_
+  - Who does your charity help?: _"Please tell us who your charity helps"_
+  - Where do you work?: _"Please tell us where your charity works"_
 - **And** the profile is not saved
 
 ---
@@ -541,7 +541,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am completing my charity profile for the first time
 - **When** I fill in all required fields and click "Save profile"
-- **Then** I see the success message: *"Your charity profile has been saved. You're ready to start your first application."*
+- **Then** I see the success message: _"Your charity profile has been saved. You're ready to start your first application."_
 - **And** I see a "Go to my dashboard" button linking to `/dashboard`
 - **And** I remain on `/profile` (I am not automatically redirected)
 
@@ -551,7 +551,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have a saved charity profile and I am editing it on `/profile`
 - **When** I update one or more fields and click "Save changes"
-- **Then** I see the success message: *"Your changes have been saved."*
+- **Then** I see the success message: _"Your changes have been saved."_
 - **And** I remain on `/profile`
 - **And** the updated values are displayed when I next visit `/profile`
 
@@ -644,8 +644,8 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on Step 1 of the application flow
 - **When** I attempt to click "Continue" without selecting a funder or entering a grant name
 - **Then** inline error messages are shown:
-  - Funder: *"Please select a funder from the list"*
-  - Grant name: *"Please enter the grant name"*
+  - Funder: _"Please select a funder from the list"_
+  - Grant name: _"Please enter the grant name"_
 - **And** no application record is created
 
 ---
@@ -654,7 +654,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on Step 1 of the application flow
 - **When** I look below the funder picker
-- **Then** I see the link *"My funder isn't listed — request it"*
+- **Then** I see the link _"My funder isn't listed — request it"_
 - **And** clicking the link opens the funder request form
 - **And** I cannot proceed with an unlisted funder name entered as free text
 
@@ -673,7 +673,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am working on an application
 - **When** I am on any step of the application flow
-- **Then** the browser tab title reads *"[Grant name] — [Funder name] — Grant Pathway"*
+- **Then** the browser tab title reads _"[Grant name] — [Funder name] — Grant Pathway"_
 
 ---
 
@@ -710,7 +710,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **When** I view `/dashboard`
 - **Then** the summary strip displays the count for all four statuses: Not started, In progress, Approved, Exported
 - **And** all four status counts are shown even when some are zero
-- **And** the format is: *"[n] applications — [n] not started · [n] in progress · [n] approved · [n] exported"*
+- **And** the format is: _"[n] applications — [n] not started · [n] in progress · [n] approved · [n] exported"_
 
 ---
 
@@ -816,7 +816,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have an application with status `not_started` or `in_progress`
 - **When** I click the Delete link on its card
-- **Then** I see the confirmation prompt: *"Are you sure you want to delete this application? This cannot be undone."*
+- **Then** I see the confirmation prompt: _"Are you sure you want to delete this application? This cannot be undone."_
 - **And** I am presented with Confirm and Cancel actions
 
 ---
@@ -825,7 +825,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have an application with status `approved`
 - **When** I click the Delete link on its card
-- **Then** I see the confirmation prompt: *"Are you sure you want to delete this approved application? Your answers will be permanently removed and cannot be recovered."*
+- **Then** I see the confirmation prompt: _"Are you sure you want to delete this approved application? Your answers will be permanently removed and cannot be recovered."_
 - **And** I am presented with Confirm and Cancel actions
 
 ---
@@ -834,7 +834,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have an application with status `exported`
 - **When** I click the Delete link on its card
-- **Then** I see the confirmation prompt: *"Are you sure you want to delete this application? Your answers will be permanently removed. Make sure you have kept a copy of your exported document."*
+- **Then** I see the confirmation prompt: _"Are you sure you want to delete this application? Your answers will be permanently removed. Make sure you have kept a copy of your exported document."_
 - **And** I am presented with Confirm and Cancel actions
 
 ---
@@ -936,7 +936,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on Step 2 of the application flow
 - **When** I upload or paste a guidelines document that exceeds 100,000 tokens
-- **Then** I see the warning: *"Your guidelines document is quite long. For the best results, we recommend uploading only the core sections — such as eligibility criteria, application questions, and assessment criteria. Very long documents may reduce the quality of your AI summary."*
+- **Then** I see the warning: _"Your guidelines document is quite long. For the best results, we recommend uploading only the core sections — such as eligibility criteria, application questions, and assessment criteria. Very long documents may reduce the quality of your AI summary."_
 - **And** I can still proceed with the full document without being blocked
 
 ---
@@ -993,7 +993,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on Step 2 of the application flow
 - **When** I attempt to upload a file in an unsupported format (e.g. .xlsx, .pptx, .jpg, .txt)
 - **Then** the file is rejected
-- **And** I see the error: *"We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."*
+- **And** I see the error: _"We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."_
 - **And** I am not advanced to Step 3
 
 ---
@@ -1003,7 +1003,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on Step 2 of the application flow
 - **When** I attempt to upload a file larger than 10MB
 - **Then** the file is rejected
-- **And** I see the error: *"Your file is over 10MB. Please upload a smaller file or paste the text directly."*
+- **And** I see the error: _"Your file is over 10MB. Please upload a smaller file or paste the text directly."_
 - **And** I am not advanced to Step 3
 
 ---
@@ -1013,7 +1013,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I am on Step 2 of the application flow
 - **When** I upload a PDF that contains only scanned images with no extractable text
 - **Then** the file is rejected
-- **And** I see the error: *"We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."*
+- **And** I see the error: _"We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."_
 - **And** I am not advanced to Step 3
 
 ---
@@ -1058,7 +1058,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** the AI summary has been generated
 - **And** the guidelines contain identifiable application questions
 - **When** I view Step 3
-- **Then** I see a note in the format: *"We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."*
+- **Then** I see a note in the format: _"We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."_
 - **And** the extracted questions are listed within the summary
 
 ---
@@ -1068,7 +1068,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** the AI summary has been generated
 - **And** no specific application questions could be identified in the guidelines
 - **When** I view Step 3
-- **Then** I see the message: *"We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."*
+- **Then** I see the message: _"We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."_
 
 ---
 
@@ -1115,8 +1115,8 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I have arrived at Step 3 and summary generation is underway
 - **When** I watch the screen during processing
-- **Then** I see the first staged message: *"Reading your funder guidelines…"*
-- **And** this transitions to *"Almost there…"* as processing nears completion
+- **Then** I see the first staged message: _"Reading your funder guidelines…"_
+- **And** this transitions to _"Almost there…"_ as processing nears completion
 
 ---
 
@@ -1148,7 +1148,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 - **Given** I am on Step 3 and summary generation is underway
 - **When** the Claude API returns an error or the request times out
-- **Then** the progress indicator is replaced with the error message: *"We couldn't generate your summary right now. This is usually temporary — please try again."*
+- **Then** the progress indicator is replaced with the error message: _"We couldn't generate your summary right now. This is usually temporary — please try again."_
 - **And** I see a "Try again" button
 - **And** the application remains at `in_progress` status — no data is lost
 
@@ -1183,11 +1183,11 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **AC-FR-28-01 — Preparation checklist shown on first entry to Step 4**
 
-- **Given** I have completed Step 3 and clicked *"This looks right — continue"*
+- **Given** I have completed Step 3 and clicked _"This looks right — continue"_
 - **When** I arrive at Step 4 for the first time
 - **Then** I see a preparation checklist before any questions are shown
 - **And** the screen lists the financial documents I should gather before starting
-- **And** there is a note: *"The financial sections cannot be completed by AI. It is worth involving a senior colleague before reaching the financial questions."*
+- **And** there is a note: _"The financial sections cannot be completed by AI. It is worth involving a senior colleague before reaching the financial questions."_
 
 ---
 
@@ -1201,7 +1201,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **AC-FR-28-03 — Q&A interface shows all questions from the Step 3 summary**
 
-- **Given** I have clicked *"I have what I need — start writing"* on the preparation checklist
+- **Given** I have clicked _"I have what I need — start writing"_ on the preparation checklist
 - **When** I view the Q&A interface
 - **Then** all questions extracted from the funder guidelines in Step 3 are shown
 - **And** each question has an empty textarea where I can write my own answer from scratch
@@ -1214,7 +1214,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **When** I view the Q&A interface
 - **Then** I see named narrative sections (e.g., "About your organisation", "Project description")
 - **And** each section has a textarea for my own answer
-- **And** a note is displayed: *"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."*
+- **And** a note is displayed: _"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."_
 
 ---
 
@@ -1222,7 +1222,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I have used 40 or more of my 50 monthly AI requests
 - **When** I am on Step 4
-- **Then** I see the soft warning banner: *"You've used most of your monthly AI allowance."*
+- **Then** I see the soft warning banner: _"You've used most of your monthly AI allowance."_
 
 ---
 
@@ -1231,7 +1231,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** I have used all 50 of my monthly AI requests
 - **When** I am on Step 4
 - **Then** all "Help me improve this" buttons are disabled
-- **And** I see the message: *"You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch."*
+- **And** I see the message: _"You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch."_
 - **And** I can still write and save my own answers without restriction
 
 ---
@@ -1259,7 +1259,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **Requirement:** Word limits extracted from the funder guidelines shall be displayed alongside each question, and answers shall display a word/character counter.
 
-*Word limits are extracted automatically from the guidelines in Step 3 — they are not manually entered by the user.*
+_Word limits are extracted automatically from the guidelines in Step 3 — they are not manually entered by the user._
 
 ---
 
@@ -1287,7 +1287,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-**AC-FR-29-04 — Approve button hidden when answer exceeds word/character limit** *(Added 2026-06-04, D-LBF-02)*
+**AC-FR-29-04 — Approve button hidden when answer exceeds word/character limit** _(Added 2026-06-04, D-LBF-02)_
 
 - **Given** a question has a word or character limit
 - **When** my answer exceeds that limit
@@ -1297,7 +1297,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-**AC-FR-29-05 — Optional questions are excluded from the assembly gate** *(Added 2026-06-04, D-LBF-01/03)*
+**AC-FR-29-05 — Optional questions are excluded from the assembly gate** _(Added 2026-06-04, D-LBF-01/03)_
 
 - **Given** a question is marked as optional — either by containing "(optional)" in its text or by beginning with "This question is optional"
 - **When** I leave that question unanswered and unapproved
@@ -1375,7 +1375,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** I am viewing a budget question on Step 4
 - **When** I look at the AI assist area on that card
 - **Then** the "Help me improve this" button is not present
-- **And** a label is displayed: *"This section requires your actual financial data — do not use AI-generated figures"*
+- **And** a label is displayed: _"This section requires your actual financial data — do not use AI-generated figures"_
 
 ---
 
@@ -1384,7 +1384,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** I have not filled in a budget question
 - **When** I attempt to click "Ready to assemble"
 - **Then** I cannot proceed
-- **And** I see the message: *"Please enter your actual budget figures before assembling"*
+- **And** I see the message: _"Please enter your actual budget figures before assembling"_
 
 ---
 
@@ -1399,16 +1399,16 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** all questions are answered and I have clicked "Ready to assemble"
 - **When** I view the next screen
 - **Then** I see a prompt recommending I check with my CEO, treasurer, or a trustee that:
-  - *"The budget figures are accurate and approved"*
-  - *"The project description reflects your current priorities"*
-  - *"You have authority to submit this application"*
+  - _"The budget figures are accurate and approved"_
+  - _"The project description reflects your current priorities"_
+  - _"You have authority to submit this application"_
 
 ---
 
 **AC-FR-31A-02 — Assembly begins only after senior review confirmation**
 
 - **Given** I am viewing the senior review prompt
-- **When** I click *"I've reviewed this — assemble my draft"*
+- **When** I click _"I've reviewed this — assemble my draft"_
 - **Then** the assembly API is called and the assembled draft is saved to the application
 
 ---
@@ -1446,9 +1446,9 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** I have generated draft answers and advanced to Step 5 (Review and approve)
 - **When** I view the page
 - **Then** I can see all three plain-language review prompts:
-  1. *"Does this accurately describe your charity and project?"*
-  2. *"Are all figures, dates, and facts correct?"*
-  3. *"Does this answer the question that was asked?"*
+  1. _"Does this accurately describe your charity and project?"_
+  2. _"Are all figures, dates, and facts correct?"_
+  3. _"Does this answer the question that was asked?"_
 
 ---
 
@@ -1469,9 +1469,9 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 **AC-FR-33-01 — Export not available without approval**
 
 - **Given** I have draft answers on Step 4 and have advanced to Step 5
-- **And** I have not yet clicked *"Approve my application"*
+- **And** I have not yet clicked _"Approve my application"_
 - **When** I view Step 5
-- **Then** the *"Download as Word document"* button is disabled
+- **Then** the _"Download as Word document"_ button is disabled
 - **And** I cannot export the application content
 
 ---
@@ -1479,18 +1479,18 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 **AC-FR-33-02 — Approval confirmation prompt shown**
 
 - **Given** I am on Step 5 and have reviewed my application
-- **When** I click *"Approve my application"*
-- **Then** I see a confirmation prompt: *"Are you sure you want to approve this application? You can re-open it to make changes at any time."*
+- **When** I click _"Approve my application"_
+- **Then** I see a confirmation prompt: _"Are you sure you want to approve this application? You can re-open it to make changes at any time."_
 - **And** I must explicitly confirm before the approval is recorded
 
 ---
 
 **AC-FR-33-03 — Application status set to approved on confirmation**
 
-- **Given** I have clicked *"Approve my application"* and seen the confirmation prompt
+- **Given** I have clicked _"Approve my application"_ and seen the confirmation prompt
 - **When** I confirm the approval
 - **Then** the application status changes to `approved`
-- **And** the *"Download as Word document"* button becomes enabled
+- **And** the _"Download as Word document"_ button becomes enabled
 
 ---
 
@@ -1507,7 +1507,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **Requirement:** The user shall write their own answers in textareas on Step 4; writing does not consume AI credits.
 
-*Note: Under the Q&A model, textareas start empty — the user writes from scratch. There is no AI-generated draft to edit. The "Help me improve this" AI assist (FR-30) is a separate optional action.*
+_Note: Under the Q&A model, textareas start empty — the user writes from scratch. There is no AI-generated draft to edit. The "Help me improve this" AI assist (FR-30) is a separate optional action._
 
 ---
 
@@ -1539,7 +1539,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **Requirement:** The user shall be able to clear and rewrite any answer at any time before assembly.
 
-*Note: The "Regenerate all answers" action no longer exists. Users write their own content from scratch; there is no AI-generated content to regenerate.*
+_Note: The "Regenerate all answers" action no longer exists. Users write their own content from scratch; there is no AI-generated content to regenerate._
 
 ---
 
@@ -1580,7 +1580,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I have approved my application on Step 5
 - **When** I navigate to `/dashboard`
-- **Then** the application card displays a green *"Approved"* status label
+- **Then** the application card displays a green _"Approved"_ status label
 
 ---
 
@@ -1598,7 +1598,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I have an application with status `approved`
 - **When** I open it from `/dashboard`
-- **Then** I see the confirmation prompt: *"Re-opening this application will remove your approval. You will need to review and approve your answers again before you can export."*
+- **Then** I see the confirmation prompt: _"Re-opening this application will remove your approval. You will need to review and approve your answers again before you can export."_
 - **And** on confirming, the application status reverts to `in_progress`
 - **And** the export button is disabled until I complete the approval step again
 
@@ -1638,14 +1638,14 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** my application has been approved and has status `approved` or `exported`
 - **When** I view Step 5
-- **Then** the *"Download as Word document"* button is enabled and available
+- **Then** the _"Download as Word document"_ button is enabled and available
 
 ---
 
 **AC-FR-37-02 — Word document downloaded successfully**
 
 - **Given** my application has been approved
-- **When** I click *"Download as Word document"*
+- **When** I click _"Download as Word document"_
 - **Then** a .docx file is downloaded to my device
 - **And** the file contains all approved application content
 
@@ -1661,7 +1661,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
   - The date exported
   - An AI disclaimer
   - The Q&A body — each question followed by its approved answer
-  - A footer: *"Prepared using Grant Pathway v[version number] — grantpathway.org.uk"*
+  - A footer: _"Prepared using Grant Pathway v[version number] — grantpathway.org.uk"_
 
 ---
 
@@ -1670,16 +1670,16 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** my application has status `approved`
 - **When** I download the Word document for the first time
 - **Then** the application status changes to `exported`
-- **And** the dashboard card shows the Teal *"Exported"* status label
+- **And** the dashboard card shows the Teal _"Exported"_ status label
 
 ---
 
 **AC-FR-37-05 — Re-export warning shown on subsequent downloads**
 
 - **Given** my application has status `exported`
-- **When** I click *"Download as Word document"* again
-- **Then** I see the re-export warning: *"You exported this application on [date]. If you have already submitted that version to the funder, please contact them to let them know a revised version is being submitted. Funders may treat multiple submissions as separate applications."*
-- **And** I am presented with *"Download anyway"* and *"Cancel"* actions
+- **When** I click _"Download as Word document"_ again
+- **Then** I see the re-export warning: _"You exported this application on [date]. If you have already submitted that version to the funder, please contact them to let them know a revised version is being submitted. Funders may treat multiple submissions as separate applications."_
+- **And** I am presented with _"Download anyway"_ and _"Cancel"_ actions
 - **And** the date shown in the warning is the date of the most recent previous export
 
 ---
@@ -1687,7 +1687,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 **AC-FR-37-06 — Re-export proceeds on confirmation**
 
 - **Given** I am viewing the re-export warning
-- **When** I click *"Download anyway"*
+- **When** I click _"Download anyway"_
 - **Then** the .docx file is downloaded
 - **And** the application status remains `exported`
 
@@ -1696,7 +1696,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 **AC-FR-37-07 — Re-export cancelled — no download occurs**
 
 - **Given** I am viewing the re-export warning
-- **When** I click *"Cancel"*
+- **When** I click _"Cancel"_
 - **Then** no file is downloaded
 - **And** I remain on Step 5 with all content unchanged
 
@@ -1706,7 +1706,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **Requirement:** The system shall allow users to export all approved application content as a plain text (.txt) file.
 
-*These criteria apply only if FR-38 is implemented in v1.*
+_These criteria apply only if FR-38 is implemented in v1._
 
 ---
 
@@ -1746,7 +1746,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** my application has not yet been approved (status is `not_started` or `in_progress`)
 - **When** I view Step 5
-- **Then** the *"Download as Word document"* button is disabled
+- **Then** the _"Download as Word document"_ button is disabled
 - **And** I cannot download the application content
 
 ---
@@ -1761,7 +1761,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **AC-FR-39-03 — Export remains blocked until approval is explicitly confirmed**
 
-- **Given** I have draft answers on Step 4 but have not yet clicked *"Approve my application"* on Step 5
+- **Given** I have draft answers on Step 4 but have not yet clicked _"Approve my application"_ on Step 5
 - **When** I view the export button on Step 5
 - **Then** the button remains disabled regardless of how many answers have been drafted or edited
 - **And** only completing the approval action on Step 5 enables the export button
@@ -1784,7 +1784,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am a signed-in user on `/account`
 - **When** I view my account settings
-- **Then** I can see a *"Delete my account"* button in the delete account section
+- **Then** I can see a _"Delete my account"_ button in the delete account section
 - **And** the button is styled as a destructive action in red
 
 ---
@@ -1792,7 +1792,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 **AC-FR-40-02 — Delete button navigates to confirmation screen**
 
 - **Given** I am on `/account`
-- **When** I click *"Delete my account"*
+- **When** I click _"Delete my account"_
 - **Then** I am taken to `/account/delete`
 
 ---
@@ -1815,7 +1815,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am on `/account`
 - **When** I view the delete account section
-- **Then** I see the warning: *"Deleting your account will permanently remove all your data, including your charity profile and saved applications. This cannot be undone."*
+- **Then** I see the warning: _"Deleting your account will permanently remove all your data, including your charity profile and saved applications. This cannot be undone."_
 
 ---
 
@@ -1823,7 +1823,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am on `/account/delete`
 - **When** I view the page
-- **Then** I see the warning: *"This will permanently delete your account and all associated data, including your charity profile and all saved applications. This cannot be undone."*
+- **Then** I see the warning: _"This will permanently delete your account and all associated data, including your charity profile and all saved applications. This cannot be undone."_
 
 ---
 
@@ -1832,10 +1832,10 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** I am on `/account/delete`
 - **When** I view the page
 - **Then** I see a plain list of exactly what will be deleted:
-  - *Your account and login details*
-  - *Your charity profile*
-  - *All saved applications and draft answers*
-  - *Any uploaded funder guidelines*
+  - _Your account and login details_
+  - _Your charity profile_
+  - _All saved applications and draft answers_
+  - _Any uploaded funder guidelines_
 
 ---
 
@@ -1843,7 +1843,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **Requirement:** The user shall be required to confirm deletion by re-entering their email address.
 
-*Note: the screen requirements specify that the user must type the word DELETE (uppercase, case-sensitive) rather than re-entering their email address. The screen requirements take precedence and the acceptance criteria below reflect the implemented behaviour.*
+_Note: the screen requirements specify that the user must type the word DELETE (uppercase, case-sensitive) rather than re-entering their email address. The screen requirements take precedence and the acceptance criteria below reflect the implemented behaviour._
 
 ---
 
@@ -1851,8 +1851,8 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am on `/account/delete`
 - **When** I view the page
-- **Then** I see a text input labelled: *"Type DELETE to confirm"*
-- **And** the *"Permanently delete my account"* button is disabled
+- **Then** I see a text input labelled: _"Type DELETE to confirm"_
+- **And** the _"Permanently delete my account"_ button is disabled
 
 ---
 
@@ -1860,7 +1860,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am on `/account/delete`
 - **When** I type the exact string `DELETE` (all uppercase) in the confirmation input
-- **Then** the *"Permanently delete my account"* button becomes enabled
+- **Then** the _"Permanently delete my account"_ button becomes enabled
 
 ---
 
@@ -1868,14 +1868,14 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am on `/account/delete`
 - **When** I type anything other than the exact string `DELETE` (e.g. `delete`, `Delete`, `DELET`, or any other value)
-- **Then** the *"Permanently delete my account"* button remains disabled
+- **Then** the _"Permanently delete my account"_ button remains disabled
 
 ---
 
 **AC-FR-42-04 — Cancel returns to account settings with no changes**
 
 - **Given** I am on `/account/delete`
-- **When** I click *"Cancel"*
+- **When** I click _"Cancel"_
 - **Then** I am returned to `/account`
 - **And** my account and all data remain unchanged
 
@@ -1891,7 +1891,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** I am on `/account/delete`
 - **And** I have typed `DELETE` in the confirmation input
-- **When** I click *"Permanently delete my account"*
+- **When** I click _"Permanently delete my account"_
 - **Then** the following are permanently and irreversibly deleted:
   - My user account and login credentials
   - My charity profile
@@ -1904,7 +1904,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** my account deletion has completed
 - **Then** my current session is ended immediately
-- **And** I am redirected to `/` with the inline message: *"Your account has been deleted."*
+- **And** I am redirected to `/` with the inline message: _"Your account has been deleted."_
 
 ---
 
@@ -1912,7 +1912,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 - **Given** my account has been deleted
 - **When** I attempt to sign in with the email address and password of the deleted account
-- **Then** I see the standard sign-in error: *"Your email address or password is incorrect. Please try again."*
+- **Then** I see the standard sign-in error: _"Your email address or password is incorrect. Please try again."_
 - **And** I am not signed in
 
 ---
@@ -1930,7 +1930,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 **Requirement:** The system shall send a confirmation email to the user once deletion is complete.
 
-*These criteria apply only if FR-44 is implemented in v1.*
+_These criteria apply only if FR-44 is implemented in v1._
 
 ---
 
@@ -1939,7 +1939,7 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **Given** I have completed the account deletion flow
 - **When** the deletion is processed
 - **Then** I receive a confirmation email (Email 5) at my former registered email address
-- **And** the email subject is: *"Your Grant Pathway account has been deleted"*
+- **And** the email subject is: _"Your Grant Pathway account has been deleted"_
 
 ---
 
@@ -1949,9 +1949,9 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **When** I read the email
 - **Then** it confirms that my account has been permanently deleted
 - **And** it confirms that all associated data has been removed
-- **And** it includes a *"Register a new account"* link for users who wish to use Grant Pathway again in the future
+- **And** it includes a _"Register a new account"_ link for users who wish to use Grant Pathway again in the future
 
 ---
 
-*Last updated: 2026-06-04*
-*Status: Complete — all 9 sections done; AC-FR-29-04 (over-limit hard stop) and AC-FR-29-05 (optional question gate) added 2026-06-04*
+_Last updated: 2026-06-04_
+_Status: Complete — all 9 sections done; AC-FR-29-04 (over-limit hard stop) and AC-FR-29-05 (optional question gate) added 2026-06-04_

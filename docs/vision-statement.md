@@ -17,5 +17,5 @@
 
 ---
 
-*Agreed: 2026-04-13*
-*Revised: 2026-05-29 — "AI-powered drafting" replaced with "AI-assisted writing"; "writing companion" replaced with "preparation tool" to reflect BD-01 and the AI assists not generates principle confirmed in Mark Two*
+_Agreed: 2026-04-13_
+_Revised: 2026-05-29 — "AI-powered drafting" replaced with "AI-assisted writing"; "writing companion" replaced with "preparation tool" to reflect BD-01 and the AI assists not generates principle confirmed in Mark Two_

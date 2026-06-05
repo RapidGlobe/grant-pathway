@@ -122,9 +122,7 @@ export function ApplicationStep5Approve({
     return 'pending'
   }
 
-  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(
-    toApprovalStatus(status),
-  )
+  const [approvalStatus, setApprovalStatus] = useState<ApprovalStatus>(toApprovalStatus(status))
   const [lastExported, setLastExported] = useState<string | null>(lastExportedAt)
 
   const isApproved = approvalStatus === 'approved' || approvalStatus === 'exported'
@@ -263,10 +261,7 @@ export function ApplicationStep5Approve({
       {/* ── Approval status banner ─────────────────────────────────────────── */}
       {isApproved && (
         <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4">
-          <CheckCircle2
-            className="h-5 w-5 shrink-0 text-[#16A34A]"
-            aria-hidden="true"
-          />
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
           <div>
             <p className="text-[14px] font-medium text-[#166534]">
               {isExported ? 'Application approved and exported.' : 'Application approved.'}
@@ -316,23 +311,21 @@ export function ApplicationStep5Approve({
             <p className="mb-4 text-[12px] font-semibold uppercase tracking-wide text-[#64748B]">
               Assembled draft
             </p>
-            {assembledDraft
-              .split('\n\n---\n\n')
-              .map((block, i) => {
-                const newlineIdx = block.indexOf('\n\n')
-                const heading = newlineIdx === -1 ? block.trim() : block.slice(0, newlineIdx).trim()
-                const body = newlineIdx === -1 ? '' : block.slice(newlineIdx + 2).trim()
-                return (
-                  <div key={i} className={i > 0 ? 'mt-6 border-t border-[#F1F5F9] pt-6' : ''}>
-                    <p className="mb-2 text-[14px] font-semibold text-[#1E293B]">{heading}</p>
-                    {body && (
-                      <p className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#374151]">
-                        {body}
-                      </p>
-                    )}
-                  </div>
-                )
-              })}
+            {assembledDraft.split('\n\n---\n\n').map((block, i) => {
+              const newlineIdx = block.indexOf('\n\n')
+              const heading = newlineIdx === -1 ? block.trim() : block.slice(0, newlineIdx).trim()
+              const body = newlineIdx === -1 ? '' : block.slice(newlineIdx + 2).trim()
+              return (
+                <div key={i} className={i > 0 ? 'mt-6 border-t border-[#F1F5F9] pt-6' : ''}>
+                  <p className="mb-2 text-[14px] font-semibold text-[#1E293B]">{heading}</p>
+                  {body && (
+                    <p className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#374151]">
+                      {body}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
           </div>
         ) : (
           // Individual answer cards — shown for legacy applications (old AI-on-load model)
@@ -348,10 +341,7 @@ export function ApplicationStep5Approve({
                 const badge = sourceBadge(answer.answerSource)
 
                 return (
-                  <div
-                    key={answer.id}
-                    className="rounded-xl border border-[#E2E8F0] bg-white p-5"
-                  >
+                  <div key={answer.id} className="rounded-xl border border-[#E2E8F0] bg-white p-5">
                     <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                       <p className="text-[14px] font-semibold text-[#1E293B]">
                         {answer.questionOrder}.&nbsp;{answer.questionText}
@@ -512,9 +502,9 @@ export function ApplicationStep5Approve({
               {lastExported
                 ? `You last exported this application on ${formatExportDate(lastExported)}.`
                 : 'You have already exported this application.'}{' '}
-              If you have already submitted that version to the funder, please contact
-              them if you intend to submit a revised version — funders may treat multiple
-              submissions as separate applications.
+              If you have already submitted that version to the funder, please contact them if you
+              intend to submit a revised version — funders may treat multiple submissions as
+              separate applications.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -544,8 +534,8 @@ export function ApplicationStep5Approve({
           <DialogHeader>
             <DialogTitle>Re-open this application?</DialogTitle>
             <DialogDescription>
-              Re-opening will remove your approval. You will need to review and
-              approve your answers again before you can export.
+              Re-opening will remove your approval. You will need to review and approve your answers
+              again before you can export.
             </DialogDescription>
           </DialogHeader>
           {reopenError && (

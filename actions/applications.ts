@@ -12,12 +12,7 @@ import { createClient } from '@/lib/supabase/server'
 // Shared types
 // ---------------------------------------------------------------------------
 
-export type ApplicationStatus =
-  | 'not_started'
-  | 'in_progress'
-  | 'approved'
-  | 'exported'
-  | 'mismatch'
+export type ApplicationStatus = 'not_started' | 'in_progress' | 'approved' | 'exported' | 'mismatch'
 
 /**
  * Lightweight application summary used by the dashboard list.
@@ -83,9 +78,7 @@ export async function createApplication(): Promise<never> {
 // S2.4 — Delete application
 // ---------------------------------------------------------------------------
 
-export type DeleteApplicationResult =
-  | { ok: true }
-  | { ok: false; error: string }
+export type DeleteApplicationResult = { ok: true } | { ok: false; error: string }
 
 /**
  * Hard-deletes an application owned by the authenticated user.
@@ -98,9 +91,7 @@ export type DeleteApplicationResult =
  * RLS on the applications table ensures users can only delete their own
  * rows — the .eq('user_id', user.id) filter is belt-and-braces.
  */
-export async function deleteApplication(
-  applicationId: string,
-): Promise<DeleteApplicationResult> {
+export async function deleteApplication(applicationId: string): Promise<DeleteApplicationResult> {
   const supabase = await createClient()
 
   const {
@@ -213,7 +204,10 @@ export async function saveApplicationStep1(
     }
   } catch {
     // Network error or Supabase unavailable
-    return { ok: false, error: 'Could not reach the server. Please check your connection and try again.' }
+    return {
+      ok: false,
+      error: 'Could not reach the server. Please check your connection and try again.',
+    }
   }
 
   redirect(`/applications/${applicationId}/step/2`)
@@ -236,9 +230,7 @@ export async function saveApplicationStep1(
  * Returns never on success (calls redirect). Returns { ok: false, error }
  * only when the DB update fails.
  */
-export async function advanceToStep3(
-  applicationId: string,
-): Promise<{ ok: false; error: string }> {
+export async function advanceToStep3(applicationId: string): Promise<{ ok: false; error: string }> {
   const supabase = await createClient()
 
   const {
@@ -292,9 +284,7 @@ export async function advanceToStep3(
  * Returns never on success (calls redirect). Returns { ok: false, error }
  * only when the DB update fails.
  */
-export async function advanceToStep4(
-  applicationId: string,
-): Promise<{ ok: false; error: string }> {
+export async function advanceToStep4(applicationId: string): Promise<{ ok: false; error: string }> {
   const supabase = await createClient()
 
   const {
@@ -418,9 +408,7 @@ export async function setDraftInProgress(
 // S6.3 — Save answer (auto-save and manual save from Step 4)
 // ---------------------------------------------------------------------------
 
-export type SaveAnswerResult =
-  | { ok: true }
-  | { ok: false; error: string }
+export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
 
 /**
  * Saves a single answer text for an existing application_answers row.
@@ -472,9 +460,7 @@ export async function saveAnswer(
  * reviewing all three FR-32 review prompts. Resets to false if the user
  * subsequently edits the answer (handled client-side via unapproveAnswer).
  */
-export async function approveAnswer(
-  answerId: string,
-): Promise<SaveAnswerResult> {
+export async function approveAnswer(answerId: string): Promise<SaveAnswerResult> {
   const supabase = await createClient()
 
   const {
@@ -519,19 +505,17 @@ export async function saveManualAnswer(
     return { ok: false, error: 'Please enter your application question.' }
   }
 
-  const { error } = await supabase
-    .from('application_answers')
-    .upsert(
-      {
-        application_id: applicationId,
-        user_id: user.id,
-        question_text: questionText.trim(),
-        question_order: 1,
-        answer_text: answerText.trim() || null,
-        answer_source: 'user_written',
-      },
-      { onConflict: 'application_id,question_order' },
-    )
+  const { error } = await supabase.from('application_answers').upsert(
+    {
+      application_id: applicationId,
+      user_id: user.id,
+      question_text: questionText.trim(),
+      question_order: 1,
+      answer_text: answerText.trim() || null,
+      answer_source: 'user_written',
+    },
+    { onConflict: 'application_id,question_order' },
+  )
 
   if (error) {
     return { ok: false, error: 'Could not save your answer. Please try again.' }
@@ -582,9 +566,7 @@ export async function setDraftReadyToAssemble(
 // S6.7 — Assemble draft and advance to Step 5
 // ---------------------------------------------------------------------------
 
-export type AssembleAndAdvanceResult =
-  | { ok: true }
-  | { ok: false; error: string }
+export type AssembleAndAdvanceResult = { ok: true } | { ok: false; error: string }
 
 /**
  * Called when the user confirms on the senior review screen. Assembles all
@@ -603,9 +585,7 @@ export type AssembleAndAdvanceResult =
  * questions should be answered before this action is reachable (the UI gate
  * requires allAnswered), but the assembly is robust to partial completion.
  */
-export async function assembleAndAdvance(
-  applicationId: string,
-): Promise<AssembleAndAdvanceResult> {
+export async function assembleAndAdvance(applicationId: string): Promise<AssembleAndAdvanceResult> {
   const supabase = await createClient()
 
   const {
@@ -706,9 +686,7 @@ export async function assembleAndAdvance(
  * Returns never on success (calls redirect). Returns { ok: false, error }
  * only when the DB update fails.
  */
-export async function advanceToStep5(
-  applicationId: string,
-): Promise<{ ok: false; error: string }> {
+export async function advanceToStep5(applicationId: string): Promise<{ ok: false; error: string }> {
   const supabase = await createClient()
 
   const {
@@ -750,9 +728,7 @@ export async function advanceToStep5(
 // S7.1 — Approve application
 // ---------------------------------------------------------------------------
 
-export type ApproveApplicationResult =
-  | { ok: true }
-  | { ok: false; error: string }
+export type ApproveApplicationResult = { ok: true } | { ok: false; error: string }
 
 /**
  * Approves an application:
@@ -762,9 +738,7 @@ export type ApproveApplicationResult =
  * The client updates local state after receiving { ok: true }.
  * updated_at is managed by the database trigger on both tables.
  */
-export async function approveApplication(
-  applicationId: string,
-): Promise<ApproveApplicationResult> {
+export async function approveApplication(applicationId: string): Promise<ApproveApplicationResult> {
   const supabase = await createClient()
 
   const {
@@ -797,9 +771,7 @@ export async function approveApplication(
 // S2.3 — Re-open application
 // ---------------------------------------------------------------------------
 
-export type ReopenApplicationResult =
-  | { ok: true }
-  | { ok: false; error: string }
+export type ReopenApplicationResult = { ok: true } | { ok: false; error: string }
 
 /**
  * Re-opens an approved or exported application:
@@ -815,9 +787,7 @@ export type ReopenApplicationResult =
  * The client redirects to Step 4 after receiving { ok: true }.
  * updated_at is managed by the database trigger on both tables.
  */
-export async function reopenApplication(
-  applicationId: string,
-): Promise<ReopenApplicationResult> {
+export async function reopenApplication(applicationId: string): Promise<ReopenApplicationResult> {
   const supabase = await createClient()
 
   const {

@@ -1,11 +1,11 @@
-import { AlertCircle } from "lucide-react";
+import { AlertCircle } from 'lucide-react'
 
 interface FormErrorSummaryProps {
-  errors: { field: string; fieldId: string; message: string }[];
+  errors: { field: string; fieldId: string; message: string }[]
 }
 
 export function FormErrorSummary({ errors }: FormErrorSummaryProps) {
-  if (errors.length === 0) return null;
+  if (errors.length === 0) return null
 
   return (
     <div
@@ -14,17 +14,11 @@ export function FormErrorSummary({ errors }: FormErrorSummaryProps) {
       className="mb-6 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-4"
     >
       <div className="flex items-start gap-3">
-        <AlertCircle
-          className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]"
-          aria-hidden="true"
-        />
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
         <div>
-          <p
-            id="form-error-heading"
-            className="text-[14px] font-semibold text-[#991B1B]"
-          >
-            There {errors.length === 1 ? "is" : "are"} {errors.length}{" "}
-            {errors.length === 1 ? "error" : "errors"} in this form
+          <p id="form-error-heading" className="text-[14px] font-semibold text-[#991B1B]">
+            There {errors.length === 1 ? 'is' : 'are'} {errors.length}{' '}
+            {errors.length === 1 ? 'error' : 'errors'} in this form
           </p>
           <ul className="mt-2 space-y-1">
             {errors.map(({ field, fieldId, message }) => (
@@ -35,7 +29,7 @@ export function FormErrorSummary({ errors }: FormErrorSummaryProps) {
                 >
                   {field}
                 </a>
-                {" — "}
+                {' — '}
                 {message}
               </li>
             ))}
@@ -43,5 +37,5 @@ export function FormErrorSummary({ errors }: FormErrorSummaryProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

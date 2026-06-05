@@ -21,7 +21,12 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { StepIndicator } from '@/components/step-indicator'
-import { saveAnswer, approveAnswer, saveManualAnswer, setDraftReadyToAssemble } from '@/actions/applications'
+import {
+  saveAnswer,
+  approveAnswer,
+  saveManualAnswer,
+  setDraftReadyToAssemble,
+} from '@/actions/applications'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -78,20 +83,20 @@ export function ApplicationStep4Draft({
   approachingLimit,
   limitReached,
 }: ApplicationStep4DraftProps) {
-  const [answers, setAnswers] = useState<Record<string, string>>(
-    () => Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
+  const [answers, setAnswers] = useState<Record<string, string>>(() =>
+    Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
   )
 
   // FR-33: per-question approval state (initialised from DB is_approved)
-  const [approved, setApproved] = useState<Record<string, boolean>>(
-    () => Object.fromEntries(questions.map((q) => [q.id, q.isApproved])),
+  const [approved, setApproved] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(questions.map((q) => [q.id, q.isApproved])),
   )
   // Tracks whether server approval call is in flight per question
   const [approvingId, setApprovingId] = useState<string | null>(null)
   const [approveErrors, setApproveErrors] = useState<Record<string, string>>({})
 
-  const [refineStates, setRefineStates] = useState<Record<string, RefineState>>(
-    () => Object.fromEntries(questions.map((q) => [q.id, { status: 'idle' } as RefineState])),
+  const [refineStates, setRefineStates] = useState<Record<string, RefineState>>(() =>
+    Object.fromEntries(questions.map((q) => [q.id, { status: 'idle' } as RefineState])),
   )
 
   const [isSaving, setIsSaving] = useState(false)
@@ -107,11 +112,11 @@ export function ApplicationStep4Draft({
   const [isManualContinuing, startManualContinueTransition] = useTransition()
 
   const latestAnswers = useRef(answers)
+  // eslint-disable-next-line react-hooks/refs -- intentional "latest value" ref pattern; read only in callbacks/intervals, not during render
   latestAnswers.current = answers
   const dirtyRef = useRef<Set<string>>(new Set())
   const pendingSaves = useRef(0)
 
-  const answeredCount = questions.filter((q) => (answers[q.id] ?? '').trim() !== '').length
   // FR-32/FR-33: progress bar and gate use approved count, not just answered count
   const approvedCount = questions.filter((q) => approved[q.id]).length
   // A question is optional if its text contains "(optional)" or starts with
@@ -124,9 +129,7 @@ export function ApplicationStep4Draft({
   const allApproved =
     questions.length > 0 &&
     questions.every(
-      (q) =>
-        approved[q.id] ||
-        (isOptionalQ(q.questionText) && (answers[q.id] ?? '').trim() === ''),
+      (q) => approved[q.id] || (isOptionalQ(q.questionText) && (answers[q.id] ?? '').trim() === ''),
     )
 
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
@@ -173,7 +176,7 @@ export function ApplicationStep4Draft({
       }
     }, 60_000)
     return () => clearInterval(interval)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
 
   // ── Refine answer (S6.6) ─────────────────────────────────────────────────
 
@@ -464,8 +467,8 @@ export function ApplicationStep4Draft({
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
           <p className="text-[13px] text-[#991B1B]">
-            You&apos;ve reached your monthly AI limit. You can still write and edit your answers
-            — AI writing assistance is unavailable until next month.
+            You&apos;ve reached your monthly AI limit. You can still write and edit your answers —
+            AI writing assistance is unavailable until next month.
           </p>
         </div>
       )}
@@ -589,7 +592,8 @@ export function ApplicationStep4Draft({
                       </button>
                       {isOver && (
                         <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer exceeds the funder&apos;s word limit. Please trim it or use AI to bring it within the limit before approving.
+                          Your answer exceeds the funder&apos;s word limit. Please trim it or use AI
+                          to bring it within the limit before approving.
                         </p>
                       )}
                     </>
@@ -644,40 +648,52 @@ export function ApplicationStep4Draft({
               {/* FR-32 / FR-33 — Review prompts and approval step.
                   Show when: answer is non-empty OR section is optional (optional
                   sections may be left blank and still approved/skipped). */}
-              {(!isEmpty || isOptionalQ(q.questionText)) && !isOver && !isApprovedQ && refineState.status !== 'showing' && (
-                <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
-                  <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
-                    Before you approve, check:
-                  </p>
-                  <ul className="mb-4 space-y-2">
-                    <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
-                      Does this accurately describe your charity and project?
-                    </li>
-                    <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
-                      Are all figures, dates, and facts correct?
-                    </li>
-                    <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
-                      Does this answer the question that was asked?
-                    </li>
-                  </ul>
-                  {approveError && (
-                    <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
-                      {approveError}
+              {(!isEmpty || isOptionalQ(q.questionText)) &&
+                !isOver &&
+                !isApprovedQ &&
+                refineState.status !== 'showing' && (
+                  <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
+                    <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
+                      Before you approve, check:
                     </p>
-                  )}
-                  <Button
-                    type="button"
-                    onClick={() => void handleApprove(q.id)}
-                    disabled={isApprovingQ}
-                    className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
-                  >
-                    {isApprovingQ ? 'Approving…' : 'Approve this answer'}
-                  </Button>
-                </div>
-              )}
+                    <ul className="mb-4 space-y-2">
+                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                        <CheckCircle2
+                          className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+                          aria-hidden="true"
+                        />
+                        Does this accurately describe your charity and project?
+                      </li>
+                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                        <CheckCircle2
+                          className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+                          aria-hidden="true"
+                        />
+                        Are all figures, dates, and facts correct?
+                      </li>
+                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                        <CheckCircle2
+                          className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+                          aria-hidden="true"
+                        />
+                        Does this answer the question that was asked?
+                      </li>
+                    </ul>
+                    {approveError && (
+                      <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
+                        {approveError}
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      onClick={() => void handleApprove(q.id)}
+                      disabled={isApprovingQ}
+                      className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+                    >
+                      {isApprovingQ ? 'Approving…' : 'Approve this answer'}
+                    </Button>
+                  </div>
+                )}
 
               {/* Approved confirmation banner */}
               {isApprovedQ && (

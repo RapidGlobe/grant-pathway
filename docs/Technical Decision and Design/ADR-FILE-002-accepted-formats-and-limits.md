@@ -21,10 +21,10 @@ Grant Pathway allows users to provide funder guidelines either by uploading a do
 
 **PDF (.pdf) and Word (.docx) file uploads are accepted, plus direct text paste. Maximum file size is 10MB.**
 
-| Input method | Accepted formats | Max size |
-|---|---|---|
-| File upload | `.pdf`, `.docx` | 10MB |
-| Direct paste | Plain text | No limit (reasonable) |
+| Input method | Accepted formats | Max size              |
+| ------------ | ---------------- | --------------------- |
+| File upload  | `.pdf`, `.docx`  | 10MB                  |
+| Direct paste | Plain text       | No limit (reasonable) |
 
 Files above 10MB are rejected client-side before upload with the message: "This file is too large. Please upload a file under 10MB, or paste the text instead."
 

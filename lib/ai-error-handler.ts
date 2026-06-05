@@ -28,14 +28,14 @@
 // ---------------------------------------------------------------------------
 
 export type AiErrorCode =
-  | 'usage_limit'   // App-level 20/month cap
-  | 'rate_limited'  // Per-minute burst limit
-  | 'overloaded'    // Bedrock 529
-  | 'timeout'       // Request timed out
-  | 'server_error'  // Bedrock 5xx
-  | 'parse_error'   // JSON parse failed
-  | 'auth_error'    // Bedrock auth failure
-  | 'unknown'       // Anything else
+  | 'usage_limit' // App-level 20/month cap
+  | 'rate_limited' // Per-minute burst limit
+  | 'overloaded' // Bedrock 529
+  | 'timeout' // Request timed out
+  | 'server_error' // Bedrock 5xx
+  | 'parse_error' // JSON parse failed
+  | 'auth_error' // Bedrock auth failure
+  | 'unknown' // Anything else
 
 // ---------------------------------------------------------------------------
 // HTTP status mapping (GAP-04)
@@ -65,20 +65,13 @@ export function httpStatusForError(code: AiErrorCode): number {
 const ERROR_MESSAGES: Record<AiErrorCode, string> = {
   usage_limit:
     'You have reached your monthly AI request limit. Your limit resets at the start of next month.',
-  rate_limited:
-    'Too many requests. Please wait a moment before trying again.',
-  overloaded:
-    'The AI service is busy right now. Please try again in a moment.',
-  timeout:
-    'The request took too long. Please try again.',
-  server_error:
-    'The AI service returned an error. Please try again.',
-  parse_error:
-    'We could not read the AI response. Please try again.',
-  auth_error:
-    'AI service configuration error. Please contact support.',
-  unknown:
-    'An unexpected error occurred. Please try again.',
+  rate_limited: 'Too many requests. Please wait a moment before trying again.',
+  overloaded: 'The AI service is busy right now. Please try again in a moment.',
+  timeout: 'The request took too long. Please try again.',
+  server_error: 'The AI service returned an error. Please try again.',
+  parse_error: 'We could not read the AI response. Please try again.',
+  auth_error: 'AI service configuration error. Please contact support.',
+  unknown: 'An unexpected error occurred. Please try again.',
 }
 
 /**
@@ -126,7 +119,12 @@ const RETRY_DELAYS_MS = [1_000, 3_000] // 1 s before attempt 2, 3 s before attem
  * 400/401/403 (auth/config errors) are not retried — they will not resolve.
  */
 function isRetryable(code: AiErrorCode): boolean {
-  return code === 'rate_limited' || code === 'overloaded' || code === 'server_error' || code === 'timeout'
+  return (
+    code === 'rate_limited' ||
+    code === 'overloaded' ||
+    code === 'server_error' ||
+    code === 'timeout'
+  )
 }
 
 /**

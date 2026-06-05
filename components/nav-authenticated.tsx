@@ -1,51 +1,51 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { Logo } from "@/components/logo";
-import { usePathname } from "next/navigation";
-import { ChevronDown, Settings, LogOut } from "lucide-react";
+import Link from 'next/link'
+import { Logo } from '@/components/logo'
+import { usePathname } from 'next/navigation'
+import { ChevronDown, Settings, LogOut } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { signOut } from "@/actions/auth";
+} from '@/components/ui/dropdown-menu'
+import { signOut } from '@/actions/auth'
 
 interface NavAuthenticatedProps {
-  firstName?: string;
-  email?: string;
+  firstName?: string
+  email?: string
 }
 
 function getInitials(firstName?: string, email?: string): string {
-  if (firstName) return firstName.charAt(0).toUpperCase();
-  if (email) return email.charAt(0).toUpperCase();
-  return "U";
+  if (firstName) return firstName.charAt(0).toUpperCase()
+  if (email) return email.charAt(0).toUpperCase()
+  return 'U'
 }
 
 function getDisplayName(firstName?: string, email?: string): string {
-  return firstName || email || "Account";
+  return firstName || email || 'Account'
 }
 
 export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
-  const pathname = usePathname();
-  const displayName = getDisplayName(firstName, email);
-  const initials = getInitials(firstName, email);
+  const pathname = usePathname()
+  const displayName = getDisplayName(firstName, email)
+  const initials = getInitials(firstName, email)
 
   async function handleSignOut() {
-    await signOut();
-    window.location.href = "/";
+    await signOut()
+    window.location.href = '/'
   }
 
   function navLinkClass(href: string): string {
-    const isActive = pathname === href || pathname.startsWith(href + "/");
+    const isActive = pathname === href || pathname.startsWith(href + '/')
     return [
-      "rounded-md px-3 py-1.5 text-[14px] transition-colors",
+      'rounded-md px-3 py-1.5 text-[14px] transition-colors',
       isActive
-        ? "bg-[#E6F4F4] font-semibold text-[#0D6E6E]"
-        : "font-medium text-[#64748B] hover:bg-[#E6F4F4] hover:text-[#1E293B]",
-    ].join(" ");
+        ? 'bg-[#E6F4F4] font-semibold text-[#0D6E6E]'
+        : 'font-medium text-[#64748B] hover:bg-[#E6F4F4] hover:text-[#1E293B]',
+    ].join(' ')
   }
 
   return (
@@ -71,12 +71,12 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
           <nav aria-label="Main navigation">
             <ul className="flex items-center gap-1 list-none m-0 p-0">
               <li>
-                <Link href="/dashboard" className={navLinkClass("/dashboard")}>
+                <Link href="/dashboard" className={navLinkClass('/dashboard')}>
                   My applications
                 </Link>
               </li>
               <li>
-                <Link href="/profile" className={navLinkClass("/profile")}>
+                <Link href="/profile" className={navLinkClass('/profile')}>
                   Charity profile
                 </Link>
               </li>
@@ -116,5 +116,5 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
         </DropdownMenu>
       </div>
     </header>
-  );
+  )
 }

@@ -37,6 +37,7 @@ This decision is related to DDR-LA-001 (application flow layout) -- the placemen
 The three mandatory review prompts (FR-32) will be displayed in the right-hand contextual panel in Step 4, consistent with the two-column layout decided in DDR-LA-001. The panel uses CSS `position: sticky` so it remains visible as the user scrolls through all question/answer pairs. A single instance of the three prompts applies to all answers on the page.
 
 The right-hand panel content per step is:
+
 - **Step 3:** Questions-found summary (number of questions extracted, key notes)
 - **Step 4:** The three mandatory review prompts (FR-32) -- always visible while the user edits answers
 
@@ -46,6 +47,6 @@ The right-hand panel content per step is:
 
 ---
 
-*Status: Decided*
-*Related: DDR-LA-001 (application flow layout)*
-*Created: 2026-04-17*
+_Status: Decided_
+_Related: DDR-LA-001 (application flow layout)_
+_Created: 2026-04-17_

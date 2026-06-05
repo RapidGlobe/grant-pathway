@@ -39,10 +39,7 @@ export async function POST(request: NextRequest) {
 
   const { path, applicationId } = body
   if (typeof path !== 'string' || !path || typeof applicationId !== 'string' || !applicationId) {
-    return NextResponse.json(
-      { error: 'Missing or invalid path / applicationId.' },
-      { status: 400 },
-    )
+    return NextResponse.json({ error: 'Missing or invalid path / applicationId.' }, { status: 400 })
   }
 
   // Service role client — required for private bucket access

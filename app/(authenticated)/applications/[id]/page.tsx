@@ -5,5 +5,5 @@ export default function ApplicationPage() {
     <div className="p-8">
       <p className="text-neutral-dark">Application — redirects to current step (stub)</p>
     </div>
-  );
+  )
 }

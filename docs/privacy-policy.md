@@ -9,13 +9,13 @@
 
 Grant Pathway is a free online tool that helps UK charities write grant applications. It is provided by **RapidGlobe Ltd**, a company registered in England and Wales.
 
-| | |
-|---|---|
-| **Company name** | RapidGlobe Ltd |
-| **Company registration number** | 05615649 |
-| **Registered address** | Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW |
-| **ICO registration number** | [TO BE CONFIRMED — see note below] |
-| **Data protection contact** | wjokhia@rapidglobe.com |
+|                                 |                                                                              |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| **Company name**                | RapidGlobe Ltd                                                               |
+| **Company registration number** | 05615649                                                                     |
+| **Registered address**          | Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW |
+| **ICO registration number**     | [TO BE CONFIRMED — see note below]                                           |
+| **Data protection contact**     | wjokhia@rapidglobe.com                                                       |
 
 > **⚠ ICO registration:** Processing personal data of UK individuals requires registration with the Information Commissioner's Office in most cases. Please confirm your ICO registration number before this policy goes live. Register or check your status at [ico.org.uk](https://ico.org.uk).
 
@@ -61,13 +61,13 @@ We do not use your information for marketing. We do not sell your data. We do no
 
 Under the UK General Data Protection Regulation (UK GDPR), we must have a legal basis for processing your personal data. We rely on the following:
 
-| Processing activity | Legal basis |
-|---|---|
-| Creating and managing your account | **Contract** — necessary to provide the service you have signed up for |
-| Saving your organisation profile and application content | **Contract** — necessary to deliver the core features of the service |
-| Sending service emails (welcome, inactivity warning) | **Contract / Legitimate interests** — necessary to operate the account lifecycle and keep you informed |
-| Managing the fair-use limit | **Legitimate interests** — necessary to manage running costs and ensure fair access for all users |
-| Error monitoring and security | **Legitimate interests** — necessary to keep the service reliable and protect against abuse |
+| Processing activity                                      | Legal basis                                                                                            |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Creating and managing your account                       | **Contract** — necessary to provide the service you have signed up for                                 |
+| Saving your organisation profile and application content | **Contract** — necessary to deliver the core features of the service                                   |
+| Sending service emails (welcome, inactivity warning)     | **Contract / Legitimate interests** — necessary to operate the account lifecycle and keep you informed |
+| Managing the fair-use limit                              | **Legitimate interests** — necessary to manage running costs and ensure fair access for all users      |
+| Error monitoring and security                            | **Legitimate interests** — necessary to keep the service reliable and protect against abuse            |
 
 ---
 
@@ -75,13 +75,13 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 
 We do not sell your data. We do not share it for advertising or marketing purposes. We work with a small number of trusted third-party service providers who process data on our behalf:
 
-| Provider | What they do | Where they are based |
-|---|---|---|
-| **Supabase** | Stores your account, organisation profile, and application data | United Kingdom / European Union |
-| **Anthropic** | Powers the AI features that summarise funder guidelines and generate draft answers | United States |
-| **Resend** | Sends transactional emails (welcome email, inactivity warning) | United States |
-| **Vercel** | Hosts the Grant Pathway web application | United States (with global edge network) |
-| **Sentry** | Captures error reports to help us diagnose and fix technical problems | United States |
+| Provider      | What they do                                                                       | Where they are based                     |
+| ------------- | ---------------------------------------------------------------------------------- | ---------------------------------------- |
+| **Supabase**  | Stores your account, organisation profile, and application data                    | United Kingdom / European Union          |
+| **Anthropic** | Powers the AI features that summarise funder guidelines and generate draft answers | United States                            |
+| **Resend**    | Sends transactional emails (welcome email, inactivity warning)                     | United States                            |
+| **Vercel**    | Hosts the Grant Pathway web application                                            | United States (with global edge network) |
+| **Sentry**    | Captures error reports to help us diagnose and fix technical problems              | United States                            |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
@@ -97,13 +97,13 @@ Several of our service providers are based outside the United Kingdom (see Secti
 
 ## 7. How Long We Keep Your Information
 
-| Data | Retention period |
-|---|---|
+| Data                                     | Retention period                                                                           |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
 | Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below) |
-| Application content | Deleted when your account is deleted |
-| AI usage log | Deleted when your account is deleted |
-| Email delivery records | Held by Resend in accordance with their standard retention policy (up to 90 days) |
-| Error reports | Retained for up to 12 months for diagnostic purposes, anonymised where possible |
+| Application content                      | Deleted when your account is deleted                                                       |
+| AI usage log                             | Deleted when your account is deleted                                                       |
+| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)          |
+| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible            |
 
 **Inactivity deletion:** If your account has not been used for two years, we will send a warning email to your registered address. If you do not log in within 30 days of that warning, your account and all associated data will be permanently deleted. You will receive no further warning before deletion occurs.
 
@@ -171,7 +171,7 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 ---
 
-*Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales.*
+_Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-*Effective date: [TO BE CONFIRMED]*
-*Last updated: 22 May 2026*
+_Effective date: [TO BE CONFIRMED]_
+_Last updated: 22 May 2026_

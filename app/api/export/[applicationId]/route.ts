@@ -169,8 +169,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     .eq('user_id', user.id)
     .single()
 
-  const fullName =
-    profile ? `${profile.first_name} ${profile.last_name}`.trim() : 'the applicant'
+  const fullName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : 'the applicant'
 
   // ── Mark as exported ────────────────────────────────────────────────────────
   await supabase
@@ -188,7 +187,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const assembledDraft = (application.assembled_draft as string | null) ?? null
 
   const disclaimer = `Disclaimer: This application was prepared with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`
-  const safeName = grantName.replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '_')
+  const safeName = grantName
+    .replace(/[^a-zA-Z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '_')
 
   // ── Plain text export ──────────────────────────────────────────────────────
   if (format === 'txt') {
@@ -399,8 +401,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   // Convert Buffer → Uint8Array for BodyInit compatibility
   return new Response(new Uint8Array(buffer), {
     headers: {
-      'Content-Type':
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'Content-Disposition': `attachment; filename="${safeName}_Application.docx"`,
     },
   })

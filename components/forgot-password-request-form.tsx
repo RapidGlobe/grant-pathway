@@ -1,44 +1,44 @@
-"use client";
+'use client'
 
-import { useActionState, useState } from "react";
-import Link from "next/link";
-import { Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { requestPasswordReset, type PasswordResetRequestState } from "@/actions/auth";
+import { useActionState, useState } from 'react'
+import Link from 'next/link'
+import { Mail } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { requestPasswordReset, type PasswordResetRequestState } from '@/actions/auth'
 
 interface FieldErrors {
-  email?: string;
+  email?: string
 }
 
-const INITIAL_STATE: PasswordResetRequestState = { status: "idle" };
+const INITIAL_STATE: PasswordResetRequestState = { status: 'idle' }
 
 export function ForgotPasswordRequestForm() {
-  const [state, action, isPending] = useActionState(requestPasswordReset, INITIAL_STATE);
+  const [state, action, isPending] = useActionState(requestPasswordReset, INITIAL_STATE)
 
-  const [email, setEmail] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [email, setEmail] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    const errors: FieldErrors = {};
+    const errors: FieldErrors = {}
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = "Please enter a valid email address";
+      errors.email = 'Please enter a valid email address'
     }
 
     if (Object.keys(errors).length > 0) {
-      e.preventDefault();
-      setFieldErrors(errors);
-      return;
+      e.preventDefault()
+      setFieldErrors(errors)
+      return
     }
 
-    setFieldErrors({});
+    setFieldErrors({})
   }
 
   // Success state — shown after the Server Action returns { status: 'sent' }.
   // Same message for registered and unregistered emails (AC-FR-05-01/02).
-  if (state.status === "sent") {
+  if (state.status === 'sent') {
     return (
       <div className="w-full max-w-[440px] text-center">
         <div className="mb-6 flex justify-center">
@@ -54,7 +54,7 @@ export function ForgotPasswordRequestForm() {
           Check your spam folder if it doesn&apos;t arrive within a few minutes.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -81,7 +81,7 @@ export function ForgotPasswordRequestForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             aria-invalid={!!fieldErrors.email || undefined}
-            aria-describedby={fieldErrors.email ? "reset-email-error" : undefined}
+            aria-describedby={fieldErrors.email ? 'reset-email-error' : undefined}
             className="h-10 text-[14px]"
           />
           {fieldErrors.email && (
@@ -96,16 +96,16 @@ export function ForgotPasswordRequestForm() {
           disabled={isPending}
           className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
-          {isPending ? "Sending…" : "Send reset link"}
+          {isPending ? 'Sending…' : 'Send reset link'}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-[14px] text-[#64748B]">
-        Remembered your password?{" "}
+        Remembered your password?{' '}
         <Link href="/" className="font-medium text-[#0D6E6E] hover:underline">
           Sign in
         </Link>
       </p>
     </div>
-  );
+  )
 }

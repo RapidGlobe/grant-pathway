@@ -30,6 +30,7 @@ Grant Pathway uses two AI prompts: one for generating the funder guidelines summ
 **Option B — All prompts are defined as exported constants or builder functions in `lib/prompts.ts`.**
 
 The file exports:
+
 - `MODEL` — the Anthropic model identifier
 - `buildSummaryPrompt(guidelinesText: string): string` — constructs the Step 3 summary prompt
 - `buildDraftPrompt(summary: string, charityProfile: CharityProfile, questions: Question[]): string` — constructs the Step 4 draft generation prompt

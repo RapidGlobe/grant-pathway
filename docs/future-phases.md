@@ -6,21 +6,22 @@ This document records items that are explicitly out of scope for v1 and are to b
 
 ## Status of All Items
 
-| Item | Description | Decision Record | Status |
-|------|-------------|----------------|--------|
-| FP-01 | Grant discovery phase | DR-PS-002 | To be confirmed post-launch |
-| FP-02 | 360Giving integration | DR-IN-002 | To be confirmed post-launch |
-| FP-03 | CIC formation | DR-OD-001 | To be confirmed post-launch |
-| FP-04 | Satisfaction survey & feedback framework | DR-SM-001, DR-SM-002 | To be confirmed post-launch |
-| FP-05 | Independent accessibility audit | DR-LC-003 | To be confirmed pre-scaling |
-| FP-06 | Liability insurance review | DR-LC-002 | To be confirmed when CIC is established |
-| FP-07 | OSCR (Scotland) and CCNI (NI) register lookup | BD-02 | **Planned before general release** |
-| FP-08 | Full question-level typing implementation (BD-04) | BD-04 | Planned — pre-launch or early post-launch |
-| FP-09 | Thick profile completeness-driven pre-fill for all funder tiers | BD-02, BD-07 | Planned — iterative post-launch |
+| Item  | Description                                                     | Decision Record      | Status                                    |
+| ----- | --------------------------------------------------------------- | -------------------- | ----------------------------------------- |
+| FP-01 | Grant discovery phase                                           | DR-PS-002            | To be confirmed post-launch               |
+| FP-02 | 360Giving integration                                           | DR-IN-002            | To be confirmed post-launch               |
+| FP-03 | CIC formation                                                   | DR-OD-001            | To be confirmed post-launch               |
+| FP-04 | Satisfaction survey & feedback framework                        | DR-SM-001, DR-SM-002 | To be confirmed post-launch               |
+| FP-05 | Independent accessibility audit                                 | DR-LC-003            | To be confirmed pre-scaling               |
+| FP-06 | Liability insurance review                                      | DR-LC-002            | To be confirmed when CIC is established   |
+| FP-07 | OSCR (Scotland) and CCNI (NI) register lookup                   | BD-02                | **Planned before general release**        |
+| FP-08 | Full question-level typing implementation (BD-04)               | BD-04                | Planned — pre-launch or early post-launch |
+| FP-09 | Thick profile completeness-driven pre-fill for all funder tiers | BD-02, BD-07         | Planned — iterative post-launch           |
 
 ---
 
 ## FP-01 — Grant Discovery Phase
+
 **Decision record:** DR-PS-002
 **Status:** To be confirmed post-launch
 
@@ -31,6 +32,7 @@ The discovery phase will be scoped and planned once Grant Pathway has an establi
 ---
 
 ## FP-02 — 360Giving Integration
+
 **Decision record:** DR-IN-002
 **Status:** To be confirmed post-launch
 
@@ -41,12 +43,14 @@ This will be revisited when the discovery phase is planned (FP-01). The 360Givin
 ---
 
 ## FP-03 — CIC Formation
+
 **Decision record:** DR-OD-001
 **Status:** To be confirmed post-launch
 
 Establishing a Community Interest Company (CIC) as the long-term owner and operator of Grant Pathway is the intended structure, but formation is deferred until after the v1 launch. The app will initially be owned and operated by the individual developer.
 
 Key considerations for the CIC formation phase:
+
 - Identify and engage a named potential successor organisation informally before launch (C18)
 - CIC formation to be initiated once v1 is stable and evidenced
 - Operational funding to be sought from sector funders once the app is established (A20)
@@ -55,10 +59,12 @@ Key considerations for the CIC formation phase:
 ---
 
 ## FP-04 — Satisfaction Survey & Feedback Framework
+
 **Decision records:** DR-SM-001, DR-SM-002
 **Status:** To be confirmed post-launch
 
 Formal satisfaction measurement and advanced impact metrics are deferred from v1. In v1:
+
 - Basic passive usage metrics only (registrations, applications created, returning users) — DR-SM-001
 - Users who opt in at registration will be invited to a feedback interview — DR-SM-002
 
@@ -67,6 +73,7 @@ A more structured feedback and survey framework will be planned once a meaningfu
 ---
 
 ## FP-05 — Independent Accessibility Audit
+
 **Decision record:** DR-LC-003
 **Status:** To be confirmed pre-scaling
 
@@ -77,6 +84,7 @@ This item should be triggered before Grant Pathway scales significantly beyond i
 ---
 
 ## FP-06 — Liability Insurance Review
+
 **Decision record:** DR-LC-002
 **Status:** To be confirmed when CIC is established
 
@@ -87,6 +95,7 @@ Liability insurance appropriate for the CIC's activities will be reviewed and ob
 ---
 
 ## FP-07 — OSCR (Scotland) and CCNI (Northern Ireland) Register Lookup
+
 **Decision record:** BD-02
 **Status:** Planned before general release
 
@@ -97,6 +106,7 @@ OSCR and CCNI publish their own public registers with separate APIs. Integrating
 ---
 
 ## FP-08 — Full Question-Level Typing Implementation
+
 **Decision record:** BD-04
 **Status:** Planned — pre-launch or early post-launch
 
@@ -105,6 +115,7 @@ Question-level typing (`question_type: narrative | data_entry | financial | drop
 ---
 
 ## FP-09 — Thick Profile Completeness-Driven Pre-fill for All Funder Tiers
+
 **Decision record:** BD-02, BD-07
 **Status:** Planned — iterative post-launch
 
@@ -114,16 +125,16 @@ The thick charity profile (BD-02) includes financial fields, contact details, an
 
 ## Checklist Coverage
 
-| Checklist Item | Description | Status |
-|---------------|-------------|--------|
-| Item 48 | Grant discovery phase | Covered by FP-01 |
-| Item 49 | 360Giving integration | Covered by FP-02 |
-| Item 50 | CIC formation | Covered by FP-03 |
-| Item 51 | Satisfaction survey and feedback framework | Covered by FP-04 |
-| Item 52 | Independent accessibility audit | Covered by FP-05 |
-| Item 53 | Liability insurance review | Covered by FP-06 |
+| Checklist Item | Description                                | Status           |
+| -------------- | ------------------------------------------ | ---------------- |
+| Item 48        | Grant discovery phase                      | Covered by FP-01 |
+| Item 49        | 360Giving integration                      | Covered by FP-02 |
+| Item 50        | CIC formation                              | Covered by FP-03 |
+| Item 51        | Satisfaction survey and feedback framework | Covered by FP-04 |
+| Item 52        | Independent accessibility audit            | Covered by FP-05 |
+| Item 53        | Liability insurance review                 | Covered by FP-06 |
 
 ---
 
-*Last updated: 2026-05-29*
-*Sources: BRD Information Gathering Checklist items 48–53; DR-PS-002, DR-IN-002, DR-OD-001, DR-SM-001, DR-SM-002, DR-LC-003, DR-LC-002; v1-out-of-scope.md; BRD Mark Two BD-02, BD-04, BD-07*
+_Last updated: 2026-05-29_
+_Sources: BRD Information Gathering Checklist items 48–53; DR-PS-002, DR-IN-002, DR-OD-001, DR-SM-001, DR-SM-002, DR-LC-003, DR-LC-002; v1-out-of-scope.md; BRD Mark Two BD-02, BD-04, BD-07_

@@ -62,15 +62,11 @@ export async function GET(request: NextRequest) {
       // 24+ months of inactivity
       if (lastSignIn < twentyFourMonthsAgo) {
         const userId = user.id
-        const firstName =
-          (user.user_metadata?.first_name as string | undefined) ?? 'there'
+        const firstName = (user.user_metadata?.first_name as string | undefined) ?? 'there'
         const email = user.email ?? ''
 
         // Cascade deletion (same order as user-initiated deletion)
-        const { data: apps } = await service
-          .from('applications')
-          .select('id')
-          .eq('user_id', userId)
+        const { data: apps } = await service.from('applications').select('id').eq('user_id', userId)
 
         const appIds = (apps ?? []).map((a: { id: string }) => a.id)
 
@@ -102,10 +98,7 @@ export async function GET(request: NextRequest) {
               html: buildAccountDeletedInactivityEmail(firstName),
             })
           } catch (emailErr) {
-            console.error(
-              `[inactivity-deletion] Email 4 failed for user ${userId}:`,
-              emailErr,
-            )
+            console.error(`[inactivity-deletion] Email 4 failed for user ${userId}:`, emailErr)
           }
         }
       }

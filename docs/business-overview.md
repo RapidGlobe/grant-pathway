@@ -116,9 +116,9 @@ The ambition is simple: to make the grant application process a little less daun
 
 ---
 
-*Grant Pathway — grantpathway.org.uk*
-*Free for UK charities. Always.*
+_Grant Pathway — grantpathway.org.uk_
+_Free for UK charities. Always._
 
 ---
 
-*Last updated: 2026-05-29 — Elevator pitch and "What Grant Pathway Does" section updated to reflect the AI assists not generates principle (BD-01). Grant Pathway is a preparation tool; charities write every substantive answer; AI refines on request only.*
+_Last updated: 2026-05-29 — Elevator pitch and "What Grant Pathway Does" section updated to reflect the AI assists not generates principle (BD-01). Grant Pathway is a preparation tool; charities write every substantive answer; AI refines on request only._

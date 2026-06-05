@@ -23,6 +23,7 @@
 **Escape hatch:** The user may update their charity profile to accurately reflect work that aligns with the funder's criteria, then create a new application from the dashboard.
 
 **Changes:**
+
 - New DR: `docs/decisions/DR-EL-001-eligibility-mismatch-handling.md`
 - FR-47 added to `docs/moscow-feature-register.md` (Must Have)
 - `mismatch` status added to `application_status` enum (migration `20260602000000_add_mismatch_status.sql`)
@@ -52,19 +53,20 @@ Testing in May 2026 against the consolidated 12-funder target list revealed that
 
 All decisions agreed with WJ Okhia in the design review session. See Section 10 of the BRD for the full log.
 
-| Decision | Summary |
-|----------|---------|
-| BD-01 | Grant Pathway is a **preparation tool**, not a submission platform |
-| BD-02 | Charity profile is **thick** — stores full org data including financials, contact details, employee data |
-| BD-03 | Non-narrative questions are **pre-filled from profile** where possible; shown as reminders otherwise |
-| BD-04 | **Question-level typing** replaces funder-level type as the primary classification for question handling |
-| BD-05 | Both **character limits and word limits** are supported |
-| BD-06 | Multi-stage applications are **separate records** with no automated linkage in v1 |
-| BD-07 | Funders marketed at the **coverage tier they genuinely support** (Full / Partial / Guidance) |
+| Decision | Summary                                                                                                  |
+| -------- | -------------------------------------------------------------------------------------------------------- |
+| BD-01    | Grant Pathway is a **preparation tool**, not a submission platform                                       |
+| BD-02    | Charity profile is **thick** — stores full org data including financials, contact details, employee data |
+| BD-03    | Non-narrative questions are **pre-filled from profile** where possible; shown as reminders otherwise     |
+| BD-04    | **Question-level typing** replaces funder-level type as the primary classification for question handling |
+| BD-05    | Both **character limits and word limits** are supported                                                  |
+| BD-06    | Multi-stage applications are **separate records** with no automated linkage in v1                        |
+| BD-07    | Funders marketed at the **coverage tier they genuinely support** (Full / Partial / Guidance)             |
 
 ### Key new concepts in Mark Two
 
 **Three-tier funder coverage model:**
+
 - Tier 1 (Full): Narrative questions with limits; full Q&A assistance
 - Tier 2 (Partial): Portal-based mixed forms; narrative subset only; pre-fill for data-entry fields
 - Tier 3 (Guidance): Free-form narrative document; section-by-section canvas
@@ -97,7 +99,7 @@ Direct portal submission, funder discovery, eligibility screening, supporting do
 
 The Mark Two BRD now opens with a clear, unambiguous statement of how Grant Pathway uses AI. Added paragraph:
 
-> *"Grant Pathway uses AI to assist the charity in writing — not to generate content on its behalf. The charity writes every substantive answer. AI helps organise, structure, and clarify what the charity has already said."*
+> _"Grant Pathway uses AI to assist the charity in writing — not to generate content on its behalf. The charity writes every substantive answer. AI helps organise, structure, and clarify what the charity has already said."_
 
 This phrase is reinforced in Sections 1.3 (what it is not), 1.4 (AI usage principle), and 5.4 (AI assistance in Step 4). It should also be reflected in product copy, onboarding, and export disclaimers.
 
@@ -107,18 +109,18 @@ Deep research (104 agents, 21 sources fetched, 25 claims verified, 22 confirmed)
 
 ### Confirmed UK funder AI policies (all verified May 2026)
 
-| Funder | One-line position |
-|--------|-------------------|
-| Henry Smith Foundation | Cautious — "use AI for structure not content" |
-| National Lottery Community Fund | Permissive — won't reject AI applications but warns against generic content |
-| Lloyds Bank Foundation | Permissive — warns AI applications are "often generic and do not bring out your own voice" |
-| Paul Hamlyn Foundation | Permissive — "Using AI tools alone will not disadvantage your application. But be careful." |
-| Arts Council England | Permissive — applicants "accountable for what they submit"; warns about bias and creative rights |
-| British Film Institute | Permissive + transparency required — warns AI applications "look remarkably similar to others" |
-| Esmée Fairbairn Foundation | No formal policy — "a decision for individual organisations to take" |
-| London Community Foundation | Exploratory — "still in the exploratory phase"; content "must be owned by you" |
-| UKRI | Permissive + transparency expected — disclosure "will not affect the assessment process" |
-| Royal Geographical Society | Disclose AI use; AI "should not be used as part of the review process" |
+| Funder                          | One-line position                                                                                  |
+| ------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Henry Smith Foundation          | Cautious — "use AI for structure not content"                                                      |
+| National Lottery Community Fund | Permissive — won't reject AI applications but warns against generic content                        |
+| Lloyds Bank Foundation          | Permissive — warns AI applications are "often generic and do not bring out your own voice"         |
+| Paul Hamlyn Foundation          | Permissive — "Using AI tools alone will not disadvantage your application. But be careful."        |
+| Arts Council England            | Permissive — applicants "accountable for what they submit"; warns about bias and creative rights   |
+| British Film Institute          | Permissive + transparency required — warns AI applications "look remarkably similar to others"     |
+| Esmée Fairbairn Foundation      | No formal policy — "a decision for individual organisations to take"                               |
+| London Community Foundation     | Exploratory — "still in the exploratory phase"; content "must be owned by you"                     |
+| UKRI                            | Permissive + transparency expected — disclosure "will not affect the assessment process"           |
+| Royal Geographical Society      | Disclose AI use; AI "should not be used as part of the review process"                             |
 | Wellcome Trust + co-signatories | Cross-funder joint statement (Sept 2023): AI use must be cited; AI must not be used in peer review |
 
 ### Dominant finding across all funders
@@ -134,7 +136,7 @@ Every policy — regardless of how permissive — warns that generic AI content 
 ### What changed
 
 **Section 2.1 — Primary user pain point reworded**
-The original bullet "Pain point: time to write, not knowledge of their own organisation" was ambiguous. Reworded to: *"Core pain point: the capacity and time to produce well-structured, compelling applications across multiple funders — not lack of knowledge about their own work. They know their organisation deeply; Grant Pathway helps them express it in the language and format each funder requires."*
+The original bullet "Pain point: time to write, not knowledge of their own organisation" was ambiguous. Reworded to: _"Core pain point: the capacity and time to produce well-structured, compelling applications across multiple funders — not lack of knowledge about their own work. They know their organisation deeply; Grant Pathway helps them express it in the language and format each funder requires."_
 
 **Section 2.2 — Senior staff financial role made explicit and mandatory**
 Added paragraph making clear that senior involvement for financial sections is not optional. The treasurer, finance lead, or trustee with financial oversight must verify all financial figures. Grant Pathway surfaces this requirement at the preparation checklist and senior review prompt.
@@ -161,9 +163,10 @@ Added introductory note explaining that Charity Commission financial data comes 
 **Policy decision:** Grant Pathway is built for the whole of the United Kingdom. The absence of OSCR and CCNI lookup in v1 is a technical sequencing decision, not an exclusion. Scottish and Northern Irish charities are fully welcome and can use the full product by entering their profile details manually. OSCR and CCNI integration is planned with the strong intention to deliver before general release.
 
 **Sections updated:**
+
 - **Section 4.2 Identity** — Register coverage note rewritten: England and Wales Charity Commission confirmed as v1 scope; OSCR (~24,000 Scottish charities) and CCNI (~7,000 NI charities) documented as planned; manual profile entry available for Scottish and NI charities in v1; table updated with v1 source and planned source columns.
 - **Section 3.2 Tier 1** — Updated to note that the Charity Commission → profile → pre-fill flow applies to E&W charities in v1; Scottish and NI charities use manual profile entry in v1 with lookup planned before release.
 
 ---
 
-*Change Log Mark Two — created 2026-05-29. To be moved from `docs/Implementation Plan/` to a permanent location in a future session.*
+_Change Log Mark Two — created 2026-05-29. To be moved from `docs/Implementation Plan/` to a permanent location in a future session._

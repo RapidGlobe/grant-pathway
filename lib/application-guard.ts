@@ -1,11 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-export type ApplicationStatus =
-  | 'not_started'
-  | 'in_progress'
-  | 'approved'
-  | 'exported'
+export type ApplicationStatus = 'not_started' | 'in_progress' | 'approved' | 'exported'
 
 export type DraftStatus =
   | 'not_started'

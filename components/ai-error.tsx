@@ -1,30 +1,24 @@
-import { AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface AiErrorProps {
-  persistent?: boolean;
-  onRetry?: () => void;
+  persistent?: boolean
+  onRetry?: () => void
 }
 
 export function AiError({ persistent = false, onRetry }: AiErrorProps) {
   return (
-    <div
-      role="alert"
-      className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-4"
-    >
+    <div role="alert" className="rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-4">
       <div className="flex items-start gap-3">
-        <AlertCircle
-          className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]"
-          aria-hidden="true"
-        />
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
         <div className="flex-1">
           <p className="text-[14px] font-semibold text-[#991B1B]">
-            {persistent ? "Something went wrong" : "We couldn't complete that request"}
+            {persistent ? 'Something went wrong' : "We couldn't complete that request"}
           </p>
           <p className="mt-1 text-[13px] text-[#991B1B]">
             {persistent
-              ? "If this keeps happening, please try again later. Your work has been saved."
-              : "This sometimes happens with AI requests. Please try again."}
+              ? 'If this keeps happening, please try again later. Your work has been saved.'
+              : 'This sometimes happens with AI requests. Please try again.'}
           </p>
           {!persistent && onRetry && (
             <Button
@@ -39,5 +33,5 @@ export function AiError({ persistent = false, onRetry }: AiErrorProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -9,6 +9,7 @@ status: Decided
 ## Context
 
 Amazon Bedrock (the platform through which Claude is accessed — ADR-AI-001) supports two response modes:
+
 1. **Streaming:** Tokens are returned incrementally as they are generated. The UI can display text appearing progressively.
 2. **Batch (non-streaming):** The full response is returned when generation is complete.
 

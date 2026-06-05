@@ -34,9 +34,7 @@ export async function POST() {
   // without recursive folder traversal (S4.4)
   const path = `${user.id}_${Date.now()}`
 
-  const { data, error } = await service.storage
-    .from('guidelines-temp')
-    .createSignedUploadUrl(path)
+  const { data, error } = await service.storage.from('guidelines-temp').createSignedUploadUrl(path)
 
   if (error || !data) {
     console.error('[signed-url] Failed to create signed URL:', error)

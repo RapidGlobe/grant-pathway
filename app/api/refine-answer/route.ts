@@ -98,18 +98,12 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (answerError || !answerRow) {
-    return NextResponse.json(
-      { error: 'not_found', message: 'Answer not found.' },
-      { status: 404 },
-    )
+    return NextResponse.json({ error: 'not_found', message: 'Answer not found.' }, { status: 404 })
   }
 
   // Belt-and-braces: application ID must match
   if (answerRow.application_id !== applicationId) {
-    return NextResponse.json(
-      { error: 'not_found', message: 'Answer not found.' },
-      { status: 404 },
-    )
+    return NextResponse.json({ error: 'not_found', message: 'Answer not found.' }, { status: 404 })
   }
 
   // Budget questions must never receive AI assistance (AC-FR-31)
@@ -183,8 +177,7 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 7. Parse JSON response ─────────────────────────────────────────────────
-  const rawText =
-    bedrockResponse.content[0]?.type === 'text' ? bedrockResponse.content[0].text : ''
+  const rawText = bedrockResponse.content[0]?.type === 'text' ? bedrockResponse.content[0].text : ''
 
   const tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)

@@ -30,6 +30,7 @@ The favicon is a minor but visible brand touchpoint. For a free tool used by cha
 The standalone icon portion of the Grant Pathway logo -- the amber "G" with person figure -- will be used as the favicon, placed on a teal (#0D6E6E) background square.
 
 **Asset requirements before development:**
+
 - The icon mark must be extracted from the logo file as a standalone transparent PNG or SVG.
 - Favicon sizes required: 16x16px, 32x32px, and 180x180px (Apple touch icon).
 - At 16x16px the person figure detail will simplify to a small amber dot on the G form -- this is acceptable; the amber-on-teal colour read is sufficient at that size.
@@ -40,5 +41,5 @@ The standalone icon portion of the Grant Pathway logo -- the amber "G" with pers
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

@@ -15,18 +15,21 @@ Grant Pathway has authenticated routes, multi-step flows, server-side AI API cal
 ## Options Considered
 
 ### Option A — App Router
+
 - **What it is:** Next.js 13+ default. Uses the `app/` directory. Supports React Server Components (RSC), nested layouts, server actions, and streaming.
 - **Strengths:** Server Components reduce client bundle size. Nested layouts handle the authenticated shell (nav + content) cleanly. Active development and all new Next.js features target App Router. Better performance defaults.
 - **Weaknesses:** Steeper learning curve. RSC mental model requires understanding what runs on server vs client. Some third-party libraries are not yet fully RSC-compatible. More complex debugging.
 - **Migration risk:** This is the strategic direction for Next.js. Building on Pages Router means a future rewrite.
 
 ### Option B — Pages Router
+
 - **What it is:** Legacy `pages/` directory routing. All components are client-side React by default. Data fetching via `getServerSideProps` / `getStaticProps`.
 - **Strengths:** Well-documented, stable, familiar to most React developers. Simpler mental model for server/client boundary.
 - **Weaknesses:** No Server Components or nested layouts. Officially in maintenance mode — no new features. Requires `_app.tsx` patterns for shared layouts. Less performant by default.
 - **Migration risk:** Will require migration to App Router at some point; delaying creates technical debt.
 
 ### Option C — App Router with heavy Client Components
+
 - **What it is:** App Router used structurally (for routing and layouts), but most components marked `"use client"`, effectively behaving like Pages Router.
 - **Strengths:** Gets App Router structure without needing to learn the full RSC pattern immediately.
 - **Weaknesses:** Loses most of the performance and architectural benefits of the App Router. Half-measure that creates inconsistency.

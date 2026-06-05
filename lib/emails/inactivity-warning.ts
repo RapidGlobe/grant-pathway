@@ -2,10 +2,7 @@
 // Subject: "Your Grant Pathway account will be deleted in 30 days"
 // Sent at 23 months of inactivity by the inactivity-warning cron job.
 
-export function buildInactivityWarningEmail(
-  firstName: string,
-  deletionDate: string,
-): string {
+export function buildInactivityWarningEmail(firstName: string, deletionDate: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>

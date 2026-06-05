@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 // Step 2 — Upload Guidelines (S4.1, S4.2, S4.3)
 //
@@ -26,42 +26,46 @@
 //   Calls advanceToStep3() Server Action → sets status=in_progress,
 //   current_step=3, redirects to Step 3.
 
-import { useState, useRef, useEffect, useTransition } from "react";
-import Link from "next/link";
-import { Upload, FileText, X, AlertTriangle, AlertCircle, Info } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { StepIndicator } from "@/components/step-indicator";
-import { advanceToStep3 } from "@/actions/applications";
-import { setGuidelines, getGuidelines, clearGuidelines } from "@/lib/guidelines-session";
+import { useState, useRef, useEffect, useTransition } from 'react'
+import Link from 'next/link'
+import { Upload, FileText, X, AlertTriangle, AlertCircle, Info } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { StepIndicator } from '@/components/step-indicator'
+import { advanceToStep3 } from '@/actions/applications'
+import {
+  setGuidelines,
+  getGuidelines,
+  clearGuidelines,
+  setGuidelinesFilename,
+} from '@/lib/guidelines-session'
 
-type UploadState = "idle" | "uploading" | "processing" | "uploaded";
-type UploadError = "format" | "size" | "scanned" | "server" | null;
+type UploadState = 'idle' | 'uploading' | 'processing' | 'uploaded'
+type UploadError = 'format' | 'size' | 'scanned' | 'server' | null
 
 interface ApplicationStep2FormProps {
-  applicationId: string;
-  funderName: string;
-  grantName: string;
+  applicationId: string
+  funderName: string
+  grantName: string
   /** Current step from the database — used to show re-upload advisory (GAP-19) */
-  currentStep: number;
-  initialError?: UploadError;
-  showLargeWarning?: boolean;
+  currentStep: number
+  initialError?: UploadError
+  showLargeWarning?: boolean
 }
 
-const ACCEPTED_EXTENSIONS = [".pdf", ".docx"];
-const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
+const ACCEPTED_EXTENSIONS = ['.pdf', '.docx']
+const MAX_FILE_BYTES = 10 * 1024 * 1024 // 10 MB
 
 const UPLOAD_ERROR_MESSAGES: Record<Exclude<UploadError, null>, string> = {
   format:
     "We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.",
-  size:
-    "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.",
+  size: 'Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.',
   scanned:
     "We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below.",
   server:
-    "Something went wrong while processing your document. Please try again, or paste the guidelines text directly.",
-};
+    'Something went wrong while processing your document. Please try again, or paste the guidelines text directly.',
+}
 
 export function ApplicationStep2Form({
   applicationId,
@@ -71,158 +75,157 @@ export function ApplicationStep2Form({
   initialError = null,
   showLargeWarning = false,
 }: ApplicationStep2FormProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [uploadState, setUploadState] = useState<UploadState>("idle");
-  const [uploadError, setUploadError] = useState<UploadError>(initialError);
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [largeWarning, setLargeWarning] = useState(showLargeWarning);
-  const [pasteText, setPasteText] = useState("");
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [continueError, setContinueError] = useState<string | null>(null);
-  const [isContinuing, startContinuing] = useTransition();
+  const [uploadState, setUploadState] = useState<UploadState>('idle')
+  const [uploadError, setUploadError] = useState<UploadError>(initialError)
+  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [largeWarning, setLargeWarning] = useState(showLargeWarning)
+  const [pasteText, setPasteText] = useState('')
+  const [isDragOver, setIsDragOver] = useState(false)
+  const [continueError, setContinueError] = useState<string | null>(null)
+  const [isContinuing, startContinuing] = useTransition()
 
   // sessionStorage restore (ADR-FILE-004):
   // Check on mount for previously extracted text from this session.
   // Runs client-side only (sessionStorage is not available server-side).
-  const [guidelinesRestored, setGuidelinesRestored] = useState(false);
+  const [guidelinesRestored, setGuidelinesRestored] = useState(false)
 
   useEffect(() => {
-    const stored = getGuidelines(applicationId);
+    const stored = getGuidelines(applicationId)
     if (stored) {
-      setGuidelinesRestored(true);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reading sessionStorage; can only run client-side in useEffect
+      setGuidelinesRestored(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [applicationId]);
+  }, [applicationId])
 
   // Whether the user has usable guidelines ready to continue
-  const hasContent =
-    uploadState === "uploaded" ||
-    pasteText.trim().length > 0 ||
-    guidelinesRestored;
+  const hasContent = uploadState === 'uploaded' || pasteText.trim().length > 0 || guidelinesRestored
 
   // ── File validation (client-side, instant) ──────────────────────────────
 
   function validateFileClient(file: File): UploadError {
-    const ext = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
-    if (!ACCEPTED_EXTENSIONS.includes(ext)) return "format";
-    if (file.size > MAX_FILE_BYTES) return "size";
-    return null;
+    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) return 'format'
+    if (file.size > MAX_FILE_BYTES) return 'size'
+    return null
   }
 
   // ── Upload flow (S4.1) ───────────────────────────────────────────────────
 
   async function processFile(file: File) {
     // Client-side validation first — avoids a round-trip for obvious errors
-    const clientError = validateFileClient(file);
+    const clientError = validateFileClient(file)
     if (clientError) {
-      setUploadError(clientError);
-      return;
+      setUploadError(clientError)
+      return
     }
 
     // If sessionStorage had a previous entry, dismiss the "restored" state
-    setGuidelinesRestored(false);
-    setUploadError(null);
-    setUploadedFileName(file.name);
-    setUploadProgress(0);
-    setUploadState("uploading");
+    setGuidelinesRestored(false)
+    setUploadError(null)
+    setUploadedFileName(file.name)
+    setUploadProgress(0)
+    setUploadState('uploading')
 
     try {
       // Step 1: Get signed upload URL
-      const signedUrlRes = await fetch("/api/upload/signed-url", { method: "POST" });
-      if (!signedUrlRes.ok) throw new Error("signed_url_failed");
+      const signedUrlRes = await fetch('/api/upload/signed-url', { method: 'POST' })
+      if (!signedUrlRes.ok) throw new Error('signed_url_failed')
       const { signedUrl, path } = (await signedUrlRes.json()) as {
-        signedUrl: string;
-        path: string;
-      };
+        signedUrl: string
+        path: string
+      }
 
       // Step 2: Upload directly to Supabase Storage with XHR for progress tracking
-      await uploadWithProgress(file, signedUrl, (pct) => setUploadProgress(pct));
+      await uploadWithProgress(file, signedUrl, (pct) => setUploadProgress(pct))
 
       // Step 3: Extract text from the uploaded file
-      setUploadState("processing");
+      setUploadState('processing')
 
-      const processRes = await fetch("/api/upload/process", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const processRes = await fetch('/api/upload/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ path, applicationId }),
-      });
+      })
 
       const processData = (await processRes.json()) as {
-        text?: string;
-        isLargeDocument?: boolean;
-        error?: string;
-      };
+        text?: string
+        isLargeDocument?: boolean
+        error?: string
+      }
 
       if (!processRes.ok || !processData.text) {
-        const err = processData.error ?? "server";
+        const err = processData.error ?? 'server'
         // Map server-side validation errors to client-side UploadError types
-        if (err === "scanned_pdf") {
-          setUploadError("scanned");
-        } else if (err === "invalid_type") {
-          setUploadError("format");
-        } else if (err === "too_large") {
-          setUploadError("size");
+        if (err === 'scanned_pdf') {
+          setUploadError('scanned')
+        } else if (err === 'invalid_type') {
+          setUploadError('format')
+        } else if (err === 'too_large') {
+          setUploadError('size')
         } else {
-          setUploadError("server");
+          setUploadError('server')
         }
-        setUploadState("idle");
-        return;
+        setUploadState('idle')
+        return
       }
 
       // Step 4: Store extracted text in sessionStorage (ADR-FILE-004)
-      setGuidelines(applicationId, processData.text);
+      setGuidelines(applicationId, processData.text)
+      setGuidelinesFilename(applicationId, file.name)
 
       if (processData.isLargeDocument) {
-        setLargeWarning(true);
+        setLargeWarning(true)
       }
 
-      setUploadState("uploaded");
+      setUploadState('uploaded')
     } catch {
-      setUploadError("server");
-      setUploadState("idle");
+      setUploadError('server')
+      setUploadState('idle')
     }
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) processFile(file);
-    e.target.value = "";
+    const file = e.target.files?.[0]
+    if (file) processFile(file)
+    e.target.value = ''
   }
 
   function handleDrop(e: React.DragEvent) {
-    e.preventDefault();
-    setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) processFile(file);
+    e.preventDefault()
+    setIsDragOver(false)
+    const file = e.dataTransfer.files?.[0]
+    if (file) processFile(file)
   }
 
   function handleRemove() {
-    clearGuidelines(applicationId);
-    setGuidelinesRestored(false);
-    setUploadState("idle");
-    setUploadError(null);
-    setUploadedFileName(null);
-    setUploadProgress(0);
-    setLargeWarning(false);
+    clearGuidelines(applicationId)
+    setGuidelinesRestored(false)
+    setUploadState('idle')
+    setUploadError(null)
+    setUploadedFileName(null)
+    setUploadProgress(0)
+    setLargeWarning(false)
   }
 
   // ── Continue (S4.1 / S4.2) ──────────────────────────────────────────────
 
   function handleContinue() {
     // For the paste path: store the text in sessionStorage before advancing
-    if (pasteText.trim() && uploadState !== "uploaded" && !guidelinesRestored) {
-      setGuidelines(applicationId, pasteText.trim());
+    if (pasteText.trim() && uploadState !== 'uploaded' && !guidelinesRestored) {
+      setGuidelines(applicationId, pasteText.trim())
+      setGuidelinesFilename(applicationId, 'Pasted text')
     }
 
-    setContinueError(null);
+    setContinueError(null)
     startContinuing(async () => {
       // On success, advanceToStep3 calls redirect() and never returns.
       // Only reaches the next line on a DB error.
-      const result = await advanceToStep3(applicationId);
-      setContinueError(result.error);
-    });
+      const result = await advanceToStep3(applicationId)
+      setContinueError(result.error)
+    })
   }
 
   return (
@@ -244,51 +247,50 @@ export function ApplicationStep2Form({
 
       {/* Re-upload advisory (GAP-19) — shown when returning to Step 2 after
           advancing past it and sessionStorage no longer has an entry */}
-      {currentStep >= 3 && !guidelinesRestored && uploadState === "idle" && !uploadError && (
+      {currentStep >= 3 && !guidelinesRestored && uploadState === 'idle' && !uploadError && (
         <div
           role="note"
           className="mb-4 flex items-start gap-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4"
         >
-          <Info
-            className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]"
-            aria-hidden="true"
-          />
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]" aria-hidden="true" />
           <p className="text-[13px] text-[#1E40AF]">
-            Your guidelines are not saved between sessions — please upload or paste them
-            again to continue.
+            Your guidelines are not saved between sessions — please upload or paste them again to
+            continue.
           </p>
         </div>
       )}
 
       {/* ── File upload area ── */}
       <div className="mb-4">
-
         {/* Idle — dropzone */}
-        {uploadState === "idle" && !uploadError && !guidelinesRestored && (
+        {uploadState === 'idle' && !uploadError && !guidelinesRestored && (
           <div
             role="button"
             tabIndex={0}
             aria-label="Upload file — click to browse or drag and drop"
             onClick={() => fileInputRef.current?.click()}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click();
+              if (e.key === 'Enter' || e.key === ' ') fileInputRef.current?.click()
             }}
-            onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setIsDragOver(true)
+            }}
             onDragLeave={() => setIsDragOver(false)}
             onDrop={handleDrop}
             className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2 ${
               isDragOver
-                ? "border-[#0D6E6E] bg-[#E6F4F4]"
-                : "border-[#CBD5E1] bg-[#F8FAFC] hover:border-[#0D6E6E] hover:bg-[#F0F9F9]"
+                ? 'border-[#0D6E6E] bg-[#E6F4F4]'
+                : 'border-[#CBD5E1] bg-[#F8FAFC] hover:border-[#0D6E6E] hover:bg-[#F0F9F9]'
             }`}
           >
             <Upload
-              className={`h-8 w-8 ${isDragOver ? "text-[#0D6E6E]" : "text-[#94A3B8]"}`}
+              className={`h-8 w-8 ${isDragOver ? 'text-[#0D6E6E]' : 'text-[#94A3B8]'}`}
               aria-hidden="true"
             />
             <div className="text-center">
               <p className="text-[14px] font-medium text-[#1E293B]">
-                Drag and drop your document here, or{" "}
+                Drag and drop your document here, or{' '}
                 <span className="text-[#0D6E6E] underline">click to browse</span>
               </p>
               <p className="mt-1 text-[13px] text-[#64748B]">PDF or Word (.docx) · max 10MB</p>
@@ -297,7 +299,7 @@ export function ApplicationStep2Form({
         )}
 
         {/* Uploading — real XHR progress bar */}
-        {uploadState === "uploading" && (
+        {uploadState === 'uploading' && (
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
             <div className="mb-3 flex items-center gap-3">
               <FileText className="h-5 w-5 shrink-0 text-[#64748B]" aria-hidden="true" />
@@ -319,7 +321,7 @@ export function ApplicationStep2Form({
         )}
 
         {/* Processing — extraction in progress */}
-        {uploadState === "processing" && (
+        {uploadState === 'processing' && (
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
             <div className="mb-3 flex items-center gap-3">
               <FileText className="h-5 w-5 shrink-0 text-[#64748B]" aria-hidden="true" />
@@ -329,7 +331,7 @@ export function ApplicationStep2Form({
               {/* Indeterminate animation while server extracts text */}
               <div
                 className="h-full animate-pulse rounded-full bg-[#0D6E6E]"
-                style={{ width: "100%" }}
+                style={{ width: '100%' }}
                 role="progressbar"
                 aria-label="Processing document"
               />
@@ -339,7 +341,7 @@ export function ApplicationStep2Form({
         )}
 
         {/* Uploaded — success */}
-        {uploadState === "uploaded" && (
+        {uploadState === 'uploaded' && (
           <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white p-4">
             <FileText className="h-5 w-5 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
             <span className="flex-1 truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
@@ -355,7 +357,7 @@ export function ApplicationStep2Form({
         )}
 
         {/* Session restored — guidelines loaded from this session */}
-        {guidelinesRestored && uploadState === "idle" && !uploadError && (
+        {guidelinesRestored && uploadState === 'idle' && !uploadError && (
           <div className="flex items-center gap-3 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4">
             <FileText className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
             <span className="flex-1 text-[14px] text-[#15803D]">
@@ -379,13 +381,8 @@ export function ApplicationStep2Form({
               role="alert"
               className="flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
             >
-              <AlertCircle
-                className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]"
-                aria-hidden="true"
-              />
-              <p className="text-[14px] text-[#991B1B]">
-                {UPLOAD_ERROR_MESSAGES[uploadError]}
-              </p>
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
+              <p className="text-[14px] text-[#991B1B]">{UPLOAD_ERROR_MESSAGES[uploadError]}</p>
             </div>
             <button
               type="button"
@@ -414,10 +411,7 @@ export function ApplicationStep2Form({
           role="alert"
           className="mb-4 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
-          <AlertTriangle
-            className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
-            aria-hidden="true"
-          />
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
           <p className="text-[13px] text-[#78350F]">
             Your guidelines document is quite long. For the best results, we recommend uploading
             only the core sections — such as eligibility criteria, application questions, and
@@ -428,21 +422,18 @@ export function ApplicationStep2Form({
 
       {/* Paste text area */}
       <div className="mb-8">
-        <Label
-          htmlFor="pasteText"
-          className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-        >
+        <Label htmlFor="pasteText" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
           Or paste the guidelines text here
         </Label>
         <Textarea
           id="pasteText"
           value={pasteText}
           onChange={(e) => {
-            setPasteText(e.target.value);
+            setPasteText(e.target.value)
             // Typing new paste text dismisses the restored state
             if (guidelinesRestored && e.target.value.trim()) {
-              setGuidelinesRestored(false);
-              clearGuidelines(applicationId);
+              setGuidelinesRestored(false)
+              clearGuidelines(applicationId)
             }
           }}
           rows={8}
@@ -453,7 +444,10 @@ export function ApplicationStep2Form({
 
       {/* Server-side continue error */}
       {continueError && (
-        <p role="alert" className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]">
+        <p
+          role="alert"
+          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+        >
           {continueError}
         </p>
       )}
@@ -468,15 +462,20 @@ export function ApplicationStep2Form({
         </Link>
         <Button
           type="button"
-          disabled={!hasContent || isContinuing || uploadState === "uploading" || uploadState === "processing"}
+          disabled={
+            !hasContent ||
+            isContinuing ||
+            uploadState === 'uploading' ||
+            uploadState === 'processing'
+          }
           onClick={handleContinue}
           className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isContinuing ? "Saving…" : "Continue"}
+          {isContinuing ? 'Saving…' : 'Continue'}
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 // ── XHR upload helper ────────────────────────────────────────────────────────
@@ -492,28 +491,28 @@ function uploadWithProgress(
   onProgress: (pct: number) => void,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", signedUrl);
-    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    const xhr = new XMLHttpRequest()
+    xhr.open('PUT', signedUrl)
+    xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream')
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
-        onProgress(Math.round((e.loaded / e.total) * 100));
+        onProgress(Math.round((e.loaded / e.total) * 100))
       }
-    };
+    }
 
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
-        onProgress(100);
-        resolve();
+        onProgress(100)
+        resolve()
       } else {
-        reject(new Error(`Storage upload failed: ${xhr.status}`));
+        reject(new Error(`Storage upload failed: ${xhr.status}`))
       }
-    };
+    }
 
-    xhr.onerror = () => reject(new Error("Network error during upload"));
-    xhr.onabort = () => reject(new Error("Upload aborted"));
+    xhr.onerror = () => reject(new Error('Network error during upload'))
+    xhr.onabort = () => reject(new Error('Upload aborted'))
 
-    xhr.send(file);
-  });
+    xhr.send(file)
+  })
 }

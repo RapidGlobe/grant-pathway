@@ -256,7 +256,9 @@ export async function resetPassword(
   const supabase = await createClient()
 
   // Verify the recovery session is still valid before attempting the update
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) {
     return { status: 'expired' }
   }
@@ -309,10 +311,7 @@ export type SignInState = {
  * Called from SignInForm via useActionState (React 19).
  * Client-side validation (email format, non-empty password) runs first.
  */
-export async function signIn(
-  _prevState: SignInState,
-  formData: FormData,
-): Promise<SignInState> {
+export async function signIn(_prevState: SignInState, formData: FormData): Promise<SignInState> {
   const email = (formData.get('email') as string | null) ?? ''
   const password = (formData.get('password') as string | null) ?? ''
 
@@ -362,7 +361,9 @@ export async function changePassword(
 ): Promise<ChangePasswordResult> {
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user?.email) return { status: 'error' }
 
   // Verify the current password before allowing the change

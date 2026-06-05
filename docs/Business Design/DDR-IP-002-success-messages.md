@@ -14,16 +14,17 @@ How should success messages be displayed after a user completes a save or update
 
 Several screens display success messages after a user action completes. These are defined in the screen requirements and information architecture document:
 
-| Action | Message |
-|--------|---------|
+| Action                             | Message                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------ |
 | Charity profile saved (first time) | "Your charity profile has been saved. You're ready to start your first application." |
-| Charity profile updated | "Your changes have been saved." |
-| Password changed | "Your password has been updated." |
-| Account deleted | "Your account has been deleted." (shown on `/` after redirect) |
+| Charity profile updated            | "Your changes have been saved."                                                      |
+| Password changed                   | "Your password has been updated."                                                    |
+| Account deleted                    | "Your account has been deleted." (shown on `/` after redirect)                       |
 
 All of these are currently described as "inline" messages -- meaning they appear on the page rather than as floating notifications. The visual form of "inline" is not yet specified.
 
 Success messages should:
+
 - Be clearly positive and reassuring
 - Use the success green (#16A34A) from the brand palette
 - Be associated with the action that triggered them
@@ -44,31 +45,34 @@ Success messages should:
 
 ### Milestone saves -- page replacement (Option D)
 
-| Trigger | Treatment |
-|---------|-----------|
+| Trigger                                  | Treatment                                  |
+| ---------------------------------------- | ------------------------------------------ |
 | Charity profile saved for the first time | Form replaced with full-page success state |
 
 **Full-page success state elements:**
+
 - Large teal `CheckCircle` icon (64px)
-- Heading: *"Your charity profile has been saved."*
-- Body: *"You're ready to start your first application."*
-- Primary button (amber): *"Go to my dashboard"* -- links to `/dashboard`
+- Heading: _"Your charity profile has been saved."_
+- Body: _"You're ready to start your first application."_
+- Primary button (amber): _"Go to my dashboard"_ -- links to `/dashboard`
 
 ### Transactional saves -- inline alert below submit button (Option B)
 
-| Trigger | Message |
-|---------|---------|
-| Charity profile updated | *"Your changes have been saved."* |
-| Password changed | *"Your password has been updated."* |
+| Trigger                 | Message                             |
+| ----------------------- | ----------------------------------- |
+| Charity profile updated | _"Your changes have been saved."_   |
+| Password changed        | _"Your password has been updated."_ |
 
 **Inline alert elements:**
+
 - Success green background (#16A34A at low opacity, e.g. #F0FDF4) with darker green text
 - Lucide `CheckCircle` icon left of message text
 - Persistent -- does not auto-dismiss; remains until the user navigates away or makes another change
 - Scrolls into view programmatically on display to ensure visibility for keyboard users on longer forms
 
 ### Account deleted
-Shown on `/` after redirect as an inline message on the sign-in page: *"Your account has been deleted."* Uses the same inline alert style as transactional saves above. No design decision required -- handled by the redirect behaviour defined in screen-requirements.md.
+
+Shown on `/` after redirect as an inline message on the sign-in page: _"Your account has been deleted."_ Uses the same inline alert style as transactional saves above. No design decision required -- handled by the redirect behaviour defined in screen-requirements.md.
 
 ## Date Decided
 
@@ -76,5 +80,5 @@ Shown on `/` after redirect as an inline message on the sign-in page: *"Your acc
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

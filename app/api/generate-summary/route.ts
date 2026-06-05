@@ -51,7 +51,10 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized', message: 'You must be signed in.' }, { status: 401 })
+    return NextResponse.json(
+      { error: 'Unauthorized', message: 'You must be signed in.' },
+      { status: 401 },
+    )
   }
 
   // ── 2. Parse and validate request body ────────────────────────────────────
@@ -166,8 +169,7 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 7. Extract and parse JSON response ────────────────────────────────────
-  const rawText =
-    bedrockResponse.content[0]?.type === 'text' ? bedrockResponse.content[0].text : ''
+  const rawText = bedrockResponse.content[0]?.type === 'text' ? bedrockResponse.content[0].text : ''
 
   const tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
@@ -208,8 +210,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
     }
 
-    const retryText =
-      retryResponse.content[0]?.type === 'text' ? retryResponse.content[0].text : ''
+    const retryText = retryResponse.content[0]?.type === 'text' ? retryResponse.content[0].text : ''
     const retryCleaned = retryText
       .replace(/^```(?:json)?\s*/i, '')
       .replace(/\s*```\s*$/, '')

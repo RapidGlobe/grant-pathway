@@ -35,10 +35,7 @@ export type ExtractionResult =
  * Called in POST /api/upload/process after retrieving the file from
  * Supabase Storage. The caller is responsible for deleting the file.
  */
-export async function extractText(
-  buffer: Buffer,
-  mimeType: string,
-): Promise<ExtractionResult> {
+export async function extractText(buffer: Buffer, mimeType: string): Promise<ExtractionResult> {
   try {
     let text = ''
 
@@ -80,21 +77,11 @@ export async function extractText(
 export function detectMimeType(buffer: Buffer): string {
   if (buffer.length >= 4) {
     // PDF magic bytes: %PDF
-    if (
-      buffer[0] === 0x25 &&
-      buffer[1] === 0x50 &&
-      buffer[2] === 0x44 &&
-      buffer[3] === 0x46
-    ) {
+    if (buffer[0] === 0x25 && buffer[1] === 0x50 && buffer[2] === 0x44 && buffer[3] === 0x46) {
       return 'application/pdf'
     }
     // DOCX magic bytes: PK\x03\x04 (ZIP archive signature)
-    if (
-      buffer[0] === 0x50 &&
-      buffer[1] === 0x4b &&
-      buffer[2] === 0x03 &&
-      buffer[3] === 0x04
-    ) {
+    if (buffer[0] === 0x50 && buffer[1] === 0x4b && buffer[2] === 0x03 && buffer[3] === 0x04) {
       return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     }
   }

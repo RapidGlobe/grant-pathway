@@ -28,13 +28,14 @@ The page background is off-white (#F8FAFC). Cards will sit on top of this backgr
 
 **Option A (drop shadow) for Mockups 1 and 3; Option C (teal left-border accent) for Mockup 2.**
 
-| Mockup | Direction | Card treatment |
-|--------|-----------|---------------|
-| Mockup 1 | Minimal & Professional | White card, very subtle shadow (`0 1px 3px rgba(0,0,0,0.06)`) |
-| Mockup 2 | Warm & Approachable | White card, 3--4px solid teal (#0D6E6E) left border, no shadow |
-| Mockup 3 | Modern SaaS | White card, moderate shadow (`0 2px 6px rgba(0,0,0,0.10)`) |
+| Mockup   | Direction              | Card treatment                                                 |
+| -------- | ---------------------- | -------------------------------------------------------------- |
+| Mockup 1 | Minimal & Professional | White card, very subtle shadow (`0 1px 3px rgba(0,0,0,0.06)`)  |
+| Mockup 2 | Warm & Approachable    | White card, 3--4px solid teal (#0D6E6E) left border, no shadow |
+| Mockup 3 | Modern SaaS            | White card, moderate shadow (`0 2px 6px rgba(0,0,0,0.10)`)     |
 
 **Status-colour left border extension for Mockup 2:** The left border colour reflects the application status, consistent with the status pill colours in screen-requirements.md:
+
 - Not started -- slate (#1E293B)
 - In progress -- amber (#D97706)
 - Approved -- green (#16A34A)
@@ -48,5 +49,5 @@ All cards include a subtle hover state (shadow deepens or border darkens) to con
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

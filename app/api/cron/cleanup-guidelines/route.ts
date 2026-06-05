@@ -67,9 +67,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ deleted: 0 })
   }
 
-  const { error: deleteError } = await service.storage
-    .from('guidelines-temp')
-    .remove(toDelete)
+  const { error: deleteError } = await service.storage.from('guidelines-temp').remove(toDelete)
 
   if (deleteError) {
     console.error('[cleanup-guidelines] Failed to delete files:', deleteError)

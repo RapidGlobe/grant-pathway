@@ -1,19 +1,13 @@
-import Link from "next/link";
-import { FileQuestion } from "lucide-react";
+import Link from 'next/link'
+import { FileQuestion } from 'lucide-react'
 
 export default function NotFound() {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 py-16 text-center">
-      <FileQuestion
-        className="mb-4 h-12 w-12 text-[#94A3B8]"
-        aria-hidden="true"
-      />
-      <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">
-        Page not found
-      </h1>
+      <FileQuestion className="mb-4 h-12 w-12 text-[#94A3B8]" aria-hidden="true" />
+      <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">Page not found</h1>
       <p className="mb-8 max-w-sm text-[14px] text-[#64748B]">
-        We couldn&apos;t find the page you were looking for. It may have been moved or
-        deleted.
+        We couldn&apos;t find the page you were looking for. It may have been moved or deleted.
       </p>
       <Link
         href="/dashboard"
@@ -22,5 +16,5 @@ export default function NotFound() {
         Go to my dashboard
       </Link>
     </div>
-  );
+  )
 }

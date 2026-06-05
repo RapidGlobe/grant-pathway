@@ -1,23 +1,19 @@
-"use client";
+'use client'
 
-import Link from "next/link";
-import { useFormStatus } from "react-dom";
-import { Upload, Sparkles, FileText, ArrowRight, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { createApplication } from "@/actions/applications";
+import Link from 'next/link'
+import { useFormStatus } from 'react-dom'
+import { Upload, Sparkles, FileText, ArrowRight, AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { createApplication } from '@/actions/applications'
 
 interface DashboardEmptyProps {
-  firstName?: string;
-  profileIncomplete?: boolean;
+  firstName?: string
+  profileIncomplete?: boolean
 }
 
 export function DashboardEmpty({
-  firstName = "Sarah",
+  firstName = 'Sarah',
   profileIncomplete = true,
 }: DashboardEmptyProps) {
   return (
@@ -47,9 +43,7 @@ export function DashboardEmpty({
 
       {/* Empty state card */}
       <div className="rounded-xl border border-[#E2E8F0] bg-white p-10 text-center">
-        <p className="mb-8 text-[15px] text-[#64748B]">
-          You don&apos;t have any applications yet.
-        </p>
+        <p className="mb-8 text-[15px] text-[#64748B]">You don&apos;t have any applications yet.</p>
 
         {/* Start button — disabled with tooltip when profile incomplete */}
         {profileIncomplete ? (
@@ -66,9 +60,7 @@ export function DashboardEmpty({
                 Start your first application
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">
-              Please set up your charity profile first
-            </TooltipContent>
+            <TooltipContent side="top">Please set up your charity profile first</TooltipContent>
           </Tooltip>
         ) : (
           // Form + Server Action so the creation URL is never added to browser
@@ -101,7 +93,7 @@ export function DashboardEmpty({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 /**
@@ -109,27 +101,19 @@ export function DashboardEmpty({
  * useFormStatus must be called inside a component that is a child of the form.
  */
 function StartButton({ label }: { label: string }) {
-  const { pending } = useFormStatus();
+  const { pending } = useFormStatus()
   return (
     <button
       type="submit"
       disabled={pending}
       className="inline-flex h-10 items-center rounded-md bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
     >
-      {pending ? "Creating…" : label}
+      {pending ? 'Creating…' : label}
     </button>
-  );
+  )
 }
 
-function Step({
-  icon,
-  label,
-  step,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  step: string;
-}) {
+function Step({ icon, label, step }: { icon: React.ReactNode; label: string; step: string }) {
   return (
     <div className="flex w-36 flex-col items-center gap-2 text-center">
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E6F4F4]">
@@ -140,5 +124,5 @@ function Step({
       </span>
       <span className="text-[13px] font-medium text-[#1E293B]">{label}</span>
     </div>
-  );
+  )
 }

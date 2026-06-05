@@ -1,78 +1,78 @@
-"use client";
+'use client'
 
-import { useState, useTransition } from "react";
-import Link from "next/link";
-import { Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { MfaSetupPanel } from "@/components/mfa-setup-panel";
-import { changePassword } from "@/actions/auth";
+import { useState, useTransition } from 'react'
+import Link from 'next/link'
+import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { MfaSetupPanel } from '@/components/mfa-setup-panel'
+import { changePassword } from '@/actions/auth'
 
 interface FieldErrors {
-  currentPassword?: string;
-  newPassword?: string;
-  confirmPassword?: string;
+  currentPassword?: string
+  newPassword?: string
+  confirmPassword?: string
 }
 
 interface AccountSettingsFormProps {
   /** Real email address from auth.users — passed from the Server Component. */
-  email: string;
+  email: string
   /** Whether the user has a verified TOTP factor. */
-  mfaEnabled?: boolean;
+  mfaEnabled?: boolean
   /** Factor ID of the enrolled TOTP factor (empty string if not enabled). */
-  mfaFactorId?: string;
+  mfaFactorId?: string
 }
 
 export function AccountSettingsForm({
   email,
   mfaEnabled = false,
-  mfaFactorId = "",
+  mfaFactorId = '',
 }: AccountSettingsFormProps) {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showCurrent, setShowCurrent] = useState(false);
-  const [showNew, setShowNew] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [passwordUpdated, setPasswordUpdated] = useState(false);
-  const [serverError, setServerError] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [passwordUpdated, setPasswordUpdated] = useState(false)
+  const [serverError, setServerError] = useState('')
+  const [isPending, startTransition] = useTransition()
 
   function handlePasswordSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setServerError("");
+    e.preventDefault()
+    setServerError('')
 
-    const errors: FieldErrors = {};
-    if (!currentPassword) errors.currentPassword = "Please enter your current password";
+    const errors: FieldErrors = {}
+    if (!currentPassword) errors.currentPassword = 'Please enter your current password'
     if (!newPassword) {
-      errors.newPassword = "Please enter a new password";
+      errors.newPassword = 'Please enter a new password'
     } else if (newPassword.length < 10) {
-      errors.newPassword = "Your password must be at least 10 characters";
+      errors.newPassword = 'Your password must be at least 10 characters'
     }
     if (!confirmPassword) {
-      errors.confirmPassword = "Please confirm your new password";
+      errors.confirmPassword = 'Please confirm your new password'
     } else if (confirmPassword !== newPassword) {
-      errors.confirmPassword = "Passwords do not match";
+      errors.confirmPassword = 'Passwords do not match'
     }
-    setFieldErrors(errors);
-    if (Object.keys(errors).length > 0) return;
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
 
     startTransition(async () => {
-      const result = await changePassword(currentPassword, newPassword);
-      if (result.status === "success") {
-        setPasswordUpdated(true);
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-        setFieldErrors({});
-      } else if (result.status === "wrong_password") {
-        setFieldErrors({ currentPassword: "Your current password is incorrect" });
+      const result = await changePassword(currentPassword, newPassword)
+      if (result.status === 'success') {
+        setPasswordUpdated(true)
+        setCurrentPassword('')
+        setNewPassword('')
+        setConfirmPassword('')
+        setFieldErrors({})
+      } else if (result.status === 'wrong_password') {
+        setFieldErrors({ currentPassword: 'Your current password is incorrect' })
       } else {
-        setServerError("Something went wrong. Please try again.");
+        setServerError('Something went wrong. Please try again.')
       }
-    });
+    })
   }
 
   return (
@@ -81,16 +81,12 @@ export function AccountSettingsForm({
 
       {/* ── Email address ──────────────────────────────────────────────────── */}
       <section aria-labelledby="email-heading" className="mb-8">
-        <h2
-          id="email-heading"
-          className="mb-4 text-[16px] font-semibold text-[#1E293B]"
-        >
+        <h2 id="email-heading" className="mb-4 text-[16px] font-semibold text-[#1E293B]">
           Email address
         </h2>
         <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3">
           <p className="text-[14px] text-[#374151]">
-            <span className="font-medium">Your email address:</span>{" "}
-            <span>{email}</span>
+            <span className="font-medium">Your email address:</span> <span>{email}</span>
           </p>
         </div>
       </section>
@@ -99,10 +95,7 @@ export function AccountSettingsForm({
 
       {/* ── Change password ────────────────────────────────────────────────── */}
       <section aria-labelledby="password-heading" className="mb-8">
-        <h2
-          id="password-heading"
-          className="mb-4 text-[16px] font-semibold text-[#1E293B]"
-        >
+        <h2 id="password-heading" className="mb-4 text-[16px] font-semibold text-[#1E293B]">
           Change your password
         </h2>
 
@@ -140,25 +133,33 @@ export function AccountSettingsForm({
             <div className="relative">
               <Input
                 id="currentPassword"
-                type={showCurrent ? "text" : "password"}
+                type={showCurrent ? 'text' : 'password'}
                 autoComplete="current-password"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 aria-invalid={!!fieldErrors.currentPassword || undefined}
-                aria-describedby={fieldErrors.currentPassword ? "currentPassword-error" : undefined}
+                aria-describedby={fieldErrors.currentPassword ? 'currentPassword-error' : undefined}
                 className="h-10 pr-10 text-[14px]"
               />
               <button
                 type="button"
                 onClick={() => setShowCurrent((v) => !v)}
-                aria-label={showCurrent ? "Hide current password" : "Show current password"}
+                aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
-                {showCurrent ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                {showCurrent ? (
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                )}
               </button>
             </div>
             {fieldErrors.currentPassword && (
-              <p id="currentPassword-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+              <p
+                id="currentPassword-error"
+                role="alert"
+                className="mt-1.5 text-[13px] text-[#DC2626]"
+              >
                 {fieldErrors.currentPassword}
               </p>
             )}
@@ -175,25 +176,27 @@ export function AccountSettingsForm({
             <div className="relative">
               <Input
                 id="newPassword"
-                type={showNew ? "text" : "password"}
+                type={showNew ? 'text' : 'password'}
                 autoComplete="new-password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 aria-invalid={!!fieldErrors.newPassword || undefined}
                 aria-describedby={
-                  fieldErrors.newPassword
-                    ? "newPassword-error"
-                    : "newPassword-hint"
+                  fieldErrors.newPassword ? 'newPassword-error' : 'newPassword-hint'
                 }
                 className="h-10 pr-10 text-[14px]"
               />
               <button
                 type="button"
                 onClick={() => setShowNew((v) => !v)}
-                aria-label={showNew ? "Hide new password" : "Show new password"}
+                aria-label={showNew ? 'Hide new password' : 'Show new password'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
-                {showNew ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                {showNew ? (
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                )}
               </button>
             </div>
             {fieldErrors.newPassword ? (
@@ -218,25 +221,33 @@ export function AccountSettingsForm({
             <div className="relative">
               <Input
                 id="confirmPassword"
-                type={showConfirm ? "text" : "password"}
+                type={showConfirm ? 'text' : 'password'}
                 autoComplete="new-password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 aria-invalid={!!fieldErrors.confirmPassword || undefined}
-                aria-describedby={fieldErrors.confirmPassword ? "confirmPassword-error" : undefined}
+                aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
                 className="h-10 pr-10 text-[14px]"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirm((v) => !v)}
-                aria-label={showConfirm ? "Hide confirm password" : "Show confirm password"}
+                aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
-                {showConfirm ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
+                {showConfirm ? (
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                )}
               </button>
             </div>
             {fieldErrors.confirmPassword && (
-              <p id="confirmPassword-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+              <p
+                id="confirmPassword-error"
+                role="alert"
+                className="mt-1.5 text-[13px] text-[#DC2626]"
+              >
                 {fieldErrors.confirmPassword}
               </p>
             )}
@@ -247,7 +258,7 @@ export function AccountSettingsForm({
             disabled={isPending}
             className="h-10 bg-[#0D6E6E] px-5 text-[14px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
           >
-            {isPending ? "Updating…" : "Update password"}
+            {isPending ? 'Updating…' : 'Update password'}
           </Button>
         </form>
       </section>
@@ -256,20 +267,13 @@ export function AccountSettingsForm({
 
       {/* ── Two-factor authentication ──────────────────────────────────────── */}
       <section aria-labelledby="mfa-heading" className="mb-8">
-        <h2
-          id="mfa-heading"
-          className="mb-1 text-[16px] font-semibold text-[#1E293B]"
-        >
+        <h2 id="mfa-heading" className="mb-1 text-[16px] font-semibold text-[#1E293B]">
           Two-factor authentication
         </h2>
         <p className="mb-4 text-[14px] text-[#64748B]">
-          Status:{" "}
-          <span
-            className={
-              mfaEnabled ? "font-medium text-[#16A34A]" : "text-[#64748B]"
-            }
-          >
-            {mfaEnabled ? "Enabled" : "Not enabled"}
+          Status:{' '}
+          <span className={mfaEnabled ? 'font-medium text-[#16A34A]' : 'text-[#64748B]'}>
+            {mfaEnabled ? 'Enabled' : 'Not enabled'}
           </span>
         </p>
 
@@ -280,10 +284,7 @@ export function AccountSettingsForm({
 
       {/* ── Delete account ─────────────────────────────────────────────────── */}
       <section aria-labelledby="delete-heading">
-        <h2
-          id="delete-heading"
-          className="mb-2 text-[16px] font-semibold text-[#1E293B]"
-        >
+        <h2 id="delete-heading" className="mb-2 text-[16px] font-semibold text-[#1E293B]">
           Delete your account
         </h2>
         <p className="mb-5 text-[14px] text-[#374151]">
@@ -300,5 +301,5 @@ export function AccountSettingsForm({
         </Link>
       </section>
     </div>
-  );
+  )
 }

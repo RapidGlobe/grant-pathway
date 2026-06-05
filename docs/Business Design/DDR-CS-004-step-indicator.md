@@ -15,6 +15,7 @@ How should the five-step progress indicator look in the application flow?
 The step indicator is displayed at the top of every screen in the application flow (Steps 1 to 5). It shows the user where they are in the journey and provides a clear sense of progress. Per the information architecture document, the step indicator is read-only -- users cannot click steps to jump ahead or back.
 
 The five steps are:
+
 1. Application Details
 2. Uploaded Guidelines
 3. AI Summary
@@ -22,6 +23,7 @@ The five steps are:
 5. Approve & Export
 
 The step indicator must clearly distinguish three states:
+
 - **Completed** -- steps the user has already passed through
 - **Current** -- the step the user is on right now
 - **Upcoming** -- steps not yet reached
@@ -42,13 +44,13 @@ It must also be accessible -- the current and completed states must meet WCAG 2.
 
 Five numbered circles connected by a horizontal line, displayed across all five steps of the application flow.
 
-| State | Visual treatment |
-|-------|-----------------|
-| Completed | Teal fill (#0D6E6E), white tick icon |
-| Current | Teal fill (#0D6E6E), white number |
-| Upcoming | White fill, grey border (#E2E8F0), grey number |
-| Connector line (completed) | Teal (#0D6E6E) |
-| Connector line (upcoming) | Grey (#E2E8F0) |
+| State                      | Visual treatment                               |
+| -------------------------- | ---------------------------------------------- |
+| Completed                  | Teal fill (#0D6E6E), white tick icon           |
+| Current                    | Teal fill (#0D6E6E), white number              |
+| Upcoming                   | White fill, grey border (#E2E8F0), grey number |
+| Connector line (completed) | Teal (#0D6E6E)                                 |
+| Connector line (upcoming)  | Grey (#E2E8F0)                                 |
 
 Step labels (Application Details, Uploaded Guidelines, AI Summary, Draft Answers, Approve & Export) appear below each circle. The indicator is read-only -- no hover state, no pointer events, no click behaviour.
 
@@ -60,6 +62,6 @@ The step indicator sits in a dedicated horizontal band below the navigation bar 
 
 ---
 
-*Status: Decided*
-*Related: DDR-LA-001 (application flow layout)*
-*Created: 2026-04-17*
+_Status: Decided_
+_Related: DDR-LA-001 (application flow layout)_
+_Created: 2026-04-17_

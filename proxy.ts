@@ -22,15 +22,11 @@ const PROTECTED = ['/dashboard', '/profile', '/applications', '/account', '/mfa'
 const AUTH_ONLY = ['/', '/register']
 
 function isProtected(pathname: string) {
-  return PROTECTED.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
-  )
+  return PROTECTED.some((route) => pathname === route || pathname.startsWith(route + '/'))
 }
 
 function isAuthOnly(pathname: string) {
-  return AUTH_ONLY.some(
-    (route) => pathname === route || pathname.startsWith(route + '/')
-  )
+  return AUTH_ONLY.some((route) => pathname === route || pathname.startsWith(route + '/'))
 }
 
 export async function proxy(request: NextRequest) {
@@ -77,7 +73,5 @@ function redirectWithCookies(url: URL, supabaseResponse: NextResponse): NextResp
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
 }

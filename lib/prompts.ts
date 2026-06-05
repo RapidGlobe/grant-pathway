@@ -80,10 +80,7 @@ export type CharityContext = {
  * @param charity         Charity profile from the database. Pass null if the
  *                        user has not yet completed their charity profile.
  */
-export function buildSummaryPrompt(
-  guidelinesText: string,
-  charity: CharityContext | null,
-): string {
+export function buildSummaryPrompt(guidelinesText: string, charity: CharityContext | null): string {
   const charitySection = charity
     ? `CHARITY PROFILE (for context — use to note eligibility considerations):
 Charity name: ${charity.charityName}

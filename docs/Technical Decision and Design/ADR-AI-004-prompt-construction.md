@@ -19,21 +19,25 @@ The prompt construction strategy determines how context is organised, how the mo
 ## Options Considered
 
 ### Option A — Unstructured natural language prompts
+
 - **What it is:** Prompts written as flowing instructions without explicit structure markers or output format specifications.
 - **Strengths:** Simple to write. Works for basic cases.
 - **Weaknesses:** Inconsistent output format. Harder to parse programmatically. Less reliable for multi-question drafts.
 
 ### Option B — XML-tagged structured prompts (Anthropic recommended pattern)
+
 - **What it is:** Input context is wrapped in XML-like tags (e.g., `<guidelines>`, `<charity_profile>`, `<questions>`). Output format is specified explicitly (e.g., "Return your answers as a JSON array with keys `question` and `answer`").
 - **Strengths:** Claude responds well to structured inputs. XML tags clearly delineate different context types. Output format specification allows reliable programmatic parsing. Anthropic's prompt engineering guide recommends this pattern.
 - **Weaknesses:** More verbose prompts. Requires output parsing logic.
 
 ### Option C — JSON input/output prompts
+
 - **What it is:** Input context is provided as a JSON string embedded in the prompt. Output is requested as JSON.
 - **Strengths:** Consistent with programmatic workflows.
 - **Weaknesses:** JSON encoding adds overhead. Claude's instruction-following is better with natural language + XML than with raw JSON.
 
 ### Option D — System prompt + user message split
+
 - **What it is:** Use Claude's system prompt field for persona/instructions and the user message for context data.
 - **Strengths:** Cleaner separation of instructions from data. System prompt is reusable across calls.
 - **Weaknesses:** Requires more careful design. Must decide what goes in system vs user message.
@@ -48,10 +52,12 @@ This is an initial implementation to be validated and refined during testing. Pr
 
 **Step 3 — AI Summary:**
 
-*System prompt (constant in `lib/prompts.ts`):*
+_System prompt (constant in `lib/prompts.ts`):_
+
 > You are an expert grant writer helping UK charities. Your task is to read funder guidelines and produce a structured summary that helps a charity understand exactly what the funder is looking for. Be precise, practical, and write in plain English.
 
-*User message (built by `buildSummaryPrompt(guidelinesText)`):*
+_User message (built by `buildSummaryPrompt(guidelinesText)`):_
+
 ```
 <guidelines>
 [extracted guidelines text]
@@ -70,10 +76,12 @@ Write each section clearly. If information is not stated in the guidelines, writ
 
 **Step 4 — Draft Answers:**
 
-*System prompt (constant in `lib/prompts.ts`):*
+_System prompt (constant in `lib/prompts.ts`):_
+
 > You are an expert grant writer helping UK charities write compelling grant applications. Write in a warm, professional tone. Be specific about the charity's work. Stay within word limits.
 
-*User message (built by `buildDraftPrompt(summary, charityProfile, questions)`):*
+_User message (built by `buildDraftPrompt(summary, charityProfile, questions)`):_
+
 ```
 <charity_profile>
 Name: [charity_name]

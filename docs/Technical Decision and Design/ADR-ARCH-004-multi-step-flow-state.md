@@ -9,6 +9,7 @@ status: Decided
 ## Context
 
 Grant Pathway's core user journey is a five-step application flow:
+
 1. Application Details
 2. Upload / Paste Funder Guidelines
 3. AI Summary (generated)
@@ -22,21 +23,25 @@ The funder guidelines text is session-use only (FR-22 — not stored in the data
 ## Options Considered
 
 ### Option A — Database as primary state store (persisted steps)
+
 - **What it is:** Each completed step writes its data to the database. On return, the application row records the current step and stored answers. Navigation between steps fetches data from the database.
 - **Strengths:** Fully persistent. Works across devices and sessions. No state management library needed. Aligns with the data model (FR-22 requires guidelines not be stored, but all other step data is persisted).
 - **Weaknesses:** Every step interaction requires a database write. The funder guidelines (Step 2 input) cannot be stored — must be held in session/memory and re-submitted if the user navigates away and returns.
 
 ### Option B — Client-side state (React Context or Zustand) with periodic database sync
+
 - **What it is:** All five steps' data is held in a client-side store. The store syncs to the database at step completion or on a timer. On return, the client re-hydrates from the database.
 - **Strengths:** Smooth step navigation without database round-trips. Good UX for typing in answer fields.
 - **Weaknesses:** Client-side state is lost on page refresh. Re-hydration logic is complex. Risk of data loss if the user closes the tab before a sync.
 
 ### Option C — URL-based step state + database
+
 - **What it is:** The current step is encoded in the URL (e.g., `/application/[id]/step/3`). Each step page fetches its own data from the database on load.
 - **Strengths:** Deep-linkable and shareable URLs. Browser back/forward works correctly. Step state is always accurate (no client desync). Aligns with SSR/RSC rendering (each step page can be server-rendered with fresh data).
 - **Weaknesses:** Every step navigation triggers a page transition. Requires each step to have its own route and data-fetching logic.
 
 ### Option D — Wizard component with in-memory state, save on exit
+
 - **What it is:** A client-side wizard manages all steps in a single-page component. Data is saved to the database only when the user explicitly saves or exits.
 - **Strengths:** Fastest UX — no page transitions. Single component manages all state.
 - **Weaknesses:** High risk of data loss. All in-memory state lost on refresh. Not recoverable across sessions.
@@ -49,14 +54,14 @@ Each step is a discrete route. The `applications` table `current_step` column tr
 
 **URL structure:**
 
-| URL | Step |
-|---|---|
-| `/application/[id]` | Redirects to `/application/[id]/step/[current_step]` |
-| `/application/[id]/step/1` | Application Details |
-| `/application/[id]/step/2` | Upload Funder Guidelines |
-| `/application/[id]/step/3` | AI Summary |
-| `/application/[id]/step/4` | Draft Answers |
-| `/application/[id]/step/5` | Review & Export |
+| URL                        | Step                                                 |
+| -------------------------- | ---------------------------------------------------- |
+| `/application/[id]`        | Redirects to `/application/[id]/step/[current_step]` |
+| `/application/[id]/step/1` | Application Details                                  |
+| `/application/[id]/step/2` | Upload Funder Guidelines                             |
+| `/application/[id]/step/3` | AI Summary                                           |
+| `/application/[id]/step/4` | Draft Answers                                        |
+| `/application/[id]/step/5` | Review & Export                                      |
 
 Each step page is a Server Component that fetches only the data relevant to that step. Advancing to a new step updates `current_step` in the database via a Server Action. Step navigation is locked if prerequisites are not met (e.g., Step 4 is inaccessible until Step 3 is complete).
 

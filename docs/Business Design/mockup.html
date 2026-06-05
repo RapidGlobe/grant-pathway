@@ -1,1721 +1,2681 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Grant Pathway — Design Mockup</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grant Pathway — Design Mockup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700&display=swap"
+      rel="stylesheet"
+    />
 
-  <style>
-  /* ============================================================
+    <style>
+      /* ============================================================
      PALETTE 1 — Teal & Amber  (brand palette)
   ============================================================ */
-  .palette-teal {
-    --p:        #0D6E6E;
-    --p-hover:  #0A5A5A;
-    --p-light:  #E6F4F4;
-    --p-mid:    #4FA4A4;
-    --p-dark:   #064444;
-    --a:        #D97706;
-    --a-hover:  #B45309;
-    --a-light:  #FEF3C7;
-    --nav-dark: #1E293B;
-  }
+      .palette-teal {
+        --p: #0d6e6e;
+        --p-hover: #0a5a5a;
+        --p-light: #e6f4f4;
+        --p-mid: #4fa4a4;
+        --p-dark: #064444;
+        --a: #d97706;
+        --a-hover: #b45309;
+        --a-light: #fef3c7;
+        --nav-dark: #1e293b;
+      }
 
-  /* ============================================================
+      /* ============================================================
      PALETTE 2 — Navy & Coral
   ============================================================ */
-  .palette-navy {
-    --p:        #1E3A5F;
-    --p-hover:  #152B47;
-    --p-light:  #E8EEF6;
-    --p-mid:    #6B91B5;
-    --p-dark:   #0E1F35;
-    --a:        #E05252;
-    --a-hover:  #C53030;
-    --a-light:  #FEE2E2;
-    --nav-dark: #1E3A5F;
-  }
+      .palette-navy {
+        --p: #1e3a5f;
+        --p-hover: #152b47;
+        --p-light: #e8eef6;
+        --p-mid: #6b91b5;
+        --p-dark: #0e1f35;
+        --a: #e05252;
+        --a-hover: #c53030;
+        --a-light: #fee2e2;
+        --nav-dark: #1e3a5f;
+      }
 
-  /* ============================================================
+      /* ============================================================
      PALETTE 3 — Plum & Gold
   ============================================================ */
-  .palette-plum {
-    --p:        #5B21B6;
-    --p-hover:  #4C1D95;
-    --p-light:  #EDE9FE;
-    --p-mid:    #9F7AEA;
-    --p-dark:   #2E1065;
-    --a:        #D97706;
-    --a-hover:  #B45309;
-    --a-light:  #FEF3C7;
-    --nav-dark: #2E1065;
-  }
+      .palette-plum {
+        --p: #5b21b6;
+        --p-hover: #4c1d95;
+        --p-light: #ede9fe;
+        --p-mid: #9f7aea;
+        --p-dark: #2e1065;
+        --a: #d97706;
+        --a-hover: #b45309;
+        --a-light: #fef3c7;
+        --nav-dark: #2e1065;
+      }
 
-  /* ============================================================
+      /* ============================================================
      SEMANTIC / FIXED COLOURS (never change with palette)
   ============================================================ */
-  :root {
-    --success:        #16A34A;
-    --success-light:  #F0FDF4;
-    --success-border: #86EFAC;
-    --warning:        #D97706;
-    --warning-light:  #FFFBEB;
-    --error:          #DC2626;
-    --error-light:    #FEF2F2;
-    --focus-ring:     #D97706;   /* Always amber — DDR-AC-001 */
-    --text:           #1E293B;
-    --text-muted:     #64748B;
-    --text-light:     #94A3B8;
-    --border:         #E2E8F0;
-    --border-strong:  #CBD5E1;
-    --white:          #FFFFFF;
-    --card:           #FFFFFF;
-  }
+      :root {
+        --success: #16a34a;
+        --success-light: #f0fdf4;
+        --success-border: #86efac;
+        --warning: #d97706;
+        --warning-light: #fffbeb;
+        --error: #dc2626;
+        --error-light: #fef2f2;
+        --focus-ring: #d97706; /* Always amber — DDR-AC-001 */
+        --text: #1e293b;
+        --text-muted: #64748b;
+        --text-light: #94a3b8;
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --white: #ffffff;
+        --card: #ffffff;
+      }
 
-  /* ============================================================
+      /* ============================================================
      DESIGN-SPECIFIC PAGE BACKGROUNDS
   ============================================================ */
-  .design-minimal { background: #F8FAFC; }
-  .design-warm    { background: #FDF9F5; }
-  .design-saas    { background: #F1F5F9; }
+      .design-minimal {
+        background: #f8fafc;
+      }
+      .design-warm {
+        background: #fdf9f5;
+      }
+      .design-saas {
+        background: #f1f5f9;
+      }
 
-  /* ============================================================
+      /* ============================================================
      RESET & BASE
   ============================================================ */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--text);
-    line-height: 1.5;
-    min-height: 100vh;
-    padding-top: 60px;
-  }
+      body {
+        font-family:
+          'Inter',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        color: var(--text);
+        line-height: 1.5;
+        min-height: 100vh;
+        padding-top: 60px;
+      }
 
-  a { color: var(--p); text-decoration: none; }
-  a:hover { text-decoration: underline; }
+      a {
+        color: var(--p);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
 
-  :focus-visible {
-    outline: 2px solid var(--focus-ring);
-    outline-offset: 2px;
-  }
+      :focus-visible {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: 2px;
+      }
 
-  .icon {
-    width: 16px; height: 16px;
-    fill: currentColor;
-    flex-shrink: 0;
-    display: inline-block;
-    vertical-align: middle;
-  }
-  .icon-sm  { width: 14px; height: 14px; }
-  .icon-lg  { width: 20px; height: 20px; }
-  .icon-xl  { width: 24px; height: 24px; }
-  .icon-2xl { width: 32px; height: 32px; }
-  .icon-3xl { width: 48px; height: 48px; }
+      .icon {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+        flex-shrink: 0;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .icon-sm {
+        width: 14px;
+        height: 14px;
+      }
+      .icon-lg {
+        width: 20px;
+        height: 20px;
+      }
+      .icon-xl {
+        width: 24px;
+        height: 24px;
+      }
+      .icon-2xl {
+        width: 32px;
+        height: 32px;
+      }
+      .icon-3xl {
+        width: 48px;
+        height: 48px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      CONTROLS BAR
   ============================================================ */
-  #controls {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 10000;
-    background: #0F172A;
-    padding: 10px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 4px 6px;
-    border-bottom: 1px solid #1E293B;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    min-height: 60px;
-  }
+      #controls {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 10000;
+        background: #0f172a;
+        padding: 10px 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 6px;
+        border-bottom: 1px solid #1e293b;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        min-height: 60px;
+      }
 
-  .ctrl-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: #F8FAFC;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    padding-right: 4px;
-  }
+      .ctrl-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #f8fafc;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        padding-right: 4px;
+      }
 
-  .ctrl-label {
-    font-size: 10px;
-    font-weight: 600;
-    color: #475569;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    padding: 0 2px;
-  }
+      .ctrl-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: #475569;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        padding: 0 2px;
+      }
 
-  .ctrl-divider {
-    width: 1px; height: 20px;
-    background: #334155;
-    margin: 0 8px;
-    flex-shrink: 0;
-  }
+      .ctrl-divider {
+        width: 1px;
+        height: 20px;
+        background: #334155;
+        margin: 0 8px;
+        flex-shrink: 0;
+      }
 
-  .ctrl-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: #1E293B;
-    border: 1px solid #334155;
-    color: #94A3B8;
-    padding: 4px 11px;
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-    line-height: 1.4;
-  }
-  .ctrl-btn:hover  { background: #334155; color: #E2E8F0; border-color: #475569; }
-  .ctrl-btn.active { background: #2563EB; border-color: #3B82F6; color: #FFFFFF; }
+      .ctrl-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: #94a3b8;
+        padding: 4px 11px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+        line-height: 1.4;
+      }
+      .ctrl-btn:hover {
+        background: #334155;
+        color: #e2e8f0;
+        border-color: #475569;
+      }
+      .ctrl-btn.active {
+        background: #2563eb;
+        border-color: #3b82f6;
+        color: #ffffff;
+      }
 
-  .ctrl-swatch {
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    border: 1px solid rgba(255,255,255,0.25);
-  }
+      .ctrl-swatch {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+      }
 
-  /* ============================================================
+      /* ============================================================
      PAGES — SHOW / HIDE
   ============================================================ */
-  .page { display: none; }
-  .page.active { display: block; }
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
 
-  /* Sub-states within a page */
-  .state { display: none; }
-  .state.active { display: block; }
+      /* Sub-states within a page */
+      .state {
+        display: none;
+      }
+      .state.active {
+        display: block;
+      }
 
-  /* ============================================================
+      /* ============================================================
      NAVIGATION BAR — SHARED BASE
   ============================================================ */
-  .nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 40px;
-    height: 64px;
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 60px;
-    z-index: 100;
-  }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 40px;
+        height: 64px;
+        background: var(--white);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 60px;
+        z-index: 100;
+      }
 
-  .nav-left  { display: flex; align-items: center; gap: 8px; }
-  .nav-right { display: flex; align-items: center; gap: 6px; }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
 
-  .nav-logo {
-    display: flex; align-items: center; gap: 10px;
-    text-decoration: none;
-  }
-  .nav-logo-mark {
-    width: 34px; height: 34px;
-    background: var(--p);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    color: white;
-    font-weight: 800;
-    font-size: 15px;
-    flex-shrink: 0;
-    letter-spacing: -0.02em;
-  }
-  .nav-logo-text {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text);
-    letter-spacing: -0.02em;
-  }
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .nav-logo-mark {
+        width: 34px;
+        height: 34px;
+        background: var(--p);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 15px;
+        flex-shrink: 0;
+        letter-spacing: -0.02em;
+      }
+      .nav-logo-text {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
 
-  .nav-sep {
-    width: 1px; height: 20px;
-    background: var(--border);
-    margin: 0 4px;
-  }
+      .nav-sep {
+        width: 1px;
+        height: 20px;
+        background: var(--border);
+        margin: 0 4px;
+      }
 
-  .nav-link {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-muted);
-    padding: 6px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: color 0.15s, background 0.15s;
-    white-space: nowrap;
-  }
-  .nav-link:hover        { color: var(--text); background: var(--p-light); text-decoration: none; }
-  .nav-link.active       { color: var(--p); background: var(--p-light); font-weight: 600; }
+      .nav-link {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+        padding: 6px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        transition:
+          color 0.15s,
+          background 0.15s;
+        white-space: nowrap;
+      }
+      .nav-link:hover {
+        color: var(--text);
+        background: var(--p-light);
+        text-decoration: none;
+      }
+      .nav-link.active {
+        color: var(--p);
+        background: var(--p-light);
+        font-weight: 600;
+      }
 
-  .nav-account {
-    display: flex; align-items: center; gap: 7px;
-    background: var(--p-light);
-    padding: 5px 12px 5px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--p);
-    border: none;
-    font-family: inherit;
-    transition: filter 0.15s;
-  }
-  .nav-account:hover { filter: brightness(0.96); }
-  .nav-account-avatar {
-    width: 24px; height: 24px;
-    background: var(--p);
-    border-radius: 50%;
-    color: white;
-    font-size: 11px;
-    font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-  }
+      .nav-account {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--p-light);
+        padding: 5px 12px 5px 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--p);
+        border: none;
+        font-family: inherit;
+        transition: filter 0.15s;
+      }
+      .nav-account:hover {
+        filter: brightness(0.96);
+      }
+      .nav-account-avatar {
+        width: 24px;
+        height: 24px;
+        background: var(--p);
+        border-radius: 50%;
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-  /* Public nav action buttons */
-  .nav-btn-ghost {
-    font-size: 14px; font-weight: 500;
-    color: var(--text-muted);
-    padding: 6px 14px;
-    border: none; background: none;
-    cursor: pointer; font-family: inherit;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: color 0.15s;
-  }
-  .nav-btn-ghost:hover { color: var(--text); }
-  .nav-btn-outline {
-    font-size: 14px; font-weight: 600;
-    color: var(--p);
-    padding: 6px 16px;
-    border: 1.5px solid var(--p);
-    background: transparent;
-    border-radius: 6px;
-    cursor: pointer; font-family: inherit;
-    text-decoration: none;
-    transition: background 0.15s;
-  }
-  .nav-btn-outline:hover { background: var(--p-light); text-decoration: none; }
+      /* Public nav action buttons */
+      .nav-btn-ghost {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+        padding: 6px 14px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-family: inherit;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+      .nav-btn-ghost:hover {
+        color: var(--text);
+      }
+      .nav-btn-outline {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--p);
+        padding: 6px 16px;
+        border: 1.5px solid var(--p);
+        background: transparent;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: inherit;
+        text-decoration: none;
+        transition: background 0.15s;
+      }
+      .nav-btn-outline:hover {
+        background: var(--p-light);
+        text-decoration: none;
+      }
 
-  /* ============================================================
+      /* ============================================================
      DESIGN OVERRIDES — NAVIGATION
   ============================================================ */
-  .design-minimal .nav { box-shadow: none; }
-  .design-warm    .nav { border-bottom-color: #EDE8E1; }
-  .design-saas    .nav {
-    background: var(--nav-dark);
-    border-bottom: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  }
-  .design-saas .nav .nav-logo-text  { color: #F8FAFC; }
-  .design-saas .nav .nav-link       { color: rgba(255,255,255,0.65); }
-  .design-saas .nav .nav-link:hover { color: #F8FAFC; background: rgba(255,255,255,0.08); }
-  .design-saas .nav .nav-link.active{ color: #F8FAFC; background: rgba(255,255,255,0.12); }
-  .design-saas .nav .nav-sep        { background: rgba(255,255,255,0.15); }
-  .design-saas .nav .nav-btn-ghost  { color: rgba(255,255,255,0.65); }
-  .design-saas .nav .nav-btn-ghost:hover { color: #F8FAFC; }
-  .design-saas .nav .nav-btn-outline {
-    color: #F8FAFC;
-    border-color: rgba(255,255,255,0.4);
-  }
-  .design-saas .nav .nav-btn-outline:hover { background: rgba(255,255,255,0.1); }
-  .design-saas .nav .nav-account {
-    background: rgba(255,255,255,0.1);
-    color: #F8FAFC;
-    border: 1px solid rgba(255,255,255,0.2);
-  }
-  .design-saas .nav .nav-account:hover { background: rgba(255,255,255,0.16); filter: none; }
-  .design-saas .nav .nav-logo-mark { background: var(--p); }
+      .design-minimal .nav {
+        box-shadow: none;
+      }
+      .design-warm .nav {
+        border-bottom-color: #ede8e1;
+      }
+      .design-saas .nav {
+        background: var(--nav-dark);
+        border-bottom: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+      }
+      .design-saas .nav .nav-logo-text {
+        color: #f8fafc;
+      }
+      .design-saas .nav .nav-link {
+        color: rgba(255, 255, 255, 0.65);
+      }
+      .design-saas .nav .nav-link:hover {
+        color: #f8fafc;
+        background: rgba(255, 255, 255, 0.08);
+      }
+      .design-saas .nav .nav-link.active {
+        color: #f8fafc;
+        background: rgba(255, 255, 255, 0.12);
+      }
+      .design-saas .nav .nav-sep {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .design-saas .nav .nav-btn-ghost {
+        color: rgba(255, 255, 255, 0.65);
+      }
+      .design-saas .nav .nav-btn-ghost:hover {
+        color: #f8fafc;
+      }
+      .design-saas .nav .nav-btn-outline {
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.4);
+      }
+      .design-saas .nav .nav-btn-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .design-saas .nav .nav-account {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f8fafc;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .design-saas .nav .nav-account:hover {
+        background: rgba(255, 255, 255, 0.16);
+        filter: none;
+      }
+      .design-saas .nav .nav-logo-mark {
+        background: var(--p);
+      }
 
-  /* ============================================================
+      /* ============================================================
      PAGE CONTAINERS
   ============================================================ */
-  .page-wrap {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 40px 80px;
-  }
-  .page-wrap-narrow {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 40px 40px 80px;
-  }
+      .page-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 40px 80px;
+      }
+      .page-wrap-narrow {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 40px 40px 80px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      TYPOGRAPHY
   ============================================================ */
-  .page-title {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    line-height: 1.2;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .page-sub {
-    font-size: 15px;
-    color: var(--text-muted);
-    margin-bottom: 32px;
-    line-height: 1.5;
-  }
+      .page-title {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .page-sub {
+        font-size: 15px;
+        color: var(--text-muted);
+        margin-bottom: 32px;
+        line-height: 1.5;
+      }
 
-  .design-warm .page-title  { font-size: 30px; }
-  .design-saas .page-title  { font-size: 26px; letter-spacing: -0.03em; }
+      .design-warm .page-title {
+        font-size: 30px;
+      }
+      .design-saas .page-title {
+        font-size: 26px;
+        letter-spacing: -0.03em;
+      }
 
-  /* ============================================================
+      /* ============================================================
      BUTTONS  (DDR-CS-003)
   ============================================================ */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: 7px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 9px 20px;
-    border: none;
-    cursor: pointer;
-    line-height: 1;
-    white-space: nowrap;
-    transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
-    text-decoration: none;
-  }
-  .btn:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
-  .btn:active { transform: translateY(1px); }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 600;
+        padding: 9px 20px;
+        border: none;
+        cursor: pointer;
+        line-height: 1;
+        white-space: nowrap;
+        transition:
+          background 0.15s,
+          box-shadow 0.15s,
+          transform 0.1s;
+        text-decoration: none;
+      }
+      .btn:focus-visible {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: 2px;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
 
-  /* Border radius per design — DDR-CS-001 */
-  .design-minimal .btn { border-radius: 6px; }
-  .design-warm    .btn { border-radius: 8px; padding: 10px 22px; }
-  .design-saas    .btn { border-radius: 8px; }
+      /* Border radius per design — DDR-CS-001 */
+      .design-minimal .btn {
+        border-radius: 6px;
+      }
+      .design-warm .btn {
+        border-radius: 8px;
+        padding: 10px 22px;
+      }
+      .design-saas .btn {
+        border-radius: 8px;
+      }
 
-  .btn-sm { padding: 6px 14px; font-size: 13px; }
-  .btn-lg { padding: 12px 28px; font-size: 15px; }
-  .design-warm .btn-sm { padding: 7px 14px; }
+      .btn-sm {
+        padding: 6px 14px;
+        font-size: 13px;
+      }
+      .btn-lg {
+        padding: 12px 28px;
+        font-size: 15px;
+      }
+      .design-warm .btn-sm {
+        padding: 7px 14px;
+      }
 
-  /* Primary — teal fill */
-  .btn-primary { background: var(--p); color: white; }
-  .btn-primary:hover { background: var(--p-hover); color: white; text-decoration: none; }
+      /* Primary — teal fill */
+      .btn-primary {
+        background: var(--p);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--p-hover);
+        color: white;
+        text-decoration: none;
+      }
 
-  /* Accent — amber fill (for primary CTAs like "New application") */
-  .btn-accent { background: var(--a); color: white; }
-  .btn-accent:hover { background: var(--a-hover); color: white; text-decoration: none; }
+      /* Accent — amber fill (for primary CTAs like "New application") */
+      .btn-accent {
+        background: var(--a);
+        color: white;
+      }
+      .btn-accent:hover {
+        background: var(--a-hover);
+        color: white;
+        text-decoration: none;
+      }
 
-  /* Secondary — grey outline */
-  .btn-secondary {
-    background: white;
-    color: var(--text);
-    border: 1.5px solid var(--border-strong);
-  }
-  .btn-secondary:hover { background: #F8FAFC; text-decoration: none; }
+      /* Secondary — grey outline */
+      .btn-secondary {
+        background: white;
+        color: var(--text);
+        border: 1.5px solid var(--border-strong);
+      }
+      .btn-secondary:hover {
+        background: #f8fafc;
+        text-decoration: none;
+      }
 
-  /* Ghost — escape / back */
-  .btn-ghost {
-    background: transparent;
-    color: var(--text-muted);
-    padding-left: 8px; padding-right: 8px;
-  }
-  .btn-ghost:hover { background: var(--p-light); color: var(--p); text-decoration: none; }
+      /* Ghost — escape / back */
+      .btn-ghost {
+        background: transparent;
+        color: var(--text-muted);
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      .btn-ghost:hover {
+        background: var(--p-light);
+        color: var(--p);
+        text-decoration: none;
+      }
 
-  /* Destructive L1 — text link */
-  .btn-destr-text {
-    background: transparent;
-    color: var(--error);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 0;
-  }
-  .btn-destr-text:hover { color: #991B1B; text-decoration: underline; }
+      /* Destructive L1 — text link */
+      .btn-destr-text {
+        background: transparent;
+        color: var(--error);
+        font-size: 13px;
+        font-weight: 500;
+        padding: 0;
+      }
+      .btn-destr-text:hover {
+        color: #991b1b;
+        text-decoration: underline;
+      }
 
-  /* Destructive L2 — red fill */
-  .btn-destructive { background: var(--error); color: white; }
-  .btn-destructive:hover { background: #B91C1C; color: white; text-decoration: none; }
+      /* Destructive L2 — red fill */
+      .btn-destructive {
+        background: var(--error);
+        color: white;
+      }
+      .btn-destructive:hover {
+        background: #b91c1c;
+        color: white;
+        text-decoration: none;
+      }
 
-  /* SaaS: subtle shadow on primary */
-  .design-saas .btn-primary { box-shadow: 0 1px 3px rgba(0,0,0,0.25); }
-  .design-saas .btn-primary:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.25); }
+      /* SaaS: subtle shadow on primary */
+      .design-saas .btn-primary {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      }
+      .design-saas .btn-primary:hover {
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+      }
 
-  /* ============================================================
+      /* ============================================================
      FORM ELEMENTS
   ============================================================ */
-  .form-group { margin-bottom: 20px; }
+      .form-group {
+        margin-bottom: 20px;
+      }
 
-  .form-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .form-optional {
-    font-size: 12px;
-    font-weight: 400;
-    color: var(--text-muted);
-    margin-left: 6px;
-  }
-  .form-hint {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-top: 5px;
-    line-height: 1.4;
-  }
+      .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .form-optional {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--text-muted);
+        margin-left: 6px;
+      }
+      .form-hint {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 5px;
+        line-height: 1.4;
+      }
 
-  .form-input {
-    width: 100%;
-    padding: 9px 12px;
-    font-family: inherit;
-    font-size: 14px;
-    color: var(--text);
-    background: white;
-    border: 1.5px solid var(--border-strong);
-    border-radius: 6px;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    line-height: 1.5;
-  }
-  .form-input::placeholder { color: var(--text-light); }
-  .form-input:focus {
-    outline: none;
-    border-color: var(--p);
-    box-shadow: 0 0 0 3px var(--p-light);
-  }
-  .form-input:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 0; }
-  textarea.form-input { resize: vertical; min-height: 96px; line-height: 1.6; }
+      .form-input {
+        width: 100%;
+        padding: 9px 12px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--text);
+        background: white;
+        border: 1.5px solid var(--border-strong);
+        border-radius: 6px;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+        line-height: 1.5;
+      }
+      .form-input::placeholder {
+        color: var(--text-light);
+      }
+      .form-input:focus {
+        outline: none;
+        border-color: var(--p);
+        box-shadow: 0 0 0 3px var(--p-light);
+      }
+      .form-input:focus-visible {
+        outline: 2px solid var(--focus-ring);
+        outline-offset: 0;
+      }
+      textarea.form-input {
+        resize: vertical;
+        min-height: 96px;
+        line-height: 1.6;
+      }
 
-  .design-warm .form-input { border-radius: 8px; }
-  .design-saas .form-input { border-radius: 8px; }
+      .design-warm .form-input {
+        border-radius: 8px;
+      }
+      .design-saas .form-input {
+        border-radius: 8px;
+      }
 
-  /* Inline validation error */
-  .form-error {
-    font-size: 13px;
-    color: var(--error);
-    margin-top: 5px;
-    display: flex; align-items: center; gap: 5px;
-  }
+      /* Inline validation error */
+      .form-error {
+        font-size: 13px;
+        color: var(--error);
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
 
-  /* Success alert below submit (DDR-IP-002) */
-  .alert-success {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px;
-    background: var(--success-light);
-    border: 1px solid var(--success-border);
-    color: #166534;
-    font-size: 14px;
-    border-radius: 6px;
-    margin-top: 16px;
-  }
-  .design-warm .alert-success { border-radius: 8px; }
-  .design-saas .alert-success { border-radius: 8px; }
+      /* Success alert below submit (DDR-IP-002) */
+      .alert-success {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: var(--success-light);
+        border: 1px solid var(--success-border);
+        color: #166534;
+        font-size: 14px;
+        border-radius: 6px;
+        margin-top: 16px;
+      }
+      .design-warm .alert-success {
+        border-radius: 8px;
+      }
+      .design-saas .alert-success {
+        border-radius: 8px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      CARDS  (DDR-CS-002)
   ============================================================ */
-  .card {
-    background: var(--card);
-    transition: box-shadow 0.15s;
-  }
+      .card {
+        background: var(--card);
+        transition: box-shadow 0.15s;
+      }
 
-  /* Minimal: subtle shadow, 6px radius */
-  .design-minimal .card {
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  .design-minimal .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.09); }
+      /* Minimal: subtle shadow, 6px radius */
+      .design-minimal .card {
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      }
+      .design-minimal .card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.09);
+      }
 
-  /* Warm: 8px radius, left-border status accent */
-  .design-warm .card {
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    border-left-width: 4px;
-    border-left-color: var(--border-strong);
-  }
-  .design-warm .card.s-not-started  { border-left-color: var(--text-light); }
-  .design-warm .card.s-in-progress  { border-left-color: var(--warning); }
-  .design-warm .card.s-approved     { border-left-color: var(--success); }
-  .design-warm .card.s-exported     { border-left-color: var(--p); }
+      /* Warm: 8px radius, left-border status accent */
+      .design-warm .card {
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        border-left-width: 4px;
+        border-left-color: var(--border-strong);
+      }
+      .design-warm .card.s-not-started {
+        border-left-color: var(--text-light);
+      }
+      .design-warm .card.s-in-progress {
+        border-left-color: var(--warning);
+      }
+      .design-warm .card.s-approved {
+        border-left-color: var(--success);
+      }
+      .design-warm .card.s-exported {
+        border-left-color: var(--p);
+      }
 
-  /* SaaS: stronger shadow, 8px radius */
-  .design-saas .card {
-    border-radius: 8px;
-    border: none;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
-  }
-  .design-saas .card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05); }
+      /* SaaS: stronger shadow, 8px radius */
+      .design-saas .card {
+        border-radius: 8px;
+        border: none;
+        box-shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.07),
+          0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      }
+      .design-saas .card:hover {
+        box-shadow:
+          0 10px 15px -3px rgba(0, 0, 0, 0.08),
+          0 4px 6px -4px rgba(0, 0, 0, 0.05);
+      }
 
-  /* ============================================================
+      /* ============================================================
      STATUS BADGES  (always pill — DDR-CS-001)
   ============================================================ */
-  .badge {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 3px 10px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 500;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
-  .badge-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 1.4;
+        white-space: nowrap;
+      }
+      .badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
 
-  .badge-not-started  { background: #F1F5F9; color: #475569; }
-  .badge-not-started  .badge-dot { background: #94A3B8; }
-  .badge-in-progress  { background: #FEF3C7; color: #92400E; }
-  .badge-in-progress  .badge-dot { background: var(--warning); }
-  .badge-approved     { background: var(--success-light); color: #14532D; }
-  .badge-approved     .badge-dot { background: var(--success); }
-  .badge-exported     { background: var(--p-light); color: var(--p); }
-  .badge-exported     .badge-dot { background: var(--p); }
+      .badge-not-started {
+        background: #f1f5f9;
+        color: #475569;
+      }
+      .badge-not-started .badge-dot {
+        background: #94a3b8;
+      }
+      .badge-in-progress {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge-in-progress .badge-dot {
+        background: var(--warning);
+      }
+      .badge-approved {
+        background: var(--success-light);
+        color: #14532d;
+      }
+      .badge-approved .badge-dot {
+        background: var(--success);
+      }
+      .badge-exported {
+        background: var(--p-light);
+        color: var(--p);
+      }
+      .badge-exported .badge-dot {
+        background: var(--p);
+      }
 
-  /* ============================================================
+      /* ============================================================
      APPLICATION CARD GRID
   ============================================================ */
-  .app-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
-  }
+      .app-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
 
-  .app-card { padding: 20px 24px; }
-  .app-card-grant  { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 3px; line-height: 1.3; }
-  .app-card-funder { font-size: 13px; color: var(--text-muted); }
-  .app-card-foot   {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-  .app-card-actions { display: flex; align-items: center; gap: 12px; }
+      .app-card {
+        padding: 20px 24px;
+      }
+      .app-card-grant {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 3px;
+        line-height: 1.3;
+      }
+      .app-card-funder {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .app-card-foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--border);
+      }
+      .app-card-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      DASHBOARD HEADER
   ============================================================ */
-  .dash-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
-    margin-bottom: 4px;
-  }
+      .dash-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 4px;
+      }
 
-  /* SaaS: hero banner across top */
-  .dash-saas-hero {
-    display: none;
-    background: linear-gradient(135deg, var(--nav-dark) 0%, var(--p) 100%);
-    padding: 36px 40px 32px;
-    color: white;
-  }
-  .design-saas .dash-saas-hero  { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-  .design-saas .dash-plain-head { display: none; }
-  .dash-plain-head { display: block; }
+      /* SaaS: hero banner across top */
+      .dash-saas-hero {
+        display: none;
+        background: linear-gradient(135deg, var(--nav-dark) 0%, var(--p) 100%);
+        padding: 36px 40px 32px;
+        color: white;
+      }
+      .design-saas .dash-saas-hero {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .design-saas .dash-plain-head {
+        display: none;
+      }
+      .dash-plain-head {
+        display: block;
+      }
 
-  .dash-saas-hero .page-title { color: white; margin-bottom: 4px; }
-  .dash-saas-hero .page-sub   { color: rgba(255,255,255,0.7); margin-bottom: 0; }
+      .dash-saas-hero .page-title {
+        color: white;
+        margin-bottom: 4px;
+      }
+      .dash-saas-hero .page-sub {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 0;
+      }
 
-  /* ============================================================
+      /* ============================================================
      STEP INDICATOR  (DDR-CS-004)
   ============================================================ */
-  .step-bar {
-    display: flex; align-items: center;
-    padding: 16px 40px;
-    background: white;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 124px;   /* 60px controls + 64px nav */
-    z-index: 50;
-    overflow-x: auto;
-  }
-  .design-warm .step-bar { border-bottom-color: #EDE8E1; }
-  .design-saas .step-bar { box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-bottom: none; }
+      .step-bar {
+        display: flex;
+        align-items: center;
+        padding: 16px 40px;
+        background: white;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 124px; /* 60px controls + 64px nav */
+        z-index: 50;
+        overflow-x: auto;
+      }
+      .design-warm .step-bar {
+        border-bottom-color: #ede8e1;
+      }
+      .design-saas .step-bar {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        border-bottom: none;
+      }
 
-  .step-item { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; }
-  .step-circle {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 600;
-    transition: all 0.2s;
-  }
-  .step-item.done    .step-circle { background: var(--p); color: white; }
-  .step-item.current .step-circle { background: var(--p); color: white; box-shadow: 0 0 0 4px var(--p-light); }
-  .step-item.upcoming .step-circle { background: white; color: var(--text-light); border: 2px solid var(--border-strong); }
+      .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+      }
+      .step-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      .step-item.done .step-circle {
+        background: var(--p);
+        color: white;
+      }
+      .step-item.current .step-circle {
+        background: var(--p);
+        color: white;
+        box-shadow: 0 0 0 4px var(--p-light);
+      }
+      .step-item.upcoming .step-circle {
+        background: white;
+        color: var(--text-light);
+        border: 2px solid var(--border-strong);
+      }
 
-  .step-name { font-size: 11px; font-weight: 500; white-space: nowrap; color: var(--text-muted); }
-  .step-item.current  .step-name { color: var(--p); font-weight: 600; }
+      .step-name {
+        font-size: 11px;
+        font-weight: 500;
+        white-space: nowrap;
+        color: var(--text-muted);
+      }
+      .step-item.current .step-name {
+        color: var(--p);
+        font-weight: 600;
+      }
 
-  .step-line { flex: 1; height: 2px; margin-bottom: 18px; min-width: 32px; max-width: 80px; }
-  .step-line.done     { background: var(--p); }
-  .step-line.upcoming { background: var(--border-strong); }
+      .step-line {
+        flex: 1;
+        height: 2px;
+        margin-bottom: 18px;
+        min-width: 32px;
+        max-width: 80px;
+      }
+      .step-line.done {
+        background: var(--p);
+      }
+      .step-line.upcoming {
+        background: var(--border-strong);
+      }
 
-  /* ============================================================
+      /* ============================================================
      TWO-COLUMN LAYOUT  (Steps 3 & 4 — DDR-LA-001)
   ============================================================ */
-  .two-col { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
-  .two-col-main { min-width: 0; }
-  .two-col-aside {
-    position: sticky;
-    top: 230px;  /* controls + nav + step bar + some padding */
-  }
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 300px;
+        gap: 32px;
+        align-items: start;
+      }
+      .two-col-main {
+        min-width: 0;
+      }
+      .two-col-aside {
+        position: sticky;
+        top: 230px; /* controls + nav + step bar + some padding */
+      }
 
-  /* ============================================================
+      /* ============================================================
      REVIEW PANEL (Step 4 right sidebar — DDR-LA-002)
   ============================================================ */
-  .review-panel {
-    background: var(--p-light);
-    border: 1px solid;
-    border-color: color-mix(in srgb, var(--p) 30%, transparent);
-    padding: 20px 22px;
-  }
-  .design-minimal .review-panel { border-radius: 6px; }
-  .design-warm    .review-panel { border-radius: 10px; }
-  .design-saas    .review-panel { border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
+      .review-panel {
+        background: var(--p-light);
+        border: 1px solid;
+        border-color: color-mix(in srgb, var(--p) 30%, transparent);
+        padding: 20px 22px;
+      }
+      .design-minimal .review-panel {
+        border-radius: 6px;
+      }
+      .design-warm .review-panel {
+        border-radius: 10px;
+      }
+      .design-saas .review-panel {
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+      }
 
-  .review-panel-head {
-    font-size: 13px; font-weight: 700;
-    color: var(--p);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 14px;
-    display: flex; align-items: center; gap: 7px;
-  }
-  .review-prompts { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-  .review-prompt  { display: flex; gap: 10px; font-size: 13px; color: var(--text); line-height: 1.5; }
-  .rp-num {
-    width: 20px; height: 20px;
-    background: var(--p);
-    color: white; border-radius: 50%;
-    font-size: 10px; font-weight: 700;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 1px;
-  }
+      .review-panel-head {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--p);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .review-prompts {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .review-prompt {
+        display: flex;
+        gap: 10px;
+        font-size: 13px;
+        color: var(--text);
+        line-height: 1.5;
+      }
+      .rp-num {
+        width: 20px;
+        height: 20px;
+        background: var(--p);
+        color: white;
+        border-radius: 50%;
+        font-size: 10px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      DRAFT ANSWER CARDS (Step 4)
   ============================================================ */
-  .answer-card { padding: 22px 24px; margin-bottom: 16px; }
-  .answer-q-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
-  .answer-q-num {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px;
-    background: var(--p-light); color: var(--p);
-    border-radius: 50%; font-size: 11px; font-weight: 700;
-  }
-  .answer-q-text { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.5; }
+      .answer-card {
+        padding: 22px 24px;
+        margin-bottom: 16px;
+      }
+      .answer-q-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .answer-q-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        margin-top: 1px;
+        background: var(--p-light);
+        color: var(--p);
+        border-radius: 50%;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .answer-q-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.5;
+      }
 
-  .answer-body {
-    background: var(--p-light);
-    padding: 14px 16px;
-    font-size: 14px; color: var(--text); line-height: 1.7;
-    margin-bottom: 8px;
-  }
-  .design-minimal .answer-body { border-radius: 6px; }
-  .design-warm    .answer-body { border-radius: 8px; background: #FEF6EC; }
-  .design-saas    .answer-body { border-radius: 8px; }
+      .answer-body {
+        background: var(--p-light);
+        padding: 14px 16px;
+        font-size: 14px;
+        color: var(--text);
+        line-height: 1.7;
+        margin-bottom: 8px;
+      }
+      .design-minimal .answer-body {
+        border-radius: 6px;
+      }
+      .design-warm .answer-body {
+        border-radius: 8px;
+        background: #fef6ec;
+      }
+      .design-saas .answer-body {
+        border-radius: 8px;
+      }
 
-  .answer-disclaimer {
-    font-size: 12px; font-style: italic; color: var(--text-muted);
-    margin-bottom: 12px;
-  }
-  .answer-foot { display: flex; justify-content: flex-end; }
+      .answer-disclaimer {
+        font-size: 12px;
+        font-style: italic;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      .answer-foot {
+        display: flex;
+        justify-content: flex-end;
+      }
 
-  .step-nav {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-top: 32px; padding-top: 24px;
-    border-top: 1px solid var(--border);
-  }
+      .step-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border);
+      }
 
-  /* ============================================================
+      /* ============================================================
      STEP PAGE META
   ============================================================ */
-  .step-meta { margin-bottom: 28px; }
-  .step-meta-label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .step-meta-title { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; color: var(--text); margin-bottom: 5px; }
-  .step-meta-sub   { font-size: 14px; color: var(--text-muted); }
+      .step-meta {
+        margin-bottom: 28px;
+      }
+      .step-meta-label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .step-meta-title {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+      .step-meta-sub {
+        font-size: 14px;
+        color: var(--text-muted);
+      }
 
-  /* ============================================================
+      /* ============================================================
      EMPTY STATE  (DDR-CS-006)
   ============================================================ */
-  .empty-state { text-align: center; padding: 48px 40px 64px; }
-  .empty-state-head { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.02em; }
-  .empty-state-sub  { font-size: 15px; color: var(--text-muted); max-width: 420px; margin: 0 auto 40px; line-height: 1.6; }
+      .empty-state {
+        text-align: center;
+        padding: 48px 40px 64px;
+      }
+      .empty-state-head {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 10px;
+        letter-spacing: -0.02em;
+      }
+      .empty-state-sub {
+        font-size: 15px;
+        color: var(--text-muted);
+        max-width: 420px;
+        margin: 0 auto 40px;
+        line-height: 1.6;
+      }
 
-  .es-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 680px; margin: 0 auto 36px; }
-  .es-step  { display: flex; flex-direction: column; align-items: center; gap: 11px; }
+      .es-steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        max-width: 680px;
+        margin: 0 auto 36px;
+      }
+      .es-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 11px;
+      }
 
-  .es-icon-wrap {
-    width: 56px; height: 56px; border-radius: 12px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  }
-  /* Icon container per design — DDR-CS-006 */
-  .design-minimal .es-icon-wrap { background: var(--p); }
-  .design-minimal .es-icon-wrap svg { color: white; }
-  .design-warm    .es-icon-wrap { background: var(--a-light); border: 2px solid var(--a); }
-  .design-warm    .es-icon-wrap svg { color: var(--a-hover); }
-  .design-saas    .es-icon-wrap { background: var(--p-light); border: 2px solid color-mix(in srgb, var(--p) 30%, transparent); }
-  .design-saas    .es-icon-wrap svg { color: var(--p); }
+      .es-icon-wrap {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      /* Icon container per design — DDR-CS-006 */
+      .design-minimal .es-icon-wrap {
+        background: var(--p);
+      }
+      .design-minimal .es-icon-wrap svg {
+        color: white;
+      }
+      .design-warm .es-icon-wrap {
+        background: var(--a-light);
+        border: 2px solid var(--a);
+      }
+      .design-warm .es-icon-wrap svg {
+        color: var(--a-hover);
+      }
+      .design-saas .es-icon-wrap {
+        background: var(--p-light);
+        border: 2px solid color-mix(in srgb, var(--p) 30%, transparent);
+      }
+      .design-saas .es-icon-wrap svg {
+        color: var(--p);
+      }
 
-  .es-step-num   { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-  .es-step-title { font-size: 14px; font-weight: 600; color: var(--text); }
-  .es-step-desc  { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.5; }
+      .es-step-num {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .es-step-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .es-step-desc {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-align: center;
+        line-height: 1.5;
+      }
 
-  /* ============================================================
+      /* ============================================================
      CHARITY PROFILE — lookup section
   ============================================================ */
-  .lookup-section {
-    background: var(--p-light);
-    border: 1px solid color-mix(in srgb, var(--p) 25%, transparent);
-    padding: 20px 24px;
-    margin-bottom: 32px;
-  }
-  .design-minimal .lookup-section { border-radius: 6px; }
-  .design-warm    .lookup-section { border-radius: 10px; }
-  .design-saas    .lookup-section { border-radius: 8px; }
+      .lookup-section {
+        background: var(--p-light);
+        border: 1px solid color-mix(in srgb, var(--p) 25%, transparent);
+        padding: 20px 24px;
+        margin-bottom: 32px;
+      }
+      .design-minimal .lookup-section {
+        border-radius: 6px;
+      }
+      .design-warm .lookup-section {
+        border-radius: 10px;
+      }
+      .design-saas .lookup-section {
+        border-radius: 8px;
+      }
 
-  .lookup-head { font-size: 14px; font-weight: 600; color: var(--p); margin-bottom: 4px; }
-  .lookup-sub  { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4; }
-  .lookup-row  { display: flex; gap: 10px; }
-  .lookup-row .form-input { flex: 1; }
+      .lookup-head {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--p);
+        margin-bottom: 4px;
+      }
+      .lookup-sub {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 16px;
+        line-height: 1.4;
+      }
+      .lookup-row {
+        display: flex;
+        gap: 10px;
+      }
+      .lookup-row .form-input {
+        flex: 1;
+      }
 
-  .lookup-note {
-    font-size: 13px; color: var(--p);
-    padding: 10px 14px;
-    background: color-mix(in srgb, var(--p) 8%, white);
-    border-left: 3px solid var(--p);
-    border-radius: 4px;
-    margin-top: 12px;
-    display: flex; align-items: center; gap: 8px;
-  }
+      .lookup-note {
+        font-size: 13px;
+        color: var(--p);
+        padding: 10px 14px;
+        background: color-mix(in srgb, var(--p) 8%, white);
+        border-left: 3px solid var(--p);
+        border-radius: 4px;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-  /* Form section divider */
-  .form-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 28px 0 24px;
-  }
-  .form-divider-line  { flex: 1; height: 1px; background: var(--border); }
-  .form-divider-label { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+      /* Form section divider */
+      .form-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 28px 0 24px;
+      }
+      .form-divider-line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+      }
+      .form-divider-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+      }
 
-  /* ============================================================
+      /* ============================================================
      SIGN IN PAGE
   ============================================================ */
-  .signin-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: calc(100vh - 60px - 64px - 65px);
-  }
+      .signin-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: calc(100vh - 60px - 64px - 65px);
+      }
 
-  .signin-hero {
-    background: var(--p);
-    padding: 64px 56px;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  .design-warm .signin-hero {
-    background: linear-gradient(150deg, var(--p) 0%, var(--p-hover) 100%);
-  }
-  .design-saas .signin-hero {
-    background: linear-gradient(150deg, var(--nav-dark) 0%, var(--p) 100%);
-  }
+      .signin-hero {
+        background: var(--p);
+        padding: 64px 56px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .design-warm .signin-hero {
+        background: linear-gradient(150deg, var(--p) 0%, var(--p-hover) 100%);
+      }
+      .design-saas .signin-hero {
+        background: linear-gradient(150deg, var(--nav-dark) 0%, var(--p) 100%);
+      }
 
-  .signin-kicker {
-    display: inline-block;
-    background: rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.9);
-    font-size: 11px; font-weight: 600; letter-spacing: 0.07em;
-    text-transform: uppercase; padding: 4px 12px; border-radius: 9999px;
-    margin-bottom: 22px;
-  }
-  .signin-headline {
-    font-size: 32px; font-weight: 700;
-    color: white; line-height: 1.2;
-    letter-spacing: -0.025em;
-    margin-bottom: 16px;
-  }
-  .design-warm .signin-headline { font-size: 34px; }
-  .signin-sub {
-    font-size: 16px; color: rgba(255,255,255,0.75);
-    line-height: 1.65; max-width: 400px; margin-bottom: 36px;
-  }
-  .signin-features { list-style: none; display: flex; flex-direction: column; gap: 11px; }
-  .signin-feature  { display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgba(255,255,255,0.85); }
-  .sf-dot { width: 22px; height: 22px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+      .signin-kicker {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        margin-bottom: 22px;
+      }
+      .signin-headline {
+        font-size: 32px;
+        font-weight: 700;
+        color: white;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+        margin-bottom: 16px;
+      }
+      .design-warm .signin-headline {
+        font-size: 34px;
+      }
+      .signin-sub {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.75);
+        line-height: 1.65;
+        max-width: 400px;
+        margin-bottom: 36px;
+      }
+      .signin-features {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 11px;
+      }
+      .signin-feature {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .sf-dot {
+        width: 22px;
+        height: 22px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
 
-  .signin-form-wrap {
-    background: white;
-    padding: 64px 56px;
-    display: flex; flex-direction: column; justify-content: center;
-  }
-  .design-warm .signin-form-wrap { background: #FDF9F5; }
-  .design-saas .signin-form-wrap { background: white; }
+      .signin-form-wrap {
+        background: white;
+        padding: 64px 56px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .design-warm .signin-form-wrap {
+        background: #fdf9f5;
+      }
+      .design-saas .signin-form-wrap {
+        background: white;
+      }
 
-  .signin-form-title { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: var(--text); margin-bottom: 6px; }
-  .signin-form-sub   { font-size: 14px; color: var(--text-muted); margin-bottom: 30px; }
-  .signin-form-sub a { color: var(--p); font-weight: 500; }
-  .signin-forgot     { text-align: right; margin-top: -12px; margin-bottom: 18px; }
-  .signin-forgot a   { font-size: 13px; color: var(--text-muted); text-decoration: none; }
-  .signin-forgot a:hover { color: var(--p); }
-  .signin-register   { text-align: center; font-size: 14px; color: var(--text-muted); margin-top: 20px; }
-  .signin-register a { color: var(--p); font-weight: 500; }
+      .signin-form-title {
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .signin-form-sub {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 30px;
+      }
+      .signin-form-sub a {
+        color: var(--p);
+        font-weight: 500;
+      }
+      .signin-forgot {
+        text-align: right;
+        margin-top: -12px;
+        margin-bottom: 18px;
+      }
+      .signin-forgot a {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+      .signin-forgot a:hover {
+        color: var(--p);
+      }
+      .signin-register {
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 20px;
+      }
+      .signin-register a {
+        color: var(--p);
+        font-weight: 500;
+      }
 
-  /* ============================================================
+      /* ============================================================
      MODAL  (DDR-IP-001, DDR-CS-002)
   ============================================================ */
-  .modal-overlay {
-    position: fixed;
-    inset: 60px 0 0 0;     /* below controls bar */
-    background: rgba(15,23,42,0.55);
-    backdrop-filter: blur(3px);
-    z-index: 500;
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px;
-  }
-  .modal {
-    background: white;
-    max-width: 440px;
-    width: 100%;
-    padding: 28px 32px;
-    position: relative;
-  }
-  .design-minimal .modal { border-radius: 8px;  box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-  .design-warm    .modal { border-radius: 14px; box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
-  .design-saas    .modal { border-radius: 10px; box-shadow: 0 25px 50px rgba(0,0,0,0.22); }
+      .modal-overlay {
+        position: fixed;
+        inset: 60px 0 0 0; /* below controls bar */
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(3px);
+        z-index: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .modal {
+        background: white;
+        max-width: 440px;
+        width: 100%;
+        padding: 28px 32px;
+        position: relative;
+      }
+      .design-minimal .modal {
+        border-radius: 8px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+      .design-warm .modal {
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+      }
+      .design-saas .modal {
+        border-radius: 10px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.22);
+      }
 
-  .modal-close {
-    position: absolute; top: 14px; right: 14px;
-    width: 28px; height: 28px;
-    border: none; background: none; cursor: pointer;
-    color: var(--text-muted); border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .modal-close:hover { background: var(--border); }
-  .modal-title  { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.01em; }
-  .modal-body   { font-size: 14px; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
-  .modal-body strong { color: var(--text); font-weight: 600; }
-  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+      .modal-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-close:hover {
+        background: var(--border);
+      }
+      .modal-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 10px;
+        letter-spacing: -0.01em;
+      }
+      .modal-body {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.65;
+        margin-bottom: 24px;
+      }
+      .modal-body strong {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
 
-  /* ============================================================
+      /* ============================================================
      GLOBAL FOOTER
   ============================================================ */
-  .footer {
-    background: white;
-    border-top: 1px solid var(--border);
-    padding: 22px 40px;
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-  }
-  .design-warm .footer { background: #FDF9F5; border-top-color: #EDE8E1; }
-  .design-saas .footer { background: #F8FAFC; }
-  .footer-copy  { font-size: 13px; color: var(--text-muted); }
-  .footer-links { display: flex; gap: 20px; }
-  .footer-link  { font-size: 13px; color: var(--text-muted); text-decoration: none; }
-  .footer-link:hover { color: var(--text); }
+      .footer {
+        background: white;
+        border-top: 1px solid var(--border);
+        padding: 22px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .design-warm .footer {
+        background: #fdf9f5;
+        border-top-color: #ede8e1;
+      }
+      .design-saas .footer {
+        background: #f8fafc;
+      }
+      .footer-copy {
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+      .footer-links {
+        display: flex;
+        gap: 20px;
+      }
+      .footer-link {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+      .footer-link:hover {
+        color: var(--text);
+      }
 
-  /* ============================================================
+      /* ============================================================
      INLINE APPROVE CONFIRM (DDR-IP-001 — Step 5 demo)
   ============================================================ */
-  .inline-confirm {
-    background: #FFFBEB;
-    border: 1.5px solid #FCD34D;
-    padding: 20px 24px;
-    margin-top: 20px;
-  }
-  .design-minimal .inline-confirm { border-radius: 6px; }
-  .design-warm    .inline-confirm { border-radius: 10px; }
-  .design-saas    .inline-confirm { border-radius: 8px; }
-  .ic-title  { font-size: 15px; font-weight: 600; color: #92400E; margin-bottom: 8px; }
-  .ic-body   { font-size: 13px; color: #78350F; line-height: 1.5; margin-bottom: 16px; }
-  .ic-footer { display: flex; gap: 10px; }
+      .inline-confirm {
+        background: #fffbeb;
+        border: 1.5px solid #fcd34d;
+        padding: 20px 24px;
+        margin-top: 20px;
+      }
+      .design-minimal .inline-confirm {
+        border-radius: 6px;
+      }
+      .design-warm .inline-confirm {
+        border-radius: 10px;
+      }
+      .design-saas .inline-confirm {
+        border-radius: 8px;
+      }
+      .ic-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #92400e;
+        margin-bottom: 8px;
+      }
+      .ic-body {
+        font-size: 13px;
+        color: #78350f;
+        line-height: 1.5;
+        margin-bottom: 16px;
+      }
+      .ic-footer {
+        display: flex;
+        gap: 10px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      PROFILE INCOMPLETE BANNER
   ============================================================ */
-  .profile-banner {
-    display: flex; align-items: center; gap: 12px;
-    background: var(--a-light);
-    border: 1.5px solid color-mix(in srgb, var(--a) 40%, transparent);
-    padding: 14px 20px;
-    font-size: 14px;
-    margin-bottom: 24px;
-    justify-content: space-between;
-    flex-wrap: wrap; gap: 12px;
-  }
-  .design-minimal .profile-banner { border-radius: 6px; }
-  .design-warm    .profile-banner { border-radius: 8px; }
-  .design-saas    .profile-banner { border-radius: 8px; }
-  .pb-text  { color: #92400E; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+      .profile-banner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--a-light);
+        border: 1.5px solid color-mix(in srgb, var(--a) 40%, transparent);
+        padding: 14px 20px;
+        font-size: 14px;
+        margin-bottom: 24px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .design-minimal .profile-banner {
+        border-radius: 6px;
+      }
+      .design-warm .profile-banner {
+        border-radius: 8px;
+      }
+      .design-saas .profile-banner {
+        border-radius: 8px;
+      }
+      .pb-text {
+        color: #92400e;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
 
-  /* ============================================================
+      /* ============================================================
      UTILITIES
   ============================================================ */
-  .flex          { display: flex; }
-  .items-center  { align-items: center; }
-  .gap-2         { gap: 8px; }
-  .gap-3         { gap: 12px; }
-  .mt-1          { margin-top: 4px; }
-  .mt-2          { margin-top: 8px; }
-  .mt-4          { margin-top: 16px; }
-  .mt-6          { margin-top: 24px; }
-  .mb-2          { margin-bottom: 8px; }
-  .mb-4          { margin-bottom: 16px; }
-  .text-sm       { font-size: 14px; }
-  .text-muted    { color: var(--text-muted); }
-  .font-600      { font-weight: 600; }
-  .w-full        { width: 100%; }
+      .flex {
+        display: flex;
+      }
+      .items-center {
+        align-items: center;
+      }
+      .gap-2 {
+        gap: 8px;
+      }
+      .gap-3 {
+        gap: 12px;
+      }
+      .mt-1 {
+        margin-top: 4px;
+      }
+      .mt-2 {
+        margin-top: 8px;
+      }
+      .mt-4 {
+        margin-top: 16px;
+      }
+      .mt-6 {
+        margin-top: 24px;
+      }
+      .mb-2 {
+        margin-bottom: 8px;
+      }
+      .mb-4 {
+        margin-bottom: 16px;
+      }
+      .text-sm {
+        font-size: 14px;
+      }
+      .text-muted {
+        color: var(--text-muted);
+      }
+      .font-600 {
+        font-weight: 600;
+      }
+      .w-full {
+        width: 100%;
+      }
 
-  /* ============================================================
+      /* ============================================================
      DEMO TOGGLE (controls inline with page content)
   ============================================================ */
-  .demo-strip {
-    background: #1E293B;
-    padding: 8px 40px;
-    display: flex; align-items: center; gap: 10px;
-    font-size: 12px; color: #64748B;
-  }
-  .demo-strip-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; }
-  .demo-btn {
-    background: #334155; border: 1px solid #475569;
-    color: #94A3B8; padding: 3px 10px; border-radius: 5px;
-    font-family: inherit; font-size: 11px; font-weight: 500;
-    cursor: pointer; transition: all 0.15s;
-  }
-  .demo-btn:hover  { background: #475569; color: white; }
-  .demo-btn.active { background: #2563EB; border-color: #3B82F6; color: white; }
+      .demo-strip {
+        background: #1e293b;
+        padding: 8px 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #64748b;
+      }
+      .demo-strip-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+      .demo-btn {
+        background: #334155;
+        border: 1px solid #475569;
+        color: #94a3b8;
+        padding: 3px 10px;
+        border-radius: 5px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .demo-btn:hover {
+        background: #475569;
+        color: white;
+      }
+      .demo-btn.active {
+        background: #2563eb;
+        border-color: #3b82f6;
+        color: white;
+      }
+    </style>
+  </head>
 
-  </style>
-</head>
-
-<!-- ============================================================
+  <!-- ============================================================
      SVG ICON SPRITES
 ============================================================ -->
-<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="ic-check" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd"/></symbol>
-  <symbol id="ic-x" viewBox="0 0 20 20"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/></symbol>
-  <symbol id="ic-plus" viewBox="0 0 20 20"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"/></symbol>
-  <symbol id="ic-chevron" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd"/></symbol>
-  <symbol id="ic-trash" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd"/></symbol>
-  <symbol id="ic-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
-  <symbol id="ic-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></symbol>
-  <symbol id="ic-filecheck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></symbol>
-  <symbol id="ic-alert" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd"/></symbol>
-  <symbol id="ic-checkcircle" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></symbol>
-  <symbol id="ic-user" viewBox="0 0 20 20"><path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"/></symbol>
-  <symbol id="ic-eye" viewBox="0 0 20 20"><path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41Z" clip-rule="evenodd"/></symbol>
-  <symbol id="ic-download" viewBox="0 0 20 20"><path d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z"/><path d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"/></symbol>
-</svg>
+  <svg style="display: none" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="ic-check" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
+        clip-rule="evenodd"
+      />
+    </symbol>
+    <symbol id="ic-x" viewBox="0 0 20 20">
+      <path
+        d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+      />
+    </symbol>
+    <symbol id="ic-plus" viewBox="0 0 20 20">
+      <path
+        d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
+      />
+    </symbol>
+    <symbol id="ic-chevron" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+        clip-rule="evenodd"
+      />
+    </symbol>
+    <symbol id="ic-trash" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z"
+        clip-rule="evenodd"
+      />
+    </symbol>
+    <symbol
+      id="ic-upload"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </symbol>
+    <symbol
+      id="ic-sparkles"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path
+        d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+      />
+      <path d="M5 3v4" />
+      <path d="M19 17v4" />
+      <path d="M3 5h4" />
+      <path d="M17 19h4" />
+    </symbol>
+    <symbol
+      id="ic-filecheck"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+      <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+      <path d="m9 15 2 2 4-4" />
+    </symbol>
+    <symbol id="ic-alert" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+        clip-rule="evenodd"
+      />
+    </symbol>
+    <symbol id="ic-checkcircle" viewBox="0 0 20 20">
+      <path
+        fill-rule="evenodd"
+        d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z"
+        clip-rule="evenodd"
+      />
+    </symbol>
+    <symbol id="ic-user" viewBox="0 0 20 20">
+      <path
+        d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z"
+      />
+    </symbol>
+    <symbol id="ic-eye" viewBox="0 0 20 20">
+      <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+      <path
+        fill-rule="evenodd"
+        d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41Z"
+        clip-rule="evenodd"
+      />
+    </symbol>
+    <symbol id="ic-download" viewBox="0 0 20 20">
+      <path
+        d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z"
+      />
+      <path
+        d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"
+      />
+    </symbol>
+  </svg>
 
-<body class="palette-teal design-minimal">
-
-<!-- ============================================================
+  <body class="palette-teal design-minimal">
+    <!-- ============================================================
      CONTROLS BAR
 ============================================================ -->
-<div id="controls">
-  <span class="ctrl-title">Grant Pathway</span>
-  <div class="ctrl-divider"></div>
+    <div id="controls">
+      <span class="ctrl-title">Grant Pathway</span>
+      <div class="ctrl-divider"></div>
 
-  <span class="ctrl-label">Design</span>
-  <button class="ctrl-btn active" onclick="setDesign('minimal',this)" id="btn-design-minimal">Minimal &amp; Professional</button>
-  <button class="ctrl-btn"        onclick="setDesign('warm',this)"    id="btn-design-warm">Warm &amp; Approachable</button>
-  <button class="ctrl-btn"        onclick="setDesign('saas',this)"    id="btn-design-saas">Modern SaaS</button>
+      <span class="ctrl-label">Design</span>
+      <button class="ctrl-btn active" onclick="setDesign('minimal', this)" id="btn-design-minimal">
+        Minimal &amp; Professional
+      </button>
+      <button class="ctrl-btn" onclick="setDesign('warm', this)" id="btn-design-warm">
+        Warm &amp; Approachable
+      </button>
+      <button class="ctrl-btn" onclick="setDesign('saas', this)" id="btn-design-saas">
+        Modern SaaS
+      </button>
 
-  <div class="ctrl-divider"></div>
-  <span class="ctrl-label">Palette</span>
-  <button class="ctrl-btn active" onclick="setPalette('teal',this)"  id="btn-palette-teal">
-    <span class="ctrl-swatch" style="background:#0D6E6E"></span> Teal &amp; Amber
-  </button>
-  <button class="ctrl-btn"        onclick="setPalette('navy',this)"  id="btn-palette-navy">
-    <span class="ctrl-swatch" style="background:#1E3A5F"></span> Navy &amp; Coral
-  </button>
-  <button class="ctrl-btn"        onclick="setPalette('plum',this)"  id="btn-palette-plum">
-    <span class="ctrl-swatch" style="background:#5B21B6"></span> Plum &amp; Gold
-  </button>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">Palette</span>
+      <button class="ctrl-btn active" onclick="setPalette('teal', this)" id="btn-palette-teal">
+        <span class="ctrl-swatch" style="background: #0d6e6e"></span> Teal &amp; Amber
+      </button>
+      <button class="ctrl-btn" onclick="setPalette('navy', this)" id="btn-palette-navy">
+        <span class="ctrl-swatch" style="background: #1e3a5f"></span> Navy &amp; Coral
+      </button>
+      <button class="ctrl-btn" onclick="setPalette('plum', this)" id="btn-palette-plum">
+        <span class="ctrl-swatch" style="background: #5b21b6"></span> Plum &amp; Gold
+      </button>
 
-  <div class="ctrl-divider"></div>
-  <span class="ctrl-label">View</span>
-  <button class="ctrl-btn active" onclick="setPage('signin',this)"    id="btn-page-signin">Sign in</button>
-  <button class="ctrl-btn"        onclick="setPage('dashboard',this)" id="btn-page-dashboard">Dashboard</button>
-  <button class="ctrl-btn"        onclick="setPage('profile',this)"   id="btn-page-profile">Charity profile</button>
-  <button class="ctrl-btn"        onclick="setPage('step4',this)"     id="btn-page-step4">Step 4 — Draft answers</button>
-  <button class="ctrl-btn"        onclick="setPage('modal',this)"     id="btn-page-modal">Delete modal</button>
-</div>
-
-
-<!-- ============================================================
-     PAGE: SIGN IN / LANDING
-============================================================ -->
-<div id="page-signin" class="page active">
-
-  <!-- Unauthenticated nav -->
-  <nav class="nav">
-    <div class="nav-left">
-      <a href="#" class="nav-logo">
-        <div class="nav-logo-mark">GP</div>
-        <span class="nav-logo-text">Grant Pathway</span>
-      </a>
-    </div>
-    <div class="nav-right">
-      <a href="#" class="nav-btn-ghost">Sign in</a>
-      <a href="#" class="nav-btn-outline">Register — it's free</a>
-    </div>
-  </nav>
-
-  <!-- Two-column hero + form -->
-  <div class="signin-layout">
-
-    <!-- Left: hero -->
-    <div class="signin-hero">
-      <span class="signin-kicker">Free for UK charities</span>
-      <h1 class="signin-headline">Grant writing support that works as hard as you do</h1>
-      <p class="signin-sub">Grant Pathway helps charity volunteers write better applications, faster. Set up your charity profile once — then get tailored draft answers for every funder you apply to.</p>
-      <ul class="signin-features">
-        <li class="signin-feature">
-          <span class="sf-dot"><svg class="icon icon-sm"><use href="#ic-check"/></svg></span>
-          Your charity profile, used for every application
-        </li>
-        <li class="signin-feature">
-          <span class="sf-dot"><svg class="icon icon-sm"><use href="#ic-check"/></svg></span>
-          Draft answers in minutes, not weekends
-        </li>
-        <li class="signin-feature">
-          <span class="sf-dot"><svg class="icon icon-sm"><use href="#ic-check"/></svg></span>
-          Review before you use — always
-        </li>
-      </ul>
-    </div>
-
-    <!-- Right: sign in form -->
-    <div class="signin-form-wrap">
-      <h2 class="signin-form-title">Welcome back</h2>
-      <p class="signin-form-sub">Don't have an account? <a href="#">Register free</a></p>
-
-      <div class="form-group">
-        <label class="form-label" for="si-email">Email address</label>
-        <input class="form-input" type="email" id="si-email" placeholder="e.g. margaret@helpersandfriends.org.uk" autocomplete="email">
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="si-pw">Password</label>
-        <input class="form-input" type="password" id="si-pw" placeholder="Your password" autocomplete="current-password">
-      </div>
-
-      <div class="signin-forgot"><a href="#">Forgot your password?</a></div>
-
-      <button class="btn btn-primary w-full btn-lg" style="justify-content:center">Sign in</button>
-
-      <p class="signin-register">
-        Don't have an account? <a href="#">Register — it's free</a>
-      </p>
-    </div>
-
-  </div>
-
-  <footer class="footer">
-    <span class="footer-copy">© RapidGlobe Ltd 2026</span>
-    <div class="footer-links">
-      <a href="#" class="footer-link">Privacy policy</a>
-      <a href="#" class="footer-link">Terms of service</a>
-    </div>
-  </footer>
-</div>
-
-
-<!-- ============================================================
-     PAGE: DASHBOARD
-============================================================ -->
-<div id="page-dashboard" class="page">
-
-  <!-- Authenticated nav -->
-  <nav class="nav">
-    <div class="nav-left">
-      <a href="#" class="nav-logo">
-        <div class="nav-logo-mark">GP</div>
-        <span class="nav-logo-text">Grant Pathway</span>
-      </a>
-      <div class="nav-sep"></div>
-      <a href="#" class="nav-link active">My applications</a>
-      <a href="#" class="nav-link">Charity profile</a>
-    </div>
-    <div class="nav-right">
-      <button class="nav-account">
-        <div class="nav-account-avatar">MR</div>
-        Margaret
-        <svg class="icon icon-sm"><use href="#ic-chevron"/></svg>
+      <div class="ctrl-divider"></div>
+      <span class="ctrl-label">View</span>
+      <button class="ctrl-btn active" onclick="setPage('signin', this)" id="btn-page-signin">
+        Sign in
+      </button>
+      <button class="ctrl-btn" onclick="setPage('dashboard', this)" id="btn-page-dashboard">
+        Dashboard
+      </button>
+      <button class="ctrl-btn" onclick="setPage('profile', this)" id="btn-page-profile">
+        Charity profile
+      </button>
+      <button class="ctrl-btn" onclick="setPage('step4', this)" id="btn-page-step4">
+        Step 4 — Draft answers
+      </button>
+      <button class="ctrl-btn" onclick="setPage('modal', this)" id="btn-page-modal">
+        Delete modal
       </button>
     </div>
-  </nav>
 
-  <!-- Demo strip -->
-  <div class="demo-strip">
-    <span class="demo-strip-label">Demo</span>
-    <button class="demo-btn active" onclick="showDashState('populated',this)">With applications</button>
-    <button class="demo-btn" onclick="showDashState('empty',this)">Empty state</button>
-  </div>
+    <!-- ============================================================
+     PAGE: SIGN IN / LANDING
+============================================================ -->
+    <div id="page-signin" class="page active">
+      <!-- Unauthenticated nav -->
+      <nav class="nav">
+        <div class="nav-left">
+          <a href="#" class="nav-logo">
+            <div class="nav-logo-mark">GP</div>
+            <span class="nav-logo-text">Grant Pathway</span>
+          </a>
+        </div>
+        <div class="nav-right">
+          <a href="#" class="nav-btn-ghost">Sign in</a>
+          <a href="#" class="nav-btn-outline">Register — it's free</a>
+        </div>
+      </nav>
 
-  <!-- SaaS hero (only visible in SaaS design) -->
-  <div class="dash-saas-hero">
-    <div>
-      <h1 class="page-title">My applications</h1>
-      <p class="page-sub">3 applications</p>
+      <!-- Two-column hero + form -->
+      <div class="signin-layout">
+        <!-- Left: hero -->
+        <div class="signin-hero">
+          <span class="signin-kicker">Free for UK charities</span>
+          <h1 class="signin-headline">Grant writing support that works as hard as you do</h1>
+          <p class="signin-sub">
+            Grant Pathway helps charity volunteers write better applications, faster. Set up your
+            charity profile once — then get tailored draft answers for every funder you apply to.
+          </p>
+          <ul class="signin-features">
+            <li class="signin-feature">
+              <span class="sf-dot"
+                ><svg class="icon icon-sm"><use href="#ic-check" /></svg
+              ></span>
+              Your charity profile, used for every application
+            </li>
+            <li class="signin-feature">
+              <span class="sf-dot"
+                ><svg class="icon icon-sm"><use href="#ic-check" /></svg
+              ></span>
+              Draft answers in minutes, not weekends
+            </li>
+            <li class="signin-feature">
+              <span class="sf-dot"
+                ><svg class="icon icon-sm"><use href="#ic-check" /></svg
+              ></span>
+              Review before you use — always
+            </li>
+          </ul>
+        </div>
+
+        <!-- Right: sign in form -->
+        <div class="signin-form-wrap">
+          <h2 class="signin-form-title">Welcome back</h2>
+          <p class="signin-form-sub">Don't have an account? <a href="#">Register free</a></p>
+
+          <div class="form-group">
+            <label class="form-label" for="si-email">Email address</label>
+            <input
+              class="form-input"
+              type="email"
+              id="si-email"
+              placeholder="e.g. margaret@helpersandfriends.org.uk"
+              autocomplete="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="si-pw">Password</label>
+            <input
+              class="form-input"
+              type="password"
+              id="si-pw"
+              placeholder="Your password"
+              autocomplete="current-password"
+            />
+          </div>
+
+          <div class="signin-forgot"><a href="#">Forgot your password?</a></div>
+
+          <button class="btn btn-primary w-full btn-lg" style="justify-content: center">
+            Sign in
+          </button>
+
+          <p class="signin-register">Don't have an account? <a href="#">Register — it's free</a></p>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span class="footer-copy">© RapidGlobe Ltd 2026</span>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Privacy policy</a>
+          <a href="#" class="footer-link">Terms of service</a>
+        </div>
+      </footer>
     </div>
-    <a href="#" class="btn btn-accent">
-      <svg class="icon"><use href="#ic-plus"/></svg>
-      New application
-    </a>
-  </div>
 
-  <!-- Populated state -->
-  <div id="dash-populated" class="state active">
-    <div class="page-wrap">
+    <!-- ============================================================
+     PAGE: DASHBOARD
+============================================================ -->
+    <div id="page-dashboard" class="page">
+      <!-- Authenticated nav -->
+      <nav class="nav">
+        <div class="nav-left">
+          <a href="#" class="nav-logo">
+            <div class="nav-logo-mark">GP</div>
+            <span class="nav-logo-text">Grant Pathway</span>
+          </a>
+          <div class="nav-sep"></div>
+          <a href="#" class="nav-link active">My applications</a>
+          <a href="#" class="nav-link">Charity profile</a>
+        </div>
+        <div class="nav-right">
+          <button class="nav-account">
+            <div class="nav-account-avatar">MR</div>
+            Margaret
+            <svg class="icon icon-sm"><use href="#ic-chevron" /></svg>
+          </button>
+        </div>
+      </nav>
 
-      <!-- Header (hidden in SaaS, which uses the hero above) -->
-      <div class="dash-plain-head">
+      <!-- Demo strip -->
+      <div class="demo-strip">
+        <span class="demo-strip-label">Demo</span>
+        <button class="demo-btn active" onclick="showDashState('populated', this)">
+          With applications
+        </button>
+        <button class="demo-btn" onclick="showDashState('empty', this)">Empty state</button>
+      </div>
+
+      <!-- SaaS hero (only visible in SaaS design) -->
+      <div class="dash-saas-hero">
+        <div>
+          <h1 class="page-title">My applications</h1>
+          <p class="page-sub">3 applications</p>
+        </div>
+        <a href="#" class="btn btn-accent">
+          <svg class="icon"><use href="#ic-plus" /></svg>
+          New application
+        </a>
+      </div>
+
+      <!-- Populated state -->
+      <div id="dash-populated" class="state active">
+        <div class="page-wrap">
+          <!-- Header (hidden in SaaS, which uses the hero above) -->
+          <div class="dash-plain-head">
+            <div class="dash-header">
+              <div>
+                <h1 class="page-title">My applications</h1>
+                <p class="page-sub">3 applications</p>
+              </div>
+              <a href="#" class="btn btn-accent">
+                <svg class="icon"><use href="#ic-plus" /></svg>
+                New application
+              </a>
+            </div>
+          </div>
+
+          <!-- Application cards -->
+          <div class="app-grid">
+            <!-- Card 1: In progress -->
+            <div class="card app-card s-in-progress">
+              <div class="app-card-grant">Community Lunch Club</div>
+              <div class="app-card-funder">The Henry Smith Charity</div>
+              <div class="app-card-foot">
+                <span class="badge badge-in-progress"
+                  ><span class="badge-dot"></span>In progress</span
+                >
+                <div class="app-card-actions">
+                  <button class="btn btn-destr-text btn-sm">
+                    <svg class="icon icon-sm"><use href="#ic-trash" /></svg>
+                    Delete
+                  </button>
+                  <a href="#" class="btn btn-primary btn-sm">Continue</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Approved -->
+            <div class="card app-card s-approved">
+              <div class="app-card-grant">Wentworth Town Hall Restoration</div>
+              <div class="app-card-funder">National Lottery Community Fund</div>
+              <div class="app-card-foot">
+                <span class="badge badge-approved"><span class="badge-dot"></span>Approved</span>
+                <div class="app-card-actions">
+                  <button class="btn btn-destr-text btn-sm">
+                    <svg class="icon icon-sm"><use href="#ic-trash" /></svg>
+                    Delete
+                  </button>
+                  <a href="#" class="btn btn-primary btn-sm">
+                    <svg class="icon icon-sm"><use href="#ic-download" /></svg>
+                    Download
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Exported -->
+            <div class="card app-card s-exported">
+              <div class="app-card-grant">Youth Equipment Fund</div>
+              <div class="app-card-funder">Sport England</div>
+              <div class="app-card-foot">
+                <span class="badge badge-exported"><span class="badge-dot"></span>Exported</span>
+                <div class="app-card-actions">
+                  <button class="btn btn-destr-text btn-sm">
+                    <svg class="icon icon-sm"><use href="#ic-trash" /></svg>
+                    Delete
+                  </button>
+                  <a href="#" class="btn btn-secondary btn-sm">
+                    <svg class="icon icon-sm"><use href="#ic-eye" /></svg>
+                    View
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /app-grid -->
+        </div>
+      </div>
+      <!-- /dash-populated -->
+
+      <!-- Empty state -->
+      <div id="dash-empty" class="state">
+        <div class="page-wrap">
+          <div class="dash-plain-head">
+            <div class="dash-header">
+              <div>
+                <h1 class="page-title">My applications</h1>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile incomplete banner -->
+          <div class="profile-banner">
+            <div class="pb-text">
+              <svg class="icon"><use href="#ic-alert" /></svg>
+              Your charity profile isn't complete yet. You'll need to fill it in before you can
+              start an application.
+            </div>
+            <a href="#" class="btn btn-accent btn-sm">Complete your profile</a>
+          </div>
+
+          <!-- Empty state explainer (DDR-CS-006) -->
+          <div class="empty-state">
+            <h2 class="empty-state-head">Welcome to Grant Pathway, Margaret</h2>
+            <p class="empty-state-sub">
+              You're ready to start your first application. Here's how it works.
+            </p>
+
+            <div class="es-steps">
+              <div class="es-step">
+                <div class="es-icon-wrap">
+                  <svg class="icon icon-3xl"><use href="#ic-upload" /></svg>
+                </div>
+                <span class="es-step-num">Step 1 &amp; 2</span>
+                <span class="es-step-title">Add funder guidelines</span>
+                <span class="es-step-desc">Upload or paste your funder's guidelines document</span>
+              </div>
+              <div class="es-step">
+                <div class="es-icon-wrap">
+                  <svg class="icon icon-3xl"><use href="#ic-sparkles" /></svg>
+                </div>
+                <span class="es-step-num">Step 3</span>
+                <span class="es-step-title">Get an AI summary</span>
+                <span class="es-step-desc">We'll read and summarise the key questions for you</span>
+              </div>
+              <div class="es-step">
+                <div class="es-icon-wrap">
+                  <svg class="icon icon-3xl"><use href="#ic-filecheck" /></svg>
+                </div>
+                <span class="es-step-num">Step 4</span>
+                <span class="es-step-title">Generate your draft answers</span>
+                <span class="es-step-desc"
+                  >We'll write draft answers using your charity profile</span
+                >
+              </div>
+            </div>
+
+            <a href="#" class="btn btn-accent btn-lg">
+              <svg class="icon"><use href="#ic-plus" /></svg>
+              Start your first application
+            </a>
+          </div>
+        </div>
+      </div>
+      <!-- /dash-empty -->
+
+      <footer class="footer">
+        <span class="footer-copy">© RapidGlobe Ltd 2026</span>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Privacy policy</a>
+          <a href="#" class="footer-link">Terms of service</a>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================
+     PAGE: CHARITY PROFILE
+============================================================ -->
+    <div id="page-profile" class="page">
+      <nav class="nav">
+        <div class="nav-left">
+          <a href="#" class="nav-logo">
+            <div class="nav-logo-mark">GP</div>
+            <span class="nav-logo-text">Grant Pathway</span>
+          </a>
+          <div class="nav-sep"></div>
+          <a href="#" class="nav-link">My applications</a>
+          <a href="#" class="nav-link active">Charity profile</a>
+        </div>
+        <div class="nav-right">
+          <button class="nav-account">
+            <div class="nav-account-avatar">MR</div>
+            Margaret
+            <svg class="icon icon-sm"><use href="#ic-chevron" /></svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Demo strip -->
+      <div class="demo-strip">
+        <span class="demo-strip-label">Demo</span>
+        <button class="demo-btn active" onclick="showProfileState('edit', this)">Edit state</button>
+        <button class="demo-btn" onclick="showProfileState('saved', this)">After save</button>
+      </div>
+
+      <div class="page-wrap-narrow">
+        <h1 class="page-title">Charity profile</h1>
+        <p class="page-sub">
+          Your profile is used to generate draft answers for every application. Keep it accurate and
+          up to date.
+        </p>
+
+        <!-- Charity Commission lookup -->
+        <div class="lookup-section">
+          <p class="lookup-head">Look up your charity</p>
+          <p class="lookup-sub">
+            Enter your charity's name or registration number to pre-fill the details below.
+          </p>
+          <div class="lookup-row">
+            <input
+              class="form-input"
+              type="text"
+              placeholder="e.g. Helpers &amp; Friends or 1234567"
+            />
+            <button class="btn btn-primary">Look up charity</button>
+          </div>
+          <div class="lookup-note" id="lookup-note" style="display: none">
+            <svg class="icon icon-sm"><use href="#ic-check" /></svg>
+            Details retrieved from the Charity Commission register.
+          </div>
+        </div>
+
+        <!-- Profile form -->
+        <div class="form-group">
+          <label class="form-label" for="pf-name">Charity name</label>
+          <input
+            class="form-input"
+            type="text"
+            id="pf-name"
+            placeholder="e.g. Helpers &amp; Friends"
+            value="Helpers &amp; Friends"
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pf-reg"
+            >Charity registration number <span class="form-optional">optional</span></label
+          >
+          <input
+            class="form-input"
+            type="text"
+            id="pf-reg"
+            placeholder="e.g. 1234567"
+            value="1234567"
+          />
+        </div>
+
+        <div class="form-divider">
+          <div class="form-divider-line"></div>
+          <span class="form-divider-label">About your charity</span>
+          <div class="form-divider-line"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pf-does">What does your charity do?</label>
+          <textarea
+            class="form-input"
+            id="pf-does"
+            rows="4"
+            placeholder="e.g. We support elderly people living alone in rural areas by providing companionship and practical help"
+          >
+We support isolated older adults in rural South Yorkshire by providing weekly companionship visits, practical assistance with daily tasks, and connections to statutory services. We work with a team of 60 trained volunteers across seven villages.</textarea
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pf-helps">Who does your charity help?</label>
+          <textarea
+            class="form-input"
+            id="pf-helps"
+            rows="4"
+            placeholder="e.g. Adults aged 65 and over who live alone in rural communities"
+          >
+Adults aged 65 and over who live alone in rural communities, with a focus on those identified by GPs, social workers, or community groups as at risk of loneliness and social isolation.</textarea
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pf-where">Where do you work?</label>
+          <input
+            class="form-input"
+            type="text"
+            id="pf-where"
+            placeholder="e.g. South Yorkshire, or National"
+            value="South Yorkshire"
+          />
+        </div>
+
+        <!-- Edit state button -->
+        <div id="profile-edit-state">
+          <button class="btn btn-primary" style="min-width: 160px">Save profile</button>
+        </div>
+
+        <!-- After-save state (DDR-IP-002: inline alert below button) -->
+        <div id="profile-saved-state" style="display: none">
+          <button class="btn btn-primary" style="min-width: 160px">Save changes</button>
+          <div class="alert-success">
+            <svg class="icon"><use href="#ic-checkcircle" /></svg>
+            Your changes have been saved.
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span class="footer-copy">© RapidGlobe Ltd 2026</span>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Privacy policy</a>
+          <a href="#" class="footer-link">Terms of service</a>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================
+     PAGE: STEP 4 — DRAFT ANSWERS
+============================================================ -->
+    <div id="page-step4" class="page">
+      <nav class="nav">
+        <div class="nav-left">
+          <a href="#" class="nav-logo">
+            <div class="nav-logo-mark">GP</div>
+            <span class="nav-logo-text">Grant Pathway</span>
+          </a>
+          <div class="nav-sep"></div>
+          <a href="#" class="nav-link">My applications</a>
+          <a href="#" class="nav-link">Charity profile</a>
+        </div>
+        <div class="nav-right">
+          <button class="nav-account">
+            <div class="nav-account-avatar">MR</div>
+            Margaret
+            <svg class="icon icon-sm"><use href="#ic-chevron" /></svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Step indicator (DDR-CS-004) -->
+      <div class="step-bar">
+        <div class="step-item done">
+          <div class="step-circle">
+            <svg class="icon icon-sm"><use href="#ic-check" /></svg>
+          </div>
+          <span class="step-name">Application details</span>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step-item done">
+          <div class="step-circle">
+            <svg class="icon icon-sm"><use href="#ic-check" /></svg>
+          </div>
+          <span class="step-name">Funder guidelines</span>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step-item done">
+          <div class="step-circle">
+            <svg class="icon icon-sm"><use href="#ic-check" /></svg>
+          </div>
+          <span class="step-name">AI summary</span>
+        </div>
+        <div class="step-line done"></div>
+        <div class="step-item current">
+          <div class="step-circle">4</div>
+          <span class="step-name">Draft answers</span>
+        </div>
+        <div class="step-line upcoming"></div>
+        <div class="step-item upcoming">
+          <div class="step-circle">5</div>
+          <span class="step-name">Approve &amp; export</span>
+        </div>
+      </div>
+
+      <div class="page-wrap">
+        <div class="two-col">
+          <!-- Main content -->
+          <div class="two-col-main">
+            <div class="step-meta">
+              <p class="step-meta-label">Community Lunch Club — The Henry Smith Charity</p>
+              <h1 class="step-meta-title">Your draft answers</h1>
+              <p class="step-meta-sub">
+                Review and edit each answer before continuing. These are starting points — check
+                every detail before use.
+              </p>
+            </div>
+
+            <!-- Answer card 1 -->
+            <div class="card answer-card">
+              <div class="answer-q-row">
+                <span class="answer-q-num">1</span>
+                <span class="answer-q-text"
+                  >Describe your organisation, its mission and the communities it serves.</span
+                >
+              </div>
+              <div class="answer-body">
+                Helpers &amp; Friends is a registered charity (no. 1234567) based in Barnsley, South
+                Yorkshire. Founded in 2003, we support isolated older adults living alone in rural
+                communities by providing weekly companionship visits, practical help, and
+                connections to statutory services. We currently support 240 beneficiaries across
+                seven villages, working with a team of 60 trained volunteers.
+              </div>
+              <p class="answer-disclaimer">
+                Review before using — check all facts, figures, and details are correct.
+              </p>
+              <div class="answer-foot">
+                <button class="btn btn-secondary btn-sm">Edit answer</button>
+              </div>
+            </div>
+
+            <!-- Answer card 2 -->
+            <div class="card answer-card">
+              <div class="answer-q-row">
+                <span class="answer-q-num">2</span>
+                <span class="answer-q-text"
+                  >What will you use the funding for, and how will it benefit your
+                  beneficiaries?</span
+                >
+              </div>
+              <div class="answer-body">
+                This funding will support our Community Lunch Club programme — twice-weekly
+                gatherings providing hot meals and social connection for up to 30 isolated older
+                adults in Penistone. The club is the only regular social provision in the area. With
+                your support, we will maintain two sessions per week for 12 months, covering food
+                costs, venue hire, and volunteer expenses.
+              </div>
+              <p class="answer-disclaimer">
+                Review before using — check all facts, figures, and details are correct.
+              </p>
+              <div class="answer-foot">
+                <button class="btn btn-secondary btn-sm">Edit answer</button>
+              </div>
+            </div>
+
+            <!-- Answer card 3 -->
+            <div class="card answer-card">
+              <div class="answer-q-row">
+                <span class="answer-q-num">3</span>
+                <span class="answer-q-text"
+                  >How many people will directly benefit, and over what period of time?</span
+                >
+              </div>
+              <div class="answer-body">
+                Over 12 months, 45 individuals will directly benefit from the Community Lunch Club.
+                Each person attends an average of 60 sessions per year. The programme also has
+                indirect benefits for family members and carers, reducing respite demands on
+                approximately 30 households.
+              </div>
+              <p class="answer-disclaimer">
+                Review before using — check all facts, figures, and details are correct.
+              </p>
+              <div class="answer-foot">
+                <button class="btn btn-secondary btn-sm">Edit answer</button>
+              </div>
+            </div>
+
+            <!-- Step navigation -->
+            <div class="step-nav">
+              <button class="btn btn-ghost">
+                <svg class="icon" style="transform: rotate(90deg)"><use href="#ic-chevron" /></svg>
+                Back
+              </button>
+              <button class="btn btn-primary">
+                Continue
+                <svg class="icon" style="transform: rotate(-90deg)"><use href="#ic-chevron" /></svg>
+              </button>
+            </div>
+          </div>
+          <!-- /two-col-main -->
+
+          <!-- Right panel — sticky review prompts (DDR-LA-002) -->
+          <div class="two-col-aside">
+            <div class="review-panel">
+              <div class="review-panel-head">
+                <svg class="icon icon-sm"><use href="#ic-alert" /></svg>
+                Before you continue
+              </div>
+              <ul class="review-prompts">
+                <li class="review-prompt">
+                  <span class="rp-num">1</span>
+                  Does this accurately describe your charity and project?
+                </li>
+                <li class="review-prompt">
+                  <span class="rp-num">2</span>
+                  Are all figures, dates, and facts correct?
+                </li>
+                <li class="review-prompt">
+                  <span class="rp-num">3</span>
+                  Does this answer the question that was asked?
+                </li>
+              </ul>
+            </div>
+
+            <div
+              style="
+                margin-top: 16px;
+                padding: 14px 16px;
+                font-size: 13px;
+                color: var(--text-muted);
+                background: var(--card);
+                border-radius: 6px;
+                border: 1px solid var(--border);
+                line-height: 1.5;
+              "
+            >
+              <strong style="color: var(--text); display: block; margin-bottom: 4px"
+                >3 questions found</strong
+              >
+              We found 3 application questions in these guidelines.
+            </div>
+          </div>
+        </div>
+        <!-- /two-col -->
+      </div>
+
+      <footer class="footer">
+        <span class="footer-copy">© RapidGlobe Ltd 2026</span>
+        <div class="footer-links">
+          <a href="#" class="footer-link">Privacy policy</a>
+          <a href="#" class="footer-link">Terms of service</a>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ============================================================
+     PAGE: DELETE APPLICATION MODAL
+     (shown as modal over dashboard)
+============================================================ -->
+    <div id="page-modal" class="page">
+      <!-- Background: muted dashboard -->
+      <nav class="nav" style="opacity: 0.5; pointer-events: none">
+        <div class="nav-left">
+          <a href="#" class="nav-logo">
+            <div class="nav-logo-mark">GP</div>
+            <span class="nav-logo-text">Grant Pathway</span>
+          </a>
+          <div class="nav-sep"></div>
+          <a href="#" class="nav-link active">My applications</a>
+          <a href="#" class="nav-link">Charity profile</a>
+        </div>
+        <div class="nav-right">
+          <button class="nav-account">
+            <div class="nav-account-avatar">MR</div>
+            Margaret
+            <svg class="icon icon-sm"><use href="#ic-chevron" /></svg>
+          </button>
+        </div>
+      </nav>
+
+      <div class="page-wrap" style="opacity: 0.35; pointer-events: none">
         <div class="dash-header">
           <div>
             <h1 class="page-title">My applications</h1>
             <p class="page-sub">3 applications</p>
           </div>
           <a href="#" class="btn btn-accent">
-            <svg class="icon"><use href="#ic-plus"/></svg>
+            <svg class="icon"><use href="#ic-plus" /></svg>
             New application
           </a>
         </div>
-      </div>
-
-      <!-- Application cards -->
-      <div class="app-grid">
-
-        <!-- Card 1: In progress -->
-        <div class="card app-card s-in-progress">
-          <div class="app-card-grant">Community Lunch Club</div>
-          <div class="app-card-funder">The Henry Smith Charity</div>
-          <div class="app-card-foot">
-            <span class="badge badge-in-progress"><span class="badge-dot"></span>In progress</span>
-            <div class="app-card-actions">
-              <button class="btn btn-destr-text btn-sm">
-                <svg class="icon icon-sm"><use href="#ic-trash"/></svg>
-                Delete
-              </button>
-              <a href="#" class="btn btn-primary btn-sm">Continue</a>
+        <div class="app-grid" style="margin-top: 24px">
+          <div class="card app-card s-in-progress">
+            <div class="app-card-grant">Community Lunch Club</div>
+            <div class="app-card-funder">The Henry Smith Charity</div>
+            <div class="app-card-foot">
+              <span class="badge badge-in-progress"
+                ><span class="badge-dot"></span>In progress</span
+              >
+            </div>
+          </div>
+          <div class="card app-card s-approved">
+            <div class="app-card-grant">Wentworth Town Hall Restoration</div>
+            <div class="app-card-funder">National Lottery Community Fund</div>
+            <div class="app-card-foot">
+              <span class="badge badge-approved"><span class="badge-dot"></span>Approved</span>
             </div>
           </div>
         </div>
-
-        <!-- Card 2: Approved -->
-        <div class="card app-card s-approved">
-          <div class="app-card-grant">Wentworth Town Hall Restoration</div>
-          <div class="app-card-funder">National Lottery Community Fund</div>
-          <div class="app-card-foot">
-            <span class="badge badge-approved"><span class="badge-dot"></span>Approved</span>
-            <div class="app-card-actions">
-              <button class="btn btn-destr-text btn-sm">
-                <svg class="icon icon-sm"><use href="#ic-trash"/></svg>
-                Delete
-              </button>
-              <a href="#" class="btn btn-primary btn-sm">
-                <svg class="icon icon-sm"><use href="#ic-download"/></svg>
-                Download
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Card 3: Exported -->
-        <div class="card app-card s-exported">
-          <div class="app-card-grant">Youth Equipment Fund</div>
-          <div class="app-card-funder">Sport England</div>
-          <div class="app-card-foot">
-            <span class="badge badge-exported"><span class="badge-dot"></span>Exported</span>
-            <div class="app-card-actions">
-              <button class="btn btn-destr-text btn-sm">
-                <svg class="icon icon-sm"><use href="#ic-trash"/></svg>
-                Delete
-              </button>
-              <a href="#" class="btn btn-secondary btn-sm">
-                <svg class="icon icon-sm"><use href="#ic-eye"/></svg>
-                View
-              </a>
-            </div>
-          </div>
-        </div>
-
-      </div><!-- /app-grid -->
-    </div>
-  </div><!-- /dash-populated -->
-
-  <!-- Empty state -->
-  <div id="dash-empty" class="state">
-    <div class="page-wrap">
-
-      <div class="dash-plain-head">
-        <div class="dash-header">
-          <div>
-            <h1 class="page-title">My applications</h1>
-          </div>
-        </div>
       </div>
 
-      <!-- Profile incomplete banner -->
-      <div class="profile-banner">
-        <div class="pb-text">
-          <svg class="icon"><use href="#ic-alert"/></svg>
-          Your charity profile isn't complete yet. You'll need to fill it in before you can start an application.
-        </div>
-        <a href="#" class="btn btn-accent btn-sm">Complete your profile</a>
-      </div>
-
-      <!-- Empty state explainer (DDR-CS-006) -->
-      <div class="empty-state">
-        <h2 class="empty-state-head">Welcome to Grant Pathway, Margaret</h2>
-        <p class="empty-state-sub">You're ready to start your first application. Here's how it works.</p>
-
-        <div class="es-steps">
-          <div class="es-step">
-            <div class="es-icon-wrap">
-              <svg class="icon icon-3xl"><use href="#ic-upload"/></svg>
-            </div>
-            <span class="es-step-num">Step 1 &amp; 2</span>
-            <span class="es-step-title">Add funder guidelines</span>
-            <span class="es-step-desc">Upload or paste your funder's guidelines document</span>
-          </div>
-          <div class="es-step">
-            <div class="es-icon-wrap">
-              <svg class="icon icon-3xl"><use href="#ic-sparkles"/></svg>
-            </div>
-            <span class="es-step-num">Step 3</span>
-            <span class="es-step-title">Get an AI summary</span>
-            <span class="es-step-desc">We'll read and summarise the key questions for you</span>
-          </div>
-          <div class="es-step">
-            <div class="es-icon-wrap">
-              <svg class="icon icon-3xl"><use href="#ic-filecheck"/></svg>
-            </div>
-            <span class="es-step-num">Step 4</span>
-            <span class="es-step-title">Generate your draft answers</span>
-            <span class="es-step-desc">We'll write draft answers using your charity profile</span>
-          </div>
-        </div>
-
-        <a href="#" class="btn btn-accent btn-lg">
-          <svg class="icon"><use href="#ic-plus"/></svg>
-          Start your first application
-        </a>
-      </div>
-
-    </div>
-  </div><!-- /dash-empty -->
-
-  <footer class="footer">
-    <span class="footer-copy">© RapidGlobe Ltd 2026</span>
-    <div class="footer-links">
-      <a href="#" class="footer-link">Privacy policy</a>
-      <a href="#" class="footer-link">Terms of service</a>
-    </div>
-  </footer>
-</div>
-
-
-<!-- ============================================================
-     PAGE: CHARITY PROFILE
-============================================================ -->
-<div id="page-profile" class="page">
-
-  <nav class="nav">
-    <div class="nav-left">
-      <a href="#" class="nav-logo">
-        <div class="nav-logo-mark">GP</div>
-        <span class="nav-logo-text">Grant Pathway</span>
-      </a>
-      <div class="nav-sep"></div>
-      <a href="#" class="nav-link">My applications</a>
-      <a href="#" class="nav-link active">Charity profile</a>
-    </div>
-    <div class="nav-right">
-      <button class="nav-account">
-        <div class="nav-account-avatar">MR</div>
-        Margaret
-        <svg class="icon icon-sm"><use href="#ic-chevron"/></svg>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Demo strip -->
-  <div class="demo-strip">
-    <span class="demo-strip-label">Demo</span>
-    <button class="demo-btn active" onclick="showProfileState('edit',this)">Edit state</button>
-    <button class="demo-btn" onclick="showProfileState('saved',this)">After save</button>
-  </div>
-
-  <div class="page-wrap-narrow">
-    <h1 class="page-title">Charity profile</h1>
-    <p class="page-sub">Your profile is used to generate draft answers for every application. Keep it accurate and up to date.</p>
-
-    <!-- Charity Commission lookup -->
-    <div class="lookup-section">
-      <p class="lookup-head">Look up your charity</p>
-      <p class="lookup-sub">Enter your charity's name or registration number to pre-fill the details below.</p>
-      <div class="lookup-row">
-        <input class="form-input" type="text" placeholder="e.g. Helpers &amp; Friends or 1234567">
-        <button class="btn btn-primary">Look up charity</button>
-      </div>
-      <div class="lookup-note" id="lookup-note" style="display:none">
-        <svg class="icon icon-sm"><use href="#ic-check"/></svg>
-        Details retrieved from the Charity Commission register.
-      </div>
-    </div>
-
-    <!-- Profile form -->
-    <div class="form-group">
-      <label class="form-label" for="pf-name">Charity name</label>
-      <input class="form-input" type="text" id="pf-name" placeholder="e.g. Helpers &amp; Friends" value="Helpers &amp; Friends">
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="pf-reg">Charity registration number <span class="form-optional">optional</span></label>
-      <input class="form-input" type="text" id="pf-reg" placeholder="e.g. 1234567" value="1234567">
-    </div>
-
-    <div class="form-divider">
-      <div class="form-divider-line"></div>
-      <span class="form-divider-label">About your charity</span>
-      <div class="form-divider-line"></div>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="pf-does">What does your charity do?</label>
-      <textarea class="form-input" id="pf-does" rows="4" placeholder="e.g. We support elderly people living alone in rural areas by providing companionship and practical help">We support isolated older adults in rural South Yorkshire by providing weekly companionship visits, practical assistance with daily tasks, and connections to statutory services. We work with a team of 60 trained volunteers across seven villages.</textarea>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="pf-helps">Who does your charity help?</label>
-      <textarea class="form-input" id="pf-helps" rows="4" placeholder="e.g. Adults aged 65 and over who live alone in rural communities">Adults aged 65 and over who live alone in rural communities, with a focus on those identified by GPs, social workers, or community groups as at risk of loneliness and social isolation.</textarea>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label" for="pf-where">Where do you work?</label>
-      <input class="form-input" type="text" id="pf-where" placeholder="e.g. South Yorkshire, or National" value="South Yorkshire">
-    </div>
-
-    <!-- Edit state button -->
-    <div id="profile-edit-state">
-      <button class="btn btn-primary" style="min-width:160px">Save profile</button>
-    </div>
-
-    <!-- After-save state (DDR-IP-002: inline alert below button) -->
-    <div id="profile-saved-state" style="display:none">
-      <button class="btn btn-primary" style="min-width:160px">Save changes</button>
-      <div class="alert-success">
-        <svg class="icon"><use href="#ic-checkcircle"/></svg>
-        Your changes have been saved.
-      </div>
-    </div>
-
-  </div>
-
-  <footer class="footer">
-    <span class="footer-copy">© RapidGlobe Ltd 2026</span>
-    <div class="footer-links">
-      <a href="#" class="footer-link">Privacy policy</a>
-      <a href="#" class="footer-link">Terms of service</a>
-    </div>
-  </footer>
-</div>
-
-
-<!-- ============================================================
-     PAGE: STEP 4 — DRAFT ANSWERS
-============================================================ -->
-<div id="page-step4" class="page">
-
-  <nav class="nav">
-    <div class="nav-left">
-      <a href="#" class="nav-logo">
-        <div class="nav-logo-mark">GP</div>
-        <span class="nav-logo-text">Grant Pathway</span>
-      </a>
-      <div class="nav-sep"></div>
-      <a href="#" class="nav-link">My applications</a>
-      <a href="#" class="nav-link">Charity profile</a>
-    </div>
-    <div class="nav-right">
-      <button class="nav-account">
-        <div class="nav-account-avatar">MR</div>
-        Margaret
-        <svg class="icon icon-sm"><use href="#ic-chevron"/></svg>
-      </button>
-    </div>
-  </nav>
-
-  <!-- Step indicator (DDR-CS-004) -->
-  <div class="step-bar">
-    <div class="step-item done">
-      <div class="step-circle"><svg class="icon icon-sm"><use href="#ic-check"/></svg></div>
-      <span class="step-name">Application details</span>
-    </div>
-    <div class="step-line done"></div>
-    <div class="step-item done">
-      <div class="step-circle"><svg class="icon icon-sm"><use href="#ic-check"/></svg></div>
-      <span class="step-name">Funder guidelines</span>
-    </div>
-    <div class="step-line done"></div>
-    <div class="step-item done">
-      <div class="step-circle"><svg class="icon icon-sm"><use href="#ic-check"/></svg></div>
-      <span class="step-name">AI summary</span>
-    </div>
-    <div class="step-line done"></div>
-    <div class="step-item current">
-      <div class="step-circle">4</div>
-      <span class="step-name">Draft answers</span>
-    </div>
-    <div class="step-line upcoming"></div>
-    <div class="step-item upcoming">
-      <div class="step-circle">5</div>
-      <span class="step-name">Approve &amp; export</span>
-    </div>
-  </div>
-
-  <div class="page-wrap">
-    <div class="two-col">
-
-      <!-- Main content -->
-      <div class="two-col-main">
-        <div class="step-meta">
-          <p class="step-meta-label">Community Lunch Club — The Henry Smith Charity</p>
-          <h1 class="step-meta-title">Your draft answers</h1>
-          <p class="step-meta-sub">Review and edit each answer before continuing. These are starting points — check every detail before use.</p>
-        </div>
-
-        <!-- Answer card 1 -->
-        <div class="card answer-card">
-          <div class="answer-q-row">
-            <span class="answer-q-num">1</span>
-            <span class="answer-q-text">Describe your organisation, its mission and the communities it serves.</span>
-          </div>
-          <div class="answer-body">
-            Helpers &amp; Friends is a registered charity (no. 1234567) based in Barnsley, South Yorkshire. Founded in 2003, we support isolated older adults living alone in rural communities by providing weekly companionship visits, practical help, and connections to statutory services. We currently support 240 beneficiaries across seven villages, working with a team of 60 trained volunteers.
-          </div>
-          <p class="answer-disclaimer">Review before using — check all facts, figures, and details are correct.</p>
-          <div class="answer-foot">
-            <button class="btn btn-secondary btn-sm">Edit answer</button>
-          </div>
-        </div>
-
-        <!-- Answer card 2 -->
-        <div class="card answer-card">
-          <div class="answer-q-row">
-            <span class="answer-q-num">2</span>
-            <span class="answer-q-text">What will you use the funding for, and how will it benefit your beneficiaries?</span>
-          </div>
-          <div class="answer-body">
-            This funding will support our Community Lunch Club programme — twice-weekly gatherings providing hot meals and social connection for up to 30 isolated older adults in Penistone. The club is the only regular social provision in the area. With your support, we will maintain two sessions per week for 12 months, covering food costs, venue hire, and volunteer expenses.
-          </div>
-          <p class="answer-disclaimer">Review before using — check all facts, figures, and details are correct.</p>
-          <div class="answer-foot">
-            <button class="btn btn-secondary btn-sm">Edit answer</button>
-          </div>
-        </div>
-
-        <!-- Answer card 3 -->
-        <div class="card answer-card">
-          <div class="answer-q-row">
-            <span class="answer-q-num">3</span>
-            <span class="answer-q-text">How many people will directly benefit, and over what period of time?</span>
-          </div>
-          <div class="answer-body">
-            Over 12 months, 45 individuals will directly benefit from the Community Lunch Club. Each person attends an average of 60 sessions per year. The programme also has indirect benefits for family members and carers, reducing respite demands on approximately 30 households.
-          </div>
-          <p class="answer-disclaimer">Review before using — check all facts, figures, and details are correct.</p>
-          <div class="answer-foot">
-            <button class="btn btn-secondary btn-sm">Edit answer</button>
-          </div>
-        </div>
-
-        <!-- Step navigation -->
-        <div class="step-nav">
-          <button class="btn btn-ghost">
-            <svg class="icon" style="transform:rotate(90deg)"><use href="#ic-chevron"/></svg>
-            Back
+      <!-- Modal overlay -->
+      <div class="modal-overlay">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+          <button class="modal-close" aria-label="Cancel">
+            <svg class="icon"><use href="#ic-x" /></svg>
           </button>
-          <button class="btn btn-primary">
-            Continue
-            <svg class="icon" style="transform:rotate(-90deg)"><use href="#ic-chevron"/></svg>
-          </button>
-        </div>
-
-      </div><!-- /two-col-main -->
-
-      <!-- Right panel — sticky review prompts (DDR-LA-002) -->
-      <div class="two-col-aside">
-        <div class="review-panel">
-          <div class="review-panel-head">
-            <svg class="icon icon-sm"><use href="#ic-alert"/></svg>
-            Before you continue
+          <h2 class="modal-title" id="modal-title">Delete this application?</h2>
+          <p class="modal-body">
+            Are you sure you want to delete
+            <strong>Community Lunch Club — The Henry Smith Charity</strong>? This cannot be undone.
+          </p>
+          <div class="modal-footer">
+            <button class="btn btn-secondary">Cancel</button>
+            <button class="btn btn-destructive">
+              <svg class="icon icon-sm"><use href="#ic-trash" /></svg>
+              Delete application
+            </button>
           </div>
-          <ul class="review-prompts">
-            <li class="review-prompt">
-              <span class="rp-num">1</span>
-              Does this accurately describe your charity and project?
-            </li>
-            <li class="review-prompt">
-              <span class="rp-num">2</span>
-              Are all figures, dates, and facts correct?
-            </li>
-            <li class="review-prompt">
-              <span class="rp-num">3</span>
-              Does this answer the question that was asked?
-            </li>
-          </ul>
-        </div>
-
-        <div style="margin-top:16px; padding: 14px 16px; font-size:13px; color: var(--text-muted); background: var(--card); border-radius: 6px; border: 1px solid var(--border); line-height: 1.5;">
-          <strong style="color:var(--text); display:block; margin-bottom:4px;">3 questions found</strong>
-          We found 3 application questions in these guidelines.
-        </div>
-      </div>
-
-    </div><!-- /two-col -->
-  </div>
-
-  <footer class="footer">
-    <span class="footer-copy">© RapidGlobe Ltd 2026</span>
-    <div class="footer-links">
-      <a href="#" class="footer-link">Privacy policy</a>
-      <a href="#" class="footer-link">Terms of service</a>
-    </div>
-  </footer>
-</div>
-
-
-<!-- ============================================================
-     PAGE: DELETE APPLICATION MODAL
-     (shown as modal over dashboard)
-============================================================ -->
-<div id="page-modal" class="page">
-
-  <!-- Background: muted dashboard -->
-  <nav class="nav" style="opacity:0.5; pointer-events:none">
-    <div class="nav-left">
-      <a href="#" class="nav-logo">
-        <div class="nav-logo-mark">GP</div>
-        <span class="nav-logo-text">Grant Pathway</span>
-      </a>
-      <div class="nav-sep"></div>
-      <a href="#" class="nav-link active">My applications</a>
-      <a href="#" class="nav-link">Charity profile</a>
-    </div>
-    <div class="nav-right">
-      <button class="nav-account">
-        <div class="nav-account-avatar">MR</div>
-        Margaret
-        <svg class="icon icon-sm"><use href="#ic-chevron"/></svg>
-      </button>
-    </div>
-  </nav>
-
-  <div class="page-wrap" style="opacity:0.35; pointer-events:none">
-    <div class="dash-header">
-      <div>
-        <h1 class="page-title">My applications</h1>
-        <p class="page-sub">3 applications</p>
-      </div>
-      <a href="#" class="btn btn-accent">
-        <svg class="icon"><use href="#ic-plus"/></svg>
-        New application
-      </a>
-    </div>
-    <div class="app-grid" style="margin-top:24px">
-      <div class="card app-card s-in-progress">
-        <div class="app-card-grant">Community Lunch Club</div>
-        <div class="app-card-funder">The Henry Smith Charity</div>
-        <div class="app-card-foot">
-          <span class="badge badge-in-progress"><span class="badge-dot"></span>In progress</span>
-        </div>
-      </div>
-      <div class="card app-card s-approved">
-        <div class="app-card-grant">Wentworth Town Hall Restoration</div>
-        <div class="app-card-funder">National Lottery Community Fund</div>
-        <div class="app-card-foot">
-          <span class="badge badge-approved"><span class="badge-dot"></span>Approved</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Modal overlay -->
-  <div class="modal-overlay">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <button class="modal-close" aria-label="Cancel">
-        <svg class="icon"><use href="#ic-x"/></svg>
-      </button>
-      <h2 class="modal-title" id="modal-title">Delete this application?</h2>
-      <p class="modal-body">
-        Are you sure you want to delete <strong>Community Lunch Club — The Henry Smith Charity</strong>? This cannot be undone.
-      </p>
-      <div class="modal-footer">
-        <button class="btn btn-secondary">Cancel</button>
-        <button class="btn btn-destructive">
-          <svg class="icon icon-sm"><use href="#ic-trash"/></svg>
-          Delete application
-        </button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-
-<!-- ============================================================
+    <!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
-<script>
-  const body = document.body;
+    <script>
+      const body = document.body
 
-  function setDesign(name, btn) {
-    // Remove existing design class
-    body.classList.remove('design-minimal', 'design-warm', 'design-saas');
-    body.classList.add('design-' + name);
-    // Update button states
-    document.querySelectorAll('[id^="btn-design-"]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+      function setDesign(name, btn) {
+        // Remove existing design class
+        body.classList.remove('design-minimal', 'design-warm', 'design-saas')
+        body.classList.add('design-' + name)
+        // Update button states
+        document
+          .querySelectorAll('[id^="btn-design-"]')
+          .forEach((b) => b.classList.remove('active'))
+        btn.classList.add('active')
+      }
 
-  function setPalette(name, btn) {
-    body.classList.remove('palette-teal', 'palette-navy', 'palette-plum');
-    body.classList.add('palette-' + name);
-    document.querySelectorAll('[id^="btn-palette-"]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+      function setPalette(name, btn) {
+        body.classList.remove('palette-teal', 'palette-navy', 'palette-plum')
+        body.classList.add('palette-' + name)
+        document
+          .querySelectorAll('[id^="btn-palette-"]')
+          .forEach((b) => b.classList.remove('active'))
+        btn.classList.add('active')
+      }
 
-  function setPage(name, btn) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + name).classList.add('active');
-    document.querySelectorAll('[id^="btn-page-"]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    window.scrollTo({ top: 0 });
-  }
+      function setPage(name, btn) {
+        document.querySelectorAll('.page').forEach((p) => p.classList.remove('active'))
+        document.getElementById('page-' + name).classList.add('active')
+        document.querySelectorAll('[id^="btn-page-"]').forEach((b) => b.classList.remove('active'))
+        btn.classList.add('active')
+        window.scrollTo({ top: 0 })
+      }
 
-  function showDashState(name, btn) {
-    document.querySelectorAll('#page-dashboard .state').forEach(s => s.classList.remove('active'));
-    document.getElementById('dash-' + name).classList.add('active');
-    btn.parentElement.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
+      function showDashState(name, btn) {
+        document
+          .querySelectorAll('#page-dashboard .state')
+          .forEach((s) => s.classList.remove('active'))
+        document.getElementById('dash-' + name).classList.add('active')
+        btn.parentElement.querySelectorAll('.demo-btn').forEach((b) => b.classList.remove('active'))
+        btn.classList.add('active')
+      }
 
-  function showProfileState(name, btn) {
-    const editBtn  = document.getElementById('profile-edit-state');
-    const savedBtn = document.getElementById('profile-saved-state');
-    if (name === 'edit') {
-      editBtn.style.display  = '';
-      savedBtn.style.display = 'none';
-    } else {
-      editBtn.style.display  = 'none';
-      savedBtn.style.display = '';
-    }
-    btn.parentElement.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-</script>
-
-</body>
+      function showProfileState(name, btn) {
+        const editBtn = document.getElementById('profile-edit-state')
+        const savedBtn = document.getElementById('profile-saved-state')
+        if (name === 'edit') {
+          editBtn.style.display = ''
+          savedBtn.style.display = 'none'
+        } else {
+          editBtn.style.display = 'none'
+          savedBtn.style.display = ''
+        }
+        btn.parentElement.querySelectorAll('.demo-btn').forEach((b) => b.classList.remove('active'))
+        btn.classList.add('active')
+      }
+    </script>
+  </body>
 </html>

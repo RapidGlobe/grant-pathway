@@ -1,7 +1,7 @@
-import Link from "next/link";
+import Link from 'next/link'
 
 export function SiteFooter() {
-  const year = new Date().getFullYear();
+  const year = new Date().getFullYear()
 
   return (
     <footer className="border-t border-[#EDE8E1] bg-[#FDF9F5]">
@@ -35,5 +35,5 @@ export function SiteFooter() {
         </nav>
       </div>
     </footer>
-  );
+  )
 }

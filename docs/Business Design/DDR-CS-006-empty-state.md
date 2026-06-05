@@ -13,6 +13,7 @@ How should the empty state on the dashboard be visually presented when a user ha
 ## Context
 
 The dashboard empty state is the first screen a newly registered user sees after completing their charity profile. It must:
+
 - Welcome the user warmly by name
 - Guide them clearly towards starting their first application
 - Explain the three-step process (Add funder guidelines -> Get AI summary -> Generate draft) without being overwhelming
@@ -36,19 +37,19 @@ The screen requirements specify the exact content: welcome message, charity prof
 
 The three-step explainer on the dashboard empty state uses three equal-width columns, each containing a large icon (48--64px) in a branded icon container, a bold step number, a short step label, and a one-line description.
 
-| Step | Label | Description | Lucide icon candidate |
-|------|-------|-------------|----------------------|
-| 1 | Add funder guidelines | Upload or paste your funder's guidelines | `Upload` or `FileText` |
-| 2 | Get an AI summary | We'll read and summarise the guidelines for you | `Sparkles` or `Wand2` |
-| 3 | Generate your draft | We'll write draft answers using your charity profile | `FileCheck` or `PenLine` |
+| Step | Label                 | Description                                          | Lucide icon candidate    |
+| ---- | --------------------- | ---------------------------------------------------- | ------------------------ |
+| 1    | Add funder guidelines | Upload or paste your funder's guidelines             | `Upload` or `FileText`   |
+| 2    | Get an AI summary     | We'll read and summarise the guidelines for you      | `Sparkles` or `Wand2`    |
+| 3    | Generate your draft   | We'll write draft answers using your charity profile | `FileCheck` or `PenLine` |
 
 **Icon container colour per mockup direction:**
 
-| Mockup | Direction | Icon container colour |
-|--------|-----------|----------------------|
-| Mockup 1 | Minimal & Professional | Teal (#0D6E6E) |
-| Mockup 2 | Warm & Approachable | Amber (#D97706) |
-| Mockup 3 | Modern SaaS | Soft teal (#E6F4F4) with teal icon |
+| Mockup   | Direction              | Icon container colour              |
+| -------- | ---------------------- | ---------------------------------- |
+| Mockup 1 | Minimal & Professional | Teal (#0D6E6E)                     |
+| Mockup 2 | Warm & Approachable    | Amber (#D97706)                    |
+| Mockup 3 | Modern SaaS            | Soft teal (#E6F4F4) with teal icon |
 
 Final icon selection from the Lucide library is a development detail. The three-step explainer is visually distinct from the five-step application flow indicator (DDR-CS-004) -- different patterns serve different purposes.
 
@@ -58,5 +59,5 @@ Final icon selection from the Lucide library is a development detail. The three-
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
+_Status: Decided_
+_Created: 2026-04-17_

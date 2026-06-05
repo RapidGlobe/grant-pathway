@@ -26,10 +26,12 @@ Grant Pathway is required to meet WCAG 2.2 Level AA from day one (DDR-AC-001). T
 **Option C — Combined automated and manual accessibility testing.**
 
 **Automated testing:**
+
 - `axe-core` (via `@axe-core/react` in development, or Lighthouse CI in the build pipeline) runs on every development build to surface violations in the browser.
 - Lighthouse accessibility audit runs as part of pre-release checks (score target: 95+).
 
 **Manual testing (before each release):**
+
 - Keyboard-only navigation: all interactive elements reachable and operable via Tab / Shift+Tab / Enter / Space / Arrow keys.
 - Focus management: modals trap focus correctly; focus returns to trigger element on close.
 - Screen reader: key user journeys tested with NVDA (Windows) or VoiceOver (macOS).

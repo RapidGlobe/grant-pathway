@@ -23,11 +23,13 @@ A separate, lower-stakes confirmation also exists: deleting an application from 
 ## Options
 
 **For the Approve application confirmation:**
+
 - **Option A -- Modal dialog:** A popup dialog overlays the screen with the confirmation message, a confirm button (teal), and a cancel button. High visibility; clearly interrupts to make the user pause. Consistent with how many web applications handle significant confirmations. Note: PDR-UI-006 discourages modals for errors but does not prohibit them for confirmations.
 - **Option B -- Inline expansion:** The approve button area expands in place to reveal the confirmation message and a "Yes, approve" / "Cancel" button pair. The user never leaves the page and no overlay appears. Lower friction; feels native to the page.
 - **Option C -- Confirmation banner:** A teal or amber banner appears at the top of the Step 5 content area with the confirmation message and action buttons. Less intrusive than a modal but clearly requires attention.
 
 **For the Delete application confirmation (dashboard):**
+
 - **Option D -- Inline card expansion:** The application card expands to show a "Are you sure? This cannot be undone." message with Delete and Cancel buttons. Keeps context visible.
 - **Option E -- Modal dialog:** Same modal approach as Option A, applied to deletion. Consistent pattern if Option A is chosen above.
 - **Option F -- Tooltip-style popover:** A small popover appears anchored to the Delete button with a compact confirmation. Low visual weight; may be too easy to accidentally confirm.
@@ -43,30 +45,31 @@ A modal dialog appears when the user clicks "Approve my application". The modal 
 
 This also gives the product a consistent pattern: every consequential action (approve, re-open, re-export, delete) uses a modal dialog.
 
-Note: PDR-UI-006 discourages modals for *unexpected* interruptions (errors). A user-initiated confirmation is not unexpected — the user clicked a button — so this does not conflict with that principle.
+Note: PDR-UI-006 discourages modals for _unexpected_ interruptions (errors). A user-initiated confirmation is not unexpected — the user clicked a button — so this does not conflict with that principle.
 
-| Element | Detail |
-|---------|--------|
-| Trigger | User clicks "Approve my application" (teal primary button) |
-| Behaviour | Modal dialog overlays the page |
+| Element              | Detail                                                                                               |
+| -------------------- | ---------------------------------------------------------------------------------------------------- |
+| Trigger              | User clicks "Approve my application" (teal primary button)                                           |
+| Behaviour            | Modal dialog overlays the page                                                                       |
 | Confirmation message | "Are you sure you want to approve this application? You can re-open it to make changes at any time." |
-| Confirm button | "Approve my application" -- teal primary |
-| Cancel button | "Cancel" -- ghost/text (escape action per DDR-CS-003) |
-| Colour treatment | Teal/slate -- constructive action, not a warning |
+| Confirm button       | "Approve my application" -- teal primary                                                             |
+| Cancel button        | "Cancel" -- ghost/text (escape action per DDR-CS-003)                                                |
+| Colour treatment     | Teal/slate -- constructive action, not a warning                                                     |
 
 ### Delete application confirmation (dashboard)
 
 A modal dialog appears when the user clicks the Delete text link on an application card.
 
-| Element | Detail |
-|---------|--------|
-| Trigger | User clicks Delete red text link on an application card |
-| Behaviour | Modal dialog overlays the page |
+| Element              | Detail                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------- |
+| Trigger              | User clicks Delete red text link on an application card                                 |
+| Behaviour            | Modal dialog overlays the page                                                          |
 | Confirmation message | "Are you sure you want to delete [Grant Name] -- [Funder Name]? This cannot be undone." |
-| Confirm button | "Delete application" -- red fill (#DC2626, Level 2 per DDR-CS-003) |
-| Cancel button | "Cancel" -- ghost/text |
+| Confirm button       | "Delete application" -- red fill (#DC2626, Level 2 per DDR-CS-003)                      |
+| Cancel button        | "Cancel" -- ghost/text                                                                  |
 
 ### Out of scope for this decision
+
 Account deletion (Screen 9) uses the separate DELETE-typing confirmation mechanism defined in screen-requirements.md and is not affected by this decision.
 
 ## Date Decided
@@ -75,6 +78,6 @@ Account deletion (Screen 9) uses the separate DELETE-typing confirmation mechani
 
 ---
 
-*Status: Decided*
-*Created: 2026-04-17*
-*Revised: 2026-05-18 — Approve confirmation changed from inline expansion (Option B) to modal dialog (Option A). Confirm button text set to "Approve my application". Rationale: modal ensures the user actively acknowledges a consequential action; consistent with all other confirmation patterns in the product.*
+_Status: Decided_
+_Created: 2026-04-17_
+_Revised: 2026-05-18 — Approve confirmation changed from inline expansion (Option B) to modal dialog (Option A). Confirm button text set to "Approve my application". Rationale: modal ensures the user actively acknowledges a consequential action; consistent with all other confirmation patterns in the product._

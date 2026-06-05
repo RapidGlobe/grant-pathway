@@ -28,15 +28,10 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const firstName =
-    (user?.user_metadata?.first_name as string | undefined) ?? ''
+  const firstName = (user?.user_metadata?.first_name as string | undefined) ?? ''
 
   // Start of the current calendar month in ISO format (used for AI usage count)
-  const monthStart = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1,
-  ).toISOString()
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
 
   const [profile, applicationsResult, usageResult] = await Promise.all([
     getCharityProfile(),
@@ -56,26 +51,19 @@ export default async function DashboardPage() {
 
   const profileIncomplete = !profile
 
-  const applications: ApplicationSummary[] = (applicationsResult.data ?? []).map(
-    (row) => ({
-      id: row.id,
-      funderName: row.funder_name,
-      grantName: row.grant_name,
-      status: row.status as ApplicationStatus,
-      currentStep: row.current_step,
-      lastUpdated: row.updated_at,
-    }),
-  )
+  const applications: ApplicationSummary[] = (applicationsResult.data ?? []).map((row) => ({
+    id: row.id,
+    funderName: row.funder_name,
+    grantName: row.grant_name,
+    status: row.status as ApplicationStatus,
+    currentStep: row.current_step,
+    lastUpdated: row.updated_at,
+  }))
 
   const aiRequestsUsed = usageResult.count ?? 0
 
   if (applications.length === 0) {
-    return (
-      <DashboardEmpty
-        firstName={firstName}
-        profileIncomplete={profileIncomplete}
-      />
-    )
+    return <DashboardEmpty firstName={firstName} profileIncomplete={profileIncomplete} />
   }
 
   return (

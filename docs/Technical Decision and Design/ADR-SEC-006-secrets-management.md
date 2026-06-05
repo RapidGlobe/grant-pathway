@@ -24,14 +24,14 @@ Secrets are stored in Vercel's environment variable store, scoped per environmen
 
 **Variable classification:**
 
-| Variable | Exposed to browser | Used in |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes (public) | Client and server |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (public) | Client and server |
-| `SUPABASE_SERVICE_ROLE_KEY` | No (server only) | API routes, server actions |
-| `AWS_ACCESS_KEY_ID` | No (server only) | AI API routes only (Amazon Bedrock) |
-| `AWS_SECRET_ACCESS_KEY` | No (server only) | AI API routes only (Amazon Bedrock) |
-| `AWS_REGION` | No (server only) | AI API routes only — value: `eu-west-2` |
+| Variable                        | Exposed to browser | Used in                                 |
+| ------------------------------- | ------------------ | --------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Yes (public)       | Client and server                       |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (public)       | Client and server                       |
+| `SUPABASE_SERVICE_ROLE_KEY`     | No (server only)   | API routes, server actions              |
+| `AWS_ACCESS_KEY_ID`             | No (server only)   | AI API routes only (Amazon Bedrock)     |
+| `AWS_SECRET_ACCESS_KEY`         | No (server only)   | AI API routes only (Amazon Bedrock)     |
+| `AWS_REGION`                    | No (server only)   | AI API routes only — value: `eu-west-2` |
 
 ## Rationale
 

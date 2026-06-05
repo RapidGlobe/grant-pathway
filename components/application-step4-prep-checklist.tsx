@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 // Step 4 — Preparation checklist (S6.4)
 //
@@ -10,39 +10,39 @@
 // draft_status = 'in_progress' and redirects back to Step 4. The page re-renders
 // and shows the Q&A interface instead of this checklist (AC-FR-28-01, AC-FR-28-02).
 
-import { useState, useTransition } from "react";
-import Link from "next/link";
-import { ClipboardList, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { StepIndicator } from "@/components/step-indicator";
-import { setDraftInProgress } from "@/actions/applications";
+import { useState, useTransition } from 'react'
+import Link from 'next/link'
+import { ClipboardList, AlertTriangle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { StepIndicator } from '@/components/step-indicator'
+import { setDraftInProgress } from '@/actions/applications'
 
 interface ApplicationStep4PrepChecklistProps {
-  applicationId: string;
+  applicationId: string
 }
 
 const CHECKLIST_ITEMS = [
-  "Most recent annual accounts or financial statements",
-  "Projected budget for the grant period (income and planned expenditure)",
-  "Details of other funding secured or applied for",
-  "Input from your treasurer, finance lead, or a trustee who understands the budget",
-];
+  'Most recent annual accounts or financial statements',
+  'Projected budget for the grant period (income and planned expenditure)',
+  'Details of other funding secured or applied for',
+  'Input from your treasurer, finance lead, or a trustee who understands the budget',
+]
 
 export function ApplicationStep4PrepChecklist({
   applicationId,
 }: ApplicationStep4PrepChecklistProps) {
-  const [serverError, setServerError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [serverError, setServerError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
 
   function handleStart() {
-    setServerError(null);
+    setServerError(null)
     startTransition(async () => {
-      const result = await setDraftInProgress(applicationId);
+      const result = await setDraftInProgress(applicationId)
       // setDraftInProgress redirects on success — only reaches here on error
       if (!result.ok) {
-        setServerError(result.error);
+        setServerError(result.error)
       }
-    });
+    })
   }
 
   return (
@@ -50,19 +50,14 @@ export function ApplicationStep4PrepChecklist({
       <StepIndicator currentStep={4} />
 
       <div className="mb-6 flex items-center gap-3">
-        <ClipboardList
-          className="h-6 w-6 shrink-0 text-[#0D6E6E]"
-          aria-hidden="true"
-        />
-        <h1 className="text-[24px] font-bold text-[#1E293B]">
-          Before you begin writing
-        </h1>
+        <ClipboardList className="h-6 w-6 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
+        <h1 className="text-[24px] font-bold text-[#1E293B]">Before you begin writing</h1>
       </div>
 
       <div className="mb-6 rounded-xl border border-[#E2E8F0] bg-white p-6">
         <p className="mb-4 text-[15px] text-[#374151]">
-          The financial sections of this application cannot be completed by AI.
-          Before you start, gather:
+          The financial sections of this application cannot be completed by AI. Before you start,
+          gather:
         </p>
 
         <ul className="mb-5 space-y-3">
@@ -80,13 +75,10 @@ export function ApplicationStep4PrepChecklist({
         </ul>
 
         <div className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
-          <AlertTriangle
-            className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
-            aria-hidden="true"
-          />
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
           <p className="text-[13px] text-[#78350F]">
-            It is worth involving a senior colleague — such as your CEO, treasurer,
-            or a trustee — before reaching the financial questions.
+            It is worth involving a senior colleague — such as your CEO, treasurer, or a trustee —
+            before reaching the financial questions.
           </p>
         </div>
       </div>
@@ -113,9 +105,9 @@ export function ApplicationStep4PrepChecklist({
           disabled={isPending}
           className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
         >
-          {isPending ? "Saving…" : "I have what I need — start writing"}
+          {isPending ? 'Saving…' : 'I have what I need — start writing'}
         </Button>
       </div>
     </div>
-  );
+  )
 }

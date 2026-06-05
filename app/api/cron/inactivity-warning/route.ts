@@ -71,8 +71,7 @@ export async function GET(request: NextRequest) {
 
       // In the 23-month window: ≥23 months ago AND <24 months ago
       if (lastSignIn >= twentyFourMonthsAgo && lastSignIn < twentyThreeMonthsAgo) {
-        const firstName =
-          (user.user_metadata?.first_name as string | undefined) ?? 'there'
+        const firstName = (user.user_metadata?.first_name as string | undefined) ?? 'there'
         const email = user.email
         if (!email) continue
 

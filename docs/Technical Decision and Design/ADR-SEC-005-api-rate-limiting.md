@@ -15,21 +15,25 @@ A soft limit is already defined in the product: 20 AI requests per user per mont
 ## Options Considered
 
 ### Option A — Application-level rate limiting only (via `ai_usage_log` check)
+
 - **What it is:** Before each AI API call, the server checks the `ai_usage_log` table for the current user's monthly count. If at 20, the request is rejected with a user-friendly message.
 - **Strengths:** Already required by product spec (PDR-AI-005). Zero additional infrastructure. Sufficient for the expected user volume at launch.
 - **Weaknesses:** Does not protect against rapid-fire requests within the limit (e.g., 20 requests in 60 seconds from a script). Does not protect non-AI routes.
 
 ### Option B — Vercel Edge Middleware rate limiting (IP-based)
+
 - **What it is:** Next.js middleware using an in-memory or KV-backed counter per IP address, limiting requests per time window to all API routes.
 - **Strengths:** Blocks automated abuse before it reaches the application. Protects all API routes.
 - **Weaknesses:** Vercel KV (Upstash Redis) is an additional service and cost. IP-based limiting is less precise for users behind NAT. Adds implementation complexity.
 
 ### Option C — Upstash Redis rate limiting library (`@upstash/ratelimit`)
+
 - **What it is:** Upstash provides a free-tier Redis instance and a rate limiting library designed for serverless/edge environments. Sliding window or fixed window algorithms.
 - **Strengths:** Purpose-built for serverless rate limiting. Free tier covers low-volume use. Works in Next.js middleware.
 - **Weaknesses:** Additional third-party dependency. Upstash free tier has limits on requests per day.
 
 ### Option D — No additional rate limiting (rely on Supabase Auth + usage log)
+
 - **What it is:** Rely on authentication (unauthenticated users cannot call AI routes) and the monthly usage cap.
 - **Strengths:** Zero additional infrastructure.
 - **Weaknesses:** A compromised or malicious authenticated user can still make 20 AI calls rapidly.
@@ -42,14 +46,15 @@ Per-user rate limiting (keyed on `auth.uid()`) is applied to all AI API routes u
 
 **Rate limit parameters:**
 
-| Route | Limit | Window |
-|---|---|---|
+| Route                        | Limit      | Window     |
+| ---------------------------- | ---------- | ---------- |
 | `POST /api/generate-summary` | 5 requests | 60 seconds |
-| `POST /api/generate-draft` | 5 requests | 60 seconds |
+| `POST /api/generate-draft`   | 5 requests | 60 seconds |
 
 This prevents rapid-fire automated requests within a user's monthly allowance while not inconveniencing a legitimate user who would never generate 5 summaries in 60 seconds.
 
 **Implementation:**
+
 - `@upstash/ratelimit` and `@upstash/redis` packages installed
 - `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` added to environment variables (ADR-SEC-006)
 - Rate limit check applied in each AI API route handler before the `ai_usage_log` check and Anthropic API call

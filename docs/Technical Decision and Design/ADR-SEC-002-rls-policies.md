@@ -15,16 +15,19 @@ The data model includes: `funders`, `user_profiles`, `charity_profiles`, `applic
 ## Options Considered
 
 ### Option A — User-scoped RLS on all tables (via `auth.uid()`)
+
 - **What it is:** Every table has RLS policies that restrict SELECT, INSERT, UPDATE, and DELETE to rows where `user_id = auth.uid()`. The Supabase service role (used in server-side code only) bypasses RLS.
 - **Strengths:** Simple, consistent, comprehensive. One policy pattern across all tables. Server-side code using the service role can perform admin operations (e.g., monthly usage reset, data export).
 - **Weaknesses:** Requires explicit policies on every table and every operation. Forgetting to add a policy on a new table creates a vulnerability.
 
 ### Option B — Application-layer access control only (no RLS)
+
 - **What it is:** RLS is disabled. All access control is implemented in API routes and server actions, which verify the user's session before querying.
 - **Strengths:** Simpler database setup. No RLS policy maintenance.
 - **Weaknesses:** A bug in application-layer access control exposes all users' data. No defence-in-depth. Not recommended for a multi-tenant application.
 
 ### Option C — RLS with per-table custom policies
+
 - **What it is:** Each table has bespoke policies tailored to its access patterns (e.g., `charity_profiles` allows read by anyone matching the user, but `ai_usage_log` only allows insert and select-own).
 - **Strengths:** Fine-grained control. Can model more complex access patterns (future: team/org accounts).
 - **Weaknesses:** More complex to define and maintain. Overkill for v1's simple user-scoped model.
@@ -37,14 +40,14 @@ RLS is enabled on all five tables with default-deny (no access unless explicitly
 
 **Policy matrix:**
 
-| Table | SELECT | INSERT | UPDATE | DELETE |
-|---|---|---|---|---|
-| `funders` | All active rows (any authenticated user) | ✗ Service role only | ✗ Service role only | ✗ Service role only |
-| `user_profiles` | Own rows | Own rows | Own rows | Own rows |
-| `charity_profiles` | Own rows | Own rows | Own rows | Own rows |
-| `applications` | Own rows | Own rows | Own rows | Own rows |
-| `application_answers` | Own rows | Own rows | Own rows | Own rows |
-| `ai_usage_log` | Own rows | Own rows | ✗ Denied | ✗ Denied |
+| Table                 | SELECT                                   | INSERT              | UPDATE              | DELETE              |
+| --------------------- | ---------------------------------------- | ------------------- | ------------------- | ------------------- |
+| `funders`             | All active rows (any authenticated user) | ✗ Service role only | ✗ Service role only | ✗ Service role only |
+| `user_profiles`       | Own rows                                 | Own rows            | Own rows            | Own rows            |
+| `charity_profiles`    | Own rows                                 | Own rows            | Own rows            | Own rows            |
+| `applications`        | Own rows                                 | Own rows            | Own rows            | Own rows            |
+| `application_answers` | Own rows                                 | Own rows            | Own rows            | Own rows            |
+| `ai_usage_log`        | Own rows                                 | Own rows            | ✗ Denied            | ✗ Denied            |
 
 "Own rows" = `user_id = auth.uid()`.
 "All active rows" = `is_active = true` — any authenticated user may read the approved funder list; no user may insert, update, or delete funder records (service role only).
@@ -69,6 +72,6 @@ ADR-STACK-002, ADR-DATA-001, BRD Section 9 (Data Privacy & Security).
 
 ## Revision History
 
-| Date | Change |
-|------|--------|
+| Date       | Change                                                                                                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2026-06-01 | `funders` table added to context and policy matrix (DR-FD-001). Non-user-scoped pattern documented: SELECT all active rows for any authenticated user; INSERT/UPDATE/DELETE restricted to service role only. |

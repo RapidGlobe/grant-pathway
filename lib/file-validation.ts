@@ -44,6 +44,5 @@ export function validateFile(mimeType: string, sizeBytes: number): FileValidatio
 export const FILE_VALIDATION_MESSAGES = {
   invalid_type:
     'We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly.',
-  too_large:
-    'Your file is over 10MB. Please upload a smaller file or paste the text directly.',
+  too_large: 'Your file is over 10MB. Please upload a smaller file or paste the text directly.',
 } as const
