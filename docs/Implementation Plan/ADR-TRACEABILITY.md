@@ -8,8 +8,15 @@
 - When a new task is added to cover a gap, update the Task column and change status to ✅ or 🔵.
 - When a task is completed, no change needed here — the task status lives in IMPLEMENTATION-STATUS.md.
 
+**Version:** 1.0  
 **Last updated:** 2026-06-07  
-**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article); ADR-AI-010 added 2026-06-05 (summary performance strategy — pre-processing pre-launch, streaming post-v1)
+**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article); ADR-AI-010 added 2026-06-05 (summary performance strategy — pre-processing pre-launch, streaming post-v1); GAP-29 and GAP-30 closed 2026-06-07
+
+## Document History
+
+| Version | Date       | Author         | Change                                                                                                                             |
+| ------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-07 | Rapidglobe Ltd | Version control introduced. GAP-29 (linting infrastructure) and GAP-30 (text pre-processing) closed — both implemented 2026-06-05. |
 
 ## Status key
 
