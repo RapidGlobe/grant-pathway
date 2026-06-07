@@ -6,19 +6,28 @@
 
 ---
 
-## 2026-06-07 — D-HSF-03 fixed — Step 4 sync hardened for multi-pass Step 3 flows
+## 2026-06-07 — D-HSF-03 fixed (second attempt) — sync moved to Server Action; hard navigation added
 
-**What changed:**
+**What changed (second attempt — first attempt 55c60a7 did not resolve the issue):**
 
-- `app/(authenticated)/applications/[id]/step/4/page.tsx` — Step 4 question sync hardened in three ways:
-  1. **Filter before upsert:** inserts are filtered to exclude rows with null/undefined `question_text` (structured) or `title` (free_form) and invalid `question_order`. Prevents silent NOT NULL constraint violations, which previously caused the entire upsert to fail without throwing.
-  2. **Check upsert error explicitly:** the `{ error }` return from `.upsert()` is now checked and logged to Vercel logs. Previously the error was swallowed entirely — the try/catch only catches thrown exceptions, and Supabase returns errors as values.
-  3. **Switch from `ignoreDuplicates: true` → `false`:** ON CONFLICT now updates question metadata (question_text, word_limit, char_limit, limit_type, is_budget_question) for existing rows rather than leaving them unchanged. answer_text, answer_source, is_approved, and ai_refined_answer are not in the insert body, so they are never overwritten — user answers are preserved across regenerations.
+- `actions/applications.ts` — `setDraftInProgress` now syncs `application_answers` from `ai_summary` before returning, ensuring rows exist in the DB before the Step 4 page renders. Return type changed from `Promise<{ ok: false; error: string }>` (redirect-on-success) to `Promise<{ ok: true } | { ok: false; error: string }>`.
+- `components/application-step4-prep-checklist.tsx` — after receiving `{ ok: true }`, uses `window.location.href` (hard navigation) instead of relying on the Server Action's `redirect()` + Next.js Router Cache soft navigation.
+- `app/(authenticated)/applications/[id]/step/4/page.tsx` — existing sync block retained as a fallback for returning users who navigate directly to Step 4 without going through the prep checklist.
 
-**Why the original code failed on multi-pass Step 3 flows:**
-The root cause is the same class as D-IT-01 (resolved 2026-06-01): the Supabase `.upsert()` call returns `{ data, error }` — it does not throw. When the upsert fails (e.g. due to a constraint violation or a column that doesn't exist at time of call), the error is returned but was not checked. The subsequent re-fetch returned the existing rows (or an empty set for new applications), and `questionRows` was set to that empty result. `ignoreDuplicates: true` (ON CONFLICT DO NOTHING) also meant that on return visits with existing rows, any question_text updates from a regenerated summary were silently discarded.
+**Why the first attempt failed (55c60a7):**
+The first fix hardened the upsert in the Server Component (null filtering, explicit error checking, `ignoreDuplicates: false`). While those changes improve resilience, the actual root cause is a **Next.js Router Cache timing issue**: when `setDraftInProgress` called `redirect()` inside a `startTransition`, the router performed a soft navigation that served a cached render of Step 4 — either one from before the upsert ran, or one where the upsert ran on the server but the client received stale cached HTML. The workaround (Back → regenerate → confirm prep checklist again) worked because the two sequential Server Action redirects caused the cache to be busted differently.
 
-**Workaround (now obsolete):** Return to Step 3 and regenerate — this triggered a new AI call which produced a summary that in some cases had different structure, allowing the sync to succeed on the next attempt.
+**Root cause (second fix):**
+Two structural problems:
+
+1. The question sync ran in the Server Component (during page render), but the Router Cache served a stale render where `questionRows` was empty, bypassing that sync entirely.
+2. `redirect()` inside `startTransition` is a soft navigation — it may reuse a cached RSC payload from the Router Cache rather than triggering a fresh server render.
+
+The fix addresses both: sync happens in the Server Action (before any navigation), and `window.location.href` forces a full page reload (hard navigation) that bypasses the Router Cache.
+
+**Prior hardening retained (55c60a7):** The Server Component sync block (null filtering, explicit upsert error logging, `ignoreDuplicates: false`) is retained as a robust fallback for direct navigation cases.
+
+**Workaround (now obsolete):** Return to Step 3 and regenerate.
 
 ---
 

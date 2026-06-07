@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-07 (D-HSF-03 fixed — Step 4 sync hardened for multi-pass Step 3 flows)
+**Last updated:** 2026-06-07 (D-HSF-03 second fix attempt — sync moved to setDraftInProgress action; hard navigation added; retest required)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026

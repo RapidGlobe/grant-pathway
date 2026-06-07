@@ -7,8 +7,10 @@
 // and to involve a senior colleague before reaching budget questions.
 //
 // On "I have what I need — start writing": calls setDraftInProgress(), which sets
-// draft_status = 'in_progress' and redirects back to Step 4. The page re-renders
-// and shows the Q&A interface instead of this checklist (AC-FR-28-01, AC-FR-28-02).
+// draft_status = 'in_progress' AND syncs application_answers from ai_summary, then
+// returns { ok: true }. The client uses window.location.href for a hard navigation
+// (bypasses Next.js Router Cache) so Step 4 renders fresh with the synced rows
+// (D-HSF-03 fix — AC-FR-28-01, AC-FR-28-02).
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
@@ -38,8 +40,11 @@ export function ApplicationStep4PrepChecklist({
     setServerError(null)
     startTransition(async () => {
       const result = await setDraftInProgress(applicationId)
-      // setDraftInProgress redirects on success — only reaches here on error
-      if (!result.ok) {
+      if (result.ok) {
+        // Hard navigation bypasses the Next.js Router Cache so Step 4 renders
+        // fresh with the rows written by setDraftInProgress (D-HSF-03 fix)
+        window.location.href = `/applications/${applicationId}/step/4`
+      } else {
         setServerError(result.error)
       }
     })

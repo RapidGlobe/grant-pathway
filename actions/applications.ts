@@ -7,6 +7,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 // ---------------------------------------------------------------------------
 // Shared types
@@ -373,15 +374,17 @@ export async function setApplicationMismatch(
 
 /**
  * Called when the user clicks "I have what I need — start writing" on the
- * Step 4 preparation checklist. Sets draft_status = 'in_progress' so the
- * checklist is not shown again on return visits (AC-FR-28-02).
+ * Step 4 preparation checklist. Sets draft_status = 'in_progress' and syncs
+ * application_answers from ai_summary so rows exist before the page renders
+ * (D-HSF-03: avoids first-load "no questions found" fallback caused by
+ * Router Cache serving a stale render before the Server Component sync runs).
  *
- * Redirects back to Step 4 on success so the page re-renders showing the
- * Q&A interface instead of the preparation checklist.
+ * Returns { ok: true } on success — the client performs a hard navigation via
+ * window.location.href to bypass the Next.js Router Cache entirely.
  */
 export async function setDraftInProgress(
   applicationId: string,
-): Promise<{ ok: false; error: string }> {
+): Promise<{ ok: true } | { ok: false; error: string }> {
   const supabase = await createClient()
 
   const {
@@ -389,6 +392,18 @@ export async function setDraftInProgress(
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/')
+
+  // Fetch ai_summary alongside the status update so we can sync questions here
+  const { data: appRow, error: fetchError } = await supabase
+    .from('applications')
+    .select('ai_summary')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (fetchError) {
+    return { ok: false, error: 'Could not load application data. Please try again.' }
+  }
 
   const { error } = await supabase
     .from('applications')
@@ -400,8 +415,85 @@ export async function setDraftInProgress(
     return { ok: false, error: 'Could not save your progress. Please try again.' }
   }
 
+  // Sync application_answers from ai_summary so rows exist before the page
+  // renders. This is the primary sync path; the Step 4 page still syncs as a
+  // fallback for returning users who navigate directly without the checklist.
+  if (appRow?.ai_summary) {
+    try {
+      const parsedSummary = JSON.parse(appRow.ai_summary) as AiSummaryData
+      const funderType = parsedSummary.funder_type ?? 'structured'
+
+      if (
+        funderType === 'free_form' &&
+        Array.isArray(parsedSummary.sections) &&
+        parsedSummary.sections.length > 0
+      ) {
+        const inserts = parsedSummary.sections
+          .filter((s) => s.title && typeof s.number === 'number')
+          .map((s) => ({
+            application_id: applicationId,
+            user_id: user!.id,
+            question_text: s.title,
+            question_order: s.number,
+            word_limit: s.wordLimit ?? null,
+            char_limit: null,
+            limit_type: s.wordLimit ? 'words' : null,
+            is_budget_question: s.is_budget_section ?? false,
+          }))
+
+        if (inserts.length > 0) {
+          const { error: upsertError } = await supabase
+            .from('application_answers')
+            .upsert(inserts, {
+              onConflict: 'application_id,question_order',
+              ignoreDuplicates: false,
+            })
+
+          if (upsertError) {
+            console.error('[setDraftInProgress] free_form upsert failed:', upsertError.message, {
+              applicationId,
+              rowCount: inserts.length,
+            })
+          }
+        }
+      } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
+        const inserts = parsedSummary.questions
+          .filter((q) => q.text)
+          .map((q, idx) => ({
+            application_id: applicationId,
+            user_id: user!.id,
+            question_text: q.text,
+            question_order: q.number ?? idx + 1,
+            word_limit: q.wordLimit ?? null,
+            char_limit: q.charLimit ?? null,
+            limit_type: q.limitType ?? null,
+            is_budget_question: q.is_budget_question ?? false,
+          }))
+
+        if (inserts.length > 0) {
+          const { error: upsertError } = await supabase
+            .from('application_answers')
+            .upsert(inserts, {
+              onConflict: 'application_id,question_order',
+              ignoreDuplicates: false,
+            })
+
+          if (upsertError) {
+            console.error('[setDraftInProgress] structured upsert failed:', upsertError.message, {
+              applicationId,
+              rowCount: inserts.length,
+            })
+          }
+        }
+      }
+    } catch (syncErr) {
+      // Non-fatal: log and continue — the Step 4 page sync will retry
+      console.error('[setDraftInProgress] sync threw unexpectedly:', syncErr, { applicationId })
+    }
+  }
+
   revalidatePath(`/applications/${applicationId}/step/4`)
-  redirect(`/applications/${applicationId}/step/4`)
+  return { ok: true }
 }
 
 // ---------------------------------------------------------------------------
