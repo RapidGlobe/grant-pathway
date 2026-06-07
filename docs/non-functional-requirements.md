@@ -94,9 +94,12 @@ WCAG 2.2 Level AA compliance is a design-in requirement from day one (C15). An i
 | During development        | Screen reader testing                                | NVDA (free) with Chrome on Windows                                        |
 | Pre-launch                | Manual WCAG 2.2 AA checklist review                  | Work through all Level AA success criteria against each screen            |
 | Pre-launch                | Colour contrast verification                         | WebAIM Contrast Checker (free, online tool)                               |
+| Pre/post-launch           | Assistive technology expert review                   | Engaged via trusted contact — professional AT expertise (see note below)  |
 | Post-launch / pre-scaling | Independent accessibility audit                      | Deferred — triggered when the user base justifies formal audit investment |
 
 **Notes:** Accessibility is not a retrofit — it must be considered at the design and build stage of every screen. The combination of automated scanning, keyboard testing, and screen reader testing provides a practical and cost-effective approach for a solo developer. The deferred independent audit provides a formal assurance milestone before the app scales significantly.
+
+**Screen reader / AT testing (updated 2026-06-07):** NVDA/VoiceOver testing will not be self-conducted by the developer. A trusted contact with professional assistive technology expertise will be engaged to review the live service at an appropriate point. This provides more reliable real-world coverage than a developer-led screen reader test, and is a stronger signal of genuine WCAG compliance.
 
 ---
 
