@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-05 (ADR-OPS-008 linting stack implemented; all Dependabot PRs merged; ADR-AI-010 Phase 1 document pre-processing implemented)
+**Last updated:** 2026-06-07 (D-HSF-03 fixed — Step 4 sync hardened for multi-pass Step 3 flows)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -127,6 +127,22 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-06-07 — D-HSF-03 fixed — Step 4 sync hardened for multi-pass Step 3 flows
+
+**File changed:** `app/(authenticated)/applications/[id]/step/4/page.tsx`
+
+Three hardening changes applied to the question sync block:
+
+1. **Upsert error now checked explicitly.** The Supabase `.upsert()` call returns `{ data, error }` — it does not throw. The previous code only had a `try/catch` (which catches thrown exceptions), so a Supabase error returned as a value was silently swallowed. The upsert error is now checked and logged to Vercel logs via `console.error`.
+
+2. **Inserts filtered for null/undefined question_text.** If the AI returns a question without a `text` field (or a section without a `title` field), that row is excluded from the insert before upserting. A null `question_text` violates the NOT NULL constraint, causing the entire upsert to fail silently — the same failure mode as D-IT-01 (resolved 2026-06-01 when `char_limit`/`limit_type` columns were missing).
+
+3. **ignoreDuplicates changed from `true` to `false`.** Previously ON CONFLICT DO NOTHING — existing rows were left entirely unchanged, even when a regenerated summary had updated question text or word limits. Now ON CONFLICT DO UPDATE updates question metadata (question_text, word_limit, char_limit, limit_type, is_budget_question) for existing rows. User answer columns (answer_text, answer_source, is_approved, ai_refined_answer) are not in the insert body and are therefore not in the UPDATE SET — they are preserved across regenerations.
+
+**Root cause:** Same class as D-IT-01 and D-GWF-01 — the upsert was failing or the results were stale, but the failure was invisible. `ignoreDuplicates: false` also ensures regenerated summaries can refresh question metadata for existing rows rather than leaving stale data in place.
+
+---
 
 ### 2026-06-05 — ADR-OPS-008 linting stack + ADR-AI-010 pre-processing implemented
 

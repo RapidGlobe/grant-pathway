@@ -96,6 +96,15 @@ export default async function Step4Page({ params }: Props) {
   // on Step 3 correctly removes questions that the new extraction dropped.
   // Unanswered orphaned rows (question_order no longer in the summary) are
   // deleted. Answered rows are preserved even if orphaned, to avoid data loss.
+  //
+  // ignoreDuplicates: false (ON CONFLICT DO UPDATE) allows regenerated summaries
+  // to refresh question_text / word_limit metadata for existing rows. answer_text,
+  // answer_source, is_approved and ai_refined_answer are NOT in the insert body
+  // so they are never touched by the UPDATE — user answers are preserved.
+  //
+  // D-HSF-03 hardening: filter inserts with null/undefined question_text before
+  // upserting (prevents silent NOT NULL constraint failures), and check the upsert
+  // error explicitly so failures surface in Vercel logs rather than being swallowed.
   if (parsedSummary) {
     try {
       if (
@@ -118,23 +127,34 @@ export default async function Step4Page({ params }: Props) {
             .in('question_order', orphaned)
         }
 
-        const inserts = parsedSummary.sections.map((s) => ({
-          application_id: id,
-          user_id: user.id,
-          question_text: s.title,
-          question_order: s.number,
-          word_limit: s.wordLimit ?? null,
-          char_limit: null,
-          limit_type: s.wordLimit ? 'words' : null,
-          is_budget_question: s.is_budget_section ?? false,
-        }))
+        const inserts = parsedSummary.sections
+          .filter((s) => s.title && typeof s.number === 'number')
+          .map((s) => ({
+            application_id: id,
+            user_id: user.id,
+            question_text: s.title,
+            question_order: s.number,
+            word_limit: s.wordLimit ?? null,
+            char_limit: null,
+            limit_type: s.wordLimit ? 'words' : null,
+            is_budget_question: s.is_budget_section ?? false,
+          }))
 
-        // ignoreDuplicates: true only returns newly inserted rows, not existing ones.
-        // Always re-fetch after upsert to get the full current set.
-        await supabase.from('application_answers').upsert(inserts, {
-          onConflict: 'application_id,question_order',
-          ignoreDuplicates: true,
-        })
+        if (inserts.length > 0) {
+          const { error: upsertError } = await supabase
+            .from('application_answers')
+            .upsert(inserts, {
+              onConflict: 'application_id,question_order',
+              ignoreDuplicates: false,
+            })
+
+          if (upsertError) {
+            console.error('[step4] free_form upsert failed:', upsertError.message, {
+              applicationId: id,
+              rowCount: inserts.length,
+            })
+          }
+        }
 
         const { data: refreshed } = await supabase
           .from('application_answers')
@@ -162,23 +182,34 @@ export default async function Step4Page({ params }: Props) {
             .in('question_order', orphaned)
         }
 
-        const inserts = parsedSummary.questions.map((q, idx) => ({
-          application_id: id,
-          user_id: user.id,
-          question_text: q.text,
-          question_order: q.number ?? idx + 1,
-          word_limit: q.wordLimit ?? null,
-          char_limit: q.charLimit ?? null,
-          limit_type: q.limitType ?? null,
-          is_budget_question: q.is_budget_question ?? false,
-        }))
+        const inserts = parsedSummary.questions
+          .filter((q) => q.text && (q.number !== undefined || true))
+          .map((q, idx) => ({
+            application_id: id,
+            user_id: user.id,
+            question_text: q.text,
+            question_order: q.number ?? idx + 1,
+            word_limit: q.wordLimit ?? null,
+            char_limit: q.charLimit ?? null,
+            limit_type: q.limitType ?? null,
+            is_budget_question: q.is_budget_question ?? false,
+          }))
 
-        // ignoreDuplicates: true only returns newly inserted rows, not existing ones.
-        // Always re-fetch after upsert to get the full current set.
-        await supabase.from('application_answers').upsert(inserts, {
-          onConflict: 'application_id,question_order',
-          ignoreDuplicates: true,
-        })
+        if (inserts.length > 0) {
+          const { error: upsertError } = await supabase
+            .from('application_answers')
+            .upsert(inserts, {
+              onConflict: 'application_id,question_order',
+              ignoreDuplicates: false,
+            })
+
+          if (upsertError) {
+            console.error('[step4] structured upsert failed:', upsertError.message, {
+              applicationId: id,
+              rowCount: inserts.length,
+            })
+          }
+        }
 
         const { data: refreshed } = await supabase
           .from('application_answers')
@@ -191,8 +222,9 @@ export default async function Step4Page({ params }: Props) {
 
         questionRows = refreshed ?? []
       }
-    } catch {
-      // sync failed — questionRows stays as fetched (manual entry path)
+    } catch (syncErr) {
+      console.error('[step4] sync threw unexpectedly:', syncErr, { applicationId: id })
+      // questionRows stays as fetched — manual entry path shown
     }
   }
 

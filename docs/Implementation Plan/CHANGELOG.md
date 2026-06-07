@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-06-07 — D-HSF-03 fixed — Step 4 sync hardened for multi-pass Step 3 flows
+
+**What changed:**
+
+- `app/(authenticated)/applications/[id]/step/4/page.tsx` — Step 4 question sync hardened in three ways:
+  1. **Filter before upsert:** inserts are filtered to exclude rows with null/undefined `question_text` (structured) or `title` (free_form) and invalid `question_order`. Prevents silent NOT NULL constraint violations, which previously caused the entire upsert to fail without throwing.
+  2. **Check upsert error explicitly:** the `{ error }` return from `.upsert()` is now checked and logged to Vercel logs. Previously the error was swallowed entirely — the try/catch only catches thrown exceptions, and Supabase returns errors as values.
+  3. **Switch from `ignoreDuplicates: true` → `false`:** ON CONFLICT now updates question metadata (question_text, word_limit, char_limit, limit_type, is_budget_question) for existing rows rather than leaving them unchanged. answer_text, answer_source, is_approved, and ai_refined_answer are not in the insert body, so they are never overwritten — user answers are preserved across regenerations.
+
+**Why the original code failed on multi-pass Step 3 flows:**
+The root cause is the same class as D-IT-01 (resolved 2026-06-01): the Supabase `.upsert()` call returns `{ data, error }` — it does not throw. When the upsert fails (e.g. due to a constraint violation or a column that doesn't exist at time of call), the error is returned but was not checked. The subsequent re-fetch returned the existing rows (or an empty set for new applications), and `questionRows` was set to that empty result. `ignoreDuplicates: true` (ON CONFLICT DO NOTHING) also meant that on return visits with existing rows, any question_text updates from a regenerated summary were silently discarded.
+
+**Workaround (now obsolete):** Return to Step 3 and regenerate — this triggered a new AI call which produced a summary that in some cases had different structure, allowing the sync to succeed on the next attempt.
+
+---
+
 ## 2026-06-05 — D-CWF-01 fixed — faith/religion conditional question exclusion
 
 **What changed:**
