@@ -1,7 +1,7 @@
 # Clothworkers' Foundation Test Plan — Small Grants Programme
 
-**Version:** 1.2
-**Date:** 2026-06-05
+**Version:** 1.3
+**Date:** 2026-06-07
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+cloth1@gmail.com
@@ -56,6 +56,8 @@ This is the first test using a **capital funder** — Clothworkers funds equipme
 
 The following narrative questions should be extracted from the Small Grants form. Budget questions are marked ← budget and should be flagged amber with AI assist disabled.
 
+**Verified output (2026-06-07 retest, D-CWF-01 fix confirmed): 8 questions extracted.** Questions 8 (project title, 20 words), 10 (shortfall, 200 words), and 11 (difference your project will make, 250 words) appear in the Large Grants section of the same PDF and are correctly excluded by the MULTIPLE FORMS rule.
+
 | #   | Question                                                                                                       | Approx. word limit |
 | --- | -------------------------------------------------------------------------------------------------------------- | ------------------ |
 | 1   | Please describe the community/group of people you support in your own words                                    | 50 words           |
@@ -65,10 +67,7 @@ The following narrative questions should be extracted from the Small Grants form
 | 5   | How are users involved in your organisation?                                                                   | 250 words          |
 | 6   | What is your organisation's financial position?                                                                | 250 words ← budget |
 | 7   | Is your organisation experiencing or expecting any financial difficulties?                                     | 250 words ← budget |
-| 8   | What is the title of your project?                                                                             | 20 words           |
-| 9   | Please describe your project                                                                                   | 250 words          |
-| 10  | Please tell us how you will raise the shortfall                                                                | 200 words ← budget |
-| 11  | Please describe the difference you expect your capital project to make                                         | 250 words          |
+| 8   | Please describe your project                                                                                   | 250 words          |
 
 ---
 
@@ -93,10 +92,10 @@ Complete after running all tests.
 
 ## Defect Log
 
-| ID       | Test     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Severity | Status                  |
-| -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- | ----------------------- |
-| D-CW-01  | IT-CW-08 | AI assist ("Help me improve this") not disabled when answer exceeded the word limit. Client-side `isOver` flag was not reliably preventing the button click due to React rendering timing. Server-side word limit guard added to `/api/refine-answer`; client-side early-return guard added to `handleRefine`. Both layers now enforce the word limit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Medium   | Fixed                   |
-| D-CWF-01 | IT-CW-06 | Question 1 ("Please provide further information about your organisation's religious affiliation…") extracted as a standard writing card. This is a conditional question that only applies to faith-based organisations. The existing conditional question exclusion rule in `lib/prompts.ts` targets project-type conditionals ("only required if applying for a vehicle") — it does not detect faith-affiliation conditionals. Non-faith organisations see this as a mandatory writing card with no guidance that it is optional. Fixed (2026-06-05): FAITH AND RELIGION QUESTIONS rule added to `lib/prompts.ts` — questions asking primarily about religious affiliation, the role of faith in activities, or faith requirements for staff/trustees are now excluded as inherently conditional. Requires retest against Clothworkers to confirm Q1 no longer appears. | Medium   | Fixed — retest required |
+| ID       | Test     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Severity | Status           |
+| -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------- |
+| D-CW-01  | IT-CW-08 | AI assist ("Help me improve this") not disabled when answer exceeded the word limit. Client-side `isOver` flag was not reliably preventing the button click due to React rendering timing. Server-side word limit guard added to `/api/refine-answer`; client-side early-return guard added to `handleRefine`. Both layers now enforce the word limit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Medium   | Fixed            |
+| D-CWF-01 | IT-CW-06 | Question 1 ("Please provide further information about your organisation's religious affiliation…") extracted as a standard writing card. This is a conditional question that only applies to faith-based organisations. The existing conditional question exclusion rule in `lib/prompts.ts` targets project-type conditionals ("only required if applying for a vehicle") — it does not detect faith-affiliation conditionals. Non-faith organisations see this as a mandatory writing card with no guidance that it is optional. Fixed (2026-06-05): FAITH AND RELIGION QUESTIONS rule added to `lib/prompts.ts` — questions asking primarily about religious affiliation, the role of faith in activities, or faith requirements for staff/trustees are now excluded as inherently conditional. Verified (2026-06-07): retest confirms faith affiliation question no longer appears — 8 questions extracted, none relating to faith or religion. | Medium   | Fixed — verified |
 
 ---
 
@@ -274,10 +273,7 @@ Complete after running all tests.
 | 5   | How are users involved in your organisation?    | 250 words      |
 | 6   | Financial position                              | 250 words      |
 | 7   | Financial difficulties                          | 250 words      |
-| 8   | Title of your project                           | 20 words       |
-| 9   | Please describe your project                    | 250 words      |
-| 10  | How will you raise the shortfall?               | 200 words      |
-| 11  | Difference your project will make               | 250 words      |
+| 8   | Please describe your project                    | 250 words      |
 
 **Steps:**
 
@@ -288,9 +284,10 @@ Complete after running all tests.
 
 **Expected result:**
 
-- 8–11 narrative questions extracted (budget questions may be grouped or excluded)
+- **8 narrative questions extracted** (verified 2026-06-07 — see Expected Narrative Questions table above)
+- Faith/religion question does NOT appear — D-CWF-01 fix confirmed
 - Word limits displayed as numbers (e.g., 250 words), not as "approx. 250 words"
-- Budget questions (financial position, financial difficulties, shortfall) flagged amber
+- Budget questions (financial position, financial difficulties) flagged amber
 - _(GAP-27 observation: record the exact limit values shown for each question)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -446,3 +443,4 @@ Additional checks:
 | 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Clothworkers' Foundation Small Grants Programme, Bridge Support MK test charity, 10 test cases including GAP-27 ("approx." word limit) and GAP-28 observations                                                                                                                                                                        |
 | 1.1     | 2026-06-02 | Rapidglobe Ltd | All 10 tests completed — 10/10 Pass. D-CW-01 found and fixed during test. Defect log, results, and observations recorded.                                                                                                                                                                                                                                 |
 | 1.2     | 2026-06-05 | Rapidglobe Ltd | ADR-AI-010 performance retest. Initial ceiling of 20,000 chars truncated 97,906-char PDF — questions not extracted (0/9). Ceiling raised to 50,000 via PREPROCESS_CHAR_CEILING env var. Second run: 30s, 9 questions extracted correctly. D-CWF-01 added: faith affiliation conditional question (Q1) appears as standard writing card for all charities. |
+| 1.3     | 2026-06-07 | Rapidglobe Ltd | D-CWF-01 retest verified. Faith/religion question no longer extracted — 8 questions confirmed. Expected questions table updated to reflect verified output. IT-CW-06 expected result updated. D-CWF-01 status updated to Fixed — verified.                                                                                                                |
