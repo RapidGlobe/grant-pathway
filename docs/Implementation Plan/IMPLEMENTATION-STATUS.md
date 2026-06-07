@@ -1,6 +1,6 @@
 # Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-07 (D-HSF-03 fixed and verified; IT-11 escape hatch fully closed — end-to-end escape hatch flow confirmed working)
+**Last updated:** 2026-06-07 (Henry Smith full end-to-end retest via escape hatch path — Q&A, approval, Word and text exports all confirmed)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
