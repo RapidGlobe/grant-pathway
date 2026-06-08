@@ -1,7 +1,7 @@
 # Grant Pathway — Terms of Service
 
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 22 May 2026**
+**Last updated: 8 June 2026**
 
 ---
 
@@ -80,7 +80,7 @@ The AI features are powered by Anthropic's API. When you request a summary or dr
 
 ## 6. Fair Use
 
-Grant Pathway is free to use. To manage the running costs of the AI features and ensure fair access for all users, each account is subject to a **fair-use limit of 20 AI-assisted requests per calendar month**.
+Grant Pathway is free to use. To manage the running costs of the AI features and ensure fair access for all users, each account is subject to a **fair-use limit of 50 AI-assisted requests per calendar month**.
 
 This limit is intended to accommodate the realistic needs of a small charity writing grant applications throughout the year. The limit resets at the start of each calendar month.
 
@@ -102,7 +102,7 @@ For full details of how we handle your data, please read our **Privacy Policy**.
 
 ## 8. Intellectual Property
 
-Grant Pathway's source code is open source and is publicly available. It may be used, modified, and distributed in accordance with the terms of its open-source licence.
+Grant Pathway's source code is open source and is publicly available. It may be used, modified, and distributed in accordance with the terms of the MIT Licence.
 
 The Grant Pathway name, logo, and brand materials are owned by RapidGlobe Ltd. You may not use them without our prior written permission.
 
@@ -188,4 +188,4 @@ For any questions about these terms, please contact us:
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 22 May 2026_
+_Last updated: 8 June 2026_
