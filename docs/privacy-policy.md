@@ -1,7 +1,7 @@
 # Grant Pathway — Privacy Policy
 
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 22 May 2026**
+**Last updated: 8 June 2026**
 
 ---
 
@@ -14,10 +14,8 @@ Grant Pathway is a free online tool that helps UK charities write grant applicat
 | **Company name**                | RapidGlobe Ltd                                                               |
 | **Company registration number** | 05615649                                                                     |
 | **Registered address**          | Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW |
-| **ICO registration number**     | [TO BE CONFIRMED — see note below]                                           |
+| **ICO registration number**     | C1954006                                                                     |
 | **Data protection contact**     | wjokhia@rapidglobe.com                                                       |
-
-> **⚠ ICO registration:** Processing personal data of UK individuals requires registration with the Information Commissioner's Office in most cases. Please confirm your ICO registration number before this policy goes live. Register or check your status at [ico.org.uk](https://ico.org.uk).
 
 RapidGlobe Ltd is the **data controller** for the personal information you provide when using Grant Pathway. This means we decide how and why your data is used, and we are responsible for keeping it safe.
 
