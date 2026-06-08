@@ -6,6 +6,39 @@
 
 ---
 
+## 2026-06-08 — Privacy Policy and Terms of Service readiness review; T&S corrected
+
+**What changed:**
+
+A readiness review of `docs/privacy-policy.md` and `docs/terms-of-service.md` was conducted against the implementation documentation set. Two inaccuracies were identified and corrected in the T&S:
+
+- **Section 6 (Fair Use):** The stated limit of 20 AI-assisted requests per calendar month was incorrect. The implementation enforces 50 requests per calendar month (raised from 20 during Step 4 redesign, 2026-05-29). The T&S now states 50.
+- **Section 8 (Intellectual Property):** The open-source licence was described vaguely as "its open-source licence". The MIT Licence is named explicitly, consistent with constraint C17.
+
+**Remaining blockers before both documents can go live:**
+
+| Item                              | Status                                                                                               |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| ICO registration number           | 🔴 Outstanding — must be confirmed and inserted before publication                                   |
+| Legal firm review                 | 🔴 Outstanding — not yet engaged                                                                     |
+| Effective date                    | 🔴 Outstanding — set when go-live date is confirmed                                                  |
+| Domain live (grantpathway.org.uk) | 🔴 Outstanding — DNS is Phase 5; Privacy Policy references this URL                                  |
+| DPAs with all five providers      | ⚠️ Unverified — Supabase, Anthropic, Resend, Vercel, Sentry each need a DPA accepted; not documented |
+
+**Items confirmed complete during review:**
+
+| Item                                       | Evidence                                                                                                        |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Account deletion (T&S §11, PP §7)          | S8.2 complete — cascade deletion, confirmation, redirect implemented                                            |
+| Policy links in UI (registration + footer) | screen-requirements.md §registration, §footer — implemented; live URLs required before go-live                  |
+| Fair-use limit enforcement (now 50/month)  | Both `generate-summary` and `refine-answer` routes enforce `MONTHLY_CAP = 50`                                   |
+| Inactivity cron cadence (PP §7)            | Warning at 23 months (08:00 UTC daily), deletion at 24 months (09:00 UTC daily) — both confirmed live in Vercel |
+| Sentry listed as data processor (PP §5)    | Sentry EU integrated at P3.7 — PII scrubbing via `beforeSend` confirmed                                         |
+
+**Commit:** f4bc816
+
+---
+
 ## 2026-06-07 — D-HSF-03 fixed (second attempt) — sync moved to Server Action; hard navigation added
 
 **What changed (second attempt — first attempt 55c60a7 did not resolve the issue):**
