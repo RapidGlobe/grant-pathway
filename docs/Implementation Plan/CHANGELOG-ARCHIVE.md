@@ -1,0 +1,742 @@
+﻿# Grant Pathway — Design & Decision Changelog (Archive — Phase 0–4)
+
+**Purpose:** Archived entries from the main CHANGELOG covering Phase 0 (bootstrapping) through Phase 4 (vertical slices and funder testing), up to and including the Phase 4→5 gate check on 2026-05-22.
+
+**Active log:** Current entries (Phase 5 onwards) are in [CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## 2026-05-22 — Phase 4→5 gate check
+
+**What changed:**
+
+- `ADR-TRACEABILITY.md` — full Phase 4 exit sweep completed; three previously resolved gaps marked; six new gaps added; Phase 4→5 gate row filled.
+- `IMPLEMENTATION-STATUS.md` — Phase 4→5 gate row added to summary table; notes entry added.
+
+**Resolved gaps (confirmed in Phase 4 implementation):**
+
+- **GAP-07** (ADR-EXPORT-002): Null `answer_text` handled — export route uses `'[No answer provided]'` fallback in both docx and txt formats (S7.2).
+- **GAP-13** (ADR-OPS-004): Cron routes confirmed excluded from rate limiter — cleanup-guidelines (S4.4), inactivity-warning + inactivity-deletion (S8.3) have no rate-limiter imports; auth is CRON_SECRET only.
+- **GAP-19** (ADR-DATA-002): Re-upload advisory implemented — blue info banner shown in Step 2 component when `currentStep >= 3` and no sessionStorage entry for guidelines (S4.3).
+
+**New gaps identified (GAP-21 to GAP-26):**
+
+- **GAP-21** (ADR-OPS-005 — Low): Sentry `withScope` + route tag not implemented in `generate-summary` or `generate-draft` routes. `technical-design.md` §14 specifies `scope.setTag('route', 'generate-summary')` for AI route error filtering. Sentry auto-captures global exceptions but tagged filtering is missing. Resolution deferred to P5.3.
+- **GAP-22** (ADR-SEC-003 — Low): Session timeout `SessionTimeoutProvider` calls `router.push("/")` with no `?timeout=true` query param. `technical-design.md` §5 specifies sign-in page should show "You've been signed out due to inactivity." message. `sign-in-form.tsx` has no timeout param handler. Resolution deferred to P5.3 or S0.5 patch.
+- **GAP-23** (ADR-ARCH-002 — Medium): Zero `loading.tsx` files exist in `app/`. ADR-ARCH-002 + `technical-design.md` §8 specify "Loading states handled via Next.js `loading.tsx` / skeleton components." `page-skeleton.tsx` exists (P1.15) but is not wired as Suspense boundaries. Resolution deferred to P5.3 per authenticated route.
+- **GAP-24** (PDR-DH-003 — Low): Export disclaimer wording differs from spec. PDR-DH-003 specifies: _"Please review carefully before submitting to the funder."_ Implementation uses: _"All content has been checked for accuracy before submission."_ — different meaning and liability implication. Resolution: patch S7.2 export route.
+- **GAP-25** (ADR-ARCH-003 — Medium): Zod validation absent from `actions/applications.ts` and `actions/auth.ts`. ADR-ARCH-003 requires Zod on all Server Actions. Only `actions/charity.ts` imports Zod. The other two actions use manual `if (!user) redirect('/')` guards only. Resolution deferred to P5.3 sweep.
+- **GAP-26** (PDR-UI-004 — High): `app/(authenticated)/applications/[id]/page.tsx` is a stub rendering "redirects to current step (stub)". Technical design and PDR-UI-004 specify it should redirect to `/applications/[id]/step/[current_step]`. A direct link to `/applications/[id]` lands on a broken page. **Must be fixed before P5.5 final testing.**
+
+---
+
+## 2026-05-22 — Slice 8: Account Management wired up (Phase 4 complete)
+
+**What changed:**
+
+- `actions/auth.ts` — `changePassword(currentPassword, newPassword)` Server Action added (S8.1). Verifies the current password by calling `signInWithPassword` before `updateUser({ password })` — Supabase has no dedicated "verify before change" API so re-authentication is the correct approach.
+- `components/account-settings-form.tsx` — static password-change simulation replaced with real SA call via `useTransition`; `wrong_password` surfaces as inline field error; server error banner added; button shows "Updating…" while pending.
+- `lib/emails/send.ts` (new) — `sendEmail()` wraps the Resend REST API using `fetch` (no extra dependency). Skips gracefully with a console error if `RESEND_API_KEY` is not set.
+- `lib/emails/account-deleted-user.ts` / `inactivity-warning.ts` / `account-deleted-inactivity.ts` (new) — Email 2 (user-initiated deletion), Email 3 (inactivity warning), Email 4 (inactivity deletion). All are inline HTML functions, consistent with the P3.8 design decision that Resend template variables aren't supported.
+- `app/api/account/delete/route.ts` (new, S8.2) — POST route using service role client. Cascade order: application_answers → applications → charity_profiles → ai_usage_log → user_profiles → `auth.admin.deleteUser`. Sends Email 2 after deletion; email failure is logged but does not block the response.
+- `components/delete-account-form.tsx` — rewritten; calls `/api/account/delete`; on success calls `signOut()` SA then redirects to `/?deleted=true`.
+- `app/(public)/page.tsx` + `components/sign-in-form.tsx` — `?deleted=true` query param now shows a green "Your account has been deleted" banner on the sign-in page.
+- `app/api/cron/inactivity-warning/route.ts` (new, S8.3) — daily 08:00 UTC; pages through `auth.admin.listUsers()`; sends Email 3 to accounts in the 23-month inactivity window.
+- `app/api/cron/inactivity-deletion/route.ts` (new, S8.3) — daily 09:00 UTC; cascade-deletes accounts ≥24 months inactive (same order as user-initiated deletion); sends Email 4 per deletion; logs user ID to console (not email — PII).
+- `vercel.json` — `inactivity-warning` (`0 8 * * *`) and `inactivity-deletion` (`0 9 * * *`) added alongside existing cleanup-guidelines cron.
+
+**Key decisions:**
+
+- **Current password verification via re-authentication (S8.1):** Supabase does not expose a dedicated "verify current password" endpoint. Re-signing-in with `signInWithPassword` achieves the same result — if the credential is wrong, `signInWithPassword` returns an error and the password change is blocked. The re-sign-in refreshes the session token as a side effect, which is harmless.
+- **Resend via `fetch`, not SDK (S8.2/S8.3):** The `resend` npm package is not installed. All three email functions use the Resend REST API directly via `fetch`. This avoids adding a dependency for what is four simple HTTP calls. The `sendEmail` wrapper is ~25 lines and covers all cases.
+- **Email failure does not block deletion (S8.2):** Once `auth.admin.deleteUser` succeeds, the user is gone and cannot be recovered. Blocking the 200 response because of an email failure would leave the client in an error state with no account — the deletion happened but the client sees a failure. Email failures are logged for investigation; the 200 is returned regardless.
+- **Inactivity cron skips null `last_sign_in_at` (S8.3):** Users who registered but never signed in have `last_sign_in_at = null`. Treating null as "infinitely old" would delete brand-new accounts that haven't confirmed their email yet. Null is explicitly skipped; only accounts with a known last sign-in date are evaluated.
+- **Deletion cron logs user ID, not email (S8.3):** Per ADR-OPS-OPS (Sentry PII scrubbing) and general GDPR hygiene, log lines contain the Supabase user UUID only. Email addresses are not logged anywhere in the cron path.
+
+---
+
+## 2026-05-21 — Slice 7: Step 5 Approve & Export wired up
+
+**What changed:**
+
+- `actions/applications.ts` — `approveApplication(applicationId)` Server Action added. Sets `applications.status = 'approved'` and `is_approved = true` on all `application_answers` rows. Ownership enforced via `user_id` filter on the applications UPDATE (prevents one user approving another's application even if they know the ID).
+- `app/(authenticated)/applications/[id]/step/5/page.tsx` — fully rewritten; `getApplicationOrRedirect(id, 5)` for step locking; separate query for `last_exported_at` (not in `ApplicationData` type); `application_answers` fetched ordered by `question_order`; typed `AnswerRow[]` and application metadata passed to component.
+- `components/application-step5-approve.tsx` — full rewrite; `AnswerRow` type exported; three-item checklist (must all be checked before Approve activates); read-only Q&A view with per-answer word count, source badge, over-limit warning; approve + re-open dialogs with real Server Action calls via `useTransition`; two download buttons (`.docx` and `.txt`); download via `fetch()` + `response.blob()` + `createObjectURL` (shows error state if route fails); re-export warning dialog shows real `lastExported` date from DB; status and `lastExported` updated client-side on first download.
+- `app/api/export/[applicationId]/route.ts` (new) — `GET` route; auth + ownership + status check (`approved` or `exported` required); fetches answers and user profile for disclaimer; generates A4 Word doc (docx v9.6.1) per PDR-DH-003; updates `status = 'exported'` and `last_exported_at = now()` on every call; `?format=txt` returns plain-text variant.
+
+**Key decisions:**
+
+- Three-item checklist gates the Approve button (not just a confirmation dialog): this reflects P1.12's spec intention of "three review prompts" and ensures users consciously confirm accuracy and AI responsibility before approving. The dialog then provides a second confirmation with grant/funder details shown.
+- Download updates status on every call (not just the first): `last_exported_at` is always current, so the re-export warning can show the accurate "last exported on [date]" message. This matches the data-model.md note: "last_exported_at is updated on every export, not just the first".
+- Source badges on read-only view: showing "AI generated / AI + edited / Written by you" on Step 5 helps users quickly spot answers they haven't personally reviewed. This was not explicitly in the spec but is low-cost and directly supports the accuracy checklist.
+- `Uint8Array` conversion before `new Response(...)`: `Packer.toBuffer()` returns `Buffer<ArrayBufferLike>` which TypeScript 5.x does not accept as `BodyInit`. Wrapping with `new Uint8Array(buffer)` is the correct fix (zero-copy for Node.js Buffers backed by `ArrayBuffer`).
+
+---
+
+## 2026-05-21 — Slice 5: Step 3 AI Summary wired up
+
+**What changed:**
+
+- `lib/prompts.ts` (new) — `MODEL = 'anthropic.claude-sonnet-4-6'`; `AI_SYSTEM_PROMPT` enforces UK grant expert persona + JSON-only output (no prose, no markdown); `buildSummaryPrompt(guidelinesText, charity|null)` injects charity context when available and specifies the exact JSON schema (`aboutGrant`, `amount`, `whoCanApply[]`, `lookingFor[]`, `questions[]`, `keyRequirements[]`); `buildDraftPrompt()` pre-built for Slice 6; `ApplicationQuestion` type exported.
+- `lib/ai-error-handler.ts` (new) — `AiErrorCode` union (8 codes); `httpStatusForError()` and `aiErrorBody()` provide consistent GAP-04 error shapes across all AI routes; `classifyBedrockError()` maps SDK `.status` codes; `withRetry<T>()` wraps any async call with 2 retries for `rate_limited`, `overloaded`, `server_error`, `timeout` — delays 1 s / 3 s; non-retryable for 400/401/403.
+- `POST /api/generate-summary` (new) — `maxDuration = 90` (Bedrock calls up to ~35 s in production; Vercel default 10 s too short — Vercel Pro required per ADR-AI-006/ADR-OPS-001); `SUMMARY_MAX_TOKENS = 1200` (reduced from spike's 1500 to cut response time while still fitting a full summary, per P2.3 deviation note); flow: auth → ownership check → monthly cap (20/month, `ai_usage_log` WHERE current month) → Upstash rate limit → charity profile fetch → Bedrock withRetry → strip markdown fences → JSON.parse → one retry on parse failure → save to `applications.ai_summary` → insert `ai_usage_log` (`request_type: 'guideline_summary'`) → return `{ summary, questionsFound, approachingLimit }`.
+- `actions/applications.ts` — `advanceToStep4()` added; advances `current_step` to `max(current, 4)`; no status change (remains `in_progress` from Step 2); redirects to step/4 on success.
+- `app/(authenticated)/applications/[id]/step/3/page.tsx` — rewritten; calls `getApplicationOrRedirect(id, 3)` for step locking; passes `existingSummary` (from `applications.ai_summary` DB column) to component so previously generated summaries are shown immediately on revisit without a Bedrock call.
+- `components/application-step3-summary.tsx` — fully rewritten; five display states; on mount: if `existingSummary` is non-null → parse JSON → render `"content"` immediately; else check sessionStorage → if no guidelines → `"no-guidelines"`; else call `/api/generate-summary`; asymptotic progress bar (GAP-02: `p += (89−p) × 0.04` every 200 ms, snaps to 100 on API return); staged loading messages; `clearGuidelines()` on success (GAP-10); `isRetry` bool — second failure shows `"persistent-failure"` (no retry button); Regenerate resets `isRetry`; `advanceToStep4()` via `useTransition`.
+
+**Key decisions:**
+
+- `SUMMARY_MAX_TOKENS = 1200` not 1500: P2.3 spike showed 1500 tokens caused 33 s response times, marginally over the 30 s NFR-01 target. 1200 tokens fits a complete summary and typically returns in ~20–25 s. Documented as P2.3 deviation in API route comment.
+- Parse failure retry uses multi-turn conversation: the retry sends the original prompt, Claude's malformed response, and a new user message demanding JSON-only output. This gives Claude the context to understand what it got wrong, more reliable than repeating the original prompt cold (ADR-AI-004).
+- `maxDuration = 90` requires Vercel Pro: noted in the route file header and tracked in P5.4 production infrastructure. On Hobby (default 10 s), the route will time out in production for large guideline documents. The current dev environment (no function timeout cap) is unaffected.
+- `clearGuidelines()` called on summary success, not on Regenerate: the guidelines must remain in sessionStorage for the user to be able to regenerate. They are only cleared once the user is satisfied with the summary (GAP-10). Navigating away and returning to Step 3 — if the DB `ai_summary` column is populated — renders the existing summary without needing sessionStorage again.
+
+---
+
+## 2026-05-20 — S1.1: Charity Commission lookup — corrected endpoints and AI paraphrase restored
+
+**What changed:**
+
+- `actions/charity.ts` (rewritten) — `lookupCharity(query)` Server Action now uses the correct Charity Commission Register of Charities API endpoints, confirmed from the official OpenAPI YAML spec:
+  - Name search: `GET /searchCharityName/{charityname}` (was incorrectly `/charitySearch/{name}/1/1`)
+  - Number search: `GET /charityRegNumber/{RegisteredNumber}/0` (was incorrectly `/allCharityDetails/{n}`)
+  - New: second call to `GET /charitygoverningdocument/{RegisteredNumber}/0` to retrieve `charitable_objects` (free-text legal description from governing document)
+  - New: Amazon Bedrock Claude (`anthropic.claude-sonnet-4-6`, eu-west-2) paraphrases `charitable_objects` into plain-English `whatDoes` and `whoHelps` descriptions. Uses `Promise.race` with a 30-second timeout. Bedrock failure degrades gracefully — name + registration number are still returned, and `whatDoes`/`whoHelps` are empty strings.
+  - Return type extended: `{ ok: true; charityName; registrationNumber; whatDoes; whoHelps }`.
+- `components/charity-profile-form.tsx` — `paraphrasedFromLookup` state restored (was incorrectly removed in initial S1.1 pass); `handleLookup` now pre-fills `whatDoes` and `whoHelps` from Bedrock result when non-empty; amber Sparkles banner displayed on match when AI descriptions were generated, prompting user to review and personalise; hint text on `whatDoes`/`whoHelps` fields condenses when `paraphrasedFromLookup` is true.
+- `app/(authenticated)/profile/page.tsx` — `export const maxDuration = 60` added (two Charity Commission API calls at 10 s each plus Bedrock at up to 30 s exceeds Vercel's default 10 s timeout).
+- `.env.example` — `CHARITY_COMMISSION_API_KEY` entry unchanged (already added in initial pass).
+
+**Why the initial implementation was wrong:**
+The initial S1.1 pass used endpoint paths reverse-engineered from the Charity Commission developer portal screenshots rather than the authoritative OpenAPI spec. After the user provided the full `register-of-charities-api.yaml`, the correct paths were confirmed. The AI paraphrase feature was also incorrectly removed in the initial pass, incorrectly assessed as "speculative Phase 1 content" — the CHANGELOG entry from 2026-05-18 (below) records it as a deliberate design decision that was always part of S1.1.
+
+**Why `useTransition` (not `useActionState`):**
+`lookupCharity` returns structured data (`{ charityName, registrationNumber, whatDoes, whoHelps }`) rather than a form state value. The same pattern applies as `mfaEnroll`.
+
+**Why `GetCharityGoverningDocument` (not `GetCharityWhoWhatHow`):**
+`GetCharityWhoWhatHow` returns structured taxonomy codes (`classification_code`, `classification_type`, `classification_desc`) — these are classification labels, not natural language. `GetCharityGoverningDocument.charitable_objects` is the actual legal free-text description of the charity's purposes — far better as input for an AI paraphrase prompt.
+
+**Action required (WJ):** Register for a Charity Commission API key at https://api.charitycommission.gov.uk/ and add it to `.env.local` as `CHARITY_COMMISSION_API_KEY`, and to Vercel environment variables for production. Also ensure `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_REGION` are set — without these the Bedrock paraphrase step is silently skipped and `whatDoes`/`whoHelps` will be empty on lookup.
+
+---
+
+## 2026-05-20 — S0.6: MFA opt-in wired up
+
+**What changed:**
+
+- `actions/auth.ts` — four new Server Actions: `mfaEnroll()` (returns QR code SVG data URL, factorId, and TOTP secret for display; called directly from a useTransition handler, not useActionState, because it returns structured data), `mfaVerifyEnrollment()` (verifies the 6-digit code entered during setup; maps status 422 to `invalid_code`), `mfaUnenroll()` (removes the TOTP factor), `verifyMfaSignIn()` (completes MFA sign-in; redirects to `/dashboard` on success). `signIn()` updated: after a successful `signInWithPassword`, calls `getAuthenticatorAssuranceLevel()`; if `nextLevel === 'aal2'` and `currentLevel !== 'aal2'`, redirects to `/mfa` instead of `/dashboard`.
+- `proxy.ts` — `/mfa` added to PROTECTED (requires an active aal1 session to reach the challenge page).
+- `app/(authenticated)/mfa/page.tsx` (new) — reads first TOTP factor via `listFactors()`; redirects to `/dashboard` if the user somehow arrives with no factor enrolled; renders `MfaChallengeForm`.
+- `components/mfa-challenge-form.tsx` (new) — `useActionState(verifyMfaSignIn)`; hidden `factorId` input; numeric code input with `inputMode="numeric"` and `autoComplete="one-time-code"`; separate error banners for `invalid_code` and `unknown`.
+- `app/(authenticated)/account/page.tsx` — rewritten as async Server Component. Previously passed `?mfa=enabled` URL param from a static demo. Now reads real email from `auth.getUser()` and real MFA status from `mfa.listFactors()` (filters by `factor_type === 'totp'` and `status === 'verified'`). Passes `email`, `mfaEnabled`, `mfaFactorId` to `AccountSettingsForm`.
+- `components/mfa-setup-panel.tsx` (new) — two-state panel. Not enabled: "Set up" button calls `mfaEnroll()` inside `useTransition` (not `useActionState`) since it returns data, not FormData; shows QR code and manual setup key; verify form uses `useActionState(mfaVerifyEnrollment)`. Enabled: unenroll form uses `useActionState(mfaUnenroll)`. `router.refresh()` triggered via `useEffect` when either action reaches `status === 'success'`, causing the parent Server Component to re-fetch and pass updated props.
+- `components/account-settings-form.tsx` — `MOCK_EMAIL` replaced with real `email` prop; static MFA toggle (local `mfaOn` useState) replaced with `MfaSetupPanel`; interface updated with `email`, `mfaEnabled`, `mfaFactorId` props.
+
+**Why:**
+`mfaEnroll()` is called outside `useActionState` because it returns structured data (QR code, factorId, secret) that the component needs to display. Encoding those as FormData round-trips would add unnecessary complexity. `useTransition` provides the pending state. The `router.refresh()` approach (useEffect on status change) is preferred over a server `redirect()` inside the action because the user stays on `/account` after MFA setup — only the data changes.
+
+---
+
+## 2026-05-20 — S0.5: Session timeout wired up
+
+**What changed:**
+
+- `actions/auth.ts` — new `signOut` Server Action; calls `supabase.auth.signOut()` only, no `redirect()`. Navigation is handled by the caller. This is intentional — calling `redirect()` inside a `setTimeout` callback is unreliable; having the client component own the navigation is cleaner and more predictable.
+- `components/session-timeout-provider.tsx` (new) — client component that implements FR-06. Attaches passive event listeners (`mousemove`, `keydown`, `click`, `touchstart`) to `document`. Any activity resets two timers: a 55-minute warning timer and a 60-minute sign-out timer. At 55 minutes, `SessionTimeoutModal` opens with a 5-minute countdown (decremented each minute via `setInterval`). At 60 minutes, `signOut()` is called and the user is sent to `/`. "I'm still here" calls `resetTimers()`. "Sign out now" calls `doSignOut()` immediately. Stable `useCallback` references ensure the `useEffect` only runs once on mount and the activity handlers always call the current version of `resetTimers`.
+- `app/(authenticated)/layout.tsx` — converted to async Server Component; `SessionTimeoutStub` replaced with `SessionTimeoutProvider`; real `first_name` and `email` now read from `supabase.auth.getUser()` via `user_metadata` and passed to `NavAuthenticated`. `MOCK_FIRST_NAME` removed.
+- `components/session-timeout-stub.tsx` — deleted.
+
+**Why:**
+The `signOut` action omits `redirect()` because Server Action redirects work reliably from form submissions (via React's transition system) but are fragile when called from timer callbacks. Owning the navigation in the client component makes the timeout flow predictable. The layout is a Server Component so it can call `getUser()` at render time without adding a client-side data-fetch waterfall.
+
+---
+
+## 2026-05-20 — S0.4: Password reset wired up
+
+**What changed:**
+
+- `actions/auth.ts` — two new actions. `requestPasswordReset`: calls `resetPasswordForEmail(email, { redirectTo: {origin}/auth/callback })`; always returns `{ status: 'sent' }` — never reveals whether the email is registered (AC-FR-05-02). `resetPassword`: checks session exists first, then calls `updateUser({ password })`; maps session errors to `{ status: 'expired' }` so the user sees the "link expired" view rather than a generic error.
+- `app/auth/callback/route.ts` — added `type === 'recovery'` routing. On success routes to `/forgot-password?state=reset`; on failure routes to `/forgot-password?state=expired`. Email verification routing (`type === 'email'`) unchanged.
+- `proxy.ts` — removed `/forgot-password` from AUTH_ONLY. The callback sets a recovery session (making the user technically "authenticated") before redirecting to `/forgot-password?state=reset`. Keeping it in AUTH_ONLY would redirect them to `/dashboard` instead of the password form.
+- `components/forgot-password-request-form.tsx` — wired via `useActionState`. `state.status === 'sent'` replaces the old `submitted` useState toggle. Anti-enumeration: the success view always shows regardless of whether the email is registered.
+- `components/reset-password-form.tsx` — wired via `useActionState`. Two expired paths: `isExpired` prop (link was expired when the user arrived) and `state.status === 'expired'` (session expired while the user was on the form). Both render the same expired view with a "Request a new link" button.
+
+**Why:**
+The `requestPasswordReset` action always returns `sent` because revealing whether an email is registered would let an attacker enumerate accounts (AC-FR-05-02). The `/forgot-password` AUTH_ONLY removal mirrors the `/verify-email` fix from S0.2 — Supabase's recovery session makes the user "authenticated" immediately after the callback, so the route must be publicly accessible in all auth states.
+
+---
+
+## 2026-05-20 — S0.3: Sign in wired up
+
+**What changed:**
+
+- `actions/auth.ts` — new `signIn` Server Action. Calls `supabase.auth.signInWithPassword()`. Detects `error.code === 'email_not_confirmed'` and returns `{ error: 'unverified' }` so the form can show the resend link. All other auth errors (wrong password, unknown email, rate limit) return the same `{ error: 'credentials' }` message — intentional, to prevent email enumeration (AC-FR-04-03). On success: `redirect('/dashboard')`.
+- `components/sign-in-form.tsx` — fully wired. `useActionState(signIn)` replaces the static `useState` stub. Same validation-first / Server Action pattern as the register form: `handleSubmit` calls `e.preventDefault()` on field errors, does nothing on success. `name` attributes added to email and password inputs. Submit button shows `disabled={isPending}` and "Signing in…". The "Resend verification email" stub button replaced with a `<Link>` to `/verify-email?email=xxx` — takes the user to the existing resend flow with their email pre-filled.
+
+**Why:**
+The same `credentials` error for both wrong password and unknown email is deliberate (AC-FR-04-03) — returning different messages would let an attacker enumerate registered email addresses. Linking to `/verify-email` for the resend (rather than calling the resend action inline) reuses the existing rate-limited resend flow and avoids duplicating resend logic on the sign-in page.
+
+---
+
+## 2026-05-20 — S0.2: Email verification wired up
+
+**What changed:**
+
+- `app/auth/callback/route.ts` (new) — handles the Supabase redirect after the user clicks their verification email link. Calls `verifyOtp({ token_hash, type })` for email OTP flow (the default); falls back to `exchangeCodeForSession(code)` for PKCE flows (OAuth, magic links). On success → `/verify-email?state=verified`; on any failure → `/verify-email?state=expired`.
+- `proxy.ts` — removed `/verify-email` from `AUTH_ONLY`. After clicking the verification link, the callback sets the session and redirects the now-authenticated user to `/verify-email?state=verified`. Having it in AUTH_ONLY would redirect them to `/dashboard` before they see the confirmation.
+- `lib/rate-limit.ts` — added `resendRatelimit` (3 per hour per email, Upstash sliding window, prefix `grant-pathway:resend`) to satisfy AC-FR-03-06.
+- `actions/auth.ts` — two changes to `registerUser`: (1) `emailRedirectTo: ${origin}/auth/callback` added to `signUp()` so the verification link points to our callback; (2) redirect updated to `/verify-email?email=xxx` so the page can display the email without a session (Supabase does not create a session before email confirmation when `enable_confirmations = true`). New `resendVerificationEmail` action: rate-checks via `resendRatelimit`, calls `supabase.auth.resend({ type: 'signup', email, options: { emailRedirectTo } })`.
+- `components/verify-email-resend-form.tsx` (new) — `"use client"` component using `useActionState(resendVerificationEmail)`. Two modes: `awaiting` (hidden email input, outline button) and `expired` (visible email input for correction, primary button). Four feedback states: sent (green), rate_limited (amber), error (red), missing_email (red).
+- `app/(public)/verify-email/page.tsx` — MOCK_EMAIL replaced; page reads email from `?email=` query param first, then from Supabase session (local dev where email confirmation is disabled), then falls back to empty string. `VerifyEmailResendForm` wired into both AwaitingState and ExpiredState.
+
+**Why:**
+`/auth/callback` is the standard Next.js + Supabase SSR pattern for handling the token returned after email verification. The `emailRedirectTo` option on `signUp()` is the mechanism that tells Supabase which URL to embed in the verification email — without it, Supabase uses the `site_url` (the homepage) which would not invoke our callback. The `?email=` param on the redirect avoids a session dependency: locally `enable_confirmations = false` so a session exists, but in production `enable_confirmations = true` means no session until the email is verified.
+
+---
+
+## 2026-05-20 — S0.1: Registration wired up
+
+**What changed:**
+
+- `supabase/migrations/20260520000001_handle_new_user_trigger.sql` (new) — `handle_new_user()` trigger (`SECURITY DEFINER SET search_path = ''`) on `auth.users` INSERT. Auto-creates a `user_profiles` row by reading `first_name`, `last_name`, and `feedback_consent` from `raw_user_meta_data`. Chosen over a service-role API call in the Server Action because the trigger is atomic with the user creation, cannot be skipped, and is the Supabase-recommended pattern for profile initialisation.
+- `actions/auth.ts` (new) — `registerUser` Server Action. Calls `supabase.auth.signUp()` with profile data in `options.data`. Detects duplicate email by checking `data.user.identities?.length === 0` (Supabase does not return an error for duplicate emails when email confirmation is enabled — privacy-preserving behaviour). Returns `{ error: 'email_exists' }` or `{ error: 'unknown' }` on failure; redirects to `/verify-email` on success.
+- `components/register-form.tsx` — wired from static shell to real Server Action using React 19 `useActionState`. Client-side validation runs first (`handleSubmit`): calls `e.preventDefault()` on field errors, does nothing on success (allowing `action={action}` to fire the Server Action). All inputs given `name` attributes for FormData. Submit button shows `disabled={isPending}` and "Creating account…" loading text. Two server-error banners: `email_exists` (with "Sign in instead?" link) and `unknown`.
+
+**Why:**
+Standard React 19 App Router pattern: `useActionState` binds the Server Action to the form; client validation guards against obviously invalid data without a round-trip; the database trigger keeps profile creation atomic.
+
+---
+
+## 2026-05-20 — P3.12: Pre-Phase 4 Gap Resolutions (GAP-06, 08, 09, 10, 11, 14, 18)
+
+**What changed:**
+
+- `.env.example` — `SUPABASE_DB_PASSWORD` added with explanation of its purpose (CLI operations, not API calls). GAP-06 resolved.
+- `lib/file-validation.ts` (new) — `validateFile(mimeType, sizeBytes)` returns a typed discriminated union result. Imported by `POST /api/upload/process` in Slice 4 to re-validate before text extraction. `FILE_VALIDATION_MESSAGES` provides user-facing error strings matching FR-23. GAP-08 resolved.
+- `lib/guidelines-session.ts` (new) — `setGuidelines()`, `getGuidelines()`, `clearGuidelines()` manage extracted guidelines text in `sessionStorage` keyed by `guidelines_text_${applicationId}`. All sessionStorage access for guidelines text must go through this utility. GAP-09 resolved.
+- `IMPLEMENTATION-PLAN.md` S5.2 spec updated — `clearGuidelines(applicationId)` call added to the generate-summary route on-success step. GAP-10 resolved.
+- `@axe-core/react` installed as dev dependency; `components/axe-provider.tsx` created (client component, no-op in production); wired into `app/layout.tsx`. WCAG violations now logged to browser console during development. GAP-14 resolved.
+- GAP-11 (GitHub branch protection): **blocked** — requires GitHub Pro for private repos. Account upgrade needed. Documented in IMPLEMENTATION-STATUS.md and ADR-TRACEABILITY.md. GAP-18 (JWT expiry): confirmed local `jwt_expiry = 3600` in config.toml; prod default is also 3600s.
+
+**Why:**
+These were ADR consequences identified during the P3.12 sweep that had no corresponding implementation task. Resolving them before Phase 4 slice work ensures the architecture contracts (ADR-FILE-002, ADR-FILE-004, ADR-OPS-006, ADR-SEC-003) are honoured from the first slice, not retrofitted. GAP-11 is the only unresolved item and is a GitHub account tier limitation, not a code issue.
+
+---
+
+## 2026-05-20 — P3.11: Health Endpoint and Public API Bypass Pattern (ADR-OPS-007)
+
+**What changed:**
+
+- `app/api/health/route.ts` created: queries `user_profiles` count; returns `{ status: 'ok' }` 200 on success, `{ status: 'error' }` 503 if Supabase is unreachable. Required by ADR-OPS-007 for UptimeRobot monitoring (to be configured in P5.4).
+- `proxy.ts` extended with a `PUBLIC_API = ['/api/health']` list. Any route in this list short-circuits before `updateSession()` is called, returning `NextResponse.next()` immediately.
+
+**Why:**
+ADR-OPS-007 requires a health check endpoint polled by UptimeRobot every 5 minutes. The endpoint must be reachable without an authenticated session. Rather than relying on the route falling through the auth checks (which would still invoke `updateSession()` and incur Supabase SSR overhead), an explicit `PUBLIC_API` early-return was introduced. This establishes a pattern for any future routes that must be public at the infrastructure level — add them to `PUBLIC_API` rather than letting them leak through the auth logic. UptimeRobot monitor configuration deferred to P5.4 when the production domain is confirmed.
+
+---
+
+## 2026-05-20 — Documentation Restructure: CHANGELOG moved to Implementation Plan folder
+
+**What changed:**
+
+- `docs/CHANGELOG.md` moved to `docs/Implementation Plan/CHANGELOG.md`.
+- All four implementation documents now live in one folder: `IMPLEMENTATION-STATUS.md`, `CHANGELOG.md`, `IMPLEMENTATION-PLAN.md`, `ADR-TRACEABILITY.md`.
+- `AGENTS.md` updated with a blanket rule: after every task, check all four documents in `docs/Implementation Plan/` and update as appropriate.
+
+**Why:**
+The changelog was previously in `docs/` root while the other implementation documents were in `docs/Implementation Plan/`. This made it easy to forget to update — there was no single rule that covered all relevant documents. Co-locating them means one folder, one check, one rule. Appropriate for a team project where multiple contributors need reliable, up-to-date documentation.
+
+---
+
+## 2026-05-20 — Process: ADR Traceability Table, Phase Gates, and Gap Resolutions
+
+**What changed:**
+
+- `docs/Implementation Plan/ADR-TRACEABILITY.md` created — maps every consequence of all 42 ADRs to a specific implementation task. 20 gaps identified (GAP-01 to GAP-20).
+- `P3.12` added to Phase 3: 7 High/Medium gap resolutions required before Phase 4 begins.
+- Formal Phase 3→4 and Phase 4→5 gate checklists added to the implementation plan.
+- Accessibility definition-of-done added to the Phase 4 introduction (ADR-OPS-006).
+- `AGENTS.md` updated with mandatory ADR consequences pre-task check rule.
+- Plan version 1.6. Total tasks: 78.
+
+**Why:**
+Full ADR consequences sweep found that 20 ADR consequences had no corresponding implementation task. Root cause: tasks were written feature-first; ADR consequences are spec-first. The traceability table makes gaps permanently visible. Phase gates make the sweep a formal required step before each phase begins rather than an ad-hoc activity. Three layers of control: AGENTS.md rule (pre-task), traceability table (ongoing visibility), phase gates (phase-boundary enforcement).
+
+---
+
+## 2026-05-20 — Phase 0–3 Re-audit: Supabase Session Cookie Bug Fixed (proxy.ts)
+
+**What changed:**
+
+- `proxy.ts` updated to forward refreshed Supabase session cookies on redirect responses.
+- A `redirectWithCookies()` helper function introduced — called in both redirect branches (unauthenticated user → sign-in page; authenticated user → dashboard).
+
+**Why:**
+Both redirect branches previously returned a bare `NextResponse.redirect(url)` without carrying the session cookies from `supabaseResponse`. The Supabase SSR documentation explicitly warns that failing to forward these cookies on every response — including redirects — prevents the session token from being refreshed. This could cause spurious logouts for users navigating to or from protected routes. Found during a full Phase 0–3 compliance re-audit (finding D-27).
+
+---
+
+## 2026-05-20 — Phase 3 Compliance Review: word_limit Migration Applied
+
+**What changed:**
+
+- New migration `20260520000000_add_word_limit_to_application_answers.sql` adds `word_limit integer` (nullable) to `application_answers`.
+- Applied to both dev (`stanwaejdvlvremtffkf`) and prod (`mvmjryipieepvsjudche`).
+
+**Why:**
+`word_limit` is specified in ADR-DATA-001, technical-design.md, and ADR-AI-004 but was omitted from the initial schema during P3.1. It is populated by the AI Summary step (Slice 5) when questions are extracted from funder guidelines, and used as a per-question constraint in the draft-answer prompt (Slice 6). Adding it now as a dedicated migration keeps a clean audit trail.
+
+---
+
+## 2026-05-20 — Phase 3 Compliance Review: High Severity Fixes Applied
+
+**What changed:**
+
+1. **CSP Sentry EU ingest domain added** (`next.config.ts`)
+   - `connect-src` directive updated to include `https://*.ingest.de.sentry.io`.
+   - Without this, the Sentry browser SDK was silently blocked and no client-side errors were being reported. The omission occurred because P3.5 (security headers) and P3.7 (Sentry setup) were completed independently with no cross-referencing of the CSP against the SDK's required domains.
+
+2. **Sentry edge config PII scrubbing added** (`sentry.edge.config.ts`)
+   - `beforeSend` hook added — strips `event.user.email` and `event.user.username` before transmission to Sentry.
+   - `sentry.client.config.ts` and `sentry.server.config.ts` already had this hook (ADR-SEC-006); the edge config was overlooked. GDPR risk: without this, user email addresses could be included in Sentry reports for middleware-layer errors.
+
+3. **Security-critical dependency updates**
+   - `next` 16.2.5 → 16.2.6: fixes CVE-2026-44575 (High) — middleware/proxy bypass via segment-prefetch routes with Turbopack enabled.
+   - `@tailwindcss/postcss` 4.2.4 → 4.3.0: resolves PostCSS XSS vulnerability (Medium).
+   - `@anthropic-ai/sdk` 0.97.0 → 0.97.1: routine patch.
+   - `tailwind-merge` 3.5.0 → 3.6.0: routine patch.
+   - `lucide-react` updated via Dependabot PR #1 (merged).
+   - Dependabot PRs #2–5 closed and consolidated into a single batch install to avoid `package-lock.json` conflicts.
+
+**Why:**
+Phase 3 compliance review against ADRs, TDD, and PRD identified 8 discrepancies. These 2 High severity items were fixed immediately. 6 Medium/Low items remain (schema migration, docs updates, health endpoint, ADR correction) — to be addressed before Phase 4 begins.
+
+---
+
+## 2026-05-20 — Phase 3 Complete: AWS Bedrock Spend Cap Configured
+
+**What changed:**
+
+- AWS Budget `grant-pathway-bedrock-cap` created in AWS Billing console: $127/month (~£100).
+- Alert #1 at $89 (~£70): early warning email to mailinglist@rapidglobe.com.
+- Alert #2 at $127 (~£100): hard cap email to mailinglist@rapidglobe.com.
+- Budget scoped to All AWS services — Bedrock does not yet appear in the service filter as it has no billing history. To be narrowed to Bedrock-only after first Bedrock invoice.
+- No automated IAM hard-stop action attached to Alert #2 — deferred to P5.4 (pre-launch infrastructure) due to complexity of IAM role setup.
+
+**Why:**
+The per-user 20 req/month limit in the application is the primary cost control. The AWS budget is a secondary backstop. Email alerts at £70 and £100 provide sufficient warning to intervene manually before launch traffic is significant. The IAM hard-stop will be properly configured during P5.4 when the full production infrastructure is reviewed.
+
+**Phase 3 is now complete.** All 10 infrastructure tasks done. Next: Phase 4 — Vertical Slices.
+
+---
+
+## 2026-05-20 — P3.8 Complete: Email Infrastructure; Inactivity Emails Moved to Code
+
+**What changed:**
+
+- Resend sending domain `grantpathway.org.uk` verified (SPF + DKIM via GoDaddy DNS).
+- Supabase Auth SMTP configured to send via Resend: `smtp.resend.com:465`, sender `noreply@grantpathway.org.uk`.
+- Supabase Auth email templates updated: Confirm sign up and Reset password — teal CTA buttons, Grant Pathway branding, tone aligned to voice guide.
+- Inactivity emails (Email 3 — inactivity warning; Email 4 — account deleted) will be built as dedicated code functions in `lib/emails/inactivity-warning.ts` and `lib/emails/account-deleted-inactivity.ts`, not as Resend templates.
+- `RESEND_API_KEY` added to `.env.example` and `.env.local`.
+- ⚠️ Prerequisite before testing: `noreply@grantpathway.org.uk` mailbox must be created in GoDaddy before any email flow is tested.
+
+**Why:**
+Resend's HTML template editor does not support variable substitution — variables rendered as literal strings (`{first_name}`) rather than being replaced at send time. Rather than use a workaround, the inactivity email HTML will be built in code as pure functions that accept variables and return an HTML string. This also separates email content from cron job logic, making both easier to maintain independently. The cron jobs in Slice 8 will call `resend.emails.send({ html: buildInactivityWarningEmail(firstName, deletionDate) })`.
+
+---
+
+## 2026-05-18 — Charity Profile Lookup Unavailable State Simplified
+
+**What changed:**
+
+- `components/charity-profile-form.tsx`: removed "Try again" and "Enter details manually" buttons from the API unavailable error state.
+- Replaced with a single plain message: "We couldn't reach the Charity Commission right now. You can try again using the **Look up charity** button above, or fill in your details manually in the fields below."
+- Removed the `showLookup` state and the conditional wrapper around the lookup section — the lookup is now always visible.
+- Removed unused `handleTryAgain` and `handleEnterManually` functions.
+
+**Why:**
+"Try again" was redundant — the "Look up charity" button already visible above does the same thing. "Enter details manually" hid the lookup section, which was jarring and unnecessary since the form fields are always visible below. One clear message pointing to what is already on screen is simpler and less confusing.
+
+---
+
+## 2026-05-18 — Charity Profile AI Paraphrase on Lookup Match
+
+**What changed:**
+
+- `components/charity-profile-form.tsx`: when the Charity Commission lookup finds a match, "What does your charity do?" and "Who does your charity help?" are now pre-filled with AI-paraphrased plain-English versions of the charity's legal objects and beneficiary description.
+- An amber "AI-generated content below" banner appears above the two fields explaining the source and instructing the user to review and edit before saving.
+- The individual hint texts for those two fields are hidden when the banner is active (the banner replaces them). They remain visible when the lookup has not been run.
+- A `paraphrasedFromLookup` state tracks whether pre-fill is active; also initialised from the `?lookup=match` URL param for static shell testing.
+
+**Why:**
+Asking non-technical users to locate and rewrite formal Charity Commission legal objects language is a barrier. AI paraphrase removes that burden while the prominent disclaimer ensures users understand the content is AI-generated and must be reviewed. One AI call (paraphrase on lookup match) rather than two.
+
+---
+
+## 2026-05-18 — Charity Profile Form Hint Text Added
+
+**What changed:**
+
+- `components/charity-profile-form.tsx`: added hint text beneath the label for three fields — "What does your charity do?", "Who does your charity help?", and "Where do you work?". Each hint is linked to its field via `aria-describedby`.
+
+| Field                       | Hint text                                                                                                                   |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| What does your charity do?  | Points to Charity Commission entry (charitable objects) and website 'About us' page.                                        |
+| Who does your charity help? | Prompts user to think about age, background, or circumstances of beneficiaries; notes Charity Commission entry as a source. |
+| Where do you work?          | Suggests town, county, or region; explains 'National'; fallback to charity's home town if unsure.                           |
+
+**Why:**
+Non-technical users (primary persona Margaret) may not know what information to enter in these open-ended fields. The hints point to authoritative, accessible sources (Charity Commission register, charity website) and give concrete examples to reduce blank-page anxiety.
+
+---
+
+## 2026-05-18 — Step 5 Back Button Hidden After Approval
+
+**What changed:**
+
+- `components/application-step5-approve.tsx`: Back link now only renders when `isApproved` is false (pending state). It is hidden once the application is approved or exported.
+
+**Why:**
+Once approved or exported, "Re-open application" is the correct route back to Step 4 — it shows a confirmation dialog warning that approval will be removed. The plain Back link bypassed that dialog, silently navigating to Step 4 with no context. It was redundant at best and misleading at worst.
+
+---
+
+## 2026-05-18 — Step 3 Approaching-Limit Banner Moved to Step 4
+
+**What changed:**
+
+- `components/application-step3-summary.tsx`: removed `approachingLimit` prop and amber "You've used most of your monthly AI allowance" banner.
+- `app/(authenticated)/applications/[id]/step/3/page.tsx`: removed `usage` search param and `approachingLimit` prop pass-through.
+- `components/application-step3-summary.tsx`: fixed missing space between question count and "application" in green questions-found banner (rendered as "3application" → "3 application").
+
+**Why:**
+The approaching-limit banner on Step 3 contradicted the green banner below it, which promised to generate draft answers in the next step. Step 3 displays a summary that has already been generated, so the AI allowance warning is irrelevant at this point. Step 4 already shows the same warning immediately before the user triggers the draft-generation AI call, which is the correct placement.
+
+---
+
+## 2026-05-18 — Step 3 Continue Button Simplified
+
+**What changed:**
+
+- `components/application-step3-summary.tsx`: continue button text changed from "This looks right — continue" to "Continue".
+- `docs/PRD inputs/screen-requirements.md`: Step 3 continue button spec updated to match.
+
+**Why:**
+"This looks right — continue" is unnecessarily wordy. "Continue" is cleaner and consistent with the button label used on Steps 1 and 2.
+
+---
+
+## 2026-05-18 — Step 2 Format and Scanned Error Messages Improved
+
+**What changed:**
+
+- `components/application-step2-form.tsx`: format and scanned error messages rewritten for consistency with the size error message.
+
+| Error   | Was                                                                                                                               | Now                                                                                                                                                                                                                                                                                                                  |
+| ------- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Format  | "We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."                          | "We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."                                                                         |
+| Scanned | "We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead." | "We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below." |
+
+**Why:**
+The scanned error made no mention of a Word doc as an alternative, inconsistent with the format error which correctly lists both accepted formats. All three error messages now follow the same pattern: explain the problem, point to the funder's website as the primary fix, then offer the paste fallback with guidance on what to paste.
+
+---
+
+## 2026-05-18 — Step 2 File Size Error Message Improved
+
+**What changed:**
+
+- `components/application-step2-form.tsx`: size error message rewritten.
+
+| Was                                                                                | Now                                                                                                                                                                                                                                                  |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| "Your file is over 10MB. Please upload a smaller file or paste the text directly." | "Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below." |
+
+**Why:**
+The original message was unhelpful — it told users to get a smaller file without explaining how. The revised message points users to the funder's website first (cleanest fix) and then offers the paste fallback as a secondary option.
+
+---
+
+## 2026-05-18 — Step 1 Heading Differentiated for New vs Existing Applications
+
+**What changed:**
+
+- `docs/PRD inputs/screen-requirements.md`: Step 1 heading split into two variants.
+- `components/application-step1-form.tsx`: heading now conditional on whether an `applicationId` is present.
+
+| Route                       | Heading                     |
+| --------------------------- | --------------------------- |
+| `/applications/new`         | "Start a new application"   |
+| `/applications/[id]/step/1` | "Continue your application" |
+
+**Why:**
+The original spec had a single heading for both states. When returning to an existing application the user is not starting anything new — "Continue your application" better reflects the context and avoids confusion.
+
+---
+
+## 2026-05-18 — Step Indicator Circle Styles Corrected (DDR-CS-004, DDR-AC-001)
+
+**What changed:**
+
+- `components/step-indicator.tsx`: two circle style fixes.
+
+| State          | Was                              | Now                                       |
+| -------------- | -------------------------------- | ----------------------------------------- |
+| Current step   | Teal fill + persistent teal ring | Teal fill only — no ring in default state |
+| Upcoming steps | Grey fill (`#E2E8F0`)            | White fill + `2px solid #E2E8F0` border   |
+
+**Why:**
+DDR-CS-004 specifies upcoming steps as white fill with grey border, not grey fill. DDR-AC-001 specifies the amber focus ring (`#D97706`) applied on `:focus-visible` only — a persistent teal ring on the current step is not part of the spec. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
+## 2026-05-18 — Charity Profile Incomplete Banner Corrected (design-requirements.md §5.12)
+
+**What changed:**
+
+- `components/dashboard-empty.tsx` and `components/dashboard-populated.tsx`: charity profile incomplete banner updated to match design-requirements.md Section 5.12.
+
+| Property   | Was                                                     | Now                                                             |
+| ---------- | ------------------------------------------------------- | --------------------------------------------------------------- |
+| Background | `#FEF9F5` (warm white)                                  | `#FEF3C7` (pale amber)                                          |
+| Border     | `1px solid #EDE8E1` (warm border)                       | `1.5px solid #FDE68A` (amber-200)                               |
+| Icon       | None                                                    | `AlertTriangle` in `#D97706`                                    |
+| Text       | "Before you start, add your charity details…" `#1E293B` | "Your charity profile isn't complete yet…" `#92400E` 500 weight |
+| Button     | Teal outline "Set up charity profile"                   | Amber fill "Complete your profile"                              |
+
+**Why:**
+The banner was built with warm-white styling instead of the spec'd pale amber. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
+## 2026-05-18 — Review Prompts Moved to Step 4 Sticky Sidebar (DDR-LA-002)
+
+**What changed:**
+
+- `components/application-step4-draft.tsx`: content state changed from single-column to two-column layout. Main content (left, max 640px) + sticky right sidebar (280px) containing the three review prompts per DDR-LA-002 and DDR-LA-001.
+- `components/application-step5-approve.tsx`: review prompts removed entirely. Step 5 is single-column per DDR-LA-001.
+
+**Why:**
+Review prompts were incorrectly placed inline at the top of Step 5 during Phase 1 implementation. DDR-LA-001 specifies single-column for Steps 1, 2, and 5, and two-column for Steps 3 and 4. DDR-LA-002 specifies the review prompts belong in a sticky right-hand sidebar on Step 4, always visible while the user edits answers. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
+## 2026-05-18 — Step 5 Review Prompts Corrected to Exact Acceptance Criteria Wording
+
+**What changed:**
+
+- `components/application-step5-approve.tsx`: three review prompts replaced with exact wording from AC-FR-32-01.
+
+| Was                                                                                  | Now                                                       |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| "Check that your answers are accurate and reflect your charity's work."              | "Does this accurately describe your charity and project?" |
+| "Make sure you have answered every question the funder asked."                       | "Are all figures, dates, and facts correct?"              |
+| "Read through as if you were the funder — does your application make a strong case?" | "Does this answer the question that was asked?"           |
+
+**Why:**
+Custom prompt text was written during Phase 1 implementation instead of reading AC-FR-32-01 verbatim. Identified during Phase 1 spec compliance review on 2026-05-18.
+
+---
+
+## 2026-05-18 — Approve Confirmation Changed from Inline Expansion to Modal Dialog
+
+**What changed:**
+
+- [DDR-IP-001](Business%20Design/DDR-IP-001-confirmation-pattern.md) revised: approve application confirmation changed from **Option B (inline expansion)** to **Option A (modal dialog)**.
+- Confirm button text set to **"Approve my application"** (was "Yes, approve" in original spec; matches what was built in Phase 1).
+- No code changes required — `components/application-step5-approve.tsx` was already built with a modal dialog.
+
+**Why:**
+The approve action is consequential — once exported, a user may have already submitted to a funder, so a duplicate submission is a real risk. An inline expansion risks being overlooked; a modal ensures the user actively acknowledges the confirmation before proceeding. This also gives the product a fully consistent pattern: every consequential action (approve, re-open, re-export warning, delete application, delete account) uses a modal or explicit confirmation.
+
+PDR-UI-006 discourages modals for unexpected interruptions (errors). A user-initiated confirmation is not unexpected, so this does not conflict with that principle.
+
+---
+
+## 2026-05-18 — Step 2 Label Renamed to "Uploaded Guidelines"
+
+**What changed:**
+
+- [DDR-CS-004](Business%20Design/DDR-CS-004-step-indicator.md) updated: Step 2 label changed from "Funder Guidelines" to "Uploaded Guidelines".
+- `components/step-indicator.tsx` updated to match.
+
+**Why:**
+During Phase 1 Static UI Shell review, the built label ("Upload Guidelines") was flagged as inconsistent with the spec ("Funder Guidelines"). Owner preference is "Uploaded Guidelines" — the past-tense phrasing better reflects that the user has already completed the upload action by the time they see it as a completed step, and is clearer to users at a glance than the more abstract "Funder Guidelines".
+
+---
+
+## 2026-05-17 — Observability Stack Completed
+
+**What changed:**
+
+- New [ADR-OPS-007](Technical%20Decision%20and%20Design/ADR-OPS-007-uptime-monitoring.md) created: uptime monitoring via UptimeRobot (free tier) + a `/api/health` endpoint.
+- [ADR-OPS-005](Technical%20Decision%20and%20Design/ADR-OPS-005-error-tracking.md) updated: added cross-reference to ADR-OPS-007 for the complete observability picture.
+- [ADR-INDEX](Technical%20Decision%20and%20Design/ADR-INDEX.md) updated: Operations group 6 → 7 ADRs, total 42 → 43.
+
+**Why:**
+Sentry (ADR-OPS-005) only captures errors when requests reach the application. A complete Vercel outage or failed deployment produces no Sentry events — the app would be down and silent. Without an external uptime monitor, there is no way to detect a total outage proactively, and no way to measure performance against the documented 99.5% uptime target (NFR-02).
+
+The `/api/health` endpoint checks database connectivity, not just homepage availability — a broken Supabase connection returns a CDN-cached 200 from the homepage even while the app is functionally unusable.
+
+**Observability stack as documented:**
+
+| Layer               | Tool                 | Covers                                      |
+| ------------------- | -------------------- | ------------------------------------------- |
+| Uptime              | UptimeRobot (free)   | App reachable? DB responding?               |
+| App errors          | Sentry EU            | Unhandled exceptions, AI API failures       |
+| DB / Auth / Storage | Supabase dashboard   | Slow queries, auth failures, storage errors |
+| Deployments         | Vercel dashboard     | Build failures, deployment status           |
+| Dev debugging       | Vercel function logs | Real-time logs during development           |
+
+**Previously:** The original design treated Vercel function logs as a dev-only complement to Sentry and did not document Supabase logs or external uptime monitoring.
+
+---
+
+## 2026-05-08 — Phase 0 Complete; Documentation Committed to GitHub
+
+**What changed:**
+
+- Project bootstrapped: Next.js 16.2.5, TypeScript, Tailwind v4, shadcn/ui 4.7.0 (14 components), lucide-react, zod.
+- Design tokens confirmed: teal `#0D6E6E`, teal-light `#E6F4F4`, amber `#D97706`, success `#16A34A`, neutral-dark `#1E293B`, neutral-light `#F8FAFC`.
+- Route group structure created: `(public)` and `(authenticated)` with 16 stub pages.
+- All documentation (BRD, PRD, ADRs, PDRs, DRs, implementation plan, data model, personas) committed to `docs/` in this repository — GitHub is now the single source of truth for all project documentation.
+- `proxy.ts` used in place of `middleware.ts` (Next.js 16 convention).
+- Vercel deployment live.
+
+**Why:**
+Phase 0 establishes the technical skeleton and confirms the toolchain works before any feature development begins. Storing documentation in the repository links design decisions directly to the code that implements them.
+
+---
+
+## 2026-05-07 — Major Revision: AI Provider, Data Residency, and Implementation Plan
+
+This is the most significant revision to the original design. Three decision records were formally revised and the implementation plan was finalised with 30 conflict resolutions.
+
+---
+
+### 1. AI Inference Layer: Anthropic Direct → Amazon Bedrock
+
+**Original decision (2026-04-09):** Claude 3.5 Sonnet via Anthropic's direct API (US infrastructure). Required Anthropic DPA and Standard Contractual Clauses (SCCs) before launch.
+
+**Revised decision:** Claude Sonnet 4.6 via **Amazon Bedrock, eu-west-2 (London), In-Region routing**. EU Geo fallback covers 7 EEA AWS regions. Data never leaves the EU/EEA under any operating condition.
+
+**Why it changed:**
+UK data residency is a trust and compliance requirement for charities. The Anthropic direct API processes data on US infrastructure, requiring DPA and SCCs — complex contractual arrangements that delay launch and complicate the privacy policy. Amazon Bedrock eu-west-2 provides In-Region routing at no surcharge, eliminating transatlantic data transfer entirely. The DPA/SCC requirement drops off the critical path.
+
+The model capability and pricing are unchanged. Claude Sonnet 4.6 is the direct successor to Claude 3.5 Sonnet. Bedrock identifiers: `anthropic.claude-sonnet-4-6` (In-Region) / `eu.anthropic.claude-sonnet-4-6` (Geo EU fallback, 10% surcharge).
+
+**References:** [DR-AI-002](decisions/DR-AI-002-ai-provider.md), [DR-DP-002](decisions/DR-DP-002-data-hosting.md), [ADR-AI-001](Technical%20Decision%20and%20Design/ADR-AI-001-ai-provider.md), [ADR-AI-002](Technical%20Decision%20and%20Design/ADR-AI-002-model-selection.md)
+
+---
+
+### 2. Context Window: 200,000 → 1,000,000 Tokens
+
+**Original design:** Claude 3.5 Sonnet context window of 200,000 tokens. Soft warning triggered at 150,000 characters (ADR-AI-007). Hard truncation of documents above the threshold was in the plan.
+
+**Revised design:** Claude Sonnet 4.6 context window of 1,000,000 tokens. Soft warning threshold set at 100,000 tokens (~400,000 characters) as a quality guidance measure only. Hard truncation removed entirely.
+
+**Why it changed:**
+The 200k window was a real engineering constraint with Claude 3.5 Sonnet — very long funder guidelines could not fit. Claude Sonnet 4.6's 1M token window makes this a non-issue. The soft warning is retained as guidance to focus on the most relevant sections of guidelines, not as a technical limit. The character threshold in ADR-AI-007 (150,000 characters) is superseded by the PRD token-based threshold (100,000 tokens).
+
+**References:** [PDR-AI-004](PRD%20decisions/), [ADR-AI-007](Technical%20Decision%20and%20Design/ADR-AI-007-context-window-management.md)
+
+---
+
+### 3. Data Ownership: Contractual Mechanism Updated (Substance Unchanged)
+
+**Original design:** Charities own all data; no AI training use ever. Enforced by Anthropic DPA.
+
+**Revised design:** Commitment unchanged. Enforcement mechanism updated — AWS Data Processing Agreement + Anthropic model terms through Bedrock now provide the contractual guarantee. Anthropic DPA no longer required as a separate instrument.
+
+**Why it changed:**
+The shift to Bedrock changed the legal chain, not the promise. The user-facing commitment (no training, user owns data) is identical.
+
+**References:** [DR-DP-003](decisions/DR-DP-003-data-ownership.md)
+
+---
+
+### 4. AWS Bedrock Spend Cap Added
+
+**Original design:** Per-user monthly AI request limit (20 requests) as the primary cost control.
+
+**Added:** AWS Bedrock monthly spend alert at £70 and hard cap at £100, configured in the AWS Bedrock console. This is a secondary backstop — the per-user limit remains the primary control. Estimated monthly cost at launch (~10 concurrent users): £35–£38.
+
+**Why it changed:**
+The Bedrock console provides native spend controls that were not available with the Anthropic direct API. Adding them as a backstop protects against unexpected usage spikes. Does not change user-facing behaviour.
+
+---
+
+### 5. Implementation Plan Finalised: 30 Specification Conflicts Resolved
+
+During implementation planning, 30 conflicts between the BRD, PRD, ADRs, screen requirements, acceptance criteria, and data model were identified and resolved. The most significant resolutions:
+
+| Topic                           | Original position                                   | Resolved position                                 | Authority                         |
+| ------------------------------- | --------------------------------------------------- | ------------------------------------------------- | --------------------------------- |
+| Route paths                     | Singular `/application/[id]` (tech-design.md)       | Plural `/applications/[id]`                       | Screen requirements               |
+| Landing page                    | Separate landing + sign-in pages                    | Single `/` page combining both                    | Screen requirements               |
+| Password reset                  | Two routes (`/forgot-password` + `/reset-password`) | Single route with two states                      | Screen requirements               |
+| Step routing                    | IA document described in-page states                | URL-based routing (`/step/[n]`)                   | ADR-ARCH-004 (later decision)     |
+| Charity profile fields          | Included income band + registered address           | Removed those fields; merged mission              | Screen requirements               |
+| Dashboard AI usage              | Not in original dashboard plan                      | AI usage indicator added (`n of 20 used`)         | ADR-AI-008 consequence            |
+| Document truncation             | Hard truncation above threshold                     | Soft warning only; no truncation                  | PDR-AI-004                        |
+| Word export font                | Inter, teal headings (ADR-EXPORT-002)               | Calibri 11pt, no teal headings                    | PDR-DH-003 (PRD takes precedence) |
+| Inactivity tracking field       | Custom `last_login_at` column                       | `auth.users.last_sign_in_at` (Supabase native)    | data-model.md                     |
+| Inactivity deletion (v1 scope)  | Deferred in ADR                                     | v1 requirement                                    | PRD inputs + acceptance criteria  |
+| Charity Commission API error UX | No retry mechanism in original plan                 | "Try again" button added                          | PDR-UI-006                        |
+| AI persistent failure state     | Single error state                                  | Second error state after failed retry             | PDR-UI-006                        |
+| Application status values       | `draft, in_progress, complete`                      | `not_started, in_progress, approved, exported`    | data-model.md                     |
+| Status transition trigger       | `not_started → in_progress` on Step 1 Continue      | Transition occurs on Step 2 guideline save        | application-status-model.md       |
+| Re-open approved application    | Status reverts only                                 | Status reverts + all `is_approved` reset to false | Acceptance criteria               |
+| Protected routes list           | Singular paths in ADR-SEC-001                       | Plural paths matching resolved routes             | Implementation plan               |
+
+**References:** [Implementation Plan](Implementation%20Plan/IMPLEMENTATION-PLAN.md)
+
+---
+
+## 2026-04-17 to 2026-04-21 — Original Architectural Decisions (ADRs)
+
+The 42 original Architectural Decision Records were created and decided in this window. These represent the baseline design. All subsequent changes above are revisions to or additions to this baseline.
+
+Key decisions in the original baseline:
+
+| Area           | Decision                                                            |
+| -------------- | ------------------------------------------------------------------- |
+| Framework      | Next.js (App Router), TypeScript                                    |
+| Database       | Supabase (PostgreSQL, eu-west-2)                                    |
+| Auth           | Supabase Auth                                                       |
+| Hosting        | Vercel Pro                                                          |
+| UI library     | shadcn/ui on Radix UI primitives                                    |
+| Error tracking | Sentry EU with PII scrubbing                                        |
+| AI provider    | Anthropic direct API (later revised to Bedrock — see above)         |
+| File uploads   | Signed-URL direct to Supabase Storage (bypasses Vercel 4.5MB limit) |
+| Rate limiting  | Upstash Redis, 5 AI requests/60s per user                           |
+| Export         | Word (.docx) via `docx` library                                     |
+| AI retry logic | Exponential backoff: 2 retries, 1s then 3s delays, for 429/500/529  |
+| Uptime target  | 99.5% (NFR-02)                                                      |
+
+**References:** [ADR-INDEX](Technical%20Decision%20and%20Design/ADR-INDEX.md) — all 43 ADRs listed with status.
+
+---
+
+## 2026-04-09 to 2026-04-16 — Original Business and Product Decisions
+
+The foundational business decisions (DR series) and product requirements decisions (PDR series) were made in this window. These defined the original scope and user experience. The major revision on 2026-05-07 changed the AI delivery mechanism but left all product decisions intact.
+
+Key product decisions that are unchanged from the original:
+
+- **Target users:** Small-to-medium UK charities; non-technical grant writers; desktop-primary.
+- **Access model:** Free at launch; registered charities only; no self-serve grant discovery.
+- **AI capabilities:** Funder guideline summarisation + question extraction + draft answer generation. Human review mandatory before export.
+- **Monthly AI limit:** 20 requests per user, with 80% soft warning.
+- **Data storage:** Charities own all data; no AI training use; 24-month inactivity deletion with 30-day warning.
+- **Liability:** App is a writing aid only; user responsible for all content submitted to funders.
+- **Accessibility:** WCAG 2.2 AA.
+- **UK-only scope:** UK grants, UK charities, UK data residency (achieved via Bedrock revision above).
+
+**References:** [decisions/](decisions/DECISIONS-INDEX.md), [PRD decisions](PRD%20decisions/)
+
+---
+
+_Last updated: 2026-05-20_
+_Maintained by: Rapidglobe Ltd_

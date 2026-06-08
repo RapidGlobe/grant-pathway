@@ -45,12 +45,12 @@ Use the table below to identify the right document(s) for every change. Multiple
 
 ### Implementation Plan documents (`docs/Implementation Plan/`)
 
-| Document                   | Update when                                                                                                                                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `IMPLEMENTATION-STATUS.md` | After every task — mark complete `[x]`, update summary table counts, update **Last updated** date, add a Notes entry for any deviation or significant decision |
-| `CHANGELOG.md`             | Any significant design decision, deviation from the original plan, or architectural change that a team member would need context for                           |
-| `ADR-TRACEABILITY.md`      | When a GAP item is resolved — update the Task column and change status from ⚠️ to ✅; also update the phase gate sign-off table when a gate is passed          |
-| `IMPLEMENTATION-PLAN.md`   | When the approach for a future task changes during implementation — update the task spec so it reflects current intent                                         |
+| Document                   | Update when                                                                                                                                                                                                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `IMPLEMENTATION-STATUS.md` | After every task — mark complete `[x]`, update summary table counts, update **Last updated** date, add a Notes entry for any deviation or significant decision                                                                                                                            |
+| `CHANGELOG.md`             | Any significant design decision, deviation from the original plan, or architectural change that a team member would need context for. **Always write new entries to `CHANGELOG.md` — never to `CHANGELOG-ARCHIVE.md`.** The archive covers Phase 0–4 (up to 2026-05-22) and is read-only. |
+| `ADR-TRACEABILITY.md`      | When a GAP item is resolved — update the Task column and change status from ⚠️ to ✅; also update the phase gate sign-off table when a gate is passed                                                                                                                                     |
+| `IMPLEMENTATION-PLAN.md`   | When the approach for a future task changes during implementation — update the task spec so it reflects current intent                                                                                                                                                                    |
 
 ### Product and design documents (`docs/`)
 
