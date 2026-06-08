@@ -31,11 +31,9 @@ Submitting the same data multiple times yields the same database state.
 
 ### "Check if actions were already processed — guard before executing"
 
-**Status: One gap identified and resolved (refine button)**
+**Status: No gap — correctly protected by conditional render**
 
-Rate limiting (5 AI requests per 60 seconds per user) prevents rapid-fire Bedrock calls. Every AI action button in the application disables while its request is in-flight — except one. The "Help me improve this" (refine) button in `application-step4-draft.tsx` was missing `refineState.status === 'loading'` in its disabled condition. All other AI buttons (`generate-summary`, `generate-draft`, approve actions) correctly guard their in-flight state.
-
-**Action taken (8 June 2026):** `components/application-step4-draft.tsx` line ~587 updated to add `|| refineState.status === 'loading'` — consistent with every other AI button in the file.
+Rate limiting (5 AI requests per 60 seconds per user) prevents rapid-fire Bedrock calls. The "Help me improve this" (refine) button is wrapped in `{refineState.status === 'idle' && ...}` — it is removed from the DOM entirely the moment the first click fires and status transitions to `'loading'`. Double-submission via this button is structurally impossible. All other AI action buttons similarly guard their in-flight state.
 
 ### "Store minimal histories of processed requests — track what has run"
 
