@@ -1,8 +1,8 @@
-# Consolidated Target Funder List
+﻿# Consolidated Target Funder List
 
 **Version:** 1.1
 **Date:** 2026-06-04
-**Status:** Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md`
+**Status:** Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`
 
 This is the canonical reference list of grant-giving organisations used to design, test, and validate Grant Pathway's Step 4 (Q&A interview model) and Step 5 (assembly and export). All product and engineering decisions about funder types, application formats, and output behaviour should be grounded in this list.
 

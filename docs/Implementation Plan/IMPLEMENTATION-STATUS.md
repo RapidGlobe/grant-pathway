@@ -1,4 +1,4 @@
-# Grant Pathway v1 — Implementation Status
+﻿# Grant Pathway v1 — Implementation Status
 
 **Last updated:** 2026-06-07 (Henry Smith full end-to-end retest via escape hatch path — Q&A, approval, Word and text exports all confirmed)
 **Plan version:** 1.5
@@ -313,7 +313,7 @@ Full rewrite of `components/application-step4-draft.tsx` and update to `app/(aut
 - `funderAiPolicy` extracted from guidelines and shown as info banner in Step 3
 - `funder_type: 'structured' | 'free_form'` extracted in Step 3; controls assembly format
 
-Full rationale and decisions: `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md`
+Full rationale and decisions: `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`
 
 **Impact on task counts:** Phase 4 grows from 36 to 40 tasks; 4 old S6 tasks removed from "done" count; 8 new S6 tasks added as "not started". Phase 4 total: 40 tasks, 32 done. Phase 4→5 gate remains open until new S6 is complete.
 

@@ -1,4 +1,4 @@
-# Grant Pathway v1 — Implementation Plan
+﻿# Grant Pathway v1 — Implementation Plan
 
 **Version:** 1.6
 **Date:** 2026-05-07
@@ -1159,7 +1159,7 @@ export const maxDuration = 90
 ### Slice 6 — Step 4: Q&A Interview
 
 **Estimated time:** 5–7 days
-**Functional requirements:** FR-28 to FR-36 (revised — see `docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md`)
+**Functional requirements:** FR-28 to FR-36 (revised — see `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`)
 **Design decision:** 2026-05-28 — replaces auto-generation model with charity-authored Q&A model
 
 > The old `/api/generate-draft` route is **removed** in this slice. New model: the charity writes

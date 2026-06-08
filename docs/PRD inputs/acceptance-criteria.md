@@ -1,4 +1,4 @@
-# Acceptance Criteria — Grant Pathway v1
+﻿# Acceptance Criteria — Grant Pathway v1
 
 This document defines testable Given/When/Then acceptance criteria for every functional requirement in Grant Pathway v1. Criteria are grouped by the same sections used in the BRD (Section 9).
 
@@ -1171,7 +1171,7 @@ _Note: the final set of profile fields was refined during screen requirements. T
 replaced with a Q&A interview model. The charity writes all answer content; AI assists with
 structure and clarity only on request. A final assembly step formats the charity's words into
 the funder's required output. The old `/api/generate-draft` route is removed. See
-`docs/Implementation Plan/STEP4-REDESIGN-PROPOSAL.md` for the full design rationale.
+`docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md` for the full design rationale.
 
 ---
 
