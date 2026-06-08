@@ -584,7 +584,9 @@ export function ApplicationStep4Draft({
                       <button
                         type="button"
                         onClick={() => void handleRefine(q)}
-                        disabled={isEmpty || limitReached || isApprovedQ}
+                        disabled={
+                          isEmpty || limitReached || isApprovedQ || refineState.status === 'loading'
+                        }
                         className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                       >
                         <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
