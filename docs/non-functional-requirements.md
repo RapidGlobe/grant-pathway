@@ -48,6 +48,18 @@ This document captures the agreed non-functional requirements for the v1 build. 
 
 **Notes:** The architecture should be designed to scale from launch figures to the 12–18 month target without requiring a major rebuild. Managed cloud services (auto-scaling hosting, managed database) are preferred over self-managed infrastructure to keep operational overhead low for a solo developer.
 
+**Concurrent AI generation behaviour (capacity plan — 2026-06-08):**
+
+Each user has their own per-minute rate limit (5 AI calls / 60 seconds via Upstash Redis). There is no global rate limit across users. Expected behaviour at each scale tier:
+
+| Tier                  | Concurrent AI calls                  | Expected outcome                                                                                                                                         |
+| --------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| At launch (~10 users) | Up to 10 simultaneous Bedrock calls  | All succeed; each takes 20–45s independently; no cross-user interference                                                                                 |
+| At scale (~100 users) | Up to 100 simultaneous Bedrock calls | Bedrock handles this comfortably; transient 429s handled by `withRetry()`; Supabase connection pool (pgbouncer) absorbs the read/write load              |
+| Stress scenario       | >100 simultaneous Bedrock calls      | Bedrock may throttle individual users (429); `withRetry()` handles with 1s/3s backoff; Vercel auto-scales function instances; no single point of failure |
+
+The main risk before the first marketing push is unmeasured AI route latency under concurrent load. Structured latency logging added to all three AI routes (2026-06-08, GAP-27 partial) will provide baseline data. Sentry performance monitoring to be configured at P5.4 once production traffic baseline is established.
+
 ---
 
 ## NFR-04 — Security

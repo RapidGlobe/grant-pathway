@@ -8,6 +8,22 @@
 
 ---
 
+## 2026-06-08 — GAP-27 partial resolution: structured latency logging + capacity plan
+
+**What changed:**
+
+Two parts of GAP-27 (performance observability) resolved following Knox "Readiness Testing" audit:
+
+1. **Structured latency logging added to all three AI routes.** Each route now records `const bedrockStart = Date.now()` before the `withRetry()` call. On success, logs `[route] Bedrock latency: Xms, Y tokens`. On failure, the existing error log now includes duration: `[route] Bedrock error after retries (Xms):`. Consistent across `generate-summary`, `generate-draft`, and `refine-answer`.
+
+2. **Capacity plan documented in NFR-03.** A "Concurrent AI generation behaviour" section added to `docs/non-functional-requirements.md` documenting expected system behaviour at launch (~10 concurrent users) and at scale (~100), the role of per-user rate limiting, and the key risk (unmeasured latency under concurrent load) to address before the first marketing push.
+
+**What remains outstanding in GAP-27:** Sentry performance monitoring configuration, deferred to P5.4 once a production traffic baseline is established.
+
+**Why:** Knox "Readiness Testing" article identified the absence of latency observability and a capacity plan as gaps against production readiness criteria. Both are low-effort, high-value additions before go-live.
+
+---
+
 ## 2026-06-08 — Privacy Policy and Terms of Service readiness review; T&S corrected
 
 **What changed:**

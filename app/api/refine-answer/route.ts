@@ -160,6 +160,7 @@ export async function POST(request: NextRequest) {
   const refineWordLimit = typeof answerRow.word_limit === 'number' ? answerRow.word_limit : null
   const prompt = buildRefinePrompt(questionText, answerText, refineWordLimit)
 
+  const bedrockStart = Date.now()
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {
     bedrockResponse = await withRetry(() =>
@@ -172,7 +173,11 @@ export async function POST(request: NextRequest) {
     )
   } catch (err) {
     const code = classifyBedrockError(err)
-    console.error('[refine-answer] Bedrock error after retries:', code, err)
+    console.error(
+      `[refine-answer] Bedrock error after retries (${Date.now() - bedrockStart}ms):`,
+      code,
+      err,
+    )
     return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
   }
 
@@ -181,6 +186,10 @@ export async function POST(request: NextRequest) {
 
   const tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
+
+  console.log(
+    `[refine-answer] Bedrock latency: ${Date.now() - bedrockStart}ms, ${tokenCount} tokens`,
+  )
 
   const cleaned = rawText
     .replace(/^```(?:json)?\s*/i, '')

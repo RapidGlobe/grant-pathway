@@ -183,6 +183,7 @@ export async function POST(request: NextRequest) {
     awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
   })
 
+  const bedrockStart = Date.now()
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {
     bedrockResponse = await withRetry(() =>
@@ -195,7 +196,11 @@ export async function POST(request: NextRequest) {
     )
   } catch (err) {
     const code = classifyBedrockError(err)
-    console.error('[generate-draft] Bedrock error after retries:', code, err)
+    console.error(
+      `[generate-draft] Bedrock error after retries (${Date.now() - bedrockStart}ms):`,
+      code,
+      err,
+    )
     return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
   }
 
@@ -204,6 +209,10 @@ export async function POST(request: NextRequest) {
 
   const tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
+
+  console.log(
+    `[generate-draft] Bedrock latency: ${Date.now() - bedrockStart}ms, ${tokenCount} tokens`,
+  )
 
   // Strip markdown code fences if Claude wrapped the JSON (ADR-AI-004)
   const cleaned = rawText
