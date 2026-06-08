@@ -1,0 +1,7 @@
+# Alan Knox Audits — Status
+
+This table records every Alan Knox article reviewed against Grant Pathway, whether it had an impact, and the outcome.
+
+| Audit name | Alan Knox article reviewed | Did it impact Grant Pathway? | What was the impact                                                                                                                                                                                                                                                                                  | Plan of action created? | Plan of action completed |
+| ---------- | -------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ------------------------ |
+| Linting    | 2026-06-05                 | Y                            | Full linting and code quality infrastructure implemented across four phases: Prettier formatting, ESLint tightening, Husky pre-commit hooks, GitHub Actions CI pipeline, and TypeScript strict flags. All AI-generated code is now checked automatically at commit time and on every push to master. | Y                       | 2026-06-05               |
