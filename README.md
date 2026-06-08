@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Grant Pathway
 
-## Getting Started
+**The free grant application preparation tool for UK charities.**
 
-First, run the development server:
+Grant Pathway helps non-specialist staff at UK charitable organisations write stronger, more consistent grant applications. It summarises funder guidelines in plain English, extracts the questions a funder wants answered, and provides AI-assisted writing support — while keeping the charity's own voice at the centre. The charity writes every answer; AI refines on request only. Every answer requires explicit human approval before export.
+
+Provided free of charge by **RapidGlobe Ltd** (company no. 05615649). Source code is open source under the MIT Licence.
+
+---
+
+## Tech stack
+
+| Concern                   | Technology                                                 |
+| ------------------------- | ---------------------------------------------------------- |
+| Framework                 | Next.js (App Router), TypeScript                           |
+| Database + Auth + Storage | Supabase (PostgreSQL, London region)                       |
+| AI                        | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) |
+| Hosting                   | Vercel (function region: London, eu-west-2)                |
+| Email                     | Resend                                                     |
+| Error tracking            | Sentry EU                                                  |
+| Rate limiting             | Upstash Redis                                              |
+| Charity register          | Charity Commission for England and Wales API               |
+| Domain                    | grantpathway.org.uk                                        |
+
+All data is stored and processed within the UK/EEA. No data is used to train AI models.
+
+---
+
+## Running locally
+
+### Prerequisites
+
+- Node.js 18+
+- A Supabase project (London region recommended)
+- AWS credentials with Amazon Bedrock access (Claude Sonnet 4.6, eu-west-2)
+- Upstash Redis instance
+- Resend API key
+- Sentry DSN (optional for local dev)
+
+### Setup
 
 ```bash
+# Install dependencies
+npm install
+
+# Copy the environment variable template and fill in your values
+cp .env.example .env.local
+
+# Apply database migrations
+# Run each file in supabase/migrations/ in order via the Supabase dashboard SQL editor
+
+# Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Available scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script                 | What it does                |
+| ---------------------- | --------------------------- |
+| `npm run dev`          | Start development server    |
+| `npm run build`        | Production build            |
+| `npm run lint`         | ESLint (max-warnings 0)     |
+| `npm run lint:fix`     | ESLint with auto-fix        |
+| `npm run format`       | Prettier write              |
+| `npm run format:check` | Prettier check (used in CI) |
+| `npm run type-check`   | TypeScript `tsc --noEmit`   |
 
-## Learn More
+### Code quality
 
-To learn more about Next.js, take a look at the following resources:
+Every commit runs Prettier and ESLint via Husky pre-commit hooks. GitHub Actions CI runs `type-check`, `lint`, and `format:check` on every push to `master` and every PR. See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Documentation
 
-## Deploy on Vercel
+All project documentation lives in `docs/`. Start here:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Document                                            | What it covers                                                                                        |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` | Current build status — what's done, what's outstanding, phase gates                                   |
+| `docs/Implementation Plan/CHANGELOG.md`             | Every significant design decision and why it was made                                                 |
+| `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md`  | Pre-deploy gates, rollback steps, feature flags                                                       |
+| `docs/Implementation Plan/ADR-TRACEABILITY.md`      | All ADR consequences mapped to tasks; known gaps (GAP-xx)                                             |
+| `docs/Technical Decision and Design/`               | Architectural Decision Records (ADRs) — 45 decisions covering every major technical choice            |
+| `docs/decisions/`                                   | Business and product decision records (DRs)                                                           |
+| `docs/PRD inputs/`                                  | Acceptance criteria and screen requirements                                                           |
+| `docs/data-model.md`                                | Full database schema and entity relationships                                                         |
+| `docs/technology-stack.md`                          | Tech stack decisions and rationale                                                                    |
+| `docs/non-functional-requirements.md`               | Performance, accessibility, security, and availability targets                                        |
+| `docs/Alan Knox Audits/`                            | Engineering practice audits against Alan Knox's vibe-coding series                                    |
+| `AGENTS.md`                                         | Rules for AI coding sessions — mandatory pre-task checks, documentation requirements, commit protocol |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Deployment
+
+Pushing to `master` triggers a GitHub Actions CI run (type-check, lint, format:check). On CI pass, Vercel automatically deploys to production. See `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md` for the full process including database migrations, rollback, and feature flags.
+
+---
+
+## Licence
+
+Source code: [MIT Licence](https://opensource.org/licenses/MIT).
+Grant Pathway name, logo, and brand materials: © RapidGlobe Ltd — not covered by the MIT Licence.
