@@ -6,6 +6,8 @@ Grant Pathway helps non-specialist staff at UK charitable organisations write st
 
 Provided free of charge by **RapidGlobe Ltd** (company no. 05615649). Source code is open source under the MIT Licence.
 
+**Live app:** https://grant-pathway-three.vercel.app
+
 ---
 
 ## Tech stack
@@ -53,7 +55,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open `http://localhost:3000` in your browser.
 
 ### Available scripts
 
