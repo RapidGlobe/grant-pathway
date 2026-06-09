@@ -8,6 +8,31 @@
 
 ---
 
+## 2026-06-09 — NavPublic: Sign in link removed; Register button hidden on /register; register form link wrapping fixed
+
+**What changed:**
+
+- `components/nav-public.tsx` — Two UX fixes to the public navigation bar:
+  1. **"Sign in" link removed entirely.** The link pointed to `/` (the sign-in page) but appeared on every public page including the sign-in page itself — a circular no-op on that page and redundant on all others (every public-facing form already has a contextual sign-in link). Removing it de-clutters the nav without losing any user journey.
+  2. **"Register — it's free" button hidden on `/register`** using `usePathname()`. When a user is already on the registration page, showing a button to navigate there is circular. The component was converted to a Client Component (`'use client'`) to support the `usePathname()` hook; the button renders on all other public pages unchanged.
+
+- `components/register-form.tsx` — `whitespace-nowrap` class added to the Terms of Service and Privacy Policy `<a>` elements to prevent mid-phrase line breaks (e.g. "Terms of" / "Service" on separate lines).
+
+**Why:** Both nav issues were identified during a UX review of the sign-in / registration flow. Circular or duplicate navigation links cause confusion — a user seeing "Sign in" in the nav while already on the sign-in page, or "Register" while on the registration page, questions whether they are in the right place. The wrapping fix is a polish item ensuring the consent checkbox text reads cleanly at all viewport widths.
+
+---
+
+## 2026-06-09 — P5.5: feedback opt-in verification and post-launch action added to implementation docs
+
+**What changed:**
+
+- `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` — P5.5 gate checklist updated: (1) a pre-go-live test step added to verify the `feedback_consent` field in `user_profiles` is populated correctly by the `handle_new_user` Supabase trigger; (2) a post-launch reminder added to action the opt-in data (contact opted-in users) so it is not silently ignored.
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — Same note added to the P5.5 gate checklist.
+
+**Why:** The `feedbackConsent` checkbox on the register form writes to `user_profiles.feedback_consent` via a Supabase database trigger. The mechanism works in code but has not been end-to-end tested. Without an explicit gate item it could be omitted from pre-launch QA. The post-launch reminder ensures the opt-in has a defined follow-up action rather than being collected and never used.
+
+---
+
 ## 2026-06-08 — GAP-27 partial resolution: structured latency logging + capacity plan
 
 **What changed:**
