@@ -285,7 +285,7 @@ export function RegisterForm() {
                 href="/terms"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-[#0D6E6E] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 rounded"
+                className="font-medium text-[#0D6E6E] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 rounded whitespace-nowrap"
               >
                 Terms of Service
               </a>{' '}
@@ -294,7 +294,7 @@ export function RegisterForm() {
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium text-[#0D6E6E] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 rounded"
+                className="font-medium text-[#0D6E6E] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 rounded whitespace-nowrap"
               >
                 Privacy Policy
               </a>
