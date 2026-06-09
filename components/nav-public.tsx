@@ -1,7 +1,11 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/logo'
 
 export function NavPublic() {
+  const pathname = usePathname()
   return (
     <header className="sticky top-0 z-[100] flex h-16 items-center border-b border-[#EDE8E1] bg-white px-10">
       {/* Skip link — first focusable element on every public page, inside the
@@ -19,14 +23,16 @@ export function NavPublic() {
         {/* Right — nav actions */}
         <nav aria-label="Site navigation">
           <ul className="flex items-center gap-2 list-none m-0 p-0">
-            <li>
-              <Link
-                href="/register"
-                className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[14px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
-              >
-                Register — it&apos;s free
-              </Link>
-            </li>
+            {pathname !== '/register' && (
+              <li>
+                <Link
+                  href="/register"
+                  className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[14px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+                >
+                  Register — it&apos;s free
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </div>
