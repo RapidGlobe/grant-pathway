@@ -21,14 +21,6 @@ export function NavPublic() {
           <ul className="flex items-center gap-2 list-none m-0 p-0">
             <li>
               <Link
-                href="/"
-                className="px-3 py-2 text-[14px] font-medium text-[#64748B] transition-colors hover:text-[#1E293B]"
-              >
-                Sign in
-              </Link>
-            </li>
-            <li>
-              <Link
                 href="/register"
                 className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[14px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
               >
