@@ -1533,6 +1533,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 - Confirm session timeout fires at 60 minutes
 - **Cross-browser testing** (NFR-05): run the full five-step flow in Chrome, Edge, Firefox, and Safari on desktop; confirm usable on Chrome Android and Safari iOS
 - **AI performance testing** (NFR-01): confirm summary generation completes within 30 seconds; confirm draft generation completes within 60 seconds under normal load
+- **Feedback opt-in verification**: confirm the "I'm happy to be contacted" checkbox on registration correctly writes `feedback_consent = true` to `user_profiles` in Supabase; verify a test registration with the box ticked and one without, and inspect the database to confirm the values. ⚠️ **Post-launch action required:** once real users are registering, establish a process to periodically query `user_profiles` where `feedback_consent = true` and act on it (e.g. contact those users for feedback). The data is being collected — do not let it go unused.
 
 ### P5.6 — DNS and Go-Live
 
