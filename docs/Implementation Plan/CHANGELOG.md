@@ -8,6 +8,20 @@
 
 ---
 
+## 2026-06-10 — Register button hidden on /verify-email
+
+**What changed:**
+
+- `components/nav-public.tsx` — The "Register — it's free" nav button is now hidden on `/verify-email` as well as `/register`. A comment in the component records both exclusions and the reasoning.
+
+**Why:** WJ's walkthrough test of the registration journey reached the "Email verified" screen and found the nav still offering "Register — it's free" — to a user who has just completed registration. Same circular-navigation rationale as the 2026-06-09 NavPublic clean-up (Register hidden on `/register`).
+
+**Also checked, no change needed:** WJ reported the footer Terms/Privacy links opening in the same tab on this screen. The deployed page already serves `target="_blank"` on both (verified via curl against production) — the same-tab behaviour was a browser-cached copy of the pre-deploy page.
+
+**Documentation updated:** `information-architecture-and-navigation.md` v1.6 (nav table); `PRD inputs/screen-requirements.md` (global elements).
+
+---
+
 ## 2026-06-10 — Supabase production project pause warnings: accepted until Phase 5 (decision)
 
 **What changed:** No code change. A decision was made and recorded after Supabase emailed a 7-day-inactivity pause warning for the production project `grant-pathway-prod` (ID `mvmjryipieepvsjudche`).

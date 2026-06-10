@@ -1,6 +1,6 @@
 # Information Architecture & Navigation -- Grant Pathway v1
 
-**Version:** 1.5
+**Version:** 1.6
 **Last updated:** 2026-06-10
 
 This document defines the complete information architecture, URL structure, navigation components, access control rules, and page-level navigation for Grant Pathway v1. It is a reference for design, development, and testing.
@@ -107,7 +107,7 @@ Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-pass
 | Element                   | Behaviour                                                                                                                                     |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | Grant Pathway logo (left) | Link to `/` -- gives pages reached directly (e.g. `/terms` from a search result) a route back; signed-in users are redirected to `/dashboard` |
-| Register -- it's free     | Link to `/register`; hidden when already on `/register`                                                                                       |
+| Register -- it's free     | Link to `/register`; hidden on `/register` (circular) and `/verify-email` (the user has just registered)                                      |
 
 > The standalone "Sign in" nav link was removed 2026-06-09 — every public-facing form already carries a contextual sign-in link (see CHANGELOG).
 
@@ -272,3 +272,4 @@ _Status: Complete_
 | 1.3     | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect question-level typing (BD-04): `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`. Tier 1/2/3 funder coverage model referenced.                                                                                                    |
 | 1.4     | 2026-06-10 | Rapidglobe Ltd | Legal routes `/terms` and `/privacy` added (site map, route reference 3.3, access control, footer link targets). Unauthenticated nav updated to reflect 2026-06-09 changes (Sign in link removed; Register button hidden on `/register`). Auth-aware routing principle amended for legal pages. |
 | 1.5     | 2026-06-10 | Rapidglobe Ltd | No-dead-ends fix for legal pages: footer legal links now open in a new tab; public nav logo now links to `/` (previously no link) so directly-reached pages have a route back.                                                                                                                  |
+| 1.6     | 2026-06-10 | Rapidglobe Ltd | Register button also hidden on `/verify-email` (found during WJ registration walkthrough — the user has just registered).                                                                                                                                                                       |

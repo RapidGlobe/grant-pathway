@@ -28,10 +28,11 @@ export function NavPublic() {
           <Logo />
         </Link>
 
-        {/* Right — nav actions */}
+        {/* Right — nav actions. The Register button is hidden on /register
+            (circular) and /verify-email (the user has just registered). */}
         <nav aria-label="Site navigation">
           <ul className="flex items-center gap-2 list-none m-0 p-0">
-            {pathname !== '/register' && (
+            {pathname !== '/register' && pathname !== '/verify-email' && (
               <li>
                 <Link
                   href="/register"
