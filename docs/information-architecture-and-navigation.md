@@ -1,7 +1,7 @@
 # Information Architecture & Navigation -- Grant Pathway v1
 
-**Version:** 1.3
-**Last updated:** 2026-05-29
+**Version:** 1.4
+**Last updated:** 2026-06-10
 
 This document defines the complete information architecture, URL structure, navigation components, access control rules, and page-level navigation for Grant Pathway v1. It is a reference for design, development, and testing.
 
@@ -19,13 +19,13 @@ This document defines the complete information architecture, URL structure, navi
 
 ## 1. Design Principles
 
-| Principle                | Application                                                                                                                                        |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Minimal navigation       | Three primary nav items plus an account dropdown -- nothing more. Non-technical users should never feel lost                                       |
-| Auth-aware routing       | Every route is either public-only or authenticated-only. Mixed-access pages do not exist                                                           |
-| Focused application flow | The multi-step application journey lives within a single route (`/applications/[id]`). Steps are not separate pages in the nav                     |
-| Predictable redirects    | Authenticated users landing on public pages are redirected to `/dashboard`. Unauthenticated users landing on protected pages are redirected to `/` |
-| No dead ends             | Every error state, expiry screen, and confirmation page provides a clear next action                                                               |
+| Principle                | Application                                                                                                                                          |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Minimal navigation       | Three primary nav items plus an account dropdown -- nothing more. Non-technical users should never feel lost                                         |
+| Auth-aware routing       | Every route is either public-only or authenticated-only, with one exception: the legal pages (`/terms`, `/privacy`) are accessible in any auth state |
+| Focused application flow | The multi-step application journey lives within a single route (`/applications/[id]`). Steps are not separate pages in the nav                       |
+| Predictable redirects    | Authenticated users landing on public pages are redirected to `/dashboard`. Unauthenticated users landing on protected pages are redirected to `/`   |
+| No dead ends             | Every error state, expiry screen, and confirmation page provides a clear next action                                                                 |
 
 ---
 
@@ -46,6 +46,11 @@ This document defines the complete information architecture, URL structure, navi
 - `/profile` -- Charity Profile
 - `/account` -- Account Settings
   - `/account/delete` -- Account Deletion Confirmation
+
+**LEGAL (accessible in any auth state)**
+
+- `/terms` -- Terms of Service
+- `/privacy` -- Privacy Policy
 
 ---
 
@@ -71,6 +76,13 @@ This document defines the complete information architecture, URL structure, navi
 | `/account`           | Account Settings | Authenticated only | Change password; link to delete account                              |
 | `/account/delete`    | Delete Account   | Authenticated only | Deletion confirmation screen; accessible only to authenticated users |
 
+### 3.3 Legal Routes
+
+| URL        | Page name        | Auth state     | Purpose                                                                                               |
+| ---------- | ---------------- | -------------- | ----------------------------------------------------------------------------------------------------- |
+| `/terms`   | Terms of Service | Any auth state | Full Terms of Service, statically rendered from `docs/terms-of-service.md` (the authoritative source) |
+| `/privacy` | Privacy Policy   | Any auth state | Full Privacy Policy, statically rendered from `docs/privacy-policy.md` (the authoritative source)     |
+
 ---
 
 ## 4. Access Control & Redirect Rules
@@ -82,6 +94,7 @@ This document defines the complete information architecture, URL structure, navi
 | User visits `/applications/[id]` for an application that does not belong to their account | Redirected to `/dashboard`                                                                          |
 | User visits `/account/delete` directly                                                    | Accessible to authenticated users; the confirmation input (typing DELETE) is the friction mechanism |
 | User's session expires while on a protected page                                          | Redirected to `/` on next interaction                                                               |
+| Any user (signed in or not) visits `/terms` or `/privacy`                                 | Page is shown — legal pages are never redirected                                                    |
 
 ---
 
@@ -89,13 +102,14 @@ This document defines the complete information architecture, URL structure, navi
 
 ### 5.1 Unauthenticated Navigation Bar
 
-Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-password`).
+Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-password`) and on the legal pages (`/terms`, `/privacy`).
 
-| Element                   | Behaviour                        |
-| ------------------------- | -------------------------------- |
-| Grant Pathway logo (left) | No link -- stays on current page |
-| Sign in                   | Link to `/`                      |
-| Register                  | Link to `/register`              |
+| Element                   | Behaviour                                               |
+| ------------------------- | ------------------------------------------------------- |
+| Grant Pathway logo (left) | No link -- stays on current page                        |
+| Register -- it's free     | Link to `/register`; hidden when already on `/register` |
+
+> The standalone "Sign in" nav link was removed 2026-06-09 — every public-facing form already carries a contextual sign-in link (see CHANGELOG).
 
 ---
 
@@ -126,8 +140,8 @@ Displayed on all routes (public and authenticated).
 | Element          | Detail                                               |
 | ---------------- | ---------------------------------------------------- |
 | Tagline          | "Your free grant writing companion for UK charities" |
-| Privacy Policy   | Link -- opens in current tab                         |
-| Terms of Service | Link -- opens in current tab                         |
+| Privacy Policy   | Link to `/privacy` -- opens in current tab           |
+| Terms of Service | Link to `/terms` -- opens in current tab             |
 | Copyright        | (c) RapidGlobe Ltd [current year]                    |
 
 ---
@@ -250,9 +264,10 @@ _Status: Complete_
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                                           |
-| ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-04-16 | Rapidglobe Ltd | Initial version                                                                                                                                                                              |
-| 1.1     | 2026-05-26 | Rapidglobe Ltd | Post-action redirect for charity profile update changed from stay-on-page to redirect to dashboard (2026-05-26 testing decision)                                                             |
-| 1.2     | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect section-by-section mode for narrative funders and Q&A mode for structured funders. Document history table added.                                       |
-| 1.3     | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect question-level typing (BD-04): `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`. Tier 1/2/3 funder coverage model referenced. |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                              |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-04-16 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                                                                 |
+| 1.1     | 2026-05-26 | Rapidglobe Ltd | Post-action redirect for charity profile update changed from stay-on-page to redirect to dashboard (2026-05-26 testing decision)                                                                                                                                                                |
+| 1.2     | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect section-by-section mode for narrative funders and Q&A mode for structured funders. Document history table added.                                                                                                                                          |
+| 1.3     | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect question-level typing (BD-04): `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`. Tier 1/2/3 funder coverage model referenced.                                                                                                    |
+| 1.4     | 2026-06-10 | Rapidglobe Ltd | Legal routes `/terms` and `/privacy` added (site map, route reference 3.3, access control, footer link targets). Unauthenticated nav updated to reflect 2026-06-09 changes (Sign in link removed; Register button hidden on `/register`). Auth-aware routing principle amended for legal pages. |

@@ -1,6 +1,6 @@
 # Screen Requirements — Grant Pathway v1
 
-This document defines the required content, fields, validation rules, and error states for each of the 9 screens in Grant Pathway v1. It is an input to the Product Requirements Document and to acceptance criteria.
+This document defines the required content, fields, validation rules, and error states for each of the 11 screens in Grant Pathway v1. It is an input to the Product Requirements Document and to acceptance criteria.
 
 Screens are listed in the order a new user would encounter them.
 
@@ -19,6 +19,8 @@ Screens are listed in the order a new user would encounter them.
 | 7   | Application Flow              | `/applications/new` and `/applications/[id]` | ✅ Complete |
 | 8   | Account Settings              | `/account`                                   | ✅ Complete |
 | 9   | Account Deletion Confirmation | `/account/delete`                            | ✅ Complete |
+| 10  | Terms of Service              | `/terms`                                     | ✅ Complete |
+| 11  | Privacy Policy                | `/privacy`                                   | ✅ Complete |
 
 ---
 
@@ -29,8 +31,7 @@ The following elements appear on all screens unless otherwise noted.
 ### Navigation bar (unauthenticated)
 
 - Grant Pathway logo (top left) — no link (stays on current page)
-- **Sign in** link — `/`
-- **Register** link — `/register`
+- **Register — it's free** button — `/register`; hidden when the user is already on `/register` (2026-06-09: standalone Sign in link removed as redundant — every public form carries a contextual sign-in link)
 
 ### Navigation bar (authenticated)
 
@@ -44,7 +45,7 @@ The following elements appear on all screens unless otherwise noted.
 ### Footer (all screens)
 
 - Tagline: _"Your free grant writing companion for UK charities"_
-- Links: Privacy Policy | Terms of Service
+- Links: Privacy Policy (`/privacy`) | Terms of Service (`/terms`)
 - © RapidGlobe Ltd [year]
 
 ---
@@ -562,4 +563,43 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ---
 
-_Last updated: 2026-04-16_
+## Screen 10 — Terms of Service
+
+**URL:** `/terms`
+**Access:** All states — no authentication required; authenticated users are not redirected away
+
+### Content
+
+- Full Terms of Service rendered from `docs/terms-of-service.md` (the single authoritative source — the page is generated from the same file a solicitor reviews)
+- Static page, statically prerendered at build time; no fields, no validation, no error states
+- Standard public navigation bar and global footer
+
+### Notes
+
+- Linked from the global footer and from the consent checkbox on the Register screen (opens in a new tab so the form is not lost)
+- Page title (browser tab): _"Terms of Service — Grant Pathway"_
+- The effective date in the source document is `[TO BE CONFIRMED]` and must be set before go-live (P5.1)
+
+---
+
+## Screen 11 — Privacy Policy
+
+**URL:** `/privacy`
+**Access:** All states — no authentication required; authenticated users are not redirected away
+
+### Content
+
+- Full Privacy Policy rendered from `docs/privacy-policy.md` (the single authoritative source)
+- Static page, statically prerendered at build time; no fields, no validation, no error states
+- Tables (company details, legal bases, data processors, retention periods) rendered as accessible HTML tables
+- Standard public navigation bar and global footer
+
+### Notes
+
+- Linked from the global footer and from the consent checkbox on the Register screen (opens in a new tab so the form is not lost)
+- Page title (browser tab): _"Privacy Policy — Grant Pathway"_
+- The effective date in the source document is `[TO BE CONFIRMED]` and must be set before go-live (P5.1)
+
+---
+
+_Last updated: 2026-06-10_

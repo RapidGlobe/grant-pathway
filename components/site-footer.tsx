@@ -17,7 +17,7 @@ export function SiteFooter() {
           <ul className="flex items-center gap-4 list-none m-0 p-0">
             <li>
               <Link
-                href="/privacy-policy"
+                href="/privacy"
                 className="text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B]"
               >
                 Privacy policy

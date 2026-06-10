@@ -8,6 +8,23 @@
 
 ---
 
+## 2026-06-10 — Terms of Service and Privacy Policy pages live at /terms and /privacy
+
+**What changed:**
+
+- `app/(public)/terms/page.tsx` and `app/(public)/privacy/page.tsx` (new) — The legal pages now exist as routes. Each page reads its markdown source from `docs/` at build time and is statically prerendered, so `docs/terms-of-service.md` and `docs/privacy-policy.md` remain the single authoritative sources — the published page can never drift from the file a solicitor reviews.
+- `components/legal-document.tsx` (new) — Shared server component rendering legal markdown with `react-markdown` + `remark-gfm` (GFM needed for the Privacy Policy's tables), styled to the app's design tokens. Headerless source tables (e.g. the company details table) have their empty header row hidden rather than rendering a blank stripe.
+- **Dependencies added:** `react-markdown`, `remark-gfm`. Chosen over `@next/mdx` because the content is plain markdown read from `docs/` (not MDX pages in `app/`), needing no `next.config` changes or `mdx-components.tsx`.
+- `components/site-footer.tsx` — Footer privacy link corrected from `/privacy-policy` (404) to `/privacy`, aligning with the register form's consent-checkbox link. Both legal pages are reachable from the footer (all pages) and the register form (new tab).
+- `docs/privacy-policy.md` — Trailing "Last updated" date corrected from 22 May 2026 to 8 June 2026 to match the header date (the footer line was missed in the 2026-06-08 readiness review update).
+- Routes are accessible in any auth state — they appear in neither the middleware's `PROTECTED` nor `AUTH_ONLY` lists, so signed-in users are not redirected away.
+
+**Documentation updated:** `information-architecture-and-navigation.md` v1.4 (site map, route reference, access control, footer); `PRD inputs/screen-requirements.md` (Screens 10 and 11 added; stale unauthenticated-nav description from the 2026-06-09 NavPublic change also corrected); `IMPLEMENTATION-STATUS.md` (P5.1/P5.6 progress notes).
+
+**Why:** P5.1 and P5.6 require the Terms of Service and Privacy Policy to be published, and the register form already linked to both routes — until now those links (and the footer's) led to 404s. **Still outstanding for P5.1:** the `[TO BE CONFIRMED]` effective dates in both documents must be set, and a solicitor should review both (particularly the Privacy Policy, UK GDPR) before go-live.
+
+---
+
 ## 2026-06-09 — NavPublic: Sign in link removed; Register button hidden on /register; register form link wrapping fixed
 
 **What changed:**
