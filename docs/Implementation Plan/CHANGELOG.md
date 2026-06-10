@@ -8,6 +8,21 @@
 
 ---
 
+## 2026-06-10 — Supabase production project pause warnings: accepted until Phase 5 (decision)
+
+**What changed:** No code change. A decision was made and recorded after Supabase emailed a 7-day-inactivity pause warning for the production project `grant-pathway-prod` (ID `mvmjryipieepvsjudche`).
+
+**Investigation findings:**
+
+- The Vercel Pro crons are running correctly, but they generate activity on whichever Supabase project the deployment's env vars point at — and production still points at the **dev** project (P5.4 env var switch not yet done).
+- The prod project therefore sits idle on the free tier, which auto-pauses after 7 days without API activity. It currently holds no schema and no data.
+
+**Decision (Wac, 2026-06-10):** Accept the pause warnings (and any actual pause) until Phase 5, rather than activating Supabase Pro early. Rationale: nothing of value is in the prod database; a paused project restores with one click within 90 days; Phase 5 is expected within 2–3 weeks, comfortably inside that window; and ADR-DATA-005 already schedules the Pro upgrade (which permanently ends pausing and enables daily backups) for pre-go-live.
+
+**Consequence recorded in IMPLEMENTATION-STATUS P5.4:** the opening steps of P5.4 are now (1) unpause `grant-pathway-prod`, (2) activate Supabase Pro per ADR-DATA-005, (3) apply migrations, (4) switch production env vars — with an explicit warning not to switch env vars while funder testing still runs against the production URL on the dev database.
+
+---
+
 ## 2026-06-10 — No-dead-ends fix: footer legal links open in a new tab; public nav logo links home
 
 **What changed:**
