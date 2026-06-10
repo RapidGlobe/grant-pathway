@@ -30,7 +30,7 @@ The following elements appear on all screens unless otherwise noted.
 
 ### Navigation bar (unauthenticated)
 
-- Grant Pathway logo (top left) — no link (stays on current page)
+- Grant Pathway logo (top left) — links to `/` (2026-06-10: previously no link; changed so pages reached directly, e.g. `/terms` from a search result, are never a dead end. Signed-in users are redirected on to `/dashboard` by the auth middleware)
 - **Register — it's free** button — `/register`; hidden when the user is already on `/register` (2026-06-09: standalone Sign in link removed as redundant — every public form carries a contextual sign-in link)
 
 ### Navigation bar (authenticated)
@@ -45,7 +45,7 @@ The following elements appear on all screens unless otherwise noted.
 ### Footer (all screens)
 
 - Tagline: _"Your free grant writing companion for UK charities"_
-- Links: Privacy Policy (`/privacy`) | Terms of Service (`/terms`)
+- Links: Privacy Policy (`/privacy`) | Terms of Service (`/terms`) — both open in a new tab so the user never loses a form or in-progress application; each link carries a visually hidden "(opens in a new tab)" hint for screen readers
 - © RapidGlobe Ltd [year]
 
 ---
@@ -576,7 +576,7 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ### Notes
 
-- Linked from the global footer and from the consent checkbox on the Register screen (opens in a new tab so the form is not lost)
+- Linked from the global footer and from the consent checkbox on the Register screen — both open in a new tab so the user never loses their place; the nav logo links to `/` for visitors who arrive directly
 - Page title (browser tab): _"Terms of Service — Grant Pathway"_
 - The effective date in the source document is `[TO BE CONFIRMED]` and must be set before go-live (P5.1)
 
@@ -596,7 +596,7 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ### Notes
 
-- Linked from the global footer and from the consent checkbox on the Register screen (opens in a new tab so the form is not lost)
+- Linked from the global footer and from the consent checkbox on the Register screen — both open in a new tab so the user never loses their place; the nav logo links to `/` for visitors who arrive directly
 - Page title (browser tab): _"Privacy Policy — Grant Pathway"_
 - The effective date in the source document is `[TO BE CONFIRMED]` and must be set before go-live (P5.1)
 

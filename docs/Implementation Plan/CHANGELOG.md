@@ -8,6 +8,19 @@
 
 ---
 
+## 2026-06-10 — No-dead-ends fix: footer legal links open in a new tab; public nav logo links home
+
+**What changed:**
+
+- `components/site-footer.tsx` — The Privacy Policy and Terms of Service footer links now open in a new tab (`target="_blank"` with `rel="noopener noreferrer"`), matching the register form's consent-checkbox links. Each link carries a visually hidden "(opens in a new tab)" hint for screen readers.
+- `components/nav-public.tsx` — The logo on the public navigation bar now links to `/` (previously deliberately unlinked). Signed-in users who click it are redirected on to `/dashboard` by the existing auth middleware.
+
+**Why:** WJ's UX review of the new legal pages found a dead end: clicking a footer legal link navigated in the same tab, and the legal pages offered no route back (logo unlinked, only nav action "Register"). The user's sole way back was the browser Back button — a breach of the IA document's "No dead ends" principle. Worse for signed-in users: the footer appears on authenticated pages too, so the same-tab link pulled them out of an in-progress application. New-tab links fix the return journey for all footer entry points; the linked logo covers visitors who arrive at `/terms` or `/privacy` directly (search result, emailed link) and have no originating tab.
+
+**Documentation updated:** `information-architecture-and-navigation.md` v1.5 (nav logo behaviour, footer link behaviour); `PRD inputs/screen-requirements.md` (global elements, Screen 10/11 notes).
+
+---
+
 ## 2026-06-10 — Terms of Service and Privacy Policy pages live at /terms and /privacy
 
 **What changed:**

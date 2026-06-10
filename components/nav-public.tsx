@@ -17,8 +17,16 @@ export function NavPublic() {
         Skip to main content
       </a>
       <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
-        {/* Logo — no link on unauthenticated nav */}
-        <Logo />
+        {/* Logo links home so pages reached directly (e.g. /terms or /privacy
+            from a search result) are never a dead end. Signed-in visitors are
+            redirected on to /dashboard by the auth middleware. */}
+        <Link
+          href="/"
+          aria-label="Grant Pathway home"
+          className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+        >
+          <Logo />
+        </Link>
 
         {/* Right — nav actions */}
         <nav aria-label="Site navigation">

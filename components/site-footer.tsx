@@ -15,20 +15,26 @@ export function SiteFooter() {
 
         <nav aria-label="Legal links">
           <ul className="flex items-center gap-4 list-none m-0 p-0">
+            {/* Legal links open in a new tab so users are never pulled out of
+                a form or an in-progress application to read a policy */}
             <li>
               <Link
                 href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B]"
               >
-                Privacy policy
+                Privacy policy<span className="sr-only"> (opens in a new tab)</span>
               </Link>
             </li>
             <li>
               <Link
                 href="/terms"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B]"
               >
-                Terms of service
+                Terms of service<span className="sr-only"> (opens in a new tab)</span>
               </Link>
             </li>
           </ul>
