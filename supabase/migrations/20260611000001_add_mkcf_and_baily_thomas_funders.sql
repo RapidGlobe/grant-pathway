@@ -63,6 +63,14 @@ values
     'narrative',
     'Not specified (cost-based)',
     'https://www.bailythomas.org.uk/grants/research-programme',
+    false  -- parked: specialist academic research programme; not relevant to typical charity users
+  ),
+  -- CPF Trust — email application, 500 words max, window 1 Jun–30 Sep only
+  (
+    'CPF Trust',
+    'narrative',
+    '£1,000–£3,000',
+    'https://www.thecpftrust.org.uk/',
     true
   )
 on conflict (name) do nothing;
