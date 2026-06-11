@@ -15,7 +15,7 @@ How should Grant Pathway control which grant-giving organisations end users can 
 
 ## Context
 
-Grant Pathway's functionality is validated against a specific set of tested and approved funders (see `docs/Test Plans/target-funder-list.md`). During the testing phase (and at initial launch), only these 12 funders are known to work correctly with the Step 3 AI extraction and Step 4 Q&A interface. Allowing users to freely enter any funder name introduces untested combinations that may produce degraded or misleading output.
+Grant Pathway's functionality is validated against a specific set of tested and approved funders (see `docs/target-funder-list.md`). During the testing phase (and at initial launch), only these approved funders are known to work correctly with the Step 3 AI extraction and Step 4 Q&A interface. The funder list has grown over time — see `docs/target-funder-list.md` (v1.3, 2026-06-11) for the current canonical set. Allowing users to freely enter any funder name introduces untested combinations that may produce degraded or misleading output.
 
 Five options were evaluated:
 
@@ -76,6 +76,7 @@ The `funders` table in Supabase is the authoritative source of approved funders.
 
 ## Document history
 
-| Version | Date       | Author         | Change                                                                     |
-| ------- | ---------- | -------------- | -------------------------------------------------------------------------- |
-| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review |
+| Version | Date       | Author         | Change                                                                                                                                                      |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review                                                                                  |
+| 1.1     | 2026-06-11 | Rapidglobe Ltd | Updated funder count reference — now refers to target-funder-list.md v1.3 (19 entries, 18 active) following addition of MKCF ×4, Baily Thomas ×3, CPF Trust |
