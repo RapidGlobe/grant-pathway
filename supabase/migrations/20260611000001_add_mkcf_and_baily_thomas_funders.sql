@@ -43,7 +43,7 @@ values
     true
   ),
   -- Baily Thomas Charitable Fund — learning disability focus only
-  -- Two grant tiers as separate entries
+  -- Three grant tiers as separate entries
   (
     'Baily Thomas — Small Grants',
     'structured',
@@ -56,6 +56,13 @@ values
     'structured',
     '£9,000+',
     'https://www.bailythomas.org.uk/grants/general-programme/general-guidelines',
+    true
+  ),
+  (
+    'Baily Thomas — Research Grants',
+    'narrative',
+    'Not specified (cost-based)',
+    'https://www.bailythomas.org.uk/grants/research-programme',
     true
   )
 on conflict (name) do nothing;

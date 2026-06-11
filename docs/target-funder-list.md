@@ -1,6 +1,6 @@
 ﻿# Consolidated Target Funder List
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-06-11
 **Status:** Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`
 
@@ -30,6 +30,7 @@ This is the canonical reference list of grant-giving organisations used to desig
 | MK Community Foundation — Strategic Partnership Grants | Narrative  | Above £15,000 p.a.                    | No deadline; EOI by email first, then invited full proposal; complex/bespoke process                                                       | mkcommunityfoundation.co.uk/apply-for-a-grant/grants-policy/   |
 | Baily Thomas — Small Grants                            | Structured | Up to £5,000                          | Learning disability focus only; BenefactorCloud portal; discrete form with word-limited fields                                             | bailythomas.org.uk/grants/general-programme/general-guidelines |
 | Baily Thomas — General Programme                       | Structured | £9,000+                               | Learning disability focus only; BenefactorCloud portal; full structured form with referee requirement                                      | bailythomas.org.uk/grants/general-programme/general-guidelines |
+| Baily Thomas — Research Grants                         | Narrative  | Not specified (cost-based)            | Learning disability research only; 5-page scientific narrative + appendices; submitted by email; deadlines 1 Feb / 1 Jul                   | bailythomas.org.uk/grants/research-programme                   |
 
 ---
 
@@ -48,3 +49,4 @@ This is the canonical reference list of grant-giving organisations used to desig
 | ------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | 2026-05-29 | Rapidglobe Ltd | Initial document — consolidated from working session research; replaces 3-funder test fixture table                                                                                            |
 | 1.1     | 2026-06-11 | Rapidglobe Ltd | Added MK Community Foundation (4 tiers: Seed/Sapling/Oak/Strategic Partnership) and Baily Thomas (2 tiers: Small/General). Sources: MKCF Nov 2025 PDFs; Baily Thomas Mar 2024 application form |
+| 1.2     | 2026-06-11 | Rapidglobe Ltd | Added Baily Thomas — Research Grants (narrative, cost-based, email submission). Source: Baily Thomas Research Guidelines Dec 2018                                                              |
