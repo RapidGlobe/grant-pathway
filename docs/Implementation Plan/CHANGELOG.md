@@ -8,6 +8,37 @@
 
 ---
 
+## 2026-06-11 — Six new funders added to dropdown (MK Community Foundation × 4, Baily Thomas × 2)
+
+**What changed:**
+
+- New migration `supabase/migrations/20260611000001_add_mkcf_and_baily_thomas_funders.sql` adds 6 funder rows.
+- `docs/target-funder-list.md` updated to v1.1 with all 6 new entries.
+
+**MK Community Foundation — 4 separate dropdown entries (one per grant tier):**
+
+| Entry                                                  | funder_type | grant_range        |
+| ------------------------------------------------------ | ----------- | ------------------ |
+| MK Community Foundation — Seed Grants                  | structured  | Up to £750         |
+| MK Community Foundation — Sapling Grants               | structured  | £750–£5,000        |
+| MK Community Foundation — Oak Grants                   | structured  | £5,001–£15,000     |
+| MK Community Foundation — Strategic Partnership Grants | narrative   | Above £15,000 p.a. |
+
+Seed, Sapling and Oak use the MKCF online portal with discrete scored questions (structured). Strategic Partnership is an email EOI + invited full proposal — no portal, bespoke process (narrative).
+
+**Baily Thomas — 2 separate dropdown entries (one per tier):**
+
+| Entry                            | funder_type | grant_range  |
+| -------------------------------- | ----------- | ------------ |
+| Baily Thomas — Small Grants      | structured  | Up to £5,000 |
+| Baily Thomas — General Programme | structured  | £9,000+      |
+
+Both use the same BenefactorCloud portal with discrete word-limited fields. Learning disability focus only (eligibility confirmed in guidelines).
+
+**Why:** WJ instruction 2026-06-11. Sources: MKCF grant criteria PDFs (Nov 2025); Baily Thomas General Application form (Mar 2024).
+
+---
+
 ## 2026-06-10 — Register button hidden on /verify-email
 
 **What changed:**
