@@ -141,27 +141,12 @@ export function ApplicationStep5Approve({
   }
 
   // ── Dialogs ────────────────────────────────────────────────────────────────
-  const [showApproveDialog, setShowApproveDialog] = useState(false)
   const [showReExportDialog, setShowReExportDialog] = useState(false)
   const [showReOpenDialog, setShowReOpenDialog] = useState(false)
   const [pendingFormat, setPendingFormat] = useState<'docx' | 'txt'>('docx')
 
-  // ── Approve action ─────────────────────────────────────────────────────────
-  const [isApproving, startApproveTransition] = useTransition()
+  // ── Approve + download action ──────────────────────────────────────────────
   const [approveError, setApproveError] = useState<string | null>(null)
-
-  function handleApproveConfirm() {
-    setApproveError(null)
-    startApproveTransition(async () => {
-      const result = await approveApplication(applicationId)
-      if (result.ok) {
-        setApprovalStatus('approved')
-        setShowApproveDialog(false)
-      } else {
-        setApproveError(result.error ?? 'Could not approve. Please try again.')
-      }
-    })
-  }
 
   // ── Re-open action ─────────────────────────────────────────────────────────
   const [isReopening, startReopenTransition] = useTransition()
@@ -231,16 +216,28 @@ export function ApplicationStep5Approve({
     }
   }
 
-  function handleDownloadClick(format: 'docx' | 'txt') {
+  async function handleDownloadClick(format: 'docx' | 'txt') {
     // Show re-export warning if a prior export exists (last_exported_at in DB),
     // regardless of current approval status. This covers the re-open → re-approve
     // → download cycle where isExported resets to false but a prior export exists.
     if (lastExported) {
       setPendingFormat(format)
       setShowReExportDialog(true)
-    } else {
-      void doDownload(format)
+      return
     }
+
+    // If not yet approved, approve first then download in a single action.
+    if (!isApproved) {
+      setApproveError(null)
+      const result = await approveApplication(applicationId)
+      if (!result.ok) {
+        setApproveError(result.error ?? 'Could not approve. Please try again.')
+        return
+      }
+      setApprovalStatus('approved')
+    }
+
+    void doDownload(format)
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -386,25 +383,17 @@ export function ApplicationStep5Approve({
 
       {/* ── Action buttons ────────────────────────────────────────────────── */}
       <div className="mb-3 space-y-3">
-        {/* Approve — only shown when pending */}
-        {!isApproved && (
-          <Button
-            type="button"
-            onClick={() => setShowApproveDialog(true)}
-            disabled={!allChecked}
-            className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Approve my application
-          </Button>
-        )}
-
-        {/* Download as Word */}
+        {/* Download as Word — clicking this approves + downloads in one step */}
         <Button
           type="button"
-          onClick={() => handleDownloadClick('docx')}
-          disabled={!isApproved || isDownloading}
-          variant="outline"
-          className="h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40"
+          onClick={() => void handleDownloadClick('docx')}
+          disabled={(!isApproved && !allChecked) || isDownloading}
+          variant={isApproved ? 'outline' : 'default'}
+          className={
+            isApproved
+              ? 'h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40'
+              : 'h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40'
+          }
         >
           <Download className="mr-2 h-4 w-4" aria-hidden="true" />
           {isDownloadingDocx ? 'Downloading…' : 'Download as Word document (.docx)'}
@@ -413,8 +402,8 @@ export function ApplicationStep5Approve({
         {/* Download as plain text */}
         <Button
           type="button"
-          onClick={() => handleDownloadClick('txt')}
-          disabled={!isApproved || isDownloading}
+          onClick={() => void handleDownloadClick('txt')}
+          disabled={(!isApproved && !allChecked) || isDownloading}
           variant="outline"
           className="h-10 w-full border-[#CBD5E1] text-[15px] font-semibold text-[#475569] hover:bg-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-40"
         >
@@ -422,6 +411,17 @@ export function ApplicationStep5Approve({
           {isDownloadingTxt ? 'Downloading…' : 'Download as plain text (.txt)'}
         </Button>
       </div>
+
+      {/* Approve error */}
+      {approveError && (
+        <p
+          role="alert"
+          className="mb-4 flex items-center gap-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
+          {approveError}
+        </p>
+      )}
 
       {/* Download error */}
       {downloadError && (
@@ -453,45 +453,6 @@ export function ApplicationStep5Approve({
           </Link>
         )}
       </div>
-
-      {/* ── Approve confirmation dialog ────────────────────────────────────── */}
-      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Approve this application?</DialogTitle>
-            <DialogDescription>
-              You are approving your answers for{' '}
-              <strong>
-                {grantName} — {funderName}
-              </strong>
-              . You can re-open it to make changes at any time before submission.
-            </DialogDescription>
-          </DialogHeader>
-          {approveError && (
-            <p className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]">
-              {approveError}
-            </p>
-          )}
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowApproveDialog(false)}
-              disabled={isApproving}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              onClick={handleApproveConfirm}
-              disabled={isApproving}
-              className="bg-[#0D6E6E] text-white hover:bg-[#0A5A5A]"
-            >
-              {isApproving ? 'Approving…' : 'Approve my application'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* ── Re-export warning dialog ───────────────────────────────────────── */}
       <Dialog open={showReExportDialog} onOpenChange={setShowReExportDialog}>
