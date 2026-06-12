@@ -29,19 +29,23 @@ export function NavPublic() {
         </Link>
 
         {/* Right — nav actions. The Register button is hidden on /register
-            (circular) and /verify-email (the user has just registered). */}
+            (circular), /verify-email (the user has just registered), and legal
+            pages where it is out of context. */}
         <nav aria-label="Site navigation">
           <ul className="flex items-center gap-2 list-none m-0 p-0">
-            {pathname !== '/register' && pathname !== '/verify-email' && (
-              <li>
-                <Link
-                  href="/register"
-                  className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[14px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
-                >
-                  Register — it&apos;s free
-                </Link>
-              </li>
-            )}
+            {pathname !== '/register' &&
+              pathname !== '/verify-email' &&
+              pathname !== '/privacy' &&
+              pathname !== '/terms' && (
+                <li>
+                  <Link
+                    href="/register"
+                    className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[14px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+                  >
+                    Register — it&apos;s free
+                  </Link>
+                </li>
+              )}
           </ul>
         </nav>
       </div>
