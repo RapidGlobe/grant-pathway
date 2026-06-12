@@ -8,6 +8,19 @@
 
 ---
 
+## 2026-06-12 — AI suggestion card: "Use this version" renamed to "Use this improved version"
+
+**What changed:**
+
+- `components/application-step4-draft.tsx` — Button label on the AI suggestion card changed from _"Use this version"_ to _"Use this improved version"_.
+- `docs/PRD inputs/screen-requirements.md` — AI assist button row updated to document the suggestion card buttons including the new label.
+- `docs/PRD inputs/acceptance-criteria.md` — Acceptance criterion updated to match new button label.
+
+**Why:**
+The original label "Use this version" was ambiguous — it was unclear what "version" referred to without reading the surrounding context. "Use this improved version" is explicit: it tells the user exactly what they are accepting, reinforcing that the AI has refined their answer rather than replaced it.
+
+---
+
 ## 2026-06-12 — Register button hidden on /privacy and /terms pages
 
 **What changed:**

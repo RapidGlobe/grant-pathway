@@ -1334,7 +1334,7 @@ _Word limits are extracted automatically from the guidelines in Step 3 — they 
 - **Given** I have received a refined answer from the AI assist
 - **When** I view the result
 - **Then** I see both my original answer and the refined version
-- **And** I can click "Use this version" to replace my answer with the refined text
+- **And** I can click "Use this improved version" to replace my answer with the refined text
 - **And** I can click "Keep my original" to discard the refined version
 
 ---
