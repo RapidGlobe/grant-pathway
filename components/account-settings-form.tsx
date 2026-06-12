@@ -6,7 +6,6 @@ import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { MfaSetupPanel } from '@/components/mfa-setup-panel'
 import { changePassword } from '@/actions/auth'
 
 interface FieldErrors {
@@ -18,17 +17,9 @@ interface FieldErrors {
 interface AccountSettingsFormProps {
   /** Real email address from auth.users — passed from the Server Component. */
   email: string
-  /** Whether the user has a verified TOTP factor. */
-  mfaEnabled?: boolean
-  /** Factor ID of the enrolled TOTP factor (empty string if not enabled). */
-  mfaFactorId?: string
 }
 
-export function AccountSettingsForm({
-  email,
-  mfaEnabled = false,
-  mfaFactorId = '',
-}: AccountSettingsFormProps) {
+export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -261,23 +252,6 @@ export function AccountSettingsForm({
             {isPending ? 'Updating…' : 'Update password'}
           </Button>
         </form>
-      </section>
-
-      <hr className="mb-8 border-[#E2E8F0]" />
-
-      {/* ── Two-factor authentication ──────────────────────────────────────── */}
-      <section aria-labelledby="mfa-heading" className="mb-8">
-        <h2 id="mfa-heading" className="mb-1 text-[16px] font-semibold text-[#1E293B]">
-          Two-factor authentication
-        </h2>
-        <p className="mb-4 text-[14px] text-[#64748B]">
-          Status:{' '}
-          <span className={mfaEnabled ? 'font-medium text-[#16A34A]' : 'text-[#64748B]'}>
-            {mfaEnabled ? 'Enabled' : 'Not enabled'}
-          </span>
-        </p>
-
-        <MfaSetupPanel mfaEnabled={mfaEnabled} mfaFactorId={mfaFactorId} />
       </section>
 
       <hr className="mb-8 border-[#E2E8F0]" />
