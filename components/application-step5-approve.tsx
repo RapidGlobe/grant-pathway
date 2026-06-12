@@ -174,6 +174,21 @@ export function ApplicationStep5Approve({
     const setLoading = format === 'docx' ? setIsDownloadingDocx : setIsDownloadingTxt
     setLoading(true)
     setDownloadError(null)
+    setApproveError(null)
+
+    // Approve first if not yet approved — covers the re-export dialog path
+    // which calls doDownload directly, bypassing handleDownloadClick's approve step.
+    if (!isApproved) {
+      const result = await approveApplication(applicationId)
+      if (!result.ok) {
+        setApproveError(result.error ?? 'Could not approve. Please try again.')
+        setLoading(false)
+        setShowReExportDialog(false)
+        return
+      }
+      setApprovalStatus('approved')
+    }
+
     try {
       const res = await fetch(
         `/api/export/${applicationId}${format === 'txt' ? '?format=txt' : ''}`,
