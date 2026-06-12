@@ -14,7 +14,7 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 | Priority        | Count | FRs                                                                |
 | --------------- | ----- | ------------------------------------------------------------------ |
 | Must Have       | 42    | FR-01–06, FR-09–31, FR-32–37, FR-39–43, FR-45–47                   |
-| Should Have     | 4     | FR-07, FR-08, FR-38, FR-44                                         |
+| Should Have     | 3     | FR-08, FR-38, FR-44                                                |
 | Could Have      | 0     | —                                                                  |
 | Won't Have (v1) | 0     | All Won't Have items are recorded in `business/v1-out-of-scope.md` |
 
@@ -22,16 +22,16 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 ## 9.1 Authentication & Accounts
 
-| Ref   | Requirement (summary)                                        | Priority        | Notes                                                                                             |
-| ----- | ------------------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------- |
-| FR-01 | Register with full name, email, and password                 | **Must Have**   |                                                                                                   |
-| FR-02 | Validate email format; enforce 10-character minimum password | **Must Have**   |                                                                                                   |
-| FR-03 | Send verification email; account inactive until link clicked | **Must Have**   |                                                                                                   |
-| FR-04 | Allow registered users to sign in with email and password    | **Must Have**   |                                                                                                   |
-| FR-05 | Self-service password reset via email                        | **Must Have**   |                                                                                                   |
-| FR-06 | Auto-logout after 60 minutes of inactivity                   | **Must Have**   |                                                                                                   |
-| FR-07 | Optional MFA as opt-in feature; not mandatory                | **Should Have** | Low friction for non-technical users is the priority; MFA may be made mandatory in a future phase |
-| FR-08 | Feedback interview opt-in at registration; response recorded | **Should Have** | Omit if feedback interview programme is not ready at launch                                       |
+| Ref   | Requirement (summary)                                        | Priority                       | Notes                                                                                                                                                                                                                                                                                                |
+| ----- | ------------------------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-01 | Register with full name, email, and password                 | **Must Have**                  |                                                                                                                                                                                                                                                                                                      |
+| FR-02 | Validate email format; enforce 10-character minimum password | **Must Have**                  |                                                                                                                                                                                                                                                                                                      |
+| FR-03 | Send verification email; account inactive until link clicked | **Must Have**                  |                                                                                                                                                                                                                                                                                                      |
+| FR-04 | Allow registered users to sign in with email and password    | **Must Have**                  |                                                                                                                                                                                                                                                                                                      |
+| FR-05 | Self-service password reset via email                        | **Must Have**                  |                                                                                                                                                                                                                                                                                                      |
+| FR-06 | Auto-logout after 60 minutes of inactivity                   | **Must Have**                  |                                                                                                                                                                                                                                                                                                      |
+| FR-07 | Optional MFA as opt-in feature; not mandatory                | ~~Should Have~~ **Won't Have** | Removed 2026-06-12. Risk analysis: worst-case password compromise allows viewing draft applications and charity profile (all publicly registered information). No payment data, no submission capability. Mandatory friction for non-technical volunteer users outweighs the marginal security gain. |
+| FR-08 | Feedback interview opt-in at registration; response recorded | **Should Have**                | Omit if feedback interview programme is not ready at launch                                                                                                                                                                                                                                          |
 
 ---
 
@@ -136,7 +136,7 @@ The three remaining Should Have requirements and their build conditions are summ
 
 | Ref   | Requirement                     | Build condition                                                                                   |
 | ----- | ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| FR-07 | Optional MFA                    | Build if authentication roadmap supports it; does not affect core user journey                    |
+| FR-07 | Optional MFA                    | Removed 2026-06-12 — demoted to Won't Have (see FR-07 row above)                                  |
 | FR-08 | Feedback opt-in at registration | Build if the feedback interview programme is confirmed as active at launch                        |
 | FR-38 | Plain text (.txt) export        | Build if time permits; low complexity addition to Step 5 export options                           |
 | FR-44 | Deletion confirmation email     | Build if transactional email service is confirmed as in scope; depends on FR-40–43 being complete |

@@ -64,17 +64,17 @@ The main risk before the first marketing push is unmeasured AI route latency und
 
 ## NFR-04 — Security
 
-| Control                           | Requirement                                                                                                          |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Encryption in transit             | TLS 1.2 or higher (HTTPS everywhere); no unencrypted HTTP connections permitted                                      |
-| Encryption at rest                | Database-level encryption enabled on all data stores                                                                 |
-| Passwords                         | Minimum 10 characters; no mandatory complexity rules (aligned with NCSC guidance)                                    |
-| Multi-factor authentication (MFA) | Available as an option; not mandatory in v1 to avoid creating a barrier for non-technical users                      |
-| Session timeout                   | Automatic logout after 60 minutes of inactivity                                                                      |
-| Security baseline                 | OWASP Top 10 used as the standard checklist for web application security                                             |
-| Secrets management                | No credentials, API keys, or secrets committed to the public repository (aligned with C17 — MIT open source licence) |
+| Control                           | Requirement                                                                                                                                                                                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Encryption in transit             | TLS 1.2 or higher (HTTPS everywhere); no unencrypted HTTP connections permitted                                                                                                                                                 |
+| Encryption at rest                | Database-level encryption enabled on all data stores                                                                                                                                                                            |
+| Passwords                         | Minimum 10 characters; no mandatory complexity rules (aligned with NCSC guidance)                                                                                                                                               |
+| Multi-factor authentication (MFA) | Not offered. Removed 2026-06-12 (FR-07 demoted to Won't Have). Risk analysis confirmed worst-case password compromise is low severity — no payment data, no submission capability, charity profile data is publicly registered. |
+| Session timeout                   | Automatic logout after 60 minutes of inactivity                                                                                                                                                                                 |
+| Security baseline                 | OWASP Top 10 used as the standard checklist for web application security                                                                                                                                                        |
+| Secrets management                | No credentials, API keys, or secrets committed to the public repository (aligned with C17 — MIT open source licence)                                                                                                            |
 
-**Notes:** Mandatory MFA would create unnecessary friction for volunteer users with limited technical confidence (e.g. primary persona Margaret). MFA will be offered as an opt-in feature and may be made mandatory in a future phase. The OWASP Top 10 provides a practical, well-recognised baseline for a solo developer.
+**Notes:** MFA removed 2026-06-12. The OWASP Top 10 provides a practical, well-recognised baseline for a solo developer.
 
 ---
 

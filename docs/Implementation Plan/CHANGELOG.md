@@ -8,6 +8,21 @@
 
 ---
 
+## 2026-06-12 — Two-factor authentication removed (FR-07 demoted to Won't Have)
+
+**What changed:**
+
+- `components/account-settings-form.tsx` — MFA section removed from Account Settings UI. `mfaEnabled` and `mfaFactorId` props removed.
+- `app/(authenticated)/account/page.tsx` — `supabase.auth.mfa.listFactors()` call removed; component now only reads email.
+- `actions/auth.ts` — `mfaEnroll`, `mfaVerifyEnrollment`, `mfaUnenroll`, `verifyMfaSignIn` actions removed. MFA assurance-level check and `/mfa` redirect removed from `signIn`.
+- `docs/moscow-feature-register.md` — FR-07 demoted from Should Have to Won't Have.
+- `docs/non-functional-requirements.md` — NFR-04 MFA row updated to reflect removal.
+
+**Why:**
+Risk analysis confirmed the worst-case password compromise is low severity for Grant Pathway: an attacker can view draft applications and charity profile data (all of which is publicly registered information for UK charities), but cannot access payment data (none exists), cannot submit applications on the charity's behalf (export is a file download the charity must manually submit), and cannot reach financial figures (never stored). The marginal security gain of optional MFA does not justify the friction it introduces for non-technical volunteer users — the primary persona. FR-07 was already Should Have (not Must Have); the decision is to not offer it in v1 or subsequent phases unless the product's data sensitivity materially increases.
+
+---
+
 ## 2026-06-12 — Step 5: Back link replaced with Re-open (loop bug fix)
 
 **What changed:**
