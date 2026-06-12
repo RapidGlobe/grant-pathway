@@ -8,6 +8,19 @@
 
 ---
 
+## 2026-06-12 — Step 5: approve + download collapsed into a single action
+
+**What changed:**
+
+- `components/application-step5-approve.tsx` — The separate "Approve my application" button and its confirmation modal have been removed. The download buttons (Word / plain text) are now disabled until all three confirmation checkboxes are ticked. On first click they approve the application and trigger the download in a single action. The re-export warning modal (for repeat downloads), re-open modal, and the three declaration checkboxes are all unchanged.
+- `docs/PRD inputs/screen-requirements.md` — Step 5 table updated: Approve button row removed; Export buttons row updated to describe the merged approve-and-download behaviour.
+- `docs/PRD inputs/acceptance-criteria.md` — AC-FR-33-01, AC-FR-33-02, AC-FR-33-03 rewritten to reflect new flow; AC-FR-39-03 updated to remove reference to the old approval button.
+
+**Why:**
+The previous flow required 6 interactions to complete a first download (3 checkbox ticks → Approve button → modal confirm → download click). The confirmation modal was redundant — three deliberate checkbox ticks already demonstrate intent; asking again immediately after added friction without adding safety. Collapsing approve + download reduces the flow to 4 interactions (3 checkbox ticks → download click) while preserving all legal declarations and the re-export / re-open safeguards.
+
+---
+
 ## 2026-06-12 — AI suggestion card: "Use this version" renamed to "Use this improved version"
 
 **What changed:**

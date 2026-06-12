@@ -1466,31 +1466,31 @@ _Word limits are extracted automatically from the guidelines in Step 3 — they 
 
 ---
 
-**AC-FR-33-01 — Export not available without approval**
+**AC-FR-33-01 — Export not available until all checkboxes are ticked**
 
 - **Given** I have draft answers on Step 4 and have advanced to Step 5
-- **And** I have not yet clicked _"Approve my application"_
+- **And** I have not yet ticked all three confirmation checkboxes
 - **When** I view Step 5
 - **Then** the _"Download as Word document"_ button is disabled
 - **And** I cannot export the application content
 
 ---
 
-**AC-FR-33-02 — Approval confirmation prompt shown**
+**AC-FR-33-02 — Download triggers approval and export in a single action** _(Revised 2026-06-12: confirmation modal removed)_
 
-- **Given** I am on Step 5 and have reviewed my application
-- **When** I click _"Approve my application"_
-- **Then** I see a confirmation prompt: _"Are you sure you want to approve this application? You can re-open it to make changes at any time."_
-- **And** I must explicitly confirm before the approval is recorded
+- **Given** I am on Step 5 and have ticked all three confirmation checkboxes
+- **When** I click _"Download as Word document"_ or _"Download as plain text"_
+- **Then** the application status is set to `approved`
+- **And** the download begins immediately with no intermediate confirmation modal
 
 ---
 
-**AC-FR-33-03 — Application status set to approved on confirmation**
+**AC-FR-33-03 — Application status set to approved on first download**
 
-- **Given** I have clicked _"Approve my application"_ and seen the confirmation prompt
-- **When** I confirm the approval
+- **Given** I have ticked all three checkboxes and clicked a download button
+- **When** the download completes
 - **Then** the application status changes to `approved`
-- **And** the _"Download as Word document"_ button becomes enabled
+- **And** both download buttons remain enabled for subsequent exports
 
 ---
 
@@ -1761,10 +1761,10 @@ _These criteria apply only if FR-38 is implemented in v1._
 
 **AC-FR-39-03 — Export remains blocked until approval is explicitly confirmed**
 
-- **Given** I have draft answers on Step 4 but have not yet clicked _"Approve my application"_ on Step 5
-- **When** I view the export button on Step 5
-- **Then** the button remains disabled regardless of how many answers have been drafted or edited
-- **And** only completing the approval action on Step 5 enables the export button
+- **Given** I have draft answers on Step 4 but have not yet ticked all three confirmation checkboxes on Step 5
+- **When** I view the export buttons on Step 5
+- **Then** the buttons remain disabled regardless of how many answers have been drafted or edited
+- **And** only ticking all three checkboxes enables the export buttons
 
 ---
 
