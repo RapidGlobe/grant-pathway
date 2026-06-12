@@ -8,6 +8,18 @@
 
 ---
 
+## 2026-06-12 — Register button hidden on /privacy and /terms pages
+
+**What changed:**
+
+- `components/nav-public.tsx` — "Register — it's free" button now hidden on `/privacy` and `/terms` in addition to the existing `/register` and `/verify-email` exclusions.
+- `docs/PRD inputs/screen-requirements.md` — Public navigation bar spec updated to reflect the new exclusions.
+
+**Why:**
+The register button is out of context on legal document pages. Visitors arrive there from footer links or search results to read policy content; a promotional CTA alongside legal text is inappropriate and clutters the header.
+
+---
+
 ## 2026-06-11 — Six new funders added to dropdown (MK Community Foundation × 4, Baily Thomas × 2)
 
 **What changed:**

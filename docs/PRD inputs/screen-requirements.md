@@ -31,7 +31,7 @@ The following elements appear on all screens unless otherwise noted.
 ### Navigation bar (unauthenticated)
 
 - Grant Pathway logo (top left) — links to `/` (2026-06-10: previously no link; changed so pages reached directly, e.g. `/terms` from a search result, are never a dead end. Signed-in users are redirected on to `/dashboard` by the auth middleware)
-- **Register — it's free** button — `/register`; hidden on `/register` (circular) and on `/verify-email` (the user has just registered; added 2026-06-10). 2026-06-09: standalone Sign in link removed as redundant — every public form carries a contextual sign-in link
+- **Register — it's free** button — `/register`; hidden on `/register` (circular), `/verify-email` (the user has just registered; added 2026-06-10), `/privacy`, and `/terms` (out of context on legal pages; added 2026-06-12). 2026-06-09: standalone Sign in link removed as redundant — every public form carries a contextual sign-in link
 
 ### Navigation bar (authenticated)
 
