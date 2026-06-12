@@ -630,7 +630,7 @@ export function ApplicationStep4Draft({
                           onClick={() => handleUseRefined(q.id, refineState.refinedText)}
                           className="h-8 bg-[#1D4ED8] px-4 text-[13px] font-semibold text-white hover:bg-[#1E40AF]"
                         >
-                          Use this version
+                          Use this improved version
                         </Button>
                         <button
                           type="button"
