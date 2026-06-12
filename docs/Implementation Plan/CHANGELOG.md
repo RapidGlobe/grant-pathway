@@ -8,6 +8,18 @@
 
 ---
 
+## 2026-06-12 — Step 5: Back link replaced with Re-open (loop bug fix)
+
+**What changed:**
+
+- `components/application-step5-approve.tsx` — "Back" link removed from Step 5. "Re-open application to make changes" is now always shown, regardless of approval state. Unused `Link` import removed.
+- `docs/PRD inputs/screen-requirements.md` — Back link row replaced with Re-open link row.
+
+**Why:**
+Step 4 (`app/(authenticated)/applications/[id]/step/4/page.tsx` line 49) unconditionally redirects to Step 5 when `draft_status === 'assembled'`. Since draft_status is always 'assembled' when a user reaches Step 5, clicking Back from Step 5 immediately bounced them straight back to Step 5 — an unescapable loop. The Back link gave the appearance of working navigation but never functioned. Re-open is the only correct route back to Step 4 as it resets `draft_status` to `in_progress`, clears the assembled draft, and redirects to Step 4 via the server action.
+
+---
+
 ## 2026-06-12 — Step 5: approve + download collapsed into a single action
 
 **What changed:**
