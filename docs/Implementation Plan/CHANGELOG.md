@@ -8,6 +8,18 @@
 
 ---
 
+## 2026-06-12 — Logo icon mark updated to match brand design
+
+**What changed:**
+
+- `components/logo.tsx` — Placeholder SVG icon replaced with hand-coded SVG accurately matching the Canva brand asset. The icon mark is three orange elements: a head circle (top), a tall left vertical bar, and a G-arc with horizontal crossbar. The dark wordmark ("Grant" in teal, "Pathway" in dark) is retained — it works on white/light backgrounds used by both navs.
+- `public/images/logo-white-wordmark.png` — Canva export (transparent background, white wordmark) added for use in dark/teal contexts such as email templates.
+
+**Why:**
+The Canva-exported SVG file was a base64-encoded PNG embedded in an SVG wrapper (309 KB), not a true vector. The PNG export has a white wordmark suitable only for dark backgrounds, while both nav bars use `bg-white`. The solution is a hand-coded SVG icon mark (faithful to the brand) combined with the existing CSS text wordmark, giving correct rendering on all backgrounds without needing multiple PNG variants in the component.
+
+---
+
 ## 2026-06-12 — Two-factor authentication removed (FR-07 demoted to Won't Have)
 
 **What changed:**
