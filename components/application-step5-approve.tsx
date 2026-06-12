@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { CheckCircle2, Download, FileText, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -434,24 +433,18 @@ export function ApplicationStep5Approve({
         </p>
       )}
 
-      {/* ── Re-open / back links ─────────────────────────────────────────── */}
+      {/* ── Re-open link ─────────────────────────────────────────────────── */}
+      {/* Back link is intentionally absent: Step 4 always redirects forward
+          to Step 5 when draft_status = 'assembled', so a Back link would loop.
+          Re-opening is the only way to return to Step 4 for edits. */}
       <div className="mb-8">
-        {isApproved ? (
-          <button
-            type="button"
-            onClick={() => setShowReOpenDialog(true)}
-            className="rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-          >
-            Re-open application to make changes
-          </button>
-        ) : (
-          <Link
-            href={`/applications/${applicationId}/step/4`}
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-          >
-            Back
-          </Link>
-        )}
+        <button
+          type="button"
+          onClick={() => setShowReOpenDialog(true)}
+          className="rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+        >
+          Re-open application to make changes
+        </button>
       </div>
 
       {/* ── Re-export warning dialog ───────────────────────────────────────── */}
