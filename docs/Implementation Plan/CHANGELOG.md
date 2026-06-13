@@ -8,6 +8,19 @@
 
 ---
 
+## 2026-06-13 — Final Grant Pathway logo implemented
+
+**What changed:**
+
+- `components/logo.tsx` — replaced hand-coded SVG placeholder with `next/image` referencing the real brand asset (`/public/images/logo.png`). The PNG was created in Canva AI and exported with transparent background (1562×560px).
+- `public/images/logo.png` — final logo: teal arc + orange person figure icon, "Grant Pathway" two-word wordmark in dark teal. Works on all white/light backgrounds used by both navs.
+- `public/images/logo-white-wordmark.png` — retained for dark/teal background contexts (emails etc.).
+
+**Why:**
+After multiple iterations attempting to hand-code the original logo as SVG (blocked by Canva exporting raster PNGs disguised as SVG), the decision was made to create a new logo using Canva AI with clear brand requirements. The new design is cleaner, more scalable, and professionally executed.
+
+---
+
 ## 2026-06-12 — Logo icon mark updated to match brand design
 
 **What changed:**
