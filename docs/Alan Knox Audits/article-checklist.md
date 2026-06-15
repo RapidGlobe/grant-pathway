@@ -19,7 +19,7 @@ Status cross-referenced from `status.md`.
 | Minimum Viable Product (MVP)          |          |
 | Trade-Offs & Constraints              |          |
 | Scope Creep                           |          |
-| Definition of Done (DoD)              |          |
+| Definition of Done (DoD)              | ✅       |
 | Cost of Ownership                     |          |
 | Software Development Lifecycle (SDLC) |          |
 | Full Stack Development                |          |

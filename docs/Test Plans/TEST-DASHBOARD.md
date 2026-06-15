@@ -1,10 +1,41 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.36
+**Version:** 1.37
 **Last updated:** 2026-06-15
 **Status:** Live — updated after each test session
 
 RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — testing not yet complete · 🔴 Failed — one or more tests failed and unresolved
+
+---
+
+## Funder Readiness Standard
+
+This defines what "done" means for a funder at each status level, and what is acceptable to have live in the dropdown at each stage.
+
+### 🟢 Fully tested — supported
+
+All of the following must be true:
+
+- Full funder test plan exists covering every step from login to Word export (minimum 10 test cases per AGENTS.md)
+- All tests passed with no unresolved defects (severity: blocking or high)
+- AI summary time recorded and within NFR-01 (≤45 seconds)
+- Any funder-specific eligibility, question, or format behaviour verified in context
+- Funder has been confirmed open and accepting applications at time of testing
+
+### 🟡 In dropdown — not fully tested
+
+A funder may be live in the dropdown before full testing is complete. This is an accepted risk during Phase 5, subject to the following conditions:
+
+- The funder has been added to the dropdown with correct `funder_type` and `grant_range` metadata
+- A test plan exists or is in progress, OR the funder is parked (programme closed)
+- Users may encounter untested behaviour — this is acceptable during the controlled P5 pilot period where users are known to Rapidglobe
+- Any defect reported by a pilot user is treated as P1 and resolved before broader rollout
+
+**Review point:** Before public launch (post-P5), every funder in the dropdown must be at 🟢 or removed. 🟡 funders should not be accessible to anonymous signups at launch.
+
+### ⏸️ Parked — programme closed
+
+Funder is in the codebase but the grant programme is currently closed or inactive. The funder remains in the dropdown (marked inactive in the database) so that existing applications are not broken. No testing required until the programme reopens.
 
 ---
 
@@ -90,3 +121,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.34    | 2026-06-07 | Rapidglobe Ltd | Henry Smith full end-to-end retest completed via escape hatch path — Q&A writing, approval, Word and text file exports all confirmed. IT-HSF-09 and IT-HSF-10 retest notes added. Henry Smith test plan updated to v1.7.                                                                                                                                                         |
 | 1.35    | 2026-06-11 | Rapidglobe Ltd | Added 8 new funders in 🟡 status following dropdown expansion: MK Community Foundation ×4 (Seed/Sapling/Oak/Strategic Partnership), Baily Thomas ×2 (Small/General), CPF Trust. Baily Thomas Research Grants added as ⏸️ inactive. Summary: 7 complete, 10 in progress/not started.                                                                                              |
 | 1.36    | 2026-06-15 | Rapidglobe Ltd | Regression Test Plan created (regression-test-plan.md). 10 test cases (5 smoke, 5 full). Derived from Alan Knox Automated Testing audit and cross-referenced against user guide v1.14. Added to dashboard as a new cross-funder section above funder-specific tests.                                                                                                             |
+| 1.37    | 2026-06-15 | Rapidglobe Ltd | Funder Readiness Standard added. Defines 🟢/🟡/⏸️ criteria, accepted risk for 🟡 funders during P5 pilot, and the pre-launch rule that all dropdown funders must reach 🟢 before public rollout. Derived from Alan Knox Definition of Done audit.                                                                                                                                |
