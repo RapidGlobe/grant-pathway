@@ -1,10 +1,16 @@
 # Grant Pathway — Test Dashboard
 
-**Version:** 1.35
-**Last updated:** 2026-06-11
+**Version:** 1.36
+**Last updated:** 2026-06-15
 **Status:** Live — updated after each test session
 
 RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — testing not yet complete · 🔴 Failed — one or more tests failed and unresolved
+
+---
+
+| Plan                                      | File                                               | Tests | Executed | RAG | Notes                                                                                                                                                                                                                                                |
+| ----------------------------------------- | -------------------------------------------------- | ----- | -------- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Regression Test Plan** _(cross-funder)_ | [regression-test-plan.md](regression-test-plan.md) | 10    | 0        | 🟡  | Created 2026-06-15. 5 smoke tests (RT-01–05) + 5 full regression tests (RT-06–10). Run after every dependency update and before each production deployment. Test account: grantpathway+idle100@gmail.com. Cross-referenced against user guide v1.14. |
 
 ---
 
@@ -83,3 +89,4 @@ RAG key: 🟢 Complete — all tests passed · 🟡 In progress or partial — t
 | 1.33    | 2026-06-07 | Rapidglobe Ltd | D-HSF-03 fixed and verified — IT-11 escape hatch scenario (profile correction → new application → regenerated summary → prep checklist) now populates Step 4 correctly on first load. IT-11 escape hatch fully closed. Henry Smith test plan updated to v1.6.                                                                                                                    |
 | 1.34    | 2026-06-07 | Rapidglobe Ltd | Henry Smith full end-to-end retest completed via escape hatch path — Q&A writing, approval, Word and text file exports all confirmed. IT-HSF-09 and IT-HSF-10 retest notes added. Henry Smith test plan updated to v1.7.                                                                                                                                                         |
 | 1.35    | 2026-06-11 | Rapidglobe Ltd | Added 8 new funders in 🟡 status following dropdown expansion: MK Community Foundation ×4 (Seed/Sapling/Oak/Strategic Partnership), Baily Thomas ×2 (Small/General), CPF Trust. Baily Thomas Research Grants added as ⏸️ inactive. Summary: 7 complete, 10 in progress/not started.                                                                                              |
+| 1.36    | 2026-06-15 | Rapidglobe Ltd | Regression Test Plan created (regression-test-plan.md). 10 test cases (5 smoke, 5 full). Derived from Alan Knox Automated Testing audit and cross-referenced against user guide v1.14. Added to dashboard as a new cross-funder section above funder-specific tests.                                                                                                             |

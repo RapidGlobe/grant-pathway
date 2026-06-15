@@ -111,9 +111,9 @@ Status cross-referenced from `status.md`.
 | Article                           | Reviewed |
 | --------------------------------- | -------- |
 | Debugging                         |          |
-| Automated Testing                 |          |
+| Automated Testing                 | ✅       |
 | Performance & Scalability Testing |          |
-| Regression Testing                |          |
+| Regression Testing                | ✅       |
 | Mock External Services            |          |
 | Testing in Production             |          |
 | Browser Developer Tools           |          |
