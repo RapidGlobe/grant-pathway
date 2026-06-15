@@ -8,6 +8,36 @@
 
 ---
 
+## 2026-06-15 — Dependency updates merged and smoke tested
+
+**What changed:**
+
+Five Dependabot PRs merged to master (#37–#41):
+
+| Package              | Before  | After   | Risk                        |
+| -------------------- | ------- | ------- | --------------------------- |
+| `@types/node`        | 25.9.1  | 25.9.3  | Low — types only            |
+| `eslint-config-next` | 16.2.7  | 16.2.9  | Low — dev/lint only         |
+| `lucide-react`       | 1.17.0  | 1.18.0  | Low — icons only            |
+| `@anthropic-ai/sdk`  | 0.100.1 | 0.104.1 | Medium — core AI library    |
+| `@supabase/ssr`      | 0.10.3  | 0.12.0  | Medium — auth/session layer |
+
+**Why:**
+
+Routine dependency hygiene. The `@supabase/ssr` bump (0.10.3 → 0.12.0) rewrote the cookie architecture but our codebase already used the `getAll`/`setAll` interface introduced in 0.5.0, so no code changes were required. The `@anthropic-ai/sdk` bump (0.100.1 → 0.104.1) included minor API additions; no breaking changes to our usage patterns.
+
+**Smoke test result (2026-06-15, local dev):**
+
+- Login / session persistence ✅ (Supabase SSR auth layer working)
+- Dashboard data load ✅ (3 applications rendered, AI usage counter correct)
+- Step 4 Q&A interface ✅ (page loads, question sections populated from DB)
+- AI "Help me improve this" ✅ (`/api/refine-answer` returned 200, 317 tokens via Bedrock, suggestion rendered in UI)
+- No console errors on any tested page
+
+Note: the `.next` build cache from the previous dev server run needed to be cleared before the step pages would compile correctly under the new versions. No code changes required.
+
+---
+
 ## 2026-06-13 — Final Grant Pathway logo implemented
 
 **What changed:**

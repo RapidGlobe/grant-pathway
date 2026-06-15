@@ -1,6 +1,6 @@
 ﻿# Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-11 (6 new funders added: MK Community Foundation ×4 tiers, Baily Thomas ×2 tiers)
+**Last updated:** 2026-06-15 (5 Dependabot dependency PRs merged and smoke tested — no issues)
 **Plan version:** 1.5
 **Overall status:** In progress
 **Target launch:** 31 July 2026
