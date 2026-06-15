@@ -1,7 +1,7 @@
 # Grant Pathway — Deployment Checklist
 
-**Version:** 1.0
-**Last updated:** 8 June 2026
+**Version:** 1.1
+**Last updated:** 15 June 2026
 
 This checklist must be completed before deploying any change that touches an API route, database migration, authentication flow, AI prompt, or environment variable. For minor documentation-only changes it may be skipped.
 
@@ -74,6 +74,16 @@ The following environment variables act as feature flags and can be toggled in V
 | --------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `DISABLE_TEXT_PREPROCESSING=true` | Bypasses the document pre-processing step in `/api/generate-summary`         | If a Prettier or preprocessing regression degrades AI summary quality |
 | `PREPROCESS_CHAR_CEILING=<n>`     | Overrides the character ceiling for document pre-processing (default 50,000) | If very large funder documents are being truncated or timing out      |
+
+#### Feature flag convention
+
+Any change in the following categories **must be wrapped in an environment variable flag before it ships**, so it can be disabled without a code rollback if problems appear in production:
+
+- **AI prompt logic** — changes to `lib/prompts.ts` (summary prompt, refine prompt, draft prompt)
+- **Funder eligibility rules** — changes to eligibility detection logic or funder-specific overrides
+- **Export behaviour** — changes to the Word document generation pipeline
+
+The pattern is a single `process.env` check at the entry point of the affected code path. Add the flag to `.env.example` with a description, set it in Vercel's environment variables, and document it in the table above. Do not ship a significant change in these categories without a flag — the Vercel instant rollback takes ~30 seconds but requires identifying the bad deployment first; a flag toggle is faster and more precise.
 
 ### Database rollback
 
