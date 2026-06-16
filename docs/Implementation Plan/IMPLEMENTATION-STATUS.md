@@ -1,7 +1,7 @@
 ﻿# Grant Pathway v1 — Implementation Status
 
 **Last updated:** 2026-06-15 (5 Dependabot dependency PRs merged and smoke tested — no issues)
-**Plan version:** 1.5
+**Plan version:** 1.9
 **Overall status:** In progress
 **Target launch:** 31 July 2026
 

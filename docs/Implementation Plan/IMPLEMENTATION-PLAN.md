@@ -1483,6 +1483,46 @@ Checklist:
 **Target start:** ~17 July 2026 (two weeks before 31 July launch)
 **Estimated time:** 2 weeks
 
+### Funder Directory (DR-FD-001) — ✅ Complete (2026-06-01)
+
+Implemented prior to P5.1 to ensure all Phase 5 testing reflects the real product experience. Decision record: `docs/decisions/DR-FD-001-funder-directory-model.md`.
+
+#### P5.FD1 — Create `funders` Supabase table and RLS policy
+
+Create the `funders` table via a migration file with columns: `id` (uuid PK), `name` (text, unique), `funder_type` (`structured | narrative`), `grant_range` (text, nullable), `guidelines_url` (text, nullable), `is_active` (boolean, default `true`), `created_at` (timestamptz). Apply RLS: all authenticated users can SELECT active funders; only service role may INSERT, UPDATE, or DELETE.
+
+#### P5.FD2 — Seed `funders` table with approved orgs from target funder list
+
+Seed the table with all approved funders from `docs/target-funder-list.md`. Each row must include `funder_type` and `grant_range`. Only active, tested funders are included at launch.
+
+#### P5.FD3 — Add nullable `funder_id` FK column to `applications` table
+
+Add `funder_id uuid REFERENCES funders(id)` as a nullable column to `applications` via a migration file. Nullable to preserve existing records. Populated when a user selects a funder from the picker at Step 1.
+
+#### P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker
+
+Replace the funder name text input in the Step 1 (Application Details) UI with a searchable picker component wired to the `funders` table (active funders only). On selection, write both `funder_id` and `funder_name` to the `applications` row (`funder_name` retained for display and export).
+
+#### P5.FD5 — Add "My funder isn't listed — request it" link below picker
+
+Add a clearly labelled escape hatch below the picker. V1 implementation is a mailto or Tally form link. Users who arrive with a legitimate unlisted funder are not dead-ended; their request becomes a demand signal for the funder validation backlog.
+
+#### P5.FD6 — Wire funder request notification to Rapidglobe
+
+Ensure each funder request submitted via the escape hatch generates a notification to Rapidglobe (email or equivalent) so no request is missed.
+
+---
+
+### Performance (ADR-AI-010) — ✅ Complete (2026-06-05)
+
+Implemented prior to P5.1 following funder testing that revealed long AI summary times for multi-PDF guideline packs. Full decision record: `docs/Technical Decision and Design/ADR-AI-010-summary-performance-strategy.md`.
+
+#### P5.PERF1 — Document pre-processing (`lib/preprocess-text.ts`) in `generate-summary`
+
+Create `lib/preprocess-text.ts` and insert it into `/api/generate-summary` before the Bedrock call. The utility strips PDF extraction artefacts and detectable boilerplate, and enforces a character ceiling (raised to 50,000 after funder testing) with a logged warning on truncation. A `DISABLE_TEXT_PREPROCESSING=true` env flag is available as an escape hatch. Tested against all 7 required funders before production deployment; all completed within NFR-01 targets.
+
+---
+
 ### P5.1 — Compliance (BRD Section 14)
 
 > **⚠️ Ahead-of-time action required (noted 2026-05-20):** The Privacy Policy and Terms of Service documents should be drafted _during Phase 4_, not left until P5.1 begins. Both documents contain commitments (data retention, funder relationships, AI disclaimers) that may influence UI copy written in Phase 4 slices. Claude can produce initial drafts based on the ADRs, BRD, and product requirements — ask when ready. A solicitor should review both documents before publication, particularly the Privacy Policy (UK GDPR compliance).
@@ -1589,6 +1629,8 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 | 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                        |
 | 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                      |
 | 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                    |
+| 1.9     | 2026-06-16 | Rapidglobe Ltd | Added Performance section (P5.PERF1) to Phase 5 — task implemented 2026-06-05 but missing from plan; added for audit trail completeness (ADR-AI-010)              |
+| 1.8     | 2026-06-16 | Rapidglobe Ltd | Added Funder Directory section (P5.FD1–FD6) to Phase 5 — tasks implemented 2026-06-01 but missing from plan; added for audit trail completeness (DR-FD-001)       |
 | 1.7     | 2026-06-16 | Rapidglobe Ltd | Added bundle size / Core Web Vitals check to P5.4 checklist (ADR-STACK-001 consequence)                                                                           |
 | 1.6     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table |
 
