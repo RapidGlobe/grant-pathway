@@ -1549,6 +1549,7 @@ Create `lib/preprocess-text.ts` and insert it into `/api/generate-summary` befor
 - **Session timeout inactivity banner (GAP-22):** Update the inactivity timer to redirect to `/?timeout=true` instead of `/`. Update the sign-in page to read the `?timeout=true` param and display a banner: "You've been signed out due to inactivity." (`technical-design.md §5`, ADR-SEC-003).
 - **Route loading states (GAP-23):** Create a `loading.tsx` file in each authenticated route folder under `app/(authenticated)/` that renders the existing `page-skeleton.tsx` component. This wires up Next.js Suspense boundaries so users see a skeleton loader during server-side data fetching rather than a blank flash (ADR-ARCH-002).
 - **Export disclaimer wording (GAP-24):** Fix the disclaimer text in the export route (`app/api/export/[applicationId]/route.ts`). Change from "All content has been checked for accuracy before submission." to "Please review carefully before submitting to the funder." (PDR-DH-003).
+- **Zod validation in Server Actions (GAP-25):** Add Zod input validation to `actions/applications.ts` and `actions/auth.ts`. Each Server Action entry point must parse its inputs through a Zod schema before processing. Follow the pattern already in use in `actions/charity.ts` (ADR-ARCH-003).
 - Run `@axe-core/react` in development mode; fix all violations before proceeding
 - Lighthouse accessibility audit on all key pages (target 95+)
 - Manual keyboard-only navigation test through the full five-step flow
@@ -1635,6 +1636,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 | 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                        |
 | 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                      |
 | 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                    |
+| 2.6     | 2026-06-16 | Rapidglobe Ltd | Added Zod validation step for Server Actions to P5.3 (GAP-25)                                                                                                     |
 | 2.5     | 2026-06-16 | Rapidglobe Ltd | Added export disclaimer wording fix to P5.3 (GAP-24)                                                                                                              |
 | 2.4     | 2026-06-16 | Rapidglobe Ltd | Added loading.tsx per authenticated route step to P5.3 (GAP-23)                                                                                                   |
 | 2.3     | 2026-06-16 | Rapidglobe Ltd | Added session timeout inactivity banner step to P5.3 (GAP-22)                                                                                                     |
