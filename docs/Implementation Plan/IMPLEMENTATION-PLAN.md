@@ -1545,6 +1545,7 @@ Create `lib/preprocess-text.ts` and insert it into `/api/generate-summary` befor
 ### P5.3 — Accessibility (WCAG 2.2 Level AA)
 
 - **Mobile viewport banner (GAP-05):** Add a full-screen banner displayed on viewports below 768px informing users that Grant Pathway is designed for desktop. Banner should block the UI (not just warn) and suggest the user switch to a desktop or laptop browser (ADR-ARCH-005).
+- **Sentry route tagging (GAP-21):** Wrap the Bedrock call in `generate-summary` and `generate-draft` routes with `Sentry.withScope(scope => { scope.setTag('route', 'generate-summary') ... })` so errors are filterable by route in the Sentry dashboard (ADR-OPS-005, `technical-design.md §14`).
 - Run `@axe-core/react` in development mode; fix all violations before proceeding
 - Lighthouse accessibility audit on all key pages (target 95+)
 - Manual keyboard-only navigation test through the full five-step flow
@@ -1631,6 +1632,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 | 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                        |
 | 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                      |
 | 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                    |
+| 2.2     | 2026-06-16 | Rapidglobe Ltd | Added Sentry route tagging step to P5.3 (GAP-21)                                                                                                                  |
 | 2.1     | 2026-06-16 | Rapidglobe Ltd | Added mobile viewport banner step to P5.3 (GAP-05)                                                                                                                |
 | 2.0     | 2026-06-16 | Rapidglobe Ltd | Added cross-user RLS test step to P5.2 (GAP-17)                                                                                                                   |
 | 1.9     | 2026-06-16 | Rapidglobe Ltd | Added Performance section (P5.PERF1) to Phase 5 — task implemented 2026-06-05 but missing from plan; added for audit trail completeness (ADR-AI-010)              |
