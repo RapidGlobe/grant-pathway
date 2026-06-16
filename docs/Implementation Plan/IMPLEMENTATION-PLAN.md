@@ -1522,6 +1522,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 - Configure Sentry for production; confirm PII scrubbing is active
 - Confirm Resend sending domain is verified (SPF + DKIM)
 - Confirm email templates in Supabase Auth reference "Grant Pathway" and use correct styling
+- Review `next build` output for unexpectedly large bundles; check Vercel dashboard Core Web Vitals after first production deployment (ADR-STACK-001)
 
 ### P5.5 — Final Testing
 
@@ -1588,6 +1589,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 | 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                        |
 | 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                      |
 | 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                    |
+| 1.7     | 2026-06-16 | Rapidglobe Ltd | Added bundle size / Core Web Vitals check to P5.4 checklist (ADR-STACK-001 consequence)                                                                           |
 | 1.6     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table |
 
 ---

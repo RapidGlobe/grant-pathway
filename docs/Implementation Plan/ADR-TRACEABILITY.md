@@ -8,15 +8,16 @@
 - When a new task is added to cover a gap, update the Task column and change status to ✅ or 🔵.
 - When a task is completed, no change needed here — the task status lives in IMPLEMENTATION-STATUS.md.
 
-**Version:** 1.0  
-**Last updated:** 2026-06-07  
-**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article); ADR-AI-010 added 2026-06-05 (summary performance strategy — pre-processing pre-launch, streaming post-v1); GAP-29 and GAP-30 closed 2026-06-07
+**Version:** 1.1  
+**Last updated:** 2026-06-16  
+**Audit basis:** Full sweep of all 42 ADRs completed 2026-05-20 (pre-Phase 4 gate); Phase 4 exit sweep completed 2026-05-22 (GAP-07/13/19 resolved; GAP-21–26 added); ADR-DATA-005 added 2026-05-26; ADR-OPS-008 added 2026-06-04 (GAP-27/28/29 added following production readiness review against Knox "Production Thinking" article); ADR-AI-010 added 2026-06-05 (summary performance strategy — pre-processing pre-launch, streaming post-v1); GAP-29 and GAP-30 closed 2026-06-07; Phase 4→5 pre-launch ADR sweep completed 2026-06-16 (all 46 ADRs — 4 new ADRs since last sweep); "five tables" corrected to "six tables" in ADR-DATA-001 and ADR-SEC-002 rows (funders table added 2026-06-01 via DR-FD-001)
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                             |
-| ------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-07 | Rapidglobe Ltd | Version control introduced. GAP-29 (linting infrastructure) and GAP-30 (text pre-processing) closed — both implemented 2026-06-05. |
+| Version | Date       | Author         | Change                                                                                                                                                                              |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026-06-16 | Rapidglobe Ltd | Phase 4→5 pre-launch ADR sweep (all 46 ADRs). Corrected "five tables" to "six tables" in ADR-DATA-001 and ADR-SEC-002 rows to reflect `funders` table added 2026-06-01 (DR-FD-001). |
+| 1.0     | 2026-06-07 | Rapidglobe Ltd | Version control introduced. GAP-29 (linting infrastructure) and GAP-30 (text pre-processing) closed — both implemented 2026-06-05.                                                  |
 
 ## Status key
 
@@ -97,7 +98,7 @@
 
 | ADR          | Consequence                                                                                                                   | Task                                                   | Status             |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------ |
-| ADR-DATA-001 | RLS policies defined for all five tables                                                                                      | P3.1                                                   | ✅                 |
+| ADR-DATA-001 | RLS policies defined for all six tables (including non-user-scoped `funders` table — public SELECT, service-role-only write)  | P3.1; `funders` table added 2026-06-01 (DR-FD-001)     | ✅                 |
 | ADR-DATA-001 | `applications.current_step` drives resume-flow logic                                                                          | S2.3, S3.1/S3.2                                        | ✅                 |
 | ADR-DATA-001 | `ai_usage_log.created_at` used for monthly usage count                                                                        | S2.1, S5.2                                             | ✅                 |
 | ADR-DATA-001 | Funder guidelines text intentionally absent from data model (ADR-DATA-002, ADR-FILE-004)                                      | ADR-FILE-004 `sessionStorage` pattern                  | ✅                 |
@@ -190,25 +191,25 @@
 
 ## Security
 
-| ADR         | Consequence                                                                  | Task                                 | Status                                                                                                                                       |
-| ----------- | ---------------------------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| ADR-SEC-001 | `proxy.ts` maintained with session refresh, route protection, redirect rules | P3.4                                 | ✅                                                                                                                                           |
-| ADR-SEC-001 | Public routes explicitly excluded from middleware                            | P3.4                                 | ✅                                                                                                                                           |
-| ADR-SEC-001 | Supabase `@supabase/ssr` client used in middleware                           | P3.3                                 | ✅                                                                                                                                           |
-| ADR-SEC-001 | Session refresh on every request; redirect responses carry refreshed cookies | P3.4 (cookie fix applied 2026-05-20) | ✅                                                                                                                                           |
-| ADR-SEC-002 | RLS policies defined for all five tables in migration                        | P3.1                                 | ✅                                                                                                                                           |
-| ADR-SEC-002 | Cross-user access tested as part of development process                      | P5.2                                 | ⚠️ GAP-17                                                                                                                                    |
-| ADR-SEC-002 | Service role key stored as server-only environment variable                  | P3.2                                 | ✅                                                                                                                                           |
-| ADR-SEC-003 | Client-side inactivity timer implemented (60-minute timeout)                 | S0.5                                 | ✅                                                                                                                                           |
-| ADR-SEC-003 | Timeout warning modal designed and implemented                               | P1.1, S0.5                           | ✅                                                                                                                                           |
-| ADR-SEC-003 | Auto-save completes before session timeout fires                             | S6.3, S0.5                           | ✅                                                                                                                                           |
-| ADR-SEC-003 | Supabase Auth JWT expiry confirmed ≥ 60 minutes                              | P3.12                                | ✅ GAP-18 resolved — local: config.toml `jwt_expiry = 3600`; prod: verified 2026-05-20 at 3600s (Project Settings → API → Legacy JWT Secret) |
-| ADR-SEC-004 | All 6 HTTP security headers configured in `next.config.ts`                   | P3.5                                 | ✅                                                                                                                                           |
-| ADR-SEC-004 | CSP tested against all pages post-deployment                                 | P5.2                                 | 🔵                                                                                                                                           |
-| ADR-SEC-005 | `ai_usage_log` count checked in all AI API routes before Bedrock call        | S5.2, S6.2                           | ✅                                                                                                                                           |
-| ADR-SEC-005 | `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` configured           | P3.6                                 | ✅                                                                                                                                           |
-| ADR-SEC-006 | Server-only variables accessed only in server-side code                      | P3.2 (convention enforced)           | ✅                                                                                                                                           |
-| ADR-SEC-006 | `.env.example` committed with all required variable names                    | P3.2                                 | ✅                                                                                                                                           |
+| ADR         | Consequence                                                                  | Task                                               | Status                                                                                                                                       |
+| ----------- | ---------------------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| ADR-SEC-001 | `proxy.ts` maintained with session refresh, route protection, redirect rules | P3.4                                               | ✅                                                                                                                                           |
+| ADR-SEC-001 | Public routes explicitly excluded from middleware                            | P3.4                                               | ✅                                                                                                                                           |
+| ADR-SEC-001 | Supabase `@supabase/ssr` client used in middleware                           | P3.3                                               | ✅                                                                                                                                           |
+| ADR-SEC-001 | Session refresh on every request; redirect responses carry refreshed cookies | P3.4 (cookie fix applied 2026-05-20)               | ✅                                                                                                                                           |
+| ADR-SEC-002 | RLS policies defined for all six tables in migration (see ADR-DATA-001 note) | P3.1; `funders` table added 2026-06-01 (DR-FD-001) | ✅                                                                                                                                           |
+| ADR-SEC-002 | Cross-user access tested as part of development process                      | P5.2                                               | ⚠️ GAP-17                                                                                                                                    |
+| ADR-SEC-002 | Service role key stored as server-only environment variable                  | P3.2                                               | ✅                                                                                                                                           |
+| ADR-SEC-003 | Client-side inactivity timer implemented (60-minute timeout)                 | S0.5                                               | ✅                                                                                                                                           |
+| ADR-SEC-003 | Timeout warning modal designed and implemented                               | P1.1, S0.5                                         | ✅                                                                                                                                           |
+| ADR-SEC-003 | Auto-save completes before session timeout fires                             | S6.3, S0.5                                         | ✅                                                                                                                                           |
+| ADR-SEC-003 | Supabase Auth JWT expiry confirmed ≥ 60 minutes                              | P3.12                                              | ✅ GAP-18 resolved — local: config.toml `jwt_expiry = 3600`; prod: verified 2026-05-20 at 3600s (Project Settings → API → Legacy JWT Secret) |
+| ADR-SEC-004 | All 6 HTTP security headers configured in `next.config.ts`                   | P3.5                                               | ✅                                                                                                                                           |
+| ADR-SEC-004 | CSP tested against all pages post-deployment                                 | P5.2                                               | 🔵                                                                                                                                           |
+| ADR-SEC-005 | `ai_usage_log` count checked in all AI API routes before Bedrock call        | S5.2, S6.2                                         | ✅                                                                                                                                           |
+| ADR-SEC-005 | `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` configured           | P3.6                                               | ✅                                                                                                                                           |
+| ADR-SEC-006 | Server-only variables accessed only in server-side code                      | P3.2 (convention enforced)                         | ✅                                                                                                                                           |
+| ADR-SEC-006 | `.env.example` committed with all required variable names                    | P3.2                                               | ✅                                                                                                                                           |
 
 ---
 
