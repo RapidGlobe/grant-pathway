@@ -1,8 +1,8 @@
 ﻿# Grant Pathway v1 — Implementation Plan
 
-**Version:** 1.6
+**Version:** 2.7
 **Date:** 2026-05-07
-**Last updated:** 2026-05-29
+**Last updated:** 2026-06-16
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -1550,6 +1550,7 @@ Create `lib/preprocess-text.ts` and insert it into `/api/generate-summary` befor
 - **Route loading states (GAP-23):** Create a `loading.tsx` file in each authenticated route folder under `app/(authenticated)/` that renders the existing `page-skeleton.tsx` component. This wires up Next.js Suspense boundaries so users see a skeleton loader during server-side data fetching rather than a blank flash (ADR-ARCH-002).
 - **Export disclaimer wording (GAP-24):** Fix the disclaimer text in the export route (`app/api/export/[applicationId]/route.ts`). Change from "All content has been checked for accuracy before submission." to "Please review carefully before submitting to the funder." (PDR-DH-003).
 - **Zod validation in Server Actions (GAP-25):** Add Zod input validation to `actions/applications.ts` and `actions/auth.ts`. Each Server Action entry point must parse its inputs through a Zod schema before processing. Follow the pattern already in use in `actions/charity.ts` (ADR-ARCH-003).
+- **Inactivity cron reliability (GAP-31):** (1) Add `last_inactivity_warned_at` column to `user_profiles` table via a migration; update the inactivity-warning cron to check this column before sending and update it after send — prevents duplicate warning emails if Vercel fires the cron twice. (2) Update the inactivity-deletion cron to surface email send failures to Sentry rather than swallowing them silently (ADR-AI-010, ADR-OPS-004).
 - Run `@axe-core/react` in development mode; fix all violations before proceeding
 - Lighthouse accessibility audit on all key pages (target 95+)
 - Manual keyboard-only navigation test through the full five-step flow
@@ -1570,6 +1571,9 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 - Confirm Resend sending domain is verified (SPF + DKIM)
 - Confirm email templates in Supabase Auth reference "Grant Pathway" and use correct styling
 - Review `next build` output for unexpectedly large bundles; check Vercel dashboard Core Web Vitals after first production deployment (ADR-STACK-001)
+- **Sentry AI route performance alert (GAP-03):** In the Sentry dashboard, configure a performance alert on the `generate-summary` and `generate-draft` routes. Set the threshold to trigger when P95 response time exceeds 75 seconds (alert before the 90s hard limit). Requires a production baseline — set up the alert after the first successful production deployment and Vercel Pro is active (ADR-AI-001).
+- **Version tag (GAP-12):** After the first successful production deployment, run `git tag -a v1.0 -m "v1.0 production launch"` and push the tag: `git push origin v1.0`. This marks the go-live commit in git history (ADR-OPS-001).
+- **Rollback procedure (GAP-28):** Document and follow this rollback procedure for production incidents: (1) In Vercel dashboard → Deployments, click the last known-good deployment and select "Redeploy" (one-click revert, ~60 seconds). (2) Only deploy to production during business hours (09:00–17:00 Mon–Fri) unless responding to a live P1 incident. (3) Before re-deploying after a revert, confirm the root-cause fix is in the branch and all tests pass locally. (4) Record the incident and rollback in `CHANGELOG.md` (ADR-OPS-001, ADR-OPS-004).
 
 ### P5.5 — Final Testing
 
@@ -1636,6 +1640,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 | 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                        |
 | 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                      |
 | 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                    |
+| 2.7     | 2026-06-16 | Rapidglobe Ltd | Added inactivity cron reliability step to P5.3 (GAP-31); added Sentry P95 alert, v1.0 git tag, and rollback procedure steps to P5.4 (GAP-03/12/28)                |
 | 2.6     | 2026-06-16 | Rapidglobe Ltd | Added Zod validation step for Server Actions to P5.3 (GAP-25)                                                                                                     |
 | 2.5     | 2026-06-16 | Rapidglobe Ltd | Added export disclaimer wording fix to P5.3 (GAP-24)                                                                                                              |
 | 2.4     | 2026-06-16 | Rapidglobe Ltd | Added loading.tsx per authenticated route step to P5.3 (GAP-23)                                                                                                   |
