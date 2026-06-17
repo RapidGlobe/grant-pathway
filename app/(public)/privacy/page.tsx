@@ -10,7 +10,10 @@ export const metadata: Metadata = {
 }
 
 export default async function PrivacyPage() {
-  const markdown = await readFile(path.join(process.cwd(), 'docs', 'privacy-policy.md'), 'utf-8')
+  const markdown = await readFile(
+    path.join(process.cwd(), 'docs', 'legal', 'privacy-policy.md'),
+    'utf-8',
+  )
 
   return <LegalDocument markdown={markdown} />
 }
