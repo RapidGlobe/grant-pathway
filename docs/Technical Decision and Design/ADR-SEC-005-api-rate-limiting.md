@@ -10,7 +10,7 @@ status: Decided
 
 Grant Pathway exposes API routes for AI generation (Step 3 AI Summary, Step 4 Draft Answers). These routes call the Anthropic API and incur direct cost per call. Without rate limiting, a single user or a bad actor could trigger unlimited AI calls, resulting in uncontrolled cost.
 
-A soft limit is already defined in the product: 20 AI requests per user per month (`ai_usage_log` table, PDR-AI-005). This is an application-level business rule. A separate technical rate limit may be needed to prevent abuse at the API layer.
+A soft limit is already defined in the product: 50 AI requests per user per month (`ai_usage_log` table, PDR-AI-005). This is an application-level business rule. A separate technical rate limit may be needed to prevent abuse at the API layer.
 
 ## Options Considered
 
@@ -75,3 +75,9 @@ PDR-AI-005, ADR-AI-008, BRD Section 9 (Data Privacy & Security).
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                      |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-17 | Monthly cap raised from 20 → 50 across all three AI routes (`generate-summary`, `generate-draft`, `refine-answer`) to align with product usage patterns. `generate-draft` was the last route still at 20; updated to match. |
