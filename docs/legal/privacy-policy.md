@@ -1,8 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.1
+**Version:** 1.2
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 26 May 2026**
+**Last updated: 17 June 2026**
+
+> **Change from v1.1 (26 May 2026):** Section 1 updated to confirm ICO registration number ZC168720.
 
 > **Change from v1.0 (22 May 2026):** Section 5 updated to reflect Amazon Bedrock (eu-west-2, London) as the AI processing provider, replacing the previous Anthropic direct API reference; Sentry data region corrected to European Union. Section 6 updated to reflect that AI processing no longer involves a US data transfer. Section 7 updated to accurately disclose the 7-day automated backup retention window that applies after account deletion (ADR-DATA-005).
 
@@ -17,10 +19,8 @@ Grant Pathway is a free online tool that helps UK charities write grant applicat
 | **Company name**                | RapidGlobe Ltd                                                               |
 | **Company registration number** | 05615649                                                                     |
 | **Registered address**          | Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW |
-| **ICO registration number**     | [TO BE CONFIRMED — see note below]                                           |
+| **ICO registration number**     | ZC168720                                                                     |
 | **Data protection contact**     | wjokhia@rapidglobe.com                                                       |
-
-> **⚠ ICO registration:** Processing personal data of UK individuals requires registration with the Information Commissioner's Office in most cases. Please confirm your ICO registration number before this policy goes live. Register or check your status at [ico.org.uk](https://ico.org.uk).
 
 RapidGlobe Ltd is the **data controller** for the personal information you provide when using Grant Pathway. This means we decide how and why your data is used, and we are responsible for keeping it safe.
 
@@ -181,6 +181,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.1_
+_Version: 1.2_
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 26 May 2026_
+_Last updated: 17 June 2026_
