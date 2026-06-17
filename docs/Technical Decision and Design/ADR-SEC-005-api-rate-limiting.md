@@ -42,7 +42,7 @@ A soft limit is already defined in the product: 50 AI requests per user per mont
 
 **Option C — Upstash Redis rate limiting (`@upstash/ratelimit`), implemented alongside the AI route build.**
 
-Per-user rate limiting (keyed on `auth.uid()`) is applied to all AI API routes using a sliding window algorithm. The application-level 20 requests/month cap (ADR-AI-008) remains in place as a second layer of protection.
+Per-user rate limiting (keyed on `auth.uid()`) is applied to all AI API routes using a sliding window algorithm. The application-level 50 requests/month cap (ADR-AI-008) remains in place as a second layer of protection.
 
 **Rate limit parameters:**
 
