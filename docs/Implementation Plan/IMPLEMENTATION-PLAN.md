@@ -1468,12 +1468,14 @@ Two Vercel cron jobs handle automated inactivity deletion. Both validate `Author
 
 Checklist:
 
-- [ ] All Phase 4 slices complete (Slice 0–8), or any incomplete slices explicitly deferred with justification
-- [ ] ADR Traceability Table reviewed — all ⚠️ Gap rows resolved or documented as N/A
-- [ ] All GAP-01 through GAP-20 resolved or explicitly signed off as deferred
-- [ ] Run compliance sweep agent: confirm no new gaps introduced during Phase 4
-- [ ] Security and GDPR-critical ADRs re-reviewed by project owner
-- [ ] Phase 4 → Phase 5 gate row in `ADR-TRACEABILITY.md` sign-off table completed
+- [x] All Phase 4 slices complete (Slice 0–8), or any incomplete slices explicitly deferred with justification
+- [x] ADR Traceability Table reviewed — all ⚠️ Gap rows resolved or documented as N/A
+- [x] All GAP-01 through GAP-20 resolved or explicitly signed off as deferred
+- [x] Run compliance sweep agent: confirm no new gaps introduced during Phase 4
+- [x] Security and GDPR-critical ADRs re-reviewed by project owner
+- [x] Phase 4 → Phase 5 gate row in `ADR-TRACEABILITY.md` sign-off table completed
+
+**Signed off: WJ, 2026-06-17**
 
 ---
 
@@ -1632,29 +1634,30 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-05-07 | Rapidglobe Ltd | Initial plan — phases 0–5 with route reference, discrepancy table (D1–D7), and all slice specifications                                                           |
-| 1.1     | 2026-05-07 | Rapidglobe Ltd | Corrected 13 inconsistencies against screen-requirements.md (D1–D7)                                                                                               |
-| 1.2     | 2026-05-07 | Rapidglobe Ltd | Corrected 10 inconsistencies against PRD inputs (D8–D10)                                                                                                          |
-| 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                        |
-| 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                      |
-| 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                    |
-| 2.7     | 2026-06-16 | Rapidglobe Ltd | Added inactivity cron reliability step to P5.3 (GAP-31); added Sentry P95 alert, v1.0 git tag, and rollback procedure steps to P5.4 (GAP-03/12/28)                |
-| 2.6     | 2026-06-16 | Rapidglobe Ltd | Added Zod validation step for Server Actions to P5.3 (GAP-25)                                                                                                     |
-| 2.5     | 2026-06-16 | Rapidglobe Ltd | Added export disclaimer wording fix to P5.3 (GAP-24)                                                                                                              |
-| 2.4     | 2026-06-16 | Rapidglobe Ltd | Added loading.tsx per authenticated route step to P5.3 (GAP-23)                                                                                                   |
-| 2.3     | 2026-06-16 | Rapidglobe Ltd | Added session timeout inactivity banner step to P5.3 (GAP-22)                                                                                                     |
-| 2.2     | 2026-06-16 | Rapidglobe Ltd | Added Sentry route tagging step to P5.3 (GAP-21)                                                                                                                  |
-| 2.1     | 2026-06-16 | Rapidglobe Ltd | Added mobile viewport banner step to P5.3 (GAP-05)                                                                                                                |
-| 2.0     | 2026-06-16 | Rapidglobe Ltd | Added cross-user RLS test step to P5.2 (GAP-17)                                                                                                                   |
-| 1.9     | 2026-06-16 | Rapidglobe Ltd | Added Performance section (P5.PERF1) to Phase 5 — task implemented 2026-06-05 but missing from plan; added for audit trail completeness (ADR-AI-010)              |
-| 1.8     | 2026-06-16 | Rapidglobe Ltd | Added Funder Directory section (P5.FD1–FD6) to Phase 5 — tasks implemented 2026-06-01 but missing from plan; added for audit trail completeness (DR-FD-001)       |
-| 1.7     | 2026-06-16 | Rapidglobe Ltd | Added bundle size / Core Web Vitals check to P5.4 checklist (ADR-STACK-001 consequence)                                                                           |
-| 1.6     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                 |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-05-07 | Rapidglobe Ltd | Initial plan — phases 0–5 with route reference, discrepancy table (D1–D7), and all slice specifications                                                                                                                                                            |
+| 1.1     | 2026-05-07 | Rapidglobe Ltd | Corrected 13 inconsistencies against screen-requirements.md (D1–D7)                                                                                                                                                                                                |
+| 1.2     | 2026-05-07 | Rapidglobe Ltd | Corrected 10 inconsistencies against PRD inputs (D8–D10)                                                                                                                                                                                                           |
+| 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                                                                                                                         |
+| 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                                                                                                                       |
+| 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                                                                                                                     |
+| 2.8     | 2026-06-17 | Rapidglobe Ltd | Phase 4→5 gate signed off by WJ (2026-06-17); gate checklist ticked; legal docs consolidated to `docs/legal/` (privacy-policy.md + terms-of-service.md); 7-day backup disclosure corrected in privacy policy; monthly AI cap aligned to 50 across all three routes |
+| 2.7     | 2026-06-16 | Rapidglobe Ltd | Added inactivity cron reliability step to P5.3 (GAP-31); added Sentry P95 alert, v1.0 git tag, and rollback procedure steps to P5.4 (GAP-03/12/28)                                                                                                                 |
+| 2.6     | 2026-06-16 | Rapidglobe Ltd | Added Zod validation step for Server Actions to P5.3 (GAP-25)                                                                                                                                                                                                      |
+| 2.5     | 2026-06-16 | Rapidglobe Ltd | Added export disclaimer wording fix to P5.3 (GAP-24)                                                                                                                                                                                                               |
+| 2.4     | 2026-06-16 | Rapidglobe Ltd | Added loading.tsx per authenticated route step to P5.3 (GAP-23)                                                                                                                                                                                                    |
+| 2.3     | 2026-06-16 | Rapidglobe Ltd | Added session timeout inactivity banner step to P5.3 (GAP-22)                                                                                                                                                                                                      |
+| 2.2     | 2026-06-16 | Rapidglobe Ltd | Added Sentry route tagging step to P5.3 (GAP-21)                                                                                                                                                                                                                   |
+| 2.1     | 2026-06-16 | Rapidglobe Ltd | Added mobile viewport banner step to P5.3 (GAP-05)                                                                                                                                                                                                                 |
+| 2.0     | 2026-06-16 | Rapidglobe Ltd | Added cross-user RLS test step to P5.2 (GAP-17)                                                                                                                                                                                                                    |
+| 1.9     | 2026-06-16 | Rapidglobe Ltd | Added Performance section (P5.PERF1) to Phase 5 — task implemented 2026-06-05 but missing from plan; added for audit trail completeness (ADR-AI-010)                                                                                                               |
+| 1.8     | 2026-06-16 | Rapidglobe Ltd | Added Funder Directory section (P5.FD1–FD6) to Phase 5 — tasks implemented 2026-06-01 but missing from plan; added for audit trail completeness (DR-FD-001)                                                                                                        |
+| 1.7     | 2026-06-16 | Rapidglobe Ltd | Added bundle size / Core Web Vitals check to P5.4 checklist (ADR-STACK-001 consequence)                                                                                                                                                                            |
+| 1.6     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table                                                                                                  |
 
 ---
 
-_Implementation Plan v1.6 — Grant Pathway_
-_Created: 2026-05-07 | Last updated: 2026-05-29_
+_Implementation Plan v2.8 — Grant Pathway_
+_Created: 2026-05-07 | Last updated: 2026-06-17_
 _Verified against: BRD v0.2, PRD v0.2, all 42 ADRs, technical-design.md, Screen Requirements, Application Status Model, Email Notifications, Acceptance Criteria, Success Metrics, Data Model, Non-Functional Requirements, Out-of-Scope Document, User Personas & Use Cases, all 17 PDR decisions, MoSCoW Feature Register, Information Architecture, Constraints & Assumptions_
