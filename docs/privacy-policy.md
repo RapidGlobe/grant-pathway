@@ -1,7 +1,7 @@
 # Grant Pathway — Privacy Policy
 
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 8 June 2026**
+**Last updated: 17 June 2026**
 
 ---
 
@@ -95,17 +95,18 @@ Several of our service providers are based outside the United Kingdom (see Secti
 
 ## 7. How Long We Keep Your Information
 
-| Data                                     | Retention period                                                                           |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below) |
-| Application content                      | Deleted when your account is deleted                                                       |
-| AI usage log                             | Deleted when your account is deleted                                                       |
-| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)          |
-| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible            |
+| Data                                     | Retention period                                                                                       |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below)             |
+| Application content                      | Deleted when your account is deleted                                                                   |
+| AI usage log                             | Deleted when your account is deleted                                                                   |
+| Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below) |
+| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                      |
+| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                        |
 
 **Inactivity deletion:** If your account has not been used for two years, we will send a warning email to your registered address. If you do not log in within 30 days of that warning, your account and all associated data will be permanently deleted. You will receive no further warning before deletion occurs.
 
-**Account deletion on request:** You can delete your account at any time from within the service. Deletion is immediate and permanent — we do not retain a backup of your data after deletion.
+**Account deletion on request:** You can delete your account at any time from within the service. Your data is removed from our live systems immediately and permanently. As part of our operational backup infrastructure, automated backup copies are permanently removed within 7 days as part of the standard backup rotation cycle. These backup copies are not accessible to users and cannot be used to restore deleted content.
 
 ---
 
