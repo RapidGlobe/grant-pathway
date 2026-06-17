@@ -8,6 +8,45 @@
 
 ---
 
+## 2026-06-17 — Privacy policy Section 7 corrected; legal docs consolidated to docs/legal/; generate-draft cap aligned to 50
+
+Three issues found and fixed during the Phase 4→5 gate ADR re-review session (ADR-SEC-005 and ADR-DATA-005):
+
+### 1. generate-draft monthly cap corrected from 20 → 50
+
+**What changed:**
+
+- `app/api/generate-draft/route.ts` — `MONTHLY_CAP` raised from 20 to 50; `APPROACHING_LIMIT_THRESHOLD` raised from 16 to 40.
+- `docs/Technical Decision and Design/ADR-SEC-005-api-rate-limiting.md` — Context and Decision sections updated to state 50 req/month throughout; revision history row added.
+
+**Why:**
+`MONTHLY_CAP` on `generate-draft` was never updated when the monthly cap was raised to 50 on 2026-05-28 (Step 4 redesign). The 2026-06-08 readiness review confirmed `generate-summary` and `refine-answer` both enforced 50 but missed `generate-draft`. Users had a cap of 20 on draft generation while the other two AI routes enforced 50 — discovered during ADR-SEC-005 re-review.
+
+### 2. Privacy policy Section 7 — incorrect GDPR disclosure on live /privacy page
+
+**What changed:**
+
+- `docs/legal/privacy-policy.md` — Already correct (updated when ADR-DATA-005 was decided, 2026-05-26).
+- `docs/privacy-policy.md` (root level, now deleted) — Section 7 incorrectly stated "we do not retain a backup of your data after deletion". This was the file the live `/privacy` page was actually serving. Corrected before deletion to accurately disclose the 7-day automated backup retention window (Supabase Pro daily backups, eu-west-2).
+
+**Why:**
+The live `/privacy` page routed to the root-level `docs/privacy-policy.md`, which was not updated when ADR-DATA-005 introduced the 7-day backup commitment on 2026-05-26. The `docs/legal/privacy-policy.md` file had the correct disclosure, but the app was reading the wrong file. This was a GDPR Article 17 compliance gap: users were told no backup is retained after deletion, but Supabase Pro retains automated daily backups for 7 days before rotation.
+
+### 3. Legal docs consolidated to docs/legal/ as single authoritative location
+
+**What changed:**
+
+- `docs/privacy-policy.md` and `docs/terms-of-service.md` (root level) — deleted via `git rm`.
+- `app/(public)/privacy/page.tsx` — `readFile` path updated from `docs/privacy-policy.md` to `docs/legal/privacy-policy.md`.
+- `app/(public)/terms/page.tsx` — `readFile` path updated from `docs/terms-of-service.md` to `docs/legal/terms-of-service.md`.
+
+**Why:**
+Two copies of each legal document existed and had drifted. `docs/legal/` was already the location of the authoritative privacy policy (since ADR-DATA-005 on 2026-05-26) but the page routes still served the root-level copies. Consolidation to `docs/legal/` as the single location eliminates the drift risk.
+
+> **Correction to 2026-06-10 entry below:** The 2026-06-10 "Terms of Service and Privacy Policy pages live" entry states the pages read from `docs/terms-of-service.md` and `docs/privacy-policy.md`. Those root-level files have now been deleted; both pages serve from `docs/legal/` as of this entry.
+
+---
+
 ## 2026-06-15 — Dependency updates merged and smoke tested
 
 **What changed:**
