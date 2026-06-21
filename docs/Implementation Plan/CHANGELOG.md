@@ -8,6 +8,20 @@
 
 ---
 
+## 2026-06-21 — IDOR/BOLA fix: applicationId ownership check added to /api/upload/process
+
+**What changed:**
+
+- `app/api/upload/process/route.ts` — added an ownership verification query before processing. The route now checks that the supplied `applicationId` belongs to the authenticated user (`eq('user_id', user.id)`) before downloading or processing the file. Returns `404` if the check fails.
+
+**Why:**
+
+A security review identified that this route accepted `applicationId` from the request body without verifying ownership. Every other sensitive API route in the application (export, generate-summary, generate-draft, refine-answer) already enforced ownership via a `user_id` column check, but `/api/upload/process` was missing that guard. An authenticated user could have passed another user's `applicationId` in the request body to associate a processed file with an application they do not own — a Broken Object Level Authorisation (BOLA/IDOR) vulnerability. The fix adds the same ownership pattern already in use across all other routes.
+
+Note: the risk was partially mitigated by all IDs being UUIDs (not guessable sequential integers) and by the file `path` being namespaced by the uploader's own `user.id`. The ownership check closes the gap fully.
+
+---
+
 ## 2026-06-17 — Privacy policy Section 7 corrected; legal docs consolidated to docs/legal/; generate-draft cap aligned to 50
 
 Three issues found and fixed during the Phase 4→5 gate ADR re-review session (ADR-SEC-005 and ADR-DATA-005):

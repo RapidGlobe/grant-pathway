@@ -7,6 +7,10 @@
 // memory as a Buffer. This unconditional delete (ADR-FILE-001) means the
 // file is never stranded even if extraction or the network call fails.
 //
+// applicationId is verified against the authenticated user before processing
+// to prevent IDOR: an attacker cannot process files against another user's
+// application even if they know the applicationId (BOLA fix, 2026-06-21).
+//
 // Request body: { path: string, applicationId: string }
 //
 // Success: { text: string, isLargeDocument: boolean }
@@ -40,6 +44,18 @@ export async function POST(request: NextRequest) {
   const { path, applicationId } = body
   if (typeof path !== 'string' || !path || typeof applicationId !== 'string' || !applicationId) {
     return NextResponse.json({ error: 'Missing or invalid path / applicationId.' }, { status: 400 })
+  }
+
+  // Verify the application belongs to the authenticated user (IDOR/BOLA guard)
+  const { data: appRow, error: appOwnershipError } = await supabase
+    .from('applications')
+    .select('id')
+    .eq('id', applicationId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (appOwnershipError || !appRow) {
+    return NextResponse.json({ error: 'not_found' }, { status: 404 })
   }
 
   // Service role client — required for private bucket access

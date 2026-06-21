@@ -1,6 +1,6 @@
 ﻿# Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-17 (Phase 4→5 gate signed off by WJ; legal docs consolidated; privacy policy corrected; monthly AI cap aligned)
+**Last updated:** 2026-06-21 (Security fix: IDOR/BOLA ownership check added to /api/upload/process)
 **Plan version:** 2.8
 **Overall status:** In progress
 **Target launch:** 31 July 2026
