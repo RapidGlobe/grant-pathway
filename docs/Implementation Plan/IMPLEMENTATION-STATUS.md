@@ -1,6 +1,6 @@
 ﻿# Grant Pathway v1 — Implementation Status
 
-**Last updated:** 2026-06-21 (Security fix: IDOR/BOLA ownership check added to /api/upload/process)
+**Last updated:** 2026-06-21 (Security fixes: middleware.ts wired up; IDOR/BOLA ownership check added to /api/upload/process)
 **Plan version:** 2.8
 **Overall status:** In progress
 **Target launch:** 31 July 2026

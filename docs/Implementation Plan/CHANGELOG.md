@@ -8,7 +8,21 @@
 
 ---
 
-## 2026-06-21 — IDOR/BOLA fix: applicationId ownership check added to /api/upload/process
+## 2026-06-21 — Edge middleware wired up; IDOR/BOLA fix
+
+### 1. middleware.ts created — edge middleware now active (ADR-SEC-001)
+
+**What changed:**
+
+- `middleware.ts` created at project root — exports `proxy` as `middleware` and re-exports `config` from `proxy.ts`.
+
+**Why:**
+
+At Phase 0 bootstrap, a comment in `proxy.ts` incorrectly stated that Next.js 16 renamed `middleware.ts` to `proxy.ts`. Next.js has never made this change — the framework always looks for `middleware.ts` at the project root. The auth logic in `proxy.ts` was correctly written at P3.4 (2026-05-19) but was never connected to the Next.js middleware pipeline. As a result, the edge-level route protection (redirect unauthenticated users from protected routes, redirect authenticated users away from auth-only routes, refresh session tokens on every request) was never executing. The gap was masked by server-side auth checks on every API route and RLS on every table. The fix is a single re-export file. Discovered during a vibe-coding security review on 2026-06-21.
+
+---
+
+### 2. IDOR/BOLA fix: applicationId ownership check added to /api/upload/process
 
 **What changed:**
 
