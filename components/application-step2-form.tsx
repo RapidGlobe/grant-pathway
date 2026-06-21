@@ -95,7 +95,6 @@ export function ApplicationStep2Form({
   useEffect(() => {
     const stored = getGuidelines(applicationId)
     if (stored) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- reading sessionStorage; can only run client-side in useEffect
       setGuidelinesRestored(true)
     }
   }, [applicationId])

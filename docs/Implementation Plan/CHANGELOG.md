@@ -8,6 +8,23 @@
 
 ---
 
+## 2026-06-21 — Dependabot vulnerabilities resolved; edge middleware wired up; IDOR/BOLA fix
+
+### 1. Dependabot vulnerabilities resolved (6 open alerts cleared)
+
+**What changed:**
+
+- `@sentry/nextjs` upgraded `10.56.0` → `10.59.0` — resolves `@opentelemetry/core` (2.7.1 → 2.8.0, unbounded memory allocation in W3C Baggage propagation, CVE moderate).
+- `package.json` overrides extended: `hono >=4.12.25` (installed 4.12.26), `@babel/core >=7.29.6`, `js-yaml >=4.2.0` — all transitive dependencies with no patch available via direct-dependency upgrades.
+- Stale `eslint-disable-next-line react-hooks/set-state-in-effect` comment removed from `components/application-step2-form.tsx` — the rule no longer fires after the `eslint-plugin-react-hooks` update; the suppression became a lint warning under `--max-warnings 0`.
+- `npm audit` now reports **0 vulnerabilities**.
+
+**Why:**
+
+Six Dependabot alerts were open on the repository (1 high, 5 moderate). All were in transitive dependencies — `hono` (via `shadcn` → `@modelcontextprotocol/sdk`) and `@opentelemetry/core` (via `@sentry/nextjs`). The `hono` vulnerabilities (CORS wildcard reflection, Lambda@Edge header handling, serve-static path traversal, body limit bypass) affect applications using hono as their HTTP server; Grant Pathway uses Next.js as its server and hono is not active in production — risk was low but alerts needed clearing. The `@opentelemetry/core` issue (unbounded memory in W3C Baggage propagation) is relevant as Sentry uses OpenTelemetry for tracing.
+
+---
+
 ## 2026-06-21 — Edge middleware wired up; IDOR/BOLA fix
 
 ### 1. middleware.ts created — edge middleware now active (ADR-SEC-001)
