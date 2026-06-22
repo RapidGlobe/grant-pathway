@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-22 — Consolidate `MONTHLY_CAP` and `MODEL` into `lib/prompts.ts`
+
+**What changed:**
+
+- `lib/prompts.ts` — `MONTHLY_CAP = 50` and `APPROACHING_LIMIT_THRESHOLD = 40` exported alongside `MODEL`; single source of truth for all AI constants.
+- `app/api/generate-summary/route.ts`, `app/api/generate-draft/route.ts`, `app/api/refine-answer/route.ts` — local `MONTHLY_CAP` and `APPROACHING_LIMIT_THRESHOLD` declarations removed; constants now imported from `lib/prompts`.
+- `actions/charity.ts` — duplicate `const MODEL = 'anthropic.claude-sonnet-4-6'` (line 16) removed; `MODEL` now imported from `@/lib/prompts`.
+
+**Why:**
+Independent system specialist review flagged: _"Reconcile `MONTHLY_CAP` (50 in summary/refine, 20 in draft) into one shared constant; import `MODEL` from `lib/prompts.ts` everywhere instead of the duplicate in `charity.ts:16`."_ The `generate-draft` cap had already been corrected to 50 in a prior session but remained a local copy. Consolidating into `lib/prompts.ts` ensures a single update point — no risk of routes drifting apart again. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-22 — AI cap-count made fail-closed across all three AI routes
 
 **What changed:**
