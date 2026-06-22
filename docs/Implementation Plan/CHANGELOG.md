@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-22 — Sentry `beforeSend` hardened; storage paths and charity content scrubbed
+
+**What changed:**
+
+- `sentry.client.config.ts` — `beforeSend` hook updated: strips `event.request.data` (request body), `Authorization`/`Cookie` headers, and sensitive breadcrumb data keys (`guidelinesText`, `answerText`, `answer_text`, `path`, `signedUrl`).
+- `sentry.server.config.ts` — same hardening applied.
+- `sentry.edge.config.ts` — same hardening applied.
+- `docs/Alan Knox Audits/initial-assessment-report-findings.md` — fourth review item logged as Actioned.
+
+**Why:**
+Independent system specialist review flagged as a launch-blocker: _"Confirm whether the storage path and guideline/answer text reach Sentry; a leak escalates the upload IDOR to Critical."_ Audit confirmed `sendDefaultPii` is not set (defaults false), so request bodies are not auto-captured by Sentry. However, all three `beforeSend` hooks have been hardened defensively to strip: the full request body (which may contain `guidelinesText` or `answerText` from API calls); `Authorization` and `Cookie` request headers; and any breadcrumb data entries keyed by storage-path or charity-content field names. Storage path (user UUID + timestamp) is now blocked from reaching Sentry regardless of how it might appear in breadcrumbs. Launch-blocker closed; IDOR severity remains at its pre-existing level — not escalated.
+
+---
+
 ## 2026-06-22 — Supabase Pro activated; backups confirmed; restore drill RTO 6 min
 
 **What changed:**
