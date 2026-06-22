@@ -54,6 +54,9 @@ ON CONFLICT (id) DO NOTHING;
 -- user_profiles
 -- ---------------------------------------------------------------------------
 
+-- The on_auth_user_created trigger fires when auth.users is inserted above,
+-- creating a user_profiles row with empty names. Upsert on user_id to ensure
+-- the seed data overwrites the trigger-created placeholder with the correct values.
 INSERT INTO public.user_profiles (id, user_id, first_name, last_name, feedback_consent)
 VALUES (
   'b0000000-0000-0000-0000-000000000001',
@@ -62,7 +65,11 @@ VALUES (
   'Thompson',
   true
 )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (user_id) DO UPDATE SET
+  id               = EXCLUDED.id,
+  first_name       = EXCLUDED.first_name,
+  last_name        = EXCLUDED.last_name,
+  feedback_consent = EXCLUDED.feedback_consent;
 
 -- ---------------------------------------------------------------------------
 -- charity_profiles
