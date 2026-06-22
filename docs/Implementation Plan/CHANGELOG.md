@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-22 — Cross-user file-read IDOR closed on upload/process; Sentry breadcrumb type fix
+
+**What changed:**
+
+- `app/api/upload/process/route.ts` — storage path prefix check added: before the service-role download, the route now verifies `path.startsWith(user.id + '_')` and returns 403 if not. Combined with the existing `applicationId` ownership check, this closes the cross-user file-read IDOR.
+- `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts` — breadcrumb scrubbing corrected: `event.breadcrumbs` is `Breadcrumb[]` in this SDK version (not `{ values: Breadcrumb[] }`); accessing `.values` silently resolved to `Array.prototype.values` and the scrubbing was never executing. TypeScript now clean (0 errors).
+
+**Why:**
+Independent system specialist review flagged as a launch-blocker: _"Add the ownership check on the upload path: before the service-role download, reject any `path` not prefixed with the caller's id and verify `applicationId` ownership. Closes the cross-user file-read IDOR."_ The `applicationId` ownership check (BOLA fix, 2026-06-21) was already in place; the storage path prefix check is the new addition. The Sentry breadcrumb type error was discovered during the typecheck run for this fix.
+
+---
+
 ## 2026-06-22 — Sentry `beforeSend` hardened; storage paths and charity content scrubbed
 
 **What changed:**
