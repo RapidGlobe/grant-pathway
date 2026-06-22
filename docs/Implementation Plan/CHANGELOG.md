@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-22 — Sentry region confirmed EU; privacy policy accurate; P5.4 updated
+
+**What changed:**
+
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — P3.7 note updated: EU region confirmed 2026-06-22, production DSN empty noted as expected pre-launch, P5.4 flagged as the action point.
+- `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` — P5.4 Sentry step updated: region pre-confirmed as EU, explicit note to set `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` in Vercel Production at P5.4.
+- `docs/Alan Knox Audits/initial-assessment-report-findings.md` — second review item logged as Actioned.
+
+**Why:**
+An independent system specialist review flagged as a launch-blocker: _"Confirm whether the Sentry org is EU or US, and correct the served privacy policy to match the code."_ Sentry Organisation Settings (org: `rapidglobe-ltd`) confirmed Data Storage Region as **European Union (EU)**. The privacy policy v1.2 statement is accurate — no correction needed. The production Vercel DSN is empty (Sentry not yet active in production), which is expected pre-launch and covered by P5.4. The launch-blocker is closed.
+
+---
+
 ## 2026-06-22 — Bedrock zero-retention launch-blocker closed; AWS DPA confirmed
 
 **What changed:**

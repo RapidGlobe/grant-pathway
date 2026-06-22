@@ -1569,7 +1569,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 - Set all production environment variables in Vercel Production scope
 - Add `CRON_SECRET` to Vercel; confirm cron job appears active in dashboard
 - Apply initial migrations to production Supabase project: `supabase db push --db-url [prod-url]`
-- Configure Sentry for production; confirm PII scrubbing is active
+- Configure Sentry for production; set `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` in Vercel Production scope; confirm PII scrubbing is active. **Data Storage Region pre-confirmed as European Union (EU) — verified 2026-06-22 in Sentry Organisation Settings (org: rapidglobe-ltd, ID: 4511417358745600). No re-check needed.**
 - Confirm Resend sending domain is verified (SPF + DKIM)
 - Confirm email templates in Supabase Auth reference "Grant Pathway" and use correct styling
 - Review `next build` output for unexpectedly large bundles; check Vercel dashboard Core Web Vitals after first production deployment (ADR-STACK-001)
