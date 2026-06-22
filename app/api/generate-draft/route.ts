@@ -192,12 +192,15 @@ export async function POST(request: NextRequest) {
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {
     bedrockResponse = await withRetry(() =>
-      client.messages.create({
-        model: MODEL,
-        max_tokens: DRAFT_MAX_TOKENS,
-        system: AI_SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: prompt }],
-      }),
+      client.messages.create(
+        {
+          model: MODEL,
+          max_tokens: DRAFT_MAX_TOKENS,
+          system: AI_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: prompt }],
+        },
+        { signal: AbortSignal.timeout(60_000) },
+      ),
     )
   } catch (err) {
     const code = classifyBedrockError(err)
@@ -243,20 +246,23 @@ export async function POST(request: NextRequest) {
     let retryResponse: Awaited<ReturnType<typeof client.messages.create>>
     try {
       retryResponse = await withRetry(() =>
-        client.messages.create({
-          model: MODEL,
-          max_tokens: DRAFT_MAX_TOKENS,
-          system: AI_SYSTEM_PROMPT,
-          messages: [
-            { role: 'user', content: prompt },
-            { role: 'assistant', content: rawText },
-            {
-              role: 'user',
-              content:
-                'Your previous response was not valid JSON. Return ONLY the JSON array, starting with [ and ending with ]. No other text.',
-            },
-          ],
-        }),
+        client.messages.create(
+          {
+            model: MODEL,
+            max_tokens: DRAFT_MAX_TOKENS,
+            system: AI_SYSTEM_PROMPT,
+            messages: [
+              { role: 'user', content: prompt },
+              { role: 'assistant', content: rawText },
+              {
+                role: 'user',
+                content:
+                  'Your previous response was not valid JSON. Return ONLY the JSON array, starting with [ and ending with ]. No other text.',
+              },
+            ],
+          },
+          { signal: AbortSignal.timeout(60_000) },
+        ),
       )
     } catch (retryErr) {
       const code = classifyBedrockError(retryErr)

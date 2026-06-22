@@ -10,6 +10,10 @@
 // The large-document threshold is 100,000 tokens ≈ 400,000 characters.
 // This triggers a soft advisory warning to the user (PDR-AI-004, ADR-AI-007) —
 // there is no hard truncation; Claude Sonnet 4.6 handles up to 1M tokens.
+//
+// Resource bounds (POST-LAUNCH):
+//   - PDF: capped at MAX_PDF_PAGES pages to prevent unbounded memory/CPU use
+//   - Both types: hard 30-second extraction timeout to protect the Lambda budget
 
 import mammoth from 'mammoth'
 import { extractText as unpdfExtractText, getDocumentProxy } from 'unpdf'
@@ -20,9 +24,15 @@ const LARGE_DOCUMENT_CHAR_THRESHOLD = 400_000
 /** Minimum characters for a readable (non-scanned) PDF */
 const SCANNED_PDF_CHAR_THRESHOLD = 100
 
+/** Maximum pages extracted from a PDF (prevents DoS on very large documents) */
+const MAX_PDF_PAGES = 200
+
+/** Hard extraction timeout in milliseconds */
+const EXTRACTION_TIMEOUT_MS = 30_000
+
 export type ExtractionResult =
   | { ok: true; text: string; isLargeDocument: boolean }
-  | { ok: false; reason: 'scanned_pdf' | 'extraction_failed' }
+  | { ok: false; reason: 'scanned_pdf' | 'extraction_failed' | 'extraction_timeout' }
 
 /**
  * Extracts plain text from a PDF or Word (.docx) buffer.
@@ -36,11 +46,27 @@ export type ExtractionResult =
  * Supabase Storage. The caller is responsible for deleting the file.
  */
 export async function extractText(buffer: Buffer, mimeType: string): Promise<ExtractionResult> {
+  const timeoutPromise = new Promise<ExtractionResult>((resolve) =>
+    setTimeout(() => resolve({ ok: false, reason: 'extraction_timeout' }), EXTRACTION_TIMEOUT_MS),
+  )
+
+  return Promise.race([doExtract(buffer, mimeType), timeoutPromise])
+}
+
+async function doExtract(buffer: Buffer, mimeType: string): Promise<ExtractionResult> {
   try {
     let text = ''
 
     if (mimeType === 'application/pdf') {
       const pdf = await getDocumentProxy(new Uint8Array(buffer))
+
+      if (pdf.numPages > MAX_PDF_PAGES) {
+        console.warn(
+          `[extract-text] PDF has ${pdf.numPages} pages, exceeding cap of ${MAX_PDF_PAGES}`,
+        )
+        return { ok: false, reason: 'extraction_failed' }
+      }
+
       const { text: extracted } = await unpdfExtractText(pdf, { mergePages: true })
       text = extracted ?? ''
 

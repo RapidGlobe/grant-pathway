@@ -175,12 +175,15 @@ export async function POST(request: NextRequest) {
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {
     bedrockResponse = await withRetry(() =>
-      client.messages.create({
-        model: MODEL,
-        max_tokens: REFINE_MAX_TOKENS,
-        system: AI_SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: prompt }],
-      }),
+      client.messages.create(
+        {
+          model: MODEL,
+          max_tokens: REFINE_MAX_TOKENS,
+          system: AI_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: prompt }],
+        },
+        { signal: AbortSignal.timeout(60_000) },
+      ),
     )
   } catch (err) {
     const code = classifyBedrockError(err)

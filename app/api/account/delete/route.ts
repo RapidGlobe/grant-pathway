@@ -19,6 +19,17 @@ import { sendEmail } from '@/lib/emails/send'
 import { buildAccountDeletedByUserEmail } from '@/lib/emails/account-deleted-user'
 
 export async function POST() {
+  // 0. Preflight: confirm email service is configured before any irreversible action.
+  //    Deletion cannot be rolled back — if we can't send the confirmation email,
+  //    fail before touching any data rather than silently deleting without receipt.
+  if (!process.env.RESEND_API_KEY) {
+    console.error('[delete-account] RESEND_API_KEY is not set — refusing deletion to protect user')
+    return NextResponse.json(
+      { error: 'Service configuration error. Please contact support.' },
+      { status: 503 },
+    )
+  }
+
   // 1. Verify the caller is authenticated
   const supabase = await createClient()
   const {

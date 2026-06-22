@@ -101,6 +101,7 @@ export function ApplicationStep3Summary({
   })
 
   const [approachingLimit, setApproachingLimit] = useState(false)
+  const [guidelinesTruncated, setGuidelinesTruncated] = useState(false)
   const [guidelinesFilename, setGuidelinesFilename] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0].text)
@@ -184,6 +185,7 @@ export function ApplicationStep3Summary({
           summary?: AiSummaryData
           questionsFound?: boolean
           approachingLimit?: boolean
+          guidelinesTruncated?: boolean
           error?: string
           message?: string
         }
@@ -202,6 +204,7 @@ export function ApplicationStep3Summary({
         setSummary(data.summary)
         setQuestionsFound(data.questionsFound ?? false)
         setApproachingLimit(data.approachingLimit ?? false)
+        setGuidelinesTruncated(data.guidelinesTruncated ?? false)
 
         // Capture the filename label before clearing (it's cleared alongside text)
         setGuidelinesFilename(getGuidelinesFilename(applicationId))
@@ -428,6 +431,21 @@ export function ApplicationStep3Summary({
         <p className="mb-6 text-[13px] text-[#64748B]">Guidelines loaded: {guidelinesFilename}</p>
       )}
       {!guidelinesFilename && <div className="mb-6" />}
+
+      {/* Guidelines truncation warning */}
+      {guidelinesTruncated && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
+        >
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
+          <p className="text-[13px] text-[#78350F]">
+            Your guidelines document is very large and was partially summarised. The AI reviewed the
+            first section of the document. If key questions or eligibility criteria appear near the
+            end of the document, consider pasting the most relevant sections as text instead.
+          </p>
+        </div>
+      )}
 
       {/* Approaching limit banner */}
       {approachingLimit && (

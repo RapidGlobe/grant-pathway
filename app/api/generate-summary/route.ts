@@ -200,12 +200,14 @@ export async function POST(request: NextRequest) {
     : DEFAULT_CHAR_CEILING
 
   let textForPrompt = guidelinesText
+  let guidelinesTruncated = false
   if (!skipPreprocessing) {
     const { text, wasTruncated, originalLength, processedLength } = preprocessText(
       guidelinesText,
       charCeiling,
     )
     textForPrompt = text
+    guidelinesTruncated = wasTruncated
     console.log(
       `[generate-summary] pre-processing: ${originalLength} → ${processedLength} chars` +
         (wasTruncated ? ` (truncated at ${charCeiling})` : ''),
@@ -230,12 +232,15 @@ export async function POST(request: NextRequest) {
   let bedrockResponse: Awaited<ReturnType<typeof client.messages.create>>
   try {
     bedrockResponse = await withRetry(() =>
-      client.messages.create({
-        model: MODEL,
-        max_tokens: SUMMARY_MAX_TOKENS,
-        system: AI_SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: prompt }],
-      }),
+      client.messages.create(
+        {
+          model: MODEL,
+          max_tokens: SUMMARY_MAX_TOKENS,
+          system: AI_SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: prompt }],
+        },
+        { signal: AbortSignal.timeout(60_000) },
+      ),
     )
   } catch (err) {
     const code = classifyBedrockError(err)
@@ -282,20 +287,23 @@ export async function POST(request: NextRequest) {
     let retryResponse: Awaited<ReturnType<typeof client.messages.create>>
     try {
       retryResponse = await withRetry(() =>
-        client.messages.create({
-          model: MODEL,
-          max_tokens: SUMMARY_MAX_TOKENS,
-          system: AI_SYSTEM_PROMPT,
-          messages: [
-            { role: 'user', content: prompt },
-            { role: 'assistant', content: rawText },
-            {
-              role: 'user',
-              content:
-                'Your previous response was not valid JSON. Return ONLY the JSON object, starting with { and ending with }. No other text.',
-            },
-          ],
-        }),
+        client.messages.create(
+          {
+            model: MODEL,
+            max_tokens: SUMMARY_MAX_TOKENS,
+            system: AI_SYSTEM_PROMPT,
+            messages: [
+              { role: 'user', content: prompt },
+              { role: 'assistant', content: rawText },
+              {
+                role: 'user',
+                content:
+                  'Your previous response was not valid JSON. Return ONLY the JSON object, starting with { and ending with }. No other text.',
+              },
+            ],
+          },
+          { signal: AbortSignal.timeout(60_000) },
+        ),
       )
     } catch (retryErr) {
       const code = classifyBedrockError(retryErr)
@@ -360,6 +368,7 @@ export async function POST(request: NextRequest) {
     summary,
     questionsFound,
     approachingLimit,
+    guidelinesTruncated,
   })
 }
 

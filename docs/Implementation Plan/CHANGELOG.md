@@ -6,6 +6,31 @@
 
 ---
 
+## 2026-06-22 — POST-LAUNCH items 1–10 resolved: error boundaries, env validation, Resend preflight, truncation UX, RLS hardening, Bedrock timeout, OG/robots/sitemap, extraction bounds, npm audit CI, Sentry instrumentation
+
+**What changed:**
+
+- `app/(authenticated)/error.tsx` (new) — React error boundary for authenticated routes; `Sentry.captureException` in `useEffect`; Try again + Go to dashboard actions.
+- `app/global-error.tsx` (new) — Root-level error boundary with minimal `html/body` wrapper; `captureException` on mount.
+- `lib/env.ts` (new) — Zod schema validates all eight required server env vars at import time. Process throws if any are missing/invalid.
+- `instrumentation.ts` — imports `lib/env.ts` (env check runs before first request) and `sentry.server.config.ts`.
+- `instrumentation-client.ts` (new) — Client-side Sentry init hook (Next.js 15 `instrumentation-client`); imports `sentry.client.config.ts`.
+- `app/api/account/delete/route.ts` — Preflight check: returns HTTP 503 if `RESEND_API_KEY` is absent, before any data is deleted.
+- `app/api/generate-summary/route.ts` — `guidelinesTruncated` flag added to JSON response (tracked from existing `preprocessText` call).
+- `components/application-step3-summary.tsx` — Inline warning banner shown when `guidelinesTruncated: true`; advises user to paste most-relevant sections manually.
+- `supabase/migrations/20260622000003_rls_hardening.sql` (new) — All RLS policies on five tables recreated: `auth.uid()` → `(select auth.uid())` (once per statement, not per row); `WITH CHECK` added to all four UPDATE policies.
+- `app/api/generate-summary/route.ts`, `app/api/generate-draft/route.ts`, `app/api/refine-answer/route.ts` — All `messages.create` calls (including JSON retry branches) now pass `{ signal: AbortSignal.timeout(60_000) }` as the second argument.
+- `app/layout.tsx` — `metadataBase: new URL('https://grantpathway.org.uk')`, `openGraph`, and `twitter` cards added to root metadata.
+- `app/robots.ts` (new) — Disallows `/api/`, `/account/`, `/dashboard/`; references sitemap.
+- `app/sitemap.ts` (new) — Five public routes: home, login, register, terms, privacy.
+- `lib/extract-text.ts` — 30-second `Promise.race` extraction timeout (returns `extraction_timeout`); PDF page count capped at 200 pages (returns `extraction_failed` if exceeded).
+- `.github/workflows/ci.yml` — `audit` job added: `npm audit --audit-level=high` on every push/PR.
+
+**Why:**
+Alan Knox POST-LAUNCH items §2.1 items 8–14, §2.4 item 32, §2.5 items 34 + 36. TypeScript clean (0 errors), 22/22 tests pass.
+
+---
+
 ## 2026-06-22 — Five LAUNCH-BLOCKERs resolved: DB indexes, prompt injection, cap TOCTOU, Vitest, migration CI gate
 
 **What changed:**

@@ -10,11 +10,24 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://grantpathway.org.uk'),
   title: {
     template: '%s — Grant Pathway',
     default: 'Grant Pathway',
   },
   description: 'Your free grant writing companion for UK charities',
+  openGraph: {
+    type: 'website',
+    siteName: 'Grant Pathway',
+    title: 'Grant Pathway',
+    description: 'Your free grant writing companion for UK charities',
+    url: 'https://grantpathway.org.uk',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Grant Pathway',
+    description: 'Your free grant writing companion for UK charities',
+  },
 }
 
 export default function RootLayout({
