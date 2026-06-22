@@ -7,13 +7,11 @@
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { MODEL } from '@/lib/prompts'
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-/** Bedrock model identifier (ADR-AI-001) */
-const MODEL = 'anthropic.claude-sonnet-4-6'
 
 /** Charity Commission Register of Charities API base URL */
 const BASE_URL = 'https://api.charitycommission.gov.uk/register/api'

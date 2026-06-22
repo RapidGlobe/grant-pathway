@@ -29,13 +29,17 @@ import {
   httpStatusForError,
   aiErrorBody,
 } from '@/lib/ai-error-handler'
-import { MODEL, AI_SYSTEM_PROMPT, buildRefinePrompt } from '@/lib/prompts'
+import {
+  MODEL,
+  AI_SYSTEM_PROMPT,
+  MONTHLY_CAP,
+  APPROACHING_LIMIT_THRESHOLD,
+  buildRefinePrompt,
+} from '@/lib/prompts'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const maxDuration = 60
 
-const MONTHLY_CAP = 50
-const APPROACHING_LIMIT_THRESHOLD = 40
 const REFINE_MAX_TOKENS = 800
 
 export async function POST(request: NextRequest) {

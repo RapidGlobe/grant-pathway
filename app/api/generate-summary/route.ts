@@ -27,16 +27,18 @@ import {
   httpStatusForError,
   aiErrorBody,
 } from '@/lib/ai-error-handler'
-import { MODEL, AI_SYSTEM_PROMPT, buildSummaryPrompt, type CharityContext } from '@/lib/prompts'
+import {
+  MODEL,
+  AI_SYSTEM_PROMPT,
+  MONTHLY_CAP,
+  APPROACHING_LIMIT_THRESHOLD,
+  buildSummaryPrompt,
+  type CharityContext,
+} from '@/lib/prompts'
 import { preprocessText, DEFAULT_CHAR_CEILING } from '@/lib/preprocess-text'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const maxDuration = 90
-
-// Monthly AI request cap per user (ADR-AI-008, ADR-SEC-005)
-// Raised from 20 → 50 on 2026-05-28 to accommodate the Q&A model call pattern.
-const MONTHLY_CAP = 50
-const APPROACHING_LIMIT_THRESHOLD = 40
 
 // Raised to 4000: complex structured documents (e.g. AB Charitable Trust with
 // 33 questions across 4 sections) were truncating at 2000 tokens, producing

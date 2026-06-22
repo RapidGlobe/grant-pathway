@@ -17,10 +17,23 @@
 
 /**
  * Bedrock model identifier — single source of truth (ADR-AI-002).
- * Both generate-summary and generate-draft import from here so changing
- * the model updates both routes simultaneously.
+ * All AI routes and server actions import from here so changing the model
+ * updates every call site simultaneously.
  */
 export const MODEL = 'anthropic.claude-sonnet-4-6'
+
+/**
+ * Monthly AI request cap per user (ADR-AI-008, ADR-SEC-005).
+ * Shared across all three AI routes so the limit is always consistent.
+ * Raised from 20 → 50 on 2026-05-28.
+ */
+export const MONTHLY_CAP = 50
+
+/**
+ * Threshold at which the "approaching limit" warning is shown to the user.
+ * Set at 40 (80% of MONTHLY_CAP) so users have notice before hitting the cap.
+ */
+export const APPROACHING_LIMIT_THRESHOLD = 40
 
 // ---------------------------------------------------------------------------
 // Shared system prompt

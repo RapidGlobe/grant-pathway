@@ -32,6 +32,8 @@ import {
 import {
   MODEL,
   AI_SYSTEM_PROMPT,
+  MONTHLY_CAP,
+  APPROACHING_LIMIT_THRESHOLD,
   buildDraftPrompt,
   type CharityContext,
   type ApplicationQuestion,
@@ -39,11 +41,6 @@ import {
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const maxDuration = 90
-
-// Monthly AI request cap per user (ADR-AI-008, ADR-SEC-005)
-// Raised from 20 → 50 on 2026-06-17 to align with generate-summary and refine-answer routes.
-const MONTHLY_CAP = 50
-const APPROACHING_LIMIT_THRESHOLD = 40
 
 // max_tokens for draft generation. Each answer is typically 300–400 words
 // (~400–550 tokens). For 3–5 questions: 1200–2750 tokens + JSON overhead.
