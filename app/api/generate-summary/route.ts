@@ -103,11 +103,20 @@ export async function POST(request: NextRequest) {
   startOfMonth.setDate(1)
   startOfMonth.setHours(0, 0, 0, 0)
 
-  const { count: usageCount } = await supabase
+  const { count: usageCount, error: usageError } = await supabase
     .from('ai_usage_log')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .gte('created_at', startOfMonth.toISOString())
+
+  // Fail closed: if the cap query errors, refuse the call rather than
+  // defaulting to 0 and bypassing the cap entirely.
+  if (usageError) {
+    console.error('[generate-summary] Failed to read usage count:', usageError)
+    return NextResponse.json(aiErrorBody('server_error'), {
+      status: httpStatusForError('server_error'),
+    })
+  }
 
   const currentUsage = usageCount ?? 0
 
