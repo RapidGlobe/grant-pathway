@@ -6,6 +6,17 @@
 
 ---
 
+## 2026-06-22 — Authenticate and meter charity paraphrase in `lookupCharity`
+
+**What changed:**
+
+- `actions/charity.ts` — `lookupCharity` now calls `getUser()` at the top and returns `{ ok: false, reason: 'unavailable' }` for unauthenticated callers. Before the Bedrock paraphrase call: monthly cap checked fail-closed (query error or cap exceeded → skip Bedrock, degrade gracefully to empty `whatDoes`/`whoHelps`); `aiRatelimit.limit()` burst check applied. After a successful paraphrase: `ai_usage_log` row inserted (`request_type: 'charity_paraphrase'`, `application_id: null`).
+
+**Why:**
+Independent system specialist review flagged: _"Authenticate and meter the charity paraphrase: add `getUser()` to `lookupCharity`, write `ai_usage_log`, and apply the cap/burst limit."_ The Bedrock paraphrase in `lookupCharity` was an unguarded AI call — no auth, no usage recording, no cap or rate-limit enforcement. A user could trigger it without a session, or exhaust cost by repeated lookups without it counting toward their monthly limit. Degradation is preserved: if cap/rate blocks the paraphrase, the Charity Commission name and registration number are still returned successfully. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-22 — Consolidate `MONTHLY_CAP` and `MODEL` into `lib/prompts.ts`
 
 **What changed:**
