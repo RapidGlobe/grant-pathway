@@ -7,7 +7,8 @@
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { MODEL } from '@/lib/prompts'
+import { MODEL, MONTHLY_CAP } from '@/lib/prompts'
+import { aiRatelimit } from '@/lib/rate-limit'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -190,6 +191,15 @@ export type CharityLookupResult =
  * not FormData, so useActionState is not appropriate here).
  */
 export async function lookupCharity(query: string): Promise<CharityLookupResult> {
+  // Authenticate — the paraphrase is a metered AI call; unauthenticated callers
+  // must not be able to trigger it.
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return { ok: false, reason: 'unavailable' }
+
   const apiKey = process.env.CHARITY_COMMISSION_API_KEY
   if (!apiKey) {
     return { ok: false, reason: 'unavailable' }
@@ -293,41 +303,69 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
   const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
 
   if (charitableObjects && awsAccessKey && awsSecretKey) {
-    try {
-      const bedrock = new AnthropicBedrock({
-        awsAccessKey,
-        awsSecretKey,
-        awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
-      })
+    // ── Monthly cap check (fail closed) ───────────────────────────────────────
+    // If the usage query fails, skip Bedrock rather than proceeding without a cap.
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
 
-      const messagePromise = bedrock.messages.create({
-        model: MODEL,
-        max_tokens: 512,
-        messages: [{ role: 'user', content: buildParaphrasePrompt(charitableObjects) }],
-      })
+    const { count: usageCount, error: usageError } = await supabase
+      .from('ai_usage_log')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', startOfMonth.toISOString())
 
-      // Promise.race gives us a hard timeout without relying on SDK signal support
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('bedrock timeout')), BEDROCK_TIMEOUT_MS),
-      )
+    const capBlocked = usageError || (usageCount !== null && usageCount >= MONTHLY_CAP)
 
-      const message = await Promise.race([messagePromise, timeoutPromise])
+    // ── Per-minute burst limit ────────────────────────────────────────────────
+    const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
 
-      const raw = message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
+    if (!capBlocked && rateLimitOk) {
+      try {
+        const bedrock = new AnthropicBedrock({
+          awsAccessKey,
+          awsSecretKey,
+          awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
+        })
 
-      if (raw) {
-        // Strip any markdown code fences the model may have added
-        const cleaned = raw
-          .replace(/^```(?:json)?\s*/i, '')
-          .replace(/\s*```$/i, '')
-          .trim()
-        const parsed = JSON.parse(cleaned) as { whatDoes?: unknown; whoHelps?: unknown }
-        whatDoes = typeof parsed.whatDoes === 'string' ? parsed.whatDoes : ''
-        whoHelps = typeof parsed.whoHelps === 'string' ? parsed.whoHelps : ''
+        const messagePromise = bedrock.messages.create({
+          model: MODEL,
+          max_tokens: 512,
+          messages: [{ role: 'user', content: buildParaphrasePrompt(charitableObjects) }],
+        })
+
+        // Promise.race gives us a hard timeout without relying on SDK signal support
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('bedrock timeout')), BEDROCK_TIMEOUT_MS),
+        )
+
+        const message = await Promise.race([messagePromise, timeoutPromise])
+
+        const raw = message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
+
+        if (raw) {
+          // Strip any markdown code fences the model may have added
+          const cleaned = raw
+            .replace(/^```(?:json)?\s*/i, '')
+            .replace(/\s*```$/i, '')
+            .trim()
+          const parsed = JSON.parse(cleaned) as { whatDoes?: unknown; whoHelps?: unknown }
+          whatDoes = typeof parsed.whatDoes === 'string' ? parsed.whatDoes : ''
+          whoHelps = typeof parsed.whoHelps === 'string' ? parsed.whoHelps : ''
+        }
+
+        // ── Log AI usage (ADR-AI-008) ─────────────────────────────────────────
+        const tokenCount = (message.usage?.input_tokens ?? 0) + (message.usage?.output_tokens ?? 0)
+        await supabase.from('ai_usage_log').insert({
+          user_id: user.id,
+          application_id: null,
+          request_type: 'charity_paraphrase',
+          token_count: tokenCount,
+        })
+      } catch {
+        // Bedrock unavailable, timeout, or JSON parse error.
+        // The name + registration number are still returned successfully.
       }
-    } catch {
-      // Bedrock unavailable, timeout, or JSON parse error.
-      // The name + registration number are still returned successfully.
     }
   }
 
