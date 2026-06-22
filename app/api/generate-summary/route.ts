@@ -19,6 +19,7 @@
 // Vercel Pro required in production (ADR-AI-006, ADR-OPS-001). (🔵 P5.4)
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiRatelimit } from '@/lib/rate-limit'
 import {
@@ -37,6 +38,39 @@ import {
 } from '@/lib/prompts'
 import { preprocessText, DEFAULT_CHAR_CEILING } from '@/lib/preprocess-text'
 import { NextResponse, type NextRequest } from 'next/server'
+
+// Zod schemas for Bedrock response validation (F-02-02)
+const aiSummaryQuestionSchema = z.object({
+  number: z.number(),
+  text: z.string(),
+  wordLimit: z.number().nullable().optional(),
+  charLimit: z.number().nullable().optional(),
+  limitType: z.enum(['words', 'characters', 'none']).nullable().optional(),
+  is_budget_question: z.boolean(),
+})
+
+const aiSummarySectionSchema = z.object({
+  number: z.number(),
+  title: z.string(),
+  guidance: z.string(),
+  wordLimit: z.number().optional(),
+  is_budget_section: z.boolean(),
+})
+
+const aiSummarySchema = z.object({
+  funder_type: z.enum(['structured', 'free_form']),
+  aboutGrant: z.string(),
+  amount: z.string(),
+  whoCanApply: z.array(z.string()),
+  lookingFor: z.array(z.string()),
+  questions: z.array(aiSummaryQuestionSchema),
+  sections: z.array(aiSummarySectionSchema).optional(),
+  keyRequirements: z.array(z.string()),
+  funderAiPolicy: z.string().nullable().optional(),
+  supportingDocuments: z.array(z.string()).optional(),
+  eligibilityMismatch: z.boolean().optional(),
+  mismatchReason: z.string().nullable().optional(),
+})
 
 export const maxDuration = 90
 
@@ -100,43 +134,41 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // ── 3. Check monthly usage cap (ADR-AI-008, ADR-SEC-005) ──────────────────
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const { count: usageCount, error: usageError } = await supabase
-    .from('ai_usage_log')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', startOfMonth.toISOString())
-
-  // Fail closed: if the cap query errors, refuse the call rather than
-  // defaulting to 0 and bypassing the cap entirely.
-  if (usageError) {
-    console.error('[generate-summary] Failed to read usage count:', usageError)
-    return NextResponse.json(aiErrorBody('server_error'), {
-      status: httpStatusForError('server_error'),
-    })
-  }
-
-  const currentUsage = usageCount ?? 0
-
-  if (currentUsage >= MONTHLY_CAP) {
-    return NextResponse.json(aiErrorBody('usage_limit'), {
-      status: httpStatusForError('usage_limit'),
-    })
-  }
-
-  const approachingLimit = currentUsage >= APPROACHING_LIMIT_THRESHOLD
-
-  // ── 4. Per-minute rate limit (ADR-SEC-005) ─────────────────────────────────
+  // ── 3. Per-minute rate limit (ADR-SEC-005) ────────────────────────────────
   const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
   if (!rateLimitOk) {
     return NextResponse.json(aiErrorBody('rate_limited'), {
       status: httpStatusForError('rate_limited'),
     })
   }
+
+  // ── 4. Atomic cap check + slot reservation (ADR-AI-008, F-01-02) ──────────
+  // reserve_ai_slot acquires a per-user advisory lock, counts usage for the
+  // current month, and inserts a placeholder log row — all in one transaction.
+  // This closes the count-then-insert TOCTOU present in the previous pattern.
+  const { data: slotData, error: slotError } = await supabase.rpc('reserve_ai_slot', {
+    p_user_id: user.id,
+    p_application_id: applicationId,
+    p_request_type: 'guideline_summary',
+    p_monthly_cap: MONTHLY_CAP,
+    p_approaching_threshold: APPROACHING_LIMIT_THRESHOLD,
+  })
+
+  if (slotError || !slotData) {
+    console.error('[generate-summary] Failed to reserve AI slot:', slotError)
+    return NextResponse.json(aiErrorBody('server_error'), {
+      status: httpStatusForError('server_error'),
+    })
+  }
+
+  if (!slotData.allowed) {
+    return NextResponse.json(aiErrorBody('usage_limit'), {
+      status: httpStatusForError('usage_limit'),
+    })
+  }
+
+  const logId = slotData.log_id as string
+  const approachingLimit = slotData.approaching_limit as boolean
 
   // ── 5. Fetch charity profile (for prompt context) ─────────────────────────
   let charity: CharityContext | null = null
@@ -212,6 +244,8 @@ export async function POST(request: NextRequest) {
       code,
       err,
     )
+    // Return the slot so the user's monthly count is not charged for a service error.
+    await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
     return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
   }
 
@@ -232,11 +266,18 @@ export async function POST(request: NextRequest) {
     .trim()
 
   let summary: AiSummaryData
+  let rawParsed: unknown
   try {
-    summary = JSON.parse(cleaned) as AiSummaryData
+    rawParsed = JSON.parse(cleaned)
   } catch {
-    // JSON parse failed — retry once with a stricter prompt (ADR-AI-004)
-    console.warn('[generate-summary] JSON parse failed on first attempt, retrying...')
+    rawParsed = null
+  }
+  const parseResult = aiSummarySchema.safeParse(rawParsed)
+  if (parseResult.success) {
+    summary = parseResult.data
+  } else {
+    // JSON parse or Zod validation failed — retry once with a stricter prompt (ADR-AI-004)
+    console.warn('[generate-summary] JSON parse/validation failed on first attempt, retrying...')
 
     let retryResponse: Awaited<ReturnType<typeof client.messages.create>>
     try {
@@ -258,6 +299,7 @@ export async function POST(request: NextRequest) {
       )
     } catch (retryErr) {
       const code = classifyBedrockError(retryErr)
+      await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
       return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
     }
 
@@ -267,10 +309,18 @@ export async function POST(request: NextRequest) {
       .replace(/\s*```\s*$/, '')
       .trim()
 
+    let retryRawParsed: unknown
     try {
-      summary = JSON.parse(retryCleaned) as AiSummaryData
+      retryRawParsed = JSON.parse(retryCleaned)
     } catch {
-      console.error('[generate-summary] JSON parse failed after retry')
+      retryRawParsed = null
+    }
+    const retryParseResult = aiSummarySchema.safeParse(retryRawParsed)
+    if (retryParseResult.success) {
+      summary = retryParseResult.data
+    } else {
+      console.error('[generate-summary] JSON parse/validation failed after retry')
+      await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
       return NextResponse.json(aiErrorBody('parse_error'), {
         status: httpStatusForError('parse_error'),
       })
@@ -292,12 +342,11 @@ export async function POST(request: NextRequest) {
     // The user can still continue; the summary will be regenerated on next visit.
   }
 
-  // ── 9. Log AI usage (ADR-AI-008) ──────────────────────────────────────────
-  await supabase.from('ai_usage_log').insert({
-    user_id: user.id,
-    application_id: applicationId,
-    request_type: 'guideline_summary',
-    token_count: tokenCount,
+  // ── 9. Commit AI usage with token count (ADR-AI-008) ──────────────────────
+  await supabase.rpc('update_ai_slot_token_count', {
+    p_log_id: logId,
+    p_user_id: user.id,
+    p_token_count: tokenCount,
   })
 
   // ── 10. Return response ────────────────────────────────────────────────────

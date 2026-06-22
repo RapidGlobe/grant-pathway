@@ -7,8 +7,13 @@
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { MODEL, MONTHLY_CAP } from '@/lib/prompts'
+import { MODEL, MONTHLY_CAP, APPROACHING_LIMIT_THRESHOLD } from '@/lib/prompts'
 import { aiRatelimit } from '@/lib/rate-limit'
+
+const paraphraseSchema = z.object({
+  whatDoes: z.string(),
+  whoHelps: z.string(),
+})
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -303,68 +308,73 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
   const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
 
   if (charitableObjects && awsAccessKey && awsSecretKey) {
-    // ── Monthly cap check (fail closed) ───────────────────────────────────────
-    // If the usage query fails, skip Bedrock rather than proceeding without a cap.
-    const startOfMonth = new Date()
-    startOfMonth.setDate(1)
-    startOfMonth.setHours(0, 0, 0, 0)
-
-    const { count: usageCount, error: usageError } = await supabase
-      .from('ai_usage_log')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', startOfMonth.toISOString())
-
-    const capBlocked = usageError || (usageCount !== null && usageCount >= MONTHLY_CAP)
-
     // ── Per-minute burst limit ────────────────────────────────────────────────
     const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
 
-    if (!capBlocked && rateLimitOk) {
-      try {
-        const bedrock = new AnthropicBedrock({
-          awsAccessKey,
-          awsSecretKey,
-          awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
-        })
+    if (rateLimitOk) {
+      // ── Atomic cap check + slot reservation (F-01-02) ────────────────────────
+      // reserve_ai_slot acquires a per-user advisory lock, counts usage, and
+      // inserts a placeholder log row atomically — closing the TOCTOU window.
+      const { data: slotData, error: slotError } = await supabase.rpc('reserve_ai_slot', {
+        p_user_id: user.id,
+        p_application_id: null,
+        p_request_type: 'charity_paraphrase',
+        p_monthly_cap: MONTHLY_CAP,
+        p_approaching_threshold: APPROACHING_LIMIT_THRESHOLD,
+      })
 
-        const messagePromise = bedrock.messages.create({
-          model: MODEL,
-          max_tokens: 512,
-          messages: [{ role: 'user', content: buildParaphrasePrompt(charitableObjects) }],
-        })
+      const slotAllowed = !slotError && slotData?.allowed === true
+      const logId: string | null = slotData?.log_id ?? null
 
-        // Promise.race gives us a hard timeout without relying on SDK signal support
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('bedrock timeout')), BEDROCK_TIMEOUT_MS),
-        )
+      if (slotAllowed && logId) {
+        try {
+          const bedrock = new AnthropicBedrock({
+            awsAccessKey,
+            awsSecretKey,
+            awsRegion: process.env.AWS_REGION ?? 'eu-west-2',
+          })
 
-        const message = await Promise.race([messagePromise, timeoutPromise])
+          const messagePromise = bedrock.messages.create({
+            model: MODEL,
+            max_tokens: 512,
+            messages: [{ role: 'user', content: buildParaphrasePrompt(charitableObjects) }],
+          })
 
-        const raw = message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
+          // Promise.race gives us a hard timeout without relying on SDK signal support
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('bedrock timeout')), BEDROCK_TIMEOUT_MS),
+          )
 
-        if (raw) {
-          // Strip any markdown code fences the model may have added
-          const cleaned = raw
-            .replace(/^```(?:json)?\s*/i, '')
-            .replace(/\s*```$/i, '')
-            .trim()
-          const parsed = JSON.parse(cleaned) as { whatDoes?: unknown; whoHelps?: unknown }
-          whatDoes = typeof parsed.whatDoes === 'string' ? parsed.whatDoes : ''
-          whoHelps = typeof parsed.whoHelps === 'string' ? parsed.whoHelps : ''
+          const message = await Promise.race([messagePromise, timeoutPromise])
+
+          const raw = message.content[0]?.type === 'text' ? message.content[0].text.trim() : ''
+
+          if (raw) {
+            const cleaned = raw
+              .replace(/^```(?:json)?\s*/i, '')
+              .replace(/\s*```$/i, '')
+              .trim()
+            const parseResult = paraphraseSchema.safeParse(JSON.parse(cleaned))
+            if (parseResult.success) {
+              whatDoes = parseResult.data.whatDoes
+              whoHelps = parseResult.data.whoHelps
+            }
+          }
+
+          // ── Commit slot with actual token count (ADR-AI-008) ───────────────
+          const tokenCount =
+            (message.usage?.input_tokens ?? 0) + (message.usage?.output_tokens ?? 0)
+          await supabase.rpc('update_ai_slot_token_count', {
+            p_log_id: logId,
+            p_user_id: user.id,
+            p_token_count: tokenCount,
+          })
+        } catch {
+          // Bedrock unavailable, timeout, or JSON parse error — cancel slot so
+          // the user's monthly count is not charged for a service-side failure.
+          await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
+          // Name + registration number are still returned successfully (degradation).
         }
-
-        // ── Log AI usage (ADR-AI-008) ─────────────────────────────────────────
-        const tokenCount = (message.usage?.input_tokens ?? 0) + (message.usage?.output_tokens ?? 0)
-        await supabase.from('ai_usage_log').insert({
-          user_id: user.id,
-          application_id: null,
-          request_type: 'charity_paraphrase',
-          token_count: tokenCount,
-        })
-      } catch {
-        // Bedrock unavailable, timeout, or JSON parse error.
-        // The name + registration number are still returned successfully.
       }
     }
   }
@@ -413,7 +423,7 @@ function toTitleCase(str: string): string {
  */
 function buildParaphrasePrompt(charitableObjects: string): string {
   const truncated = charitableObjects.slice(0, 2000)
-  return `You are a helpful assistant for UK charities. You will receive the charitable objects text from a charity's governing document, as registered with the Charity Commission for England and Wales.
+  return `You are a helpful assistant for UK charities. You will receive the charitable objects text from a charity's governing document, as registered with the Charity Commission for England and Wales, in the <charitable_objects> tag below.
 
 Your task is to extract two short, plain-English summaries:
 1. "whatDoes": 1-2 sentences describing what the charity does (its activities and purposes). Avoid legal jargon.
@@ -424,6 +434,7 @@ Write these as friendly, accessible descriptions suitable for a grant applicatio
 Return ONLY a JSON object in this exact format, with no other text before or after:
 {"whatDoes": "...", "whoHelps": "..."}
 
-Charitable objects:
-${truncated}`
+<charitable_objects>
+${truncated}
+</charitable_objects>`
 }

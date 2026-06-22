@@ -21,6 +21,7 @@
 // in production and increase if truncation occurs.
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiRatelimit } from '@/lib/rate-limit'
 import {
@@ -39,6 +40,8 @@ import {
   type ApplicationQuestion,
 } from '@/lib/prompts'
 import { NextResponse, type NextRequest } from 'next/server'
+
+const draftAnswersSchema = z.array(z.object({ id: z.string(), answer: z.string() }))
 
 export const maxDuration = 90
 
@@ -95,43 +98,38 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // ── 4. Check monthly usage cap (ADR-AI-008, ADR-SEC-005) ──────────────────
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const { count: usageCount, error: usageError } = await supabase
-    .from('ai_usage_log')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', startOfMonth.toISOString())
-
-  // Fail closed: if the cap query errors, refuse the call rather than
-  // defaulting to 0 and bypassing the cap entirely.
-  if (usageError) {
-    console.error('[generate-draft] Failed to read usage count:', usageError)
-    return NextResponse.json(aiErrorBody('server_error'), {
-      status: httpStatusForError('server_error'),
-    })
-  }
-
-  const currentUsage = usageCount ?? 0
-
-  if (currentUsage >= MONTHLY_CAP) {
-    return NextResponse.json(aiErrorBody('usage_limit'), {
-      status: httpStatusForError('usage_limit'),
-    })
-  }
-
-  const approachingLimit = currentUsage >= APPROACHING_LIMIT_THRESHOLD
-
-  // ── 5. Per-minute rate limit (ADR-SEC-005) ─────────────────────────────────
+  // ── 4. Per-minute rate limit (ADR-SEC-005) ────────────────────────────────
   const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
   if (!rateLimitOk) {
     return NextResponse.json(aiErrorBody('rate_limited'), {
       status: httpStatusForError('rate_limited'),
     })
   }
+
+  // ── 5. Atomic cap check + slot reservation (ADR-AI-008, F-01-02) ──────────
+  const { data: slotData, error: slotError } = await supabase.rpc('reserve_ai_slot', {
+    p_user_id: user.id,
+    p_application_id: applicationId,
+    p_request_type: 'draft_generation',
+    p_monthly_cap: MONTHLY_CAP,
+    p_approaching_threshold: APPROACHING_LIMIT_THRESHOLD,
+  })
+
+  if (slotError || !slotData) {
+    console.error('[generate-draft] Failed to reserve AI slot:', slotError)
+    return NextResponse.json(aiErrorBody('server_error'), {
+      status: httpStatusForError('server_error'),
+    })
+  }
+
+  if (!slotData.allowed) {
+    return NextResponse.json(aiErrorBody('usage_limit'), {
+      status: httpStatusForError('usage_limit'),
+    })
+  }
+
+  const logId = slotData.log_id as string
+  const approachingLimit = slotData.approaching_limit as boolean
 
   // ── 6. Fetch questions from application_answers ───────────────────────────
   const { data: questionRows, error: qError } = await supabase
@@ -208,6 +206,7 @@ export async function POST(request: NextRequest) {
       code,
       err,
     )
+    await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
     return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
   }
 
@@ -228,11 +227,18 @@ export async function POST(request: NextRequest) {
     .trim()
 
   let draftAnswers: Array<{ id: string; answer: string }>
+  let rawParsed: unknown
   try {
-    draftAnswers = JSON.parse(cleaned) as Array<{ id: string; answer: string }>
+    rawParsed = JSON.parse(cleaned)
   } catch {
-    // JSON parse failed — retry once with a stricter prompt (ADR-AI-004)
-    console.warn('[generate-draft] JSON parse failed on first attempt, retrying...')
+    rawParsed = null
+  }
+  const parseResult = draftAnswersSchema.safeParse(rawParsed)
+  if (parseResult.success) {
+    draftAnswers = parseResult.data
+  } else {
+    // JSON parse or Zod validation failed — retry once with a stricter prompt (ADR-AI-004)
+    console.warn('[generate-draft] JSON parse/validation failed on first attempt, retrying...')
 
     let retryResponse: Awaited<ReturnType<typeof client.messages.create>>
     try {
@@ -254,6 +260,7 @@ export async function POST(request: NextRequest) {
       )
     } catch (retryErr) {
       const code = classifyBedrockError(retryErr)
+      await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
       return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
     }
 
@@ -263,10 +270,18 @@ export async function POST(request: NextRequest) {
       .replace(/\s*```\s*$/, '')
       .trim()
 
+    let retryRawParsed: unknown
     try {
-      draftAnswers = JSON.parse(retryCleaned) as Array<{ id: string; answer: string }>
+      retryRawParsed = JSON.parse(retryCleaned)
     } catch {
-      console.error('[generate-draft] JSON parse failed after retry')
+      retryRawParsed = null
+    }
+    const retryParseResult = draftAnswersSchema.safeParse(retryRawParsed)
+    if (retryParseResult.success) {
+      draftAnswers = retryParseResult.data
+    } else {
+      console.error('[generate-draft] JSON parse/validation failed after retry')
+      await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
       return NextResponse.json(aiErrorBody('parse_error'), {
         status: httpStatusForError('parse_error'),
       })
@@ -306,12 +321,11 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  // ── 12. Log AI usage (ADR-AI-008) ─────────────────────────────────────────
-  await supabase.from('ai_usage_log').insert({
-    user_id: user.id,
-    application_id: applicationId,
-    request_type: 'draft_generation',
-    token_count: tokenCount,
+  // ── 12. Commit AI usage with token count (ADR-AI-008) ────────────────────
+  await supabase.rpc('update_ai_slot_token_count', {
+    p_log_id: logId,
+    p_user_id: user.id,
+    p_token_count: tokenCount,
   })
 
   // ── 13. Return response ────────────────────────────────────────────────────

@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-22 — Five LAUNCH-BLOCKERs resolved: DB indexes, prompt injection, cap TOCTOU, Vitest, migration CI gate
+
+**What changed:**
+
+- `supabase/migrations/20260622000000_add_performance_indexes.sql` — four missing indexes added: `ai_usage_log(user_id, created_at)` (cap check), `applications(user_id, updated_at DESC)` (dashboard), `application_answers(user_id)` (RLS/upload), `applications(funder_id)` (funder FK).
+- `supabase/migrations/20260622000001_add_charity_paraphrase_enum.sql` — adds `charity_paraphrase` to `ai_request_type` enum (apply via SQL Editor, not CLI — `ALTER TYPE ADD VALUE` cannot run in a transaction).
+- `supabase/migrations/20260622000002_ai_cap_rpc.sql` — three SECURITY DEFINER functions: `reserve_ai_slot` (advisory lock + count + insert placeholder atomically), `update_ai_slot_token_count`, `cancel_ai_slot`. Closes the count-then-insert TOCTOU.
+- `lib/prompts.ts` / `AI_SYSTEM_PROMPT` — added XML data-isolation directive. All four prompt builders now wrap untrusted user content in XML tags: `<funder_guidelines>`, `<question>`, `<original_answer>`, `<funder_summary>`, `<questions>`, `<charitable_objects>`.
+- `app/api/generate-summary/route.ts`, `app/api/generate-draft/route.ts`, `app/api/refine-answer/route.ts` — replaced manual count + insert with `reserve_ai_slot` RPC; `cancel_ai_slot` called on Bedrock or parse error; `update_ai_slot_token_count` called on success. Added Zod safeParse for all AI JSON responses.
+- `actions/charity.ts` — same RPC pattern applied; `paraphraseSchema` Zod validation added; XML fencing on `buildParaphrasePrompt`.
+- `vitest.config.ts`, `package.json` — Vitest installed; `npm test` runs `vitest run`; 22 tests across 3 files (pure functions + IDOR guard + cap thresholds).
+- `__tests__/prompts.test.ts`, `__tests__/ai-cap.test.ts`, `__tests__/upload-idor.test.ts` — first test suite.
+- `.github/workflows/ci.yml` — `test` job (runs `npm test`) and `validate-migrations` job (Supabase CLI, `db start` + `db reset`) added.
+
+**Why:**
+Alan Knox initial assessment LAUNCH-BLOCKER items §2.1 item 5 (indexes), §2.1 item 7 (prompt injection), §2.2 item 16 (cap TOCTOU), §2.2 item 17 (test strategy), §2.4 item 30 (migration CI gate). All five resolved. TypeScript clean (0 errors), 22/22 tests pass.
+
+---
+
 ## 2026-06-22 — Authenticate and meter charity paraphrase in `lookupCharity`
 
 **What changed:**

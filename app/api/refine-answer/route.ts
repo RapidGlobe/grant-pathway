@@ -21,6 +21,7 @@
 // but still require more than the 10 s default Vercel function timeout.
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiRatelimit } from '@/lib/rate-limit'
 import {
@@ -37,6 +38,8 @@ import {
   buildRefinePrompt,
 } from '@/lib/prompts'
 import { NextResponse, type NextRequest } from 'next/server'
+
+const refineSchema = z.object({ refinedText: z.string().min(1) })
 
 export const maxDuration = 60
 
@@ -125,43 +128,38 @@ export async function POST(request: NextRequest) {
   // The refine prompt instructs the AI to stay within the word limit, actively
   // compressing the answer — more helpful than blocking the user at this point.
 
-  // ── 4. Check monthly usage cap (ADR-AI-008, ADR-SEC-005) ──────────────────
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
-
-  const { count: usageCount, error: usageError } = await supabase
-    .from('ai_usage_log')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .gte('created_at', startOfMonth.toISOString())
-
-  // Fail closed: if the cap query errors, refuse the call rather than
-  // defaulting to 0 and bypassing the cap entirely.
-  if (usageError) {
-    console.error('[refine-answer] Failed to read usage count:', usageError)
-    return NextResponse.json(aiErrorBody('server_error'), {
-      status: httpStatusForError('server_error'),
-    })
-  }
-
-  const currentUsage = usageCount ?? 0
-
-  if (currentUsage >= MONTHLY_CAP) {
-    return NextResponse.json(aiErrorBody('usage_limit'), {
-      status: httpStatusForError('usage_limit'),
-    })
-  }
-
-  const approachingLimit = currentUsage >= APPROACHING_LIMIT_THRESHOLD
-
-  // ── 5. Per-minute rate limit (ADR-SEC-005) ─────────────────────────────────
+  // ── 4. Per-minute rate limit (ADR-SEC-005) ────────────────────────────────
   const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
   if (!rateLimitOk) {
     return NextResponse.json(aiErrorBody('rate_limited'), {
       status: httpStatusForError('rate_limited'),
     })
   }
+
+  // ── 5. Atomic cap check + slot reservation (ADR-AI-008, F-01-02) ──────────
+  const { data: slotData, error: slotError } = await supabase.rpc('reserve_ai_slot', {
+    p_user_id: user.id,
+    p_application_id: applicationId,
+    p_request_type: 'refine_answer',
+    p_monthly_cap: MONTHLY_CAP,
+    p_approaching_threshold: APPROACHING_LIMIT_THRESHOLD,
+  })
+
+  if (slotError || !slotData) {
+    console.error('[refine-answer] Failed to reserve AI slot:', slotError)
+    return NextResponse.json(aiErrorBody('server_error'), {
+      status: httpStatusForError('server_error'),
+    })
+  }
+
+  if (!slotData.allowed) {
+    return NextResponse.json(aiErrorBody('usage_limit'), {
+      status: httpStatusForError('usage_limit'),
+    })
+  }
+
+  const logId = slotData.log_id as string
+  const approachingLimit = slotData.approaching_limit as boolean
 
   // ── 6. Call Bedrock with retry ─────────────────────────────────────────────
   const client = new AnthropicBedrock({
@@ -191,6 +189,7 @@ export async function POST(request: NextRequest) {
       code,
       err,
     )
+    await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
     return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
   }
 
@@ -210,25 +209,28 @@ export async function POST(request: NextRequest) {
     .trim()
 
   let refinedText: string
+  let rawParsed: unknown
   try {
-    const parsed = JSON.parse(cleaned) as { refinedText?: unknown }
-    if (typeof parsed.refinedText !== 'string' || !parsed.refinedText.trim()) {
-      throw new Error('refinedText missing or empty')
-    }
-    refinedText = parsed.refinedText.trim()
+    rawParsed = JSON.parse(cleaned)
   } catch {
-    console.error('[refine-answer] JSON parse failed:', cleaned.slice(0, 200))
+    rawParsed = null
+  }
+  const parseResult = refineSchema.safeParse(rawParsed)
+  if (parseResult.success) {
+    refinedText = parseResult.data.refinedText.trim()
+  } else {
+    console.error('[refine-answer] JSON parse/validation failed:', cleaned.slice(0, 200))
+    await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
     return NextResponse.json(aiErrorBody('parse_error'), {
       status: httpStatusForError('parse_error'),
     })
   }
 
-  // ── 8. Log AI usage (ADR-AI-008) ──────────────────────────────────────────
-  await supabase.from('ai_usage_log').insert({
-    user_id: user.id,
-    application_id: applicationId,
-    request_type: 'refine_answer',
-    token_count: tokenCount,
+  // ── 8. Commit AI usage with token count (ADR-AI-008) ──────────────────────
+  await supabase.rpc('update_ai_slot_token_count', {
+    p_log_id: logId,
+    p_user_id: user.id,
+    p_token_count: tokenCount,
   })
 
   // ── 9. Return response ─────────────────────────────────────────────────────
