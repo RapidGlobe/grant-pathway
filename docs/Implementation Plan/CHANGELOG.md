@@ -4,6 +4,25 @@
 
 **Authoritative sources:** When this log refers to a decision record, the full rationale lives in the linked file. This log summarises; the ADR or DR is the definitive record.
 
+---
+
+## 2026-06-22 — Bedrock zero-retention launch-blocker closed; AWS DPA confirmed
+
+**What changed:**
+
+- `docs/legal/AWS-navigating-gdpr-compliance.pdf` (new) — AWS whitepaper "Navigating GDPR Compliance on AWS" added to the legal folder as the authoritative reference for the AWS Data Processing Addendum.
+- `docs/legal/AWS-DPA-reference.md` (new) — Reference summary confirming DPA status, confirmed checks, and links to related decision records.
+- `docs/decisions/DR-DP-003-data-ownership.md` — Review note added (2026-06-22) recording the two production account checks completed and formally closing the launch-blocker.
+- `docs/decisions/DR-DP-002-data-hosting.md` — Pre-launch actions updated: three of four marked complete with dates; EU Geo fallback live test remains outstanding.
+
+**Why:**
+An independent system specialist review identified as a launch-blocker: _"Confirm the production Bedrock account in eu-west-2 enforces zero retention and no training-data use."_ Two checks were completed against the live AWS production account on 2026-06-22:
+
+1. **Model Invocation Logging** — confirmed disabled in the AWS Bedrock Console (eu-west-2 Settings). Prompts and responses are not captured to S3 or CloudWatch.
+2. **AWS Data Processing Agreement** — confirmed automatically in force for the RapidGlobe AWS account. The AWS DPA is incorporated into the AWS Service Terms and applies to all customers without separate acceptance (verified against the AWS GDPR whitepaper, February 2021 Supplementary Addendum).
+
+The launch-blocker is closed. One pre-launch action remains open: a live test call to confirm EU Geo fallback routing (`eu.anthropic.claude-sonnet-4-6`) before go-live.
+
 > **Phase 0–4 entries** (up to 2026-05-22) have been moved to [CHANGELOG-ARCHIVE.md](CHANGELOG-ARCHIVE.md) to keep this file manageable. All entries are preserved in full.
 
 ---
