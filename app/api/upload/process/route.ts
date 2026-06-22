@@ -7,9 +7,11 @@
 // memory as a Buffer. This unconditional delete (ADR-FILE-001) means the
 // file is never stranded even if extraction or the network call fails.
 //
-// applicationId is verified against the authenticated user before processing
-// to prevent IDOR: an attacker cannot process files against another user's
-// application even if they know the applicationId (BOLA fix, 2026-06-21).
+// Two ownership checks prevent cross-user file-read IDOR (2026-06-22):
+//   1. Storage path must be prefixed with the caller's user ID — rejects any
+//      attempt to read another user's file via a crafted path.
+//   2. applicationId is verified against the authenticated user — prevents
+//      associating a valid file with another user's application (BOLA fix, 2026-06-21).
 //
 // Request body: { path: string, applicationId: string }
 //
@@ -44,6 +46,13 @@ export async function POST(request: NextRequest) {
   const { path, applicationId } = body
   if (typeof path !== 'string' || !path || typeof applicationId !== 'string' || !applicationId) {
     return NextResponse.json({ error: 'Missing or invalid path / applicationId.' }, { status: 400 })
+  }
+
+  // Reject any storage path not prefixed with the caller's user ID.
+  // Prevents cross-user file-read IDOR: an attacker cannot download another
+  // user's file even if they know the path format (`{userId}_{timestamp}`).
+  if (!path.startsWith(user.id + '_')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   // Verify the application belongs to the authenticated user (IDOR/BOLA guard)

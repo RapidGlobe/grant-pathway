@@ -27,8 +27,8 @@ Sentry.init({
       }
     }
     // Strip sensitive keys from breadcrumb data (storage paths, answer content)
-    if (event.breadcrumbs?.values) {
-      event.breadcrumbs.values = event.breadcrumbs.values.map((crumb) => {
+    if (event.breadcrumbs) {
+      event.breadcrumbs = event.breadcrumbs.map((crumb) => {
         if (!crumb.data) return crumb
         const d = { ...crumb.data }
         delete d['guidelinesText']
