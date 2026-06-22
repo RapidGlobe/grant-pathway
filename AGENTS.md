@@ -98,6 +98,21 @@ If it is not obvious where a decision or change should be documented, **stop and
 
 <!-- END:implementation-docs-rules -->
 
+<!-- BEGIN:file-reference-rules -->
+
+# File references and information search
+
+The canonical source for all project files is the GitHub repository:
+**https://github.com/RapidGlobe/grant-pathway**
+
+When searching for or referencing project files:
+
+1. **Use the GitHub repository as the default location for information search** — browse or fetch files from `https://github.com/RapidGlobe/grant-pathway` rather than navigating the local OneDrive file structure.
+2. **Use relative paths in all file references** — always reference files relative to the repository root (e.g. `grant-pathway/docs/Technical Decision and Design/ADR-AI-001-ai-provider.md`), never absolute Windows/OneDrive paths.
+3. **Never expose the full OneDrive path** in responses, commit messages, or documentation. The local working directory is an implementation detail of the developer's machine, not a project reference.
+
+<!-- END:file-reference-rules -->
+
 <!-- BEGIN:github-commit-rules -->
 
 # GitHub — Always commit and push after changes
