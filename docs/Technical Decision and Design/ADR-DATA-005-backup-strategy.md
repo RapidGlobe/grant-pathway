@@ -83,11 +83,29 @@ This distinction is a GDPR-relevant disclosure under the Right to Erasure (Artic
 
 ## Consequences
 
-- Supabase Pro plan must be activated on the production project before go-live. Add to P5.4 pre-launch checklist in IMPLEMENTATION-PLAN.md (and the pre-launch checklist in ADR-OPS-002).
+- Supabase Pro plan must be activated on the production project before go-live. Add to P5.4 pre-launch checklist in IMPLEMENTATION-PLAN.md (and the pre-launch checklist in ADR-OPS-002). ✅ **Activated 2026-06-22.**
 - Privacy policy Section 7 must be updated to disclose the 7-day backup retention window that applies after user-requested account deletion. ✅ Done 2026-05-26.
 - Operating cost table in `technical-design.md` §3 must be updated: Supabase line changes from "Free tier (initially)" to "Pro (~£20/month)"; total fixed costs change from ~£16/month to ~£36/month. ✅ Done 2026-05-26.
 - Business overview "Data, Privacy, and Trust" section updated to reflect operational resilience measures. ✅ Done 2026-05-26.
 - Future consideration: at scale, revisit PITR (Option C) or supplement with custom pg_dump exports (Option D) for longer retention.
+
+## Production verification — 2026-06-22
+
+Completed as part of independent system specialist pre-launch review:
+
+| Check                    | Result                                                                                                                                                                                          |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Supabase Pro activated   | ✅ Confirmed — Billing shows Pro Plan active                                                                                                                                                    |
+| Project region           | ✅ AWS \| eu-west-2 (London) — confirmed in Supabase Projects dashboard                                                                                                                         |
+| Compute tier             | ✅ MICRO — automatically upgraded with Pro                                                                                                                                                      |
+| Scheduled backups active | ✅ 8 daily backups visible (15–22 Jun 2026), running at ~02:55 UTC                                                                                                                              |
+| Backup retention         | ✅ 7 days confirmed                                                                                                                                                                             |
+| Backup type              | ✅ PHYSICAL                                                                                                                                                                                     |
+| Storage objects included | ⚠️ Not included — Storage API objects excluded from backup. Acceptable: `guidelines-temp` bucket holds temporary files only, cleared after Step 3 (GAP-10). No persistent user data in Storage. |
+| Restore drill completed  | ✅ "Restore to new project" executed 2026-06-22 using 22 Jun backup                                                                                                                             |
+| **RTO (actual)**         | **6 minutes** (restore started 12:11, completed 12:17)                                                                                                                                          |
+| **RPO**                  | **≤ 24 hours** (daily backup at ~02:55 UTC)                                                                                                                                                     |
+| Test project deleted     | ✅ Confirmed post-drill                                                                                                                                                                         |
 
 ---
 

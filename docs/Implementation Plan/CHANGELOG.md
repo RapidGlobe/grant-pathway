@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-22 — Supabase Pro activated; backups confirmed; restore drill RTO 6 min
+
+**What changed:**
+
+- `docs/Technical Decision and Design/ADR-DATA-005-backup-strategy.md` — Production verification section added recording all confirmed checks, RTO (6 minutes), and RPO (≤24 hours).
+- `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` — P5.4 Supabase pause warning replaced with completion note; Notes entry added for 2026-06-22.
+- `docs/Alan Knox Audits/initial-assessment-report-findings.md` — third review item logged as Actioned.
+
+**Why:**
+Independent system specialist review flagged as a launch-blocker: _"Confirm the project is London/UK on a tier with daily backups, and run the first restore drill to record an RTO and RPO."_ All items confirmed on 2026-06-22: Supabase Pro activated on `grant-pathway-prod`; region AWS | eu-west-2; compute MICRO; daily physical backups running at ~02:55 UTC with 7-day retention (8 backups visible). Restore drill completed via "Restore to new project" — elapsed time 6 minutes (RTO), RPO ≤24 hours. Test project deleted post-drill. Launch-blocker closed.
+
+---
+
 ## 2026-06-22 — Sentry region confirmed EU; privacy policy accurate; P5.4 updated
 
 **What changed:**
