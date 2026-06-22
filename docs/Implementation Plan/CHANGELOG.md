@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-22 — AI cap-count made fail-closed across all three AI routes
+
+**What changed:**
+
+- `app/api/generate-summary/route.ts` — destructures `error` from the `ai_usage_log` count query; returns 500 (`server_error`) immediately if the query fails, instead of defaulting `usageCount ?? 0` to 0.
+- `app/api/generate-draft/route.ts` — same fix applied.
+- `app/api/refine-answer/route.ts` — same fix applied.
+
+**Why:**
+Independent system specialist review flagged as a launch-blocker (F-01-01): _"Make the AI cap-count fail closed: inspect the count-query `error` and refuse the call on error instead of defaulting `usageCount ?? 0` to 0."_ If the count query fails and the result is treated as zero, the monthly cap is silently bypassed — a user (or attacker) triggering a DB error on the usage log could make unlimited AI calls, resulting in unbounded Bedrock cost. The fix refuses all three AI calls with HTTP 500 if the cap cannot be read. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-22 — Cross-user file-read IDOR closed on upload/process; Sentry breadcrumb type fix
 
 **What changed:**
