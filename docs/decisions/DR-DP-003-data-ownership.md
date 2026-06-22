@@ -2,7 +2,7 @@
 id: DR-DP-003
 category: Data & Privacy
 status: Decided
-last-reviewed: 2026-05-07
+last-reviewed: 2026-06-22
 ---
 
 # DR-DP-003 — Charity Data Ownership and AI Training Use
@@ -38,10 +38,23 @@ This commitment will be stated plainly and prominently in the privacy policy —
 
 The original decision (2026-04-09) referenced the Anthropic DPA as the contractual mechanism for locking in the no-training commitment. Following the change to Amazon Bedrock as the AI inference layer (DR-AI-002, DR-DP-002), the Anthropic DPA is no longer the operative instrument. The no-training commitment and the substance of this decision are unchanged; only the contractual mechanism through which it is enforced has been updated.
 
+## Review Note (2026-06-22) — Production account verified
+
+As part of an independent system specialist review prior to launch, the following checks were completed against the live AWS production account (eu-west-2) on 2026-06-22:
+
+| Check                                        | Result                                                                                                                                                                                                                                                |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bedrock Model Invocation Logging (eu-west-2) | **Disabled** — confirmed in AWS Bedrock Console Settings; prompts and responses are not captured to S3 or CloudWatch                                                                                                                                  |
+| AWS Data Processing Agreement in force       | **Confirmed** — AWS DPA is incorporated automatically into the AWS Service Terms and applies to all customers without separate acceptance (verified against AWS whitepaper "Navigating GDPR Compliance on AWS", February 2021 Supplementary Addendum) |
+
+The AWS GDPR whitepaper has been saved to `docs/legal/AWS-navigating-gdpr-compliance.pdf` with a reference summary at `docs/legal/AWS-DPA-reference.md`.
+
+This closes the launch-blocker raised in the independent review: _"Confirm the production Bedrock account in eu-west-2 enforces zero retention and no training-data use."_
+
 ## Date Decided
 
 2026-04-09
 
 ## Last Reviewed
 
-2026-05-07
+2026-06-22

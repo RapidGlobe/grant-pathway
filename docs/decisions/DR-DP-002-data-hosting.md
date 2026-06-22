@@ -42,10 +42,10 @@ This decision supersedes that arrangement. By routing AI inference through Amazo
 
 ## Pre-Launch Actions Required
 
-- Confirm AWS eu-west-2 In-Region routing is correctly configured for Claude Sonnet 4.6 (`anthropic.claude-sonnet-4-6`) before go-live
-- Confirm EU Geo fallback inference ID (`eu.anthropic.claude-sonnet-4-6`) is configured and tested
-- Reflect the UK-primary / EU-fallback arrangement clearly in the app's privacy policy
-- No Anthropic DPA or SCCs required (supersedes previous pre-launch action)
+- [x] Confirm AWS eu-west-2 In-Region routing is correctly configured for Claude Sonnet 4.6 (`anthropic.claude-sonnet-4-6`) before go-live — **confirmed 2026-06-22; model invocation logging disabled, Bedrock requests routing through eu-west-2**
+- [ ] Confirm EU Geo fallback inference ID (`eu.anthropic.claude-sonnet-4-6`) is configured and tested — **outstanding; requires a live test call**
+- [x] Reflect the UK-primary / EU-fallback arrangement clearly in the app's privacy policy — **completed; privacy policy live at /privacy (2026-06-10)**
+- [x] No Anthropic DPA or SCCs required (supersedes previous pre-launch action) — **confirmed; AWS DPA operative automatically via AWS Service Terms**
 
 ## Date Decided
 
