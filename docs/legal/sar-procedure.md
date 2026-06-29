@@ -1,6 +1,6 @@
 # Subject Access Request (SAR) Procedure
 
-**Version:** 1.3
+**Version:** 1.4
 **Last updated:** 29 June 2026
 **Owner:** Wac Jokhia, RapidGlobe Ltd
 **Legal basis:** UK GDPR Article 15 — Right of Access
@@ -11,6 +11,7 @@
 | 1.1     | 29 June 2026 | Step 3 rewritten — six numbered queries; warning added that `user_id` is a UUID not an email |
 | 1.2     | 29 June 2026 | Notes: added future automation note                                                          |
 | 1.3     | 29 June 2026 | Version history table added; no content changes                                              |
+| 1.4     | 29 June 2026 | SAR contact email changed from wjokhia@rapidglobe.com to admin@rapidglobe.com                |
 
 ---
 
@@ -24,7 +25,7 @@ This document describes how to handle such a request from receipt to completion.
 
 ## Step 1 — Receive and acknowledge (within 3 working days)
 
-Requests will arrive at **wjokhia@rapidglobe.com**. They may be worded informally — any request
+Requests will arrive at **admin@rapidglobe.com**. They may be worded informally — any request
 asking "what data do you hold about me?" or "I'd like to see my information" counts as a SAR.
 
 Send the acknowledgement email below within 3 working days of receipt. Note the date received
@@ -48,7 +49,7 @@ separately.
 Kind regards,
 Wac Jokhia
 RapidGlobe Ltd
-wjokhia@rapidglobe.com
+admin@rapidglobe.com
 ```
 
 ---
@@ -171,7 +172,7 @@ we use it. Details are in our Privacy Policy at https://grantpathway.org.uk/priv
 Kind regards,
 Wac Jokhia
 RapidGlobe Ltd
-wjokhia@rapidglobe.com
+admin@rapidglobe.com
 ```
 
 ---
