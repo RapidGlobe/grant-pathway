@@ -6,6 +6,24 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 19 resolved: SAR procedure documented (Article 15, manual process)
+
+**What changed:**
+
+- `docs/legal/sar-procedure.md` (new) — Internal procedure for handling UK GDPR Article 15
+  subject access requests. Covers: receipt and acknowledgement (within 3 working days),
+  identity verification, Supabase SQL queries to retrieve all personal data held per user,
+  response email template with ZIP attachment, and a running log of requests handled.
+
+**Why:**
+Alan Knox POST-LAUNCH item 19, F-05-02 (M12), §2.2 item 19. UK GDPR Article 15 requires a
+response to SARs within one calendar month. Decision: manual process is proportionate at
+pre-launch scale. Privacy Policy Section 8 already directs users to wjokhia@rapidglobe.com —
+no policy change required. Automated self-serve export endpoint deferred to a future phase
+once live user volumes justify the build effort.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 18 resolved: generated Supabase types, createClient<Database>(), AiSummaryData to lib/types.ts
 
 **What changed:**
