@@ -1,0 +1,158 @@
+<svg width="1000" height="1500" viewBox="0 0 1000 1500" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arr-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
+    </marker>
+    <marker id="arr-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+    </marker>
+    <marker id="arr-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="1500" fill="#f8fafc"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1000" height="58" fill="#1e293b"/>
+  <text x="500" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" letter-spacing="2">GRANT PATHWAY</text>
+  <text x="500" y="44" text-anchor="middle" fill="white" font-size="20" font-weight="bold">Application Workflow  —  User Journey</text>
+
+  <!-- ── START ── -->
+  <ellipse cx="500" cy="98" rx="80" ry="26" fill="#1e293b"/>
+  <text x="500" y="103" text-anchor="middle" fill="white" font-size="13" font-weight="bold">START</text>
+  <line x1="500" y1="124" x2="500" y2="148" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ── LOGIN / REGISTER ── -->
+  <rect x="300" y="148" width="400" height="80" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="300" y="148" width="400" height="28" rx="8" fill="#475569"/>
+  <rect x="300" y="162" width="400" height="14" fill="#475569"/>
+  <text x="500" y="167" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Login or Register</text>
+  <text x="500" y="196" text-anchor="middle" fill="#475569" font-size="11">Email verified · Password 12+ chars · Leaked-pw check</text>
+  <text x="500" y="212" text-anchor="middle" fill="#94a3b8" font-size="10">Session cookie issued by Supabase Auth</text>
+  <line x1="500" y1="228" x2="500" y2="252" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ── CHARITY PROFILE ── -->
+  <rect x="300" y="252" width="400" height="80" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="300" y="252" width="400" height="28" rx="8" fill="#475569"/>
+  <rect x="300" y="266" width="400" height="14" fill="#475569"/>
+  <text x="500" y="271" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Charity Profile Setup</text>
+  <text x="500" y="300" text-anchor="middle" fill="#475569" font-size="11">Name · Registration no. · Mission · Financials</text>
+  <text x="500" y="316" text-anchor="middle" fill="#94a3b8" font-size="10">Required before first application · Charity Commission lookup</text>
+  <line x1="500" y1="332" x2="500" y2="358" stroke="#64748b" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 1
+  ───────────────────────────────────────────── -->
+  <!-- Step number badge -->
+  <circle cx="500" cy="380" r="22" fill="#2563eb"/>
+  <text x="500" y="386" text-anchor="middle" fill="white" font-size="14" font-weight="bold">1</text>
+  <line x1="500" y1="402" x2="500" y2="420" stroke="#2563eb" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+  <rect x="240" y="420" width="520" height="110" rx="8" fill="white" stroke="#bfdbfe" stroke-width="2"/>
+  <rect x="240" y="420" width="520" height="30" rx="8" fill="#2563eb"/>
+  <rect x="240" y="436" width="520" height="14" fill="#2563eb"/>
+  <text x="500" y="440" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Step 1  ·  Select Funder &amp; Name Grant</text>
+  <text x="500" y="468" text-anchor="middle" fill="#475569" font-size="11">Choose from active funder directory  ·  Enter grant name</text>
+  <text x="500" y="485" text-anchor="middle" fill="#475569" font-size="11">Application record created (status: not_started)</text>
+  <text x="500" y="502" text-anchor="middle" fill="#94a3b8" font-size="10">funder_id + funder_name stored  ·  current_step = 1</text>
+  <text x="500" y="518" text-anchor="middle" fill="#94a3b8" font-size="10">User can return to saved application from dashboard at any time</text>
+  <line x1="500" y1="530" x2="500" y2="556" stroke="#2563eb" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 2
+  ───────────────────────────────────────────── -->
+  <circle cx="500" cy="578" r="22" fill="#2563eb"/>
+  <text x="500" y="584" text-anchor="middle" fill="white" font-size="14" font-weight="bold">2</text>
+  <line x1="500" y1="600" x2="500" y2="618" stroke="#2563eb" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+  <rect x="240" y="618" width="520" height="120" rx="8" fill="white" stroke="#bfdbfe" stroke-width="2"/>
+  <rect x="240" y="618" width="520" height="30" rx="8" fill="#2563eb"/>
+  <rect x="240" y="634" width="520" height="14" fill="#2563eb"/>
+  <text x="500" y="638" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Step 2  ·  Upload Funder Guidelines</text>
+  <text x="500" y="666" text-anchor="middle" fill="#475569" font-size="11">Upload PDF / Word file  OR  paste guidelines text</text>
+  <text x="500" y="683" text-anchor="middle" fill="#475569" font-size="11">File stored temporarily in Supabase Storage (guidelines-temp)</text>
+  <text x="500" y="700" text-anchor="middle" fill="#94a3b8" font-size="10">200-page PDF cap  ·  30 s extraction timeout  ·  20k char limit surfaced to user</text>
+  <text x="500" y="716" text-anchor="middle" fill="#94a3b8" font-size="10">File cleaned up within 30 min by cron  ·  NOT stored permanently</text>
+  <line x1="500" y1="738" x2="500" y2="762" stroke="#2563eb" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 3
+  ───────────────────────────────────────────── -->
+  <circle cx="500" cy="784" r="22" fill="#d97706"/>
+  <text x="500" y="790" text-anchor="middle" fill="white" font-size="14" font-weight="bold">3</text>
+  <line x1="500" y1="806" x2="500" y2="824" stroke="#d97706" stroke-width="2" marker-end="url(#arr-orange)"/>
+
+  <rect x="240" y="824" width="520" height="140" rx="8" fill="white" stroke="#fed7aa" stroke-width="2"/>
+  <rect x="240" y="824" width="520" height="30" rx="8" fill="#d97706"/>
+  <rect x="240" y="840" width="520" height="14" fill="#d97706"/>
+  <text x="500" y="844" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Step 3  ·  AI Summary Generation</text>
+  <text x="500" y="872" text-anchor="middle" fill="#475569" font-size="11">Upstash rate check  →  Postgres cap check (50/month)</text>
+  <text x="500" y="889" text-anchor="middle" fill="#475569" font-size="11">Advisory lock acquired  →  AWS Bedrock (claude-sonnet-4-6)</text>
+  <text x="500" y="906" text-anchor="middle" fill="#475569" font-size="11">Plain-English summary of guidelines + extracted Q&amp;A structure</text>
+  <text x="500" y="923" text-anchor="middle" fill="#94a3b8" font-size="10">ai_summary stored on application  ·  application_answers rows created</text>
+  <text x="500" y="940" text-anchor="middle" fill="#94a3b8" font-size="10">Summary cached — regeneration not required on return visit</text>
+  <text x="500" y="957" text-anchor="middle" fill="#94a3b8" font-size="10">Zero retention  ·  no training-data use  ·  eu-west-2 only</text>
+  <line x1="500" y1="964" x2="500" y2="988" stroke="#d97706" stroke-width="2" marker-end="url(#arr-orange)"/>
+
+  <!-- Preparation checklist gate -->
+  <rect x="310" y="988" width="380" height="52" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="500" y="1010" text-anchor="middle" fill="#92400e" font-size="11" font-weight="bold">&#9888;  Preparation Checklist Gate</text>
+  <text x="500" y="1028" text-anchor="middle" fill="#78350f" font-size="10">User confirms readiness before writing begins</text>
+  <line x1="500" y1="1040" x2="500" y2="1062" stroke="#d97706" stroke-width="2" marker-end="url(#arr-orange)"/>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 4
+  ───────────────────────────────────────────── -->
+  <circle cx="500" cy="1084" r="22" fill="#059669"/>
+  <text x="500" y="1090" text-anchor="middle" fill="white" font-size="14" font-weight="bold">4</text>
+  <line x1="500" y1="1106" x2="500" y2="1124" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <rect x="200" y="1124" width="600" height="190" rx="8" fill="white" stroke="#bbf7d0" stroke-width="2"/>
+  <rect x="200" y="1124" width="600" height="30" rx="8" fill="#059669"/>
+  <rect x="200" y="1140" width="600" height="14" fill="#059669"/>
+  <text x="500" y="1144" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Step 4  ·  Write &amp; Approve Answers</text>
+  <text x="500" y="1172" text-anchor="middle" fill="#475569" font-size="11">One card per extracted question  ·  word / char limit shown</text>
+  <text x="500" y="1189" text-anchor="middle" fill="#475569" font-size="11">AI draft generation per answer (cap shared with Step 3)</text>
+  <text x="500" y="1206" text-anchor="middle" fill="#475569" font-size="11">User edits answer  →  clicks Approve per question</text>
+  <text x="500" y="1223" text-anchor="middle" fill="#475569" font-size="11">All answers approved  →  application status: approved</text>
+  <text x="500" y="1240" text-anchor="middle" fill="#94a3b8" font-size="10">Budget questions flagged amber  ·  AI assist disabled for budget Qs</text>
+  <text x="500" y="1257" text-anchor="middle" fill="#94a3b8" font-size="10">is_approved per answer stored in application_answers</text>
+  <text x="500" y="1290" text-anchor="middle" fill="#94a3b8" font-size="10">User can re-open approved application → resets all is_approved flags</text>
+
+  <!-- Re-open loop arrow -->
+  <path d="M 200 1220 Q 100 1220 100 1084 Q 100 950 200 950" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+  <text x="55" y="1090" fill="#94a3b8" font-size="9" text-anchor="middle">Re-open</text>
+  <text x="55" y="1103" fill="#94a3b8" font-size="9" text-anchor="middle">resets all</text>
+  <text x="55" y="1116" fill="#94a3b8" font-size="9" text-anchor="middle">approvals</text>
+
+  <line x1="500" y1="1314" x2="500" y2="1338" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 5
+  ───────────────────────────────────────────── -->
+  <circle cx="500" cy="1360" r="22" fill="#059669"/>
+  <text x="500" y="1366" text-anchor="middle" fill="white" font-size="14" font-weight="bold">5</text>
+  <line x1="500" y1="1382" x2="500" y2="1400" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <rect x="270" y="1400" width="460" height="62" rx="8" fill="white" stroke="#bbf7d0" stroke-width="2"/>
+  <rect x="270" y="1400" width="460" height="28" rx="8" fill="#059669"/>
+  <rect x="270" y="1414" width="460" height="14" fill="#059669"/>
+  <text x="500" y="1418" text-anchor="middle" fill="white" font-size="13" font-weight="bold">Step 5  ·  Export Word Document</text>
+  <text x="500" y="1448" text-anchor="middle" fill="#475569" font-size="11">Formatted .docx download  ·  last_exported_at updated</text>
+  <line x1="500" y1="1462" x2="500" y2="1476" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+
+  <!-- ── END ── -->
+  <ellipse cx="500" cy="1490" rx="80" ry="22" fill="#1e293b"/>
+  <text x="500" y="1495" text-anchor="middle" fill="white" font-size="13" font-weight="bold">COMPLETE</text>
+
+  <!-- Footer -->
+  <line x1="0" y1="1482" x2="1000" y2="1482" stroke="#e2e8f0" stroke-width="1"/>
+</svg>

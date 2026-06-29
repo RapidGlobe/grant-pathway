@@ -1,0 +1,231 @@
+<svg width="1600" height="1000" viewBox="0 0 1600 1000" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arr-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+    <marker id="arr-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
+    </marker>
+    <marker id="arr-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <!-- Page background -->
+  <rect width="1600" height="1000" fill="#f8fafc"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1600" height="58" fill="#1e293b"/>
+  <text x="800" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" letter-spacing="2">GRANT PATHWAY</text>
+  <text x="800" y="44" text-anchor="middle" fill="white" font-size="20" font-weight="bold">System Architecture Overview</text>
+
+  <!-- ── COLUMN 1: USER ── -->
+  <rect x="20" y="72" width="190" height="900" rx="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="115" y="95" text-anchor="middle" fill="#64748b" font-size="12" font-weight="bold" letter-spacing="1">USER</text>
+
+  <!-- Browser box -->
+  <rect x="35" y="108" width="160" height="130" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="35" y="108" width="160" height="30" rx="6" fill="#2563eb"/>
+  <rect x="35" y="124" width="160" height="14" fill="#2563eb"/>
+  <text x="115" y="128" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Web Browser</text>
+  <text x="115" y="158" text-anchor="middle" fill="#475569" font-size="10">Charity Staff / Manager</text>
+  <text x="115" y="175" text-anchor="middle" fill="#94a3b8" font-size="10">HTTPS / TLS 1.3</text>
+  <text x="115" y="192" text-anchor="middle" fill="#94a3b8" font-size="10">Chrome · Firefox · Safari</text>
+  <text x="115" y="209" text-anchor="middle" fill="#94a3b8" font-size="10">Edge</text>
+
+  <!-- Developer box -->
+  <rect x="35" y="258" width="160" height="100" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="35" y="258" width="160" height="30" rx="6" fill="#374151"/>
+  <rect x="35" y="274" width="160" height="14" fill="#374151"/>
+  <text x="115" y="278" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Developer</text>
+  <text x="115" y="310" text-anchor="middle" fill="#475569" font-size="10">git push → master</text>
+  <text x="115" y="328" text-anchor="middle" fill="#475569" font-size="10">Branch protection enforced</text>
+
+  <!-- GitHub box -->
+  <rect x="35" y="378" width="160" height="100" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+  <rect x="35" y="378" width="160" height="30" rx="6" fill="#24292f"/>
+  <rect x="35" y="394" width="160" height="14" fill="#24292f"/>
+  <text x="115" y="398" text-anchor="middle" fill="white" font-size="12" font-weight="bold">GitHub</text>
+  <text x="115" y="428" text-anchor="middle" fill="#475569" font-size="10">master branch</text>
+  <text x="115" y="446" text-anchor="middle" fill="#475569" font-size="10">4 CI checks required</text>
+
+  <!-- Arrow: browser → Vercel -->
+  <line x1="197" y1="173" x2="235" y2="173" stroke="#2563eb" stroke-width="2" marker-end="url(#arr-blue)"/>
+  <text x="210" y="165" text-anchor="middle" fill="#2563eb" font-size="9">HTTPS</text>
+
+  <!-- Arrow: dev → GitHub -->
+  <line x1="115" y1="360" x2="115" y2="375" stroke="#374151" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Arrow: GitHub → GitHub Actions (dashed) -->
+  <line x1="197" y1="428" x2="1050" y2="858" stroke="#24292f" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arr)"/>
+
+  <!-- ── COLUMN 2: VERCEL ── -->
+  <rect x="230" y="72" width="780" height="900" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1.5"/>
+  <text x="620" y="95" text-anchor="middle" fill="#1d4ed8" font-size="13" font-weight="bold" letter-spacing="1">VERCEL PLATFORM  ·  Edge Network</text>
+
+  <!-- Middleware -->
+  <rect x="248" y="108" width="360" height="165" rx="6" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+  <rect x="248" y="108" width="360" height="30" rx="6" fill="#2563eb"/>
+  <rect x="248" y="124" width="360" height="14" fill="#2563eb"/>
+  <text x="428" y="128" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Middleware  (middleware.ts)</text>
+  <text x="264" y="158" fill="#475569" font-size="11">• Session validation (Supabase SSR)</text>
+  <text x="264" y="175" fill="#475569" font-size="11">• CSP nonce per request (item 22)</text>
+  <text x="264" y="192" fill="#475569" font-size="11">• Route protection → auth redirect</text>
+  <text x="264" y="209" fill="#475569" font-size="11">• x-nonce header forwarded to layout</text>
+  <text x="264" y="226" fill="#475569" font-size="11">• Public API routes bypass auth check</text>
+
+  <!-- App Router -->
+  <rect x="630" y="108" width="360" height="165" rx="6" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+  <rect x="630" y="108" width="360" height="30" rx="6" fill="#2563eb"/>
+  <rect x="630" y="124" width="360" height="14" fill="#2563eb"/>
+  <text x="810" y="128" text-anchor="middle" fill="white" font-size="12" font-weight="bold">App Router  (Next.js)</text>
+  <text x="646" y="158" fill="#475569" font-size="11">• Auth pages: login, register, reset</text>
+  <text x="646" y="175" fill="#475569" font-size="11">• Dashboard: application list + status</text>
+  <text x="646" y="192" fill="#475569" font-size="11">• Application wizard: Steps 1–5</text>
+  <text x="646" y="209" fill="#475569" font-size="11">• Charity profile, Account settings</text>
+  <text x="646" y="226" fill="#475569" font-size="11">• /terms  /privacy  /robots  /sitemap</text>
+
+  <!-- API Routes -->
+  <rect x="248" y="292" width="360" height="200" rx="6" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+  <rect x="248" y="292" width="360" height="30" rx="6" fill="#1d4ed8"/>
+  <rect x="248" y="308" width="360" height="14" fill="#1d4ed8"/>
+  <text x="428" y="312" text-anchor="middle" fill="white" font-size="12" font-weight="bold">API Routes</text>
+  <text x="264" y="344" fill="#475569" font-size="11">POST  /api/generate-summary</text>
+  <text x="264" y="361" fill="#475569" font-size="11">POST  /api/generate-draft</text>
+  <text x="264" y="378" fill="#475569" font-size="11">POST  /api/refine-answer</text>
+  <text x="264" y="395" fill="#475569" font-size="11">POST  /api/upload/process</text>
+  <text x="264" y="412" fill="#475569" font-size="11">DELETE /api/account/delete</text>
+  <text x="264" y="429" fill="#475569" font-size="11">GET   /api/health</text>
+  <text x="264" y="476" fill="#94a3b8" font-size="10" font-style="italic">AI cap check (Postgres RPC) before every Bedrock call</text>
+
+  <!-- Server Actions -->
+  <rect x="630" y="292" width="360" height="200" rx="6" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+  <rect x="630" y="292" width="360" height="30" rx="6" fill="#1d4ed8"/>
+  <rect x="630" y="308" width="360" height="14" fill="#1d4ed8"/>
+  <text x="810" y="312" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Server Actions</text>
+  <text x="646" y="344" fill="#475569" font-size="11">applications.ts — CRUD, approve, reopen (RPC)</text>
+  <text x="646" y="361" fill="#475569" font-size="11">charity.ts — Charity Comm. lookup + paraphrase</text>
+  <text x="646" y="378" fill="#475569" font-size="11">funders.ts — list active funders</text>
+  <text x="646" y="395" fill="#475569" font-size="11">export.ts — generate Word document</text>
+  <text x="646" y="412" fill="#475569" font-size="11">account.ts — user preferences</text>
+  <text x="646" y="476" fill="#94a3b8" font-size="10" font-style="italic">Typed with Supabase Database generics (lib/database.types.ts)</text>
+
+  <!-- Cron Jobs -->
+  <rect x="248" y="512" width="742" height="115" rx="6" fill="white" stroke="#bfdbfe" stroke-width="1.5"/>
+  <rect x="248" y="512" width="742" height="30" rx="6" fill="#3b82f6"/>
+  <rect x="248" y="528" width="742" height="14" fill="#3b82f6"/>
+  <text x="619" y="532" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Vercel Cron Jobs</text>
+  <text x="264" y="562" fill="#475569" font-size="11">cleanup-guidelines      every 30 min   →  deletes expired files from Supabase Storage guidelines-temp bucket</text>
+  <text x="264" y="579" fill="#475569" font-size="11">inactivity-warning      daily          →  sends Email 3 (warning) at 23 months inactivity</text>
+  <text x="264" y="596" fill="#475569" font-size="11">inactivity-deletion     daily          →  deletes all user data + Auth record at 24 months</text>
+
+  <!-- Env validation + Sentry -->
+  <rect x="248" y="646" width="355" height="80" rx="6" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <text x="426" y="672" text-anchor="middle" fill="#166534" font-size="12" font-weight="bold">lib/env.ts — Zod Env Validation</text>
+  <text x="426" y="691" text-anchor="middle" fill="#16a34a" font-size="10">Validates all 8 required secrets at startup</text>
+  <text x="426" y="708" text-anchor="middle" fill="#16a34a" font-size="10">Throws before first request if any are missing</text>
+
+  <rect x="635" y="646" width="355" height="80" rx="6" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1.5"/>
+  <text x="812" y="672" text-anchor="middle" fill="#6d28d9" font-size="12" font-weight="bold">Sentry Instrumentation</text>
+  <text x="812" y="691" text-anchor="middle" fill="#7c3aed" font-size="10">Client / Server / Edge  ·  beforeSend scrubs PII</text>
+  <text x="812" y="708" text-anchor="middle" fill="#7c3aed" font-size="10">captureException on error boundaries</text>
+
+  <!-- Error boundaries note -->
+  <rect x="248" y="746" width="742" height="60" rx="6" fill="#fff7ed" stroke="#fed7aa" stroke-width="1.5"/>
+  <text x="619" y="770" text-anchor="middle" fill="#92400e" font-size="12" font-weight="bold">Error Boundaries</text>
+  <text x="619" y="790" text-anchor="middle" fill="#b45309" font-size="10">app/(authenticated)/error.tsx  ·  app/global-error.tsx  ·  both capture to Sentry via captureException</text>
+
+  <!-- ── COLUMN 3: EXTERNAL SERVICES ── -->
+  <rect x="1030" y="72" width="550" height="900" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+  <text x="1305" y="95" text-anchor="middle" fill="#475569" font-size="13" font-weight="bold" letter-spacing="1">EXTERNAL SERVICES</text>
+
+  <!-- Supabase -->
+  <rect x="1048" y="108" width="514" height="160" rx="6" fill="white" stroke="#10b981" stroke-width="1.5"/>
+  <rect x="1048" y="108" width="514" height="30" rx="6" fill="#059669"/>
+  <rect x="1048" y="124" width="514" height="14" fill="#059669"/>
+  <text x="1305" y="128" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Supabase  ·  eu-west-2 London  ·  Pro</text>
+  <text x="1064" y="158" fill="#475569" font-size="11">PostgreSQL:  applications, answers, profiles, funders, ai_usage_log</text>
+  <text x="1064" y="175" fill="#475569" font-size="11">Auth:  email/password, session cookies, JWT, email confirm</text>
+  <text x="1064" y="192" fill="#475569" font-size="11">Storage:  guidelines-temp bucket  (TTL-cleaned every 30 min)</text>
+  <text x="1064" y="209" fill="#475569" font-size="11">RLS:  row-level security  ·  daily backups  ·  7-day retention</text>
+  <text x="1064" y="248" fill="#94a3b8" font-size="10" font-style="italic">Password policy: 12 chars, leaked-pw check, secure change enforced</text>
+
+  <!-- AWS Bedrock -->
+  <rect x="1048" y="288" width="514" height="130" rx="6" fill="white" stroke="#f59e0b" stroke-width="1.5"/>
+  <rect x="1048" y="288" width="514" height="30" rx="6" fill="#d97706"/>
+  <rect x="1048" y="304" width="514" height="14" fill="#d97706"/>
+  <text x="1305" y="308" text-anchor="middle" fill="white" font-size="12" font-weight="bold">AWS Bedrock  ·  eu-west-2 London</text>
+  <text x="1064" y="338" fill="#475569" font-size="11">Model:  claude-sonnet-4-6  (zero-retention · no training-data use)</text>
+  <text x="1064" y="355" fill="#475569" font-size="11">IAM:  grant-pathway-prod  ·  single InvokeModel permission</text>
+  <text x="1064" y="372" fill="#475569" font-size="11">Timeout:  60 s AbortSignal on every call  ·  advisory lock on cap</text>
+  <text x="1064" y="400" fill="#94a3b8" font-size="10" font-style="italic">Monthly cap: 50 requests/user  ·  soft warn at 40  ·  fail-closed on DB error</text>
+
+  <!-- Resend -->
+  <rect x="1048" y="438" width="514" height="110" rx="6" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="1048" y="438" width="514" height="30" rx="6" fill="#374151"/>
+  <rect x="1048" y="454" width="514" height="14" fill="#374151"/>
+  <text x="1305" y="458" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Resend  (via Amazon SES)</text>
+  <text x="1064" y="488" fill="#475569" font-size="11">Sending access scoped to grantpathway.org.uk only</text>
+  <text x="1064" y="505" fill="#475569" font-size="11">SPF · DKIM (resend._domainkey) · DMARC p=quarantine  all verified</text>
+  <text x="1064" y="530" fill="#94a3b8" font-size="10" font-style="italic">4 templates: email confirm, welcome, inactivity warning, account deleted</text>
+
+  <!-- Upstash -->
+  <rect x="1048" y="568" width="245" height="110" rx="6" fill="white" stroke="#00a98f" stroke-width="1.5"/>
+  <rect x="1048" y="568" width="245" height="30" rx="6" fill="#00a98f"/>
+  <rect x="1048" y="584" width="245" height="14" fill="#00a98f"/>
+  <text x="1170" y="588" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Upstash Redis</text>
+  <text x="1064" y="618" fill="#475569" font-size="11">AI burst rate-limiting</text>
+  <text x="1064" y="635" fill="#475569" font-size="11">Per-user sliding window</text>
+  <text x="1064" y="665" fill="#94a3b8" font-size="10" font-style="italic">Applied before Bedrock</text>
+
+  <!-- Sentry -->
+  <rect x="1317" y="568" width="245" height="110" rx="6" fill="white" stroke="#7c3aed" stroke-width="1.5"/>
+  <rect x="1317" y="568" width="245" height="30" rx="6" fill="#6d28d9"/>
+  <rect x="1317" y="584" width="245" height="14" fill="#6d28d9"/>
+  <text x="1440" y="588" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Sentry  (EU region)</text>
+  <text x="1333" y="618" fill="#475569" font-size="11">Error &amp; performance</text>
+  <text x="1333" y="635" fill="#475569" font-size="11">PII scrubbed beforeSend</text>
+  <text x="1333" y="665" fill="#94a3b8" font-size="10" font-style="italic">Org: rapidglobe-ltd</text>
+
+  <!-- Charity Commission -->
+  <rect x="1048" y="698" width="514" height="90" rx="6" fill="white" stroke="#94a3b8" stroke-width="1.5"/>
+  <rect x="1048" y="698" width="514" height="30" rx="6" fill="#475569"/>
+  <rect x="1048" y="714" width="514" height="14" fill="#475569"/>
+  <text x="1305" y="718" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Charity Commission API  (register.charity.gov.uk)</text>
+  <text x="1064" y="748" fill="#475569" font-size="11">Read-only charity lookup by registration number</text>
+  <text x="1064" y="765" fill="#94a3b8" font-size="10" font-style="italic">No write access exists — key is read-only by API design</text>
+
+  <!-- GitHub Actions -->
+  <rect x="1048" y="808" width="514" height="100" rx="6" fill="white" stroke="#24292f" stroke-width="1.5"/>
+  <rect x="1048" y="808" width="514" height="30" rx="6" fill="#24292f"/>
+  <rect x="1048" y="824" width="514" height="14" fill="#24292f"/>
+  <text x="1305" y="828" text-anchor="middle" fill="white" font-size="12" font-weight="bold">GitHub Actions  (CI — 4 required jobs)</text>
+  <text x="1064" y="858" fill="#475569" font-size="11">lint-and-typecheck  ·  test (Vitest 22)  ·  npm audit</text>
+  <text x="1064" y="875" fill="#475569" font-size="11">validate-migrations  (Supabase CLI db reset from empty)</text>
+  <text x="1064" y="895" fill="#94a3b8" font-size="10" font-style="italic">All 4 must pass before merge to master (branch protection)</text>
+
+  <!-- ARROWS: Vercel → External Services -->
+  <!-- → Supabase -->
+  <line x1="1012" y1="200" x2="1044" y2="200" stroke="#059669" stroke-width="2" marker-end="url(#arr-green)"/>
+  <text x="1020" y="194" fill="#059669" font-size="9">DB / Auth</text>
+
+  <!-- → Bedrock -->
+  <line x1="1012" y1="370" x2="1044" y2="360" stroke="#d97706" stroke-width="2" marker-end="url(#arr-orange)"/>
+  <text x="1018" y="364" fill="#d97706" font-size="9">InvokeModel</text>
+
+  <!-- → Resend -->
+  <line x1="1012" y1="590" x2="1044" y2="490" stroke="#64748b" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- → Upstash -->
+  <line x1="1012" y1="400" x2="1044" y2="615" stroke="#00a98f" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+  <!-- → Charity Commission -->
+  <line x1="1012" y1="430" x2="1044" y2="730" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+
+  <!-- Footer -->
+  <line x1="0" y1="980" x2="1600" y2="980" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="800" y="994" text-anchor="middle" fill="#94a3b8" font-size="10">Grant Pathway  ·  RapidGlobe Ltd  (Reg. 05615649)  ·  Diagram v1.0  ·  2026-06-29</text>
+</svg>

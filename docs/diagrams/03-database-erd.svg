@@ -1,0 +1,261 @@
+<svg width="1600" height="1050" viewBox="0 0 1600 1050" xmlns="http://www.w3.org/2000/svg" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arr-pk" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="1050" fill="#f8fafc"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1600" height="58" fill="#1e293b"/>
+  <text x="800" y="22" text-anchor="middle" fill="#94a3b8" font-size="11" letter-spacing="2">GRANT PATHWAY</text>
+  <text x="800" y="44" text-anchor="middle" fill="white" font-size="20" font-weight="bold">Database Schema  —  Entity Relationship Diagram</text>
+
+  <!-- Legend -->
+  <rect x="20" y="72" width="320" height="70" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="35" y="92" fill="#1e293b" font-size="11" font-weight="bold">Legend</text>
+  <rect x="35" y="100" width="12" height="12" fill="#fef9c3" stroke="#ca8a04" stroke-width="1"/>
+  <text x="54" y="111" fill="#475569" font-size="10">Primary Key (PK)</text>
+  <rect x="160" y="100" width="12" height="12" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="179" y="111" fill="#475569" font-size="10">Foreign Key (FK)</text>
+  <line x1="35" y1="128" x2="80" y2="128" stroke="#2563eb" stroke-width="2" marker-end="url(#arr-pk)"/>
+  <text x="88" y="132" fill="#475569" font-size="10">One-to-many relationship</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: auth.users  (top-center, anchor)
+  ═══════════════════════════════════════════════ -->
+  <!-- Box -->
+  <rect x="580" y="85" width="280" height="185" rx="6" fill="white" stroke="#059669" stroke-width="2"/>
+  <rect x="580" y="85" width="280" height="32" rx="6" fill="#059669"/>
+  <rect x="580" y="101" width="280" height="16" fill="#059669"/>
+  <text x="720" y="106" text-anchor="middle" fill="white" font-size="12" font-weight="bold">auth.users</text>
+  <text x="720" y="121" text-anchor="middle" fill="#d1fae5" font-size="10">Supabase Auth — managed</text>
+  <!-- Fields -->
+  <rect x="588" y="128" width="264" height="16" rx="2" fill="#fef9c3"/>
+  <text x="596" y="140" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="780" y="140" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <text x="596" y="160" fill="#475569" font-size="10">email</text>
+  <text x="780" y="160" text-anchor="end" fill="#94a3b8" font-size="10">String  unique</text>
+  <text x="596" y="176" fill="#475569" font-size="10">email_confirmed_at</text>
+  <text x="780" y="176" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="596" y="192" fill="#475569" font-size="10">last_sign_in_at</text>
+  <text x="780" y="192" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="596" y="208" fill="#475569" font-size="10">encrypted_password</text>
+  <text x="780" y="208" text-anchor="end" fill="#94a3b8" font-size="10">String</text>
+  <text x="596" y="224" fill="#475569" font-size="10">created_at</text>
+  <text x="780" y="224" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="596" y="256" fill="#94a3b8" font-size="9" font-style="italic">Inactivity deletion at 24 months</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: user_profiles  (top-left)
+  ═══════════════════════════════════════════════ -->
+  <rect x="60" y="115" width="270" height="185" rx="6" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="60" y="115" width="270" height="32" rx="6" fill="#2563eb"/>
+  <rect x="60" y="131" width="270" height="16" fill="#2563eb"/>
+  <text x="195" y="136" text-anchor="middle" fill="white" font-size="12" font-weight="bold">user_profiles</text>
+  <text x="195" y="151" text-anchor="middle" fill="#bfdbfe" font-size="10">1:1 with auth.users</text>
+  <rect x="68" y="158" width="254" height="16" rx="2" fill="#fef9c3"/>
+  <text x="76" y="170" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="318" y="170" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <rect x="68" y="176" width="254" height="16" rx="2" fill="#fee2e2"/>
+  <text x="76" y="188" fill="#dc2626" font-size="10" font-weight="bold">FK  user_id</text>
+  <text x="318" y="188" text-anchor="end" fill="#dc2626" font-size="10">UUID  unique</text>
+  <text x="76" y="208" fill="#475569" font-size="10">first_name</text>
+  <text x="318" y="208" text-anchor="end" fill="#94a3b8" font-size="10">String</text>
+  <text x="76" y="224" fill="#475569" font-size="10">last_name</text>
+  <text x="318" y="224" text-anchor="end" fill="#94a3b8" font-size="10">String</text>
+  <text x="76" y="240" fill="#475569" font-size="10">feedback_consent</text>
+  <text x="318" y="240" text-anchor="end" fill="#94a3b8" font-size="10">Boolean  default false</text>
+  <text x="76" y="256" fill="#475569" font-size="10">created_at / updated_at</text>
+  <text x="318" y="256" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="76" y="284" fill="#94a3b8" font-size="9" font-style="italic">Name used in emails and nav bar</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: charity_profiles  (mid-left)
+  ═══════════════════════════════════════════════ -->
+  <rect x="60" y="380" width="270" height="320" rx="6" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="60" y="380" width="270" height="32" rx="6" fill="#2563eb"/>
+  <rect x="60" y="396" width="270" height="16" fill="#2563eb"/>
+  <text x="195" y="401" text-anchor="middle" fill="white" font-size="12" font-weight="bold">charity_profiles</text>
+  <text x="195" y="416" text-anchor="middle" fill="#bfdbfe" font-size="10">1:1 with auth.users</text>
+  <rect x="68" y="423" width="254" height="16" rx="2" fill="#fef9c3"/>
+  <text x="76" y="435" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="318" y="435" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <rect x="68" y="441" width="254" height="16" rx="2" fill="#fee2e2"/>
+  <text x="76" y="453" fill="#dc2626" font-size="10" font-weight="bold">FK  user_id</text>
+  <text x="318" y="453" text-anchor="end" fill="#dc2626" font-size="10">UUID  unique</text>
+  <text x="76" y="473" fill="#475569" font-size="10">charity_name  /  legal_name</text>
+  <text x="76" y="489" fill="#475569" font-size="10">registration_number  /  org_type</text>
+  <text x="76" y="505" fill="#475569" font-size="10">what_charity_does  (required)</text>
+  <text x="76" y="521" fill="#475569" font-size="10">who_charity_helps  (required)</text>
+  <text x="76" y="537" fill="#475569" font-size="10">where_charity_works  (required)</text>
+  <text x="76" y="553" fill="#475569" font-size="10">registered_address  /  contact_*</text>
+  <text x="76" y="569" fill="#475569" font-size="10">total_income  /  total_expenditure</text>
+  <text x="76" y="585" fill="#475569" font-size="10">number_of_employees_fte</text>
+  <text x="76" y="601" fill="#475569" font-size="10">has_safeguarding_policy  (Boolean)</text>
+  <text x="76" y="617" fill="#475569" font-size="10">has_annual_accounts  (Boolean)</text>
+  <text x="76" y="633" fill="#475569" font-size="10">lookup_source  (enum)</text>
+  <text x="76" y="649" fill="#475569" font-size="10">created_at / updated_at</text>
+  <text x="76" y="683" fill="#94a3b8" font-size="9" font-style="italic">Profile required before first application</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: funders  (top-right)
+  ═══════════════════════════════════════════════ -->
+  <rect x="1260" y="115" width="300" height="200" rx="6" fill="white" stroke="#7c3aed" stroke-width="1.5"/>
+  <rect x="1260" y="115" width="300" height="32" rx="6" fill="#7c3aed"/>
+  <rect x="1260" y="131" width="300" height="16" fill="#7c3aed"/>
+  <text x="1410" y="136" text-anchor="middle" fill="white" font-size="12" font-weight="bold">funders</text>
+  <text x="1410" y="151" text-anchor="middle" fill="#ede9fe" font-size="10">Global — not user-scoped</text>
+  <rect x="1268" y="158" width="284" height="16" rx="2" fill="#fef9c3"/>
+  <text x="1276" y="170" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="1548" y="170" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <text x="1276" y="190" fill="#475569" font-size="10">name</text>
+  <text x="1548" y="190" text-anchor="end" fill="#94a3b8" font-size="10">String  unique</text>
+  <text x="1276" y="206" fill="#475569" font-size="10">funder_type</text>
+  <text x="1548" y="206" text-anchor="end" fill="#94a3b8" font-size="10">enum: structured | narrative</text>
+  <text x="1276" y="222" fill="#475569" font-size="10">grant_range</text>
+  <text x="1548" y="222" text-anchor="end" fill="#94a3b8" font-size="10">String  (display only)</text>
+  <text x="1276" y="238" fill="#475569" font-size="10">guidelines_url</text>
+  <text x="1548" y="238" text-anchor="end" fill="#94a3b8" font-size="10">String</text>
+  <text x="1276" y="254" fill="#475569" font-size="10">is_active</text>
+  <text x="1548" y="254" text-anchor="end" fill="#94a3b8" font-size="10">Boolean  default true</text>
+  <text x="1276" y="296" fill="#94a3b8" font-size="9" font-style="italic">RLS: auth users SELECT only · no INSERT/UPDATE</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: applications  (center)
+  ═══════════════════════════════════════════════ -->
+  <rect x="590" y="340" width="540" height="280" rx="6" fill="white" stroke="#2563eb" stroke-width="2"/>
+  <rect x="590" y="340" width="540" height="32" rx="6" fill="#1d4ed8"/>
+  <rect x="590" y="356" width="540" height="16" fill="#1d4ed8"/>
+  <text x="860" y="361" text-anchor="middle" fill="white" font-size="13" font-weight="bold">applications</text>
+  <text x="860" y="376" text-anchor="middle" fill="#bfdbfe" font-size="10">Many per user</text>
+  <rect x="598" y="383" width="524" height="16" rx="2" fill="#fef9c3"/>
+  <text x="606" y="395" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="1118" y="395" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <rect x="598" y="401" width="524" height="16" rx="2" fill="#fee2e2"/>
+  <text x="606" y="413" fill="#dc2626" font-size="10" font-weight="bold">FK  user_id  →  auth.users.id</text>
+  <text x="1118" y="413" text-anchor="end" fill="#dc2626" font-size="10">UUID</text>
+  <rect x="598" y="419" width="524" height="16" rx="2" fill="#fee2e2"/>
+  <text x="606" y="431" fill="#dc2626" font-size="10" font-weight="bold">FK  funder_id  →  funders.id</text>
+  <text x="1118" y="431" text-anchor="end" fill="#dc2626" font-size="10">UUID  nullable</text>
+  <text x="606" y="451" fill="#475569" font-size="10">funder_name</text>
+  <text x="1118" y="451" text-anchor="end" fill="#94a3b8" font-size="10">String  (retained for display)</text>
+  <text x="606" y="467" fill="#475569" font-size="10">grant_name</text>
+  <text x="1118" y="467" text-anchor="end" fill="#94a3b8" font-size="10">String</text>
+  <text x="606" y="483" fill="#475569" font-size="10">status</text>
+  <text x="1118" y="483" text-anchor="end" fill="#94a3b8" font-size="10">enum: not_started | in_progress | approved | exported | mismatch</text>
+  <text x="606" y="499" fill="#475569" font-size="10">current_step</text>
+  <text x="1118" y="499" text-anchor="end" fill="#94a3b8" font-size="10">Integer  1–5</text>
+  <text x="606" y="515" fill="#475569" font-size="10">ai_summary</text>
+  <text x="1118" y="515" text-anchor="end" fill="#94a3b8" font-size="10">Text  (cached AI output)</text>
+  <text x="606" y="531" fill="#475569" font-size="10">assembled_draft</text>
+  <text x="1118" y="531" text-anchor="end" fill="#94a3b8" font-size="10">Text  (nullable)</text>
+  <text x="606" y="547" fill="#475569" font-size="10">draft_status</text>
+  <text x="1118" y="547" text-anchor="end" fill="#94a3b8" font-size="10">enum</text>
+  <text x="606" y="563" fill="#475569" font-size="10">last_exported_at</text>
+  <text x="1118" y="563" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp  nullable</text>
+  <text x="606" y="579" fill="#475569" font-size="10">created_at / updated_at</text>
+  <text x="1118" y="579" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="606" y="607" fill="#94a3b8" font-size="9" font-style="italic">Guidelines file/text NOT stored — session-only. mismatch is terminal state.</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: application_answers  (bottom-center)
+  ═══════════════════════════════════════════════ -->
+  <rect x="530" y="720" width="580" height="280" rx="6" fill="white" stroke="#2563eb" stroke-width="1.5"/>
+  <rect x="530" y="720" width="580" height="32" rx="6" fill="#3b82f6"/>
+  <rect x="530" y="736" width="580" height="16" fill="#3b82f6"/>
+  <text x="820" y="741" text-anchor="middle" fill="white" font-size="12" font-weight="bold">application_answers</text>
+  <text x="820" y="756" text-anchor="middle" fill="#dbeafe" font-size="10">Many per application</text>
+  <rect x="538" y="763" width="564" height="16" rx="2" fill="#fef9c3"/>
+  <text x="546" y="775" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="1098" y="775" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <rect x="538" y="781" width="564" height="16" rx="2" fill="#fee2e2"/>
+  <text x="546" y="793" fill="#dc2626" font-size="10" font-weight="bold">FK  application_id  →  applications.id</text>
+  <text x="1098" y="793" text-anchor="end" fill="#dc2626" font-size="10">UUID</text>
+  <text x="546" y="813" fill="#475569" font-size="10">question_text</text>
+  <text x="1098" y="813" text-anchor="end" fill="#94a3b8" font-size="10">Text</text>
+  <text x="546" y="829" fill="#475569" font-size="10">question_type</text>
+  <text x="1098" y="829" text-anchor="end" fill="#94a3b8" font-size="10">enum: narrative | data_entry | financial | dropdown | date | file_upload</text>
+  <text x="546" y="845" fill="#475569" font-size="10">question_order</text>
+  <text x="1098" y="845" text-anchor="end" fill="#94a3b8" font-size="10">Integer  unique per application</text>
+  <text x="546" y="861" fill="#475569" font-size="10">word_limit  /  char_limit  /  limit_type</text>
+  <text x="1098" y="861" text-anchor="end" fill="#94a3b8" font-size="10">Integer / Integer / enum  nullable</text>
+  <text x="546" y="877" fill="#475569" font-size="10">answer_text</text>
+  <text x="1098" y="877" text-anchor="end" fill="#94a3b8" font-size="10">Text  nullable</text>
+  <text x="546" y="893" fill="#475569" font-size="10">answer_source</text>
+  <text x="1098" y="893" text-anchor="end" fill="#94a3b8" font-size="10">enum: ai_assisted | user_edited | user_written</text>
+  <text x="546" y="909" fill="#475569" font-size="10">is_budget_question</text>
+  <text x="1098" y="909" text-anchor="end" fill="#94a3b8" font-size="10">Boolean  default false</text>
+  <text x="546" y="925" fill="#475569" font-size="10">is_approved</text>
+  <text x="1098" y="925" text-anchor="end" fill="#94a3b8" font-size="10">Boolean  default false</text>
+  <text x="546" y="941" fill="#475569" font-size="10">created_at / updated_at</text>
+  <text x="1098" y="941" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="546" y="985" fill="#94a3b8" font-size="9" font-style="italic">is_approved reset to false when application re-opened  ·  RLS: user_id via parent application</text>
+
+  <!-- ═══════════════════════════════════════════════
+       TABLE: ai_usage_log  (bottom-right)
+  ═══════════════════════════════════════════════ -->
+  <rect x="1180" y="500" width="380" height="240" rx="6" fill="white" stroke="#d97706" stroke-width="1.5"/>
+  <rect x="1180" y="500" width="380" height="32" rx="6" fill="#d97706"/>
+  <rect x="1180" y="516" width="380" height="16" fill="#d97706"/>
+  <text x="1370" y="521" text-anchor="middle" fill="white" font-size="12" font-weight="bold">ai_usage_log</text>
+  <text x="1370" y="536" text-anchor="middle" fill="#fef3c7" font-size="10">Many per user  ·  append-only</text>
+  <rect x="1188" y="543" width="364" height="16" rx="2" fill="#fef9c3"/>
+  <text x="1196" y="555" fill="#92400e" font-size="10" font-weight="bold">PK  id</text>
+  <text x="1548" y="555" text-anchor="end" fill="#92400e" font-size="10">UUID</text>
+  <rect x="1188" y="561" width="364" height="16" rx="2" fill="#fee2e2"/>
+  <text x="1196" y="573" fill="#dc2626" font-size="10" font-weight="bold">FK  user_id  →  auth.users.id</text>
+  <text x="1548" y="573" text-anchor="end" fill="#dc2626" font-size="10">UUID</text>
+  <rect x="1188" y="579" width="364" height="16" rx="2" fill="#fee2e2"/>
+  <text x="1196" y="591" fill="#dc2626" font-size="10" font-weight="bold">FK  application_id  →  applications.id</text>
+  <text x="1548" y="591" text-anchor="end" fill="#dc2626" font-size="10">UUID  nullable</text>
+  <text x="1196" y="611" fill="#475569" font-size="10">request_type</text>
+  <text x="1548" y="611" text-anchor="end" fill="#94a3b8" font-size="10">enum: guideline_summary | draft_generation | charity_paraphrase</text>
+  <text x="1196" y="627" fill="#475569" font-size="10">token_count</text>
+  <text x="1548" y="627" text-anchor="end" fill="#94a3b8" font-size="10">Integer  nullable</text>
+  <text x="1196" y="643" fill="#475569" font-size="10">created_at</text>
+  <text x="1548" y="643" text-anchor="end" fill="#94a3b8" font-size="10">Timestamp</text>
+  <text x="1196" y="679" fill="#94a3b8" font-size="9" font-style="italic">Cap: 50/month per user  ·  warn at 40  ·  atomic advisory lock</text>
+  <text x="1196" y="695" fill="#94a3b8" font-size="9" font-style="italic">Deleted when user deletes account</text>
+  <text x="1196" y="723" fill="#94a3b8" font-size="9" font-style="italic">Count-query guarded by Postgres RPC (reserve_ai_slot)</text>
+
+  <!-- ═══════════════════════════════════════════════
+       RELATIONSHIP LINES
+  ═══════════════════════════════════════════════ -->
+  <!-- auth.users → user_profiles (1:1) -->
+  <line x1="580" y1="170" x2="334" y2="208" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr-pk)"/>
+  <text x="450" y="182" fill="#2563eb" font-size="9">1:1</text>
+
+  <!-- auth.users → charity_profiles (1:1) -->
+  <line x1="580" y1="200" x2="334" y2="460" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr-pk)"/>
+  <text x="430" y="330" fill="#2563eb" font-size="9">1:1</text>
+
+  <!-- auth.users → applications (1:many) -->
+  <line x1="720" y1="270" x2="780" y2="337" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr-pk)"/>
+  <text x="730" y="310" fill="#2563eb" font-size="9">1:N</text>
+
+  <!-- auth.users → ai_usage_log (1:many) -->
+  <line x1="860" y1="270" x2="1260" y2="560" stroke="#d97706" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="1050" y="380" fill="#d97706" font-size="9">1:N</text>
+
+  <!-- funders → applications (1:many) -->
+  <line x1="1260" y1="240" x2="1132" y2="420" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="1210" y="330" fill="#7c3aed" font-size="9">1:N</text>
+
+  <!-- applications → application_answers (1:many) -->
+  <line x1="820" y1="622" x2="820" y2="717" stroke="#2563eb" stroke-width="1.5" marker-end="url(#arr-pk)"/>
+  <text x="828" y="670" fill="#2563eb" font-size="9">1:N</text>
+
+  <!-- applications → ai_usage_log (1:many) -->
+  <line x1="1132" y1="500" x2="1200" y2="575" stroke="#d97706" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr)"/>
+  <text x="1170" y="545" fill="#d97706" font-size="9">1:N</text>
+
+  <!-- Footer -->
+  <line x1="0" y1="1032" x2="1600" y2="1032" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="800" y="1046" text-anchor="middle" fill="#94a3b8" font-size="10">Grant Pathway  ·  RapidGlobe Ltd  (Reg. 05615649)  ·  Diagram v1.0  ·  2026-06-29  ·  All tables in PostgreSQL via Supabase (eu-west-2 London)</text>
+</svg>
