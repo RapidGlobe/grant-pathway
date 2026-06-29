@@ -25,6 +25,19 @@ Alan Knox POST-LAUNCH item 25, VQ-009, §2.3 item 25. The previous defaults (6-c
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 26 resolved: least-privilege key scoping (VQ-021)
+
+**What changed:**
+
+- **AWS:** New IAM user `grant-pathway-prod` created with custom policy `grant.pathway.bedrock.invoke` — single permission `bedrock:InvokeModel` scoped to `arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-6`. New access key applied to Vercel Production env vars. Old `grant-pathway-dev` user (had `AmazonBedrockFullAccess`) retained for dev environment only.
+- **Resend:** New API key `grant-pathway-production-send` created with Sending access scoped to `grantpathway.org.uk`. Old Full access key deleted. Vercel `RESEND_API_KEY` updated to new scoped key.
+- **Charity Commission:** Read-only by API design — no action required.
+
+**Why:**
+Alan Knox POST-LAUNCH item 26, VQ-021, §2.3 item 26. `AmazonBedrockFullAccess` granted every Bedrock operation including model management and training. Resend Full access allowed domain management, API key deletion, and log access. Both are now scoped to the minimum required: invoke one model, send from one domain.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 27 resolved: SPF/DKIM/DMARC confirmed for grantpathway.org.uk (VQ-022)
 
 **What changed:**
