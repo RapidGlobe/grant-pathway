@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 22 resolved: CSP nonce migration — script-src off 'unsafe-inline' (F-08-02, M5)
+
+**What changed:**
+
+- `middleware.ts` — generates a fresh `crypto.randomUUID()` nonce (base64-encoded) on every request; builds the `Content-Security-Policy` header with `'nonce-{nonce}'` on `script-src` (replaces `'unsafe-inline'`); passes nonce to `updateSession`.
+- `lib/supabase/middleware.ts` — accepts optional `nonce`; forwards it as `x-nonce` request header in both `NextResponse.next()` calls (including the cookie-refresh path) so the page layout can read it.
+- `next.config.ts` — static `Content-Security-Policy` header removed; all other security headers unchanged. CSP is now set per-request in middleware.
+- `app/layout.tsx` — made async; calls `await headers()` to make the layout dynamic so Next.js renders it fresh per request and stamps the nonce on its own inline hydration scripts.
+
+**Why:**
+Alan Knox POST-LAUNCH item 22, F-08-02 (M5), §2.2 item 22. `'unsafe-inline'` on `script-src` allows any injected inline script to execute — removing it eliminates that XSS vector. A static nonce in `next.config.ts` would be trivially bypassable (same value every request); a per-request nonce is not. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 21 resolved: transactional integrity for approve and reopen (F-06-05/06, M9)
 
 **What changed:**

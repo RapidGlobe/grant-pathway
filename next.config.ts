@@ -1,10 +1,9 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs'
 
-// In development, React requires 'unsafe-eval' for call stack reconstruction
-// and other debugging features. Never included in production.
-const isDev = process.env.NODE_ENV === 'development'
-
+// Content-Security-Policy is set per-request in middleware.ts (item 22, F-08-02)
+// so it can carry a per-request nonce replacing 'unsafe-inline' on script-src.
+// All other security headers are set statically here as they do not vary per request.
 const securityHeaders = [
   // Prevent the page being loaded in an iframe — blocks clickjacking
   { key: 'X-Frame-Options', value: 'DENY' },
@@ -16,20 +15,6 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
   // Force HTTPS for one year — only active over HTTPS (ignored locally)
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-  // Content Security Policy — tighten iteratively after first production deploy
-  // (validate at securityheaders.com per Phase 5 P5.2)
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data:",
-      // Sentry EU ingest added in P3.7 review — must be present or browser SDK is silently blocked
-      "connect-src 'self' https://*.supabase.co https://*.ingest.de.sentry.io",
-      "frame-ancestors 'none'",
-    ].join('; '),
-  },
 ]
 
 const nextConfig: NextConfig = {
