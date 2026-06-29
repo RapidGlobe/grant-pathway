@@ -295,6 +295,20 @@ export type Database = {
         }
         Returns: undefined
       }
+      approve_application: {
+        Args: {
+          p_application_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      reopen_application: {
+        Args: {
+          p_application_id: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       ai_request_type:

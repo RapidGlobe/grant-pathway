@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 21 resolved: transactional integrity for approve and reopen (F-06-05/06, M9)
+
+**What changed:**
+
+- `docs/migrations/item-21-transactional-integrity.sql` (new) — two Postgres functions: `approve_application` and `reopen_application`. Each performs both table updates (`applications` + `application_answers`) in a single transaction; raises `application_not_found` if the row is missing or not owned by the caller. `SECURITY INVOKER` — RLS applies.
+- `actions/applications.ts` — `approveApplication` and `reopenApplication` now call `supabase.rpc()` instead of two separate update calls.
+- `lib/database.types.ts` — typed signatures added for both new RPC functions.
+
+**Why:**
+Alan Knox POST-LAUNCH item 21, F-06-05/06 (M9), §2.2 item 21. The previous two-step pattern left a window where `applications.status` could be updated but `application_answers.is_approved` not (or vice versa), leaving the application in a permanently inconsistent state visible to the user. Wrapping both writes in one Postgres transaction eliminates the window. Scope limited to approve and reopen — `assembleAndAdvance` is serial with no cross-table race risk, and the deletion paths are handled by Supabase Auth cascade.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 20 resolved: AI kill-switch added (F-09-03, M15)
 
 **What changed:**
