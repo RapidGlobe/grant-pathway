@@ -4,8 +4,8 @@
 **Volatility:** Medium
 **Update when:** Any change to technology choices, libraries, services, or infrastructure
 
-**Version:** 1.2
-**Last updated:** 2026-05-29
+**Version:** 1.3
+**Last updated:** 2026-06-29
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
 
@@ -87,29 +87,96 @@ Vercel is built by the same team as Next.js — deployment is a single command a
 
 ---
 
-## TS-05 — Existing Infrastructure & Accounts
+## TS-05 — Email Service
 
-### Available
+| Decision | Choice |
+| -------- | ------ |
+| Provider | Resend |
 
-| Item                | Status        | Notes                                                   |
-| ------------------- | ------------- | ------------------------------------------------------- |
-| Domain name         | ✅ Registered | **Grantpathway.org.uk**                                 |
-| AWS cloud account   | ✅ Exists     | Verify access and credentials before development starts |
-| Azure cloud account | ✅ Exists     | Verify access and credentials before development starts |
-| VS Code             | ✅ Installed  | Primary development environment                         |
+**Rationale:**
+Resend is a developer-focused transactional email API with first-class Next.js support. It handles all system emails — account verification, password reset, inactivity warnings, account deletion confirmation — via the `RESEND_API_KEY` environment variable. Chosen over alternatives for its simple API, reliable delivery, and straightforward domain verification.
 
-### To Be Set Up Before Development Begins
+**Emails sent by the application:**
 
-| Item                         | Action Required                                                                                                   | Priority                                                                    |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Amazon Bedrock Claude access | Enable Claude Sonnet 4.6 model access in AWS console (eu-west-2); configure IAM permissions for Bedrock inference | High — required for AI features                                             |
-| GitHub account               | Create account at github.com; set up public repository for the project                                            | High — required for open source licence (C17) and codebase continuity (C18) |
-| Supabase account             | Sign up at supabase.com; create project in London region                                                          | High — required for database and auth                                       |
-| Vercel account               | Sign up at vercel.com; link to GitHub account                                                                     | High — required for deployment                                              |
+- Email address verification (on registration)
+- Password reset link
+- Inactivity warning (23 months, via cron)
+- Account deletion confirmation (on user-initiated deletion and on cron-triggered deletion)
 
-### Notes on Domain
+See `ADR-OPS-003-email-service.md`.
 
-The domain **Grantpathway.org.uk** has been registered and is likely to inform the official product name (see App Name & Branding — checklist item 41). Once hosting is confirmed on Vercel, DNS records for Grantpathway.org.uk should be pointed to the Vercel deployment.
+---
+
+## TS-06 — Error Tracking
+
+| Decision | Choice    |
+| -------- | --------- |
+| Provider | Sentry EU |
+
+**Rationale:**
+Sentry provides real-time error tracking across all three Next.js runtimes (client, server, edge). The EU data region is used to keep error data within UK/EEA infrastructure (C13). Configuration is split across three files: `sentry.client.config.ts`, `sentry.server.config.ts`, and `sentry.edge.config.ts`. The client-side DSN is exposed via `NEXT_PUBLIC_SENTRY_DSN`; the server-side DSN is kept server-only.
+
+See `ADR-OPS-005-error-tracking.md`.
+
+---
+
+## TS-07 — Rate Limiting
+
+| Decision | Choice        |
+| -------- | ------------- |
+| Provider | Upstash Redis |
+
+**Rationale:**
+Upstash provides a serverless Redis instance used for per-user rate limiting on all three AI API routes (`/api/generate-summary`, `/api/refine-answer`, and the draft generation route). A sliding window algorithm limits requests per user per time window, providing a defence-in-depth layer on top of the monthly AI usage cap enforced at the database level.
+
+---
+
+## TS-08 — CI Pipeline
+
+| Decision | Choice         |
+| -------- | -------------- |
+| Provider | GitHub Actions |
+
+**Rationale:**
+GitHub Actions runs automatically on every push to `master` and every pull request. Four jobs run in CI:
+
+| Job        | What it checks                                                        |
+| ---------- | --------------------------------------------------------------------- |
+| Quality    | `type-check`, `lint` (ESLint, max-warnings 0), `format:check`         |
+| Tests      | Vitest test suite (`npm test`)                                        |
+| Security   | `npm audit --audit-level=high`                                        |
+| Migrations | Applies all migrations from scratch against a local Supabase instance |
+
+See `ADR-OPS-008-linting-and-code-quality.md`.
+
+---
+
+## TS-09 — Test Framework
+
+| Decision  | Choice |
+| --------- | ------ |
+| Framework | Vitest |
+
+**Rationale:**
+Vitest is a fast, Vite-native test runner with first-class TypeScript support and a Jest-compatible API. It runs the unit and integration test suite (`__tests__/`) as part of the CI pipeline. Configuration is in `vitest.config.ts`.
+
+---
+
+## TS-10 — Infrastructure & Accounts
+
+### Registered and active
+
+| Item              | Status    | Notes                                                                        |
+| ----------------- | --------- | ---------------------------------------------------------------------------- |
+| Domain name       | ✅ Active | **grantpathway.org.uk** — registered; DNS to be pointed to Vercel pre-launch |
+| AWS cloud account | ✅ Active | Amazon Bedrock (Claude Sonnet 4.6, eu-west-2) configured                     |
+| GitHub account    | ✅ Active | Public repository at github.com/RapidGlobe/grant-pathway                     |
+| Supabase account  | ✅ Active | Two projects: grant-pathway-dev and grant-pathway-prod (London)              |
+| Vercel account    | ✅ Active | Pro plan; linked to GitHub; auto-deploys on push to master                   |
+| Resend account    | ✅ Active | Domain verified; transactional emails live                                   |
+| Sentry account    | ✅ Active | EU region; client and server error tracking live                             |
+| Upstash account   | ✅ Active | Redis instance; rate limiting live on all AI routes                          |
+| VS Code           | ✅ Active | Primary development environment                                              |
 
 ---
 
@@ -118,16 +185,21 @@ The domain **Grantpathway.org.uk** has been registered and is likely to inform t
 | Concern                 | Technology                                                 |
 | ----------------------- | ---------------------------------------------------------- |
 | Language                | TypeScript                                                 |
-| Framework               | Next.js                                                    |
+| Framework               | Next.js (App Router)                                       |
 | Database                | PostgreSQL via Supabase (London)                           |
 | Authentication          | Supabase Auth                                              |
 | File storage            | Supabase Storage (London)                                  |
 | App hosting             | Vercel (function region: London, eu-west-2 / lhr1)         |
 | AI API                  | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) |
+| Email                   | Resend                                                     |
+| Error tracking          | Sentry EU                                                  |
+| Rate limiting           | Upstash Redis                                              |
+| CI pipeline             | GitHub Actions                                             |
+| Test framework          | Vitest                                                     |
 | Charity register        | Charity Commission for England and Wales public API        |
 | Source control          | GitHub (public repository)                                 |
 | Development environment | VS Code                                                    |
-| Domain                  | Grantpathway.org.uk                                        |
+| Domain                  | grantpathway.org.uk                                        |
 
 ---
 
@@ -139,16 +211,15 @@ The domain **Grantpathway.org.uk** has been registered and is likely to inform t
 | Item 37        | Database preference                           | Covered by TS-02 |
 | Item 38        | Hosting platform — UK region                  | Covered by TS-04 |
 | Item 39        | Authentication provider                       | Covered by TS-03 |
-| Item 40        | Existing infrastructure, accounts and tooling | Covered by TS-05 |
-
----
+| Item 40        | Existing infrastructure, accounts and tooling | Covered by TS-10 |
 
 ---
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                                        |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-04-13 | Rapidglobe Ltd | Initial version                                                                                                                                                                           |
-| 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                     |
-| 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2. |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                               |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-04-13 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                  |
+| 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                                                                            |
+| 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2.                                                        |
+| 1.3     | 2026-06-29 | Rapidglobe Ltd | Added TS-05 (Resend), TS-06 (Sentry), TS-07 (Upstash Redis), TS-08 (GitHub Actions CI), TS-09 (Vitest). Retired "To Be Set Up" table — all accounts now active; replaced with current status table. Stack Summary updated with all new services. |
