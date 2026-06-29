@@ -1,8 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.2
+**Version:** 1.3
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 17 June 2026**
+**Last updated: 29 June 2026**
+
+> **Change from v1.2 (17 June 2026):** Data protection contact email (Section 1), rights contact email (Section 8), and general contact email (Section 11) updated from wjokhia@rapidglobe.com to admin@rapidglobe.com.
 
 > **Change from v1.1 (26 May 2026):** Section 1 updated to confirm ICO registration number ZC168720.
 
@@ -20,7 +22,7 @@ Grant Pathway is a free online tool that helps UK charities write grant applicat
 | **Company registration number** | 05615649                                                                     |
 | **Registered address**          | Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW |
 | **ICO registration number**     | ZC168720                                                                     |
-| **Data protection contact**     | wjokhia@rapidglobe.com                                                       |
+| **Data protection contact**     | admin@rapidglobe.com                                                         |
 
 RapidGlobe Ltd is the **data controller** for the personal information you provide when using Grant Pathway. This means we decide how and why your data is used, and we are responsible for keeping it safe.
 
@@ -131,7 +133,7 @@ Under UK GDPR, you have the following rights in relation to your personal data:
 - **Right to object** — you can object to processing based on legitimate interests
 - **Rights related to automated decision-making** — Grant Pathway does not make automated decisions that have a legal or similarly significant effect on you
 
-To exercise any of these rights, please contact us at **wjokhia@rapidglobe.com**. We will respond within one month of receiving your request. We may need to verify your identity before we can process it.
+To exercise any of these rights, please contact us at **admin@rapidglobe.com**. We will respond within one month of receiving your request. We may need to verify your identity before we can process it.
 
 There is no charge for exercising your rights in most cases.
 
@@ -159,7 +161,7 @@ Minor or clarificatory changes may be made without advance notice. The updated p
 
 For any questions about this privacy policy, or to exercise your data rights, please contact us:
 
-**Email:** wjokhia@rapidglobe.com
+**Email:** admin@rapidglobe.com
 
 **Post:** RapidGlobe Ltd, Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW
 
