@@ -1,9 +1,13 @@
 # Subject Access Request (SAR) Procedure
 
-**Version:** 1.0
+**Version:** 1.3
 **Last updated:** 29 June 2026
-**Owner:** Wac Jokhia, RapidGlobe Ltd
-**Legal basis:** UK GDPR Article 15 — Right of Access
+
+> **v1.1 (29 June 2026):** Step 3 rewritten — split into six numbered queries; added warning that `user_id` is a UUID not an email address.
+> **v1.2 (29 June 2026):** Notes section: added future automation note (self-serve endpoint as next step when volume increases).
+> **v1.3 (29 June 2026):** Version history added; no content changes.
+> **Owner:** Wac Jokhia, RapidGlobe Ltd
+> **Legal basis:** UK GDPR Article 15 — Right of Access
 
 ---
 
