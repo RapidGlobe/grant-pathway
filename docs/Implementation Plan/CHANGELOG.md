@@ -6,6 +6,19 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 20 resolved: AI kill-switch added (F-09-03, M15)
+
+**What changed:**
+
+- `app/api/generate-summary/route.ts`, `app/api/generate-draft/route.ts`, `app/api/refine-answer/route.ts` — kill-switch check added as step 0 of each POST handler: if `AI_ENABLED === 'false'`, returns HTTP 503 with `overloaded` error body immediately, before authentication.
+- `actions/charity.ts` — `AI_ENABLED !== 'false'` added to the Bedrock paraphrase guard; skips paraphrase and degrades gracefully (empty `whatDoes`/`whoHelps`) when kill-switch is active. Charity Commission lookup is unaffected.
+- `.env.example` — `AI_ENABLED=true` added with usage instructions.
+
+**Why:**
+Alan Knox POST-LAUNCH item 20, F-09-03 (M15), §2.2 item 20. Provides an immediate lever to disable all AI spend in a runaway-cost incident or Bedrock outage without a code deploy — change `AI_ENABLED=false` in Vercel env vars and redeploy. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 19 resolved: SAR procedure documented (Article 15, manual process)
 
 **What changed:**

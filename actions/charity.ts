@@ -307,7 +307,7 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
   const awsAccessKey = process.env.AWS_ACCESS_KEY_ID
   const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
 
-  if (charitableObjects && awsAccessKey && awsSecretKey) {
+  if (charitableObjects && awsAccessKey && awsSecretKey && process.env.AI_ENABLED !== 'false') {
     // ── Per-minute burst limit ────────────────────────────────────────────────
     const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
 

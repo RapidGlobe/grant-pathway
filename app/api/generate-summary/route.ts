@@ -82,6 +82,11 @@ export const maxDuration = 90
 const SUMMARY_MAX_TOKENS = 4000
 
 export async function POST(request: NextRequest) {
+  // ── 0. Kill-switch ─────────────────────────────────────────────────────────
+  if (process.env.AI_ENABLED === 'false') {
+    return NextResponse.json(aiErrorBody('overloaded'), { status: 503 })
+  }
+
   // ── 1. Authenticate ────────────────────────────────────────────────────────
   const supabase = await createClient()
   const {
