@@ -308,7 +308,7 @@ export async function advanceToStep4(applicationId: string): Promise<{ ok: false
     // 'in_progress') but navigates back to Step 3 and continues again, reset
     // to 'not_started' so the checklist is shown on the next visit to Step 4.
     // Do not reset if further along (ready_to_assemble / assembled).
-    const updates: Record<string, unknown> = { current_step: newStep }
+    const updates: { current_step: number; draft_status?: string } = { current_step: newStep }
     if (existing?.draft_status === 'in_progress') {
       updates.draft_status = 'not_started'
     }
