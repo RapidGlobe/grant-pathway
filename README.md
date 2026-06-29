@@ -91,20 +91,20 @@ See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`
 
 All project documentation lives in `docs/`. Start here:
 
-| Document                                            | What it covers                                                                                        |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` | Current build status — what's done, what's outstanding, phase gates                                   |
-| `docs/Implementation Plan/CHANGELOG.md`             | Every significant design decision and why it was made                                                 |
-| `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md`  | Pre-deploy gates, rollback steps, feature flags                                                       |
-| `docs/Implementation Plan/ADR-TRACEABILITY.md`      | All ADR consequences mapped to tasks; known gaps (GAP-xx)                                             |
-| `docs/Technical Decision and Design/`               | Architectural Decision Records (ADRs) — 46 decisions covering every major technical choice            |
-| `docs/decisions/`                                   | Business and product decision records (DRs)                                                           |
-| `docs/PRD inputs/`                                  | Acceptance criteria and screen requirements                                                           |
-| `docs/data-model.md`                                | Full database schema and entity relationships                                                         |
-| `docs/technology-stack.md`                          | Tech stack decisions and rationale                                                                    |
-| `docs/non-functional-requirements.md`               | Performance, accessibility, security, and availability targets                                        |
-| `docs/Alan Knox Audits/`                            | Engineering practice audits against Alan Knox's vibe-coding series                                    |
-| `AGENTS.md`                                         | Rules for AI coding sessions — mandatory pre-task checks, documentation requirements, commit protocol |
+| Document                                                 | What it covers                                                                                        |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`      | Current build status — what's done, what's outstanding, phase gates                                   |
+| `docs/Implementation Plan/CHANGELOG.md`                  | Every significant design decision and why it was made                                                 |
+| `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md`       | Pre-deploy gates, rollback steps, feature flags                                                       |
+| `docs/Implementation Plan/ADR-TRACEABILITY.md`           | All ADR consequences mapped to tasks; known gaps (GAP-xx)                                             |
+| `docs/Technical Decision and Design/`                    | Architectural Decision Records (ADRs) — 46 decisions covering every major technical choice            |
+| `docs/decisions/`                                        | Business and product decision records (DRs)                                                           |
+| `docs/PRD inputs/`                                       | Acceptance criteria and screen requirements                                                           |
+| `docs/data-model.md`                                     | Full database schema and entity relationships                                                         |
+| `docs/Technical Decision and Design/technology-stack.md` | Tech stack decisions and rationale                                                                    |
+| `docs/non-functional-requirements.md`                    | Performance, accessibility, security, and availability targets                                        |
+| `docs/Alan Knox Audits/`                                 | Engineering practice audits against Alan Knox's vibe-coding series                                    |
+| `AGENTS.md`                                              | Rules for AI coding sessions — mandatory pre-task checks, documentation requirements, commit protocol |
 
 ---
 

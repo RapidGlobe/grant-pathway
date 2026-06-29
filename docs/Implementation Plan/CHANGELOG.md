@@ -10,6 +10,29 @@
 
 ---
 
+## 2026-06-29 — technology-stack.md updated to v1.3 — five missing services documented
+
+**What changed:**
+
+`docs/Technical Decision and Design/technology-stack.md` updated from v1.2 to v1.3. Five services that were already live in production but undocumented in the stack doc have been added:
+
+| Section | Service added                 |
+| ------- | ----------------------------- |
+| TS-05   | Resend (transactional email)  |
+| TS-06   | Sentry EU (error tracking)    |
+| TS-07   | Upstash Redis (rate limiting) |
+| TS-08   | GitHub Actions (CI pipeline)  |
+| TS-09   | Vitest (test framework)       |
+
+The "To Be Set Up Before Development Begins" table (TS-10) has been retired — all accounts are now active. Replaced with a "Registered and active" status table. Stack Summary updated from 11 to 16 rows.
+
+File also moved from `docs/` root to `docs/Technical Decision and Design/` to keep the docs root tidy.
+
+**Why:**
+The stack doc was written in April 2026 and not updated as new services were added during development. A gap analysis in June 2026 identified five services running in production with no stack entry. An undocumented stack is a risk for onboarding, handover, and future sessions that check technology decisions.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 25 resolved: production password policy hardened (VQ-009)
 
 **What changed:**
