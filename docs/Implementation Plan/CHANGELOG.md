@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 25 resolved: production password policy hardened (VQ-009)
+
+**What changed:**
+
+Supabase prod project (`stanwaejdvlvremtffkf`) Auth settings updated:
+
+| Setting                                | Before | After                   |
+| -------------------------------------- | ------ | ----------------------- |
+| Minimum password length                | 6      | 12                      |
+| Password requirements                  | None   | Letters and digits      |
+| Prevent use of leaked passwords        | Off    | On (HaveIBeenPwned API) |
+| Secure password change                 | Off    | On                      |
+| Require current password when updating | Off    | On                      |
+
+**Why:**
+Alan Knox POST-LAUNCH item 25, VQ-009, §2.3 item 25. The previous defaults (6-char minimum, no complexity, no breach check) were too weak for a service holding charity application data. NCSC recommends 12+ characters. The HaveIBeenPwned check silently rejects known-compromised passwords with no friction for users who choose sensible ones.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 28 resolved: master branch protection enabled (VQ-014)
 
 **What changed:**
