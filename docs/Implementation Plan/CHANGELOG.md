@@ -6,6 +6,20 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 18 resolved: generated Supabase types, createClient<Database>(), AiSummaryData to lib/types.ts
+
+**What changed:**
+
+- `lib/database.types.ts` (new) — Generated from remote Supabase project (`stanwaejdvlvremtffkf`) via `supabase gen types typescript`. Three SECURITY DEFINER RPC function types (`reserve_ai_slot`, `update_ai_slot_token_count`, `cancel_ai_slot`) added manually (CLI did not detect them). `charity_paraphrase` enum value added manually (was applied via SQL Editor, not captured by gen).
+- `lib/supabase/client.ts`, `lib/supabase/server.ts`, `lib/supabase/middleware.ts` — `createClient<Database>()` type parameter applied to all three Supabase client factories.
+- `lib/types.ts` (new) — `AiSummaryData`, `AiSummaryQuestion`, `AiSummarySection` moved here from `app/api/generate-summary/route.ts`. Re-exported from route to preserve all existing import paths without changes.
+- `actions/applications.ts` — Update payload re-typed from `Record<string, unknown>` to `{ current_step: number; draft_status?: string }` (typed client now rejects the loose record type).
+
+**Why:**
+Alan Knox POST-LAUNCH item 18, F-06-07 (M10), §2.2 item 18. Typed Supabase clients catch schema mismatches at compile time rather than runtime. Moving shared types to `lib/` removes the dependency on a route file for types used across components and actions. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-22 — POST-LAUNCH items 1–10 resolved: error boundaries, env validation, Resend preflight, truncation UX, RLS hardening, Bedrock timeout, OG/robots/sitemap, extraction bounds, npm audit CI, Sentry instrumentation
 
 **What changed:**
