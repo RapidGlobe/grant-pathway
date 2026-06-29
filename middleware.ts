@@ -21,6 +21,21 @@ const PROTECTED = ['/dashboard', '/profile', '/applications', '/account', '/mfa'
 // their new password.
 const AUTH_ONLY = ['/', '/register']
 
+// In development React requires 'unsafe-eval' for call-stack reconstruction.
+const isDev = process.env.NODE_ENV === 'development'
+
+function buildCsp(nonce: string): string {
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ''}`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    // Sentry EU ingest — must be present or browser SDK requests are silently blocked
+    "connect-src 'self' https://*.supabase.co https://*.ingest.de.sentry.io",
+    "frame-ancestors 'none'",
+  ].join('; ')
+}
+
 function isProtected(pathname: string) {
   return PROTECTED.some((route) => pathname === route || pathname.startsWith(route + '/'))
 }
@@ -32,13 +47,21 @@ function isAuthOnly(pathname: string) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Generate a fresh nonce for every request — used to replace 'unsafe-inline'
+  // in script-src so only Next.js-stamped scripts execute (item 22, F-08-02).
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64')
+  const csp = buildCsp(nonce)
+
   // Public API routes bypass session handling entirely — return immediately
   // without calling updateSession() so no Supabase SSR overhead is incurred
   if (PUBLIC_API.some((route) => pathname === route || pathname.startsWith(route + '/'))) {
     return NextResponse.next()
   }
 
-  const { supabaseResponse, user } = await updateSession(request)
+  const { supabaseResponse, user } = await updateSession(request, nonce)
+
+  // Stamp the CSP header on every HTML response.
+  supabaseResponse.headers.set('content-security-policy', csp)
 
   // Unauthenticated user trying to access a protected route → sign in page
   if (!user && isProtected(pathname)) {

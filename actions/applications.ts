@@ -308,7 +308,7 @@ export async function advanceToStep4(applicationId: string): Promise<{ ok: false
     // 'in_progress') but navigates back to Step 3 and continues again, reset
     // to 'not_started' so the checklist is shown on the next visit to Step 4.
     // Do not reset if further along (ready_to_assemble / assembled).
-    const updates: Record<string, unknown> = { current_step: newStep }
+    const updates: { current_step: number; draft_status?: string } = { current_step: newStep }
     if (existing?.draft_status === 'in_progress') {
       updates.draft_status = 'not_started'
     }
@@ -839,22 +839,14 @@ export async function approveApplication(applicationId: string): Promise<Approve
 
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
-  // 1. Update application status (ownership check via user_id)
-  const { error: appError } = await supabase
-    .from('applications')
-    .update({ status: 'approved' })
-    .eq('id', applicationId)
-    .eq('user_id', user.id)
+  const { error } = await supabase.rpc('approve_application', {
+    p_application_id: applicationId,
+    p_user_id: user.id,
+  })
 
-  if (appError) {
+  if (error) {
     return { ok: false, error: 'Could not approve the application. Please try again.' }
   }
-
-  // 2. Set is_approved on all answers (non-fatal if no answers exist)
-  await supabase
-    .from('application_answers')
-    .update({ is_approved: true })
-    .eq('application_id', applicationId)
 
   return { ok: true }
 }
@@ -888,27 +880,14 @@ export async function reopenApplication(applicationId: string): Promise<ReopenAp
 
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
-  // 1. Update application status, step, and draft state
-  const { error: appError } = await supabase
-    .from('applications')
-    .update({
-      status: 'in_progress',
-      current_step: 4,
-      draft_status: 'in_progress',
-      assembled_draft: null,
-    })
-    .eq('id', applicationId)
-    .eq('user_id', user.id)
+  const { error } = await supabase.rpc('reopen_application', {
+    p_application_id: applicationId,
+    p_user_id: user.id,
+  })
 
-  if (appError) {
+  if (error) {
     return { ok: false, error: 'Could not re-open the application. Please try again.' }
   }
-
-  // 2. Reset is_approved on all answers (non-fatal if no answers exist yet)
-  await supabase
-    .from('application_answers')
-    .update({ is_approved: false })
-    .eq('application_id', applicationId)
 
   return { ok: true }
 }
