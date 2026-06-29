@@ -37,6 +37,7 @@ import {
   type CharityContext,
 } from '@/lib/prompts'
 import { preprocessText, DEFAULT_CHAR_CEILING } from '@/lib/preprocess-text'
+import type { AiSummaryData } from '@/lib/types'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // Zod schemas for Bedrock response validation (F-02-02)
@@ -81,6 +82,11 @@ export const maxDuration = 90
 const SUMMARY_MAX_TOKENS = 4000
 
 export async function POST(request: NextRequest) {
+  // ── 0. Kill-switch ─────────────────────────────────────────────────────────
+  if (process.env.AI_ENABLED === 'false') {
+    return NextResponse.json(aiErrorBody('overloaded'), { status: 503 })
+  }
+
   // ── 1. Authenticate ────────────────────────────────────────────────────────
   const supabase = await createClient()
   const {
@@ -372,38 +378,5 @@ export async function POST(request: NextRequest) {
   })
 }
 
-// ---------------------------------------------------------------------------
-// Types (shared with the Step 3 component via import)
-// ---------------------------------------------------------------------------
-
-export type AiSummaryQuestion = {
-  number: number
-  text: string
-  wordLimit?: number | null
-  charLimit?: number | null
-  limitType?: 'words' | 'characters' | 'none' | null
-  is_budget_question: boolean
-}
-
-export type AiSummarySection = {
-  number: number
-  title: string
-  guidance: string
-  wordLimit?: number
-  is_budget_section: boolean
-}
-
-export type AiSummaryData = {
-  funder_type: 'structured' | 'free_form'
-  aboutGrant: string
-  amount: string
-  whoCanApply: string[]
-  lookingFor: string[]
-  questions: AiSummaryQuestion[]
-  sections?: AiSummarySection[]
-  keyRequirements: string[]
-  funderAiPolicy?: string | null
-  supportingDocuments?: string[]
-  eligibilityMismatch?: boolean
-  mismatchReason?: string | null
-}
+// AiSummaryData, AiSummaryQuestion, AiSummarySection — see lib/types.ts
+export type { AiSummaryData, AiSummaryQuestion, AiSummarySection } from '@/lib/types'
