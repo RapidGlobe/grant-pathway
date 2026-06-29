@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { headers } from 'next/headers'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AxeProvider from '@/components/axe-provider'
 import './globals.css'
@@ -30,11 +31,17 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Calling headers() makes this layout dynamic (rendered fresh per request).
+  // Next.js reads x-nonce from the incoming request headers at the framework level
+  // and stamps it on its own inline hydration scripts, satisfying the CSP
+  // without 'unsafe-inline' (item 22, F-08-02).
+  await headers()
+
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
