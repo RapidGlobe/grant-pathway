@@ -1,5 +1,9 @@
 # App Name & Branding — Grant Pathway v1
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to product name, domain, branding guidelines, or tone decisions
+
 This document captures the confirmed product name, branding guidelines, and domain for Grant Pathway. These inform the BRD and all user-facing content, design, and communications.
 
 ---

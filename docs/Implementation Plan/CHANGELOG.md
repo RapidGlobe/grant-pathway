@@ -1,5 +1,9 @@
 ﻿# Grant Pathway — Design & Decision Changelog
 
+**Tier:** 1 — Always check after every task
+**Volatility:** High
+**Update when:** Any significant design decision, deviation from plan, or architectural change
+
 **Purpose:** This log records every significant change to the original design of Grant Pathway, together with the reason for each change. Use it to refresh context on why the design evolved, without having to re-read all the source documents.
 
 **Authoritative sources:** When this log refers to a decision record, the full rationale lives in the linked file. This log summarises; the ADR or DR is the definitive record.
@@ -1365,7 +1369,7 @@ During S1-P-04 testing, WJ found the stay-on-page behaviour felt like a dead end
 
 **Decision recorded:**
 
-- Vercel Pro upgrade approved — Hobby plan blockers (sub-daily cron rejected, 2-cron cap, unreliable webhook) caused significant testing overhead. Upgrade to Pro (~£16/month) will be actioned as part of P5.4. Total fixed costs remain within C1 budget (~£36/month of £100/month).
+- Vercel Pro upgrade approved — Hobby plan blockers (sub-daily cron rejected, 2-cron cap, unreliable webhook) caused significant testing overhead. Upgrade to Pro (~~£16/month) will be actioned as part of P5.4. Total fixed costs remain within C1 budget (~~£36/month of £100/month).
 
 **Why:**
 First full test run of Slice 0 (authentication) uncovered four bugs in the auth flow, all fixed on the same day. The most significant was D-002 (password reset routing) which required understanding the interaction between Supabase's PKCE code flow and the app's auth callback route. Infrastructure issues (Vercel Hobby cron restriction and missing webhook) caused unexpected deployment friction; both are resolved and documented.

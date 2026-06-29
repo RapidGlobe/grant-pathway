@@ -1,5 +1,9 @@
 # MoSCoW Feature Register — Grant Pathway v1
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any feature added, removed, promoted, or demoted between Must/Should/Could/Won't
+
 **Version:** 1.8
 **Last updated:** 2026-06-04
 

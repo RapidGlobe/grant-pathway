@@ -1,5 +1,9 @@
 # Non-Functional Requirements — Grant Pathway v1
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to performance targets, availability, scalability, security, browser support, or accessibility approach
+
 This document captures the agreed non-functional requirements for the v1 build. These inform the BRD and constrain the technical architecture and hosting choices.
 
 ---

@@ -1,5 +1,9 @@
 ﻿# Grant Pathway — ADR Consequences Traceability
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** A GAP item is resolved or a phase gate is passed
+
 **Purpose:** Maps every ADR consequence to a specific implementation task. A gap in this table means a consequence has no covering task — it will not be implemented unless a task is added. This is the single place to see whether the full spec is covered.
 
 **How to use:**

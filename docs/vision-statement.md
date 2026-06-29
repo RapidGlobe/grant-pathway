@@ -1,5 +1,9 @@
 # Vision Statement — AI Grant Accelerator
 
+**Tier:** 3 — Stable; only update if a formal decision changed
+**Volatility:** Low
+**Update when:** The product vision is formally revised
+
 > **To be the trusted, free preparation tool for UK charities — helping non-specialists produce stronger, more consistent grant applications through AI-assisted writing, plain-English guideline summarisation, and mandatory human review.**
 
 ---

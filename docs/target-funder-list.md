@@ -1,5 +1,9 @@
 ﻿# Consolidated Target Funder List
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to the set of target grant-giving organisations or their classification
+
 **Version:** 1.3
 **Date:** 2026-06-11
 **Status:** Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`

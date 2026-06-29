@@ -1,5 +1,9 @@
 # Constraints & Assumptions — AI Grant Accelerator v1
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to budget, timeline, scope, or operating constraints
+
 This document captures the key constraints and assumptions that bound the v1 build. These inform the BRD and should be reviewed if circumstances change.
 
 ---

@@ -1,5 +1,9 @@
 # Data Model — Grant Pathway v1
 
+**Tier:** 1 — Always check after every task
+**Volatility:** High
+**Update when:** Any change to database schema, table definitions, field types, constraints, or entity relationships
+
 This document defines the entities, fields, relationships, and key constraints for all data stored by Grant Pathway v1. It is a reference for the PRD, for development, and for data protection documentation.
 
 All data is stored in PostgreSQL via Supabase (London region). Authentication is managed by Supabase Auth. No persistent data is held at the application layer (Vercel).

@@ -1,5 +1,9 @@
 # Grant Pathway — Business Overview
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to product purpose, problem statement, or target audience
+
 ---
 
 ## The Elevator Pitch

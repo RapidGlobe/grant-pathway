@@ -1,5 +1,9 @@
 # Future Phases — Grant Pathway
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any item is deferred to post-v1, or a previously deferred item is brought back into scope
+
 This document records items that are explicitly out of scope for v1 and are to be confirmed at a later date. Each item has been deferred by a formal decision record. This document serves as a parking lot to ensure nothing is lost.
 
 ---

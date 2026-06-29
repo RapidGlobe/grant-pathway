@@ -1,5 +1,9 @@
 # User Personas, Journeys & Use Cases — AI Grant Accelerator v1
 
+**Tier:** 3 — Stable; only update if a formal decision changed
+**Volatility:** Low
+**Update when:** Any change to target users, user goals, pain points, journeys, or use cases
+
 **Version:** 1.3
 **Last updated:** 2026-06-01
 

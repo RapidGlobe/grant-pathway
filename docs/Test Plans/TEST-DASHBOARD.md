@@ -1,5 +1,9 @@
 # Grant Pathway — Test Dashboard
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** After every funder test session, or when a new funder test plan is created
+
 **Version:** 1.39
 **Last updated:** 2026-06-17
 **Status:** Live — updated after each test session

@@ -1,5 +1,9 @@
 # Information Architecture & Navigation -- Grant Pathway v1
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to page structure, navigation, routing, or information hierarchy
+
 **Version:** 1.6
 **Last updated:** 2026-06-10
 

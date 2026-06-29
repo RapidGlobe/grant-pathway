@@ -1,5 +1,9 @@
 ﻿# Grant Pathway v1 — Implementation Plan
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Approach for a future task changes — update the task spec to reflect current intent
+
 **Version:** 2.7
 **Date:** 2026-05-07
 **Last updated:** 2026-06-16

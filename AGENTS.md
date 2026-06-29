@@ -23,57 +23,97 @@ Before starting any implementation task:
 
 <!-- END:adr-consequences-rules -->
 
-<!-- BEGIN:implementation-docs-rules -->
+<!-- BEGIN:documentation-rules -->
 
 # Documentation — mandatory audit trail. No exceptions.
 
 **Every change must be documented. This is not optional.**
 
-This project requires a complete audit trail of all decisions, design changes, and product evolution. A change that is not documented did not happen as far as any future session, team member, or review is concerned. Missing documentation has already caused rework (e.g. the consolidated funder list that was researched but never written down, 2026-05-29). Do not let this happen again.
+This project requires a complete audit trail of all decisions, design changes, and product evolution. A change that is not documented did not happen as far as any future session, team member, or review is concerned.
 
-## What must be documented
+## Document volatility tiers
 
-- Any new product or design decision, including research findings, funder lists, scope changes, or feature decisions — even if no code changes
+Every project document carries a **Tier** in its header. The tier tells you how urgently it needs checking after any task.
+
+| Tier  | Label             | Rule                                                                                                           |
+| ----- | ----------------- | -------------------------------------------------------------------------------------------------------------- |
+| **1** | Always check      | Review and update after every task that could affect it. These docs must reflect current reality at all times. |
+| **2** | Check if relevant | Review when the task touches the domain this doc covers. Update if anything has changed.                       |
+| **3** | Stable            | Only update if a formal decision was made or revised. Do not update for implementation changes.                |
+
+## End-of-task documentation checklist
+
+Before closing any task, work through this checklist in order:
+
+**Step 1 — Tier 1 docs (always):**
+Check every Tier 1 doc listed below. If the task affected it, update it before committing.
+
+| Document                                                 | Update when                                                                                                                                                                                    |
+| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`      | After every task — mark complete `[x]`, update summary table counts, update **Last updated** date, add a Notes entry for any deviation or significant decision                                 |
+| `docs/Implementation Plan/CHANGELOG.md`                  | Any significant design decision, deviation from plan, or architectural change. **Always write new entries here — never to `CHANGELOG-ARCHIVE.md`** (archive covers Phase 0–4 and is read-only) |
+| `docs/Technical Decision and Design/technical-design.md` | Any change to system architecture, data model, API contracts, or component design                                                                                                              |
+| `docs/data-model.md`                                     | Any change to database schema, table definitions, field types, constraints, or entity relationships                                                                                            |
+| `docs/PRD inputs/screen-requirements.md`                 | Any change to the content, fields, validation rules, or error states of any screen                                                                                                             |
+| `docs/PRD inputs/acceptance-criteria.md`                 | Any change to functional requirements that alters what "done" looks like                                                                                                                       |
+
+**Step 2 — Tier 2 docs (if relevant):**
+Scan this list. Update any doc whose domain was touched by the task.
+
+| Document                                          | Domain                                                                                                                                                                 |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` | Approach for a future task changes — update the task spec                                                                                                              |
+| `docs/Implementation Plan/ADR-TRACEABILITY.md`    | A GAP item is resolved — update Task column, change ⚠️ to ✅; update phase gate sign-off when a gate is passed                                                         |
+| `docs/technology-stack.md`                        | Technology choices, libraries, services, or infrastructure                                                                                                             |
+| `docs/non-functional-requirements.md`             | Performance targets, availability, scalability, security, browser support, accessibility                                                                               |
+| `docs/moscow-feature-register.md`                 | Feature added, removed, promoted, or demoted between Must/Should/Could/Won't                                                                                           |
+| `docs/information-architecture-and-navigation.md` | Page structure, navigation, routing, or information hierarchy                                                                                                          |
+| `docs/target-funder-list.md`                      | Set of target grant-giving organisations or their classification                                                                                                       |
+| `docs/Test Plans/TEST-DASHBOARD.md`               | After every funder test session — update funder row, summary counts, version, and document history. Also when a new funder test plan is created (add row in 🟡 status) |
+| `docs/app-name-and-branding.md`                   | Product name, domain, branding, or tone decisions                                                                                                                      |
+| `docs/constraints-and-assumptions.md`             | Budget, timeline, scope, or operating constraints change                                                                                                               |
+| `docs/future-phases.md`                           | Items explicitly deferred to post-v1                                                                                                                                   |
+| `docs/v1-out-of-scope.md`                         | Items confirmed out of scope for v1                                                                                                                                    |
+| `docs/business-overview.md`                       | Product purpose, problem statement, or target audience                                                                                                                 |
+| `docs/Business Design/` (DDR-\* files)            | UI design decisions, component specifications, or visual design changes — update or create the relevant DDR file; update `DESIGN-DECISIONS-INDEX.md`                   |
+| `docs/PRD decisions/` (PDR-\* files)              | Product decisions on AI, data handling, features, or UI — update or create the relevant PDR file; update `PRD-DECISIONS-INDEX.md`                                      |
+| `docs/legal/`                                     | Privacy policy, terms of service, data protection, or compliance documents                                                                                             |
+
+**Step 3 — Tier 3 docs (only if a decision changed):**
+These docs are stable. Only update if a formal business, product, or architectural decision was made or revised — not for implementation changes.
+
+- `docs/decisions/` (DR-\* files) — business and product decisions; update `DECISIONS-INDEX.md`
+- `docs/Technical Decision and Design/` (ADR-\* files) — architectural decisions; update `ADR-INDEX.md`
+- `docs/vision-statement.md` — product vision
+- `docs/user-personas-journeys-and-use-cases.md` — target users, goals, journeys
+- `docs/BRD plus decisions Mark Two/` — business requirements
+
+**Step 4 — When in doubt:**
+If it is not obvious whether a doc needs updating, **stop and ask the user before proceeding**. The cost of a 30-second question is far lower than the cost of a lost decision reconstructed weeks later.
+
+## What must always be documented
+
+- Any new product or design decision — including research findings, funder lists, scope changes, or feature decisions — even if no code changes
 - Any change to how the product works, looks, or behaves
 - Any deviation from the implementation plan
 - Any architectural decision, data model change, or API change
 - Any resolved question or open issue that gets closed
 
-## Where to document it
+## Adding a new document
 
-Use the table below to identify the right document(s) for every change. Multiple documents may need updating for a single change — work through the full list.
+When creating a new project document, add the following header block so it is immediately governed by the tier system:
 
-### Implementation Plan documents (`docs/Implementation Plan/`)
+```
+**Tier:** [1 / 2 / 3]
+**Volatility:** [High / Medium / Low]
+**Update when:** [one-line trigger]
+```
 
-| Document                   | Update when                                                                                                                                                                                                                                                                               |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `IMPLEMENTATION-STATUS.md` | After every task — mark complete `[x]`, update summary table counts, update **Last updated** date, add a Notes entry for any deviation or significant decision                                                                                                                            |
-| `CHANGELOG.md`             | Any significant design decision, deviation from the original plan, or architectural change that a team member would need context for. **Always write new entries to `CHANGELOG.md` — never to `CHANGELOG-ARCHIVE.md`.** The archive covers Phase 0–4 (up to 2026-05-22) and is read-only. |
-| `ADR-TRACEABILITY.md`      | When a GAP item is resolved — update the Task column and change status from ⚠️ to ✅; also update the phase gate sign-off table when a gate is passed                                                                                                                                     |
-| `IMPLEMENTATION-PLAN.md`   | When the approach for a future task changes during implementation — update the task spec so it reflects current intent                                                                                                                                                                    |
-
-### Product and design documents (`docs/`)
-
-| Document                                                 | Update when                                                                                                                                                                                                                                                      |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `docs/decisions/` (DR-\* files)                          | Any business or product decision is made or revised — create a new DR file or update the relevant existing one; update `DECISIONS-INDEX.md`                                                                                                                      |
-| `docs/Technical Decision and Design/` (ADR-\* files)     | Any architectural or technical decision is made or revised — create a new ADR file or update the relevant existing one; update `ADR-INDEX.md`                                                                                                                    |
-| `docs/Technical Decision and Design/technical-design.md` | Any change to system architecture, data model, API contracts, or component design                                                                                                                                                                                |
-| `docs/user-personas-journeys-and-use-cases.md`           | Any change to target users, user goals, pain points, journeys, or use cases                                                                                                                                                                                      |
-| `docs/information-architecture-and-navigation.md`        | Any change to page structure, navigation, routing, or information hierarchy                                                                                                                                                                                      |
-| `docs/moscow-feature-register.md`                        | Any feature added, removed, promoted, or demoted between Must/Should/Could/Won't                                                                                                                                                                                 |
-| `docs/technology-stack.md`                               | Any change to the technology choices, libraries, services, or infrastructure (if applicable)                                                                                                                                                                     |
-| `docs/test-plan-e2e-slices-4-8.md`                       | Any change to test coverage, E2E slice scope, or acceptance criteria that affects the test plan (if applicable)                                                                                                                                                  |
-| `docs/target-funder-list.md`                             | Any change to the set of target grant-giving organisations or their classification                                                                                                                                                                               |
-| `docs/Test Plans/TEST-DASHBOARD.md`                      | After every funder test session — update the funder row (passed/failed counts, RAG status, notes), update the summary counts, bump the version, and add a document history entry. Also update when a new funder test plan is created (add the row in 🟡 status). |
-| `docs/data-model.md`                                     | Any change to the database schema, table definitions, field types, constraints, or entity relationships                                                                                                                                                          |
-| `docs/PRD inputs/screen-requirements.md`                 | Any change to the content, fields, validation rules, or error states of any screen                                                                                                                                                                               |
-| `docs/PRD inputs/acceptance-criteria.md`                 | Any change to functional requirements that alters what "done" looks like — revised requirements, new edge cases, or new acceptance criteria                                                                                                                      |
-| `docs/non-functional-requirements.md`                    | Any change to performance targets, availability, scalability, security, browser support, or accessibility testing approach — update the relevant NFR row and bump the Last updated date                                                                          |
+No change to AGENTS.md is required — the tier header makes the doc self-governing.
 
 ## Test plans — mandatory coverage rule
 
-Every funder test plan in `docs/Test Plans/` must cover the **complete end-to-end flow** for each application — from login through to export. No step may be omitted on the assumption that it was tested previously or is not specific to that funder. Every step must be verified in the context of the specific funder being tested.
+Every funder test plan in `docs/Test Plans/` must cover the **complete end-to-end flow** for each application — from login through to export. No step may be omitted on the assumption that it was tested previously or is not specific to that funder.
 
 The minimum required steps for every funder test plan are:
 
@@ -88,15 +128,9 @@ The minimum required steps for every funder test plan are:
 9. Export as Word document (Step 5)
 10. Any funder-specific tests relevant to that organisation's question set, format, or eligibility criteria
 
-**Why:** Steps that appear generic (e.g. the preparation checklist, the progress bar, the export) may behave differently for different funders due to funder type, question count, or character/word limit handling. Testing them in context catches issues that a generic test would not.
+**Why:** Steps that appear generic may behave differently for different funders due to funder type, question count, or character/word limit handling. Testing them in context catches issues that a generic test would not.
 
-## When in doubt — ask before proceeding
-
-If it is not obvious where a decision or change should be documented, **stop and ask the user before proceeding**. Do not proceed on the assumption that it will be captured later. The cost of a 30-second question is far lower than the cost of a lost decision that has to be reconstructed weeks later.
-
-**Why this matters:** Teammates and future AI sessions rely on these documents to understand the current state of the project. An update missed here means someone works from stale information. The changelog in particular captures _why_ decisions were made — that context is lost if it is not recorded at the time.
-
-<!-- END:implementation-docs-rules -->
+<!-- END:documentation-rules -->
 
 <!-- BEGIN:file-reference-rules -->
 
@@ -108,7 +142,7 @@ The canonical source for all project files is the GitHub repository:
 When searching for or referencing project files:
 
 1. **Use the GitHub repository as the default location for information search** — browse or fetch files from `https://github.com/RapidGlobe/grant-pathway` rather than navigating the local OneDrive file structure.
-2. **Use relative paths in all file references** — always reference files relative to the repository root (e.g. `grant-pathway/docs/Technical Decision and Design/ADR-AI-001-ai-provider.md`), never absolute Windows/OneDrive paths.
+2. **Use relative paths in all file references** — always reference files relative to the repository root (e.g. `docs/Technical Decision and Design/ADR-AI-001-ai-provider.md`), never absolute Windows/OneDrive paths.
 3. **Never expose the full OneDrive path** in responses, commit messages, or documentation. The local working directory is an implementation detail of the developer's machine, not a project reference.
 
 <!-- END:file-reference-rules -->

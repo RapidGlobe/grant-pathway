@@ -1,5 +1,9 @@
 # Screen Requirements — Grant Pathway v1
 
+**Tier:** 1 — Always check after every task
+**Volatility:** High
+**Update when:** Any change to the content, fields, validation rules, or error states of any screen
+
 This document defines the required content, fields, validation rules, and error states for each of the 11 screens in Grant Pathway v1. It is an input to the Product Requirements Document and to acceptance criteria.
 
 Screens are listed in the order a new user would encounter them.

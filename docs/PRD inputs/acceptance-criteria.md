@@ -1,5 +1,9 @@
 ﻿# Acceptance Criteria — Grant Pathway v1
 
+**Tier:** 1 — Always check after every task
+**Volatility:** High
+**Update when:** Any change to functional requirements that alters what "done" looks like
+
 This document defines testable Given/When/Then acceptance criteria for every functional requirement in Grant Pathway v1. Criteria are grouped by the same sections used in the BRD (Section 9).
 
 Each requirement is marked **Must Have** or **Should Have**. Should Have requirements are included for completeness — acceptance criteria for a Should Have requirement only apply if that requirement is built in v1.

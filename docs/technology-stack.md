@@ -1,5 +1,9 @@
 # Technology Stack — AI Grant Accelerator v1
 
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** Any change to technology choices, libraries, services, or infrastructure
+
 **Version:** 1.2
 **Last updated:** 2026-05-29
 

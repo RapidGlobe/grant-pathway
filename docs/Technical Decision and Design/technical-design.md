@@ -1,5 +1,9 @@
 ﻿# Grant Pathway — Technical Design Document
 
+**Tier:** 1 — Always check after every task
+**Volatility:** High
+**Update when:** Any change to system architecture, data model, API contracts, or component design
+
 **Version:** 1.3
 **Date:** 2026-04-21
 **Last updated:** 2026-05-29
