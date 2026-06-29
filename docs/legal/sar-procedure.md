@@ -194,3 +194,7 @@ Add a row to the table below once the response has been sent.
   Privacy Policy Section 7.
 - **Solicitor review:** if a SAR appears connected to a complaint, potential legal claim, or
   is unusually complex, seek legal advice before responding.
+- **Future automation:** if SAR volume increases to the point where manual processing becomes
+  a burden, build a self-serve `/api/account/data-export` endpoint that assembles and downloads
+  all personal data in one step from Account Settings. This was the alternative considered at
+  the time this procedure was adopted (2026-06-29) and remains the natural next step.
