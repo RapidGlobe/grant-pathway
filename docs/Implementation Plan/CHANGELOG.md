@@ -6,6 +6,135 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 25 resolved: production password policy hardened (VQ-009)
+
+**What changed:**
+
+Supabase prod project (`stanwaejdvlvremtffkf`) Auth settings updated:
+
+| Setting                                | Before | After                   |
+| -------------------------------------- | ------ | ----------------------- |
+| Minimum password length                | 6      | 12                      |
+| Password requirements                  | None   | Letters and digits      |
+| Prevent use of leaked passwords        | Off    | On (HaveIBeenPwned API) |
+| Secure password change                 | Off    | On                      |
+| Require current password when updating | Off    | On                      |
+
+**Why:**
+Alan Knox POST-LAUNCH item 25, VQ-009, §2.3 item 25. The previous defaults (6-char minimum, no complexity, no breach check) were too weak for a service holding charity application data. NCSC recommends 12+ characters. The HaveIBeenPwned check silently rejects known-compromised passwords with no friction for users who choose sensible ones.
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 26 resolved: least-privilege key scoping (VQ-021)
+
+**What changed:**
+
+- **AWS:** New IAM user `grant-pathway-prod` created with custom policy `grant.pathway.bedrock.invoke` — single permission `bedrock:InvokeModel` scoped to `arn:aws:bedrock:eu-west-2::foundation-model/anthropic.claude-sonnet-4-6`. New access key applied to Vercel Production env vars. Old `grant-pathway-dev` user (had `AmazonBedrockFullAccess`) retained for dev environment only.
+- **Resend:** New API key `grant-pathway-production-send` created with Sending access scoped to `grantpathway.org.uk`. Old Full access key deleted. Vercel `RESEND_API_KEY` updated to new scoped key.
+- **Charity Commission:** Read-only by API design — no action required.
+
+**Why:**
+Alan Knox POST-LAUNCH item 26, VQ-021, §2.3 item 26. `AmazonBedrockFullAccess` granted every Bedrock operation including model management and training. Resend Full access allowed domain management, API key deletion, and log access. Both are now scoped to the minimum required: invoke one model, send from one domain.
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 27 resolved: SPF/DKIM/DMARC confirmed for grantpathway.org.uk (VQ-022)
+
+**What changed:**
+
+- SPF TXT record updated to add `include:amazonses.com` (Resend sends via Amazon SES): `v=spf1 include:secureserver.net include:amazonses.com -all`
+- DKIM confirmed: `resend._domainkey.grantpathway.org.uk` present and Verified in Resend dashboard
+- DMARC confirmed: `v=DMARC1; p=quarantine` in place
+
+**Why:**
+Alan Knox POST-LAUNCH item 27, VQ-022, §2.3 item 27. Without SPF covering Resend's infrastructure, transactional emails (welcome, inactivity warning, account deletion) risk landing in spam or being rejected. Cross-client email rendering deferred to P5.4 pre-launch testing.
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 28 resolved: master branch protection enabled (VQ-014)
+
+**What changed:**
+
+- GitHub Pro activated on the RapidGlobe personal account.
+- Branch protection rule applied to `master` via GitHub API: all four CI jobs required to pass (`lint-and-typecheck`, `test`, `audit`, `validate-migrations`); `strict: true` (branch must be up to date with master before merge); force-pushes and deletions blocked.
+
+**Why:**
+Alan Knox POST-LAUNCH item 28, VQ-014, §2.3 item 28. Without branch protection, a push directly to master could trigger a Vercel production deploy before CI completes, or a failed CI could be ignored. Branch protection closes that gap — no merge (or direct push from a PR) reaches master unless all four checks pass.
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 22 resolved: CSP nonce migration — script-src off 'unsafe-inline' (F-08-02, M5)
+
+**What changed:**
+
+- `middleware.ts` — generates a fresh `crypto.randomUUID()` nonce (base64-encoded) on every request; builds the `Content-Security-Policy` header with `'nonce-{nonce}'` on `script-src` (replaces `'unsafe-inline'`); passes nonce to `updateSession`.
+- `lib/supabase/middleware.ts` — accepts optional `nonce`; forwards it as `x-nonce` request header in both `NextResponse.next()` calls (including the cookie-refresh path) so the page layout can read it.
+- `next.config.ts` — static `Content-Security-Policy` header removed; all other security headers unchanged. CSP is now set per-request in middleware.
+- `app/layout.tsx` — made async; calls `await headers()` to make the layout dynamic so Next.js renders it fresh per request and stamps the nonce on its own inline hydration scripts.
+
+**Why:**
+Alan Knox POST-LAUNCH item 22, F-08-02 (M5), §2.2 item 22. `'unsafe-inline'` on `script-src` allows any injected inline script to execute — removing it eliminates that XSS vector. A static nonce in `next.config.ts` would be trivially bypassable (same value every request); a per-request nonce is not. TypeScript clean (0 errors).
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 21 resolved: transactional integrity for approve and reopen (F-06-05/06, M9)
+
+**What changed:**
+
+- `docs/migrations/item-21-transactional-integrity.sql` (new) — two Postgres functions: `approve_application` and `reopen_application`. Each performs both table updates (`applications` + `application_answers`) in a single transaction; raises `application_not_found` if the row is missing or not owned by the caller. `SECURITY INVOKER` — RLS applies.
+- `actions/applications.ts` — `approveApplication` and `reopenApplication` now call `supabase.rpc()` instead of two separate update calls.
+- `lib/database.types.ts` — typed signatures added for both new RPC functions.
+
+**Why:**
+Alan Knox POST-LAUNCH item 21, F-06-05/06 (M9), §2.2 item 21. The previous two-step pattern left a window where `applications.status` could be updated but `application_answers.is_approved` not (or vice versa), leaving the application in a permanently inconsistent state visible to the user. Wrapping both writes in one Postgres transaction eliminates the window. Scope limited to approve and reopen — `assembleAndAdvance` is serial with no cross-table race risk, and the deletion paths are handled by Supabase Auth cascade.
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 20 resolved: AI kill-switch added (F-09-03, M15)
+
+**What changed:**
+
+- `app/api/generate-summary/route.ts`, `app/api/generate-draft/route.ts`, `app/api/refine-answer/route.ts` — kill-switch check added as step 0 of each POST handler: if `AI_ENABLED === 'false'`, returns HTTP 503 with `overloaded` error body immediately, before authentication.
+- `actions/charity.ts` — `AI_ENABLED !== 'false'` added to the Bedrock paraphrase guard; skips paraphrase and degrades gracefully (empty `whatDoes`/`whoHelps`) when kill-switch is active. Charity Commission lookup is unaffected.
+- `.env.example` — `AI_ENABLED=true` added with usage instructions.
+
+**Why:**
+Alan Knox POST-LAUNCH item 20, F-09-03 (M15), §2.2 item 20. Provides an immediate lever to disable all AI spend in a runaway-cost incident or Bedrock outage without a code deploy — change `AI_ENABLED=false` in Vercel env vars and redeploy. TypeScript clean (0 errors).
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 19 resolved: SAR procedure documented (Article 15, manual process)
+
+**What changed:**
+
+- `docs/legal/sar-procedure.md` (new) — Internal procedure for handling UK GDPR Article 15
+  subject access requests. Covers: receipt and acknowledgement (within 3 working days),
+  identity verification, Supabase SQL queries to retrieve all personal data held per user,
+  response email template with ZIP attachment, and a running log of requests handled.
+
+**Why:**
+Alan Knox POST-LAUNCH item 19, F-05-02 (M12), §2.2 item 19. UK GDPR Article 15 requires a
+response to SARs within one calendar month. Decision: manual process is proportionate at
+pre-launch scale. Privacy Policy Section 8 already directs users to wjokhia@rapidglobe.com —
+no policy change required. Automated self-serve export endpoint deferred to a future phase
+once live user volumes justify the build effort.
+
+---
+
+## 2026-06-29 — POST-LAUNCH item 18 resolved: generated Supabase types, createClient<Database>(), AiSummaryData to lib/types.ts
+
+**What changed:**
+
+- `lib/database.types.ts` (new) — Generated from remote Supabase project (`stanwaejdvlvremtffkf`) via `supabase gen types typescript`. Three SECURITY DEFINER RPC function types (`reserve_ai_slot`, `update_ai_slot_token_count`, `cancel_ai_slot`) added manually (CLI did not detect them). `charity_paraphrase` enum value added manually (was applied via SQL Editor, not captured by gen).
+- `lib/supabase/client.ts`, `lib/supabase/server.ts`, `lib/supabase/middleware.ts` — `createClient<Database>()` type parameter applied to all three Supabase client factories.
+- `lib/types.ts` (new) — `AiSummaryData`, `AiSummaryQuestion`, `AiSummarySection` moved here from `app/api/generate-summary/route.ts`. Re-exported from route to preserve all existing import paths without changes.
+- `actions/applications.ts` — Update payload re-typed from `Record<string, unknown>` to `{ current_step: number; draft_status?: string }` (typed client now rejects the loose record type).
+
+**Why:**
+Alan Knox POST-LAUNCH item 18, F-06-07 (M10), §2.2 item 18. Typed Supabase clients catch schema mismatches at compile time rather than runtime. Moving shared types to `lib/` removes the dependency on a route file for types used across components and actions. TypeScript clean (0 errors).
+
+---
+
 ## 2026-06-22 — POST-LAUNCH items 1–10 resolved: error boundaries, env validation, Resend preflight, truncation UX, RLS hardening, Bedrock timeout, OG/robots/sitemap, extraction bounds, npm audit CI, Sentry instrumentation
 
 **What changed:**
