@@ -63,15 +63,27 @@ Open `http://localhost:3000` in your browser.
 | ---------------------- | --------------------------- |
 | `npm run dev`          | Start development server    |
 | `npm run build`        | Production build            |
+| `npm run start`        | Start production server     |
 | `npm run lint`         | ESLint (max-warnings 0)     |
 | `npm run lint:fix`     | ESLint with auto-fix        |
 | `npm run format`       | Prettier write              |
 | `npm run format:check` | Prettier check (used in CI) |
 | `npm run type-check`   | TypeScript `tsc --noEmit`   |
+| `npm test`             | Run Vitest test suite       |
+| `npm run test:watch`   | Run Vitest in watch mode    |
 
 ### Code quality
 
-Every commit runs Prettier and ESLint via Husky pre-commit hooks. GitHub Actions CI runs `type-check`, `lint`, and `format:check` on every push to `master` and every PR. See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
+Every commit runs Prettier and ESLint via Husky pre-commit hooks. GitHub Actions CI runs four jobs on every push to `master` and every PR:
+
+| CI job     | What it checks                                                        |
+| ---------- | --------------------------------------------------------------------- |
+| Quality    | `type-check`, `lint`, `format:check`                                  |
+| Tests      | Vitest test suite (`npm test`)                                        |
+| Security   | `npm audit --audit-level=high`                                        |
+| Migrations | Applies all migrations from scratch against a local Supabase instance |
+
+See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
 
 ---
 
@@ -85,7 +97,7 @@ All project documentation lives in `docs/`. Start here:
 | `docs/Implementation Plan/CHANGELOG.md`             | Every significant design decision and why it was made                                                 |
 | `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md`  | Pre-deploy gates, rollback steps, feature flags                                                       |
 | `docs/Implementation Plan/ADR-TRACEABILITY.md`      | All ADR consequences mapped to tasks; known gaps (GAP-xx)                                             |
-| `docs/Technical Decision and Design/`               | Architectural Decision Records (ADRs) — 45 decisions covering every major technical choice            |
+| `docs/Technical Decision and Design/`               | Architectural Decision Records (ADRs) — 46 decisions covering every major technical choice            |
 | `docs/decisions/`                                   | Business and product decision records (DRs)                                                           |
 | `docs/PRD inputs/`                                  | Acceptance criteria and screen requirements                                                           |
 | `docs/data-model.md`                                | Full database schema and entity relationships                                                         |
