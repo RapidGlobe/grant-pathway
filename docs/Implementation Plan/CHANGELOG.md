@@ -6,6 +6,18 @@
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 28 resolved: master branch protection enabled (VQ-014)
+
+**What changed:**
+
+- GitHub Pro activated on the RapidGlobe personal account.
+- Branch protection rule applied to `master` via GitHub API: all four CI jobs required to pass (`lint-and-typecheck`, `test`, `audit`, `validate-migrations`); `strict: true` (branch must be up to date with master before merge); force-pushes and deletions blocked.
+
+**Why:**
+Alan Knox POST-LAUNCH item 28, VQ-014, §2.3 item 28. Without branch protection, a push directly to master could trigger a Vercel production deploy before CI completes, or a failed CI could be ignored. Branch protection closes that gap — no merge (or direct push from a PR) reaches master unless all four checks pass.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 22 resolved: CSP nonce migration — script-src off 'unsafe-inline' (F-08-02, M5)
 
 **What changed:**
