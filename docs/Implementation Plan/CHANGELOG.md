@@ -25,6 +25,19 @@ Alan Knox POST-LAUNCH item 25, VQ-009, §2.3 item 25. The previous defaults (6-c
 
 ---
 
+## 2026-06-29 — POST-LAUNCH item 27 resolved: SPF/DKIM/DMARC confirmed for grantpathway.org.uk (VQ-022)
+
+**What changed:**
+
+- SPF TXT record updated to add `include:amazonses.com` (Resend sends via Amazon SES): `v=spf1 include:secureserver.net include:amazonses.com -all`
+- DKIM confirmed: `resend._domainkey.grantpathway.org.uk` present and Verified in Resend dashboard
+- DMARC confirmed: `v=DMARC1; p=quarantine` in place
+
+**Why:**
+Alan Knox POST-LAUNCH item 27, VQ-022, §2.3 item 27. Without SPF covering Resend's infrastructure, transactional emails (welcome, inactivity warning, account deletion) risk landing in spam or being rejected. Cross-client email rendering deferred to P5.4 pre-launch testing.
+
+---
+
 ## 2026-06-29 — POST-LAUNCH item 28 resolved: master branch protection enabled (VQ-014)
 
 **What changed:**
