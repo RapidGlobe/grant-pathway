@@ -60,10 +60,14 @@ before proceeding.
 ## Step 3 — Retrieve the data from Supabase
 
 Log in to the Supabase dashboard at [https://supabase.com](https://supabase.com) and open the
-**grant-pathway-prod** project (`stanwaejdvlvremtffkf`). Navigate to **Table Editor** or the
-**SQL Editor** and run the following queries, substituting the user's email address.
+**grant-pathway-prod** project (`stanwaejdvlvremtffkf`). Navigate to the **SQL Editor** and
+run the queries below, substituting the user's email address where shown.
 
-### Find the user ID
+> **Important:** `user_id` is a UUID, not an email address. The first query resolves the email
+> to a UUID. Copy that UUID before running the remaining queries — do not paste the email address
+> into the `where user_id = ...` clauses or you will get a type error.
+
+### Query 1 — Resolve email to user ID (run this first)
 
 ```sql
 select id, email, created_at, last_sign_in_at
@@ -71,31 +75,40 @@ from auth.users
 where email = 'user@example.com';
 ```
 
-Note the `id` (UUID) — you will need it for the queries below.
+Copy the `id` value (a UUID like `a1b2c3d4-...`). Use it in place of `<user_id>` in all
+queries below.
 
-### Retrieve all personal data
+### Query 2 — User profile
 
 ```sql
--- User profile
 select first_name, last_name, feedback_consent, created_at, updated_at
 from user_profiles
 where user_id = '<user_id>';
+```
 
--- Charity / organisation profile
+### Query 3 — Charity / organisation profile
+
+```sql
 select charity_name, registration_number, what_charity_does,
        who_charity_helps, where_charity_works, lookup_source,
        created_at, updated_at
 from charity_profiles
 where user_id = '<user_id>';
+```
 
--- Applications
+### Query 4 — Applications
+
+```sql
 select id, funder_name, grant_name, status, current_step,
        draft_status, created_at, updated_at, last_exported_at
 from applications
 where user_id = '<user_id>'
 order by created_at;
+```
 
--- Application answers (for each application)
+### Query 5 — Application answers
+
+```sql
 select a.funder_name, a.grant_name,
        aa.question_text, aa.answer_text, aa.ai_refined_answer,
        aa.answer_source, aa.is_approved, aa.word_limit,
@@ -104,15 +117,18 @@ from application_answers aa
 join applications a on a.id = aa.application_id
 where aa.user_id = '<user_id>'
 order by a.created_at, aa.question_order;
+```
 
--- AI usage log
+### Query 6 — AI usage log
+
+```sql
 select request_type, token_count, created_at, application_id
 from ai_usage_log
 where user_id = '<user_id>'
 order by created_at;
 ```
 
-Export each result as CSV (Supabase Table Editor → Download CSV, or copy from SQL Editor output).
+Export each query result as CSV using the download button in the SQL Editor results panel.
 
 ---
 
