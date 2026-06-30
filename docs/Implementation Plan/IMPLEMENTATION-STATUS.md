@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** After every task — mark complete, update counts, add notes for deviations
 
-**Last updated:** 2026-06-30 (technical-design.md v1.4; data-model.md v1.3; screen-requirements.md and acceptance-criteria.md updated — all Tier 1 docs now current)
+**Last updated:** 2026-06-30 (technical-design.md v1.4; data-model.md v1.3; screen-requirements.md and acceptance-criteria.md updated — all Tier 1 docs now current; non-functional-requirements.md NFR-04 updated; information-architecture-and-navigation.md v1.7)
 **Plan version:** 2.8
 **Overall status:** In progress
 **Target launch:** 31 July 2026

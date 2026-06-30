@@ -1,11 +1,11 @@
-# Information Architecture & Navigation -- Grant Pathway v1
+﻿# Information Architecture & Navigation -- Grant Pathway v1
 
 **Tier:** 2 — Check if relevant to the task
 **Volatility:** Medium
 **Update when:** Any change to page structure, navigation, routing, or information hierarchy
 
-**Version:** 1.6
-**Last updated:** 2026-06-10
+**Version:** 1.7
+**Last updated:** 2026-06-30
 
 This document defines the complete information architecture, URL structure, navigation components, access control rules, and page-level navigation for Grant Pathway v1. It is a reference for design, development, and testing.
 
@@ -158,7 +158,7 @@ The five-step application journey is contained within `/applications/new` (Step 
 
 | Step | Name                | Key action                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ---- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1    | Application Details | Enter funder name and grant name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 1    | Application Details | Select funder from the funder directory and enter grant name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 2    | Funder Guidelines   | Upload or paste funder guidelines                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | 3    | AI Summary          | Review AI-generated plain-English summary                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 4    | Draft Answers       | Write answers section by section (Tier 3 / free_form funders) or respond to numbered questions (Tier 1 / Tier 2 structured funders). Every extracted question or section carries a `question_type` (`narrative \| data_entry \| financial \| dropdown \| date \| file_upload`). Narrative questions show a writing card with textarea, word/character counter, and AI assist. Data-entry and financial questions are pre-filled from the charity profile. Dropdown, date, and file_upload questions are shown as reminders only. All substantive content is written by the charity; AI assists on request only |
@@ -239,12 +239,13 @@ When a user opens an in-progress application from the dashboard, they are taken 
 
 ## 9. Inactivity & Session Behaviour
 
-| Event                                                 | Behaviour                                                 |
-| ----------------------------------------------------- | --------------------------------------------------------- |
-| 60 minutes of inactivity                              | Session ended; user redirected to `/` on next interaction |
-| User interacts with the app                           | Inactivity timer reset                                    |
-| User returns to a protected page after session expiry | Redirected to `/`                                         |
-| User signs out manually                               | Session ended immediately; redirected to `/`              |
+| Event                                                 | Behaviour                                                                |
+| ----------------------------------------------------- | ------------------------------------------------------------------------ |
+| 55 minutes of inactivity (5-minute warning)           | Inactivity warning banner displayed; user can dismiss to reset the timer |
+| 60 minutes of inactivity                              | Session ended; user redirected to `/` on next interaction                |
+| User interacts with the app                           | Inactivity timer reset                                                   |
+| User returns to a protected page after session expiry | Redirected to `/`                                                        |
+| User signs out manually                               | Session ended immediately; redirected to `/`                             |
 
 ---
 
@@ -277,3 +278,4 @@ _Status: Complete_
 | 1.4     | 2026-06-10 | Rapidglobe Ltd | Legal routes `/terms` and `/privacy` added (site map, route reference 3.3, access control, footer link targets). Unauthenticated nav updated to reflect 2026-06-09 changes (Sign in link removed; Register button hidden on `/register`). Auth-aware routing principle amended for legal pages. |
 | 1.5     | 2026-06-10 | Rapidglobe Ltd | No-dead-ends fix for legal pages: footer legal links now open in a new tab; public nav logo now links to `/` (previously no link) so directly-reached pages have a route back.                                                                                                                  |
 | 1.6     | 2026-06-10 | Rapidglobe Ltd | Register button also hidden on `/verify-email` (found during WJ registration walkthrough — the user has just registered).                                                                                                                                                                       |
+| 1.7     | 2026-06-30 | Rapidglobe Ltd | Step 1 description updated: funder is now selected from the funder directory picker, not entered as free text. Inactivity warning row added to §9 (55-minute banner; resolves GAP-22).                                                                                                          |

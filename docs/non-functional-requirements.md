@@ -1,4 +1,4 @@
-# Non-Functional Requirements — Grant Pathway v1
+﻿# Non-Functional Requirements — Grant Pathway v1
 
 **Tier:** 2 — Check if relevant to the task
 **Volatility:** Medium
@@ -72,7 +72,7 @@ The main risk before the first marketing push is unmeasured AI route latency und
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Encryption in transit             | TLS 1.2 or higher (HTTPS everywhere); no unencrypted HTTP connections permitted                                                                                                                                                 |
 | Encryption at rest                | Database-level encryption enabled on all data stores                                                                                                                                                                            |
-| Passwords                         | Minimum 10 characters; no mandatory complexity rules (aligned with NCSC guidance)                                                                                                                                               |
+| Passwords                         | Minimum 12 characters; must contain both letters and digits (hardened 2026-06-29 following pre-launch security review)                                                                                                          |
 | Multi-factor authentication (MFA) | Not offered. Removed 2026-06-12 (FR-07 demoted to Won't Have). Risk analysis confirmed worst-case password compromise is low severity — no payment data, no submission capability, charity profile data is publicly registered. |
 | Session timeout                   | Automatic logout after 60 minutes of inactivity                                                                                                                                                                                 |
 | Security baseline                 | OWASP Top 10 used as the standard checklist for web application security                                                                                                                                                        |
@@ -132,5 +132,5 @@ WCAG 2.2 Level AA compliance is a design-in requirement from day one (C15). An i
 
 ---
 
-_Last updated: 2026-06-04_
+_Last updated: 2026-06-30_
 _Sources: BRD Information Gathering Checklist items 30–35; constraints-and-assumptions.md (C15, C16, C17); DR-LC-003; PDR-UI-003 (desktop-primary decision)_

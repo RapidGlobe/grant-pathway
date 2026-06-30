@@ -10,6 +10,21 @@
 
 ---
 
+## 2026-06-30 — Tier 2 docs updated — non-functional-requirements, information-architecture-and-navigation
+
+Two Tier 2 documents updated to reflect changes since they were last written. No code changes.
+
+**`docs/non-functional-requirements.md`** (last updated 2026-06-04 → 2026-06-30)
+
+- NFR-04 password requirement corrected: minimum 10 characters → minimum 12 characters, must contain both letters and digits. Reflects Supabase password policy hardened on 2026-06-29.
+
+**`docs/information-architecture-and-navigation.md`** → v1.7 (last updated 2026-06-10 → 2026-06-30)
+
+- Step 1 description updated: funder is now selected from the funder directory picker, not entered as free text (funder directory added 2026-06-01 via DR-FD-001).
+- §9 Inactivity: inactivity warning banner row added (55-minute warning; user can dismiss to reset timer). Resolves GAP-22 documentation gap.
+
+---
+
 ## 2026-06-30 — Remaining Tier 1 docs updated — data-model, screen-requirements, acceptance-criteria
 
 Three Tier 1 documents updated to reflect changes since they were last written. No code changes.
