@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** After every task — mark complete, update counts, add notes for deviations
 
-**Last updated:** 2026-06-29 (key scoping; SPF/DKIM/DMARC confirmed; password policy hardened; branch protection; CSP nonce migration; transactional integrity; AI kill-switch; SAR procedure; generated Supabase types)
+**Last updated:** 2026-06-30 (technical-design.md updated to v1.4 — gap analysis applied across all 16 sections)
 **Plan version:** 2.8
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -131,6 +131,14 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-06-30 — technical-design.md updated to v1.4
+
+`docs/Technical Decision and Design/technical-design.md` updated from v1.3 to v1.4 based on a gap analysis against live code. No code changes — documentation only.
+
+Key sections updated: §3 (Vitest + GitHub Actions added to stack; AI cap corrected to 50/month); §4 (full project tree rewrite); §5 (middleware updated to `updateSession()` + CSP nonce pattern; public routes corrected); §6 (full schema rewrite to match `data-model.md` — thick `charity_profiles`, corrected `user_profiles`, `funders` table added, `application_answers` columns updated); §9 (`/api/generate-draft` restored as active; `/api/health` added); §11 (`AiSummaryData` canonical location moved to `lib/types.ts`; type updated with `charLimit`/`limitType`/`eligibilityMismatch`); §13 (CSP moved to middleware, nonce-based; defence-in-depth and secrets table updated); §14 (branch `main→master`; CI 4 jobs documented; `vercel.json` updated to 3 cron jobs).
+
+---
 
 ### 2026-06-07 — D-HSF-03 fixed — Step 4 sync hardened for multi-pass Step 3 flows
 
