@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-06-30 — Technology stack review completed
+
+**`docs/Technical Decision and Design/technology-stack-review-2026-06-30.md`** and `.pdf` added.
+
+Full review of all 10 v1 stack components against current alternatives. Verdict: retain all components.
+One new addition recommended: Axiom (structured log management) at P5.4 to close the AI route latency
+observability gap (GAP-27). No architectural changes arising from the review.
+
+---
+
 ## 2026-06-30 — Tier 2 docs updated — future-phases FP-10 added
 
 **`docs/future-phases.md`** (last updated 2026-05-29 → 2026-06-30)
