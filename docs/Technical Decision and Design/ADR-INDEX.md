@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-30
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -148,7 +148,7 @@ Infrastructure, deployment, and operational decisions.
 | AI Integration | 10     | 10      | 0       | 0        |
 | Export         | 2      | 2       | 0       | 0        |
 | Operations     | 8      | 8       | 0       | 0        |
-| **Total**      | **45** | **45**  | **0**   | **0**    |
+| **Total**      | **46** | **46**  | **0**   | **0**    |
 
 ---
 
@@ -166,7 +166,7 @@ Grant Pathway has no remaining architectural blockers to production deployment.
 
 ## All Decisions Complete
 
-All 44 architectural decisions have been decided as of 2026-05-26. Grant Pathway is ready to move into the development phase.
+All 46 architectural decisions have been decided. Grant Pathway is ready to move into the development phase.
 
 **Key implementation reminders before writing code:**
 
