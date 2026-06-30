@@ -10,6 +10,32 @@
 
 ---
 
+## 2026-06-30 — Remaining Tier 1 docs updated — data-model, screen-requirements, acceptance-criteria
+
+Three Tier 1 documents updated to reflect changes since they were last written. No code changes.
+
+**`docs/data-model.md`** → v1.3
+
+- `ai_usage_log.request_type` enum updated: `charity_paraphrase` added as third value (migration 20260622000001, applied via SQL Editor).
+
+**`docs/PRD inputs/screen-requirements.md`** (last updated 2026-06-10 → 2026-06-30)
+
+- Screen 2 (Register): password validation updated — minimum 12 characters (was 10), must contain letters and digits (2026-06-29 Supabase prod policy hardening).
+- Step 2 (Upload): two new extraction error states — PDF exceeds 200 pages; extraction timeout (30 seconds) (2026-06-22).
+- Step 3 (AI Summary): truncation warning banner added — shown when `guidelinesTruncated: true` (2026-06-22). AI kill-switch unavailable state added (2026-06-29).
+- Step 4 (Draft Answers): AI kill-switch unavailable state added for "Help me improve this" button (2026-06-29).
+
+**`docs/PRD inputs/acceptance-criteria.md`** (last updated 2026-06-04 → 2026-06-30)
+
+- FR-02 requirement text updated (10→12 chars; letters + digits); AC-FR-02-02 updated; AC-FR-02-02b added.
+- AC-FR-23-04 added: 200-page PDF cap rejection.
+- AC-FR-23-05 added: extraction timeout handling.
+- AC-FR-24-06 added: truncation warning shown when guidelines pre-processed.
+- AC-FR-27-03 added: AI kill-switch error state on Step 3.
+- AC-FR-27-04 added: AI kill-switch error state on Step 4 AI assist.
+
+---
+
 ## 2026-06-30 — technical-design.md updated to v1.4 — gap analysis applied
 
 `docs/Technical Decision and Design/technical-design.md` updated from v1.3 to v1.4. No code changes — documentation brought into line with the current codebase following a gap analysis performed on 2026-06-29.

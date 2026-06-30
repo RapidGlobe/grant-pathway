@@ -68,7 +68,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ### FR-02 — Must Have
 
-**Requirement:** The system shall validate email format and enforce a minimum password length of 10 characters at registration.
+**Requirement:** The system shall validate email format and enforce a minimum password length of 12 characters containing both letters and digits at registration. _(Updated 2026-06-29: minimum raised from 10 to 12 characters; complexity requirement added.)_
 
 ---
 
@@ -85,9 +85,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 **AC-FR-02-02 — Password below minimum length rejected**
 
 - **Given** I am on `/register`
-- **When** I enter a password with fewer than 10 characters
+- **When** I enter a password with fewer than 12 characters
 - **And** I submit the form
-- **Then** I see the inline error: _"Your password must be at least 10 characters"_
+- **Then** I see the inline error: _"Your password must be at least 12 characters and include both letters and numbers"_
+- **And** my account is not created
+
+---
+
+**AC-FR-02-02b — Password without letters and digits rejected** _(Added 2026-06-29)_
+
+- **Given** I am on `/register`
+- **When** I enter a password of 12 or more characters that does not contain both letters and digits (e.g. all letters, all digits, or special characters only)
+- **And** I submit the form
+- **Then** I see the inline error: _"Your password must be at least 12 characters and include both letters and numbers"_
 - **And** my account is not created
 
 ---
@@ -1022,6 +1032,27 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
+**AC-FR-23-04 — PDF exceeding 200 pages rejected** _(Added 2026-06-22)_
+
+- **Given** I am on Step 2 of the application flow
+- **When** I upload a PDF with more than 200 pages
+- **Then** the file is rejected
+- **And** I see the error: _"This PDF is too large to process (over 200 pages). Please upload a shorter document or paste the relevant sections as text."_
+- **And** I am not advanced to Step 3
+
+---
+
+**AC-FR-23-05 — Extraction timeout handled gracefully** _(Added 2026-06-22)_
+
+- **Given** I am on Step 2 of the application flow
+- **When** I upload a file and text extraction takes longer than 30 seconds
+- **Then** the upload is rejected
+- **And** I see the error: _"We couldn't read your document in time. Please try again, or paste the text directly."_
+- **And** I am not advanced to Step 3
+- **And** no incomplete data is written to the database
+
+---
+
 ---
 
 ## 9.5 AI Guideline Summarisation
@@ -1082,6 +1113,16 @@ _Note: the final set of profile fields was refined during screen requirements. T
 - **When** I click "Regenerate summary"
 - **Then** a new summary is generated from the same guidelines
 - **And** this regeneration counts as one AI request against my monthly allowance
+
+---
+
+**AC-FR-24-06 — Truncation warning shown when guidelines were pre-processed** _(Added 2026-06-22)_
+
+- **Given** I uploaded a guidelines document that was very long
+- **And** the system pre-processed and truncated it before sending to the AI
+- **When** the AI summary is displayed on Step 3
+- **Then** I see an inline warning: _"Your guidelines document was very long, so only the most relevant sections were sent for summarisation. If anything looks incomplete, try pasting the key sections manually."_
+- **And** the summary is still displayed in full
 
 ---
 
@@ -1164,6 +1205,27 @@ _Note: the final set of profile fields was refined during screen requirements. T
 - **When** I click "Try again"
 - **Then** the system makes a new attempt to generate the summary
 - **And** the staged progress indicator is shown again during the retry
+
+---
+
+**AC-FR-27-03 — AI kill-switch — service unavailable on Step 3** _(Added 2026-06-29)_
+
+- **Given** the AI service has been disabled via the `AI_ENABLED` kill-switch
+- **When** I arrive at Step 3 and summary generation is attempted
+- **Then** I see the message: _"The AI service is temporarily unavailable. Please try again later."_
+- **And** a "Try again" button is shown
+- **And** no AI request is logged against my monthly allowance
+- **And** the application remains at `in_progress` status — no data is lost
+
+---
+
+**AC-FR-27-04 — AI kill-switch — service unavailable on Step 4 AI assist** _(Added 2026-06-29)_
+
+- **Given** the AI service has been disabled via the `AI_ENABLED` kill-switch
+- **When** I click "Help me improve this" on a question card in Step 4
+- **Then** an inline error is shown on that card: _"The AI service is temporarily unavailable. Please try again later."_
+- **And** no AI request is logged against my monthly allowance
+- **And** my existing answer is preserved
 
 ---
 
@@ -1957,5 +2019,5 @@ _These criteria apply only if FR-44 is implemented in v1._
 
 ---
 
-_Last updated: 2026-06-04_
-_Status: Complete — all 9 sections done; AC-FR-29-04 (over-limit hard stop) and AC-FR-29-05 (optional question gate) added 2026-06-04_
+_Last updated: 2026-06-30_
+_Status: Complete — all 9 sections done. Changes in this version: FR-02 requirement updated (password 10→12 chars, letters + digits required); AC-FR-02-02 updated, AC-FR-02-02b added (2026-06-29). AC-FR-23-04 (200-page PDF cap) and AC-FR-23-05 (extraction timeout) added (2026-06-22). AC-FR-24-06 (truncation warning) added (2026-06-22). AC-FR-27-03 (kill-switch Step 3) and AC-FR-27-04 (kill-switch Step 4 AI assist) added (2026-06-29)._

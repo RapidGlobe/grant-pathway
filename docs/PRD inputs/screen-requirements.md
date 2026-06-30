@@ -114,15 +114,15 @@ The following elements appear on all screens unless otherwise noted.
 
 ### Validation Rules
 
-| Field                 | Rule                                     | Inline error message                                                  |
-| --------------------- | ---------------------------------------- | --------------------------------------------------------------------- |
-| First name            | Required                                 | _"Please enter your first name"_                                      |
-| Last name             | Required                                 | _"Please enter your last name"_                                       |
-| Email                 | Required, valid email format             | _"Please enter a valid email address"_                                |
-| Email                 | Not already registered                   | _"An account with this email address already exists"_                 |
-| Password              | Required, minimum 10 characters (NFR-04) | _"Your password must be at least 10 characters"_                      |
-| Password confirmation | Must match password field                | _"Your passwords do not match"_                                       |
-| Terms checkbox        | Must be checked                          | _"Please accept the Terms of Service and Privacy Policy to continue"_ |
+| Field                 | Rule                                                                                          | Inline error message                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| First name            | Required                                                                                      | _"Please enter your first name"_                                                      |
+| Last name             | Required                                                                                      | _"Please enter your last name"_                                                       |
+| Email                 | Required, valid email format                                                                  | _"Please enter a valid email address"_                                                |
+| Email                 | Not already registered                                                                        | _"An account with this email address already exists"_                                 |
+| Password              | Required, minimum 12 characters, must contain letters and digits (NFR-04, updated 2026-06-29) | _"Your password must be at least 12 characters and include both letters and numbers"_ |
+| Password confirmation | Must match password field                                                                     | _"Your passwords do not match"_                                                       |
+| Terms checkbox        | Must be checked                                                                               | _"Please accept the Terms of Service and Privacy Policy to continue"_                 |
 
 ### Post-Submission Behaviour
 
@@ -420,27 +420,32 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 **File upload error states:**
 
-| Scenario                  | Message                                                                                                                             |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Wrong format              | _"We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."_                          |
-| File too large            | _"Your file is over 10MB. Please upload a smaller file or paste the text directly."_                                                |
-| Scanned / image-based PDF | _"We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."_ |
+| Scenario                  | Message                                                                                                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wrong format              | _"We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."_                                           |
+| File too large            | _"Your file is over 10MB. Please upload a smaller file or paste the text directly."_                                                                 |
+| Scanned / image-based PDF | _"We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."_                  |
+| PDF exceeds 200 pages     | _"This PDF is too large to process (over 200 pages). Please upload a shorter document or paste the relevant sections as text."_ _(Added 2026-06-22)_ |
+| Extraction timeout        | _"We couldn't read your document in time. Please try again, or paste the text directly."_ _(Added 2026-06-22 — 30-second extraction timeout)_        |
+| Password-protected PDF    | _"This PDF is password protected — please remove the password or paste the text instead."_                                                           |
 
 ---
 
 ### Step 3 — AI Summary
 
-| Element                  | Detail                                                                                                                                                                                                                                                    |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page heading             | _"Your funder guidelines — summary"_                                                                                                                                                                                                                      |
-| Progress indicator       | Staged messages during generation: _"Reading your funder guidelines…"_ → _"Almost there…"_ (PDR-AI-003)                                                                                                                                                   |
-| Summary content          | AI-generated plain-English digest of the guidelines displayed in full once complete. Includes: what the grant is for, grant amount, who can apply, what the funder is looking for, extracted application questions with word limits, and key requirements |
-| Questions extracted note | _"We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."_                                                                                                                              |
-| Questions not found note | If no questions could be extracted: _"We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."_                                                                          |
-| Regenerate link          | _"Regenerate summary"_ — secondary action. Counts as one AI request against monthly allowance (PDR-AI-005)                                                                                                                                                |
-| Continue button          | _"Continue"_ — primary action, advances to Step 4                                                                                                                                                                                                         |
-| Back link                | Returns to Step 2                                                                                                                                                                                                                                         |
-| API failure state        | _"We couldn't generate your summary right now. This is usually temporary — please try again."_ with a **Try again** button (PDR-UI-006)                                                                                                                   |
+| Element                  | Detail                                                                                                                                                                                                                                                                             |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page heading             | _"Your funder guidelines — summary"_                                                                                                                                                                                                                                               |
+| Progress indicator       | Staged messages during generation: _"Reading your funder guidelines…"_ → _"Almost there…"_ (PDR-AI-003)                                                                                                                                                                            |
+| Summary content          | AI-generated plain-English digest of the guidelines displayed in full once complete. Includes: what the grant is for, grant amount, who can apply, what the funder is looking for, extracted application questions with word limits, and key requirements                          |
+| Truncation warning       | Shown when guidelines were pre-processed and truncated before AI processing: _"Your guidelines document was very long, so only the most relevant sections were sent for summarisation. If anything looks incomplete, try pasting the key sections manually."_ _(Added 2026-06-22)_ |
+| Questions extracted note | _"We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."_                                                                                                                                                       |
+| Questions not found note | If no questions could be extracted: _"We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."_                                                                                                   |
+| Regenerate link          | _"Regenerate summary"_ — secondary action. Counts as one AI request against monthly allowance (PDR-AI-005)                                                                                                                                                                         |
+| Continue button          | _"Continue"_ — primary action, advances to Step 4                                                                                                                                                                                                                                  |
+| Back link                | Returns to Step 2                                                                                                                                                                                                                                                                  |
+| API failure state        | _"We couldn't generate your summary right now. This is usually temporary — please try again."_ with a **Try again** button (PDR-UI-006)                                                                                                                                            |
+| AI service unavailable   | When `AI_ENABLED=false` (kill-switch active): _"The AI service is temporarily unavailable. Please try again later."_ — Try again button shown; no quota consumed. _(Added 2026-06-29)_                                                                                             |
 
 ---
 
@@ -464,6 +469,7 @@ This ensures no work is lost if the user closes their browser or navigates away 
 | Approved state           | Card shown with green border and _"Answer approved — edit above to revise"_ confirmation.                                                                                                                                                                                                                                                                                                                                  |
 | Ready to assemble        | Button active when all mandatory questions/sections are approved. Greyed when any mandatory question is unapproved. Optional questions do not block the gate.                                                                                                                                                                                                                                                              |
 | Manual entry fallback    | If no questions/sections were extracted in Step 3, user sees a manual entry field to add a question and write their answer. _"No specific questions were found in the funder's guidelines."_                                                                                                                                                                                                                               |
+| AI service unavailable   | When `AI_ENABLED=false` and user clicks "Help me improve this": _"The AI service is temporarily unavailable. Please try again later."_ — inline error shown on the card; no quota consumed. _(Added 2026-06-29)_                                                                                                                                                                                                           |
 | Back link                | Returns to Step 3 (via funder context bar or bottom of page)                                                                                                                                                                                                                                                                                                                                                               |
 
 ---
@@ -606,4 +612,6 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ---
 
-_Last updated: 2026-06-10_
+_Last updated: 2026-06-30_
+
+_Changes in this version: Register screen — password minimum raised to 12 characters, letters + digits required (2026-06-29). Step 2 — extraction timeout and 200-page cap error states added (2026-06-22). Step 3 — truncation warning banner added (2026-06-22); AI kill-switch unavailable state added (2026-06-29). Step 4 — AI kill-switch unavailable state added for AI assist button (2026-06-29)._

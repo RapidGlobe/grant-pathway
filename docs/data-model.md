@@ -244,7 +244,7 @@ Tracks every AI API request made by each user. Used to enforce the monthly per-u
 | `id`             | UUID      | Yes      | Primary key                                                                                                       |
 | `user_id`        | UUID      | Yes      | Foreign key → `auth.users.id`                                                                                     |
 | `application_id` | UUID      | No       | Foreign key → `applications.id`. Null for any AI calls not tied to a specific application                         |
-| `request_type`   | Enum      | Yes      | One of: `guideline_summary`, `draft_generation`. Identifies the type of AI call                                   |
+| `request_type`   | Enum      | Yes      | One of: `guideline_summary`, `draft_generation`, `charity_paraphrase`. Identifies the type of AI call             |
 | `token_count`    | Integer   | No       | Total tokens used (prompt + completion). Populated from the Amazon Bedrock API response. Used for cost monitoring |
 | `created_at`     | Timestamp | Yes      | Timestamp of the request. Used to calculate monthly usage (calendar month window)                                 |
 
@@ -311,6 +311,7 @@ The following are explicitly **not** stored in the database:
 | 1.0     | 2026-04-16 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 1.1     | 2026-05-29 | Rapidglobe Ltd | Section 2 (charity_profiles) replaced with thick profile structure (BD-02): identity, address/contact, mission/work, financial fields, supporting document status. OSCR/CCNI register coverage note added. `question_type` and `limit_type`/`word_limit`/`char_limit` fields added to `application_answers` (BD-04, BD-05). `is_budget_question` field added. `answer_source` enum updated (`ai_generated` → `ai_assisted`). AI cap corrected 20 → 50 in ai_usage_log constraints. |
 | 1.2     | 2026-06-01 | Rapidglobe Ltd | Section 2a added: `funders` table (DR-FD-001) — approved funder directory, global/non-user-scoped, seeded with 12 approved orgs. `funder_id` nullable FK added to `applications`. Entity overview and relationships summary updated.                                                                                                                                                                                                                                               |
+| 1.3     | 2026-06-30 | Rapidglobe Ltd | `ai_usage_log.request_type` enum updated: `charity_paraphrase` added as third value (migration 20260622000001 — applied via SQL Editor as ALTER TYPE ADD VALUE cannot run in a transaction).                                                                                                                                                                                                                                                                                       |
 
-_Last updated: 2026-06-01_
+_Last updated: 2026-06-30_
 _Status: Updated — reflects Mark Two decisions BD-02, BD-04, BD-05; funder directory DR-FD-001_

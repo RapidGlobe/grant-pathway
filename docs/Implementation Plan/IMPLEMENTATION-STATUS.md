@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** After every task — mark complete, update counts, add notes for deviations
 
-**Last updated:** 2026-06-30 (technical-design.md updated to v1.4 — gap analysis applied across all 16 sections)
+**Last updated:** 2026-06-30 (technical-design.md v1.4; data-model.md v1.3; screen-requirements.md and acceptance-criteria.md updated — all Tier 1 docs now current)
 **Plan version:** 2.8
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -131,6 +131,16 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 ---
 
 ## Notes
+
+### 2026-06-30 — All remaining Tier 1 docs brought up to date
+
+Following the technical-design.md v1.4 update, the other three out-of-date Tier 1 documents were updated in the same session. No code changes in any of these — documentation only.
+
+- **`docs/data-model.md`** → v1.3: `ai_usage_log.request_type` enum updated to include `charity_paraphrase` (added by migration 20260622000001).
+- **`docs/PRD inputs/screen-requirements.md`**: Register screen password rule updated (10→12 chars, letters + digits). Step 2 extraction error states added (200-page cap, 30-second timeout). Step 3 truncation warning banner added. Steps 3 and 4 AI kill-switch error state added.
+- **`docs/PRD inputs/acceptance-criteria.md`**: FR-02 requirement text updated; AC-FR-02-02 updated and AC-FR-02-02b added (password complexity). AC-FR-23-04 (200-page cap) and AC-FR-23-05 (extraction timeout) added. AC-FR-24-06 (truncation warning) added. AC-FR-27-03 and AC-FR-27-04 (AI kill-switch error states) added.
+
+---
 
 ### 2026-06-30 — technical-design.md updated to v1.4
 
