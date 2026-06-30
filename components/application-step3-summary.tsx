@@ -37,12 +37,7 @@ import { advanceToStep4, setApplicationMismatch } from '@/actions/applications'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 type DisplayState =
-  | 'loading'
-  | 'content'
-  | 'mismatch'
-  | 'failure'
-  | 'persistent-failure'
-  | 'no-guidelines'
+  'loading' | 'content' | 'mismatch' | 'failure' | 'persistent-failure' | 'no-guidelines'
 
 interface ApplicationStep3SummaryProps {
   applicationId: string

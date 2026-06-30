@@ -19,8 +19,7 @@ export type AcceptedMimeType = (typeof ACCEPTED_MIME_TYPES)[number]
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
 
 export type FileValidationResult =
-  | { ok: true; mimeType: AcceptedMimeType }
-  | { ok: false; reason: 'invalid_type' | 'too_large' }
+  { ok: true; mimeType: AcceptedMimeType } | { ok: false; reason: 'invalid_type' | 'too_large' }
 
 /**
  * Validates a file's MIME type and size server-side.
