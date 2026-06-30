@@ -1594,6 +1594,35 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 - **AI performance testing** (NFR-01): confirm summary generation completes within 30 seconds; confirm draft generation completes within 60 seconds under normal load
 - **Feedback opt-in verification**: confirm the "I'm happy to be contacted" checkbox on registration correctly writes `feedback_consent = true` to `user_profiles` in Supabase; verify a test registration with the box ticked and one without, and inspect the database to confirm the values. ⚠️ **Post-launch action required:** once real users are registering, establish a process to periodically query `user_profiles` where `feedback_consent = true` and act on it (e.g. contact those users for feedback). The data is being collected — do not let it go unused.
 
+### P5.5b — Admin Dashboard (`/admin`)
+
+Build the internal service dashboard as a live, database-connected page at `/admin`. This page is for the Rapidglobe operator only — it must be protected so that no registered user can access it.
+
+**Route:** `app/(admin)/admin/page.tsx` — separate layout group from `(authenticated)` so it can carry its own middleware check.
+
+**Access control:** Middleware must verify that the authenticated user's email matches a hardcoded operator allowlist (e.g. `wjokhia@rapidglobe.com`) before rendering the page. Any other user — including registered charities — must receive a 404, not a 403, to avoid revealing that the route exists.
+
+**Data:** All figures are read directly from Supabase using a Server Component — no client-side fetch, no caching beyond Next.js default. The following queries cover all dashboard panels:
+
+| Panel                        | Query                                                                                                                              |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Registered users             | `SELECT COUNT(*) FROM user_profiles`                                                                                               |
+| Active last 7 days           | `SELECT COUNT(DISTINCT user_id) FROM user_profiles WHERE last_sign_in_at > now() - interval '7 days'`                              |
+| Applications created / today | `SELECT COUNT(*) FROM applications` / `WHERE created_at::date = current_date`                                                      |
+| Avg applications per user    | Derived from the two counts above                                                                                                  |
+| Top funders                  | `SELECT f.name, COUNT(*) FROM applications a JOIN funders f ON a.funder_id = f.id GROUP BY f.name ORDER BY COUNT(*) DESC LIMIT 10` |
+| AI usage this month          | `SELECT route, COUNT(*) FROM ai_usage_log WHERE created_at > date_trunc('month', now()) GROUP BY route`                            |
+| Monthly cap utilisation      | AI requests this month ÷ (50 × registered users)                                                                                   |
+| Recent registrations         | `SELECT email, created_at FROM user_profiles ORDER BY created_at DESC LIMIT 10` joined to application count per user               |
+
+**Design:** Use the approved design at `docs/Business Design/dashboard-sketch-2026-06-30.html` as the visual reference — brand colours, layout, and panel structure are already signed off.
+
+**RLS note:** This page must use the Supabase service-role key (server-side only, never exposed to the client) to read across all users' data. The anon key and user-scoped client must not be used here.
+
+**No export / no edit:** The dashboard is read-only. No actions, buttons, or data modifications.
+
+---
+
 ### P5.6 — DNS and Go-Live
 
 - Point `grantpathway.org.uk` DNS to Vercel deployment
@@ -1647,6 +1676,7 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 | 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                                                                                                                         |
 | 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                                                                                                                       |
 | 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                                                                                                                     |
+| 3.0     | 2026-06-30 | Rapidglobe Ltd | Added P5.5b — /admin service dashboard page (live Supabase data, operator-only access, design ref dashboard-sketch-2026-06-30.html)                                                                                                                                |
 | 2.9     | 2026-06-30 | Rapidglobe Ltd | Added Axiom log management setup step to P5.4 (technology stack review recommendation)                                                                                                                                                                             |
 | 2.8     | 2026-06-17 | Rapidglobe Ltd | Phase 4→5 gate signed off by WJ (2026-06-17); gate checklist ticked; legal docs consolidated to `docs/legal/` (privacy-policy.md + terms-of-service.md); 7-day backup disclosure corrected in privacy policy; monthly AI cap aligned to 50 across all three routes |
 | 2.7     | 2026-06-16 | Rapidglobe Ltd | Added inactivity cron reliability step to P5.3 (GAP-31); added Sentry P95 alert, v1.0 git tag, and rollback procedure steps to P5.4 (GAP-03/12/28)                                                                                                                 |
