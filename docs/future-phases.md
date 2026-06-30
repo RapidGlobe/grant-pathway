@@ -21,6 +21,7 @@ This document records items that are explicitly out of scope for v1 and are to b
 | FP-07 | OSCR (Scotland) and CCNI (NI) register lookup                   | BD-02                | **Planned before general release**        |
 | FP-08 | Full question-level typing implementation (BD-04)               | BD-04                | Planned — pre-launch or early post-launch |
 | FP-09 | Thick profile completeness-driven pre-fill for all funder tiers | BD-02, BD-07         | Planned — iterative post-launch           |
+| FP-10 | Streaming AI responses                                          | ADR-AI-010           | Deferred post-v1                          |
 
 ---
 
@@ -127,6 +128,23 @@ The thick charity profile (BD-02) includes financial fields, contact details, an
 
 ---
 
+## FP-10 — Streaming AI Responses
+
+**Decision record:** ADR-AI-010
+**Status:** Deferred post-v1
+
+All three AI routes (`/api/generate-summary`, `/api/generate-draft`, `/api/paraphrase`) use batch mode: the full response is generated server-side before being returned to the client. This was the correct choice for v1 — streaming requires a design change to the user interface (replacing the current determinate progress bar with an incremental text rendering pattern) and adds complexity to error handling and partial-response recovery.
+
+Streaming would improve perceived responsiveness for large guideline documents where summary generation takes 30–45 seconds. This should be evaluated once the v1 user base provides real latency data from Sentry performance monitoring (P5.4+).
+
+Pre-requisites before scoping streaming:
+
+- Sentry performance baseline established (P5.4)
+- Real-world latency distribution measured across funder types
+- UX design for incremental text rendering agreed
+
+---
+
 ## Checklist Coverage
 
 | Checklist Item | Description                                | Status           |
@@ -140,5 +158,5 @@ The thick charity profile (BD-02) includes financial fields, contact details, an
 
 ---
 
-_Last updated: 2026-05-29_
+_Last updated: 2026-06-30_
 _Sources: BRD Information Gathering Checklist items 48–53; DR-PS-002, DR-IN-002, DR-OD-001, DR-SM-001, DR-SM-002, DR-LC-003, DR-LC-002; v1-out-of-scope.md; BRD Mark Two BD-02, BD-04, BD-07_

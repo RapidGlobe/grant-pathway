@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-06-30 — Tier 2 docs updated — future-phases FP-10 added
+
+**`docs/future-phases.md`** (last updated 2026-05-29 → 2026-06-30)
+
+- FP-10 added: Streaming AI responses deferred post-v1 per ADR-AI-010. All three AI routes use batch mode for v1; streaming requires a UX design change (incremental text render) and is deferred until a Sentry performance baseline is established post-launch.
+
+---
+
 ## 2026-06-30 — Tier 2 docs updated — non-functional-requirements, information-architecture-and-navigation
 
 Two Tier 2 documents updated to reflect changes since they were last written. No code changes.
