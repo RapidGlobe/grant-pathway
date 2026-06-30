@@ -189,3 +189,21 @@ After completing any task that modifies source files or documentation:
 4. This applies to all changes — code, components, documentation, changelogs, and design records.
 
 **Why:** Multiple contributors may be working on this project. Every push ensures the latest code and documentation is available to all team members and is reflected in Vercel's production deployment.
+
+### Prettier — files copied from outside the repository
+
+The pre-commit hook (lint-staged) only runs Prettier on files it recognises by extension that are **staged within the repo**. It does not catch files that were written directly from external sources (scratchpad output, artifact exports, downloaded files, generated HTML) without going through the normal edit workflow.
+
+The CI `format:check` job runs `prettier --check .` across the entire repository and **will** catch these files. To prevent a CI failure:
+
+**Before committing any file that originated outside the repository**, run:
+
+```bash
+npx prettier --write <path-to-file>
+```
+
+Then stage the formatted version and commit as normal.
+
+**Affected file types most likely to trigger this:** `.html`, `.md`, `.json`, `.ts`, `.tsx` files that were copied, pasted, or generated rather than edited in-place.
+
+**Past incidents:** CI lint-and-typecheck failed twice (2026-06-30) on `docs/Business Design/dashboard-sketch-2026-06-30.html`, which was copied from a scratchpad without being formatted first.
