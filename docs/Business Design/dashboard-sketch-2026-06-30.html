@@ -1,0 +1,659 @@
+<title>Grant Pathway — Service Dashboard</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #FDF9F5;
+  --surface:    #FFFFFF;
+  --surface2:   #F8F5F1;
+  --border:     #E2E8F0;
+  --border2:    #EDF2F7;
+  --teal:       #0D6E6E;
+  --teal-dark:  #0A5A5A;
+  --teal-light: #E6F4F4;
+  --amber:      #D97706;
+  --amber-dark: #B45309;
+  --amber-light:#FEF3C7;
+  --green:      #16A34A;
+  --green-bg:   #F0FDF4;
+  --green-bdr:  #86EFAC;
+  --red:        #DC2626;
+  --red-bg:     #FEF2F2;
+  --text:       #1E293B;
+  --text2:      #64748B;
+  --text3:      #94A3B8;
+  --mono: 'SFMono-Regular', Consolas, 'Cascadia Code', monospace;
+  --sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  background: var(--teal);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logo-mark svg { width: 16px; height: 16px; }
+.header-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.01em;
+}
+.header-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.01em;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #6EE7B7;
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #6EE7B7;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+.updated {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  font-family: var(--mono);
+}
+
+/* ── Main ── */
+.main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Section label ── */
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+
+/* ── Stat cards ── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+@media (max-width: 720px) {
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--teal);
+  border-radius: 4px;
+  padding: 16px 18px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text3);
+}
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--teal);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.stat-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+  width: fit-content;
+}
+.stat-delta.up   { color: var(--green);      background: var(--green-bg); }
+.stat-delta.flat { color: var(--text3);      background: var(--surface2); }
+.stat-note {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 1px;
+}
+
+/* ── Mid row ── */
+.mid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .mid-row { grid-template-columns: 1fr; }
+}
+
+/* ── Panels ── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 18px;
+}
+.panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.panel-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.panel-range {
+  font-size: 10px;
+  color: var(--text3);
+  font-family: var(--mono);
+  letter-spacing: 0.04em;
+}
+canvas#sparkline { width: 100%; display: block; }
+
+/* ── Funder table ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.data-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: left;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table tbody tr { border-bottom: 1px solid var(--border2); }
+.data-table tbody tr:last-child { border-bottom: none; }
+.data-table tbody td {
+  padding: 9px 0;
+  color: var(--text2);
+  vertical-align: middle;
+}
+.data-table tbody td:first-child { color: var(--text); font-weight: 500; }
+.data-table tbody td:last-child {
+  text-align: right;
+  color: var(--teal);
+  font-weight: 700;
+  font-family: var(--mono);
+}
+.funder-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.badge-t1 { background: var(--teal-light); color: var(--teal-dark); }
+.badge-t2 { background: var(--amber-light); color: var(--amber-dark); }
+
+.bar-wrap {
+  width: 60px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+}
+.bar-fill {
+  height: 100%;
+  background: var(--teal);
+  border-radius: 2px;
+}
+
+/* ── AI strip ── */
+.ai-strip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 18px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+@media (max-width: 560px) {
+  .ai-strip { grid-template-columns: 1fr; }
+}
+.ai-item {
+  padding: 0 24px;
+  border-left: 1px solid var(--border);
+}
+.ai-item:first-child { padding-left: 0; border-left: none; }
+.ai-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 4px;
+}
+.ai-value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--teal);
+  margin-bottom: 4px;
+}
+.ai-value.warn { color: var(--amber); }
+.ai-sub {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--mono);
+}
+.cap-bar {
+  width: 100%;
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.cap-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--teal);
+}
+.cap-fill.warn { background: var(--amber); }
+
+/* ── Users table ── */
+.user-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 16px 18px;
+  overflow-x: auto;
+}
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.user-table thead th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: left;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.user-table tbody tr { border-bottom: 1px solid var(--border2); }
+.user-table tbody tr:last-child { border-bottom: none; }
+.user-table tbody td { padding: 8px 12px 8px 0; color: var(--text2); vertical-align: middle; }
+.user-table tbody td:first-child { color: var(--text); }
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 2px;
+}
+.status-pill.active   { color: var(--green);  background: var(--green-bg); }
+.status-pill.inactive { color: var(--text3);  background: var(--surface2); }
+
+/* ── Footer ── */
+.footer-note {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--mono);
+  text-align: center;
+  padding-top: 4px;
+  line-height: 1.7;
+}
+</style>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 12L6 5L9 9L11 6.5L14 12H3Z" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div>
+      <div class="header-title">Grant Pathway</div>
+      <div class="header-sub">Service Dashboard</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill"><div class="live-dot"></div>Production</div>
+    <div class="updated">Updated 09:14 · 30 Jun 2026</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div>
+    <div class="section-label">Overview</div>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-label">Registered users</div>
+        <div class="stat-value">47</div>
+        <div class="stat-delta up">+6 this week</div>
+        <div class="stat-note">Since launch 17 Jul</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active last 7 days</div>
+        <div class="stat-value">31</div>
+        <div class="stat-delta up">66% of base</div>
+        <div class="stat-note">Logged in at least once</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Applications created</div>
+        <div class="stat-value">83</div>
+        <div class="stat-delta up">+12 this week</div>
+        <div class="stat-note">Avg 1.8 per user</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Applications today</div>
+        <div class="stat-value">7</div>
+        <div class="stat-delta flat">↔ typical</div>
+        <div class="stat-note">Daily avg 5.9</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mid-row">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">New registrations — last 14 days</div>
+        <div class="panel-range">17 Jun – 30 Jun</div>
+      </div>
+      <canvas id="sparkline" height="90"></canvas>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Top funders by applications</div>
+        <div class="panel-range">All time</div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Funder</th>
+            <th>Tier</th>
+            <th style="text-align:right">Applications</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>National Lottery Community Fund<span class="funder-badge badge-t1">T1</span></td>
+            <td><span style="color:var(--text3);font-size:11px">National</span></td>
+            <td>18<div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></td>
+          </tr>
+          <tr>
+            <td>Garfield Weston Foundation<span class="funder-badge badge-t1">T1</span></td>
+            <td><span style="color:var(--text3);font-size:11px">National</span></td>
+            <td>14<div class="bar-wrap"><div class="bar-fill" style="width:78%"></div></div></td>
+          </tr>
+          <tr>
+            <td>City Bridge Foundation<span class="funder-badge badge-t2">T2</span></td>
+            <td><span style="color:var(--text3);font-size:11px">London</span></td>
+            <td>11<div class="bar-wrap"><div class="bar-fill" style="width:61%"></div></div></td>
+          </tr>
+          <tr>
+            <td>Idlewild Trust<span class="funder-badge badge-t2">T2</span></td>
+            <td><span style="color:var(--text3);font-size:11px">National</span></td>
+            <td>9<div class="bar-wrap"><div class="bar-fill" style="width:50%"></div></div></td>
+          </tr>
+          <tr>
+            <td>Henry Smith Charity<span class="funder-badge badge-t1">T1</span></td>
+            <td><span style="color:var(--text3);font-size:11px">National</span></td>
+            <td>7<div class="bar-wrap"><div class="bar-fill" style="width:39%"></div></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">AI Usage — June 2026</div>
+    <div class="ai-strip">
+      <div class="ai-item">
+        <div class="ai-label">Summaries generated</div>
+        <div class="ai-value">76</div>
+        <div class="ai-sub">generate-summary route</div>
+      </div>
+      <div class="ai-item">
+        <div class="ai-label">Drafts &amp; paraphrases</div>
+        <div class="ai-value">312</div>
+        <div class="ai-sub">generate-draft + refine-answer</div>
+      </div>
+      <div class="ai-item">
+        <div class="ai-label">Monthly cap utilisation</div>
+        <div class="ai-value warn">74%</div>
+        <div class="ai-sub">50 req/user · 47 users</div>
+        <div class="cap-bar"><div class="cap-fill warn" style="width:74%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Recent registrations</div>
+    <div class="user-panel">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Registered</th>
+            <th>Applications</th>
+            <th>AI requests (Jun)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>h.matthews@citizensadvice.org.uk</td>
+            <td style="color:var(--text3)">28 Jun</td>
+            <td>3</td>
+            <td>14</td>
+            <td><span class="status-pill active">Active</span></td>
+          </tr>
+          <tr>
+            <td>grants@stjohnshospice.org.uk</td>
+            <td style="color:var(--text3)">27 Jun</td>
+            <td>2</td>
+            <td>9</td>
+            <td><span class="status-pill active">Active</span></td>
+          </tr>
+          <tr>
+            <td>fundraising@refugecouncil.org.uk</td>
+            <td style="color:var(--text3)">25 Jun</td>
+            <td>4</td>
+            <td>22</td>
+            <td><span class="status-pill active">Active</span></td>
+          </tr>
+          <tr>
+            <td>admin@localfoodbank.org.uk</td>
+            <td style="color:var(--text3)">24 Jun</td>
+            <td>1</td>
+            <td>4</td>
+            <td><span class="status-pill inactive">Inactive</span></td>
+          </tr>
+          <tr>
+            <td>ceo@mentalhealthmatter.org</td>
+            <td style="color:var(--text3)">22 Jun</td>
+            <td>5</td>
+            <td>31</td>
+            <td><span class="status-pill active">Active</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Data source: Supabase — user_profiles · applications · ai_usage_log<br>
+    All figures drawn from production database. Email addresses shown are illustrative only.
+  </div>
+
+</div>
+
+<script>
+const data = [1, 0, 2, 1, 3, 2, 1, 4, 2, 3, 5, 3, 4, 6];
+const canvas = document.getElementById('sparkline');
+
+function drawSparkline() {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const W = rect.width - 36;
+  const H = 90;
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const n = data.length;
+  const maxV = Math.max(...data);
+  const padT = 8, padB = 22, padL = 28, padR = 8;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const xOf = i => padL + (i / (n - 1)) * plotW;
+  const yOf = v => padT + plotH - (v / (maxV || 1)) * plotH;
+
+  // Grid lines
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  [0, 2, 4, 6].forEach(v => {
+    const y = yOf(v);
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + plotW, y);
+    ctx.stroke();
+    ctx.fillStyle = '#94A3B8';
+    ctx.font = '9px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'right';
+    ctx.fillText(v, padL - 4, y + 3);
+  });
+
+  // Area fill
+  ctx.beginPath();
+  ctx.moveTo(xOf(0), yOf(data[0]));
+  for (let i = 1; i < n; i++) ctx.lineTo(xOf(i), yOf(data[i]));
+  ctx.lineTo(xOf(n - 1), padT + plotH);
+  ctx.lineTo(xOf(0), padT + plotH);
+  ctx.closePath();
+  const grad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
+  grad.addColorStop(0, 'rgba(13,110,110,0.18)');
+  grad.addColorStop(1, 'rgba(13,110,110,0.02)');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(xOf(0), yOf(data[0]));
+  for (let i = 1; i < n; i++) ctx.lineTo(xOf(i), yOf(data[i]));
+  ctx.strokeStyle = '#0D6E6E';
+  ctx.lineWidth = 1.75;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Endpoint dot
+  const ex = xOf(n - 1), ey = yOf(data[n - 1]);
+  ctx.beginPath();
+  ctx.arc(ex, ey, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#0D6E6E';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(ex, ey, 2, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+
+  // X labels
+  const labels = ['17', '19', '21', '23', '25', '27', '29', '30 Jun'];
+  const labelIdx = [0, 2, 4, 6, 8, 10, 12, 13];
+  ctx.fillStyle = '#94A3B8';
+  ctx.font = '9px ' + getComputedStyle(document.body).fontFamily;
+  ctx.textAlign = 'center';
+  labelIdx.forEach((di, li) => ctx.fillText(labels[li], xOf(di), H - 6));
+}
+
+drawSparkline();
+window.addEventListener('resize', drawSparkline);
+</script>
