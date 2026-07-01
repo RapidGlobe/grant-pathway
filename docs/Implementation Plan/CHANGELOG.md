@@ -21,6 +21,16 @@ Follow-up from the diagram review that surfaced the FR-07/MFA regression (see en
 
 ---
 
+## 2026-07-01 — `07-application-workflow.png`/`.docx` regenerated (ImageMagick installed)
+
+**`docs/diagrams/07-application-workflow.svg`**, **`.png`**, **`.docx`**
+
+Follow-up to the entry above, which flagged the diagram's `.png`/`.docx` exports as stale with no SVG rasteriser available. WJ installed ImageMagick (`choco install imagemagick -y`), which bundles librsvg. Regenerated `07-application-workflow.png` at `-density 200` (matches the original's 2083×3125px output exactly — ImageMagick/rsvg treats the SVG at 96 DPI base, so density 200 reproduces the same pixel dimensions as the original renderer's 150 DPI-at-72-base assumption). Also fixed a rendering defect surfaced by the switch to ImageMagick: the `&#9888;` (⚠) Unicode warning-sign entity used in two diagram callouts rendered as a missing-glyph box under the local font set, whereas the original renderer (browser-based) had emoji font coverage. Replaced both occurrences in `07-application-workflow.svg` with a small hand-drawn vector warning-triangle icon (`<path>` + rect + circle) so rendering no longer depends on font/emoji coverage — verified consistent across the diagram.
+
+`07-application-workflow.docx` updated by swapping the embedded image bytes only (same filename, same relationship ID, identical pixel dimensions) — no XML content changed. Verified via independent zip-integrity check (`zipfile.testzip()` clean, all 20 expected parts present, embedded PNG size matches exactly) since LibreOffice is not installed in this environment for a full visual re-render.
+
+---
+
 ## 2026-07-01 — FR-07 (MFA) documentation regression corrected
 
 **`docs/Technical Decision and Design/technical-design.md`** → v1.5, **`docs/PRD inputs/acceptance-criteria.md`**, **`middleware.ts`**
