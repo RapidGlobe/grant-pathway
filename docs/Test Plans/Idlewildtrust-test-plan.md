@@ -94,7 +94,7 @@ Log any failures not listed in Known Expected Behaviours above.
 
 1. Go to [grant-pathway-three.vercel.app](https://grant-pathway-three.vercel.app)
 2. Click **Register**
-3. Enter first name, last name, email `grantpathway+idle1@gmail.com`, password (10+ characters), accept Terms and Privacy Policy
+3. Enter first name, last name, email `grantpathway+idle1@gmail.com`, password (12+ characters, must include letters and digits), accept Terms and Privacy Policy
 4. Click **Create account**
 5. Open the verification email and click the verification link
 6. Click **Go to my dashboard**

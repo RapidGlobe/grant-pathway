@@ -1,12 +1,21 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-06-15
-**Status:** Ready for execution
+**Last updated:** 2026-07-01
+**Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
 ---
+
+## ⚠️ Read this before running v1.1 for the first time
+
+On 2026-07-01, a full audit found that `grant-pathway-dev` and `grant-pathway-prod` had been silently missing critical schema for weeks: the AI usage-cap RPC functions (`reserve_ai_slot` and friends — used by **every** AI call) were absent from **both** projects, and the transactional `approve_application`/`reopen_application` RPCs were absent from **prod**. This has now been fixed and verified on both projects (see `docs/Implementation Plan/CHANGELOG.md`, 2026-07-01 entries) — but it means:
+
+- **Every "passed" result recorded against any funder test plan in this folder predates the fix** (all funder testing finished by 2026-06-17; the AI-cap RPC dependency was only introduced into the route code on 2026-06-22, and the approve/reopen RPC on 2026-06-29). None of those passes are evidence that the _current_ codebase works end-to-end.
+- **This regression plan itself has zero recorded executions.** It was written 2026-06-15 and never run.
+- RT-00 below is new — run it **first**, every time, before trusting any other result in this plan or any funder plan.
 
 ## Purpose
 
@@ -23,19 +32,21 @@ It does not test whether AI output is accurate or funder-specific question extra
 - After any change to the AI API routes
 - Before deploying a new release to production
 - After any infrastructure change (Supabase, Vercel, Node version)
+- **Before relying on any historical funder test result** — if the schema has drifted from tracked migrations before, it can happen again; RT-00 catches it in under a minute
 
 ---
 
 ## Test Tiers
 
-This plan has two tiers:
+This plan has three tiers:
 
-| Tier | Name            | When to run                                      | Time    |
-| ---- | --------------- | ------------------------------------------------ | ------- |
-| 1    | Smoke           | Every dependency update / quick confidence check | ~10 min |
-| 2    | Full regression | Before any production deployment                 | ~25 min |
+| Tier | Name              | When to run                                             | Time    |
+| ---- | ----------------- | ------------------------------------------------------- | ------- |
+| 0    | Environment check | First, every session — before trusting any other result | ~2 min  |
+| 1    | Smoke             | Every dependency update / quick confidence check        | ~10 min |
+| 2    | Full regression   | Before any production deployment                        | ~25 min |
 
-Tier 1 tests are marked **[SMOKE]**. Run all Tier 1 tests first; proceed to Tier 2 only if all pass.
+Tier 0 is marked **[ENV]** and always runs first. Tier 1 tests are marked **[SMOKE]**. Run all Tier 1 tests first; proceed to Tier 2 only if all pass.
 
 ---
 
@@ -43,14 +54,15 @@ Tier 1 tests are marked **[SMOKE]**. Run all Tier 1 tests first; proceed to Tier
 
 This plan uses a pre-seeded test account with an existing in-progress application. No new application creation is required for Tier 1.
 
-| Item                   | Value                                       |
-| ---------------------- | ------------------------------------------- |
-| Test URL               | https://grant-pathway-three.vercel.app      |
-| Test account           | grantpathway+idle100@gmail.com              |
-| Display name           | Testname                                    |
-| Pre-seeded application | Henry Smith Foundation — "Test Application" |
-| Application status     | In progress (Step 4, Q&A writing interface) |
-| Funder                 | Henry Smith Foundation                      |
+| Item                      | Value                                                                                                           |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Test URL                  | https://grant-pathway-three.vercel.app                                                                          |
+| Test URL Supabase project | **Not yet confirmed as of 2026-07-01 — see RT-00.** Do not assume dev or prod without checking Vercel env vars. |
+| Test account              | grantpathway+idle100@gmail.com                                                                                  |
+| Display name              | Testname                                                                                                        |
+| Pre-seeded application    | Henry Smith Foundation — "Test Application"                                                                     |
+| Application status        | In progress (Step 4, Q&A writing interface)                                                                     |
+| Funder                    | Henry Smith Foundation                                                                                          |
 
 **Pre-test check:** Confirm the test account still has the "Test Application" in "In progress" status at Step 4. If it has been deleted or exported, a new application will need to be created first (see Appendix A).
 
@@ -58,18 +70,55 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 
 ## Test Results Summary
 
-| Test ID | Test Name                        | Tier  | Result | Date | Notes |
-| ------- | -------------------------------- | ----- | ------ | ---- | ----- |
-| RT-01   | Sign-in and session persistence  | Smoke |        |      |       |
-| RT-02   | Unauthenticated redirect         | Smoke |        |      |       |
-| RT-03   | Dashboard renders with data      | Smoke |        |      |       |
-| RT-04   | Step 4 Q&A interface loads       | Smoke |        |      |       |
-| RT-05   | AI refine-answer endpoint        | Smoke |        |      |       |
-| RT-06   | Answer approval and progress bar | Full  |        |      |       |
-| RT-07   | Preparation checklist gate       | Full  |        |      |       |
-| RT-08   | Senior review screen             | Full  |        |      |       |
-| RT-09   | Final review and approval        | Full  |        |      |       |
-| RT-10   | Word document export             | Full  |        |      |       |
+| Test ID | Test Name                           | Tier  | Result | Date | Notes |
+| ------- | ----------------------------------- | ----- | ------ | ---- | ----- |
+| RT-00   | Environment and schema verification | Env   |        |      |       |
+| RT-01   | Sign-in and session persistence     | Smoke |        |      |       |
+| RT-02   | Unauthenticated redirect            | Smoke |        |      |       |
+| RT-03   | Dashboard renders with data         | Smoke |        |      |       |
+| RT-04   | Step 4 Q&A interface loads          | Smoke |        |      |       |
+| RT-05   | AI refine-answer endpoint           | Smoke |        |      |       |
+| RT-06   | Answer approval and progress bar    | Full  |        |      |       |
+| RT-07   | Preparation checklist gate          | Full  |        |      |       |
+| RT-08   | Senior review screen                | Full  |        |      |       |
+| RT-09   | Final review and approval           | Full  |        |      |       |
+| RT-10   | Word document export                | Full  |        |      |       |
+| RT-11   | Dashboard reopen application        | Full  |        |      |       |
+
+---
+
+## Tier 0 — Environment Check
+
+Run this before every session, every time, no exceptions. It exists because on 2026-07-01 the hosted `grant-pathway-dev` and `grant-pathway-prod` Supabase projects were found to be missing schema that every other check (CI, local dev, prior test sessions) had no way of detecting — the gap was invisible from inside the app until someone deliberately checked the database directly.
+
+---
+
+### RT-00 — Environment and Schema Verification [ENV]
+
+**What this tests:** That the environment being tested has the full, current schema applied — not just that the app loads.
+
+**Steps:**
+
+1. Confirm which Supabase project backs the test URL. In the Vercel dashboard, check the Production (or Preview, whichever `grant-pathway-three.vercel.app` serves) environment variables for `NEXT_PUBLIC_SUPABASE_URL` — the project ref in that URL tells you dev (`stanwaejdvlvremtffkf`) or prod (`mvmjryipieepvsjudche`).
+2. Run this against **that** project's SQL Editor:
+   ```sql
+   select proname from pg_proc where proname in
+     ('reserve_ai_slot', 'update_ai_slot_token_count', 'cancel_ai_slot',
+      'approve_application', 'reopen_application');
+   ```
+3. Confirm all 5 rows are returned.
+4. Run `supabase migration list --linked` (after linking the CLI to the correct project) and confirm every row shows a matching Local/Remote timestamp — no blanks.
+
+**Expected result:**
+
+- All 5 functions present
+- No blank rows in `migration list`
+
+**If this fails:** stop. Do not proceed to RT-01 or any funder test plan — every AI feature and the approve/reopen flow will fail, and the failure will look like a product bug rather than a missing-migration issue. Fix the schema gap first (see `docs/Implementation Plan/CHANGELOG.md`, 2026-07-01, for the exact remediation SQL if this recurs).
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes (record which project — dev or prod — this session tested against):**
 
 ---
 
@@ -191,7 +240,7 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 ### RT-05 — AI Refine-Answer Endpoint [SMOKE]
 
 **User guide reference:** Section 7 — Getting AI Help
-**What this tests:** `@anthropic-ai/sdk`, `/api/refine-answer` route, Bedrock connectivity, AI suggestion rendering
+**What this tests:** `@anthropic-ai/sdk`, `/api/refine-answer` route, Bedrock connectivity, AI suggestion rendering, and — critically — the `reserve_ai_slot` RPC that every AI route calls before touching Bedrock. This is the single most important test in this plan: if the AI cap-check schema is missing on the environment under test, this is where it surfaces (as a generic error, not an obvious "missing function" message).
 
 **Prerequisite:** RT-04 complete (Step 4 visible with question cards)
 
@@ -311,7 +360,7 @@ Run these after all Tier 1 tests pass.
 ### RT-09 — Final Review and Approval [FULL]
 
 **User guide reference:** Section 9 (Review)
-**What this tests:** Step 5 review screen, confirmation checkboxes, final approve action
+**What this tests:** Step 5 review screen, confirmation checkboxes, final approve action — this calls `approveApplication()`, which runs the `approve_application` Postgres RPC. This RPC was missing from production until 2026-07-01; this test is the direct end-to-end check that it's actually present and working on the environment under test.
 
 **Prerequisite:** RT-08 complete
 
@@ -371,6 +420,34 @@ Run these after all Tier 1 tests pass.
 
 ---
 
+### RT-11 — Dashboard Reopen Application [FULL]
+
+**User guide reference:** Section 2 (Your Dashboard) — reopening an approved application
+**What this tests:** The dashboard "Reopen" action, which calls `reopenApplication()` → the `reopen_application` Postgres RPC. Like RT-09, this RPC was missing from production until 2026-07-01. This is the only test in this plan that exercises the reopen path — RT-06's approve/unapprove cycle is a different code path (direct `is_approved` column update, not this RPC) and does not cover it.
+
+**Prerequisite:** RT-09 complete (an approved application exists)
+
+**Steps:**
+
+1. From the dashboard, locate the application approved in RT-09
+2. Click **Reopen** (or equivalent control on the application card)
+3. Confirm the application returns to Step 4 with status **In progress**
+4. Confirm all previously-approved answers now show as unapproved (per the "resets all approvals" behaviour)
+5. Confirm `current_step` is 4 and the Q&A interface loads correctly, not a blank or error state
+
+**Expected result:**
+
+- Reopen action completes without error
+- Application status changes from Approved back to In progress
+- All answer approvals are reset
+- Step 4 Q&A interface loads correctly on return
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
 ## Defect Log
 
 | ID  | Test | Description | Severity | Status |
@@ -409,6 +486,7 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                 |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers. |

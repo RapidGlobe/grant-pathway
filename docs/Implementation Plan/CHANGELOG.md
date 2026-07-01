@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-01 — Test dashboard reset; regression plan hardened; live `is_active` data bug found
+
+**`docs/Test Plans/TEST-DASHBOARD.md`** → v2.0 (old v1.39 archived to `docs/Test Plans/archive/`), **`docs/Test Plans/regression-test-plan.md`** → v1.1, plus 3 funder test plans
+
+Direct consequence of today's dev/prod schema-gap finding (see earlier entries): every recorded funder test result predates the 2026-06-22 introduction of the AI-cap RPC and the 2026-06-29 introduction of the approve/reopen RPC — both of which were broken on hosted environments until today. This means none of the 7 funders previously marked 🟢 "fully tested" have actually been verified against the current codebase; the schema gap was invisible from inside the app the whole time.
+
+**Fixed:**
+
+- `regression-test-plan.md` v1.1: added RT-00 (environment/schema verification — checks all 5 RPC functions exist and `supabase migration list` shows no drift, before trusting any other result) and RT-11 (dashboard reopen — the only test covering `reopen_application`, previously untested by this plan). Annotated RT-05 and RT-09 with their RPC dependencies. Noted the plan has zero recorded executions since it was written 2026-06-15.
+- `TEST-DASHBOARD.md` reset to v2.0: all 7 previously-🟢 funders downgraded to a new 🔁 "needs re-verification" status (not a claim anything is broken — an honest statement that the last verified-passing result predates a confirmed infrastructure gap). Old dashboard (39 revisions, 2026-06-02 to 06-17) preserved at `docs/Test Plans/archive/TEST-DASHBOARD-v1.39.md`.
+- **New finding, not yet fixed:** a live database check found `Foyle Foundation`, `Nationwide Building Society`, `Motability Foundation`, and `City Bridge Foundation` — all four documented as closed/parked/removed since 2026-06-04 — still have `is_active = true` in the database, meaning they're currently selectable in the live funder picker. Per the dashboard's own Funder Readiness Standard, parked funders should be `is_active = false`. Logged as a Known Issue in the new dashboard for WJ to action; remediation SQL provided there.
+- 3 active funder test plans (A B Charitable Trust, Clothworkers' Foundation, Idlewild Trust) still referenced the old "10+ characters" password rule; corrected to the current 12-character-plus-letters-and-digits rule.
+- `target-funder-list.md` (v1.1, 2026-06-04) noted as stale — missing MK Community Foundation, Baily Thomas, and CPF Trust variants added to the dropdown 2026-06-11. Not yet updated; flagged for a future pass since `TEST-DASHBOARD.md`'s Active Funders table is the more current source of truth in the meantime.
+
+---
+
 ## 2026-07-01 — `Grant-Pathway-Business-Overview.docx` regenerated from `business-overview.md`
 
 **`docs/Grant-Pathway-Business-Overview.docx`**
