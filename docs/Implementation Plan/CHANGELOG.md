@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-01 — `Grant-Pathway-Business-Overview.docx` regenerated from `business-overview.md`
+
+**`docs/Grant-Pathway-Business-Overview.docx`**
+
+Closes the loop on the finding that started today's whole audit chain. The Word export was Version 1.3 (22 May 2026) and still described Grant Pathway as generating first-draft answers from scratch — the model abandoned on 2026-05-28 after real funder guidance (Henry Smith Foundation, National Lottery Community Fund) showed AI-generated content disadvantages applications. `docs/business-overview.md` was correctly updated to the "AI assists, doesn't generate" model on 2026-05-29 and verified accurate against the live Step 4 code; the `.docx` was simply never regenerated to match.
+
+Rebuilt from scratch via `docx-js` (hand-editing the original's ~1100-line Word XML was judged too error-prone given how much prose changed) — same cover-page structure and both brand logos (Grant Pathway teal, RapidGlobe navy) reused from the original file, content copied verbatim from the current `business-overview.md`, version bumped to 1.4 (1 July 2026). Verified via `zipfile.testzip()` (clean) and a full pandoc round-trip extraction compared line-by-line against the source `.md` — no content drift.
+
+---
+
 ## 2026-07-01 — `/api/generate-draft` and `advanceToStep5` deleted; all doc/diagram references corrected
 
 **`app/api/generate-draft/route.ts`** (deleted), **`actions/applications.ts`** (`advanceToStep5` deleted), **`docs/Technical Decision and Design/technical-design.md`** → v1.7, plus 6 ADR files, `docs/future-phases.md`, `docs/Implementation Plan/IMPLEMENTATION-PLAN.md`, and both `docs/diagrams/01-system-architecture.*`/`07-application-workflow.*`
