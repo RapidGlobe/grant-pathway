@@ -51,8 +51,8 @@ Vercel Pro is the required hosting plan for production. The upgrade will be acti
 **Immediate actions on upgrade:**
 
 - Set `export const maxDuration = 90` in `/api/generate-summary/route.ts`
-- Set `export const maxDuration = 90` in `/api/generate-draft/route.ts`
-- These two lines must be added at the same time as the upgrade — the upgrade without the config change does not resolve the timeout blocker
+- Set `export const maxDuration = 60` in `/api/refine-answer/route.ts`
+- These lines must be added at the same time as the upgrade — the upgrade without the config change does not resolve the timeout blocker
 
 All other routes continue to use the default 10-second timeout.
 

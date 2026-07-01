@@ -49,7 +49,7 @@ Per-user rate limiting (keyed on `auth.uid()`) is applied to all AI API routes u
 | Route                        | Limit      | Window     |
 | ---------------------------- | ---------- | ---------- |
 | `POST /api/generate-summary` | 5 requests | 60 seconds |
-| `POST /api/generate-draft`   | 5 requests | 60 seconds |
+| `POST /api/refine-answer`    | 5 requests | 60 seconds |
 
 This prevents rapid-fire automated requests within a user's monthly allowance while not inconveniencing a legitimate user who would never generate 5 summaries in 60 seconds.
 

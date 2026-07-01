@@ -133,7 +133,7 @@ The thick charity profile (BD-02) includes financial fields, contact details, an
 **Decision record:** ADR-AI-010
 **Status:** Deferred post-v1
 
-All three AI routes (`/api/generate-summary`, `/api/generate-draft`, `/api/paraphrase`) use batch mode: the full response is generated server-side before being returned to the client. This was the correct choice for v1 — streaming requires a design change to the user interface (replacing the current determinate progress bar with an incremental text rendering pattern) and adds complexity to error handling and partial-response recovery.
+All AI-calling code paths (`/api/generate-summary`, `/api/refine-answer`, and the charity paraphrase step in `actions/charity.ts`) use batch mode: the full response is generated server-side before being returned to the client. This was the correct choice for v1 — streaming requires a design change to the user interface (replacing the current determinate progress bar with an incremental text rendering pattern) and adds complexity to error handling and partial-response recovery.
 
 Streaming would improve perceived responsiveness for large guideline documents where summary generation takes 30–45 seconds. This should be evaluated once the v1 user base provides real latency data from Sentry performance monitoring (P5.4+).
 

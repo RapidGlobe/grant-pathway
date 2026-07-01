@@ -73,9 +73,9 @@ This ensures email addresses and names captured in request context are never sen
 Errors in AI generation routes are tagged with a `route` label so they can be filtered separately from application bugs. Anthropic API failures have a different profile and resolution path than code errors:
 
 ```typescript
-// in /api/generate-summary/route.ts and /api/generate-draft/route.ts
+// in /api/generate-summary/route.ts and /api/refine-answer/route.ts
 Sentry.withScope((scope) => {
-  scope.setTag('route', 'generate-summary') // or 'generate-draft'
+  scope.setTag('route', 'generate-summary') // or 'refine-answer'
   Sentry.captureException(error)
 })
 ```

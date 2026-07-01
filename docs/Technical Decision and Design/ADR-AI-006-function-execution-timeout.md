@@ -46,22 +46,24 @@ This is closely linked to ADR-OPS-001 (Vercel Plan Tier).
 
 ## Decision
 
-**Option A — `export const maxDuration = 90` on both AI route files, applied at the same time as the Vercel Pro upgrade.**
+**Option A — `export const maxDuration` on both AI route files, applied at the same time as the Vercel Pro upgrade.**
 
 ```typescript
 // app/api/generate-summary/route.ts
 export const maxDuration = 90 // seconds — requires Vercel Pro
 
-// app/api/generate-draft/route.ts
-export const maxDuration = 90 // seconds — requires Vercel Pro
+// app/api/refine-answer/route.ts
+export const maxDuration = 60 // seconds — requires Vercel Pro
 ```
+
+_Route naming updated 2026-07-01 — the original Step 4 draft-generation route (`/api/generate-draft`) named here was replaced by the charity-authored Q&A model (2026-05-28 redesign, ADR reflected in `STEP4-REDESIGN-PROPOSAL.md`); `/api/refine-answer` is its functional successor. The decision itself — Vercel Pro plus `maxDuration` on both AI routes — is unchanged._
 
 90 seconds provides the 60-second generation target plus 30 seconds of headroom for retry attempts (ADR-AI-009) and network overhead. All other routes use the default 10-second timeout. If generation approaches 90 seconds in practice, Vercel Pro supports up to 300 seconds and the value can be increased without architectural changes.
 
 ## Consequences
 
 - Vercel Pro plan is required (ADR-OPS-001).
-- Only AI generation routes need `maxDuration = 90`. All other routes use the default.
+- Only AI generation routes need an extended `maxDuration`. All other routes use the default.
 - The 90-second timeout provides headroom: 60 seconds for generation + 30 seconds for network and processing overhead.
 - Monitoring should alert if AI routes approach 90 seconds — this would indicate a prompt or model issue.
 

@@ -507,9 +507,11 @@ export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
  * Called by the debounced auto-save (400 ms) and the 60-second background
  * save in the Step 4 component.
  *
- * answer_source must be 'user_edited' (user modified an AI-generated answer)
- * or 'user_written' (user wrote without AI). 'ai_generated' is set by the
- * /api/generate-draft route only, never by this action.
+ * answer_source must be 'user_edited' (user replaced their answer with an
+ * AI-refined version via "Help me improve this") or 'user_written' (user
+ * wrote without AI assistance). This action never sets 'ai_generated' —
+ * that value is unused; the charity-authored model has no code path that
+ * generates an answer from scratch.
  *
  * user_id check is belt-and-braces in addition to RLS on application_answers.
  */
@@ -761,56 +763,6 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
 
   if (saveError) {
     return { ok: false, error: 'Could not save your draft. Please try again.' }
-  }
-
-  redirect(`/applications/${applicationId}/step/5`)
-}
-
-// ---------------------------------------------------------------------------
-// S6.4 — Advance to Step 5 (legacy — superseded by setDraftReadyToAssemble)
-// ---------------------------------------------------------------------------
-
-/**
- * Called when the user clicks "I've reviewed my answers — continue" on Step 4.
- * Advances current_step to 5 (never regresses if already further along).
- * Does not change status — it remains 'in_progress' from Step 2.
- *
- * Returns never on success (calls redirect). Returns { ok: false, error }
- * only when the DB update fails.
- */
-export async function advanceToStep5(applicationId: string): Promise<{ ok: false; error: string }> {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) redirect('/')
-
-  try {
-    const { data: existing } = await supabase
-      .from('applications')
-      .select('current_step')
-      .eq('id', applicationId)
-      .eq('user_id', user.id)
-      .single()
-
-    const newStep = Math.max(existing?.current_step ?? 4, 5)
-
-    const { error } = await supabase
-      .from('applications')
-      .update({ current_step: newStep })
-      .eq('id', applicationId)
-      .eq('user_id', user.id)
-
-    if (error) {
-      return { ok: false, error: 'Could not save your progress. Please try again.' }
-    }
-  } catch {
-    return {
-      ok: false,
-      error: 'Could not reach the server. Please check your connection and try again.',
-    }
   }
 
   redirect(`/applications/${applicationId}/step/5`)

@@ -83,7 +83,7 @@ Redesign `/api/generate-summary` to stream tokens from Bedrock to the client usi
 - Requires replacing the batch `fetch` in the client with `EventSource` or a streaming `fetch` reader — a non-trivial client change.
 - The asymptotic progress bar (DDR-CS-005) must be replaced with an in-place text render — a design change requiring new UI work.
 - `/api/generate-summary` currently saves the full summary to Supabase (`ai_summary` column) on completion. Streaming complicates this — the route must accumulate the stream, then save, while simultaneously forwarding tokens to the client.
-- The `generate-draft` route (Step 4) returns a structured JSON array of question answers. Streaming partial JSON is significantly more complex to parse incrementally and is out of scope for v1.
+- _(Historical, pre-2026-05-28)_ The `generate-draft` route (Step 4) returned a structured JSON array of question answers. Streaming partial JSON is significantly more complex to parse incrementally and was out of scope for v1.
 - Total implementation time: estimated 4–6 hours. Higher regression risk.
 
 ---
@@ -101,7 +101,7 @@ Implement Option B first (pre-processing) to reduce input tokens and bring perfo
 - **Pre-v1 (pre-launch):** Implement Option B (document pre-processing) in `/api/generate-summary`. Target: reduce median summary time by 15–25% and build headroom before the large-document tier ceiling.
 - **Post-v1:** Evaluate Option C (streaming) as a quality-of-life improvement. This will require a design change to Step 3 (replace progress bar with incremental text render) and is scoped as a post-launch enhancement.
 
-The `generate-draft` route (Step 4) is **excluded** from streaming consideration in v1. Structured JSON streaming is a separate, more complex problem.
+Step 4's AI assist (`/api/refine-answer`, successor to the removed `generate-draft` route after the 2026-05-28 charity-authored redesign) is **excluded** from streaming consideration in v1 for consistency with `/api/generate-summary` — see Rationale below. Its response shape (`{ refinedText: string }`) is simple enough that structured-JSON streaming complexity no longer applies, but a coherent product-wide streaming strategy should still cover both routes together rather than one at a time.
 
 ---
 
@@ -110,7 +110,7 @@ The `generate-draft` route (Step 4) is **excluded** from streaming consideration
 - Pre-processing is additive — it slots into the existing pipeline without changing the API contract, the client, or the UI. Risk is low.
 - The 15–25% token reduction creates meaningful headroom against the 45-second large-document tier limit without requiring a UI redesign.
 - Streaming improves perceived responsiveness but does not reduce actual AI processing time. For v1, where funder documents are ≤11 pages and within NFR-01, perceived responsiveness is secondary to shipping a stable product.
-- Streaming the summary route while leaving `generate-draft` in batch mode would create an inconsistent UX — one step streams, the other does not. A coherent streaming strategy (if adopted) should cover both routes simultaneously, which is post-v1 scope.
+- Streaming `/api/generate-summary` while leaving `/api/refine-answer` in batch mode would create an inconsistent UX — one step streams, the other does not. A coherent streaming strategy (if adopted) should cover both routes simultaneously, which is post-v1 scope.
 - ADR-AI-005 is not superseded — batch mode remains the decision for v1. This ADR documents the performance optimisation strategy that operates within that batch architecture.
 
 ---

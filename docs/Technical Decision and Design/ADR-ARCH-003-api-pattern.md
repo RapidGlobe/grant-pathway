@@ -53,7 +53,7 @@ Grant Pathway needs server-side logic for AI calls, data mutations, and file han
 | Route                         | Purpose                                      | Config             |
 | ----------------------------- | -------------------------------------------- | ------------------ |
 | `POST /api/generate-summary`  | Step 3 AI summary generation                 | `maxDuration = 90` |
-| `POST /api/generate-draft`    | Step 4 draft answer generation               | `maxDuration = 90` |
+| `POST /api/refine-answer`     | Step 4 "Help me improve this" AI assist      | `maxDuration = 60` |
 | `POST /api/upload/signed-url` | Request a Supabase Storage signed upload URL | Default timeout    |
 | `POST /api/upload/process`    | Trigger text extraction after upload         | Default timeout    |
 | `GET /api/export/[id]`        | Generate and stream Word document download   | Default timeout    |
@@ -62,7 +62,7 @@ Zod is used for input validation on all Server Actions and API Routes. The Supab
 
 ## Consequences
 
-- AI generation routes (`/api/generate-summary`, `/api/generate-draft`) must be explicit API Routes so `maxDuration` can be configured.
+- AI generation routes (`/api/generate-summary`, `/api/refine-answer`) must be explicit API Routes so `maxDuration` can be configured.
 - Form submissions (charity profile, application answers) may use Server Actions if App Router is chosen.
 - Zod is recommended for input validation on all API Routes and Server Actions regardless of the choice.
 

@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-07-01 — `/api/generate-draft` and `advanceToStep5` deleted; all doc/diagram references corrected
+
+**`app/api/generate-draft/route.ts`** (deleted), **`actions/applications.ts`** (`advanceToStep5` deleted), **`docs/Technical Decision and Design/technical-design.md`** → v1.7, plus 6 ADR files, `docs/future-phases.md`, `docs/Implementation Plan/IMPLEMENTATION-PLAN.md`, and both `docs/diagrams/01-system-architecture.*`/`07-application-workflow.*`
+
+Final cleanup from today's orphaned-code audit (see earlier entries — the audit that found the dev/prod schema gap started here).
+
+**Code deleted, both confirmed to have zero callers anywhere in the codebase:**
+
+- `app/api/generate-draft/route.ts` — the route that started this entire investigation. Fully implemented, actively maintained (kill-switch, fail-closed cap check, cap raised to 50), but never wired to any UI since the 2026-05-28 charity-authored redesign. `answer_source: 'ai_generated'` (the enum value only this route could set) is now permanently unused — noted in `saveAnswer`'s docstring rather than removed from the DB enum, since removing an enum value is a separate, riskier migration.
+- `advanceToStep5()` in `actions/applications.ts` — the code's own comment already called it "legacy — superseded by `setDraftReadyToAssemble`." Deleted along with its section header.
+
+Verified via `tsc --noEmit`, `eslint`, and the full Vitest suite (22/22) after both deletions — clean.
+
+**Documentation swept for every current (non-archived) reference to `/api/generate-draft`:**
+
+- `technical-design.md` — removed from §4 project tree, §9 API routes table, §13 rate-limiting table; `/api/refine-answer`'s config corrected from "Default timeout" to the actual `maxDuration = 60`. Also caught and backfilled two missing document-history rows (v1.5 MFA fix, v1.6 route-naming fix) that were never logged when those versions were bumped earlier today.
+- `future-phases.md` (FP-10) — corrected the "three AI routes" streaming-scope list, which also incorrectly named a non-existent `/api/paraphrase` route (charity paraphrase is a step inside `actions/charity.ts`, not a route).
+- `IMPLEMENTATION-PLAN.md` — two still-pending P5.3/P5.4 tasks (Sentry route tagging, Sentry performance alert) retargeted from `generate-draft` to `refine-answer` so future work doesn't get pointed at a deleted route.
+- Six ADR files (`ADR-AI-006`, `ADR-AI-010`, `ADR-ARCH-003`, `ADR-OPS-001`, `ADR-OPS-005`, `ADR-SEC-005`) — illustrative route examples and tables corrected to `refine-answer`. Formal decisions in each ADR are unchanged; only stale example route names/durations were updated, with an editorial note added where an ADR's _reasoning_ (not just its example) referenced `generate-draft`'s specific behaviour (ADR-AI-010's JSON-streaming-complexity argument, which doesn't transfer to `refine-answer`'s simple text response).
+- `acceptance-criteria.md`, `IMPLEMENTATION-PLAN.md`'s Slice 6 note, and `docs/Implementation Plan/ADR-TRACEABILITY.md` already correctly described the route as removed/historical — left untouched.
+
+**Diagrams corrected and regenerated** (`.svg` source edited, `.png`/`.docx` regenerated with ImageMagick, verified via crop-and-inspect):
+
+- `01-system-architecture.svg` — removed from the API Routes panel; five remaining routes reflowed to close the gap.
+- `07-application-workflow.svg` — Step 4's description corrected from "AI draft generation per answer" to "Charity writes answer · optional 'Help me improve this' AI refine," matching the edge-case callout already added to this diagram earlier today.
+
+---
+
 ## 2026-07-01 — Dev/prod schema gap closed: AI features and approve/reopen were broken on every hosted environment
 
 **`supabase/migrations/20260701000000_item21_transactional_approve_reopen.sql`** (new), **`docs/migrations/item-21-transactional-integrity.sql`** (removed), **`docs/Implementation Plan/IMPLEMENTATION-PLAN.md`** → v3.1 — **RESOLVED, both dev and prod fully reconciled**
