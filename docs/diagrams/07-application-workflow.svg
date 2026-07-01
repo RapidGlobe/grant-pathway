@@ -108,6 +108,21 @@
   <text x="500" y="1028" text-anchor="middle" fill="#78350f" font-size="10">User confirms readiness before writing begins</text>
   <line x1="500" y1="1040" x2="500" y2="1062" stroke="#d97706" stroke-width="2" marker-end="url(#arr-orange)"/>
 
+  <!-- Edge cases: guideline truncation + AI kill-switch -->
+  <rect x="785" y="824" width="200" height="200" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="885" y="844" text-anchor="middle" fill="#92400e" font-size="10" font-weight="bold">&#9888; Edge Cases</text>
+  <text x="885" y="864" text-anchor="middle" fill="#78350f" font-size="9">Guidelines extract</text>
+  <text x="885" y="878" text-anchor="middle" fill="#78350f" font-size="9">&gt; 20k chars →</text>
+  <text x="885" y="892" text-anchor="middle" fill="#78350f" font-size="9">truncation warning</text>
+  <text x="885" y="906" text-anchor="middle" fill="#78350f" font-size="9">banner (Step 3)</text>
+  <line x1="815" y1="920" x2="955" y2="920" stroke="#ca8a04" stroke-width="1" stroke-dasharray="2,2"/>
+  <text x="885" y="938" text-anchor="middle" fill="#78350f" font-size="9">AI_ENABLED=false</text>
+  <text x="885" y="952" text-anchor="middle" fill="#78350f" font-size="9">(kill-switch) → Step 3</text>
+  <text x="885" y="966" text-anchor="middle" fill="#78350f" font-size="9">summary &amp; Step 4 AI-</text>
+  <text x="885" y="980" text-anchor="middle" fill="#78350f" font-size="9">assist show "AI</text>
+  <text x="885" y="994" text-anchor="middle" fill="#78350f" font-size="9">unavailable"; manual</text>
+  <text x="885" y="1008" text-anchor="middle" fill="#78350f" font-size="9">entry only</text>
+
   <!-- ─────────────────────────────────────────────
        STEP 4
   ───────────────────────────────────────────── -->

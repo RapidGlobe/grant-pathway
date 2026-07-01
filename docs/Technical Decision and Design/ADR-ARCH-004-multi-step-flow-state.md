@@ -36,7 +36,7 @@ The funder guidelines text is session-use only (FR-22 — not stored in the data
 
 ### Option C — URL-based step state + database
 
-- **What it is:** The current step is encoded in the URL (e.g., `/application/[id]/step/3`). Each step page fetches its own data from the database on load.
+- **What it is:** The current step is encoded in the URL (e.g., `/applications/[id]/step/3`). Each step page fetches its own data from the database on load.
 - **Strengths:** Deep-linkable and shareable URLs. Browser back/forward works correctly. Step state is always accurate (no client desync). Aligns with SSR/RSC rendering (each step page can be server-rendered with fresh data).
 - **Weaknesses:** Every step navigation triggers a page transition. Requires each step to have its own route and data-fetching logic.
 
@@ -50,18 +50,18 @@ The funder guidelines text is session-use only (FR-22 — not stored in the data
 
 **Option A — Database as primary state store, with URL-encoded step routing.**
 
-Each step is a discrete route. The `applications` table `current_step` column tracks progress. Navigating to `/application/[id]` redirects to the current step.
+Each step is a discrete route. The `applications` table `current_step` column tracks progress. Navigating to `/applications/[id]` redirects to the current step.
 
 **URL structure:**
 
-| URL                        | Step                                                 |
-| -------------------------- | ---------------------------------------------------- |
-| `/application/[id]`        | Redirects to `/application/[id]/step/[current_step]` |
-| `/application/[id]/step/1` | Application Details                                  |
-| `/application/[id]/step/2` | Upload Funder Guidelines                             |
-| `/application/[id]/step/3` | AI Summary                                           |
-| `/application/[id]/step/4` | Draft Answers                                        |
-| `/application/[id]/step/5` | Review & Export                                      |
+| URL                         | Step                                                  |
+| --------------------------- | ----------------------------------------------------- |
+| `/applications/[id]`        | Redirects to `/applications/[id]/step/[current_step]` |
+| `/applications/[id]/step/1` | Application Details                                   |
+| `/applications/[id]/step/2` | Upload Funder Guidelines                              |
+| `/applications/[id]/step/3` | AI Summary                                            |
+| `/applications/[id]/step/4` | Draft Answers                                         |
+| `/applications/[id]/step/5` | Review & Export                                       |
 
 Each step page is a Server Component that fetches only the data relevant to that step. Advancing to a new step updates `current_step` in the database via a Server Action. Step navigation is locked if prerequisites are not met (e.g., Step 4 is inaccessible until Step 3 is complete).
 
@@ -71,7 +71,7 @@ Each step page is a Server Component that fetches only the data relevant to that
 
 ## Consequences
 
-- Each step is a separate route under `/application/[id]/step/[n]` or similar.
+- Each step is a separate route under `/applications/[id]/step/[n]` or similar.
 - The `applications` table must record `current_step` to redirect the user to the correct step on return.
 - The AI API routes receive guidelines text in the POST body (not from the database).
 - Auto-save in Step 4 requires a debounce mechanism (300–500ms after typing stops).

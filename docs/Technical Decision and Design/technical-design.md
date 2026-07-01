@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2026-04-21
 **Last updated:** 2026-07-01
 **Status:** Approved — all architectural decisions decided
@@ -153,8 +153,7 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 │   │   ├── dashboard/page.tsx
 │   │   ├── profile/page.tsx
 │   │   ├── applications/
-│   │   │   └── new/                 # Creation intermediary (no UI rendered)
-│   │   ├── application/
+│   │   │   ├── new/                 # Creation intermediary (no UI rendered)
 │   │   │   └── [id]/
 │   │   │       ├── page.tsx         # Redirects to current step
 │   │   │       └── step/
@@ -441,37 +440,37 @@ Two route groups separate public and authenticated pages, sharing different layo
 
 The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 
-| URL                        | Purpose                                              |
-| -------------------------- | ---------------------------------------------------- |
-| `/application/[id]`        | Redirects to `/application/[id]/step/[current_step]` |
-| `/application/[id]/step/1` | Application Details                                  |
-| `/application/[id]/step/2` | Upload Funder Guidelines                             |
-| `/application/[id]/step/3` | AI Summary                                           |
-| `/application/[id]/step/4` | Draft Answers                                        |
-| `/application/[id]/step/5` | Review & Export                                      |
+| URL                         | Purpose                                               |
+| --------------------------- | ----------------------------------------------------- |
+| `/applications/[id]`        | Redirects to `/applications/[id]/step/[current_step]` |
+| `/applications/[id]/step/1` | Application Details                                   |
+| `/applications/[id]/step/2` | Upload Funder Guidelines                              |
+| `/applications/[id]/step/3` | AI Summary                                            |
+| `/applications/[id]/step/4` | Draft Answers                                         |
+| `/applications/[id]/step/5` | Review & Export                                       |
 
 **Step locking:** Users cannot jump ahead to a step whose prerequisites are not met. Accessing `/step/4` before Step 3 is complete redirects to the current step.
 
-**Resume on return:** Navigating to `/application/[id]` reads `current_step` from the `applications` table and redirects to the correct step.
+**Resume on return:** Navigating to `/applications/[id]` reads `current_step` from the `applications` table and redirects to the correct step.
 
 ### Page inventory
 
-| Route                      | Type               | Data source                           |
-| -------------------------- | ------------------ | ------------------------------------- |
-| `/`                        | Public, static     | None — landing + sign-in page         |
-| `/register`                | Public, static     | None                                  |
-| `/forgot-password`         | Public, static     | None                                  |
-| `/verify-email`            | Public, static     | None                                  |
-| `/terms`                   | Public, static     | None                                  |
-| `/privacy`                 | Public, static     | None                                  |
-| `/dashboard`               | Authenticated, SSR | `applications` table                  |
-| `/profile`                 | Authenticated, SSR | `charity_profiles` table              |
-| `/application/[id]/step/1` | Authenticated, SSR | `applications` table                  |
-| `/application/[id]/step/2` | Authenticated, SSR | `applications` table                  |
-| `/application/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`             |
-| `/application/[id]/step/4` | Authenticated, SSR | `applications`, `application_answers` |
-| `/application/[id]/step/5` | Authenticated, SSR | `applications`, `application_answers` |
-| `/account`                 | Authenticated, SSR | `user_profiles`                       |
+| Route                       | Type               | Data source                           |
+| --------------------------- | ------------------ | ------------------------------------- |
+| `/`                         | Public, static     | None — landing + sign-in page         |
+| `/register`                 | Public, static     | None                                  |
+| `/forgot-password`          | Public, static     | None                                  |
+| `/verify-email`             | Public, static     | None                                  |
+| `/terms`                    | Public, static     | None                                  |
+| `/privacy`                  | Public, static     | None                                  |
+| `/dashboard`                | Authenticated, SSR | `applications` table                  |
+| `/profile`                  | Authenticated, SSR | `charity_profiles` table              |
+| `/applications/[id]/step/1` | Authenticated, SSR | `applications` table                  |
+| `/applications/[id]/step/2` | Authenticated, SSR | `applications` table                  |
+| `/applications/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`             |
+| `/applications/[id]/step/4` | Authenticated, SSR | `applications`, `application_answers` |
+| `/applications/[id]/step/5` | Authenticated, SSR | `applications`, `application_answers` |
+| `/account`                  | Authenticated, SSR | `user_profiles`                       |
 
 ---
 

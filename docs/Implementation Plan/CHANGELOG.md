@@ -10,6 +10,17 @@
 
 ---
 
+## 2026-07-01 — Diagram edge-case update + route-naming consistency fix
+
+**`docs/diagrams/07-application-workflow.svg`**, **`docs/Technical Decision and Design/technical-design.md`** → v1.6, **`docs/Technical Decision and Design/ADR-ARCH-004-multi-step-flow-state.md`**
+
+Follow-up from the diagram review that surfaced the FR-07/MFA regression (see entry below). Two further items closed:
+
+1. **Application-workflow diagram edge cases.** `07-application-workflow.svg` was missing two edge-case states added to `screen-requirements.md` on 2026-06-30: the Step 2 guidelines-truncation warning banner (>20k extracted characters) and the `AI_ENABLED` kill-switch "AI unavailable" state (Step 3 summary and Step 4 AI-assist). Added as a dashed callout box alongside Step 3. **Known limitation:** no SVG rasteriser (rsvg-convert, ImageMagick, headless browser) is available in this environment — Chrome automation blocked both `file://` and `localhost` navigation pending user permission grant. `07-application-workflow.svg` (the source of truth) is updated; `07-application-workflow.png` and `.docx` are now stale and need manual re-export.
+2. **Route-naming inconsistency.** `technical-design.md` §4 (project tree) and §7 (routes tables) referred to the application-detail routes as `/application/[id]/step/N` (singular), while the actual codebase, `screen-requirements.md`, and the information architecture all use `/applications/[id]/step/N` (plural) — already resolved in favour of plural per decision D1 in `IMPLEMENTATION-PLAN.md`. `technical-design.md`'s project tree also listed `applications/` and `application/` as two separate top-level directories; merged into one. Same stale singular form corrected in `ADR-ARCH-004-multi-step-flow-state.md` (9 occurrences) — the ADR's decision (URL-encoded step state) is unchanged, only the example route string.
+
+---
+
 ## 2026-07-01 — FR-07 (MFA) documentation regression corrected
 
 **`docs/Technical Decision and Design/technical-design.md`** → v1.5, **`docs/PRD inputs/acceptance-criteria.md`**, **`middleware.ts`**
