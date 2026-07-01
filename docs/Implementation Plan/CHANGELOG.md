@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-01 — CI fix: `validate-migrations` rate-limit failures
+
+**`.github/workflows/ci.yml`**
+
+- `supabase/setup-cli@v2` step now passes `github-token: ${{ secrets.GITHUB_TOKEN }}`.
+
+Overnight and through 2026-06-30, `validate-migrations` failed intermittently across many unrelated pushes (docs-only commits, dependency bumps) with `Failed to resolve latest Supabase CLI release: rate limit exceeded`. The action resolves `version: latest` via the GitHub API; without a token this call is unauthenticated (60 req/hour) and was being exhausted by the volume of CI runs. Passing the built-in `GITHUB_TOKEN` raises the quota to 1000 req/hour per repo. No actual migration files were broken — this was a CI infrastructure issue only.
+
+---
+
 ## 2026-06-30 — Technology stack review completed
 
 **`docs/Technical Decision and Design/technology-stack-review-2026-06-30.md`** and `.pdf` added.
