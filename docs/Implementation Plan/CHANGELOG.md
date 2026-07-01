@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-07-01 — Dev/prod schema gap closed: AI features and approve/reopen were broken on every hosted environment
+
+**`supabase/migrations/20260701000000_item21_transactional_approve_reopen.sql`** (new), **`docs/migrations/item-21-transactional-integrity.sql`** (removed), **`docs/Implementation Plan/IMPLEMENTATION-PLAN.md`** → v3.0
+
+Follow-up to the orphaned-code audit (previous entry). A full dev-vs-prod schema diff, prompted by the confirmed-broken `approve_application`/`reopen_application` finding, turned up a much larger gap:
+
+- **`reserve_ai_slot`, `update_ai_slot_token_count`, `cancel_ai_slot` (the AI cap-check RPCs) existed on neither `grant-pathway-dev` nor `grant-pathway-prod`.** Every AI route (`generate-summary`, `refine-answer`, and the charity paraphrase action) calls `reserve_ai_slot` as its first step — this means the AI features have been non-functional on every hosted environment (Vercel preview and production both connect to one of these two remote Supabase projects, not local Docker) since the `20260622000002_ai_cap_rpc.sql` migration was written and never actually applied outside local dev/CI.
+- **`approve_application`/`reopen_application` existed on dev but not prod** — confirmed via direct SQL query against both projects. Step 5 "Approve" and the dashboard "Reopen" action were broken in production.
+- **6 columns missing on prod only:** `applications.assembled_draft`, `applications.draft_status`, `application_answers.ai_refined_answer`, `.is_budget_question`, `.char_limit`, `.limit_type` — breaking draft assembly and character-limit funders in production.
+- **`ai_request_type` enum missing `'charity_paraphrase'` on both projects.**
+
+Root cause: schema changes since 2026-05-20 have been applied by pasting SQL directly into the Supabase dashboard SQL editor rather than via `supabase db push`, so the CLI's own migration tracking table only recorded the first 3 of 17 migrations as applied — on both dev and prod. `docs/migrations/item-21-transactional-integrity.sql` (never a tracked migration) even had a header comment reading "Run this in the Supabase SQL Editor for grant-pathway-prod" immediately followed by dev's project reference ID — almost certainly why that fix reached dev but not production.
+
+**Fixed:**
+
+1. All missing schema (columns, enum value, all 5 missing functions) applied directly to `grant-pathway-dev` and `grant-pathway-prod` via the SQL Editor, in dependency order (columns before functions that reference them). Verified via a full table/column/function fingerprint re-diff — dev and prod now match exactly.
+2. `item-21-transactional-integrity.sql` relocated from `docs/migrations/` into `supabase/migrations/20260701000000_item21_transactional_approve_reopen.sql` as a proper tracked migration. Verified it applies cleanly via `supabase db reset --local` (the same check CI's `validate-migrations` job runs).
+3. `grant-pathway-dev`'s migration tracking table fully repaired via `supabase migration repair --status applied` for all 14 previously-untracked versions plus the new item-21 migration — confirmed via `supabase migration list` showing all 18 local migrations matched against remote. `supabase db push` is trustworthy against dev again.
+4. Prod's tracking table repair is pending — needs to run from a real terminal (the CLI's DB password prompt can't go through an AI-issued command) and needs one more check first: confirming `20260622000003_rls_hardening.sql`'s `WITH CHECK` policies are actually present on prod, not just the functions/columns, before marking that migration "applied" in the tracking table.
+
+**Why this matters:** CI's `validate-migrations` job only proves the tracked migration files apply cleanly to an empty local database — it says nothing about whether the real, hosted dev/prod databases match what's in version control. This gap would only have been caught by testing against an actually-deployed URL, which hadn't happened yet this close to launch.
+
+---
+
 ## 2026-07-01 — Orphaned-code audit finds broken prod approve/reopen; migration tracking reconciliation added to P5.4
 
 **`docs/Implementation Plan/IMPLEMENTATION-PLAN.md`** → v2.9
