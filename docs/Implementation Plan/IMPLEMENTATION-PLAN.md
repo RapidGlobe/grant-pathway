@@ -4,7 +4,7 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 2.8
+**Version:** 2.9
 **Date:** 2026-05-07
 **Last updated:** 2026-07-01
 **Status:** Ready for development
@@ -1572,7 +1572,12 @@ Accessibility violations are treated as bugs and must be fixed before launch (C1
 - **Activate Supabase Pro plan (~£20/month) on the production project and confirm automated daily backup is enabled** (ADR-DATA-005 — billing dashboard action only; no code change required)
 - Set all production environment variables in Vercel Production scope
 - Add `CRON_SECRET` to Vercel; confirm cron job appears active in dashboard
-- Apply initial migrations to production Supabase project: `supabase db push --db-url [prod-url]`
+- **Migration tracking reconciliation (found 2026-07-01 — do this before any other migration work):** `supabase migration list --linked` shows only the first 3 of 17 local migrations as applied on both `grant-pathway-dev` and `grant-pathway-prod` — the CLI's tracking table has been stale since 2026-05-20 because subsequent schema changes were applied by pasting SQL directly into the Supabase dashboard SQL editor rather than via `supabase db push`. Running `db push` as originally planned below would fail, since the CLI would attempt to re-apply 14 migrations it believes never ran. Before touching production:
+  1. Run `supabase link --project-ref <prod-ref>` (requires the production DB password — run interactively yourself, not via an AI-issued command, since the password prompt needs a real terminal)
+  2. Confirm prod's actual schema (tables, columns, functions) fully matches what all 17 migrations plus `docs/migrations/item-21-transactional-integrity.sql` would produce — a full dev-vs-prod diff, not just the migration tracking table. **Known confirmed gap:** `approve_application` and `reopen_application` (item 21 — transactional approve/reopen) do not exist in production at all; they were applied to dev only. This means the Step 5 "Approve" and dashboard "Reopen" actions are currently broken in production.
+  3. Move `docs/migrations/item-21-transactional-integrity.sql` into `supabase/migrations/` with a proper timestamp prefix so it becomes a tracked migration, then apply it to production.
+  4. Once dev and prod schemas are confirmed to match all tracked migrations, use `supabase migration repair --status applied <version>` for each of the 14 untracked-but-already-applied versions on both projects, so the tracking table reflects reality and `supabase db push` is trustworthy for all future migrations.
+- ~~Apply initial migrations to production Supabase project: `supabase db push --db-url [prod-url]`~~ — superseded by the reconciliation step above; do not run `db push` against prod until migration tracking is repaired.
 - Configure Sentry for production; set `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` in Vercel Production scope; confirm PII scrubbing is active. **Data Storage Region pre-confirmed as European Union (EU) — verified 2026-06-22 in Sentry Organisation Settings (org: rapidglobe-ltd, ID: 4511417358745600). No re-check needed.**
 - Confirm Resend sending domain is verified (SPF + DKIM)
 - Confirm email templates in Supabase Auth reference "Grant Pathway" and use correct styling

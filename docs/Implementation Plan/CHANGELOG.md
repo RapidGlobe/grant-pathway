@@ -10,6 +10,21 @@
 
 ---
 
+## 2026-07-01 — Orphaned-code audit finds broken prod approve/reopen; migration tracking reconciliation added to P5.4
+
+**`docs/Implementation Plan/IMPLEMENTATION-PLAN.md`** → v2.9
+
+Following the FR-07/MFA and diagram accuracy work earlier today, a scoped audit was run across every API route, Server Action, and Supabase RPC function to check for orphaned/unreachable code (the same failure shape as the `/mfa` and `generate-draft` findings, but for live code rather than docs). Findings:
+
+- `app/api/generate-draft/route.ts` and `advanceToStep5()` in `actions/applications.ts` confirmed orphaned (zero callers anywhere) — pending deletion, not yet actioned.
+- **`approve_application` and `reopen_application` — the two Postgres RPC functions backing Step 5 "Approve" and the dashboard "Reopen" action — exist on `grant-pathway-dev` but do not exist on `grant-pathway-prod`.** Confirmed via direct SQL query against both projects. These features are currently broken in production.
+- Root cause: `supabase migration list --linked` shows only 3 of 17 local migrations recorded as applied in the CLI's tracking table, on both dev and prod — schema changes since 2026-05-20 have been applied by pasting SQL directly into the Supabase dashboard SQL editor rather than via `supabase db push`. This is why the item-21 transactional-integrity fix (2026-06-29) ended up at `docs/migrations/item-21-transactional-integrity.sql` instead of a tracked `supabase/migrations/` file — and why it silently never reached production.
+- `IMPLEMENTATION-PLAN.md` P5.4's existing "Apply initial migrations to production… `supabase db push --db-url [prod-url]`" bullet would fail if run as written, since the CLI believes 14 migrations have never been applied. Replaced with a migration tracking reconciliation sequence (link to prod, full dev-vs-prod schema diff, file the item-21 migration properly, apply to prod, `supabase migration repair` on both projects).
+
+**Status:** Full dev-vs-prod schema comparison in progress. WJ to attempt Phase 5 next week.
+
+---
+
 ## 2026-07-01 — Diagram edge-case update + route-naming consistency fix
 
 **`docs/diagrams/07-application-workflow.svg`**, **`docs/Technical Decision and Design/technical-design.md`** → v1.6, **`docs/Technical Decision and Design/ADR-ARCH-004-multi-step-flow-state.md`**
