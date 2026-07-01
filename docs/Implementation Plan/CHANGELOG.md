@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-01 — Schema drift check automated; test URL confirmed as dev; target-funder-list.md retired
+
+**`.github/workflows/schema-drift-check.yml`** (new), **`docs/Test Plans/regression-test-plan.md`**
+
+Follow-up to the test dashboard reset (previous entry). Two items closed:
+
+- **RT-00 automated.** New scheduled GitHub Actions workflow runs daily (07:00 UTC) plus on-demand, checking both `grant-pathway-dev` and `grant-pathway-prod` for the same two things RT-00 checks by hand: all 5 required RPC functions present, and the migration count tracked remotely matches the local `supabase/migrations/` file count. Fails loudly (GitHub email notification) if either environment drifts again. Requires two repository secrets (`SUPABASE_DEV_DB_URL`, `SUPABASE_PROD_DB_URL`) to be added manually in GitHub — not yet configured as of this commit.
+- **Confirmed: `grant-pathway-three.vercel.app` (the regression/funder test URL) points to `grant-pathway-dev`.** Nothing currently points to `grant-pathway-prod` — it has no live consumer yet, pending the P5.6 DNS/go-live cutover. Recorded in `regression-test-plan.md`'s Test Data table.
+- `docs/Test Plans/target-funder-list.md` retired to `docs/Test Plans/archive/target-funder-list-v1.1.md` — it was never updated after the 2026-06-11 funder additions and had drifted to missing 8 of 20 live funders. `TEST-DASHBOARD.md`'s Active Funders table is now the single source of truth for the funder list. Live references in `data-model.md` and `DR-FD-001` redirected accordingly; also found `DR-FD-001` referenced a "v1.3" version of the retired file that was apparently planned but never actually created.
+
+---
+
 ## 2026-07-01 — Test dashboard reset; regression plan hardened; live `is_active` data bug found
 
 **`docs/Test Plans/TEST-DASHBOARD.md`** → v2.0 (old v1.39 archived to `docs/Test Plans/archive/`), **`docs/Test Plans/regression-test-plan.md`** → v1.1, plus 3 funder test plans

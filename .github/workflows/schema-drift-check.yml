@@ -1,0 +1,71 @@
+name: Schema Drift Check
+
+# Automated version of regression-test-plan.md RT-00. Checks that every
+# tracked migration and every AI-cap/approve-reopen RPC function actually
+# exists on the real, hosted dev and prod databases -- not just that the
+# tracked migration files apply cleanly to an empty local database (which
+# is all validate-migrations in ci.yml proves).
+#
+# Added 2026-07-01 after grant-pathway-dev and grant-pathway-prod were
+# found to have been silently missing this exact schema for weeks -- the
+# gap was invisible from inside the app and from CI. See CHANGELOG.md,
+# 2026-07-01, for the full story.
+
+on:
+  schedule:
+    - cron: '0 7 * * *' # daily, 07:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  check-schema:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        environment: [dev, prod]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install postgresql-client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Select database URL for this environment
+        id: db
+        run: |
+          if [ "${{ matrix.environment }}" = "dev" ]; then
+            echo "url=${{ secrets.SUPABASE_DEV_DB_URL }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=${{ secrets.SUPABASE_PROD_DB_URL }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check required RPC functions exist
+        env:
+          PGCONNECT_TIMEOUT: '10'
+        run: |
+          MISSING=$(psql "${{ steps.db.outputs.url }}" -tAc "
+            select string_agg(fn, ', ') from (
+              select unnest(array[
+                'reserve_ai_slot',
+                'update_ai_slot_token_count',
+                'cancel_ai_slot',
+                'approve_application',
+                'reopen_application'
+              ]) as fn
+            ) required
+            where fn not in (select proname from pg_proc where pronamespace = 'public'::regnamespace);
+          ")
+          if [ -n "$MISSING" ]; then
+            echo "::error::${{ matrix.environment }} is missing required RPC function(s): $MISSING"
+            exit 1
+          fi
+          echo "✓ ${{ matrix.environment }}: all 5 required RPC functions present"
+
+      - name: Check migration tracking matches local files
+        run: |
+          LOCAL_COUNT=$(ls supabase/migrations/*.sql | wc -l)
+          REMOTE_COUNT=$(psql "${{ steps.db.outputs.url }}" -tAc "select count(*) from supabase_migrations.schema_migrations;")
+          if [ "$LOCAL_COUNT" != "$REMOTE_COUNT" ]; then
+            echo "::error::${{ matrix.environment }} migration count mismatch: $LOCAL_COUNT tracked locally, $REMOTE_COUNT recorded as applied on the remote. Run 'supabase migration list --linked' against this project to see exactly which versions are missing."
+            exit 1
+          fi
+          echo "✓ ${{ matrix.environment }}: $REMOTE_COUNT/$LOCAL_COUNT migrations recorded as applied"

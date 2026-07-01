@@ -54,15 +54,15 @@ Tier 0 is marked **[ENV]** and always runs first. Tier 1 tests are marked **[SMO
 
 This plan uses a pre-seeded test account with an existing in-progress application. No new application creation is required for Tier 1.
 
-| Item                      | Value                                                                                                           |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Test URL                  | https://grant-pathway-three.vercel.app                                                                          |
-| Test URL Supabase project | **Not yet confirmed as of 2026-07-01 — see RT-00.** Do not assume dev or prod without checking Vercel env vars. |
-| Test account              | grantpathway+idle100@gmail.com                                                                                  |
-| Display name              | Testname                                                                                                        |
-| Pre-seeded application    | Henry Smith Foundation — "Test Application"                                                                     |
-| Application status        | In progress (Step 4, Q&A writing interface)                                                                     |
-| Funder                    | Henry Smith Foundation                                                                                          |
+| Item                      | Value                                                                                                                                                                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test URL                  | https://grant-pathway-three.vercel.app                                                                                                                                                                                          |
+| Test URL Supabase project | `grant-pathway-dev` (confirmed by WJ, 2026-07-01). Nothing currently points to `grant-pathway-prod` — it has no live consumer yet. Re-check via Vercel env vars if this ever changes (e.g. after the P5.6 DNS/go-live cutover). |
+| Test account              | grantpathway+idle100@gmail.com                                                                                                                                                                                                  |
+| Display name              | Testname                                                                                                                                                                                                                        |
+| Pre-seeded application    | Henry Smith Foundation — "Test Application"                                                                                                                                                                                     |
+| Application status        | In progress (Step 4, Q&A writing interface)                                                                                                                                                                                     |
+| Funder                    | Henry Smith Foundation                                                                                                                                                                                                          |
 
 **Pre-test check:** Confirm the test account still has the "Test Application" in "In progress" status at Step 4. If it has been deleted or exported, a new application will need to be created first (see Appendix A).
 
