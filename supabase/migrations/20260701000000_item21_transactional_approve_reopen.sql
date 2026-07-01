@@ -1,6 +1,16 @@
 -- Item 21 — Transactional Integrity
--- Run this in the Supabase SQL Editor for grant-pathway-prod (stanwaejdvlvremtffkf)
--- Both functions execute as a single transaction — either both updates succeed or neither does.
+-- Alan Knox POST-LAUNCH item 21, F-06-05/06 (M9)
+--
+-- Both functions execute as a single transaction — either both updates
+-- succeed or neither does. Resolves a window where applications.status
+-- could be updated but application_answers.is_approved not (or vice versa).
+--
+-- Relocated 2026-07-01 from docs/migrations/item-21-transactional-integrity.sql,
+-- which was never a tracked migration. Applied to grant-pathway-dev on
+-- 2026-06-29 and grant-pathway-prod on 2026-07-01 via the Supabase SQL
+-- Editor before this file existed; content is unchanged from what actually
+-- ran on both projects. See CHANGELOG.md 2026-07-01 for the full story of
+-- how this ended up untracked and missing from production for a month.
 
 -- ---------------------------------------------------------------------------
 -- approve_application
