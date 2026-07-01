@@ -15,7 +15,9 @@ How should Grant Pathway control which grant-giving organisations end users can 
 
 ## Context
 
-Grant Pathway's functionality is validated against a specific set of tested and approved funders (see `docs/target-funder-list.md`). During the testing phase (and at initial launch), only these approved funders are known to work correctly with the Step 3 AI extraction and Step 4 Q&A interface. The funder list has grown over time — see `docs/target-funder-list.md` (v1.3, 2026-06-11) for the current canonical set. Allowing users to freely enter any funder name introduces untested combinations that may produce degraded or misleading output.
+Grant Pathway's functionality is validated against a specific set of tested and approved funders (see `docs/Test Plans/TEST-DASHBOARD.md`). During the testing phase (and at initial launch), only these approved funders are known to work correctly with the Step 3 AI extraction and Step 4 Q&A interface. The funder list has grown over time — see the Active Funders table in `docs/Test Plans/TEST-DASHBOARD.md` for the current canonical set (20 funders as of 2026-07-01). Allowing users to freely enter any funder name introduces untested combinations that may produce degraded or misleading output.
+
+_Note (2026-07-01): `docs/target-funder-list.md` (referenced below and in the version history) was retired — it was never updated after the 2026-06-11 MK Community Foundation/Baily Thomas/CPF Trust additions and had drifted out of sync with the live funder directory. `TEST-DASHBOARD.md` is now the single source of truth._
 
 Five options were evaluated:
 

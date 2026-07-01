@@ -1,8 +1,10 @@
-﻿# Consolidated Target Funder List
+﻿# Consolidated Target Funder List (ARCHIVED — retired 2026-07-01)
 
-**Version:** 1.1
+> **This document is retired.** It listed 12 funders as of 2026-06-04 and was never updated when MK Community Foundation, Baily Thomas, and CPF Trust (8 more funder variants) were added to the dropdown a week later on 2026-06-11 — it was missing 40% of the live funder directory. Rather than maintain two funder lists that can silently drift apart (the exact failure pattern that caused several other issues found on 2026-07-01), the **Active Funders and Parked/Unavailable tables in `docs/Test Plans/TEST-DASHBOARD.md`** are now the single source of truth for which funders exist, their status, and their test plan. Preserved here for historical reference only.
+
+**Version:** 1.1 (final, before retirement)
 **Date:** 2026-06-04
-**Status:** Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`
+**Status:** Retired 2026-07-01 — superseded by `docs/Test Plans/TEST-DASHBOARD.md`
 
 This is the canonical reference list of grant-giving organisations used to design, test, and validate Grant Pathway's Step 4 (Q&A interview model) and Step 5 (assembly and export). All product and engineering decisions about funder types, application formats, and output behaviour should be grounded in this list.
 

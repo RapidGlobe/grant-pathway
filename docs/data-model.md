@@ -174,7 +174,7 @@ The approved funder directory. This table is **not user-scoped** — it is a glo
 
 - `name` is unique — no duplicate funder names
 - RLS: authenticated users can SELECT where `is_active = true`; INSERT/UPDATE/DELETE restricted to service role only
-- Seeded with the 12 approved funders from `docs/Test Plans/target-funder-list.md`
+- Seeded with the approved funders tracked in `docs/Test Plans/TEST-DASHBOARD.md` (20 as of 2026-07-01, up from the original 12 — `target-funder-list.md` was retired for being out of sync with the live dropdown)
 
 ---
 
