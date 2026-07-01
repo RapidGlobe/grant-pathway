@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 2.7
+**Version:** 2.8
 **Date:** 2026-05-07
-**Last updated:** 2026-06-16
+**Last updated:** 2026-07-01
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -976,9 +976,9 @@ For each slice: replace the static mock page with real data fetching, add Server
 - At 55 minutes: show warning modal
 - At 60 minutes: call `supabase.auth.signOut()` + redirect to `/` with "You've been signed out due to inactivity."
 
-#### Opt-In MFA (FR-07 — Should Have)
+#### ~~Opt-In MFA (FR-07 — Should Have)~~ — Won't Have
 
-- Implement as opt-in only; not mandatory; accessible from `/account`
+- Removed 2026-06-12; FR-07 demoted to Won't Have. See `docs/moscow-feature-register.md` §9.1 for the risk-analysis rationale. Not part of the v1 build.
 
 #### Feedback Interview Opt-In (FR-08 — Should Have)
 

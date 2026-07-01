@@ -340,11 +340,11 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ---
 
-### FR-07 — Should Have
+### ~~FR-07 — Should Have~~ FR-07 — Won't Have
 
-**Requirement:** The system shall provide optional multi-factor authentication (MFA) as an opt-in feature; MFA shall not be mandatory in v1.
+**Requirement:** ~~The system shall provide optional multi-factor authentication (MFA) as an opt-in feature; MFA shall not be mandatory in v1.~~ **Removed 2026-06-12** — demoted to Won't Have. See `docs/moscow-feature-register.md` §9.1 for the risk-analysis rationale. May be reconsidered post-launch if demand warrants it.
 
-_These criteria apply only if FR-07 is implemented in v1._
+_The criteria below are retained for historical reference only. FR-07 will not be built in v1._
 
 ---
 
@@ -2019,5 +2019,5 @@ _These criteria apply only if FR-44 is implemented in v1._
 
 ---
 
-_Last updated: 2026-06-30_
-_Status: Complete — all 9 sections done. Changes in this version: FR-02 requirement updated (password 10→12 chars, letters + digits required); AC-FR-02-02 updated, AC-FR-02-02b added (2026-06-29). AC-FR-23-04 (200-page PDF cap) and AC-FR-23-05 (extraction timeout) added (2026-06-22). AC-FR-24-06 (truncation warning) added (2026-06-22). AC-FR-27-03 (kill-switch Step 3) and AC-FR-27-04 (kill-switch Step 4 AI assist) added (2026-06-29)._
+_Last updated: 2026-07-01_
+_Status: Complete — all 9 sections done. Changes in this version: FR-07 (MFA) marked Won't Have — criteria retained for historical reference only, matching the 2026-06-12 removal already recorded in `docs/moscow-feature-register.md` (2026-07-01). FR-02 requirement updated (password 10→12 chars, letters + digits required); AC-FR-02-02 updated, AC-FR-02-02b added (2026-06-29). AC-FR-23-04 (200-page PDF cap) and AC-FR-23-05 (extraction timeout) added (2026-06-22). AC-FR-24-06 (truncation warning) added (2026-06-22). AC-FR-27-03 (kill-switch Step 3) and AC-FR-27-04 (kill-switch Step 4 AI assist) added (2026-06-29)._

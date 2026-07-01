@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.4
+**Version:** 1.5
 **Date:** 2026-04-21
-**Last updated:** 2026-06-30
+**Last updated:** 2026-07-01
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -152,7 +152,6 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 │   │   ├── error.tsx                # Authenticated error boundary
 │   │   ├── dashboard/page.tsx
 │   │   ├── profile/page.tsx
-│   │   ├── mfa/page.tsx             # TOTP MFA challenge
 │   │   ├── applications/
 │   │   │   └── new/                 # Creation intermediary (no UI rendered)
 │   │   ├── application/
@@ -266,7 +265,7 @@ export const config = {
 }
 ```
 
-**Protected routes:** `/dashboard`, `/profile`, `/applications`, `/account`, `/mfa`
+**Protected routes:** `/dashboard`, `/profile`, `/applications`, `/account`
 
 **Public routes:** `/` (landing + sign-in), `/register`, `/forgot-password`, `/verify-email`, `/terms`, `/privacy`
 
@@ -467,7 +466,6 @@ The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 | `/privacy`                 | Public, static     | None                                  |
 | `/dashboard`               | Authenticated, SSR | `applications` table                  |
 | `/profile`                 | Authenticated, SSR | `charity_profiles` table              |
-| `/mfa`                     | Authenticated, SSR | None — TOTP challenge                 |
 | `/application/[id]/step/1` | Authenticated, SSR | `applications` table                  |
 | `/application/[id]/step/2` | Authenticated, SSR | `applications` table                  |
 | `/application/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`             |

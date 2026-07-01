@@ -4,8 +4,8 @@
 **Volatility:** Medium
 **Update when:** Any change to technology choices, libraries, services, or infrastructure
 
-**Version:** 1.3
-**Last updated:** 2026-06-29
+**Version:** 1.4
+**Last updated:** 2026-07-01
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
 
@@ -66,7 +66,7 @@ Supabase Auth is included within the Supabase platform at no additional cost, el
 - Email and password login
 - Magic link (passwordless) login
 - Password reset — built in
-- Optional MFA — available as opt-in, not mandatory in v1 (NFR-04)
+- MFA — not offered. Removed 2026-06-12; FR-07 demoted to Won't Have (NFR-04)
 - Account deletion — full user and data removal supported (DR-DP-003)
 
 ---

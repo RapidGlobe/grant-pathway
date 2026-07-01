@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-01 — FR-07 (MFA) documentation regression corrected
+
+**`docs/Technical Decision and Design/technical-design.md`** → v1.5, **`docs/PRD inputs/acceptance-criteria.md`**, **`middleware.ts`**
+
+While reviewing the diagrams in `docs/diagrams` against yesterday's technical-design.md v1.4 gap-analysis update, a documentation regression was found: the gap-analysis pass had resurrected a `/mfa` TOTP challenge route as if it were live — in the project tree, the protected-routes list, and the routes table. In reality, MFA was implemented on 2026-05-20 (S0.6), then removed on 2026-06-12 (`fix: remove orphaned MFA component and page files`) and already correctly demoted to Won't Have in `docs/moscow-feature-register.md` with a documented risk-analysis rationale (worst-case password compromise exposes only draft applications and publicly-registered charity data; no payment data or submission capability; mandatory MFA friction outweighs the marginal security gain for non-technical volunteer users). The regression traced back to a stale `/mfa` entry left in `middleware.ts`'s `PROTECTED` array after the removal, which the gap-analysis picked up without checking whether the page still existed.
+
+Fixed: `middleware.ts` dead `/mfa` entry and comment removed; technical-design.md v1.5 strips all 3 phantom `/mfa` references; acceptance-criteria.md FR-07 explicitly marked `~~Should Have~~` **Won't Have**, criteria retained for historical reference only.
+
+Confirmed with WJ: MFA stays out of v1 permanently for now; may be reconsidered post-launch if user demand or a security incident warrants it. No new decision record was created — `docs/moscow-feature-register.md` already carries the full rationale and is the canonical record of this decision.
+
+---
+
 ## 2026-07-01 — CI fix: `validate-migrations` rate-limit failures
 
 **`.github/workflows/ci.yml`**
