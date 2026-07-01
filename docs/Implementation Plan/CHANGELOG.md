@@ -12,7 +12,7 @@
 
 ## 2026-07-01 — Dev/prod schema gap closed: AI features and approve/reopen were broken on every hosted environment
 
-**`supabase/migrations/20260701000000_item21_transactional_approve_reopen.sql`** (new), **`docs/migrations/item-21-transactional-integrity.sql`** (removed), **`docs/Implementation Plan/IMPLEMENTATION-PLAN.md`** → v3.0
+**`supabase/migrations/20260701000000_item21_transactional_approve_reopen.sql`** (new), **`docs/migrations/item-21-transactional-integrity.sql`** (removed), **`docs/Implementation Plan/IMPLEMENTATION-PLAN.md`** → v3.1 — **RESOLVED, both dev and prod fully reconciled**
 
 Follow-up to the orphaned-code audit (previous entry). A full dev-vs-prod schema diff, prompted by the confirmed-broken `approve_application`/`reopen_application` finding, turned up a much larger gap:
 
@@ -27,8 +27,8 @@ Root cause: schema changes since 2026-05-20 have been applied by pasting SQL dir
 
 1. All missing schema (columns, enum value, all 5 missing functions) applied directly to `grant-pathway-dev` and `grant-pathway-prod` via the SQL Editor, in dependency order (columns before functions that reference them). Verified via a full table/column/function fingerprint re-diff — dev and prod now match exactly.
 2. `item-21-transactional-integrity.sql` relocated from `docs/migrations/` into `supabase/migrations/20260701000000_item21_transactional_approve_reopen.sql` as a proper tracked migration. Verified it applies cleanly via `supabase db reset --local` (the same check CI's `validate-migrations` job runs).
-3. `grant-pathway-dev`'s migration tracking table fully repaired via `supabase migration repair --status applied` for all 14 previously-untracked versions plus the new item-21 migration — confirmed via `supabase migration list` showing all 18 local migrations matched against remote. `supabase db push` is trustworthy against dev again.
-4. Prod's tracking table repair is pending — needs to run from a real terminal (the CLI's DB password prompt can't go through an AI-issued command) and needs one more check first: confirming `20260622000003_rls_hardening.sql`'s `WITH CHECK` policies are actually present on prod, not just the functions/columns, before marking that migration "applied" in the tracking table.
+3. `20260622000003_rls_hardening.sql`'s `WITH CHECK` policies confirmed genuinely present on prod (queried `pg_policy` directly on `applications`, not assumed) before including it in the repair.
+4. Both `grant-pathway-dev` and `grant-pathway-prod` migration tracking tables fully repaired via `supabase migration repair --status applied` for the same 15 versions (14 previously-untracked plus the new item-21 migration) — confirmed via `supabase migration list` on both projects showing all 18 local migrations matched against remote. WJ ran the prod repair himself from a real terminal (`supabase link --project-ref` needs an interactive DB-password prompt that can't go through an AI-issued command). `supabase db push` is trustworthy against both dev and prod again.
 
 **Why this matters:** CI's `validate-migrations` job only proves the tracked migration files apply cleanly to an empty local database — it says nothing about whether the real, hosted dev/prod databases match what's in version control. This gap would only have been caught by testing against an actually-deployed URL, which hadn't happened yet this close to launch.
 
