@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.7
+**Version:** 1.8
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (RT-07 corrected — step 4 asked to verify a "50 AI request monthly limit" tip on the preparation checklist screen that was never a real requirement; the actual screen and AC-FR-28-01 both only cover the financial-documents checklist and the senior-colleague note. Found by WJ during live testing.)
+**Last updated:** 2026-07-02 (RT-09 corrected — still described the separate "Approve my application" button and confirmation modal, removed 2026-06-12 per CHANGELOG.md; rewritten to match the actual tick-checkboxes-then-download combined action. Found by WJ during live testing.)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -397,7 +397,9 @@ Run these after all Tier 1 tests pass.
 ### RT-09 — Final Review and Approval [FULL]
 
 **User guide reference:** Section 9 (Review)
-**What this tests:** Step 5 review screen, confirmation checkboxes, final approve action — this calls `approveApplication()`, which runs the `approve_application` Postgres RPC. This RPC was missing from production until 2026-07-01; this test is the direct end-to-end check that it's actually present and working on the environment under test.
+**What this tests:** Step 5 review screen, confirmation checkboxes, and the combined approve+download action — clicking a download button calls `approveApplication()`, which runs the `approve_application` Postgres RPC, then downloads immediately. This RPC was missing from production until 2026-07-01; this test is the direct end-to-end check that it's actually present and working on the environment under test.
+
+**Note:** there is no separate "Approve" button or confirmation modal. This was deliberately removed on 2026-06-12 (see `CHANGELOG.md`) — the previous flow took 6 interactions (3 checkbox ticks → Approve button → modal confirm → download click); three deliberate checkbox ticks already demonstrate intent, so the modal was judged redundant friction. Approval and download are now a single action. See `AC-FR-33-01` through `AC-FR-33-03`.
 
 **Prerequisite:** RT-08 complete
 
@@ -405,20 +407,24 @@ Run these after all Tier 1 tests pass.
 
 1. Confirm the Step 5 review screen loads
 2. Verify all approved answers are displayed for review
-3. Tick all confirmation checkboxes
-4. Click **Approve my application** (or equivalent button — record exact label)
-5. Confirm the approval modal or confirmation state appears
+3. Confirm the download buttons are disabled before any checkboxes are ticked
+4. Tick all three confirmation checkboxes
+5. Confirm a download button becomes enabled
+6. Click **Download as Word document** (or plain text — record which)
+7. Confirm the download begins immediately, with no intermediate modal
+8. Confirm a persistent "Application approved" banner now replaces the checklist
 
 **Expected result:**
 
 - Review screen matches Section 9 of user guide
 - All answers visible
-- Confirmation checkboxes present and ticking them enables the approve button
+- Download buttons disabled until all three checkboxes are ticked
+- Clicking download approves and exports in one action, no confirmation modal
 - Approval action completes without error
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record exact button label shown):**
+**Notes (record which download format was used, and the exact banner text shown):**
 
 ---
 

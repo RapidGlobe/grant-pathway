@@ -10,6 +10,12 @@
 
 ---
 
+## 2026-07-02 — RT-09 corrected: still described the approval modal removed weeks ago
+
+Found by Wac while running the live regression suite — he recalled a past decision to not have a separate approval modal at Step 5, and asked for it to be checked against the design docs before treating it as a defect. Confirmed: `CHANGELOG.md`'s own 2026-06-12 entry ("Step 5: approve + download collapsed into a single action") already documents that the separate "Approve my application" button and its confirmation modal were deliberately removed -- three checkbox ticks already demonstrate intent, so the modal was judged redundant friction. `screen-requirements.md` and `acceptance-criteria.md` (AC-FR-33-01 through 03) were correctly updated at the time. Only `regression-test-plan.md`'s RT-09 was never updated to match -- rewritten to describe the actual flow (tick three checkboxes -> a download button becomes enabled -> clicking it approves and downloads in one action, no modal).
+
+---
+
 ## 2026-07-02 — RT-07 corrected: stale test step never matched the real design
 
 Found by Wac while running the live regression suite. RT-07 step 4 asked the tester to verify a "50 AI request monthly limit" tip on the Step 4 preparation checklist screen. Checked both the actual component (`components/application-step4-prep-checklist.tsx`) and the authoritative requirement (`AC-FR-28-01`) -- neither has ever specified this. That screen only covers the financial-documents checklist and the note about involving a senior colleague before the budget questions; the only AI-usage-limit messaging anywhere near Step 4 is a conditional banner inside the Q&A interface itself, shown only when nearing the 40-50 request range -- a different screen entirely. Corrected RT-07 to check for the senior-colleague note instead, which is what the screen actually shows.
