@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.2
+**Version:** 1.3
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (RT-00 step 4 amended to include the `cd` into the project directory before running `supabase migration list --linked` — the CLI needs to run from inside the project to find the linked project config)
+**Last updated:** 2026-07-02 (Added RT-01a — account registration and email verification — for testers using freshly created accounts instead of the pre-seeded one; updated Test Data and Appendix A to reference it)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -54,6 +54,8 @@ Tier 0 is marked **[ENV]** and always runs first. Tier 1 tests are marked **[SMO
 
 This plan uses a pre-seeded test account with an existing in-progress application. No new application creation is required for Tier 1.
 
+**Using a freshly registered account instead (e.g. to verify full functionality end-to-end rather than reuse prior state):** run **RT-01a** (below) first, immediately after RT-00 and before RT-01. A fresh account has no charity profile and no pre-seeded application, so RT-01a covers registration, email verification, and charity profile setup, then hands off to Appendix A to create a new application before continuing to RT-04 onward.
+
 | Item                      | Value                                                                                                                                                                                                                                                                                                                            |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Test URL                  | https://grant-pathway-three.vercel.app                                                                                                                                                                                                                                                                                           |
@@ -70,20 +72,21 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 
 ## Test Results Summary
 
-| Test ID | Test Name                           | Tier  | Result | Date | Notes |
-| ------- | ----------------------------------- | ----- | ------ | ---- | ----- |
-| RT-00   | Environment and schema verification | Env   |        |      |       |
-| RT-01   | Sign-in and session persistence     | Smoke |        |      |       |
-| RT-02   | Unauthenticated redirect            | Smoke |        |      |       |
-| RT-03   | Dashboard renders with data         | Smoke |        |      |       |
-| RT-04   | Step 4 Q&A interface loads          | Smoke |        |      |       |
-| RT-05   | AI refine-answer endpoint           | Smoke |        |      |       |
-| RT-06   | Answer approval and progress bar    | Full  |        |      |       |
-| RT-07   | Preparation checklist gate          | Full  |        |      |       |
-| RT-08   | Senior review screen                | Full  |        |      |       |
-| RT-09   | Final review and approval           | Full  |        |      |       |
-| RT-10   | Word document export                | Full  |        |      |       |
-| RT-11   | Dashboard reopen application        | Full  |        |      |       |
+| Test ID | Test Name                                 | Tier  | Result | Date | Notes |
+| ------- | ----------------------------------------- | ----- | ------ | ---- | ----- |
+| RT-00   | Environment and schema verification       | Env   |        |      |       |
+| RT-01a  | Account registration (fresh account only) | Smoke |        |      |       |
+| RT-01   | Sign-in and session persistence           | Smoke |        |      |       |
+| RT-02   | Unauthenticated redirect                  | Smoke |        |      |       |
+| RT-03   | Dashboard renders with data               | Smoke |        |      |       |
+| RT-04   | Step 4 Q&A interface loads                | Smoke |        |      |       |
+| RT-05   | AI refine-answer endpoint                 | Smoke |        |      |       |
+| RT-06   | Answer approval and progress bar          | Full  |        |      |       |
+| RT-07   | Preparation checklist gate                | Full  |        |      |       |
+| RT-08   | Senior review screen                      | Full  |        |      |       |
+| RT-09   | Final review and approval                 | Full  |        |      |       |
+| RT-10   | Word document export                      | Full  |        |      |       |
+| RT-11   | Dashboard reopen application              | Full  |        |      |       |
 
 ---
 
@@ -123,6 +126,40 @@ Run this before every session, every time, no exceptions. It exists because on 2
 ---
 
 ## Tier 1 — Smoke Tests
+
+---
+
+### RT-01a — Account Registration and Email Verification [SMOKE]
+
+**Applies only when testing with a freshly created account** — skip this and go straight to RT-01 if reusing the pre-seeded test account.
+
+**User guide reference:** Sections 1–2 (Registering, Verifying Your Email)
+**What this tests:** The registration and onboarding path a brand-new user goes through — account creation, email verification, and charity profile setup — none of which the pre-seeded account exercises, since it already has all of this done.
+
+**Steps:**
+
+1. Open https://grant-pathway-three.vercel.app in a fresh browser tab (or private/incognito window)
+2. Click **Register** / **Create an account**
+3. Enter a new test email (e.g. `grantpathway+<label>@gmail.com`), a compliant password (12+ characters, letters and digits), first name, and last name. Deliberately note whether you tick or leave unticked the feedback-consent checkbox — this is needed later for P5.5's `feedback_consent` verification.
+4. Submit registration
+5. Open the verification email and click the verification link. **Note:** the link expires after 1 hour, not 24 hours as the user guide currently states (known discrepancy, see `screen-requirements.md`) — don't leave this step for later in the session.
+6. Confirm the app shows a success state after verification
+7. Sign in with the new account
+8. Complete charity profile setup — either look up the charity by name/registration number, or enter the fields manually
+9. Confirm you land on the dashboard showing the correct empty state (no applications yet)
+
+**Expected result:**
+
+- Registration succeeds and the verification email arrives promptly
+- Verification link works within the 1-hour window
+- Charity profile saves successfully
+- Dashboard renders the correct empty state
+
+**Note:** After this test, the account has no application yet. Use Appendix A to create one before continuing to RT-04 onward (which assume an application already exists at a specific step). RT-01 (sign-in) is effectively already covered by step 7 above — running it again with this account is optional, not required.
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes (record the test email used, and the feedback-consent choice made in step 3):**
 
 ---
 
@@ -458,9 +495,9 @@ Run these after all Tier 1 tests pass.
 
 ## Appendix A — Resetting or Creating Test Data
 
-If the pre-seeded "Test Application" is no longer available (deleted, exported, or at the wrong step), create a fresh one:
+If the pre-seeded "Test Application" is no longer available (deleted, exported, or at the wrong step) — or you're using a freshly registered account per RT-01a, which has no application at all yet — create one:
 
-1. Sign in as `grantpathway+idle100@gmail.com`
+1. Sign in as `grantpathway+idle100@gmail.com` (or skip this if you're already signed in from RT-01a with a fresh account)
 2. Click **+ New Application**
 3. Select **Henry Smith Foundation** from the funder picker
 4. Enter grant name: **"Regression Test Application"**
