@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.0
+**Version:** 2.1
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (RT-09 and RT-10 merged into a single approve+Word-export test, matching the fact that they're now one user action; the freed RT-10 slot reused for plain-text export, run second and always via the re-export path. Export footer version number briefly removed then reinstated — see PDR-DH-003 — with page numbering added to the Word export only.)
+**Last updated:** 2026-07-02 (RT-11 corrected — reopening an exported application is done via the card's "View" button, which directly opens the re-open confirmation modal; there is no separate "Reopen" button or navigation into the application first. Found by WJ during live testing.)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -486,10 +486,12 @@ Run these after all Tier 1 tests pass.
 **Steps:**
 
 1. From the dashboard, locate the application approved in RT-09
-2. Click **Reopen** (or equivalent control on the application card)
-3. Confirm the application returns to Step 4 with status **In progress**
-4. Confirm all previously-approved answers now show as unapproved (per the "resets all approvals" behaviour)
-5. Confirm `current_step` is 4 and the Q&A interface loads correctly, not a blank or error state
+2. Click **View** on that application's card — for an approved/exported application, this button directly opens the re-open confirmation modal (there is no separate "Reopen" button on the card itself, and no intermediate navigation into the application first)
+3. Confirm the modal reads "Re-open application" with the warning that re-opening removes approval and answers will need re-reviewing
+4. Click **Re-open** in the modal
+5. Confirm the application returns to Step 4 with status **In progress**
+6. Confirm all previously-approved answers now show as unapproved (per the "resets all approvals" behaviour)
+7. Confirm `current_step` is 4 and the Q&A interface loads correctly, not a blank or error state
 
 **Expected result:**
 
