@@ -10,7 +10,7 @@
 
 ---
 
-## 2026-07-02 — PROPOSAL (not yet decided): a real versioning strategy for the service
+## 2026-07-02 — Versioning strategy: proposed and implemented same day
 
 Raised while reinstating the export footer's version number (see entry below) -- the footer has always shown a hardcoded literal `"v1"`, which has never actually changed and doesn't derive from anything real. `package.json`'s own `version` field is `0.1.0` and is not connected to the footer at all. Whatever the footer is meant to support (traceability for support and issue reporting, per `PDR-DH-003`), a string that has never once updated cannot deliver on that.
 
@@ -26,7 +26,16 @@ Vercel automatically injects Git commit metadata as build-time environment varia
 
 Suggested format: `v2026.07.02 (a2ca520)` or similar -- exact display wording is a matter of taste, not something this proposal is trying to settle. Mechanically: read `VERCEL_GIT_COMMIT_SHA` (and its own commit date) at build time in `next.config.ts`, expose it via `NEXT_PUBLIC_APP_VERSION` (or similar) so it's available without a database round-trip, and have the export route read it the same way it currently reads the hardcoded literal.
 
-**Not implemented.** This is a proposal for Wac to react to, not a decision -- if agreed, it would need its own PDR (or an ADR, since it's arguably more an operational/build concern than a product decision) recording the choice, plus the code change in the export route and wherever else a version string might eventually be useful (e.g. Sentry release tracking, which typically wants exactly this kind of build identifier anyway).
+**Approved and implemented the same day.** Format settled on `YYYY.MM.DD-<short SHA>` (e.g. `2026.07.02-a2ca520`), joined with a hyphen rather than the parenthesised form originally suggested -- simpler to read inline in a discreet footer.
+
+- `next.config.ts` -- computes `appVersion` once at build time (`new Date()` for the build date, `process.env.VERCEL_GIT_COMMIT_SHA` for the commit), exposed everywhere via the `env` config key as `process.env.APP_VERSION`
+- `lib/version.ts` (new) -- `getAppVersion()` helper, falls back to `"dev"` when `APP_VERSION` is unset
+- `app/api/export/[applicationId]/route.ts` -- footer now interpolates `getAppVersion()` instead of the hardcoded `"v1"` literal, on both export formats
+- `__tests__/version.test.ts` (new) -- covers the set/fallback cases
+
+**Bug caught before it shipped, via a local production build (`npm run build`), not just type-check:** the initial implementation used `process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev'`. Locally, `.env.local` (written by a past `vercel env pull`) sets this variable to an **empty string**, not absent -- nullish coalescing (`??`) only falls back on `null`/`undefined`, not `""`, so the version silently came out as `2026.07.02-` with no identifier at all. Fixed with an explicit truthiness check instead. Would not have affected the real Vercel deployment (which sets a genuine SHA), but would have produced a subtly broken version string on any local build -- worth knowing about if this pattern (`vercel env pull` + `VERCEL_*` vars + `??`) comes up again elsewhere in the codebase.
+
+Not yet done: PDR-DH-003's `[version number]` placeholder wording was updated to show the new format as an example, but this hasn't been wired into Sentry release tracking (`withSentryConfig` already auto-detects a release identifier from the local Git repo independently -- confirmed via `_sentryRelease` in the build output -- so this is a nice-to-have alignment, not a gap).
 
 ---
 

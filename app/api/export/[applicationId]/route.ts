@@ -22,11 +22,12 @@
 //   Separator:  horizontal rule
 //   Disclaimer: italic disclaimer paragraph (11pt)
 //   Q&A:        Question N (14pt bold) followed by answer paragraph (11pt)
-//   Footer:     "Prepared using Grant Pathway v1 — grantpathway.org.uk" (9pt, centred),
+//   Footer:     "Prepared using Grant Pathway v[version] — grantpathway.org.uk" (9pt, centred),
 //               "Page N of NN" on the line below (Word only)
 //   NOTE (2026-07-02): the version number is intentional -- see PDR-DH-003 --
 //   it exists for support/issue-reporting traceability. Do not remove it
-//   without checking that decision record first.
+//   without checking that decision record first. Auto-derived from Vercel's
+//   build-time Git metadata (lib/version.ts) -- not a manually-bumped number.
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
@@ -45,6 +46,7 @@ import {
 const A4_WIDTH_TWIPS = 11906
 const A4_HEIGHT_TWIPS = 16838
 import { createClient } from '@/lib/supabase/server'
+import { getAppVersion } from '@/lib/version'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -190,6 +192,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const funderName = application.funder_name as string
   const grantName = application.grant_name as string
   const assembledDraft = (application.assembled_draft as string | null) ?? null
+  const appVersion = getAppVersion()
 
   const disclaimer = `Disclaimer: This application was prepared with AI assistance and reviewed by ${fullName}. All content has been checked for accuracy before submission.`
   const safeName = grantName
@@ -226,7 +229,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     lines.push('')
-    lines.push('Prepared using Grant Pathway v1 — grantpathway.org.uk')
+    lines.push(`Prepared using Grant Pathway v${appVersion} — grantpathway.org.uk`)
 
     return new Response(lines.join('\n'), {
       headers: {
@@ -273,7 +276,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 alignment: AlignmentType.CENTER,
                 children: [
                   new TextRun({
-                    text: 'Prepared using Grant Pathway v1 — grantpathway.org.uk',
+                    text: `Prepared using Grant Pathway v${appVersion} — grantpathway.org.uk`,
                     font: 'Calibri',
                     size: pt(9),
                     color: '888888',

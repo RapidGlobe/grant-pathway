@@ -875,6 +875,10 @@ Vercel automatic Git deployment. (ADR-OPS-002)
 3. Merge to `master`
 4. Confirm the Vercel production deployment completes
 
+### App versioning
+
+Since this project deploys continuously rather than on a release cadence, the app version (shown in the export document footer, per `PDR-DH-003`) is auto-derived from Vercel's build-time Git metadata rather than manually bumped. Format: `YYYY.MM.DD-<short git SHA>` (e.g. `2026.07.02-a2ca520`). Computed once at build time in `next.config.ts` (`APP_VERSION`), read via `lib/version.ts`'s `getAppVersion()`. Falls back to `"dev"` outside Vercel. Added 2026-07-02 — see `CHANGELOG.md` for the full rationale.
+
 ### Continuous Integration
 
 GitHub Actions CI runs on every push and pull request to `master`. Four jobs:
