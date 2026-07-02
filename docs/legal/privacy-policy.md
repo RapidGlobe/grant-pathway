@@ -1,8 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.3
+**Version:** 1.4
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 29 June 2026**
+**Last updated: 2 July 2026**
+
+> **Change from v1.3 (29 June 2026):** Sections 2, 3, and 5 corrected to describe the actual AI model — the charity writes every answer; AI refines and improves on request only, and does not generate answers from scratch. This corrects a stale claim left over from an earlier product model abandoned on 2026-05-28.
 
 > **Change from v1.2 (17 June 2026):** Data protection contact email (Section 1), rights contact email (Section 8), and general contact email (Section 11) updated from wjokhia@rapidglobe.com to admin@rapidglobe.com.
 
@@ -36,8 +38,8 @@ When you register and use Grant Pathway, you provide:
 
 - **Your email address** — used to create and identify your account
 - **Your organisation's details** — the name, description, who you help, and where you work, as entered in your organisation profile
-- **Grant application content** — funder guidelines you upload or paste in, and the application questions and draft answers you work on within the tool
-- **Any edits or corrections** you make to AI-generated content before saving it
+- **Grant application content** — funder guidelines you upload or paste in, and the answers you write and refine within the tool
+- **Any AI-suggested improvements** you choose to accept, and any further edits you make, before saving your answer
 
 ### Information we collect automatically
 
@@ -53,7 +55,7 @@ We do not collect payment information. We do not use advertising trackers. We do
 
 We use your information to:
 
-- **Provide the service** — create your account, save your organisation profile, generate AI-assisted summaries and draft answers tailored to your charity, and let you export completed applications
+- **Provide the service** — create your account, save your organisation profile, generate AI-assisted summaries of funder guidelines and refine the answers you write on request, and let you export completed applications
 - **Maintain the service** — monitor for errors, manage the fair-use limit, and keep the system running reliably
 - **Communicate with you** — send a welcome email when you register, and a warning email if your account is approaching the two-year inactivity threshold (see Section 7)
 - **Keep the service secure** — detect and prevent fraudulent or abusive use of the platform
@@ -80,17 +82,17 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 
 We do not sell your data. We do not share it for advertising or marketing purposes. We work with a small number of trusted third-party service providers who process data on our behalf:
 
-| Provider                          | What they do                                                                       | Where they are based                     |
-| --------------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------- |
-| **Supabase**                      | Stores your account, organisation profile, and application data                    | United Kingdom (London)                  |
-| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and generate draft answers | United Kingdom / European Union          |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                     | United States                            |
-| **Vercel**                        | Hosts the Grant Pathway web application                                            | United States (with global edge network) |
-| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems              | European Union                           |
+| Provider                          | What they do                                                                                  | Where they are based                     |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                  |
+| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union          |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States                            |
+| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United States (with global edge network) |
+| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | European Union                           |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
-**A note on AI processing:** When you ask Grant Pathway to summarise funder guidelines or generate a draft answer, the relevant content (funder guidelines and your organisation profile) is processed by Amazon Web Services using the Anthropic Claude model via the Amazon Bedrock service. This processing takes place within the United Kingdom (AWS eu-west-2, London) under normal operating conditions, and never outside the European Economic Area under any circumstances. Your email address is never sent to the AI processing layer. Anthropic does not use this data to train its AI models — this commitment is upheld through the AWS and Anthropic terms governing the Bedrock service.
+**A note on AI processing:** When you ask Grant Pathway to summarise funder guidelines or help refine an answer you have written, the relevant content (funder guidelines and your organisation profile) is processed by Amazon Web Services using the Anthropic Claude model via the Amazon Bedrock service. This processing takes place within the United Kingdom (AWS eu-west-2, London) under normal operating conditions, and never outside the European Economic Area under any circumstances. Your email address is never sent to the AI processing layer. Anthropic does not use this data to train its AI models — this commitment is upheld through the AWS and Anthropic terms governing the Bedrock service.
 
 ---
 
@@ -183,6 +185,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.2_
+_Version: 1.4_
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 17 June 2026_
+_Last updated: 2 July 2026_

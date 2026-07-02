@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** After every task — mark complete, update counts, add notes for deviations
 
-**Last updated:** 2026-07-01 (`Grant-Pathway-Business-Overview.docx` regenerated to match `business-overview.md` — was 5 weeks stale, still describing the abandoned AI-generates-drafts model)
+**Last updated:** 2026-07-02 (`terms-of-service.md` and `privacy-policy.md` corrected — same abandoned AI-generates-drafts model, never caught in the legal docs; see P5.1)
 **Plan version:** 3.1
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -734,6 +734,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
   - ⚠️ **Action during Phase 4 (noted 2026-05-20):** Both documents should be drafted during Phase 4, not left until P5.1 begins — UI copy in Phase 4 slices may reference commitments made in these documents. Claude can produce initial drafts from the ADRs and BRD. A solicitor should review before publication, particularly the Privacy Policy (UK GDPR). Ask when ready.
   - ✅ **Pages built (2026-06-10):** `/terms` and `/privacy` are live, statically rendered from `docs/legal/terms-of-service.md` and `docs/legal/privacy-policy.md`; footer and register-form links both resolve. **Updated 2026-06-17:** legal docs consolidated from root `docs/` to `docs/legal/` as the single authoritative location; page routes updated accordingly; 7-day backup retention disclosure corrected in privacy policy Section 7 (was incorrectly stating no backup retained after deletion).
   - ✅ **AWS DPA confirmed (2026-06-22):** Model invocation logging confirmed disabled in Bedrock eu-west-2 console; AWS DPA automatically in force via AWS Service Terms (no separate acceptance required). See DR-DP-003 review note and `docs/legal/AWS-DPA-reference.md`. **Remaining before P5.1 can be ticked:** set the `[TO BE CONFIRMED]` effective dates in both documents; solicitor review.
+  - ✅ **Stale AI-model claim corrected (2026-07-02):** Both documents described AI as generating draft answers from scratch — the product model abandoned 2026-05-28 (BD-01) and already corrected in `business-overview.md` on 2026-05-29, but never caught in the legal docs. `terms-of-service.md` bumped to v1.2, `privacy-policy.md` to v1.4 (also fixed a pre-existing version/date mismatch between that file's header and footer). Wording drafted and approved by Wac; taken offline for re-review before this correction is folded into the pending solicitor review.
 - [ ] **P5.2** Security: OWASP Top 10 review complete; securityheaders.com score A or above; no secrets in repository
 - [ ] **P5.3** Accessibility: axe-core violations resolved; Lighthouse 95+ on all key pages; keyboard navigation test passed; WCAG 2.2 AA checklist complete
   - ⚠️ **Screen reader / assistive technology testing (2026-06-07):** NVDA/VoiceOver testing will NOT be self-tested. A trusted expert with professional assistive technology experience (friend of Wac) will be engaged to review the service at an appropriate point before or after launch. This gives more reliable coverage than a developer-led screen reader test. The remaining P5.3 items (axe-core, Lighthouse, keyboard navigation, checklist) can still be completed as a self-test run.

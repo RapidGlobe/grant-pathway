@@ -1,8 +1,10 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.1
+**Version:** 1.2
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 26 May 2026**
+**Last updated: 2 July 2026**
+
+> **Change from v1.1 (26 May 2026):** Section 5 corrected to describe the actual AI model — the charity writes every answer; AI refines and improves on request only, and does not generate answers from scratch. This corrects a stale claim left over from an earlier product model abandoned on 2026-05-28.
 
 > **Change from v1.0 (22 May 2026):** Section 5 updated to reference Amazon Bedrock as the AI processing layer, consistent with the privacy policy and DR-DP-002. Section 9 updated to acknowledge that operational backup infrastructure is maintained for disaster recovery purposes; this does not constitute a guarantee of data recovery and does not change the limitation of liability in Section 10.
 
@@ -65,7 +67,7 @@ We reserve the right to suspend or terminate accounts that violate these terms (
 
 ## 5. AI-Generated Content
 
-Grant Pathway uses artificial intelligence to summarise funder guidelines and generate draft answers to application questions. This is designed to support your writing — not to replace your judgement.
+Grant Pathway uses artificial intelligence to summarise funder guidelines and, on request, help you refine and improve the answers you write to application questions. You write every answer yourself — the AI does not generate answers from scratch. This is designed to support your writing — not to replace your judgement.
 
 Before any AI-generated content is saved to your application, you are asked to confirm that:
 
@@ -73,7 +75,7 @@ Before any AI-generated content is saved to your application, you are asked to c
 - All figures, dates, and facts are correct
 - It answers the question that was asked
 
-**You are responsible for all content you submit in a grant application.** Grant Pathway generates a draft. You decide whether to use it, edit it, or discard it entirely. We do not review your applications. We do not submit applications on your behalf.
+**You are responsible for all content you submit in a grant application.** You write every answer. If you ask for help, Grant Pathway suggests an improved version of what you have already written — it does not create an answer from nothing. You decide whether to use the suggestion, edit it, or discard it entirely. We do not review your applications. We do not submit applications on your behalf.
 
 We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder.
 
@@ -192,6 +194,6 @@ For any questions about these terms, please contact us:
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.1_
+_Version: 1.2_
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 26 May 2026_
+_Last updated: 2 July 2026_

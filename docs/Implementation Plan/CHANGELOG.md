@@ -10,6 +10,21 @@
 
 ---
 
+## 2026-07-02 — Legal docs corrected for the abandoned AI-generates-drafts model
+
+**`docs/legal/terms-of-service.md`** → v1.2, **`docs/legal/privacy-policy.md`** → v1.4, **`docs/business-overview.md`**
+
+Flagged while preparing yesterday's session plan (`docs/Test Plans/2026-07-02-session-plan.md`, Priority 1): both live legal documents — the actual files `/terms` and `/privacy` read at request time — still described AI as generating draft answers to application questions from scratch. This is the same stale claim corrected in `business-overview.md` on 2026-05-29 (BD-01) after the product model was abandoned 2026-05-28, but it was never caught in the legal docs. Higher stakes here since these are the documents users click through to accept.
+
+**Fixed:**
+
+- `terms-of-service.md` Section 5 (two paragraphs) reworded to state the actual model: the charity writes every answer; AI refines and improves on request only via "Help me improve this," and never generates an answer from nothing. Confirmed against the current code (`components/application-step4-draft.tsx`'s `handleRefine` → `/api/refine-answer`; the old `/api/generate-draft` route was deleted 2026-07-01). Version bumped 1.1 → 1.2.
+- `privacy-policy.md` Sections 2, 3, and 5 (five locations) reworded the same way. Version bumped 1.3 → 1.4. Also fixed a pre-existing bug found in passing: the document's footer said "Version 1.2 / Last updated 17 June 2026" while its own header said "Version 1.3 / 29 June 2026" — the footer had not been kept in sync through the last two version bumps.
+- `business-overview.md` "What Grant Pathway Does Not Do" section had one residual line — "The AI generates a draft. A human reviews it." — missed by the 2026-05-29 pass that fixed the rest of the file. Corrected to match.
+- Wording was drafted and approved by Wac before editing (legal document — deliberate wording, not a mechanical find-replace, per the session plan). Both amended documents are being taken offline by Wac for a further re-review pass. This does not replace the still-outstanding solicitor review or the `[TO BE CONFIRMED]` effective dates (P5.1).
+
+---
+
 ## 2026-07-01 — Schema drift check automated; test URL confirmed as dev; target-funder-list.md retired
 
 **`.github/workflows/schema-drift-check.yml`** (new), **`docs/Test Plans/regression-test-plan.md`**

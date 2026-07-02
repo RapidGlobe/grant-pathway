@@ -62,7 +62,7 @@ It is just as important to be clear about what Grant Pathway does not do.
 
 **It does not submit applications.** Nothing is ever sent to a funder on the charity's behalf. The charity worker reviews, approves, and submits their own application in their own way.
 
-**It does not make decisions.** The AI generates a draft. A human reviews it. The human decides whether to use it, edit it, or discard it. That responsibility never passes to the tool.
+**It does not make decisions.** The AI can suggest an improved version of an answer the charity has already written. A human reviews every suggestion and decides whether to use it, edit it, or discard it. That responsibility never passes to the tool.
 
 **It is not a replacement for human expertise.** For charities that have access to a professional fundraiser, Grant Pathway can complement their work. For those that do not, it provides meaningful support where there was previously none.
 
@@ -124,5 +124,7 @@ _Grant Pathway — grantpathway.org.uk_
 _Free for UK charities. Always._
 
 ---
+
+_Last updated: 2026-07-02 — Fixed a residual stale line in "What Grant Pathway Does Not Do" that still described the AI as generating a draft; missed in the 2026-05-29 pass._
 
 _Last updated: 2026-05-29 — Elevator pitch and "What Grant Pathway Does" section updated to reflect the AI assists not generates principle (BD-01). Grant Pathway is a preparation tool; charities write every substantive answer; AI refines on request only._
