@@ -22,6 +22,8 @@ Confirmed no orphaned/partially-created `auth.users` rows result from the failur
 
 Logged as **D-012** in `regression-test-plan.md`'s Defect Log, severity Blocking -- this affects every prospective new user, including the real charity application planned for next week, so it needs resolving before then regardless of testing progress otherwise.
 
+**Resolved same day.** The Resend API key configured as the SMTP password in Supabase Dashboard -> Authentication -> Emails -> SMTP Settings (dev project) was stale/invalid -- confirmed independently by querying Resend's API directly with the key on file (`"API key is invalid"`), and by Resend's own dashboard showing zero sent emails in the last 15 days. Domain verification was ruled out first (DKIM and SPF records both correctly in place). Wac generated a new Resend API key (`grant-pathway-supabase-smtp`, Sending-access scope) and updated the SMTP password field. Verified fixed by repeating the direct `/auth/v1/signup` call -- Supabase returned a full success response with `confirmation_sent_at` set. Prod's SMTP settings were not touched -- prod has no live consumer yet -- but should be checked before it does.
+
 ---
 
 ## 2026-07-02 — P5.6 DNS: Vercel side configured, GoDaddy record outstanding
