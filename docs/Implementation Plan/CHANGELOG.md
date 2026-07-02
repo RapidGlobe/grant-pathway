@@ -10,6 +10,12 @@
 
 ---
 
+## 2026-07-02 — RT-07 corrected: stale test step never matched the real design
+
+Found by Wac while running the live regression suite. RT-07 step 4 asked the tester to verify a "50 AI request monthly limit" tip on the Step 4 preparation checklist screen. Checked both the actual component (`components/application-step4-prep-checklist.tsx`) and the authoritative requirement (`AC-FR-28-01`) -- neither has ever specified this. That screen only covers the financial-documents checklist and the note about involving a senior colleague before the budget questions; the only AI-usage-limit messaging anywhere near Step 4 is a conditional banner inside the Q&A interface itself, shown only when nearing the 40-50 request range -- a different screen entirely. Corrected RT-07 to check for the senior-colleague note instead, which is what the screen actually shows.
+
+---
+
 ## 2026-07-02 — D-012 continued: Gmail's own link scanning was silently consuming verification links
 
 Follow-up to the Resend API key fix below. Once email delivery started working again, verification links began showing "This link has expired" within minutes of being sent -- confirmed as a _second, distinct_ root cause from the SMTP issue.

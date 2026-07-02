@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.6
+**Version:** 1.7
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (D-012 fully resolved — second, deeper root cause found (Gmail server-side link scanning) and fixed after the Resend key rotation; re-tested clean across Comet, Chrome, and Edge. Also corrected the 24-hour vs 1-hour link expiry discrepancy in screen-requirements.md and acceptance-criteria.md.)
+**Last updated:** 2026-07-02 (RT-07 corrected — step 4 asked to verify a "50 AI request monthly limit" tip on the preparation checklist screen that was never a real requirement; the actual screen and AC-FR-28-01 both only cover the financial-documents checklist and the senior-colleague note. Found by WJ during live testing.)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -351,7 +351,7 @@ Run these after all Tier 1 tests pass.
 1. Navigate to an application that is at Step 4 for the first time (draft_status = not_started)
 2. Confirm the preparation checklist screen appears (not the Q&A interface)
 3. Verify the screen prompts the user to have financial information ready (per user guide Section 6)
-4. Verify the tip about the 50 AI request monthly limit is shown
+4. Verify the note about involving a senior colleague (e.g. CEO, treasurer, or trustee) before the financial questions is shown
 5. Click **I have what I need — start writing**
 6. Confirm the Q&A interface (Step 4 main view) now loads
 
