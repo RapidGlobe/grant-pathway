@@ -89,14 +89,14 @@ function VerifiedState() {
         <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Email verified</h1>
 
         <p className="mb-8 text-[15px] text-[#64748B]">
-          Your account is now active. Let&apos;s get started.
+          Your account is now active. Sign in to get started.
         </p>
 
         <Link
-          href="/dashboard"
+          href="/"
           className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
         >
-          Go to my dashboard
+          Sign in
         </Link>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { resendRatelimit } from '@/lib/rate-limit'
+import type { EmailOtpType } from '@supabase/supabase-js'
 
 // ---------------------------------------------------------------------------
 // S0.1 — Registration
@@ -82,6 +83,75 @@ export async function registerUser(
   // needing a session (Supabase does not create a session before email
   // confirmation when enable_confirmations = true).
   redirect(`/verify-email?email=${encodeURIComponent(email)}`)
+}
+
+// ---------------------------------------------------------------------------
+// S0.2 — Confirm email (explicit click, not a bare page load)
+//
+// D-012: the /auth/callback route used to complete verification the instant
+// its page loaded. Gmail's own server-side link scanning visits links in
+// incoming HTML email as part of spam/phishing detection -- entirely
+// independent of the recipient's browser -- and was silently consuming the
+// single-use link within seconds of every signup email being sent, before
+// the real person ever opened it. Confirmed across 5/5 sampled accounts
+// going back a month. /auth/callback now redirects here instead of
+// completing anything; this action only runs when a real person clicks the
+// "Confirm my email address" button, which an automated scanner does not do.
+// See CHANGELOG.md, 2026-07-02, D-012.
+// ---------------------------------------------------------------------------
+
+export type ConfirmEmailState = {
+  error: 'invalid' | null
+}
+
+/**
+ * Completes email verification via verifyOtp() (token_hash flow) or
+ * exchangeCodeForSession() (PKCE flow) -- whichever the confirm page
+ * received from /auth/callback. Signs the resulting session straight back
+ * out, matching resetPassword()'s pattern, so the success screen's
+ * "Sign in" link lands on a clean sign-in page rather than /dashboard.
+ *
+ * Called from ConfirmEmailForm via useActionState.
+ */
+export async function confirmEmail(
+  _prevState: ConfirmEmailState,
+  formData: FormData,
+): Promise<ConfirmEmailState> {
+  const code = (formData.get('code') as string | null) ?? ''
+  const tokenHash = (formData.get('token_hash') as string | null) ?? ''
+  const type = formData.get('type') as EmailOtpType | null
+
+  const supabase = await createClient()
+
+  const { error } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : tokenHash && type
+      ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
+      : { error: { message: 'confirmEmail called with neither code nor token_hash' } }
+
+  const userAgent = (await headers()).get('user-agent')
+  console.log(
+    '[D-012-EXPERIMENT]',
+    JSON.stringify({
+      label: 'confirmEmail action result',
+      success: !error,
+      errorMessage: error?.message ?? null,
+      userAgent,
+      timestamp: new Date().toISOString(),
+    }),
+  )
+  Sentry.captureMessage('D-012 experiment: confirmEmail action result', {
+    level: 'info',
+    tags: { experiment: 'd-012-auth-callback' },
+    extra: { success: !error, errorMessage: error?.message ?? null, userAgent },
+  })
+
+  if (error) {
+    return { error: 'invalid' }
+  }
+
+  await supabase.auth.signOut()
+  redirect('/verify-email?state=verified')
 }
 
 // ---------------------------------------------------------------------------

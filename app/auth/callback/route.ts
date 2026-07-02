@@ -35,8 +35,18 @@ function logCallbackHit(request: Request, label: string, extra: Record<string, u
 //   • ?token_hash=xxx&type=email  — email OTP flow (email confirmation)
 //   • ?code=xxx                   — PKCE code exchange (OAuth, magic links)
 //
-// On success → /verify-email?state=verified  (session cookies set)
-// On failure → /verify-email?state=expired   (invalid or expired token)
+// Password recovery (type=recovery, or next=reset) completes immediately here,
+// same as before — that flow is unaffected by D-012.
+//
+// Everything else (signup confirmation) does NOT complete here any more.
+// D-012: completing verification on a bare page load meant Gmail's own
+// server-side link scanning was silently consuming the single-use link
+// within seconds of the email being sent, before the real person ever saw
+// it -- confirmed across 5/5 sampled accounts going back a month, regardless
+// of browser. Loading a page is something any automated scanner does; instead
+// we redirect to /verify-email/confirm, which requires an explicit button
+// click (a real user action, not a page fetch) before the token is spent.
+// See CHANGELOG.md, 2026-07-02, D-012.
 //
 // This route is intentionally NOT in the AUTH_ONLY list in proxy.ts — it must
 // be reachable by authenticated and unauthenticated users alike.
@@ -58,63 +68,45 @@ export async function GET(request: Request) {
     next,
   })
 
-  // Token hash flow — covers email verification (type=email) and password
-  // reset (type=recovery). Route the success/failure redirect based on type.
+  // Token hash flow. Recovery completes immediately (unchanged); anything
+  // else (signup confirmation) defers to the explicit-confirm page.
   if (token_hash && type) {
-    const supabase = await createClient()
-
-    // For recovery tokens, sign out any existing session first. If the user
-    // is already signed in and clicks the reset link, the active session
-    // causes verifyOtp to fail with "token expired". Signing out first gives
-    // verifyOtp a clean slate to create the recovery session.
     if (type === 'recovery') {
+      const supabase = await createClient()
+      // Sign out any existing session first. If the user is already signed
+      // in and clicks the reset link, the active session causes verifyOtp
+      // to fail with "token expired". Signing out first gives verifyOtp a
+      // clean slate to create the recovery session.
       await supabase.auth.signOut()
-    }
 
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type })
-    logCallbackHit(request, 'verifyOtp result', {
-      tokenHashPrefix: token_hash.slice(0, 12),
-      type,
-      success: !error,
-      errorMessage: error?.message ?? null,
-      errorCode: error?.code ?? null,
-    })
-    if (!error) {
-      if (type === 'recovery') {
-        // Recovery session set — send user to the "choose new password" form
+      const { error } = await supabase.auth.verifyOtp({ token_hash, type })
+      if (!error) {
         return NextResponse.redirect(`${origin}/forgot-password?state=reset`)
       }
-      return NextResponse.redirect(`${origin}/verify-email?state=verified`)
-    }
-    // Token was invalid or expired — route to the appropriate expired state
-    if (type === 'recovery') {
       return NextResponse.redirect(`${origin}/forgot-password?state=expired`)
     }
-    return NextResponse.redirect(`${origin}/verify-email?state=expired`)
+
+    logCallbackHit(request, 'deferring token_hash to confirm page', { type })
+    return NextResponse.redirect(
+      `${origin}/verify-email/confirm?token_hash=${encodeURIComponent(token_hash)}&type=${encodeURIComponent(type)}`,
+    )
   }
 
-  // PKCE code exchange — used by OAuth providers, magic links, and password
-  // reset (resetPasswordForEmail passes next=reset in redirectTo so we can
-  // distinguish recovery from email verification here).
+  // PKCE code exchange. next=reset (password recovery) completes immediately
+  // (unchanged); anything else (signup confirmation) defers to the
+  // explicit-confirm page.
   if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    logCallbackHit(request, 'exchangeCodeForSession result', {
-      codePrefix: code.slice(0, 12),
-      next,
-      success: !error,
-      errorMessage: error?.message ?? null,
-      errorCode: error?.code ?? null,
-    })
-    if (!error) {
-      if (next === 'reset') {
+    if (next === 'reset') {
+      const supabase = await createClient()
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      if (!error) {
         return NextResponse.redirect(`${origin}/forgot-password?state=reset`)
       }
-      return NextResponse.redirect(`${origin}/verify-email?state=verified`)
-    }
-    if (next === 'reset') {
       return NextResponse.redirect(`${origin}/forgot-password?state=expired`)
     }
+
+    logCallbackHit(request, 'deferring code to confirm page', {})
+    return NextResponse.redirect(`${origin}/verify-email/confirm?code=${encodeURIComponent(code)}`)
   }
 
   // Token/code missing — fall back to verify-email expired state
