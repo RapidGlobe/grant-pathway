@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-02 — P5.6 DNS: Vercel side configured, GoDaddy record outstanding
+
+A real charity contact wants to complete a live application next week under Wac's supervision. That doesn't require production to be publicly reachable (the session will be supervised, on Wac's device, dev or prod both fine) -- but it surfaced that `grantpathway.org.uk` was never actually connected, worth fixing anyway since it's needed eventually. Investigated and got as far as CLI access allows:
+
+- `grantpathway.org.uk` and `www.grantpathway.org.uk` added and attached to the `grant-pathway` Vercel project (`vercel domains add`).
+- Confirmed via `vercel domains inspect` that the domain is still sitting on GoDaddy's default parking IPs (nameservers `ns39/ns40.domaincontrol.com`) -- never pointed at Vercel.
+- **Deliberately did not recommend migrating nameservers to Vercel.** The domain has live MX records (`smtp.secureserver.net`, `mailstore1.secureserver.net`) and an SPF record covering both `secureserver.net` and `amazonses.com` -- real email depends on this, including the `noreply@grantpathway.org.uk` mailbox. A full nameserver migration would silently break it unless every record were manually recreated at Vercel DNS.
+- **Correct fix instead:** a single `A` record at GoDaddy, `grantpathway.org.uk -> 76.76.21.21` (and the same for `www`), leaving nameservers and all other records untouched. This requires GoDaddy registrar access, which Claude does not have -- flagged for Wac.
+- Checked the second half of the "domain gap" -- the SSO/Vercel-Authentication wall currently blocking the raw `*.vercel.app` production URL. Queried the Vercel API directly (`vercel api`) and found `ssoProtection.deploymentType = "all_except_custom_domains"` -- it's already configured to exempt custom domains. No Vercel-side change needed; the domain will work as soon as the DNS record is added.
+
+See `IMPLEMENTATION-STATUS.md` P5.6 for the outstanding action.
+
+---
+
 ## 2026-07-02 — Legal docs corrected for the abandoned AI-generates-drafts model
 
 **`docs/legal/terms-of-service.md`** → v1.2, **`docs/legal/privacy-policy.md`** → v1.4, **`docs/business-overview.md`**

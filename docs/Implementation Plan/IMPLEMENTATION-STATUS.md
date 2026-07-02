@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** After every task — mark complete, update counts, add notes for deviations
 
-**Last updated:** 2026-07-02 (`terms-of-service.md` and `privacy-policy.md` corrected — same abandoned AI-generates-drafts model, never caught in the legal docs; see P5.1)
+**Last updated:** 2026-07-02 (P5.6 DNS setup started on Vercel side — domain attached, awaiting a GoDaddy DNS record from Wac; see below)
 **Plan version:** 3.1
 **Overall status:** In progress
 **Target launch:** 31 July 2026
@@ -15,118 +15,118 @@ Update this file as tasks are completed. Change `[ ]` to `[x]` for completed ite
 
 ## Summary
 
-| Phase                                                                                                             | Tasks  | Done   | Status                         |
-| ----------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------------------------ |
-| **Phase 0 — Project Bootstrap**                                                                                   | **6**  | **6**  | **✅ Complete**                |
-| &nbsp;&nbsp;P0.1 — Accounts confirmed (GitHub, Vercel, Node.js)                                                   | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P0.2 — Next.js scaffold                                                                               | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P0.3 — Core dependencies installed                                                                    | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P0.4 — Design tokens and font                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P0.5 — Directory structure                                                                            | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P0.6 — Proxy stub, GitHub push, Vercel live                                                           | 1      | 1      | ✅ Complete                    |
-| **Phase 1 — Static UI Shell**                                                                                     | **15** | **15** | **✅ Complete**                |
-| &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal)                                     | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.2 — Sign In / Landing page                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.3 — Register page                                                                                  | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.4 — Verify Email page                                                                              | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.5 — Forgot Password page                                                                           | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states)                                                           | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.7 — Charity Profile page                                                                           | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.8 — Step 1: Application Details                                                                    | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines                                                                      | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.10 — Step 3: AI Summary                                                                            | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.11 — Step 4: Draft Answers                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.12 — Step 5: Approve & Export                                                                      | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.13 — Account Settings page                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.14 — Account Deletion page                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P1.15 — Reusable loading and error components                                                         | 1      | 1      | ✅ Complete                    |
-| **Phase 2 — Risk-First Spikes**                                                                                   | **3**  | **3**  | ✅ Complete                    |
-| &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage                                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export                                                   | 1      | 1      | ✅ Complete                    |
-| **Phase 3 — Infrastructure Setup**                                                                                | **12** | **12** | **✅ Complete**                |
-| &nbsp;&nbsp;P3.1 — Supabase schema and RLS                                                                        | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.2 — Environment variables                                                                          | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.3 — Supabase client instances                                                                      | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.4 — Auth middleware                                                                                | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.5 — HTTP security headers                                                                          | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.6 — Upstash Redis rate limiting                                                                    | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.7 — Sentry error monitoring                                                                        | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.8 — Resend email sending                                                                           | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.9 — Seed data                                                                                      | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.11 — Health endpoint                                                                               | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18)                                  | 1      | 1      | ✅ Complete                    |
-| **Phase 3 → Phase 4 Gate**                                                                                        | —      | —      | ✅ Signed off — WJ, 2026-05-20 |
-| **Phase 4 — Vertical Slices**                                                                                     | **40** | **40** | **✅ Complete**                |
-| &nbsp;&nbsp;**Slice 0 — Authentication**                                                                          | **6**  | **6**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration                                                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification                                                                 | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in                                                                            | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset                                                                     | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout                                                                    | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 1 — Charity Profile**                                                                         | **4**  | **4**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup                                                          | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S1.2 — Profile save                                                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit                                                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S1.4 — Profile incomplete banner                                                          | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 2 — Dashboard and Application Management**                                                    | **5**  | **5**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.1 — Applications list and empty state                                                  | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.2 — New application creation                                                           | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.3 — Resume application                                                                 | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.4 — Delete application                                                                 | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S2.5 — Start button disabled until profile complete                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 3 — Step 1: Application Details**                                                             | **3**  | **3**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application                                                                    | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application                                                               | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S3.3 — Step locking                                                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 4 — Step 2: File Upload**                                                                     | **4**  | **4**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.1 — Upload path                                                                        | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.2 — Paste path                                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.3 — File error states                                                                  | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S4.4 — Orphan cleanup cron                                                                | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 5 — Step 3: AI Summary**                                                                      | **4**  | **4**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S5.1 — Prompt library                                                                     | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route                                                         | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler                                                                   | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up                                        | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** _(redesigned 2026-05-28)_                                         | **8**  | **8**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type                                        | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments                             | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Database migration (4 new columns)                                                 | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Preparation checklist screen                                                       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface                                                                      | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.6 — Per-question refine-answer API route                                               | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.7 — Senior review prompt + assembly API route                                          | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S6.8 — Step 5 export updated (read from assembled_draft)                                  | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export**                                                                | **3**  | **3**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open                                                                | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export                                                                        | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S7.3 — Plain text export                                                                  | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Slice 8 — Account Management**                                                                      | **3**  | **3**  | **✅ Complete**                |
-| &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA                                                            | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion                                                                   | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion                                                                | 1      | 1      | ✅ Complete                    |
-| **Phase 4 → Phase 5 Gate**                                                                                        | —      | —      | ✅ Signed off — WJ, 2026-06-17 |
-| **Phase 5 — Pre-Launch**                                                                                          | **13** | **7**  | In progress                    |
-| &nbsp;&nbsp;**Funder Directory (DR-FD-001)**                                                                      | **6**  | **6**  | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD1 — Create `funders` Supabase table and RLS policy                                   | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD2 — Seed `funders` table with 12 approved orgs from target funder list               | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD3 — Add nullable `funder_id` FK column to `applications` table (migration)           | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker component   | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD5 — Add "My funder isn't listed — request it" link below picker (mailto or Tally v1) | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD6 — Wire funder request notification to Rapidglobe                                   | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Performance (ADR-AI-010)**                                                                          | **1**  | **1**  | ✅ Complete                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.PERF1 — Document pre-processing (`lib/preprocess-text.ts`) in `generate-summary`       | 1      | 1      | ✅ Complete                    |
-| &nbsp;&nbsp;**Pre-Launch**                                                                                        | **6**  | **0**  | Not started                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.1 — Compliance                                                                         | 1      | 0      | Not started                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.2 — Security review                                                                    | 1      | 0      | Not started                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.3 — Accessibility                                                                      | 1      | 0      | Not started                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.4 — Production infrastructure                                                          | 1      | 0      | Not started                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.5 — Final testing                                                                      | 1      | 0      | Not started                    |
-| &nbsp;&nbsp;&nbsp;&nbsp;P5.6 — DNS                                                                                | 1      | 0      | Not started                    |
-| **Total**                                                                                                         | **89** | **83** |                                |
+| Phase                                                                                                             | Tasks  | Done   | Status                                                             |
+| ----------------------------------------------------------------------------------------------------------------- | ------ | ------ | ------------------------------------------------------------------ |
+| **Phase 0 — Project Bootstrap**                                                                                   | **6**  | **6**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;P0.1 — Accounts confirmed (GitHub, Vercel, Node.js)                                                   | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P0.2 — Next.js scaffold                                                                               | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P0.3 — Core dependencies installed                                                                    | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P0.4 — Design tokens and font                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P0.5 — Directory structure                                                                            | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P0.6 — Proxy stub, GitHub push, Vercel live                                                           | 1      | 1      | ✅ Complete                                                        |
+| **Phase 1 — Static UI Shell**                                                                                     | **15** | **15** | **✅ Complete**                                                    |
+| &nbsp;&nbsp;P1.1 — Global components (navbars, footer, session timeout modal)                                     | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.2 — Sign In / Landing page                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.3 — Register page                                                                                  | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.4 — Verify Email page                                                                              | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.5 — Forgot Password page                                                                           | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.6 — Dashboard (empty + populated states)                                                           | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.7 — Charity Profile page                                                                           | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.8 — Step 1: Application Details                                                                    | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.9 — Step 2: Upload Guidelines                                                                      | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.10 — Step 3: AI Summary                                                                            | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.11 — Step 4: Draft Answers                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.12 — Step 5: Approve & Export                                                                      | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.13 — Account Settings page                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.14 — Account Deletion page                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P1.15 — Reusable loading and error components                                                         | 1      | 1      | ✅ Complete                                                        |
+| **Phase 2 — Risk-First Spikes**                                                                                   | **3**  | **3**  | ✅ Complete                                                        |
+| &nbsp;&nbsp;P2.1 — Spike 1: Bedrock API call from Next.js                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P2.2 — Spike 2: File upload to Supabase Storage                                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P2.3 — Spike 3: PDF/docx extraction and Word export                                                   | 1      | 1      | ✅ Complete                                                        |
+| **Phase 3 — Infrastructure Setup**                                                                                | **12** | **12** | **✅ Complete**                                                    |
+| &nbsp;&nbsp;P3.1 — Supabase schema and RLS                                                                        | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.2 — Environment variables                                                                          | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.3 — Supabase client instances                                                                      | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.4 — Auth middleware                                                                                | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.5 — HTTP security headers                                                                          | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.6 — Upstash Redis rate limiting                                                                    | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.7 — Sentry error monitoring                                                                        | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.8 — Resend email sending                                                                           | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.9 — Seed data                                                                                      | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.10 — AWS Bedrock spend cap                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.11 — Health endpoint                                                                               | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;P3.12 — Pre-Phase 4 gap resolutions (GAP-06, 08, 09, 10, 11, 14, 18)                                  | 1      | 1      | ✅ Complete                                                        |
+| **Phase 3 → Phase 4 Gate**                                                                                        | —      | —      | ✅ Signed off — WJ, 2026-05-20                                     |
+| **Phase 4 — Vertical Slices**                                                                                     | **40** | **40** | **✅ Complete**                                                    |
+| &nbsp;&nbsp;**Slice 0 — Authentication**                                                                          | **6**  | **6**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.1 — Registration                                                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.2 — Email verification                                                                 | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.3 — Sign in                                                                            | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.4 — Password reset                                                                     | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.5 — Session timeout                                                                    | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S0.6 — MFA opt-in                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 1 — Charity Profile**                                                                         | **4**  | **4**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.1 — Charity Commission lookup                                                          | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.2 — Profile save                                                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.3 — Profile edit                                                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S1.4 — Profile incomplete banner                                                          | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 2 — Dashboard and Application Management**                                                    | **5**  | **5**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.1 — Applications list and empty state                                                  | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.2 — New application creation                                                           | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.3 — Resume application                                                                 | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.4 — Delete application                                                                 | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S2.5 — Start button disabled until profile complete                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 3 — Step 1: Application Details**                                                             | **3**  | **3**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.1 — New application                                                                    | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.2 — Existing application                                                               | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S3.3 — Step locking                                                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 4 — Step 2: File Upload**                                                                     | **4**  | **4**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.1 — Upload path                                                                        | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.2 — Paste path                                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.3 — File error states                                                                  | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S4.4 — Orphan cleanup cron                                                                | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 5 — Step 3: AI Summary**                                                                      | **4**  | **4**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.1 — Prompt library                                                                     | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.2 — Generate summary API route                                                         | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.3 — AI error handler                                                                   | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S5.4 — Questions extracted and regenerate wired up                                        | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 6 — Step 4: Q&A Interview** _(redesigned 2026-05-28)_                                         | **8**  | **8**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.1 — Extend Step 3 prompt and AiSummaryData type                                        | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.2 — Step 3 UI: funderAiPolicy banner + supportingDocuments                             | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.3 — Database migration (4 new columns)                                                 | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.4 — Preparation checklist screen                                                       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.5 — Q&A interface                                                                      | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.6 — Per-question refine-answer API route                                               | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.7 — Senior review prompt + assembly API route                                          | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S6.8 — Step 5 export updated (read from assembled_draft)                                  | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 7 — Step 5: Approve & Export**                                                                | **3**  | **3**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.1 — Approve and re-open                                                                | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.2 — Word export                                                                        | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S7.3 — Plain text export                                                                  | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Slice 8 — Account Management**                                                                      | **3**  | **3**  | **✅ Complete**                                                    |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.1 — Change password and MFA                                                            | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.2 — Account deletion                                                                   | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;S8.3 — Inactivity deletion                                                                | 1      | 1      | ✅ Complete                                                        |
+| **Phase 4 → Phase 5 Gate**                                                                                        | —      | —      | ✅ Signed off — WJ, 2026-06-17                                     |
+| **Phase 5 — Pre-Launch**                                                                                          | **13** | **7**  | In progress                                                        |
+| &nbsp;&nbsp;**Funder Directory (DR-FD-001)**                                                                      | **6**  | **6**  | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD1 — Create `funders` Supabase table and RLS policy                                   | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD2 — Seed `funders` table with 12 approved orgs from target funder list               | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD3 — Add nullable `funder_id` FK column to `applications` table (migration)           | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker component   | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD5 — Add "My funder isn't listed — request it" link below picker (mailto or Tally v1) | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.FD6 — Wire funder request notification to Rapidglobe                                   | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Performance (ADR-AI-010)**                                                                          | **1**  | **1**  | ✅ Complete                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.PERF1 — Document pre-processing (`lib/preprocess-text.ts`) in `generate-summary`       | 1      | 1      | ✅ Complete                                                        |
+| &nbsp;&nbsp;**Pre-Launch**                                                                                        | **6**  | **0**  | Not started                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.1 — Compliance                                                                         | 1      | 0      | Not started                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.2 — Security review                                                                    | 1      | 0      | Not started                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.3 — Accessibility                                                                      | 1      | 0      | Not started                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.4 — Production infrastructure                                                          | 1      | 0      | Not started                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.5 — Final testing                                                                      | 1      | 0      | Not started                                                        |
+| &nbsp;&nbsp;&nbsp;&nbsp;P5.6 — DNS                                                                                | 1      | 0      | In progress — awaiting GoDaddy DNS record (Vercel-side setup done) |
+| **Total**                                                                                                         | **89** | **83** |                                                                    |
 
 ---
 
@@ -746,6 +746,7 @@ All five test scenarios passed. Bugs found and fixed during testing:
 - [ ] **P5.5** Final testing: full five-step flow on production; all error states tested (including large-document warning); account deletion tested; both export formats tested (Word export opened in Word to verify structure, font, disclaimer); returning user flow; session timeout confirmed; cross-browser test (Chrome, Edge, Firefox, Safari desktop; Chrome Android, Safari iOS); AI performance confirmed (summary ≤30s, draft ≤60s); **feedback opt-in verified** (register with box ticked and unticked; confirm `feedback_consent` value written correctly to `user_profiles` in Supabase). ⚠️ Post-launch: query `user_profiles` where `feedback_consent = true` and establish a process to contact those users — do not let the data go unused.
 - [ ] **P5.6** DNS: `grantpathway.org.uk` pointing to Vercel; HTTPS enforced; Privacy Policy and Terms of Service live in footer
   - ✅ **Footer legal links resolve (2026-06-10):** both footer links now point at live pages (`/privacy` corrected from `/privacy-policy`, which returned 404). DNS and HTTPS items remain.
+  - 🔁 **Vercel-side setup done (2026-07-02):** `grantpathway.org.uk` and `www.grantpathway.org.uk` both added and attached to the `grant-pathway` project (`vercel domains add`). Confirmed via `vercel domains inspect` that domain is currently unconfigured — GoDaddy nameservers (`ns39/ns40.domaincontrol.com`) still point the apex at GoDaddy's default parking IPs, not Vercel. **Do not migrate nameservers to Vercel** — the domain has live MX records (`smtp.secureserver.net`, `mailstore1.secureserver.net`) and an SPF record covering both `secureserver.net` and `amazonses.com`, meaning real email (including the `noreply@grantpathway.org.uk` mailbox) depends on GoDaddy's existing DNS. **Remaining action (requires GoDaddy registrar access, which Claude does not have):** add two `A` records at GoDaddy — `grantpathway.org.uk → 76.76.21.21` (required) and `www.grantpathway.org.uk → 76.76.21.21` (recommended) — leaving nameservers and all other existing records untouched. Also confirmed via the Vercel API that `ssoProtection.deploymentType = "all_except_custom_domains"` — the Deployment Protection wall that currently blocks the raw `*.vercel.app` production URL is already configured to exempt custom domains, so no additional Vercel-side change is needed once DNS is fixed; the domain will simply work.
 
 ---
 
