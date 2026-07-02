@@ -10,6 +10,32 @@
 
 ---
 
+## 2026-07-02 — Export footer: version number removed, page numbering added (PDR-DH-003 revised)
+
+Wac downloaded both export formats during live RT-10 testing and asked for two changes: remove the version number from the footer, and add page numbers to the Word export ("Page N of NN" — not meaningful for plain text, which has no concept of pages).
+
+This wasn't just a typo fix -- `PDR-DH-003` (Export Format and Structure) explicitly specified the version number, with a stated rationale ("provides traceability for support and issue reporting"). Implemented as requested and recorded properly as a decision reversal in `PDR-DH-003`'s new Revision History section, rather than silently overwriting the original decision -- Wac did not give a specific reason for the change beyond wanting it removed, which the revision entry states plainly rather than inventing a justification.
+
+**What changed** (`app/api/export/[applicationId]/route.ts`):
+
+- Footer text on both formats: _"Prepared using Grant Pathway v1 — grantpathway.org.uk"_ -> _"Prepared using Grant Pathway — grantpathway.org.uk"_
+- Word export only: added a second footer paragraph, "Page N of NN", using `docx`'s `PageNumber.CURRENT` / `PageNumber.TOTAL_PAGES` fields (dynamic Word fields, computed by Word itself at open/print time)
+- Verified via a standalone test document using the same `docx` calls, checked with the skill's `validate.py` -- structurally valid OOXML. Could not render to PDF for a visual check (the sandboxed LibreOffice wrapper hits a Windows socket-API incompatibility, unrelated to this change) -- relying on the well-documented, standard nature of these field codes instead.
+
+**Documentation updated:** `PDR-DH-003` (new Revision History entry, footer/formatting sections struck through and corrected), `acceptance-criteria.md` (`AC-FR-37-03`), `regression-test-plan.md` (RT-10's verification list now checks for the corrected footer and page number).
+
+Also found and fixed in passing: `technical-design.md`'s API Routes table had `/api/export/[id]` -- the route folder is actually `[applicationId]`, and the table didn't mention the route also serves `format=txt`, not just Word. The route's own doc comment (line 760) already had the correct param name -- just an internal inconsistency within the same file.
+
+---
+
+## 2026-07-02 — RT-10 corrected and RT-10a added: plain-text export was never independently tested
+
+Found while fixing RT-09 (see entry below) -- once approve+download became a single action (2026-06-12), RT-09's download click already produces one exported file, in whichever format the tester chose. RT-10, written before that merge, still assumed a fresh "download button just became active" state and only ever exercised Word. Plain-text export (`format=txt` in the same route) has always been a separate code path with its own test coverage gap.
+
+**Fixed:** RT-10 now explicitly handles both cases -- if RT-09 already produced the Word file, verify it directly; if RT-09 used plain text instead, clicking "Download as Word document" now correctly triggers the re-export confirmation dialog (D-WF-04), which is expected, not a defect. Added **RT-10a**, the mirror image for plain-text export, with its own content checklist (no version number, no page numbers -- plain text has no pages).
+
+---
+
 ## 2026-07-02 — RT-09 corrected: still described the approval modal removed weeks ago
 
 Found by Wac while running the live regression suite — he recalled a past decision to not have a separate approval modal at Step 5, and asked for it to be checked against the design docs before treating it as a defect. Confirmed: `CHANGELOG.md`'s own 2026-06-12 entry ("Step 5: approve + download collapsed into a single action") already documents that the separate "Approve my application" button and its confirmation modal were deliberately removed -- three checkbox ticks already demonstrate intent, so the modal was judged redundant friction. `screen-requirements.md` and `acceptance-criteria.md` (AC-FR-33-01 through 03) were correctly updated at the time. Only `regression-test-plan.md`'s RT-09 was never updated to match -- rewritten to describe the actual flow (tick three checkboxes -> a download button becomes enabled -> clicking it approves and downloads in one action, no modal).

@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.8
+**Version:** 1.9
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (RT-09 corrected — still described the separate "Approve my application" button and confirmation modal, removed 2026-06-12 per CHANGELOG.md; rewritten to match the actual tick-checkboxes-then-download combined action. Found by WJ during live testing.)
+**Last updated:** 2026-07-02 (RT-10 corrected to account for the RT-09 approve+download merge; added RT-10a for plain-text export, previously untested; export footer version number removed and page numbering added to the Word export per PDR-DH-003 revision.)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -86,6 +86,7 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 | RT-08   | Senior review screen                      | Full  |        |      |       |
 | RT-09   | Final review and approval                 | Full  |        |      |       |
 | RT-10   | Word document export                      | Full  |        |      |       |
+| RT-10a  | Plain text export                         | Full  |        |      |       |
 | RT-11   | Dashboard reopen application              | Full  |        |      |       |
 
 ---
@@ -433,13 +434,14 @@ Run these after all Tier 1 tests pass.
 **User guide reference:** Section 10 (Export)
 **What this tests:** Export API route, Word document generation, file download
 
-**Prerequisite:** RT-09 complete (application approved)
+**Prerequisite:** RT-09 complete (application approved and exported via whichever format was used there)
+
+**Note:** RT-09's download click already approved and exported the application once, in whichever format was chosen there. If RT-09 used **Word**, you already have the file — skip to "Verify the document contains" below. If RT-09 used **plain text**, click **Download as Word document** now: since the application is already exported, this triggers the **re-export confirmation dialog** (expected, not a defect — see D-WF-04 in `CHANGELOG.md`) — confirm through it to get the Word file.
 
 **Steps:**
 
-1. Confirm the download button(s) are now active on the Step 5 screen
-2. Click **Download as Word document**
-3. Open the downloaded .docx file
+1. Obtain the Word document as above
+2. Open the downloaded .docx file
 
 **Verify the document contains:**
 
@@ -448,6 +450,8 @@ Run these after all Tier 1 tests pass.
 - Export date
 - All approved answers in a readable, structured format
 - AI disclaimer text
+- Footer reading "Prepared using Grant Pathway — grantpathway.org.uk" — **no version number** (removed 2026-07-02, see `PDR-DH-003` revision history)
+- A page number ("Page N of NN") in the footer, below the attribution line
 - No corrupted or missing content
 
 **Expected result:**
@@ -456,6 +460,38 @@ Run these after all Tier 1 tests pass.
 - Document opens cleanly in Word or equivalent
 - Content matches the approved answers entered in Step 4
 - Application status on dashboard updates to **Exported**
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
+### RT-10a — Plain Text Export [FULL]
+
+**User guide reference:** Section 10 (Export)
+**What this tests:** Export API route's `format=txt` path — a separate code path from the Word export, not previously covered by its own test.
+
+**Note:** same logic as RT-10 in reverse. If RT-09 used **plain text**, you already have the file. If RT-09 used **Word**, click **Download as plain text** now — this triggers the same re-export confirmation dialog as RT-10 (expected).
+
+**Steps:**
+
+1. Obtain the plain-text (.txt) file as above
+2. Open it in a plain-text editor (not Word — confirm it is genuinely plain text, no formatting)
+
+**Verify the file contains:**
+
+- Application title (grant name), funder name, and export date as the opening lines
+- AI disclaimer text
+- All approved answers, each clearly separated (e.g. by a rule of dashes)
+- Closing line reading "Prepared using Grant Pathway — grantpathway.org.uk" — **no version number**, and **no page numbers** (plain text has no concept of pages)
+- No corrupted or missing content, no stray formatting characters
+
+**Expected result:**
+
+- .txt file downloads without error
+- Content matches the approved answers entered in Step 4
+- Content matches the Word export's content (same answers, same order), just without Word formatting
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 

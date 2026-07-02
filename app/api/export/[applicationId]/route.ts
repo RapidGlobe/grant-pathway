@@ -22,7 +22,8 @@
 //   Separator:  horizontal rule
 //   Disclaimer: italic disclaimer paragraph (11pt)
 //   Q&A:        Question N (14pt bold) followed by answer paragraph (11pt)
-//   Footer:     "Prepared using Grant Pathway v1 — grantpathway.org.uk" (9pt, centred)
+//   Footer:     "Prepared using Grant Pathway — grantpathway.org.uk" (9pt, centred),
+//               "Page N of NN" on the line below
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
@@ -34,6 +35,7 @@ import {
   BorderStyle,
   UnderlineType,
   Footer,
+  PageNumber,
 } from 'docx'
 
 // A4 page dimensions in twips (1 twip = 1/1440 inch)
@@ -221,7 +223,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     lines.push('')
-    lines.push('Prepared using Grant Pathway v1 — grantpathway.org.uk')
+    lines.push('Prepared using Grant Pathway — grantpathway.org.uk')
 
     return new Response(lines.join('\n'), {
       headers: {
@@ -268,7 +270,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 alignment: AlignmentType.CENTER,
                 children: [
                   new TextRun({
-                    text: 'Prepared using Grant Pathway v1 — grantpathway.org.uk',
+                    text: 'Prepared using Grant Pathway — grantpathway.org.uk',
+                    font: 'Calibri',
+                    size: pt(9),
+                    color: '888888',
+                  }),
+                ],
+              }),
+              new Paragraph({
+                alignment: AlignmentType.CENTER,
+                children: [
+                  new TextRun({ text: 'Page ', font: 'Calibri', size: pt(9), color: '888888' }),
+                  new TextRun({
+                    children: [PageNumber.CURRENT],
+                    font: 'Calibri',
+                    size: pt(9),
+                    color: '888888',
+                  }),
+                  new TextRun({ text: ' of ', font: 'Calibri', size: pt(9), color: '888888' }),
+                  new TextRun({
+                    children: [PageNumber.TOTAL_PAGES],
                     font: 'Calibri',
                     size: pt(9),
                     color: '888888',

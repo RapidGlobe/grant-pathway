@@ -1739,7 +1739,7 @@ _Note: The "Regenerate all answers" action no longer exists. Users write their o
   - The date exported
   - An AI disclaimer
   - The Q&A body — each question followed by its approved answer
-  - A footer: _"Prepared using Grant Pathway v[version number] — grantpathway.org.uk"_
+  - A footer: _"Prepared using Grant Pathway — grantpathway.org.uk"_ (no version number — see PDR-DH-003, revised 2026-07-02), plus a page number ("Page N of NN")
 
 ---
 
