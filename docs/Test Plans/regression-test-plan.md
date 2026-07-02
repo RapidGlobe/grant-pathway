@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-06-15
-**Last updated:** 2026-07-01
+**Last updated:** 2026-07-02 (RT-00 step 4 amended to include the `cd` into the project directory before running `supabase migration list --linked` — the CLI needs to run from inside the project to find the linked project config)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -107,7 +107,7 @@ Run this before every session, every time, no exceptions. It exists because on 2
       'approve_application', 'reopen_application');
    ```
 3. Confirm all 5 rows are returned.
-4. Run `supabase migration list --linked` (after linking the CLI to the correct project) and confirm every row shows a matching Local/Remote timestamp — no blanks.
+4. In a terminal, run `cd "C:\Users\WJ\OneDrive - Rapidglobe Ltd\Documents\Rapidglobe\Development\AI Grant Accelerator\grant-pathway"` (the CLI needs to be run from inside the project directory to find the linked project config), then run `supabase migration list --linked` (after linking the CLI to the correct project) and confirm every row shows a matching Local/Remote timestamp — no blanks.
 
 **Expected result:**
 
