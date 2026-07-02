@@ -157,19 +157,33 @@ User has been redirected here after registering. They have not yet clicked the l
 | Resend button      | _"Resend verification email"_ — secondary action                                                             |
 | Wrong email prompt | _"Wrong email address? [Sign in with a different account]"_ — links to `/`                                   |
 
+### Intermediate screen — Confirming (`/verify-email/confirm`)
+
+**Added 2026-07-02 (D-012).** Between clicking the email link and reaching State 2, the user is briefly routed through `/verify-email/confirm`. This exists because Gmail's own server-side link scanning was found to silently visit — and consume — the single-use verification link within seconds of the email being sent, before the real user ever opened it (confirmed across accounts going back a month, independent of browser). Completing verification the instant the link loads is therefore unsafe; it must instead require an action a scanner won't perform.
+
+| Element      | Detail                                                                                                                                                                                                                                        |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page heading | _"Confirming your email"_                                                                                                                                                                                                                     |
+| Message      | _"This will only take a moment."_                                                                                                                                                                                                             |
+| Interaction  | **None visible.** JavaScript submits the confirmation automatically on page load — a real user is not expected to click anything. This is safe against Gmail's scanner, which fetches the raw page over HTTP and does not execute JavaScript. |
+
+If the link is invalid or has already been used, the user instead sees an inline message here ("We couldn't confirm your email with this link...") with the option to sign in (if already verified) or request a new link.
+
 ### State 2 — Link Clicked (valid and unexpired)
 
-User has clicked a valid, unexpired verification link from their email.
+User has clicked a valid, unexpired verification link from their email, and has passed through the automatic confirming step above.
 
-| Element         | Detail                                                         |
-| --------------- | -------------------------------------------------------------- |
-| Page heading    | _"Email verified"_                                             |
-| Message         | _"Your account is now active. Let's get started."_             |
-| Continue button | _"Go to my dashboard"_ — primary action, links to `/dashboard` |
+| Element         | Detail                                                  |
+| --------------- | ------------------------------------------------------- |
+| Page heading    | _"Email verified"_                                      |
+| Message         | _"Your account is now active. Sign in to get started."_ |
+| Continue button | _"Sign in"_ — primary action, links to `/`              |
+
+**Note (D-012):** the user is deliberately signed out after confirming, so this button always leads to a normal sign-in with credentials, rather than an active session carried over from the confirmation link.
 
 ### State 3 — Link Expired or Invalid
 
-User has clicked a verification link that has expired (after 24 hours) or is malformed.
+User has clicked a verification link that has expired (after 1 hour) or is malformed.
 
 | Element       | Detail                                                                  |
 | ------------- | ----------------------------------------------------------------------- |

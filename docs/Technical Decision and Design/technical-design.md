@@ -144,6 +144,7 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 │   │   ├── register/page.tsx
 │   │   ├── forgot-password/page.tsx
 │   │   ├── verify-email/page.tsx
+│   │   ├── verify-email/confirm/page.tsx  # D-012: auto-confirms via JS, no visible action
 │   │   ├── terms/page.tsx
 │   │   └── privacy/page.tsx
 │   │
@@ -265,7 +266,7 @@ export const config = {
 
 **Protected routes:** `/dashboard`, `/profile`, `/applications`, `/account`
 
-**Public routes:** `/` (landing + sign-in), `/register`, `/forgot-password`, `/verify-email`, `/terms`, `/privacy`
+**Public routes:** `/` (landing + sign-in), `/register`, `/forgot-password`, `/verify-email`, `/verify-email/confirm`, `/terms`, `/privacy`
 
 ### Session timeout
 
@@ -454,22 +455,23 @@ The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 
 ### Page inventory
 
-| Route                       | Type               | Data source                           |
-| --------------------------- | ------------------ | ------------------------------------- |
-| `/`                         | Public, static     | None — landing + sign-in page         |
-| `/register`                 | Public, static     | None                                  |
-| `/forgot-password`          | Public, static     | None                                  |
-| `/verify-email`             | Public, static     | None                                  |
-| `/terms`                    | Public, static     | None                                  |
-| `/privacy`                  | Public, static     | None                                  |
-| `/dashboard`                | Authenticated, SSR | `applications` table                  |
-| `/profile`                  | Authenticated, SSR | `charity_profiles` table              |
-| `/applications/[id]/step/1` | Authenticated, SSR | `applications` table                  |
-| `/applications/[id]/step/2` | Authenticated, SSR | `applications` table                  |
-| `/applications/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`             |
-| `/applications/[id]/step/4` | Authenticated, SSR | `applications`, `application_answers` |
-| `/applications/[id]/step/5` | Authenticated, SSR | `applications`, `application_answers` |
-| `/account`                  | Authenticated, SSR | `user_profiles`                       |
+| Route                       | Type               | Data source                               |
+| --------------------------- | ------------------ | ----------------------------------------- |
+| `/`                         | Public, static     | None — landing + sign-in page             |
+| `/register`                 | Public, static     | None                                      |
+| `/forgot-password`          | Public, static     | None                                      |
+| `/verify-email`             | Public, static     | None                                      |
+| `/verify-email/confirm`     | Public, SSR        | None — D-012, see §9 for `/auth/callback` |
+| `/terms`                    | Public, static     | None                                      |
+| `/privacy`                  | Public, static     | None                                      |
+| `/dashboard`                | Authenticated, SSR | `applications` table                      |
+| `/profile`                  | Authenticated, SSR | `charity_profiles` table                  |
+| `/applications/[id]/step/1` | Authenticated, SSR | `applications` table                      |
+| `/applications/[id]/step/2` | Authenticated, SSR | `applications` table                      |
+| `/applications/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`                 |
+| `/applications/[id]/step/4` | Authenticated, SSR | `applications`, `application_answers`     |
+| `/applications/[id]/step/5` | Authenticated, SSR | `applications`, `application_answers`     |
+| `/account`                  | Authenticated, SSR | `user_profiles`                           |
 
 ---
 
@@ -499,7 +501,7 @@ Server Actions handle all data mutations. Defined in `actions/` with the `"use s
 
 | Action file               | Key functions                                                                                                                                                                                           |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `actions/auth.ts`         | Sign in, register, reset password, change password, sign out                                                                                                                                            |
+| `actions/auth.ts`         | Sign in, register, `confirmEmail` (D-012 — completes signup verification, called only from `/verify-email/confirm`), reset password, change password, sign out                                          |
 | `actions/charity.ts`      | `saveCharityProfile(data)`                                                                                                                                                                              |
 | `actions/applications.ts` | `createApplication`, `updateStep1`, `deleteApplication`, `advanceToStep4`, `saveAnswer`, `saveManualAnswer`, `setDraftReadyToAssemble`, `assembleAndAdvance`, `approveApplication`, `reopenApplication` |
 
@@ -507,18 +509,19 @@ Server Actions handle all data mutations. Defined in `actions/` with the `"use s
 
 Explicit API routes handle long-running operations, file handling, export, and scheduled jobs. (ADR-ARCH-003)
 
-| Route                           | Method | Purpose                                                            | Config                |
-| ------------------------------- | ------ | ------------------------------------------------------------------ | --------------------- |
-| `/api/generate-summary`         | POST   | Step 3: AI summary generation                                      | `maxDuration = 90`    |
-| `/api/refine-answer`            | POST   | Step 4: Per-answer structure/clarity improvement (non-budget only) | `maxDuration = 60`    |
-| `/api/health`                   | GET    | Uptime monitoring endpoint (polled by UptimeRobot)                 | Default timeout       |
-| `/api/upload/signed-url`        | POST   | Request Supabase Storage signed URL                                | Default timeout       |
-| `/api/upload/process`           | POST   | Extract text after upload; store in sessionStorage                 | Default timeout       |
-| `/api/export/[id]`              | GET    | Generate and stream Word document                                  | Default timeout       |
-| `/api/account/delete`           | POST   | Cascade-delete user account and all data                           | Default timeout       |
-| `/api/cron/cleanup-guidelines`  | GET    | Delete orphaned Storage objects                                    | Cron: every 30 min    |
-| `/api/cron/inactivity-warning`  | GET    | Send inactivity warning emails                                     | Cron: 08:00 UTC daily |
-| `/api/cron/inactivity-deletion` | GET    | Delete inactive accounts ≥24 months                                | Cron: 09:00 UTC daily |
+| Route                           | Method | Purpose                                                                                                                                                                                                    | Config                |
+| ------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| `/auth/callback`                | GET    | Supabase email verification / password reset redirect target. Password recovery completes immediately here; signup confirmation redirects to `/verify-email/confirm` instead of completing on load (D-012) | Default timeout       |
+| `/api/generate-summary`         | POST   | Step 3: AI summary generation                                                                                                                                                                              | `maxDuration = 90`    |
+| `/api/refine-answer`            | POST   | Step 4: Per-answer structure/clarity improvement (non-budget only)                                                                                                                                         | `maxDuration = 60`    |
+| `/api/health`                   | GET    | Uptime monitoring endpoint (polled by UptimeRobot)                                                                                                                                                         | Default timeout       |
+| `/api/upload/signed-url`        | POST   | Request Supabase Storage signed URL                                                                                                                                                                        | Default timeout       |
+| `/api/upload/process`           | POST   | Extract text after upload; store in sessionStorage                                                                                                                                                         | Default timeout       |
+| `/api/export/[id]`              | GET    | Generate and stream Word document                                                                                                                                                                          | Default timeout       |
+| `/api/account/delete`           | POST   | Cascade-delete user account and all data                                                                                                                                                                   | Default timeout       |
+| `/api/cron/cleanup-guidelines`  | GET    | Delete orphaned Storage objects                                                                                                                                                                            | Cron: every 30 min    |
+| `/api/cron/inactivity-warning`  | GET    | Send inactivity warning emails                                                                                                                                                                             | Cron: 08:00 UTC daily |
+| `/api/cron/inactivity-deletion` | GET    | Delete inactive accounts ≥24 months                                                                                                                                                                        | Cron: 09:00 UTC daily |
 
 ### Zod validation pattern
 

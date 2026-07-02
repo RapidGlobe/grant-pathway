@@ -142,7 +142,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 - **Given** I have successfully submitted the registration form
 - **Then** I receive a verification email at my registered email address
 - **And** the email contains a verification link
-- **And** the link expires after 24 hours
+- **And** the link expires after 1 hour
 
 ---
 
@@ -159,17 +159,29 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 **AC-FR-03-03 — Valid verification link activates account**
 
 - **Given** I have received my verification email
-- **When** I click the verification link within 24 hours
-- **Then** I am directed to `/verify-email` showing the heading _"Email verified"_
+- **When** I click the verification link within 1 hour
+- **Then** I am briefly routed through `/verify-email/confirm`, which confirms automatically with no action required from me (D-012)
+- **And** I am then directed to `/verify-email` showing the heading _"Email verified"_
 - **And** my account is now active
+- **And** I am signed out (not left in an active session from the link)
 - **And** I can sign in with my email address and password
+
+---
+
+**AC-FR-03-3a — Verification link cannot be completed by a page load alone (D-012)**
+
+- **Given** an automated system (e.g. an email provider's link-scanning) requests the verification link before I do
+- **Then** my account is not activated by that request alone
+- **And** activation only completes when a real browser executes the confirmation page's JavaScript
+- **When** I subsequently open the same link myself within the 1-hour window
+- **Then** my account activates normally, exactly as if the automated request had not happened
 
 ---
 
 **AC-FR-03-04 — Expired verification link**
 
 - **Given** I have received a verification email
-- **When** I click the verification link after 24 hours have passed
+- **When** I click the verification link after 1 hour has passed
 - **Then** I see the heading _"This link has expired"_
 - **And** I see the message: _"Your verification link is no longer valid. Request a new one below."_
 - **And** I am shown a "Send a new verification email" button

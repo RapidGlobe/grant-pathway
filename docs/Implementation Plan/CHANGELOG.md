@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-07-02 — D-012 continued: Gmail's own link scanning was silently consuming verification links
+
+Follow-up to the Resend API key fix below. Once email delivery started working again, verification links began showing "This link has expired" within minutes of being sent -- confirmed as a _second, distinct_ root cause from the SMTP issue.
+
+**Investigation:** Checked `auth.users` timestamps across 5 accounts spanning a month (`created_at` back to 2026-06-09) and found every single one confirmed 15-80 seconds after the email was sent -- far too fast for a human, and consistent regardless of which browser was used to read the email (Comet, Chrome, and later re-tested in Edge). Ruled out browser-specific causes directly: registered a fresh account in Wac's non-Chrome default browser as a controlled experiment, and it auto-confirmed in 25.7 seconds -- _faster_ than the Chrome attempt. Ruled out Resend's own click-tracking (the "New tracking subdomain" screen Wac found was an unsaved setup wizard, not an active config). Checked Supabase's own Auth Logs directly: the verification token (`token=pkce_...&type=signup`) was hit twice at `/auth/v1/verify`, 5 seconds apart, minutes before Wac ever opened the email.
+
+**Root cause:** all 5 sampled accounts were `+alias@gmail.com` addresses on the same underlying Gmail inbox. Gmail performs server-side link scanning on incoming HTML email as part of spam/phishing detection -- entirely independent of the recipient's browser or device -- and was visiting the single-use verification link within seconds of delivery, before the real person ever saw it. This is a widely-documented gotcha for exactly this style of single-use email link, unrelated to this app's implementation quality; it will affect any Gmail recipient, including quite possibly the charity contact using the service next week.
+
+**Fix, in two stages (both in `app/auth/callback/route.ts`, `actions/auth.ts`, and new files `app/(public)/verify-email/confirm/page.tsx` + `components/confirm-email-form.tsx`):**
+
+1. `/auth/callback` no longer completes verification (`verifyOtp` / `exchangeCodeForSession`) the instant its page loads -- that's exactly the kind of GET request an automated scanner performs. Password recovery (`type=recovery` or `next=reset`) is unchanged. Signup confirmation now redirects to a new `/verify-email/confirm` page, which required an explicit "Confirm my email address" button click before the token is spent -- scanners fetch pages, they don't click buttons.
+2. **Wac tested this via Comet and found it asked the user to verify twice** -- once via the button in the email itself, then again via the new page's button. Confirmed by checking `auth.users` (30s send-to-confirm, consistent with a human clicking through both steps quickly) and by Wac describing exactly two clicks. Fixed by auto-submitting the confirm page's form the instant it mounts in a real browser (`formRef.current.requestSubmit()` in a mount-only `useEffect`) -- Gmail's scanner fetches the raw page over HTTP and does not execute JavaScript, so this stays safe, while a real person gets back a single-click experience.
+3. **Further UX refinement, also from Wac:** since a real person isn't expected to interact with the confirm step at all, showing "Confirm your email address" + a clickable button was misleading even though nobody has to click it. Replaced with a passive "Confirming your email… This will only take a moment." spinner, no interactive element at all.
+
+On success, `confirmEmail()` (the new Server Action) signs the session back out immediately, mirroring the existing `resetPassword()` pattern, so the "Email verified" screen's button always leads to a normal sign-in with credentials rather than an active session carried over from the link. `verify-email/page.tsx`'s verified-state copy and button updated to match ("Sign in" / `/`, not "Go to my dashboard" / `/dashboard`).
+
+**Verified fixed** by re-registering fresh accounts and completing the full flow via Comet, Chrome, and Edge -- all three confirmed cleanly (14.5s-30s, single pass, no repeat prompts) with no code changes between browsers.
+
+**Documentation corrected in the same pass** (deferred until the fix was confirmed working, per Wac): `screen-requirements.md` (new `/verify-email/confirm` intermediate-screen entry; State 2 copy/button updated) and `acceptance-criteria.md` (AC-FR-03-03 updated, new AC-FR-03-3a added for the scanner-safety behaviour) both also had their verification-link expiry documented as 24 hours -- corrected to the actual 1 hour while in these files for an unrelated but adjacent reason. `technical-design.md` updated: project structure tree, public routes list, page inventory, API routes table (`/auth/callback` added), and the `actions/auth.ts` Server Actions row (`confirmEmail` added). `regression-test-plan.md`'s D-012 Defect Log entry rewritten to cover both chained root causes.
+
+Temporary D-012 experiment logging (`Sentry.captureMessage` + `console.log` in `route.ts` and `actions/auth.ts`, tagged `d-012-auth-callback`) removed now that the fix is confirmed and documented.
+
+---
+
 ## 2026-07-02 — D-012: registration broken for every new account (email delivery)
 
 Found live during the first run of RT-01a (the new account-registration regression test). Every attempt to register a new account on dev showed the generic "Something went wrong. Please try again in a moment." error.

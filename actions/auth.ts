@@ -129,23 +129,6 @@ export async function confirmEmail(
       ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
       : { error: { message: 'confirmEmail called with neither code nor token_hash' } }
 
-  const userAgent = (await headers()).get('user-agent')
-  console.log(
-    '[D-012-EXPERIMENT]',
-    JSON.stringify({
-      label: 'confirmEmail action result',
-      success: !error,
-      errorMessage: error?.message ?? null,
-      userAgent,
-      timestamp: new Date().toISOString(),
-    }),
-  )
-  Sentry.captureMessage('D-012 experiment: confirmEmail action result', {
-    level: 'info',
-    tags: { experiment: 'd-012-auth-callback' },
-    extra: { success: !error, errorMessage: error?.message ?? null, userAgent },
-  })
-
   if (error) {
     return { error: 'invalid' }
   }
