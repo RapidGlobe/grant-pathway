@@ -174,7 +174,7 @@ Every component in the current stack is the correct selection for its role. No s
 
 **Verdict:** Consider adding at P5.4
 
-Axiom provides a searchable, chartable log management layer with a native Vercel log drain integration. Once the drain is configured — a single URL added in Vercel project settings — every function log line becomes queryable in real time, including the structured latency logs already emitted by all three AI routes.
+Axiom provides a searchable, chartable log management layer with a native Vercel log drain integration. Once the drain is configured — a single URL added in Vercel project settings — every function log line becomes queryable in real time, including the structured latency logs already emitted by both AI routes (`generate-summary`, `refine-answer`; the third route, `generate-draft`, was removed 2026-07-01 as orphaned code — see CHANGELOG.md).
 
 This directly closes the remaining gap from GAP-27: AI route latency data is being logged in structured form but currently has nowhere to land that supports alerting or trend analysis. Sentry handles exceptions; Axiom handles telemetry. They are complementary, not competing.
 
@@ -208,5 +208,6 @@ It also provides a searchable audit trail for AI usage patterns, error rates per
 
 ---
 
-_Last updated: 2026-06-30_  
+_Last updated: 2026-07-02 — corrected the Axiom section's AI route count from three to two, reflecting the `generate-draft` route removal on 2026-07-01. No component verdicts changed._  
+_Originally published: 2026-06-30_  
 _Basis: technology-stack.md v1.3 · technical-design.md v1.4 · ADR-AI-001/002, ADR-STACK-001–006, ADR-OPS-003/005/008, ADR-SEC-005_
