@@ -4,6 +4,7 @@
 // All Supabase Auth calls are centralised here so components stay thin
 // and the auth flow is easy to trace and test.
 
+import * as Sentry from '@sentry/nextjs'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
@@ -64,6 +65,7 @@ export async function registerUser(
   })
 
   if (error) {
+    Sentry.captureException(error, { tags: { action: 'registerUser' } })
     return { error: 'unknown' }
   }
 

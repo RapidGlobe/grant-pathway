@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-02 — D-012: registration broken for every new account (email delivery)
+
+Found live during the first run of RT-01a (the new account-registration regression test). Every attempt to register a new account on dev showed the generic "Something went wrong. Please try again in a moment." error.
+
+**Root cause, confirmed by calling Supabase Auth's `/auth/v1/signup` endpoint directly** (bypassing the app, using the project's anon key): `{"code":500,"error_code":"unexpected_failure","msg":"Error sending confirmation email"}`. This is Supabase Auth failing to send the verification email via its configured SMTP relay (Resend) -- not an application bug in the traditional sense. Checked in passing: the Resend API key recorded in `AWS and Supabase keys.md` also failed authentication when queried directly against Resend's API (`"API key is invalid"`) -- may or may not be the same key configured in Supabase's SMTP settings, but consistent with a Resend-side credential or account problem. **Not yet fixed -- needs Wac to check the Resend account (suspension, domain verification, sending limits) and the SMTP API key configured in Supabase Dashboard -> Authentication -> Settings -> SMTP Settings, for both dev and prod projects.**
+
+Confirmed no orphaned/partially-created `auth.users` rows result from the failure (checked directly against the dev database) -- Supabase rolls back the whole signup, so retries are safe once the email issue is resolved.
+
+**Fixed in code, separately from the root cause:** `actions/auth.ts`'s `registerUser` caught the Supabase error and returned a generic `{ error: 'unknown' }` with **no logging at all** -- the real reason was completely invisible without manually reproducing the API call. Added `Sentry.captureException(error, { tags: { action: 'registerUser' } })` before the generic return, so future auth failures of any kind surface in Sentry instead of vanishing silently.
+
+Logged as **D-012** in `regression-test-plan.md`'s Defect Log, severity Blocking -- this affects every prospective new user, including the real charity application planned for next week, so it needs resolving before then regardless of testing progress otherwise.
+
+---
+
 ## 2026-07-02 — P5.6 DNS: Vercel side configured, GoDaddy record outstanding
 
 A real charity contact wants to complete a live application next week under Wac's supervision. That doesn't require production to be publicly reachable (the session will be supervised, on Wac's device, dev or prod both fine) -- but it surfaced that `grantpathway.org.uk` was never actually connected, worth fixing anyway since it's needed eventually. Investigated and got as far as CLI access allows:

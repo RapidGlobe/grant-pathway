@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.3
+**Version:** 1.4
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (Added RT-01a — account registration and email verification — for testers using freshly created accounts instead of the pre-seeded one; updated Test Data and Appendix A to reference it)
+**Last updated:** 2026-07-02 (Logged D-012: registration fails for every new account — Supabase Auth cannot send the confirmation email. Found during the first live run of RT-01a.)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -487,9 +487,11 @@ Run these after all Tier 1 tests pass.
 
 ## Defect Log
 
-| ID  | Test | Description | Severity | Status |
-| --- | ---- | ----------- | -------- | ------ |
-|     |      |             |          |        |
+| ID    | Test   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Severity | Status                                                                           |
+| ----- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| D-012 | RT-01a | Registration fails with the generic "Something went wrong" message for every new account. Root cause confirmed by calling Supabase Auth's `/auth/v1/signup` directly (bypassing the app): `{"code":500,"error_code":"unexpected_failure","msg":"Error sending confirmation email"}`. This is an email-delivery failure inside Supabase Auth's SMTP relay (Resend), not an app bug — but the app was silently swallowing the real error into a generic `{ error: 'unknown' }` with no logging, making it look like a mystery app failure. Confirmed no orphaned/partial `auth.users` rows are created when this happens — safe to retry once fixed. | Blocking | Open — needs Wac to check Resend account/API key and Supabase Auth SMTP settings |
+
+**Fixed alongside this finding:** `actions/auth.ts` now calls `Sentry.captureException(error, { tags: { action: 'registerUser' } })` before returning `{ error: 'unknown' }`, so the real Supabase error is visible in Sentry next time instead of vanishing. This does not fix the underlying email-delivery problem — that still needs to be resolved via Resend/Supabase configuration (outside code).
 
 ---
 
