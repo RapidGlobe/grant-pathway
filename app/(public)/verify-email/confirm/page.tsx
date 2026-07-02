@@ -13,9 +13,11 @@ interface Props {
 
 // D-012: reached from /auth/callback, which no longer completes verification
 // on page load (Gmail's own link scanning was silently consuming the
-// single-use link before the real user ever clicked it). This page requires
-// an explicit button click — see components/confirm-email-form.tsx and
-// actions/auth.ts's confirmEmail(). See CHANGELOG.md, 2026-07-02, D-012.
+// single-use link before the real user ever clicked it). This page confirms
+// automatically via JavaScript, with no visible button -- a real person
+// isn't expected to interact with it at all, just see a brief "Confirming…"
+// spinner. See components/confirm-email-form.tsx and actions/auth.ts's
+// confirmEmail(). See CHANGELOG.md, 2026-07-02, D-012.
 export default async function ConfirmEmailPage({ searchParams }: Props) {
   const { code, token_hash: tokenHash, type } = await searchParams
 
@@ -32,11 +34,9 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Confirm your email address</h1>
+        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Confirming your email</h1>
 
-        <p className="mb-8 text-[15px] text-[#64748B]">
-          Click the button below to finish verifying your email and activate your account.
-        </p>
+        <p className="mb-8 text-[15px] text-[#64748B]">This will only take a moment.</p>
 
         <ConfirmEmailForm code={code ?? null} tokenHash={tokenHash ?? null} type={type ?? null} />
       </div>

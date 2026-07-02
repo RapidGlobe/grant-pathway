@@ -1,8 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useRef } from 'react'
-import { AlertCircle } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { confirmEmail, type ConfirmEmailState } from '@/actions/auth'
 import { VerifyEmailResendForm } from '@/components/verify-email-resend-form'
 
@@ -15,17 +14,16 @@ interface Props {
 const INITIAL_STATE: ConfirmEmailState = { error: null }
 
 export function ConfirmEmailForm({ code, tokenHash, type }: Props) {
-  const [state, action, isPending] = useActionState(confirmEmail, INITIAL_STATE)
+  const [state, action] = useActionState(confirmEmail, INITIAL_STATE)
   const formRef = useRef<HTMLFormElement>(null)
 
   // D-012 follow-up: submit automatically the instant this loads in a real
-  // browser, rather than waiting for a manual click. Gmail's own link
-  // scanning fetches the raw page over HTTP and does not execute
-  // JavaScript, so this stays safe against the exact behaviour that caused
-  // D-012 -- but a real person now gets a single-click experience (click the
-  // email link, land here, confirmation completes immediately) instead of
-  // being asked to click twice. The button remains as a fallback in case JS
-  // is disabled or this effect doesn't fire.
+  // browser -- no visible button, since we don't expect (or want) a real
+  // person to interact with this step at all. Gmail's own link scanning
+  // fetches the raw page over HTTP and does not execute JavaScript, so this
+  // stays safe against the exact behaviour that caused D-012, while a real
+  // person just sees a brief "Confirming..." spinner before landing on the
+  // verified screen.
   useEffect(() => {
     formRef.current?.requestSubmit()
   }, [])
@@ -54,13 +52,10 @@ export function ConfirmEmailForm({ code, tokenHash, type }: Props) {
       {code && <input type="hidden" name="code" value={code} />}
       {tokenHash && <input type="hidden" name="token_hash" value={tokenHash} />}
       {type && <input type="hidden" name="type" value={type} />}
-      <Button
-        type="submit"
-        disabled={isPending}
-        className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
-      >
-        {isPending ? 'Confirming…' : 'Confirm my email address'}
-      </Button>
+      <div role="status" className="flex items-center justify-center gap-2 text-[#64748B]">
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+        <span className="text-[14px]">Confirming…</span>
+      </div>
     </form>
   )
 }
