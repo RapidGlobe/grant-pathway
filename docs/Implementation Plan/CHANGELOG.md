@@ -10,29 +10,51 @@
 
 ---
 
-## 2026-07-02 — Export footer: version number removed, page numbering added (PDR-DH-003 revised)
+## 2026-07-02 — PROPOSAL (not yet decided): a real versioning strategy for the service
 
-Wac downloaded both export formats during live RT-10 testing and asked for two changes: remove the version number from the footer, and add page numbers to the Word export ("Page N of NN" — not meaningful for plain text, which has no concept of pages).
+Raised while reinstating the export footer's version number (see entry below) -- the footer has always shown a hardcoded literal `"v1"`, which has never actually changed and doesn't derive from anything real. `package.json`'s own `version` field is `0.1.0` and is not connected to the footer at all. Whatever the footer is meant to support (traceability for support and issue reporting, per `PDR-DH-003`), a string that has never once updated cannot deliver on that.
 
-This wasn't just a typo fix -- `PDR-DH-003` (Export Format and Structure) explicitly specified the version number, with a stated rationale ("provides traceability for support and issue reporting"). Implemented as requested and recorded properly as a decision reversal in `PDR-DH-003`'s new Revision History section, rather than silently overwriting the original decision -- Wac did not give a specific reason for the change beyond wanting it removed, which the revision entry states plainly rather than inventing a justification.
+**Why a manually-bumped semantic version (the obvious default) is a poor fit here specifically:** this project has no formal release cadence -- it's continuously deployed, often more than a dozen times a day (today alone had well over 20 pushes to `master`). A manual version bump requires remembering to do it on every meaningful change, which is exactly the discipline that has evidently already failed once (`"v1"` frozen since the footer was first built). Even bumped diligently, a coarse `MAJOR.MINOR.PATCH` wouldn't have the resolution to distinguish two builds shipped hours apart, which is the realistic scenario for a support conversation about this project ("was this generated before or after this afternoon's fix?").
 
-**What changed** (`app/api/export/[applicationId]/route.ts`):
+**Proposed instead: auto-derived from build metadata, zero manual maintenance.**
 
-- Footer text on both formats: _"Prepared using Grant Pathway v1 — grantpathway.org.uk"_ -> _"Prepared using Grant Pathway — grantpathway.org.uk"_
-- Word export only: added a second footer paragraph, "Page N of NN", using `docx`'s `PageNumber.CURRENT` / `PageNumber.TOTAL_PAGES` fields (dynamic Word fields, computed by Word itself at open/print time)
-- Verified via a standalone test document using the same `docx` calls, checked with the skill's `validate.py` -- structurally valid OOXML. Could not render to PDF for a visual check (the sandboxed LibreOffice wrapper hits a Windows socket-API incompatibility, unrelated to this change) -- relying on the well-documented, standard nature of these field codes instead.
+Vercel automatically injects Git commit metadata as build-time environment variables on every deployment (`VERCEL_GIT_COMMIT_SHA`, `VERCEL_GIT_COMMIT_MESSAGE`, etc.) -- no configuration needed. A version string built from this at build time would be:
 
-**Documentation updated:** `PDR-DH-003` (new Revision History entry, footer/formatting sections struck through and corrected), `acceptance-criteria.md` (`AC-FR-37-03`), `regression-test-plan.md` (RT-10's verification list now checks for the corrected footer and page number).
+- **Precise:** a short commit SHA maps to exactly one code state, unambiguously -- exactly what's needed to diagnose "what was live when this document was generated"
+- **Human-readable at a glance:** paired with the deploy date, gives an immediate "roughly when" answer without needing to look anything up
+- **Zero maintenance:** nobody has to remember to bump anything, ever -- it changes automatically with every deployment, which matches how this project actually ships
 
-Also found and fixed in passing: `technical-design.md`'s API Routes table had `/api/export/[id]` -- the route folder is actually `[applicationId]`, and the table didn't mention the route also serves `format=txt`, not just Word. The route's own doc comment (line 760) already had the correct param name -- just an internal inconsistency within the same file.
+Suggested format: `v2026.07.02 (a2ca520)` or similar -- exact display wording is a matter of taste, not something this proposal is trying to settle. Mechanically: read `VERCEL_GIT_COMMIT_SHA` (and its own commit date) at build time in `next.config.ts`, expose it via `NEXT_PUBLIC_APP_VERSION` (or similar) so it's available without a database round-trip, and have the export route read it the same way it currently reads the hardcoded literal.
+
+**Not implemented.** This is a proposal for Wac to react to, not a decision -- if agreed, it would need its own PDR (or an ADR, since it's arguably more an operational/build concern than a product decision) recording the choice, plus the code change in the export route and wherever else a version string might eventually be useful (e.g. Sentry release tracking, which typically wants exactly this kind of build identifier anyway).
 
 ---
 
-## 2026-07-02 — RT-10 corrected and RT-10a added: plain-text export was never independently tested
+## 2026-07-02 — Export footer: version number briefly removed, then reinstated; page numbering added (PDR-DH-003 revised)
 
-Found while fixing RT-09 (see entry below) -- once approve+download became a single action (2026-06-12), RT-09's download click already produces one exported file, in whichever format the tester chose. RT-10, written before that merge, still assumed a fresh "download button just became active" state and only ever exercised Word. Plain-text export (`format=txt` in the same route) has always been a separate code path with its own test coverage gap.
+Wac downloaded both export formats during live RT-10 testing and initially asked for the version number to be removed from the footer, plus page numbers added to the Word export ("Page N of NN" — not meaningful for plain text, which has no concept of pages).
 
-**Fixed:** RT-10 now explicitly handles both cases -- if RT-09 already produced the Word file, verify it directly; if RT-09 used plain text instead, clicking "Download as Word document" now correctly triggers the re-export confirmation dialog (D-WF-04), which is expected, not a defect. Added **RT-10a**, the mirror image for plain-text export, with its own content checklist (no version number, no page numbers -- plain text has no pages).
+This wasn't just a typo fix -- `PDR-DH-003` (Export Format and Structure) explicitly specified the version number, with a stated rationale ("provides traceability for support and issue reporting"). Implemented and recorded as a decision reversal in `PDR-DH-003`'s new Revision History section rather than silently overwriting the original decision. **Wac then recalled the version number was included deliberately for that reason and asked to reinstate it** -- reverted the same session, before it was ever deployed to a real user-facing state for long. Recorded as a further Revision History entry rather than pretending the excursion didn't happen.
+
+**Net result** (`app/api/export/[applicationId]/route.ts`):
+
+- Footer text: unchanged from the original -- _"Prepared using Grant Pathway v1 — grantpathway.org.uk"_ on both formats
+- Word export only: added a second footer paragraph, "Page N of NN", using `docx`'s `PageNumber.CURRENT` / `PageNumber.TOTAL_PAGES` fields (dynamic Word fields, computed by Word itself at open/print time) -- this part of the change stuck
+- Verified via a standalone test document using the same `docx` calls, checked with the skill's `validate.py` -- structurally valid OOXML. Could not render to PDF for a visual check (the sandboxed LibreOffice wrapper hits a Windows socket-API incompatibility, unrelated to this change) -- relying on the well-documented, standard nature of these field codes instead.
+
+**Documentation:** `PDR-DH-003` Revision History now has an honest two-entry record (removed, then reinstated) rather than a single edit that erases what actually happened. `acceptance-criteria.md` (`AC-FR-37-03`) and `regression-test-plan.md` both reflect the final state (version number present, page number added).
+
+Also found and fixed in passing: `technical-design.md`'s API Routes table had `/api/export/[id]` -- the route folder is actually `[applicationId]`, and the table didn't mention the route also serves `format=txt`, not just Word. The route's own doc comment already had the correct param name -- just an internal inconsistency within the same file.
+
+**Raised in passing, not yet actioned:** the footer's version string has always been a hardcoded literal (`"v1"`), never derived from `package.json` (currently `0.1.0`) or any real build/deploy metadata -- it has never actually tracked anything. See the versioning-strategy proposal below.
+
+---
+
+## 2026-07-02 — RT-09 and RT-10 merged: approve + Word export is one user action, so it's one test
+
+Following on from the footer discussion above, Wac raised that RT-09 (approval) and RT-10 (Word export verification) would be better merged, given approve+download became a single action on 2026-06-12 -- testing them as two separate cases had forced awkward "if RT-09 used Word... if RT-09 used plain text..." branching logic to stitch them back together, which was itself a sign the split no longer matched reality.
+
+**Fixed:** RT-09 is now "Final Review, Approval, and Word Export" -- tick checkboxes, click **Download as Word document** (a fixed choice, not "record which"), verify the approval RPC and banner, verify the resulting Word document content, all as one continuous test. The freed **RT-10** slot is reused for plain-text export (previously **RT-10a**, added earlier the same day when the gap was first found -- plain-text export had never had its own test at all). Because RT-09 now always downloads Word first, RT-10 (plain text) deterministically triggers the re-export confirmation dialog (D-WF-04) every time -- no more conditional "if/if" logic needed in either test.
 
 ---
 

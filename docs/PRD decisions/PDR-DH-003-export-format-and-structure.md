@@ -26,14 +26,14 @@ The BRD specifies that users can export approved application content as a Word (
 
 ### Export document structure
 
-| Element            | Content                                                                                                                                                        |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Document title** | [Grant name] — Application                                                                                                                                     |
-| **Funder**         | [Funder name]                                                                                                                                                  |
-| **Exported**       | [Date exported, e.g. 16 April 2026]                                                                                                                            |
-| **Disclaimer**     | _"This draft was generated with AI assistance and reviewed by [user's full name]. Please review carefully before submitting to the funder."_                   |
-| **Body**           | Each application question as a bold heading, followed by the approved answer in plain text beneath it                                                          |
-| **Footer**         | _"Prepared using Grant Pathway — grantpathway.org.uk"_, plus a page number ("Page N of NN") on the Word export. **Revised 2026-07-02 — see Revision History.** |
+| Element            | Content                                                                                                                                                                     |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Document title** | [Grant name] — Application                                                                                                                                                  |
+| **Funder**         | [Funder name]                                                                                                                                                               |
+| **Exported**       | [Date exported, e.g. 16 April 2026]                                                                                                                                         |
+| **Disclaimer**     | _"This draft was generated with AI assistance and reviewed by [user's full name]. Please review carefully before submitting to the funder."_                                |
+| **Body**           | Each application question as a bold heading, followed by the approved answer in plain text beneath it                                                                       |
+| **Footer**         | _"Prepared using Grant Pathway v[version number] — grantpathway.org.uk"_, plus a page number ("Page N of NN") on the Word export (added 2026-07-02 — see Revision History). |
 
 ### Formatting
 
@@ -41,7 +41,7 @@ The BRD specifies that users can export approved application content as a Word (
 - No Grant Pathway logo, colours, or imagery in the document body
 - Single-column layout, A4 page size
 - Standard margins (2.54cm)
-- ~~The footer version number reflects the application version at time of export (e.g. _Grant Pathway v1.0_)~~ **Removed 2026-07-02 — see Revision History.**
+- The footer version number reflects the application version at time of export (e.g. _Grant Pathway v1.0_) — **confirmed intentional 2026-07-02, see Revision History**
 - The Word export footer includes a page number ("Page N of NN"), added 2026-07-02. Not applicable to the plain-text export, which has no concept of pages.
 
 ### Plain text export (Could Have — FR-38)
@@ -58,6 +58,7 @@ The exported document is submitted by the user to a funder — it is the user's 
 
 ## Revision History
 
-| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-02 | Footer version number removed from both the Word and plain-text export (was _"Prepared using Grant Pathway v1 — grantpathway.org.uk"_; now _"Prepared using Grant Pathway — grantpathway.org.uk"_). A page number ("Page N of NN") added to the Word export footer instead, using `docx`'s `PageNumber.CURRENT`/`PageNumber.TOTAL_PAGES` fields — not applicable to the plain-text export. Requested by Wac while reviewing exported test documents during RT-10; this reverses the original decision's stated rationale that the version number "provides traceability for support and issue reporting" — Wac did not record a specific reason for the change beyond wanting it removed. |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-02 | Footer version number briefly removed from both export formats, then **reinstated the same day** once Wac recalled it was included deliberately for support/audit traceability, not an oversight. Net change that stuck: a page number ("Page N of NN") added to the Word export footer, using `docx`'s `PageNumber.CURRENT`/`PageNumber.TOTAL_PAGES` fields — not applicable to the plain-text export, which has no concept of pages. The version number itself is unchanged from the original decision. |
+| 2026-07-02 | Raised in passing: the footer's version string has always been a hardcoded literal (`"v1"`), not derived from `package.json` (currently `0.1.0`) or any other real source of truth — so it has never actually tracked anything. A proper versioning strategy for the service is still an open question; see `CHANGELOG.md` for a proposal.                                                                                                                                                                |

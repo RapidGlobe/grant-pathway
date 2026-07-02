@@ -22,8 +22,11 @@
 //   Separator:  horizontal rule
 //   Disclaimer: italic disclaimer paragraph (11pt)
 //   Q&A:        Question N (14pt bold) followed by answer paragraph (11pt)
-//   Footer:     "Prepared using Grant Pathway — grantpathway.org.uk" (9pt, centred),
-//               "Page N of NN" on the line below
+//   Footer:     "Prepared using Grant Pathway v1 — grantpathway.org.uk" (9pt, centred),
+//               "Page N of NN" on the line below (Word only)
+//   NOTE (2026-07-02): the version number is intentional -- see PDR-DH-003 --
+//   it exists for support/issue-reporting traceability. Do not remove it
+//   without checking that decision record first.
 
 import { NextRequest, NextResponse } from 'next/server'
 import {
@@ -223,7 +226,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     lines.push('')
-    lines.push('Prepared using Grant Pathway — grantpathway.org.uk')
+    lines.push('Prepared using Grant Pathway v1 — grantpathway.org.uk')
 
     return new Response(lines.join('\n'), {
       headers: {
@@ -270,7 +273,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 alignment: AlignmentType.CENTER,
                 children: [
                   new TextRun({
-                    text: 'Prepared using Grant Pathway — grantpathway.org.uk',
+                    text: 'Prepared using Grant Pathway v1 — grantpathway.org.uk',
                     font: 'Calibri',
                     size: pt(9),
                     color: '888888',

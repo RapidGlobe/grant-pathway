@@ -1,8 +1,8 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 1.9
+**Version:** 2.0
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (RT-10 corrected to account for the RT-09 approve+download merge; added RT-10a for plain-text export, previously untested; export footer version number removed and page numbering added to the Word export per PDR-DH-003 revision.)
+**Last updated:** 2026-07-02 (RT-09 and RT-10 merged into a single approve+Word-export test, matching the fact that they're now one user action; the freed RT-10 slot reused for plain-text export, run second and always via the re-export path. Export footer version number briefly removed then reinstated — see PDR-DH-003 — with page numbering added to the Word export only.)
 **Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
@@ -84,9 +84,8 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 | RT-06   | Answer approval and progress bar          | Full  |        |      |       |
 | RT-07   | Preparation checklist gate                | Full  |        |      |       |
 | RT-08   | Senior review screen                      | Full  |        |      |       |
-| RT-09   | Final review and approval                 | Full  |        |      |       |
-| RT-10   | Word document export                      | Full  |        |      |       |
-| RT-10a  | Plain text export                         | Full  |        |      |       |
+| RT-09   | Final review, approval, and Word export   | Full  |        |      |       |
+| RT-10   | Plain text export                         | Full  |        |      |       |
 | RT-11   | Dashboard reopen application              | Full  |        |      |       |
 
 ---
@@ -395,12 +394,12 @@ Run these after all Tier 1 tests pass.
 
 ---
 
-### RT-09 — Final Review and Approval [FULL]
+### RT-09 — Final Review, Approval, and Word Export [FULL]
 
-**User guide reference:** Section 9 (Review)
-**What this tests:** Step 5 review screen, confirmation checkboxes, and the combined approve+download action — clicking a download button calls `approveApplication()`, which runs the `approve_application` Postgres RPC, then downloads immediately. This RPC was missing from production until 2026-07-01; this test is the direct end-to-end check that it's actually present and working on the environment under test.
+**User guide reference:** Section 9 (Review), Section 10 (Export)
+**What this tests:** Step 5 review screen, confirmation checkboxes, the combined approve+download action, and the resulting Word document — clicking a download button calls `approveApplication()`, which runs the `approve_application` Postgres RPC, then downloads immediately. This RPC was missing from production until 2026-07-01; this test is the direct end-to-end check that it's present and working, and that the resulting export is correct.
 
-**Note:** there is no separate "Approve" button or confirmation modal. This was deliberately removed on 2026-06-12 (see `CHANGELOG.md`) — the previous flow took 6 interactions (3 checkbox ticks → Approve button → modal confirm → download click); three deliberate checkbox ticks already demonstrate intent, so the modal was judged redundant friction. Approval and download are now a single action. See `AC-FR-33-01` through `AC-FR-33-03`.
+**Note:** there is no separate "Approve" button or confirmation modal. This was deliberately removed on 2026-06-12 (see `CHANGELOG.md`) — the previous flow took 6 interactions (3 checkbox ticks → Approve button → modal confirm → download click); three deliberate checkbox ticks already demonstrate intent, so the modal was judged redundant friction. Approval and download are now a single action, so this test covers approval and the Word export together rather than as two separate tests (as it briefly did earlier today) — RT-10 covers the second format (plain text) as its own test, since downloading it afterwards exercises a genuinely distinct scenario (the re-export confirmation dialog, D-WF-04). See `AC-FR-33-01` through `AC-FR-33-03`.
 
 **Prerequisite:** RT-08 complete
 
@@ -410,38 +409,11 @@ Run these after all Tier 1 tests pass.
 2. Verify all approved answers are displayed for review
 3. Confirm the download buttons are disabled before any checkboxes are ticked
 4. Tick all three confirmation checkboxes
-5. Confirm a download button becomes enabled
-6. Click **Download as Word document** (or plain text — record which)
+5. Confirm both download buttons become enabled
+6. Click **Download as Word document**
 7. Confirm the download begins immediately, with no intermediate modal
 8. Confirm a persistent "Application approved" banner now replaces the checklist
-
-**Expected result:**
-
-- Review screen matches Section 9 of user guide
-- All answers visible
-- Download buttons disabled until all three checkboxes are ticked
-- Clicking download approves and exports in one action, no confirmation modal
-- Approval action completes without error
-
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
-
-**Notes (record which download format was used, and the exact banner text shown):**
-
----
-
-### RT-10 — Word Document Export [FULL]
-
-**User guide reference:** Section 10 (Export)
-**What this tests:** Export API route, Word document generation, file download
-
-**Prerequisite:** RT-09 complete (application approved and exported via whichever format was used there)
-
-**Note:** RT-09's download click already approved and exported the application once, in whichever format was chosen there. If RT-09 used **Word**, you already have the file — skip to "Verify the document contains" below. If RT-09 used **plain text**, click **Download as Word document** now: since the application is already exported, this triggers the **re-export confirmation dialog** (expected, not a defect — see D-WF-04 in `CHANGELOG.md`) — confirm through it to get the Word file.
-
-**Steps:**
-
-1. Obtain the Word document as above
-2. Open the downloaded .docx file
+9. Open the downloaded .docx file
 
 **Verify the document contains:**
 
@@ -450,45 +422,50 @@ Run these after all Tier 1 tests pass.
 - Export date
 - All approved answers in a readable, structured format
 - AI disclaimer text
-- Footer reading "Prepared using Grant Pathway — grantpathway.org.uk" — **no version number** (removed 2026-07-02, see `PDR-DH-003` revision history)
-- A page number ("Page N of NN") in the footer, below the attribution line
+- Footer reading "Prepared using Grant Pathway v[version number] — grantpathway.org.uk"
+- A page number ("Page N of NN") in the footer, below the attribution line (added 2026-07-02 — see `PDR-DH-003`)
 - No corrupted or missing content
 
 **Expected result:**
 
-- .docx file downloads without error
-- Document opens cleanly in Word or equivalent
-- Content matches the approved answers entered in Step 4
+- Review screen matches Section 9 of user guide
+- Download buttons disabled until all three checkboxes are ticked
+- Clicking download approves and exports in one action, no confirmation modal
 - Application status on dashboard updates to **Exported**
+- Document opens cleanly in Word or equivalent; content matches the approved answers entered in Step 4
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes (record the exact banner text shown):**
 
 ---
 
-### RT-10a — Plain Text Export [FULL]
+### RT-10 — Plain Text Export [FULL]
 
 **User guide reference:** Section 10 (Export)
-**What this tests:** Export API route's `format=txt` path — a separate code path from the Word export, not previously covered by its own test.
+**What this tests:** Export API route's `format=txt` path — a separate code path from the Word export, not previously covered by its own test. Also confirms the re-export confirmation dialog (D-WF-04) correctly appears for a second download of an already-exported application.
 
-**Note:** same logic as RT-10 in reverse. If RT-09 used **plain text**, you already have the file. If RT-09 used **Word**, click **Download as plain text** now — this triggers the same re-export confirmation dialog as RT-10 (expected).
+**Prerequisite:** RT-09 complete (application already approved and exported as Word)
 
 **Steps:**
 
-1. Obtain the plain-text (.txt) file as above
-2. Open it in a plain-text editor (not Word — confirm it is genuinely plain text, no formatting)
+1. Click **Download as plain text**
+2. Confirm the re-export confirmation dialog appears (expected — the application was already exported as Word in RT-09, not a defect)
+3. Confirm through the dialog
+4. Open the downloaded .txt file in a plain-text editor (not Word — confirm it is genuinely plain text, no formatting)
 
 **Verify the file contains:**
 
 - Application title (grant name), funder name, and export date as the opening lines
 - AI disclaimer text
 - All approved answers, each clearly separated (e.g. by a rule of dashes)
-- Closing line reading "Prepared using Grant Pathway — grantpathway.org.uk" — **no version number**, and **no page numbers** (plain text has no concept of pages)
+- Closing line reading "Prepared using Grant Pathway v[version number] — grantpathway.org.uk"
+- No page numbers (plain text has no concept of pages)
 - No corrupted or missing content, no stray formatting characters
 
 **Expected result:**
 
+- Re-export confirmation dialog appears and can be confirmed
 - .txt file downloads without error
 - Content matches the approved answers entered in Step 4
 - Content matches the Word export's content (same answers, same order), just without Word formatting
