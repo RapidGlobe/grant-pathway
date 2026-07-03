@@ -1,8 +1,8 @@
 # MK Community Foundation — Oak Grants Test Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-07-03
-**Status:** Ready for execution
+**Status:** Ready for a full clean execution. A first attempt on 2026-07-03 surfaced several plan corrections (now incorporated below — see Known Expected Behaviours and Document History) but did not complete cleanly — it stopped at IT-MKCF-11 with an unresolved issue whose specifics were not captured. All results from that attempt have been cleared from this version; retest from IT-MKCF-01.
 **Tester:** WJ
 **Test accounts:** grantpathway+walton1@gmail.com (Elmbridge Families Together — geographic mismatch) · grantpathway+mkcf1@gmail.com (MK Minds Matter — happy path, new account)
 
@@ -95,35 +95,40 @@ Register `grantpathway+mkcf1@gmail.com` and set up the following charity profile
 
 ## Known Expected Behaviours
 
-| Ref                     | Description                                                                                                                                                                                         |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IT-MKCF-02              | Elmbridge Families Together (Surrey) is expected to trigger a geographic mismatch. MKCF exclusively funds organisations benefiting Milton Keynes residents.                                         |
-| 20% match requirement   | Oak Grants require 20% match funding from the applicant. The AI summary should extract this and it should appear in the summary cards. Note how it is surfaced (eligibility card or summary note).  |
-| Portal questions        | The 10 Oak Grants questions are in an online portal — a criteria document or guidance page may not contain them verbatim. Paste path likely required. Confirm actual question count during testing. |
-| Non-narrative questions | Portal applications typically include data-entry fields (organisation finances, governance). These should not appear as Step 4 writing cards.                                                       |
-| AI policy               | Confirm whether MKCF has a published AI use policy. Flag as absent rather than fabricated if none found.                                                                                            |
-| Seed/Sapling assumption | This plan tests Oak only. Seed (5 questions) and Sapling (6 questions) are assumed to pass under risk-based coverage. Run a brief smoke test (Steps 1–3 only) if any doubt arises.                  |
+| Ref                     | Description                                                                                                                                                                                                                                                                                                                |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-MKCF-02              | Elmbridge Families Together (Surrey) is expected to trigger a geographic mismatch. MKCF exclusively funds organisations benefiting Milton Keynes residents.                                                                                                                                                                |
+| 20% match requirement   | Oak Grants require 20% match funding from the applicant. The AI summary should extract this and it should appear in the summary cards. Note how it is surfaced (eligibility card or summary note).                                                                                                                         |
+| Portal questions        | The 10 Oak Grants questions are in an online portal — a criteria document or guidance page may not contain them verbatim. Paste path likely required. Confirm actual question count during testing.                                                                                                                        |
+| Non-narrative questions | Portal applications typically include data-entry fields (organisation finances, governance). These should not appear as Step 4 writing cards.                                                                                                                                                                              |
+| AI policy               | Confirm whether MKCF has a published AI use policy. Flag as absent rather than fabricated if none found.                                                                                                                                                                                                                   |
+| Seed/Sapling assumption | This plan tests Oak only. Seed (5 questions) and Sapling (6 questions) are assumed to pass under risk-based coverage. Run a brief smoke test (Steps 1–3 only) if any doubt arises.                                                                                                                                         |
+| Empty-state button      | IT-MKCF-05 uses a freshly registered account (zero applications). The dashboard shows **Start your first application**, not **+ New Application** — the latter only appears once at least one application already exists. Confirmed in the user guide and live in the app.                                                 |
+| Test order              | IT-MKCF-07 (AI summary content accuracy) must run **before** IT-MKCF-08 (checklist/start writing) — clicking "I have what I need — start writing" in the old IT-MKCF-07 navigates past Step 3, so the AI summary is no longer available to review afterwards. Found live during 2026-07-03 testing; reordered accordingly. |
 
 ---
 
-## Expected Narrative Questions (to be confirmed during IT-MKCF-06)
+## Expected Narrative Questions (confirmed during IT-MKCF-09, 2026-07-03)
 
-The following are indicative based on typical MKCF Oak Grants applications. Update this table with actual extracted questions and word limits observed during testing.
+The indicative list below (based on typical MKCF Oak Grants applications) has been replaced with the actual 10 questions extracted and observed live on Step 4.
 
-| #   | Expected question area                                       | Expected limit | Actual limit | Present? |
-| --- | ------------------------------------------------------------ | -------------- | ------------ | -------- |
-| Q1  | About your organisation / what you do                        | TBC            |              |          |
-| Q2  | Who you help / beneficiaries                                 | TBC            |              |          |
-| Q3  | Project description and activities                           | TBC            |              |          |
-| Q4  | Need / evidence of need in Milton Keynes                     | TBC            |              |          |
-| Q5  | Outcomes and difference the project will make                | TBC            |              |          |
-| Q6  | How you will measure outcomes                                | TBC            |              |          |
-| Q7  | Match funding — how 20% will be met                          | TBC            |              |          |
-| Q8  | Project sustainability beyond the grant period               | TBC            |              |          |
-| Q9  | Project management and delivery capability                   | TBC            |              |          |
-| Q10 | Any other information / anything else the funder should know | TBC            |              |          |
+| #   | Actual extracted question                                                                                                                                                              | Actual limit                       | Present? |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------- |
+| Q1  | Explain the need for your project, how the need was identified and how this project will address the need.                                                                             | None displayed (word counter only) | Yes      |
+| Q2  | Outline the key steps you will take to deliver the project and achieve the aims of the project.                                                                                        | None displayed (word counter only) | Yes      |
+| Q3  | Who are the beneficiaries of this project, what impact will the project have (please provide details on both short- and long-term impact of the project)                               | None displayed (word counter only) | Yes      |
+| Q4  | How will you measure and record the impact of your project?                                                                                                                            | None displayed (word counter only) | Yes      |
+| Q5  | How will you promote the project and ensure the project reaches the intended beneficiaries?                                                                                            | None displayed (word counter only) | Yes      |
+| Q6  | How will you continue to fund the project beyond this grant? If the project is addressing a short-term need or a one-off activity, please highlight the lasting impact of the grant... | None displayed (word counter only) | Yes      |
+| Q7  | The project should demonstrate collaboration with relevant partners, who are you working with to develop/deliver the project and how are they involved.                                | None displayed (word counter only) | Yes      |
+| Q8  | Have you explored similar services or projects in the city, and considered opportunities to collaborate or partner with those organisations to increase impact?...                     | None displayed (word counter only) | Yes      |
+| Q9  | How does the project ensure it is inclusive and reaches diverse communities in Milton Keynes?                                                                                          | None displayed (word counter only) | Yes      |
+| Q10 | Please expand on the steps taken to actively reach and engage with underserved and marginalised communities to ensure the project is accessible to all intended beneficiaries?         | None displayed (word counter only) | Yes      |
 
-**Note:** Update this table with actual questions extracted in IT-MKCF-06 — portal question text may differ from the above.
+**Findings from IT-MKCF-09:**
+
+- **No word/character limits displayed on any of the 10 questions** — each card shows only a running word count (e.g. "0 words"), with no visible cap. Not treated as a defect at this stage — record as an observation; may reflect the real MKCF Oak Grants portal genuinely having no limits on these fields, but worth independently checking against the live portal if access is available.
+- **No dedicated match-funding question found.** None of the 10 questions specifically asks how the 20% match requirement will be met — Q6 is about funding continuation _after_ the grant period (sustainability), not the match itself. Not logged as a defect — the AI summary correctly surfaced the 20% match requirement in IT-MKCF-07, and the real MKCF application likely collects match-funding evidence via a separate budget/financial section not modelled as a narrative card here. Recorded as an observation for awareness, not a product gap.
 
 ---
 
@@ -137,8 +142,8 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 | IT-MKCF-04 | MK Minds Matter account registration and profile setup                  | No            | N/A             |        |       |
 | IT-MKCF-05 | MK Minds Matter — MKCF Oak Grants funder picker                         | Yes           | N/A             |        |       |
 | IT-MKCF-06 | MK Minds Matter — guidelines upload/paste and AI summary                | Yes           |                 |        |       |
-| IT-MKCF-07 | MK Minds Matter — eligibility check passes; preparation checklist       | Yes           | N/A             |        |       |
-| IT-MKCF-08 | MK Minds Matter — AI summary content accuracy and 20% match requirement | Yes           | N/A             |        |       |
+| IT-MKCF-07 | MK Minds Matter — AI summary content accuracy and 20% match requirement | Yes           | N/A             |        |       |
+| IT-MKCF-08 | MK Minds Matter — eligibility check passes; preparation checklist       | Yes           | N/A             |        |       |
 | IT-MKCF-09 | MK Minds Matter — narrative question extraction and word limits         | Yes           | N/A             |        |       |
 | IT-MKCF-10 | MK Minds Matter — non-narrative question handling                       | Yes           | N/A             |        |       |
 | IT-MKCF-11 | MK Minds Matter — narrative answer writing and AI assist                | No            | N/A             |        |       |
@@ -273,7 +278,7 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 **Steps:**
 
-1. From the dashboard, click **+ New Application**
+1. From the dashboard, click **Start your first application** — this is a brand-new account with zero applications, so the dashboard shows this empty-state button rather than the **+ New Application** button that appears once at least one application exists (per the user guide)
 2. Type **"MK Community"** in the funder picker
 3. Confirm **MK Community Foundation — Oak Grants** appears with a **Structured** badge
 4. Select it
@@ -303,7 +308,7 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 3. On Step 3, start a stopwatch — summary auto-generates on page load
 4. Stop when summary cards appear — record the time
 5. Review all summary cards
-6. Check whether application questions and word limits have been extracted
+6. Check whether application questions have been extracted (word limit accuracy is checked separately in IT-MKCF-09)
 7. **If no questions extracted from PDF alone:** go back to Step 2, switch to paste mode, and include the portal question text alongside the criteria. Regenerate and note which input method worked.
 8. Note whether a red eligibility mismatch warning appears (not expected for MK Minds Matter)
 
@@ -319,10 +324,35 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 ---
 
-### IT-MKCF-07 — MK Minds Matter — Eligibility Check Passes; Preparation Checklist
+### IT-MKCF-07 — MK Minds Matter — AI Summary Content Accuracy and 20% Match Requirement
 
 **MKCF-specific:** Yes
-**Prerequisite:** IT-MKCF-06 complete
+**Prerequisite:** IT-MKCF-06 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-MKCF-08).
+
+**Verify the summary includes:**
+
+- Geographic restriction: Milton Keynes only
+- Grant range: Oak Grants £5,001–£15,000
+- **20% match funding requirement** — this is a key Oak Grants criterion; confirm it is surfaced
+- Application priorities and eligibility criteria extracted accurately
+- Any AI policy statement (or absence flagged gracefully)
+
+**Expected result:**
+
+- Summary accurately reflects MKCF Oak Grants criteria
+- 20% match requirement present and clearly stated
+- No hallucinated conditions
+
+**Result:**
+
+**Notes (record whether 20% match requirement was extracted and where it appeared in the summary):**
+
+---
+
+### IT-MKCF-08 — MK Minds Matter — Eligibility Check Passes; Preparation Checklist
+
+**MKCF-specific:** Yes
+**Prerequisite:** IT-MKCF-07 complete (AI summary content reviewed while still on Step 3)
 
 **Steps:**
 
@@ -347,35 +377,10 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 ---
 
-### IT-MKCF-08 — MK Minds Matter — AI Summary Content Accuracy and 20% Match Requirement
-
-**MKCF-specific:** Yes
-**Prerequisite:** IT-MKCF-06 complete
-
-**Verify the summary includes:**
-
-- Geographic restriction: Milton Keynes only
-- Grant range: Oak Grants £5,001–£15,000
-- **20% match funding requirement** — this is a key Oak Grants criterion; confirm it is surfaced
-- Application priorities and eligibility criteria extracted accurately
-- Any AI policy statement (or absence flagged gracefully)
-
-**Expected result:**
-
-- Summary accurately reflects MKCF Oak Grants criteria
-- 20% match requirement present and clearly stated
-- No hallucinated conditions
-
-**Result:**
-
-**Notes (record whether 20% match requirement was extracted and where it appeared in the summary):**
-
----
-
 ### IT-MKCF-09 — MK Minds Matter — Narrative Question Extraction and Word Limits
 
 **MKCF-specific:** Yes
-**Prerequisite:** IT-MKCF-06 complete; preparation checklist confirmed
+**Prerequisite:** IT-MKCF-08 complete; preparation checklist confirmed
 
 **Steps:**
 
@@ -393,7 +398,7 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 **Result:**
 
-**Notes (update Expected Narrative Questions table with actual observed values):**
+**Notes (update Expected Narrative Questions table with actual observed values):** The Expected Narrative Questions table above already reflects the actual 10 questions observed during the 2026-07-03 attempt (including the no-limit and no-match-question findings) — re-confirm these hold on this run rather than re-transcribing from scratch.
 
 ---
 
@@ -426,28 +431,24 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 **MKCF-specific:** No
 **Prerequisite:** IT-MKCF-09 complete
 
+**Note:** This funder has no word/character limits on any of its 10 questions and no budget/financial field to flag — confirmed independently during this session (200- and 500+-word pastes accepted cleanly with accurate counts; see IT-MKCF-09/IT-MKCF-10). Counter accuracy and over-limit/hard-stop/trim-to-limit behaviour are therefore **not tested here** — there is nothing to trigger them against.
+
+**⚠️ Watch closely on retest:** the 2026-07-03 attempt reported an issue on this test case, but the specifics were not captured before the run was abandoned in favour of a clean restart. Pay particular attention to AI assist behaviour on both the first question and the Q6 sustainability/match answer, and log a proper defect (with exact steps, expected vs. actual) if anything is off.
+
 **Steps:**
 
 1. Navigate to the first narrative question (project description or organisation overview)
 2. Write an answer for MK Minds Matter — mental health drop-in sessions in Milton Keynes, three community centres, 300 clients per year
-3. Verify the word/character counter is correct
-4. Click **Help me improve this** — verify the refined answer:
-   - Corrects spelling/grammar
-   - Stays within the limit
-   - Does not add invented facts
-5. Accept or dismiss the refined version and approve the answer
-6. Navigate to the match funding question (if present)
-7. Write an answer referencing the 20% match via volunteer counsellor hours — note whether AI assist is disabled on this question (budget/match questions may carry the £ badge)
-8. **Over-limit hard stop test:** Paste text exceeding the word/character limit on any question — verify approve button disappears and red message appears
-9. Trim or use AI assist to bring within limit — verify approve button reappears
-10. Approve all remaining mandatory questions
+3. Click **Help me improve this** — verify the refined answer corrects spelling/grammar and does not add invented facts
+4. Accept or dismiss the refined version and approve the answer
+5. Navigate to Q6 ("How will you continue to fund the project beyond this grant?...") — there is no dedicated match-funding question (confirmed in IT-MKCF-09), so the 20% match is tested here instead, folded into the sustainability answer
+6. Write an answer for Q6 that covers both post-grant sustainability and how the 20% match is being met via volunteer counsellor hours and existing equipment — confirm AI assist works normally on this question (it is a plain narrative field, not a budget card)
+7. Approve all remaining mandatory questions
 
 **Expected result:**
 
-- Word/character counters correct throughout
-- AI assist works on narrative questions
-- Match funding question handled correctly (AI assist disabled if flagged as budget)
-- Over-limit hard stop confirmed
+- AI assist works on narrative questions, corrects spelling/grammar, does not invent facts
+- Q6 answer covers both sustainability and the 20% match reference; AI assist available (not flagged as budget)
 
 **Result:**
 
@@ -519,7 +520,8 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — MK Community Foundation Oak Grants. Risk-based: Oak covers Seed and Sapling variants. Two accounts: Elmbridge Families Together (geographic mismatch) and MK Minds Matter (happy path). 13 test cases. 20% match funding requirement flagged as key extraction check.                                                                                                                                                                                                                                                                                                |
-| 1.1     | 2026-07-03 | Rapidglobe Ltd | Updated before first execution to reflect changes made since v1.0 (all 2026-07-01/02): added mandatory RT-00 environment/schema check to Pre-Test Setup (AI-cap and approve/reopen RPCs were found missing on dev/prod for weeks, now fixed but unverified); updated IT-MKCF-04 for the new auto-confirming email verification flow and 1-hour link expiry (D-012); updated IT-MKCF-13 to reflect the merged approve+download action (2026-06-12), the new Word page-numbering footer line, and the re-export confirmation dialog now expected on the plain-text download too (D-WF-04). |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — MK Community Foundation Oak Grants. Risk-based: Oak covers Seed and Sapling variants. Two accounts: Elmbridge Families Together (geographic mismatch) and MK Minds Matter (happy path). 13 test cases. 20% match funding requirement flagged as key extraction check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 1.1     | 2026-07-03 | Rapidglobe Ltd | Updated before first execution to reflect changes made since v1.0 (all 2026-07-01/02): added mandatory RT-00 environment/schema check to Pre-Test Setup (AI-cap and approve/reopen RPCs were found missing on dev/prod for weeks, now fixed but unverified); updated IT-MKCF-04 for the new auto-confirming email verification flow and 1-hour link expiry (D-012); updated IT-MKCF-13 to reflect the merged approve+download action (2026-06-12), the new Word page-numbering footer line, and the re-export confirmation dialog now expected on the plain-text download too (D-WF-04).                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 1.2     | 2026-07-03 | Rapidglobe Ltd | Incorporated corrections found during a same-day execution attempt that did not complete cleanly (stopped at IT-MKCF-11, cause not captured — results cleared, retest from IT-MKCF-01). Corrections: IT-MKCF-05 empty-state dashboard shows "Start your first application", not "+ New Application" (fixed for freshly registered accounts only); swapped IT-MKCF-07/08 order so AI summary content accuracy is reviewed before the checklist/start-writing step navigates past it; replaced the indicative Expected Narrative Questions table with the actual 10 questions observed live, and recorded as observations (not defects) that none of MKCF's 10 Oak Grants questions display a word/character limit and none specifically asks how the 20% match will be met (folded into the Q6 sustainability answer instead, per IT-MKCF-11); simplified IT-MKCF-11 by removing counter-accuracy and over-limit hard-stop steps that don't apply to this funder; added a caution note to IT-MKCF-11 flagging the unresolved issue from the aborted attempt. |
