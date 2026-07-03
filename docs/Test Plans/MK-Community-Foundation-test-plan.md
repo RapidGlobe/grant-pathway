@@ -1,7 +1,7 @@
 # MK Community Foundation — Oak Grants Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-17
+**Version:** 1.1
+**Date:** 2026-07-03
 **Status:** Ready for execution
 **Tester:** WJ
 **Test accounts:** grantpathway+walton1@gmail.com (Elmbridge Families Together — geographic mismatch) · grantpathway+mkcf1@gmail.com (MK Minds Matter — happy path, new account)
@@ -29,6 +29,10 @@ This test plan covers an end-to-end test of Grant Pathway using the **MK Communi
 ---
 
 ## Pre-Test Setup
+
+### Environment check — run first, every session
+
+Run **RT-00** in `regression-test-plan.md` before starting IT-MKCF-01. On 2026-07-01 an audit found `grant-pathway-dev` and `grant-pathway-prod` had been silently missing the AI usage-cap RPCs (both projects) and the `approve_application`/`reopen_application` RPCs (prod only) for weeks — this has been fixed, but never re-verified. Skipping RT-00 risks the AI summary (IT-MKCF-06) or export/approve step (IT-MKCF-13) failing in a way that looks like a product bug rather than a schema gap. Confirm via RT-00 step 1 which Supabase project (dev/prod) the test URL is backed by, and record it in this plan's notes.
 
 ### Guidelines — access before testing
 
@@ -246,7 +250,7 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 1. Sign out of Elmbridge Families Together account
 2. Register `grantpathway+mkcf1@gmail.com` (first name James, last name Nkosi)
-3. Verify the email and click the verification link
+3. Open the verification email and click the verification link — as of D-012 (2026-07-02) this now auto-confirms on page load (no second button click) and expires after **1 hour** (not 24). Don't leave this step for later in the session.
 4. On first login, complete the charity profile using the MK Minds Matter values in the Pre-Test Setup table above
 5. Save the profile and confirm redirect to dashboard
 
@@ -486,23 +490,25 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 **Steps:**
 
 1. Tick all three review checkboxes on Step 5
-2. Click **Download as Word document (.docx)**
+2. Click **Download as Word document (.docx)** — this both approves and downloads in one action (no separate Approve button/modal since 2026-06-12); confirm a persistent "Application approved" banner replaces the checklist
 3. Open the downloaded .docx file and verify:
    - Title: **"Community Mental Health Drop-In Programme 2026–27"**
    - Funder: **"MK Community Foundation"** (or similar)
    - Export date includes time (e.g. **"17 June 2026, 10:30"**)
    - AI disclaimer present and correctly worded
+   - Footer reads "Prepared using Grant Pathway v[version] — grantpathway.org.uk" plus a "Page N of NN" line (page numbering added 2026-07-02)
    - All approved answers present
 4. Click **Download as Word document (.docx)** again
 5. Verify the re-export warning dialog appears with the prior export timestamp
 6. Cancel — do not re-export
-7. Click **Download as plain text (.txt)** and verify a .txt file is downloaded
+7. Click **Download as plain text (.txt)** — because the application was already exported as Word in step 2, the re-export confirmation dialog will appear again here too (D-WF-04, expected, not a defect); confirm through it
+8. Verify a .txt file is downloaded, with the same footer line but no page numbers (plain text has no concept of pages)
 
 **Expected result:**
 
 - Word export opens correctly in Microsoft Word
 - Export date includes HH:MM timestamp
-- Re-export warning shows full timestamp
+- Re-export warning shows full timestamp on both the second Word download and the plain-text download
 - Plain text download works
 
 **Result:**
@@ -513,6 +519,7 @@ The following are indicative based on typical MKCF Oak Grants applications. Upda
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                    |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — MK Community Foundation Oak Grants. Risk-based: Oak covers Seed and Sapling variants. Two accounts: Elmbridge Families Together (geographic mismatch) and MK Minds Matter (happy path). 13 test cases. 20% match funding requirement flagged as key extraction check. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — MK Community Foundation Oak Grants. Risk-based: Oak covers Seed and Sapling variants. Two accounts: Elmbridge Families Together (geographic mismatch) and MK Minds Matter (happy path). 13 test cases. 20% match funding requirement flagged as key extraction check.                                                                                                                                                                                                                                                                                                |
+| 1.1     | 2026-07-03 | Rapidglobe Ltd | Updated before first execution to reflect changes made since v1.0 (all 2026-07-01/02): added mandatory RT-00 environment/schema check to Pre-Test Setup (AI-cap and approve/reopen RPCs were found missing on dev/prod for weeks, now fixed but unverified); updated IT-MKCF-04 for the new auto-confirming email verification flow and 1-hour link expiry (D-012); updated IT-MKCF-13 to reflect the merged approve+download action (2026-06-12), the new Word page-numbering footer line, and the re-export confirmation dialog now expected on the plain-text download too (D-WF-04). |
