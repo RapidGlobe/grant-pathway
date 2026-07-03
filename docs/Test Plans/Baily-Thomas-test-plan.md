@@ -1,7 +1,7 @@
 # Baily Thomas Charitable Foundation — General Programme Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-17
+**Version:** 1.1
+**Date:** 2026-07-03
 **Status:** Ready for execution
 **Tester:** WJ
 **Test accounts:** grantpathway+idle1@gmail.com (Harry's Rainbow — eligibility mismatch) · grantpathway+bt1@gmail.com (Steps Forward — happy path, new account)
@@ -91,14 +91,15 @@ Register `grantpathway+bt1@gmail.com` and set up the following charity profile:
 
 ## Known Expected Behaviours
 
-| Ref                      | Description                                                                                                                                                                                                                          |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| IT-BT-02                 | Harry's Rainbow (bereavement charity) is expected to trigger an eligibility mismatch. Baily Thomas exclusively funds learning disability organisations.                                                                              |
-| Learning disability only | The AI summary must clearly state the learning disability focus. Pure autism-only charities are also excluded — summary should surface this restriction.                                                                             |
-| BenefactorCloud portal   | Questions appear in the BenefactorCloud portal which may require registration. Paste path with question text likely required alongside criteria. Confirm during IT-BT-06.                                                            |
-| Non-narrative fields     | Portal applications typically include financial, governance, and data-entry fields. These should not appear as Step 4 writing cards.                                                                                                 |
-| Small Grants assumption  | This plan tests General Programme only. Small Grants (£1,000–£8,999, same portal, same funder type, simpler application) are assumed to pass under risk-based coverage. Run a brief smoke test (Steps 1–3 only) if any doubt arises. |
-| AI policy                | Confirm whether Baily Thomas has a published AI use policy in the criteria or portal. Flag as absent if none found.                                                                                                                  |
+| Ref                      | Description                                                                                                                                                                                                                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| IT-BT-02                 | Harry's Rainbow (bereavement charity) is expected to trigger an eligibility mismatch. Baily Thomas exclusively funds learning disability organisations.                                                                                                                  |
+| Learning disability only | The AI summary must clearly state the learning disability focus. Pure autism-only charities are also excluded — summary should surface this restriction.                                                                                                                 |
+| BenefactorCloud portal   | Questions appear in the BenefactorCloud portal which may require registration. Paste path with question text likely required alongside criteria. Confirm during IT-BT-06.                                                                                                |
+| Non-narrative fields     | Portal applications typically include financial, governance, and data-entry fields. These should not appear as Step 4 writing cards.                                                                                                                                     |
+| Small Grants assumption  | This plan tests General Programme only. Small Grants (£1,000–£8,999, same portal, same funder type, simpler application) are assumed to pass under risk-based coverage. Run a brief smoke test (Steps 1–3 only) if any doubt arises.                                     |
+| AI policy                | Confirm whether Baily Thomas has a published AI use policy in the criteria or portal. Flag as absent if none found.                                                                                                                                                      |
+| Empty-state button       | IT-BT-05 uses a freshly registered account (zero applications). The dashboard shows **Start your first application**, not **+ New Application** — the latter only appears once at least one application already exists. Confirmed in the user guide and live in the app. |
 
 ---
 
@@ -268,7 +269,7 @@ The following are indicative based on typical Baily Thomas General Programme app
 
 **Steps:**
 
-1. From the dashboard, click **+ New Application**
+1. From the dashboard, click **Start your first application** — this is a brand-new account with zero applications, so the dashboard shows this empty-state button rather than the **+ New Application** button that appears once at least one application exists (per the user guide)
 2. Type **"Baily Thomas"** in the funder picker
 3. Confirm **Baily Thomas — General Programme** appears with a **Structured** badge
 4. Select it
@@ -512,3 +513,4 @@ The following are indicative based on typical Baily Thomas General Programme app
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                    |
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — Baily Thomas General Programme. Risk-based: General Programme covers Small Grants variant. Two accounts: Harry's Rainbow (subject-matter mismatch — bereavement) and Steps Forward (learning disability happy path). 13 test cases. Autism exclusion flagged as key extraction check. |
+| 1.1     | 2026-07-03 | Rapidglobe Ltd | Fixed IT-BT-05 step 1: Steps Forward is a freshly registered account with zero applications, so the dashboard shows **Start your first application**, not **+ New Application** (per user guide). Added corresponding row to Known Expected Behaviours.                                                   |
