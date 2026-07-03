@@ -4,7 +4,7 @@
 **Volatility:** Medium
 **Update when:** After every funder test session, or when a new funder test plan is created
 
-**Version:** 2.2
+**Version:** 2.3
 **Last updated:** 2026-07-03
 **Status:** Live — updated after each test session
 
@@ -69,9 +69,9 @@ Funder is in the codebase but the grant programme is currently closed or inactiv
 
 ---
 
-| Plan                                      | File                                               | Tests | Executed | RAG | Notes                                                                                                                                                                                                                                          |
-| ----------------------------------------- | -------------------------------------------------- | ----- | -------- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Regression Test Plan** _(cross-funder)_ | [regression-test-plan.md](regression-test-plan.md) | 11    | 0        | 🟡  | v1.1 (2026-07-01) — added RT-00 (environment/schema check) and RT-11 (dashboard reopen). **Has never been executed.** Run RT-00 first, every session. Test account: grantpathway+idle100@gmail.com. Cross-referenced against user guide v1.14. |
+| Plan                                      | File                                               | Tests | Executed | RAG | Notes                                                                                                                                                                                                                                                                         |
+| ----------------------------------------- | -------------------------------------------------- | ----- | -------- | --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Regression Test Plan** _(cross-funder)_ | [regression-test-plan.md](regression-test-plan.md) | 11    | 1        | 🟡  | v2.2 (2026-07-03) — RT-00 (environment/schema check) passed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. RT-01–11 still unrun. Run RT-00 first, every session. Test account: grantpathway+idle100@gmail.com. Cross-referenced against user guide v1.14. |
 
 ---
 
@@ -133,3 +133,4 @@ Full revision history 2026-06-02 to 2026-06-17 (v1.0–v1.39, all funder testing
 | ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2.0     | 2026-07-01 | Rapidglobe Ltd | Dashboard reset following discovery that `grant-pathway-dev`/`grant-pathway-prod` were missing the AI-cap RPC schema (both projects) and the approve/reopen RPC (prod only) for weeks. All 7 previously-🟢 funders downgraded to 🔁 (needs re-verification) — none re-tested yet. New 🔁 status introduced. Added Known Issues section documenting the `is_active = true` bug on 4 parked/removed funders, found during this reset. Old dashboard (v1.39) archived to `docs/Test Plans/archive/TEST-DASHBOARD-v1.39.md`. Regression Test Plan row updated to reflect its new v1.1 (11 tests, RT-00 + RT-11 added). |
 | 2.2     | 2026-07-03 | Rapidglobe Ltd | MK Community Foundation — Oak Grants row updated to reflect test plan v1.1 (RT-00 prerequisite added, D-012 auto-confirm email flow, merged approve+download and D-WF-04 re-export dialog on plain-text download) ahead of first execution.                                                                                                                                                                                                                                                                                                                                                                        |
+| 2.3     | 2026-07-03 | Rapidglobe Ltd | Regression Test Plan row updated — RT-00 executed and passed against `grant-pathway-dev`, ahead of MKCF Oak Grants testing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |

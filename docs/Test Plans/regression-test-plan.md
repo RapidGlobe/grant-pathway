@@ -1,9 +1,9 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.1
+**Version:** 2.2
 **Date:** 2026-06-15
-**Last updated:** 2026-07-02 (RT-11 corrected — reopening an exported application is done via the card's "View" button, which directly opens the re-open confirmation modal; there is no separate "Reopen" button or navigation into the application first. Found by WJ during live testing.)
-**Status:** Ready for execution — **has never actually been run** (all RT-01–10 results are still blank as of this update)
+**Last updated:** 2026-07-03 (RT-00 executed and passed against `grant-pathway-dev`, ahead of MKCF Oak Grants testing)
+**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-01–11 results are still blank as of this update
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
@@ -14,7 +14,7 @@
 On 2026-07-01, a full audit found that `grant-pathway-dev` and `grant-pathway-prod` had been silently missing critical schema for weeks: the AI usage-cap RPC functions (`reserve_ai_slot` and friends — used by **every** AI call) were absent from **both** projects, and the transactional `approve_application`/`reopen_application` RPCs were absent from **prod**. This has now been fixed and verified on both projects (see `docs/Implementation Plan/CHANGELOG.md`, 2026-07-01 entries) — but it means:
 
 - **Every "passed" result recorded against any funder test plan in this folder predates the fix** (all funder testing finished by 2026-06-17; the AI-cap RPC dependency was only introduced into the route code on 2026-06-22, and the approve/reopen RPC on 2026-06-29). None of those passes are evidence that the _current_ codebase works end-to-end.
-- **This regression plan itself has zero recorded executions.** It was written 2026-06-15 and never run.
+- **This regression plan had zero recorded executions until 2026-07-03**, when RT-00 was run and passed against `grant-pathway-dev`. RT-01–11 remain unrun.
 - RT-00 below is new — run it **first**, every time, before trusting any other result in this plan or any funder plan.
 
 ## Purpose
@@ -72,21 +72,21 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 
 ## Test Results Summary
 
-| Test ID | Test Name                                 | Tier  | Result | Date | Notes |
-| ------- | ----------------------------------------- | ----- | ------ | ---- | ----- |
-| RT-00   | Environment and schema verification       | Env   |        |      |       |
-| RT-01a  | Account registration (fresh account only) | Smoke |        |      |       |
-| RT-01   | Sign-in and session persistence           | Smoke |        |      |       |
-| RT-02   | Unauthenticated redirect                  | Smoke |        |      |       |
-| RT-03   | Dashboard renders with data               | Smoke |        |      |       |
-| RT-04   | Step 4 Q&A interface loads                | Smoke |        |      |       |
-| RT-05   | AI refine-answer endpoint                 | Smoke |        |      |       |
-| RT-06   | Answer approval and progress bar          | Full  |        |      |       |
-| RT-07   | Preparation checklist gate                | Full  |        |      |       |
-| RT-08   | Senior review screen                      | Full  |        |      |       |
-| RT-09   | Final review, approval, and Word export   | Full  |        |      |       |
-| RT-10   | Plain text export                         | Full  |        |      |       |
-| RT-11   | Dashboard reopen application              | Full  |        |      |       |
+| Test ID | Test Name                                 | Tier  | Result | Date       | Notes                                                                            |
+| ------- | ----------------------------------------- | ----- | ------ | ---------- | -------------------------------------------------------------------------------- |
+| RT-00   | Environment and schema verification       | Env   | Pass   | 2026-07-03 | Confirmed pointing at `grant-pathway-dev`. Run ahead of MKCF Oak Grants testing. |
+| RT-01a  | Account registration (fresh account only) | Smoke |        |            |                                                                                  |
+| RT-01   | Sign-in and session persistence           | Smoke |        |            |                                                                                  |
+| RT-02   | Unauthenticated redirect                  | Smoke |        |            |                                                                                  |
+| RT-03   | Dashboard renders with data               | Smoke |        |            |                                                                                  |
+| RT-04   | Step 4 Q&A interface loads                | Smoke |        |            |                                                                                  |
+| RT-05   | AI refine-answer endpoint                 | Smoke |        |            |                                                                                  |
+| RT-06   | Answer approval and progress bar          | Full  |        |            |                                                                                  |
+| RT-07   | Preparation checklist gate                | Full  |        |            |                                                                                  |
+| RT-08   | Senior review screen                      | Full  |        |            |                                                                                  |
+| RT-09   | Final review, approval, and Word export   | Full  |        |            |                                                                                  |
+| RT-10   | Plain text export                         | Full  |        |            |                                                                                  |
+| RT-11   | Dashboard reopen application              | Full  |        |            |                                                                                  |
 
 ---
 
@@ -119,9 +119,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 
 **If this fails:** stop. Do not proceed to RT-01 or any funder test plan — every AI feature and the approve/reopen flow will fail, and the failure will look like a product bug rather than a missing-migration issue. Fix the schema gap first (see `docs/Implementation Plan/CHANGELOG.md`, 2026-07-01, for the exact remediation SQL if this recurs).
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record which project — dev or prod — this session tested against):**
+**Notes (record which project — dev or prod — this session tested against):** Confirmed via the `sb-stanwaejdvlvremtffkf-auth-token` cookie — `grant-pathway-dev`. Run 2026-07-03 ahead of MKCF Oak Grants testing.
 
 ---
 
@@ -552,3 +552,4 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers. |
+| 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
