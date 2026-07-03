@@ -1,7 +1,7 @@
 # Nationwide Building Society — Community Grants Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-04
+**Version:** 1.1
+**Date:** 2026-07-03
 **Status:** Ready for execution
 **Tester:** WJ
 **Test accounts:** grantpathway+idle1@gmail.com (Harry's Rainbow — focus area mismatch) · grantpathway+nationwide1@gmail.com (Homehaven Oldham — happy path, new account)
@@ -99,15 +99,16 @@ Register `grantpathway+nationwide1@gmail.com` and set up the following charity p
 
 ## Known Expected Behaviours
 
-| Ref                                | Description                                                                                                                                                                                                                                                                                              |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IT-NBS-02                          | Harry's Rainbow is expected to trigger a mismatch. Nationwide's programme is exclusively focused on housing need — children's bereavement support has no housing nexus. The AI should identify the thematic mismatch clearly.                                                                            |
-| No official application form       | Nationwide's application form is online-only (portal-gated). The criteria PDF does not contain specific questions with word limits. The AI summary may extract implied questions or section headings rather than numbered questions with word limits. Record what is extracted and whether it is useful. |
-| No AI policy                       | Not published by Nationwide or any regional Community Foundation. Summary should flag the absence.                                                                                                                                                                                                       |
-| Programme status                   | Programme may be between rounds or paused. Testing uses available criteria documentation. Flag if funder does not appear in the picker.                                                                                                                                                                  |
-| Income/grant cap rules             | Grant must be ≤25% of annual income per year; grant must be ≥50% of total project cost. Verify these are captured in the summary.                                                                                                                                                                        |
-| Real Living Wage requirement       | All staff funded must be paid the Real Living Wage. Verify this is captured in the summary.                                                                                                                                                                                                              |
-| Safeguarding + equal opportunities | Both policies are mandatory — missing either is an automatic disqualifier. Verify both are mentioned in the summary.                                                                                                                                                                                     |
+| Ref                                | Description                                                                                                                                                                                                                                                                                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| IT-NBS-02                          | Harry's Rainbow is expected to trigger a mismatch. Nationwide's programme is exclusively focused on housing need — children's bereavement support has no housing nexus. The AI should identify the thematic mismatch clearly.                                                                                                                                            |
+| No official application form       | Nationwide's application form is online-only (portal-gated). The criteria PDF does not contain specific questions with word limits. The AI summary may extract implied questions or section headings rather than numbered questions with word limits. Record what is extracted and whether it is useful.                                                                 |
+| No AI policy                       | Not published by Nationwide or any regional Community Foundation. Summary should flag the absence.                                                                                                                                                                                                                                                                       |
+| Programme status                   | Programme may be between rounds or paused. Testing uses available criteria documentation. Flag if funder does not appear in the picker.                                                                                                                                                                                                                                  |
+| Income/grant cap rules             | Grant must be ≤25% of annual income per year; grant must be ≥50% of total project cost. Verify these are captured in the summary.                                                                                                                                                                                                                                        |
+| Test order                         | IT-NBS-07 (AI summary content accuracy) must run **before** IT-NBS-08 (checklist/start writing) — clicking "I have what I need — start writing" in the old IT-NBS-07 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly before first execution. |
+| Real Living Wage requirement       | All staff funded must be paid the Real Living Wage. Verify this is captured in the summary.                                                                                                                                                                                                                                                                              |
+| Safeguarding + equal opportunities | Both policies are mandatory — missing either is an automatic disqualifier. Verify both are mentioned in the summary.                                                                                                                                                                                                                                                     |
 
 ---
 
@@ -137,8 +138,8 @@ Register `grantpathway+nationwide1@gmail.com` and set up the following charity p
 | IT-NBS-04 | Homehaven Oldham account registration and profile setup            | No           | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
 | IT-NBS-05 | Homehaven Oldham — Nationwide funder picker                        | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
 | IT-NBS-06 | Homehaven Oldham — PDF upload and AI summary                       | Yes          |                 | ☐ Pass ☐ Fail ☐ Blocked |       |
-| IT-NBS-07 | Homehaven Oldham — eligibility check passes; preparation checklist | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
-| IT-NBS-08 | Homehaven Oldham — AI summary content accuracy                     | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
+| IT-NBS-07 | Homehaven Oldham — AI summary content accuracy                     | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
+| IT-NBS-08 | Homehaven Oldham — eligibility check passes; preparation checklist | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
 | IT-NBS-09 | Homehaven Oldham — question/section extraction                     | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
 | IT-NBS-10 | Homehaven Oldham — non-narrative question handling                 | Yes          | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
 | IT-NBS-11 | Homehaven Oldham — narrative answer writing and AI assist          | No           | N/A             | ☐ Pass ☐ Fail ☐ Blocked |       |
@@ -314,31 +315,10 @@ Register `grantpathway+nationwide1@gmail.com` and set up the following charity p
 
 ---
 
-### IT-NBS-07 — Homehaven Oldham — Eligibility Check Passes; Preparation Checklist
+### IT-NBS-07 — Homehaven Oldham — AI Summary Content Accuracy
 
 **NBS-specific:** Yes
-**Prerequisite:** IT-NBS-06 complete
-
-**Steps:**
-
-1. Confirm eligibility passed (no red mismatch warning)
-2. Verify the **"Before you begin writing"** preparation checklist appears correctly
-3. Click **"I have what I need — start writing"**
-
-**Expected result:** Homehaven Oldham passes eligibility — floating support for recently housed people is a clear fit. Preparation checklist displayed correctly.
-
-**If mismatch appears (unexpected):** Record as a defect and investigate.
-
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
-
-**Notes:**
-
----
-
-### IT-NBS-08 — Homehaven Oldham — AI Summary Content Accuracy
-
-**NBS-specific:** Yes
-**Prerequisite:** IT-NBS-06 complete
+**Prerequisite:** IT-NBS-06 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-NBS-08).
 
 **Verify the summary includes:**
 
@@ -362,10 +342,31 @@ Register `grantpathway+nationwide1@gmail.com` and set up the following charity p
 
 ---
 
+### IT-NBS-08 — Homehaven Oldham — Eligibility Check Passes; Preparation Checklist
+
+**NBS-specific:** Yes
+**Prerequisite:** IT-NBS-07 complete (AI summary content reviewed while still on Step 3)
+
+**Steps:**
+
+1. Confirm eligibility passed (no red mismatch warning)
+2. Verify the **"Before you begin writing"** preparation checklist appears correctly
+3. Click **"I have what I need — start writing"**
+
+**Expected result:** Homehaven Oldham passes eligibility — floating support for recently housed people is a clear fit. Preparation checklist displayed correctly.
+
+**If mismatch appears (unexpected):** Record as a defect and investigate.
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
 ### IT-NBS-09 — Homehaven Oldham — Question/Section Extraction
 
 **NBS-specific:** Yes — key test of how the app handles criteria-only documentation
-**Prerequisite:** IT-NBS-06 complete; preparation checklist confirmed
+**Prerequisite:** IT-NBS-08 complete; preparation checklist confirmed
 
 **Steps:**
 
@@ -498,3 +499,4 @@ Register `grantpathway+nationwide1@gmail.com` and set up the following charity p
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | 2026-06-04 | Rapidglobe Ltd | Initial test plan — Nationwide Building Society Community Grants. Two test accounts: Harry's Rainbow (thematic mismatch — bereavement vs housing) and Homehaven Oldham (happy path, floating support for recently housed individuals). 13 test cases. Notes: no downloadable application form (portal-only); no AI policy published; programme may be between rounds. Third-party criteria PDF used as guidelines source. All lessons from LBF and WC cycles incorporated. |
+| 1.1     | 2026-07-03 | Rapidglobe Ltd | Swapped IT-NBS-07/IT-NBS-08 order: AI summary content accuracy now runs first (while still on Step 3), checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Updated Test Results Summary, IT-NBS-09 prerequisite, and added Known Expected Behaviours row.                                                                                                                                                                |

@@ -1,7 +1,7 @@
 # CPF Trust Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-17
+**Version:** 1.1
+**Date:** 2026-07-03
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+cpf1@gmail.com (Elmwood Community Arts — happy path, new account)
@@ -66,15 +66,16 @@ Register `grantpathway+cpf1@gmail.com` and set up the following charity profile:
 
 ## Known Expected Behaviours
 
-| Ref                    | Description                                                                                                                                                                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Narrative format       | CPF Trust is a narrative funder. Step 4 is expected to display a single writing card rather than multiple structured question cards. Confirm actual card count during IT-CPF-06.                                                                                         |
-| 500-word limit         | The email application is capped at 500 words. The word counter on the single narrative card should enforce this limit. The over-limit hard stop (approve button disappears) must be confirmed.                                                                           |
-| Application window     | CPF Trust only accepts applications 1 June–30 September. The app does not currently enforce funder-specific date windows — note whether any advisory warning is shown. This is an observation, not a defect, unless the summary fails to surface the window restriction. |
-| AI summary window note | The AI summary (Step 3) should extract and surface the June–September window as part of the key facts or eligibility criteria.                                                                                                                                           |
-| Export format          | For a 500-word email application, the Word export should produce a document suitable for copy-pasting into an email. Verify the content reads as a coherent narrative, not a structured Q&A.                                                                             |
-| AI policy              | Check the CPF Trust website for any statement on AI-generated content. Flag as absent rather than fabricated if none found.                                                                                                                                              |
-| Mismatch check         | Review eligibility criteria before executing. If a geographic or sector restriction is identified, add a mismatch test case before executing this plan.                                                                                                                  |
+| Ref                    | Description                                                                                                                                                                                                                                                                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Narrative format       | CPF Trust is a narrative funder. Step 4 is expected to display a single writing card rather than multiple structured question cards. Confirm actual card count during IT-CPF-06.                                                                                                                                                                                         |
+| 500-word limit         | The email application is capped at 500 words. The word counter on the single narrative card should enforce this limit. The over-limit hard stop (approve button disappears) must be confirmed.                                                                                                                                                                           |
+| Application window     | CPF Trust only accepts applications 1 June–30 September. The app does not currently enforce funder-specific date windows — note whether any advisory warning is shown. This is an observation, not a defect, unless the summary fails to surface the window restriction.                                                                                                 |
+| AI summary window note | The AI summary (Step 3) should extract and surface the June–September window as part of the key facts or eligibility criteria.                                                                                                                                                                                                                                           |
+| Export format          | For a 500-word email application, the Word export should produce a document suitable for copy-pasting into an email. Verify the content reads as a coherent narrative, not a structured Q&A.                                                                                                                                                                             |
+| AI policy              | Check the CPF Trust website for any statement on AI-generated content. Flag as absent rather than fabricated if none found.                                                                                                                                                                                                                                              |
+| Mismatch check         | Review eligibility criteria before executing. If a geographic or sector restriction is identified, add a mismatch test case before executing this plan.                                                                                                                                                                                                                  |
+| Test order             | IT-CPF-04 (AI summary content accuracy) must run **before** IT-CPF-05 (checklist/start writing) — clicking "I have what I need — start writing" in the old IT-CPF-04 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly before first execution. |
 
 ---
 
@@ -85,8 +86,8 @@ Register `grantpathway+cpf1@gmail.com` and set up the following charity profile:
 | IT-CPF-01 | Elmwood Community Arts account registration and profile setup               | No           | N/A             |        |       |
 | IT-CPF-02 | Elmwood Community Arts — CPF Trust funder picker                            | Yes          | N/A             |        |       |
 | IT-CPF-03 | Elmwood Community Arts — guidelines upload/paste and AI summary             | Yes          |                 |        |       |
-| IT-CPF-04 | Elmwood Community Arts — eligibility check passes; preparation checklist    | Yes          | N/A             |        |       |
-| IT-CPF-05 | Elmwood Community Arts — AI summary content accuracy and application window | Yes          | N/A             |        |       |
+| IT-CPF-04 | Elmwood Community Arts — AI summary content accuracy and application window | Yes          | N/A             |        |       |
+| IT-CPF-05 | Elmwood Community Arts — eligibility check passes; preparation checklist    | Yes          | N/A             |        |       |
 | IT-CPF-06 | Elmwood Community Arts — narrative card count and 500-word limit            | Yes          | N/A             |        |       |
 | IT-CPF-07 | Elmwood Community Arts — narrative answer writing and AI assist             | No           | N/A             |        |       |
 | IT-CPF-08 | Elmwood Community Arts — over-limit hard stop (500 words)                   | Yes          | N/A             |        |       |
@@ -188,10 +189,35 @@ Register `grantpathway+cpf1@gmail.com` and set up the following charity profile:
 
 ---
 
-### IT-CPF-04 — Elmwood Community Arts — Eligibility Check Passes; Preparation Checklist
+### IT-CPF-04 — Elmwood Community Arts — AI Summary Content Accuracy and Application Window
 
 **CPF-specific:** Yes
-**Prerequisite:** IT-CPF-03 complete
+**Prerequisite:** IT-CPF-03 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-CPF-05).
+
+**Verify the summary includes:**
+
+- **Application window:** June–September (must be surfaced — this is a key risk for applicants who miss the window)
+- **Grant range:** £1,000–£3,000
+- **500-word limit:** mentioned or implied
+- Any eligibility restrictions identified from the criteria
+- AI policy (flag as absent if not found)
+
+**Expected result:**
+
+- Application window (June–September) clearly surfaced in summary
+- Grant range and word limit present
+- No hallucinated conditions
+
+**Result:**
+
+**Notes (record whether the application window was prominently surfaced in the summary cards):**
+
+---
+
+### IT-CPF-05 — Elmwood Community Arts — Eligibility Check Passes; Preparation Checklist
+
+**CPF-specific:** Yes
+**Prerequisite:** IT-CPF-04 complete (AI summary content reviewed while still on Step 3)
 
 **Steps:**
 
@@ -216,35 +242,10 @@ Register `grantpathway+cpf1@gmail.com` and set up the following charity profile:
 
 ---
 
-### IT-CPF-05 — Elmwood Community Arts — AI Summary Content Accuracy and Application Window
-
-**CPF-specific:** Yes
-**Prerequisite:** IT-CPF-03 complete
-
-**Verify the summary includes:**
-
-- **Application window:** June–September (must be surfaced — this is a key risk for applicants who miss the window)
-- **Grant range:** £1,000–£3,000
-- **500-word limit:** mentioned or implied
-- Any eligibility restrictions identified from the criteria
-- AI policy (flag as absent if not found)
-
-**Expected result:**
-
-- Application window (June–September) clearly surfaced in summary
-- Grant range and word limit present
-- No hallucinated conditions
-
-**Result:**
-
-**Notes (record whether the application window was prominently surfaced in the summary cards):**
-
----
-
 ### IT-CPF-06 — Elmwood Community Arts — Narrative Card Count and 500-Word Limit
 
 **CPF-specific:** Yes — key test for narrative funder format
-**Prerequisite:** IT-CPF-04 complete
+**Prerequisite:** IT-CPF-05 complete
 
 **Steps:**
 
@@ -386,6 +387,7 @@ Register `grantpathway+cpf1@gmail.com` and set up the following charity profile:
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                          |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — CPF Trust. Single account (Elmwood Community Arts). Narrative funder, 500-word email application, June–September window. 10 test cases. Key checks: single narrative card, 500-word hard stop, application window in AI summary, coherent narrative export. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                      |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — CPF Trust. Single account (Elmwood Community Arts). Narrative funder, 500-word email application, June–September window. 10 test cases. Key checks: single narrative card, 500-word hard stop, application window in AI summary, coherent narrative export.                             |
+| 1.1     | 2026-07-03 | Rapidglobe Ltd | Swapped IT-CPF-04/IT-CPF-05 order: AI summary content accuracy now runs first (while still on Step 3), checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Updated Test Results Summary, IT-CPF-06 prerequisite, and added Known Expected Behaviours row. |

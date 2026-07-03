@@ -1,6 +1,6 @@
 # Baily Thomas Charitable Foundation — General Programme Test Plan
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-07-03
 **Status:** Ready for execution
 **Tester:** WJ
@@ -91,15 +91,16 @@ Register `grantpathway+bt1@gmail.com` and set up the following charity profile:
 
 ## Known Expected Behaviours
 
-| Ref                      | Description                                                                                                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| IT-BT-02                 | Harry's Rainbow (bereavement charity) is expected to trigger an eligibility mismatch. Baily Thomas exclusively funds learning disability organisations.                                                                                                                  |
-| Learning disability only | The AI summary must clearly state the learning disability focus. Pure autism-only charities are also excluded — summary should surface this restriction.                                                                                                                 |
-| BenefactorCloud portal   | Questions appear in the BenefactorCloud portal which may require registration. Paste path with question text likely required alongside criteria. Confirm during IT-BT-06.                                                                                                |
-| Non-narrative fields     | Portal applications typically include financial, governance, and data-entry fields. These should not appear as Step 4 writing cards.                                                                                                                                     |
-| Small Grants assumption  | This plan tests General Programme only. Small Grants (£1,000–£8,999, same portal, same funder type, simpler application) are assumed to pass under risk-based coverage. Run a brief smoke test (Steps 1–3 only) if any doubt arises.                                     |
-| AI policy                | Confirm whether Baily Thomas has a published AI use policy in the criteria or portal. Flag as absent if none found.                                                                                                                                                      |
-| Empty-state button       | IT-BT-05 uses a freshly registered account (zero applications). The dashboard shows **Start your first application**, not **+ New Application** — the latter only appears once at least one application already exists. Confirmed in the user guide and live in the app. |
+| Ref                      | Description                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-BT-02                 | Harry's Rainbow (bereavement charity) is expected to trigger an eligibility mismatch. Baily Thomas exclusively funds learning disability organisations.                                                                                                                                                                                                               |
+| Learning disability only | The AI summary must clearly state the learning disability focus. Pure autism-only charities are also excluded — summary should surface this restriction.                                                                                                                                                                                                              |
+| BenefactorCloud portal   | Questions appear in the BenefactorCloud portal which may require registration. Paste path with question text likely required alongside criteria. Confirm during IT-BT-06.                                                                                                                                                                                             |
+| Non-narrative fields     | Portal applications typically include financial, governance, and data-entry fields. These should not appear as Step 4 writing cards.                                                                                                                                                                                                                                  |
+| Small Grants assumption  | This plan tests General Programme only. Small Grants (£1,000–£8,999, same portal, same funder type, simpler application) are assumed to pass under risk-based coverage. Run a brief smoke test (Steps 1–3 only) if any doubt arises.                                                                                                                                  |
+| AI policy                | Confirm whether Baily Thomas has a published AI use policy in the criteria or portal. Flag as absent if none found.                                                                                                                                                                                                                                                   |
+| Empty-state button       | IT-BT-05 uses a freshly registered account (zero applications). The dashboard shows **Start your first application**, not **+ New Application** — the latter only appears once at least one application already exists. Confirmed in the user guide and live in the app.                                                                                              |
+| Test order               | IT-BT-07 (AI summary content accuracy) must run **before** IT-BT-08 (checklist/start writing) — clicking "I have what I need — start writing" in the old IT-BT-07 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly before first execution. |
 
 ---
 
@@ -133,8 +134,8 @@ The following are indicative based on typical Baily Thomas General Programme app
 | IT-BT-04 | Steps Forward account registration and profile setup                                   | No          | N/A             |        |       |
 | IT-BT-05 | Steps Forward — Baily Thomas General Programme funder picker                           | Yes         | N/A             |        |       |
 | IT-BT-06 | Steps Forward — guidelines upload/paste and AI summary                                 | Yes         |                 |        |       |
-| IT-BT-07 | Steps Forward — eligibility check passes; preparation checklist                        | Yes         | N/A             |        |       |
-| IT-BT-08 | Steps Forward — AI summary content accuracy and learning disability restriction        | Yes         | N/A             |        |       |
+| IT-BT-07 | Steps Forward — AI summary content accuracy and learning disability restriction        | Yes         | N/A             |        |       |
+| IT-BT-08 | Steps Forward — eligibility check passes; preparation checklist                        | Yes         | N/A             |        |       |
 | IT-BT-09 | Steps Forward — narrative question extraction and word limits                          | Yes         | N/A             |        |       |
 | IT-BT-10 | Steps Forward — non-narrative question handling                                        | Yes         | N/A             |        |       |
 | IT-BT-11 | Steps Forward — narrative answer writing and AI assist                                 | No          | N/A             |        |       |
@@ -315,10 +316,36 @@ The following are indicative based on typical Baily Thomas General Programme app
 
 ---
 
-### IT-BT-07 — Steps Forward — Eligibility Check Passes; Preparation Checklist
+### IT-BT-07 — Steps Forward — AI Summary Content Accuracy and Learning Disability Restriction
 
 **BT-specific:** Yes
-**Prerequisite:** IT-BT-06 complete
+**Prerequisite:** IT-BT-06 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-BT-08).
+
+**Verify the summary includes:**
+
+- **Learning disability focus** — the sole beneficiary group
+- **Autism exclusion** — standalone autism without learning disability is not funded; confirm this restriction is surfaced
+- Grant range: £9,000+ (General Programme)
+- Application priorities and eligibility criteria extracted accurately
+- Any AI policy statement (or absence flagged gracefully)
+
+**Expected result:**
+
+- Summary accurately reflects Baily Thomas General Programme criteria
+- Learning disability focus clearly stated
+- Autism-only exclusion present and clearly worded
+- No hallucinated conditions
+
+**Result:**
+
+**Notes (record whether the autism exclusion was extracted and where it appeared in the summary):**
+
+---
+
+### IT-BT-08 — Steps Forward — Eligibility Check Passes; Preparation Checklist
+
+**BT-specific:** Yes
+**Prerequisite:** IT-BT-07 complete (AI summary content reviewed while still on Step 3)
 
 **Steps:**
 
@@ -343,36 +370,10 @@ The following are indicative based on typical Baily Thomas General Programme app
 
 ---
 
-### IT-BT-08 — Steps Forward — AI Summary Content Accuracy and Learning Disability Restriction
-
-**BT-specific:** Yes
-**Prerequisite:** IT-BT-06 complete
-
-**Verify the summary includes:**
-
-- **Learning disability focus** — the sole beneficiary group
-- **Autism exclusion** — standalone autism without learning disability is not funded; confirm this restriction is surfaced
-- Grant range: £9,000+ (General Programme)
-- Application priorities and eligibility criteria extracted accurately
-- Any AI policy statement (or absence flagged gracefully)
-
-**Expected result:**
-
-- Summary accurately reflects Baily Thomas General Programme criteria
-- Learning disability focus clearly stated
-- Autism-only exclusion present and clearly worded
-- No hallucinated conditions
-
-**Result:**
-
-**Notes (record whether the autism exclusion was extracted and where it appeared in the summary):**
-
----
-
 ### IT-BT-09 — Steps Forward — Narrative Question Extraction and Word Limits
 
 **BT-specific:** Yes
-**Prerequisite:** IT-BT-06 complete; preparation checklist confirmed
+**Prerequisite:** IT-BT-08 complete; preparation checklist confirmed
 
 **Steps:**
 
@@ -514,3 +515,4 @@ The following are indicative based on typical Baily Thomas General Programme app
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — Baily Thomas General Programme. Risk-based: General Programme covers Small Grants variant. Two accounts: Harry's Rainbow (subject-matter mismatch — bereavement) and Steps Forward (learning disability happy path). 13 test cases. Autism exclusion flagged as key extraction check. |
 | 1.1     | 2026-07-03 | Rapidglobe Ltd | Fixed IT-BT-05 step 1: Steps Forward is a freshly registered account with zero applications, so the dashboard shows **Start your first application**, not **+ New Application** (per user guide). Added corresponding row to Known Expected Behaviours.                                                   |
+| 1.2     | 2026-07-03 | Rapidglobe Ltd | Swapped IT-BT-07/IT-BT-08 order: AI summary content accuracy now runs first (while still on Step 3), checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Updated Test Results Summary, IT-BT-09 prerequisite, and added Known Expected Behaviours row.  |
