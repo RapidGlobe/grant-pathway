@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-04 — D-CW-02: AI assist not reliably compressing over-limit answers
+
+Found live during Clothworkers Foundation testing (IT-CW-09): a 344-word answer against a 250-word limit (38% over) was returned by "Help me improve this" almost completely unchanged — no words removed. An earlier, smaller case that same session (60 words against a 50-word limit, 20% over) was partially compressed but still left over the limit.
+
+**Root cause:** `buildRefinePrompt` (`lib/prompts.ts`) told the model both "the refined answer must not exceed N words" and "do not change facts... the claims being made," with no instruction on _how_ to actually cut length when over. With those two instructions in tension and no explicit permission to trim, the model appears to have prioritised preserving every sentence over meeting the limit — more so as the excess grew, which fits both observed data points (worse compliance the further over the limit the answer started).
+
+**Fix:** `buildRefinePrompt` now computes the answer's word count and, when it exceeds the limit, swaps in an explicit hard-requirement instruction: cut less essential detail, combine sentences, and remove repetition or examples to hit the limit. The general "don't change facts" instruction is now scoped explicitly to facts that are _kept_ — it no longer implies every sentence must survive — and explicitly permits omitting less essential detail to meet a word limit.
+
+**Verified:** `npx tsc --noEmit` clean; existing `__tests__/prompts.test.ts` (9 tests) and full suite (24 tests) pass unchanged. **Not yet re-verified live against Bedrock** — pending WJ's next over-limit AI assist test during A B Charitable Trust testing.
+
+Logged as D-CW-02 in `docs/Test Plans/Clothworkers-Foundation-test-plan.md`.
+
+---
+
 ## 2026-07-02 — Versioning strategy: proposed and implemented same day
 
 Raised while reinstating the export footer's version number (see entry below) -- the footer has always shown a hardcoded literal `"v1"`, which has never actually changed and doesn't derive from anything real. `package.json`'s own `version` field is `0.1.0` and is not connected to the footer at all. Whatever the footer is meant to support (traceability for support and issue reporting, per `PDR-DH-003`), a string that has never once updated cannot deliver on that.

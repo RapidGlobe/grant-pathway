@@ -197,11 +197,16 @@ export function buildRefinePrompt(
   answerText: string,
   wordLimit: number | null,
 ): string {
+  const wordCount = answerText.trim().split(/\s+/).filter(Boolean).length
+  const isOverLimit = wordLimit !== null && wordCount > wordLimit
+
   const limitInstruction = wordLimit
-    ? `The refined answer must not exceed ${wordLimit} words.`
+    ? isOverLimit
+      ? `The current answer is approximately ${wordCount} words, which exceeds the ${wordLimit}-word limit. The refined answer MUST be ${wordLimit} words or fewer — this is a hard requirement, not a suggestion. To get there, cut less essential detail, combine sentences, and remove repetition or examples rather than trying to preserve every sentence.`
+      : `The refined answer must not exceed ${wordLimit} words.`
     : 'Keep the refined answer a similar length to the original.'
 
-  return `A UK charity is writing a grant application. Improve the structure, flow, and clarity of their answer provided in the <original_answer> tag below. Correct any spelling errors and grammatical mistakes. You must not add any information that is not already in the answer. Do not change facts, dates, figures, names, or the claims being made. Maintain their first-person plural voice ("we", "our", "us").
+  return `A UK charity is writing a grant application. Improve the structure, flow, and clarity of their answer provided in the <original_answer> tag below. Correct any spelling errors and grammatical mistakes. You must not add any information that is not already in the answer, and any facts, dates, figures, names, or claims that you keep must not be altered. If you need to shorten the answer to meet a word limit, you may omit less essential detail, examples, or repetition — do not preserve every sentence at the cost of exceeding the limit. Maintain their first-person plural voice ("we", "our", "us").
 
 ${limitInstruction}
 
