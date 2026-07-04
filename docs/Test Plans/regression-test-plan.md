@@ -1,9 +1,9 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.2
+**Version:** 2.3
 **Date:** 2026-06-15
-**Last updated:** 2026-07-03 (RT-00 executed and passed against `grant-pathway-dev`, ahead of MKCF Oak Grants testing)
-**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-01–11 results are still blank as of this update
+**Last updated:** 2026-07-04 (added RT-12/RT-13/RT-14 — account housekeeping had no coverage)
+**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-01–14 results are still blank as of this update
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
@@ -14,7 +14,7 @@
 On 2026-07-01, a full audit found that `grant-pathway-dev` and `grant-pathway-prod` had been silently missing critical schema for weeks: the AI usage-cap RPC functions (`reserve_ai_slot` and friends — used by **every** AI call) were absent from **both** projects, and the transactional `approve_application`/`reopen_application` RPCs were absent from **prod**. This has now been fixed and verified on both projects (see `docs/Implementation Plan/CHANGELOG.md`, 2026-07-01 entries) — but it means:
 
 - **Every "passed" result recorded against any funder test plan in this folder predates the fix** (all funder testing finished by 2026-06-17; the AI-cap RPC dependency was only introduced into the route code on 2026-06-22, and the approve/reopen RPC on 2026-06-29). None of those passes are evidence that the _current_ codebase works end-to-end.
-- **This regression plan had zero recorded executions until 2026-07-03**, when RT-00 was run and passed against `grant-pathway-dev`. RT-01–11 remain unrun.
+- **This regression plan had zero recorded executions until 2026-07-03**, when RT-00 was run and passed against `grant-pathway-dev`. RT-01–14 remain unrun.
 - RT-00 below is new — run it **first**, every time, before trusting any other result in this plan or any funder plan.
 
 ## Purpose
@@ -44,7 +44,7 @@ This plan has three tiers:
 | ---- | ----------------- | ------------------------------------------------------- | ------- |
 | 0    | Environment check | First, every session — before trusting any other result | ~2 min  |
 | 1    | Smoke             | Every dependency update / quick confidence check        | ~10 min |
-| 2    | Full regression   | Before any production deployment                        | ~25 min |
+| 2    | Full regression   | Before any production deployment                        | ~30 min |
 
 Tier 0 is marked **[ENV]** and always runs first. Tier 1 tests are marked **[SMOKE]**. Run all Tier 1 tests first; proceed to Tier 2 only if all pass.
 
@@ -87,6 +87,9 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 | RT-09   | Final review, approval, and Word export   | Full  |        |            |                                                                                  |
 | RT-10   | Plain text export                         | Full  |        |            |                                                                                  |
 | RT-11   | Dashboard reopen application              | Full  |        |            |                                                                                  |
+| RT-12   | Change password                           | Full  |        |            |                                                                                  |
+| RT-13   | Sign out                                  | Full  |        |            |                                                                                  |
+| RT-14   | Delete account                            | Full  |        |            |                                                                                  |
 
 ---
 
@@ -506,6 +509,94 @@ Run these after all Tier 1 tests pass.
 
 ---
 
+### RT-12 — Change Password [FULL]
+
+**User guide reference:** Section 15 (Managing Your Account) — Change your password
+**What this tests:** The password-update flow on the Account settings screen.
+
+**⚠️ Uses the shared regression test account — you must change the password back at the end of this test (step 5), or every subsequent regression session will fail to sign in with the documented test credentials.**
+
+**Prerequisite:** RT-01 complete (signed in)
+
+**Steps:**
+
+1. Click the user icon in the top right corner of any page and select **Account settings**
+2. Under **Change your password**, enter the current password, then a new password (at least 10 characters) in both **New password** and **Confirm new password**
+3. Click **Update password**
+4. Sign out and sign back in using the new password to confirm it took effect
+5. Repeat steps 1–3 to change the password back to the original — do not skip this step
+
+**Expected result:**
+
+- Password updates without error
+- Signing in with the new password succeeds
+- Password is successfully reverted at the end, leaving the shared test account in its documented state
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
+### RT-13 — Sign Out [FULL]
+
+**User guide reference:** Section 15 (Managing Your Account) — Sign out
+**What this tests:** That signing out actually clears the session server-side, not just hides the UI.
+
+**Prerequisite:** RT-01 complete (signed in)
+
+**Steps:**
+
+1. Click the user icon in the top right corner and select **Account settings**
+2. Click **Sign out**
+3. Confirm you land on the public sign-in page
+4. Navigate directly to `/dashboard`
+5. Confirm you are redirected back to the sign-in page, not shown dashboard content
+
+**Expected result:**
+
+- Sign out redirects to the sign-in page
+- The session is genuinely cleared — direct navigation to a protected route redirects again, the same as RT-02's unauthenticated check, but exercised via the actual sign-out action rather than a fresh incognito window
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
+### RT-14 — Delete Account [FULL]
+
+**User guide reference:** Section 15 (Managing Your Account) — Deleting Your Account
+**What this tests:** The account deletion flow — confirmation gating and that the account, profile, and applications are actually removed.
+
+**⚠️ Never run this against the shared regression account (`grantpathway+idle100@gmail.com`) or any funder test account still in active use — deletion is permanent and irreversible. Register a disposable throwaway account for this test.**
+
+**Prerequisite:** A disposable test account, registered and signed in (see RT-01a for the registration flow)
+
+**Steps:**
+
+1. Click the user icon in the top right corner and select **Account settings**
+2. Click **Delete my account**
+3. Confirm the warning screen lists what will be permanently deleted: charity profile, all grant applications and AI-generated content, account and login details
+4. Confirm the **Permanently delete my account** button is disabled (or the action is blocked) until **DELETE** is typed in the confirmation box
+5. Type **DELETE** in the confirmation box
+6. Click **Permanently delete my account**
+7. Confirm you are redirected away from the app (e.g. to the public sign-in page)
+8. Attempt to sign in again with the deleted account's credentials and confirm it fails
+
+**Expected result:**
+
+- Confirmation requires typing DELETE before deletion can proceed
+- Account, charity profile, and applications are permanently removed
+- Signing back in with the deleted account's credentials fails
+- Clicking **Cancel** on the confirmation screen (if tested instead) returns to Account settings without deleting anything
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
 ## Defect Log
 
 | ID    | Test   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Severity | Status                                                                  |
@@ -553,3 +644,4 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 | 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers. |
 | 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 2.3     | 2026-07-04 | Rapidglobe Ltd | Added RT-12 (Change Password), RT-13 (Sign Out), and RT-14 (Delete Account) — account housekeeping had no regression coverage at all (guide Section 15, "Managing Your Account"). RT-12 mutates the shared regression account's password and includes an explicit revert step. RT-14 requires a disposable throwaway account, never the shared regression account or an in-use funder test account, since deletion is permanent. 14 test cases across 3 tiers.                                                                                                                                                                                                                                      |
