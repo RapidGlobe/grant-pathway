@@ -1,7 +1,7 @@
 # Garfield Weston Foundation — Regular Grants Test Plan
 
-**Version:** 1.6
-**Date:** 2026-06-04
+**Version:** 1.7
+**Date:** 2026-07-04
 **Status:** Ready for execution
 **Tester:** WJ
 **Test accounts:** grantpathway+idle1@gmail.com (Harry's Rainbow — broad eligibility pass test) · grantpathway+garfield1@gmail.com (Greenfield Community Trust — happy path, new account)
@@ -93,15 +93,16 @@ Register `grantpathway+garfield1@gmail.com` and set up the following charity pro
 
 ## Known Expected Behaviours
 
-| Ref                         | Description                                                                                                                                                                                                                      |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IT-GWF-02                   | Harry's Rainbow is **not** expected to trigger a mismatch. Garfield Weston funds Welfare and Health broadly — bereavement support for children is within scope. If a mismatch is triggered, record as a defect (false positive). |
-| Free-form path              | Step 4 shows a section-by-section interface, not numbered question cards. This is the first test of the narrative path. The number and names of sections depend on what the AI extracts from the PDF.                            |
-| No per-section word limits  | Garfield Weston specifies no word limits per section — only a 10-page overall limit. The app should not show word limit badges on section cards, or may show a general page-count advisory.                                      |
-| Finance sections            | Sections covering projected income tables, expenditure breakdown, and income narrative may appear as budget/financial sections or may be absent from writing cards (non-narrative data). Record what appears.                    |
-| No AI policy                | Not published by Garfield Weston. Summary should flag absence.                                                                                                                                                                   |
-| No specific amount required | Garfield Weston does not require applicants to specify a grant amount. Trustees decide. The summary should reflect this.                                                                                                         |
-| Reapplication bar           | Must wait 12 months after any outcome before reapplying. Verify this appears in key requirements.                                                                                                                                |
+| Ref                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-GWF-02                   | Harry's Rainbow is **not** expected to trigger a mismatch. Garfield Weston funds Welfare and Health broadly — bereavement support for children is within scope. If a mismatch is triggered, record as a defect (false positive).                                                                                                                                                                                                                         |
+| Free-form path              | Step 4 shows a section-by-section interface, not numbered question cards. This is the first test of the narrative path. The number and names of sections depend on what the AI extracts from the PDF.                                                                                                                                                                                                                                                    |
+| No per-section word limits  | Garfield Weston specifies no word limits per section — only a 10-page overall limit. The app should not show word limit badges on section cards, or may show a general page-count advisory.                                                                                                                                                                                                                                                              |
+| Finance sections            | Sections covering projected income tables, expenditure breakdown, and income narrative may appear as budget/financial sections or may be absent from writing cards (non-narrative data). Record what appears.                                                                                                                                                                                                                                            |
+| No AI policy                | Not published by Garfield Weston. Summary should flag absence.                                                                                                                                                                                                                                                                                                                                                                                           |
+| No specific amount required | Garfield Weston does not require applicants to specify a grant amount. Trustees decide. The summary should reflect this.                                                                                                                                                                                                                                                                                                                                 |
+| Reapplication bar           | Must wait 12 months after any outcome before reapplying. Verify this appears in key requirements.                                                                                                                                                                                                                                                                                                                                                        |
+| Test order                  | IT-GWF-07 (AI summary content accuracy) must run **before** IT-GWF-08 (checklist/start writing) — clicking "I have what I need — start writing" in the old IT-GWF-07 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly. Both were already marked Pass under the old order — results carried over with the content, not the ID. |
 
 ---
 
@@ -137,8 +138,8 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | IT-GWF-04 | Greenfield Community Trust account registration and profile setup             | No           | N/A             | ✅ Pass                 |                                                                                                                                                                                                                              |
 | IT-GWF-05 | Greenfield Community Trust — Garfield Weston funder picker                    | Yes          | N/A             | ✅ Pass                 |                                                                                                                                                                                                                              |
 | IT-GWF-06 | Greenfield Community Trust — PDF upload and AI summary                        | Yes          |                 | ☐ Pass ☐ Fail ☐ Blocked |                                                                                                                                                                                                                              |
-| IT-GWF-07 | Greenfield Community Trust — eligibility check passes; preparation checklist  | Yes          | N/A             | ✅ Pass                 | D-GWF-01 raised: Step 4 served stale cached page after prep checklist — Ctrl+Shift+R required as workaround. Fixed: revalidatePath() added to all step/4 redirects.                                                          |
-| IT-GWF-08 | Greenfield Community Trust — AI summary content accuracy                      | Yes          | N/A             | ✅ Pass                 | Summary accurate and comprehensive. AI policy absence handled gracefully. Budget section wording updated: "AI cannot generate these" → "AI cannot assist you with this".                                                     |
+| IT-GWF-07 | Greenfield Community Trust — AI summary content accuracy                      | Yes          | N/A             | ✅ Pass                 | Summary accurate and comprehensive. AI policy absence handled gracefully. Budget section wording updated: "AI cannot generate these" → "AI cannot assist you with this".                                                     |
+| IT-GWF-08 | Greenfield Community Trust — eligibility check passes; preparation checklist  | Yes          | N/A             | ✅ Pass                 | D-GWF-01 raised: Step 4 served stale cached page after prep checklist — Ctrl+Shift+R required as workaround. Fixed: revalidatePath() added to all step/4 redirects.                                                          |
 | IT-GWF-09 | Greenfield Community Trust — section extraction and free-form interface       | Yes          | N/A             | ✅ Pass                 | All 11 sections present in correct order with correct guidance text. No word limits shown (correct). Budget sections 8 and 9 correctly flagged amber with Budget badge. Free-form interface confirmed (no numbered Q cards). |
 | IT-GWF-10 | Greenfield Community Trust — non-narrative content handling; finance sections | Yes          | N/A             | ✅ Pass                 | No financial table cards. Budget sections are free-text with Budget badge. No AI assist button on budget sections. Ready to assemble correctly greyed until all 11 approved.                                                 |
 | IT-GWF-11 | Greenfield Community Trust — section writing and AI assist                    | No           | N/A             | ✅ Pass                 | AI assist working on narrative sections. Budget sections correctly have no AI assist button. All 11 sections written and approved.                                                                                           |
@@ -304,29 +305,10 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 ---
 
-### IT-GWF-07 — Greenfield Community Trust — Eligibility Check Passes; Preparation Checklist
+### IT-GWF-07 — Greenfield Community Trust — AI Summary Content Accuracy
 
 **GWF-specific:** Yes
-**Prerequisite:** IT-GWF-06 complete
-
-**Steps:**
-
-1. Confirm eligibility passed (no red mismatch warning)
-2. Verify the **"Before you begin writing"** preparation checklist appears
-3. Click **"I have what I need — start writing"**
-
-**Expected result:** Greenfield Community Trust passes — community welfare charity in Welfare sector is a clear fit. Preparation checklist displayed correctly.
-
-**Result:** ✅ Pass
-
-**Notes:** Eligibility passed. Preparation checklist appeared correctly. D-GWF-01 raised — Step 4 showed stale cached page (free-form fallback) after clicking "I have what I need". Ctrl+Shift+R resolved it. Fix deployed: revalidatePath() added to all step/4 redirects.
-
----
-
-### IT-GWF-08 — Greenfield Community Trust — AI Summary Content Accuracy
-
-**GWF-specific:** Yes
-**Prerequisite:** IT-GWF-06 complete
+**Prerequisite:** IT-GWF-06 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-GWF-08).
 
 **Verify the summary includes:**
 
@@ -351,10 +333,29 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 
 ---
 
+### IT-GWF-08 — Greenfield Community Trust — Eligibility Check Passes; Preparation Checklist
+
+**GWF-specific:** Yes
+**Prerequisite:** IT-GWF-07 complete (AI summary content reviewed while still on Step 3)
+
+**Steps:**
+
+1. Confirm eligibility passed (no red mismatch warning)
+2. Verify the **"Before you begin writing"** preparation checklist appears
+3. Click **"I have what I need — start writing"**
+
+**Expected result:** Greenfield Community Trust passes — community welfare charity in Welfare sector is a clear fit. Preparation checklist displayed correctly.
+
+**Result:** ✅ Pass
+
+**Notes:** Eligibility passed. Preparation checklist appeared correctly. D-GWF-01 raised — Step 4 showed stale cached page (free-form fallback) after clicking "I have what I need". Ctrl+Shift+R resolved it. Fix deployed: revalidatePath() added to all step/4 redirects.
+
+---
+
 ### IT-GWF-09 — Greenfield Community Trust — Section Extraction and Free-Form Interface
 
 **GWF-specific:** Yes — key test of the narrative/free-form path
-**Prerequisite:** IT-GWF-06 complete; preparation checklist confirmed
+**Prerequisite:** IT-GWF-08 complete; preparation checklist confirmed
 
 **Steps:**
 
@@ -500,3 +501,4 @@ Based on the published guidelines. The AI may extract all, some, or variations o
 | 1.4     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-07, 08, 09 passed. D-GWF-01 raised and fixed (revalidatePath on step/4 redirects). All 11 sections confirmed. Budget wording improved. 9/13 complete.                                                                                                                                                                                                                                                                |
 | 1.5     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-10, 11, 12 passed. No financial table cards. No AI assist on budget sections. Assembly and approval complete. 12/13 complete.                                                                                                                                                                                                                                                                                        |
 | 1.6     | 2026-06-04 | Rapidglobe Ltd | IT-GWF-13 passed. Testing complete — 13/13. Narrative export format confirmed (Title → Content → separator). Timestamp HH:MM confirmed. D-GWF-01 only defect, already fixed.                                                                                                                                                                                                                                                |
+| 1.7     | 2026-07-04 | Rapidglobe Ltd | Swapped IT-GWF-07/IT-GWF-08 order: AI summary content accuracy now runs first (while still on Step 3), checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Results carried over with the content (both already Pass). Updated Test Results Summary, IT-GWF-09 prerequisite, and added Known Expected Behaviours row.                                                      |

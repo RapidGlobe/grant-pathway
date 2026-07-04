@@ -1,7 +1,7 @@
 # Henry Smith Foundation — Proud Homes Fund Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-02
+**Version:** 1.1
+**Date:** 2026-07-04
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+hsf1@gmail.com
@@ -44,10 +44,11 @@ Henry Smith Foundation has a published AI policy statement — this is a key tes
 
 ## Known Expected Behaviours
 
-| Ref              | Description                                                                                                                                                                                                                                                               |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GAP-28           | Non-narrative questions (staff numbers, volunteer numbers, file uploads for income projection and budget, dropdown for safeguarding statements, yes/no for Development Grant, time to complete, data protection checkboxes) may appear as text areas. Observe and record. |
-| Conditional Q2.8 | Q2.8 is conditional on whether the organisation is a Development Grant or Established Practice grant. The updated prompt should exclude this conditional question from extraction. Observe whether it appears.                                                            |
+| Ref              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GAP-28           | Non-narrative questions (staff numbers, volunteer numbers, file uploads for income projection and budget, dropdown for safeguarding statements, yes/no for Development Grant, time to complete, data protection checkboxes) may appear as text areas. Observe and record.                                                                                                                                                                           |
+| Conditional Q2.8 | Q2.8 is conditional on whether the organisation is a Development Grant or Established Practice grant. The updated prompt should exclude this conditional question from extraction. Observe whether it appears.                                                                                                                                                                                                                                      |
+| Test order       | IT-HSF-04 (eligibility check) and IT-HSF-05 (content accuracy) must run **before** IT-HSF-06 (preparation checklist/start writing) — clicking "start writing" navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); fixed here by splitting the Step 4 navigation out of IT-HSF-03 into its own IT-HSF-06, renumbering old IT-HSF-06–10 to IT-HSF-07–11. |
 
 ---
 
@@ -72,18 +73,19 @@ The following narrative questions should be extracted from the Full Application 
 
 ## Test Results Summary
 
-| Test ID   | Test Name                                                     | HSF-Specific | AI Summary Time | Result | Notes |
-| --------- | ------------------------------------------------------------- | ------------ | --------------- | ------ | ----- |
-| IT-HSF-01 | Account registration and charity profile                      | No           | N/A             |        |       |
-| IT-HSF-02 | Henry Smith Foundation funder picker                          | Yes          | N/A             |        |       |
-| IT-HSF-03 | DOCX upload, AI summary, prep checklist, and AI policy banner | Yes          | TBC             |        |       |
-| IT-HSF-04 | Eligibility check — Rainbow Steps MK passes                   | Yes          | N/A             |        |       |
-| IT-HSF-05 | AI summary content accuracy                                   | Yes          | N/A             |        |       |
-| IT-HSF-06 | Narrative question extraction — exact 300-word limits         | Yes          | N/A             |        |       |
-| IT-HSF-07 | Budget and non-narrative question handling                    | Yes          | N/A             |        |       |
-| IT-HSF-08 | Narrative answer writing and AI assist                        | No           | N/A             |        |       |
-| IT-HSF-09 | Answer approval and Step 5 navigation                         | No           | N/A             |        |       |
-| IT-HSF-10 | Word document export — structure and content                  | No           | N/A             |        |       |
+| Test ID   | Test Name                                             | HSF-Specific | AI Summary Time | Result | Notes |
+| --------- | ----------------------------------------------------- | ------------ | --------------- | ------ | ----- |
+| IT-HSF-01 | Account registration and charity profile              | No           | N/A             |        |       |
+| IT-HSF-02 | Henry Smith Foundation funder picker                  | Yes          | N/A             |        |       |
+| IT-HSF-03 | DOCX upload, AI summary, and AI policy banner         | Yes          | TBC             |        |       |
+| IT-HSF-04 | Eligibility check — Rainbow Steps MK passes           | Yes          | N/A             |        |       |
+| IT-HSF-05 | AI summary content accuracy                           | Yes          | N/A             |        |       |
+| IT-HSF-06 | Preparation checklist and start writing               | Yes          | N/A             |        |       |
+| IT-HSF-07 | Narrative question extraction — exact 300-word limits | Yes          | N/A             |        |       |
+| IT-HSF-08 | Budget and non-narrative question handling            | Yes          | N/A             |        |       |
+| IT-HSF-09 | Narrative answer writing and AI assist                | No           | N/A             |        |       |
+| IT-HSF-10 | Answer approval and Step 5 navigation                 | No           | N/A             |        |       |
+| IT-HSF-11 | Word document export — structure and content          | No           | N/A             |        |       |
 
 ---
 
@@ -153,7 +155,7 @@ The following narrative questions should be extracted from the Full Application 
 
 ---
 
-### IT-HSF-03 — DOCX Upload, AI Summary, Prep Checklist, and AI Policy Banner
+### IT-HSF-03 — DOCX Upload, AI Summary, and AI Policy Banner
 
 **HSF-specific:** Yes — tests DOCX upload path with the Full Application form; AI policy banner is a key test for Henry Smith's published AI statement
 **Prerequisite:** IT-HSF-02 complete
@@ -166,8 +168,8 @@ The following narrative questions should be extracted from the Full Application 
 4. Review summary cards
 5. Check for the **blue AI policy banner** — Henry Smith's policy should be extracted and displayed
 6. Confirm **no red eligibility mismatch warning** — Rainbow Steps MK should pass
-7. Click **Continue** → verify preparation checklist screen appears
-8. Click **"I have what I need — start writing"**
+
+**Do not click Continue yet** — the eligibility check (IT-HSF-04) and content-accuracy review (IT-HSF-05) both need the AI summary visible on Step 3. Continuing to Step 4 happens in IT-HSF-06, after both reviews are complete.
 
 **Expected result:**
 
@@ -175,7 +177,6 @@ The following narrative questions should be extracted from the Full Application 
 - AI summary generates without error
 - Blue **AI policy banner** appears with Henry Smith's statement about using AI responsibly (something to the effect of: AI welcome, use for structure not content, your own words are important)
 - No eligibility mismatch warning
-- Preparation checklist appears on clicking Continue
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -186,7 +187,7 @@ The following narrative questions should be extracted from the Full Application 
 ### IT-HSF-04 — Eligibility Check — Rainbow Steps MK Passes
 
 **HSF-specific:** Yes — verifies FR-47 does not incorrectly flag Rainbow Steps MK
-**Prerequisite:** IT-HSF-03 complete
+**Prerequisite:** IT-HSF-03 complete. Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-HSF-06).
 
 **Steps:**
 
@@ -208,7 +209,7 @@ The following narrative questions should be extracted from the Full Application 
 ### IT-HSF-05 — AI Summary Content Accuracy
 
 **HSF-specific:** Yes
-**Prerequisite:** IT-HSF-03 complete
+**Prerequisite:** IT-HSF-03 complete. Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-HSF-06).
 
 **Verify the summary includes:**
 
@@ -232,10 +233,32 @@ The following narrative questions should be extracted from the Full Application 
 
 ---
 
-### IT-HSF-06 — Narrative Question Extraction — Exact 300-Word Limits
+### IT-HSF-06 — Preparation Checklist and Start Writing
+
+**HSF-specific:** Yes
+**Prerequisite:** IT-HSF-05 complete (eligibility and AI summary content reviewed while still on Step 3)
+
+**Steps:**
+
+1. Click **Continue** to proceed to Step 4
+2. Verify the preparation checklist screen appears
+3. Click **"I have what I need — start writing"**
+
+**Expected result:**
+
+- Preparation checklist appears on clicking Continue
+- Q&A interface loads
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
+### IT-HSF-07 — Narrative Question Extraction — Exact 300-Word Limits
 
 **HSF-specific:** Yes — all narrative questions use exact 300-word limits (not "approx."); this is the primary test that GAP-27 works for exact word counts
-**Prerequisite:** IT-HSF-03 complete
+**Prerequisite:** IT-HSF-06 complete
 
 **Expected questions:**
 
@@ -268,10 +291,10 @@ The following narrative questions should be extracted from the Full Application 
 
 ---
 
-### IT-HSF-07 — Budget and Non-Narrative Question Handling
+### IT-HSF-08 — Budget and Non-Narrative Question Handling
 
 **HSF-specific:** Yes
-**Prerequisite:** IT-HSF-03 complete
+**Prerequisite:** IT-HSF-06 complete
 
 **Non-narrative questions in Proud Homes Full Application:**
 
@@ -307,10 +330,10 @@ The following narrative questions should be extracted from the Full Application 
 
 ---
 
-### IT-HSF-08 — Narrative Answer Writing and AI Assist
+### IT-HSF-09 — Narrative Answer Writing and AI Assist
 
 **HSF-specific:** No
-**Prerequisite:** IT-HSF-06 complete
+**Prerequisite:** IT-HSF-07 complete
 
 **Steps:**
 
@@ -337,10 +360,10 @@ The following narrative questions should be extracted from the Full Application 
 
 ---
 
-### IT-HSF-09 — Answer Approval and Step 5 Navigation
+### IT-HSF-10 — Answer Approval and Step 5 Navigation
 
 **HSF-specific:** No
-**Prerequisite:** IT-HSF-08 complete (at least Q2.1 and Q3.2 approved)
+**Prerequisite:** IT-HSF-09 complete (at least Q2.1 and Q3.2 approved)
 
 **Steps:**
 
@@ -362,10 +385,10 @@ The following narrative questions should be extracted from the Full Application 
 
 ---
 
-### IT-HSF-10 — Word Document Export — Structure and Content
+### IT-HSF-11 — Word Document Export — Structure and Content
 
 **HSF-specific:** No
-**Prerequisite:** IT-HSF-09 complete
+**Prerequisite:** IT-HSF-10 complete
 
 **Steps:**
 
@@ -388,6 +411,7 @@ The following narrative questions should be extracted from the Full Application 
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                        |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Henry Smith Foundation Proud Homes Fund, Rainbow Steps MK test charity, 10 test cases including AI policy banner test and exact 300-word limit extraction |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Henry Smith Foundation Proud Homes Fund, Rainbow Steps MK test charity, 10 test cases including AI policy banner test and exact 300-word limit extraction                                                                                                                                                                                                                                                                                                                                                                                 |
+| 1.1     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): IT-HSF-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so IT-HSF-04/IT-HSF-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of IT-HSF-03 into a new IT-HSF-06 ("Preparation Checklist and Start Writing"), which now runs after IT-HSF-04/IT-HSF-05. Old IT-HSF-06–10 renumbered to IT-HSF-07–11; now 11 test cases total. Plan remains deferred/unexecuted. |

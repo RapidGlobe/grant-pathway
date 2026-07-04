@@ -1,7 +1,7 @@
 # Clothworkers' Foundation Test Plan — Small Grants Programme
 
-**Version:** 1.3
-**Date:** 2026-06-07
+**Version:** 1.4
+**Date:** 2026-07-04
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+cloth1@gmail.com
@@ -45,10 +45,11 @@ This is the first test using a **capital funder** — Clothworkers funds equipme
 
 ## Known Expected Behaviours
 
-| Ref            | Description                                                                                                                                                                                                                                                                                                                        |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GAP-27 variant | Clothworkers uses "approx. X words" format (not exact word counts). Observe whether the AI extracts these as word limits and what value it records (e.g., "approx. 250 words" → 250 words).                                                                                                                                        |
-| GAP-28         | Non-narrative questions (religion affiliation yes/no, Living Wage accredited yes/no, programme area multi-select, percentage fields for lived experience, income/expenditure numbers, file uploads for accounts and project budget, project type dropdown, marketing consent yes/no) may appear as text areas. Observe and record. |
+| Ref            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GAP-27 variant | Clothworkers uses "approx. X words" format (not exact word counts). Observe whether the AI extracts these as word limits and what value it records (e.g., "approx. 250 words" → 250 words).                                                                                                                                                                                                                                                  |
+| GAP-28         | Non-narrative questions (religion affiliation yes/no, Living Wage accredited yes/no, programme area multi-select, percentage fields for lived experience, income/expenditure numbers, file uploads for accounts and project budget, project type dropdown, marketing consent yes/no) may appear as text areas. Observe and record.                                                                                                           |
+| Test order     | IT-CW-04 (eligibility check) and IT-CW-05 (content accuracy) must run **before** IT-CW-06 (preparation checklist/start writing) — clicking "start writing" navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); fixed here by splitting the Step 4 navigation out of IT-CW-03 into its own IT-CW-06, renumbering old IT-CW-06–10 to IT-CW-07–11. |
 
 ---
 
@@ -79,14 +80,15 @@ Complete after running all tests.
 | -------- | -------------------------------------------------------- | --------------------- | --------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | IT-CW-01 | Account registration and charity profile                 | No                    | N/A             | ✅ Pass |                                                                                                                                                                                                                                      |
 | IT-CW-02 | Clothworkers' Foundation funder picker                   | Yes                   | N/A             | ✅ Pass |                                                                                                                                                                                                                                      |
-| IT-CW-03 | PDF upload, AI summary, and prep checklist               | Yes                   | 40–47s          | ✅ Pass | Load time within revised NFR-01 large-document target (≤45s) but approaches upper limit. Large multi-form PDF (1.1MB, 30 pages). Pre-launch performance improvement recommended. Prompt fixes required during test (see defect log). |
+| IT-CW-03 | PDF upload and AI summary                                | Yes                   | 40–47s          | ✅ Pass | Load time within revised NFR-01 large-document target (≤45s) but approaches upper limit. Large multi-form PDF (1.1MB, 30 pages). Pre-launch performance improvement recommended. Prompt fixes required during test (see defect log). |
 | IT-CW-04 | Eligibility check — Bridge Support MK passes             | Yes                   | N/A             | ✅ Pass | No mismatch warning — FR-47 correctly did not flag Bridge Support MK                                                                                                                                                                 |
 | IT-CW-05 | AI summary content accuracy                              | Yes                   | N/A             | ✅ Pass | All key content accurate — capital-only, programme areas, grant tiers, exclusions                                                                                                                                                    |
-| IT-CW-06 | Narrative question extraction with "approx." word limits | Yes                   | N/A             | ✅ Pass | 11 questions extracted after prompt fixes; "approx." limits correctly extracted as numbers; faith affiliation Q1 still extracted (GAP-28 Layer 2 — open)                                                                             |
-| IT-CW-07 | Budget and non-narrative question handling               | Yes                   | N/A             | ✅ Pass | Q7, Q8, Q10 amber with Budget badge and AI assist disabled; non-narrative questions correctly absent from Step 4                                                                                                                     |
-| IT-CW-08 | Narrative answer writing and AI assist                   | No                    | N/A             | ✅ Pass | Word counter correct; AI assist blocked over word limit (D-CW-01 found and fixed during test)                                                                                                                                        |
-| IT-CW-09 | Answer approval and Step 5 navigation                    | No                    | N/A             | ✅ Pass | Assembly and Step 5 approval flow correct                                                                                                                                                                                            |
-| IT-CW-10 | Word document export — structure and content             | No                    | N/A             | ✅ Pass | Both .docx and .txt exported; all required sections present; clean and readable                                                                                                                                                      |
+| IT-CW-06 | Preparation checklist and start writing                  | Yes                   | N/A             | ✅ Pass | Preparation checklist screen appeared correctly on clicking Continue                                                                                                                                                                 |
+| IT-CW-07 | Narrative question extraction with "approx." word limits | Yes                   | N/A             | ✅ Pass | 11 questions extracted after prompt fixes; "approx." limits correctly extracted as numbers; faith affiliation Q1 still extracted (GAP-28 Layer 2 — open)                                                                             |
+| IT-CW-08 | Budget and non-narrative question handling               | Yes                   | N/A             | ✅ Pass | Q7, Q8, Q10 amber with Budget badge and AI assist disabled; non-narrative questions correctly absent from Step 4                                                                                                                     |
+| IT-CW-09 | Narrative answer writing and AI assist                   | No                    | N/A             | ✅ Pass | Word counter correct; AI assist blocked over word limit (D-CW-01 found and fixed during test)                                                                                                                                        |
+| IT-CW-10 | Answer approval and Step 5 navigation                    | No                    | N/A             | ✅ Pass | Assembly and Step 5 approval flow correct                                                                                                                                                                                            |
+| IT-CW-11 | Word document export — structure and content             | No                    | N/A             | ✅ Pass | Both .docx and .txt exported; all required sections present; clean and readable                                                                                                                                                      |
 
 ---
 
@@ -165,7 +167,7 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-03 — PDF Upload, AI Summary, and Prep Checklist
+### IT-CW-03 — PDF Upload and AI Summary
 
 **Clothworkers-specific:** Yes — tests the full guidance document (including sample form) as the guidelines source; also verifies no mismatch is triggered for Bridge Support MK
 **Prerequisite:** IT-CW-02 complete
@@ -182,9 +184,8 @@ Complete after running all tests.
 8. Stop the stopwatch when the summary appears — record the time in the results table
 9. Review the generated AI summary
 10. Confirm **no red eligibility mismatch warning** appears — Bridge Support MK should be eligible
-11. Click **Continue** to proceed to Step 4
-12. Confirm the **"Before you begin writing"** preparation checklist screen appears
-13. Click **"I have what I need — start writing"**
+
+**Do not click Continue yet** — the eligibility check (IT-CW-04) and content-accuracy review (IT-CW-05) both need the AI summary visible on Step 3. Continuing to Step 4 happens in IT-CW-06, after both reviews are complete.
 
 **Expected result:**
 
@@ -192,8 +193,6 @@ Complete after running all tests.
 - AI summary generates without error
 - **No eligibility mismatch warning** — Bridge Support MK qualifies under Young People Facing Disadvantage and Economic Disadvantage
 - Summary cards displayed (about the grant, grant amount, who can apply, what funder is looking for, questions, key requirements)
-- Preparation checklist screen appears on clicking Continue
-- Q&A interface loads
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -204,7 +203,7 @@ Complete after running all tests.
 ### IT-CW-04 — Eligibility Check — Bridge Support MK Passes
 
 **Clothworkers-specific:** Yes — verifies FR-47 does not incorrectly flag Bridge Support MK as ineligible
-**Prerequisite:** IT-CW-03 complete
+**Prerequisite:** IT-CW-03 complete. Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-CW-06).
 
 **Steps:**
 
@@ -230,7 +229,7 @@ Complete after running all tests.
 ### IT-CW-05 — AI Summary Content Accuracy
 
 **Clothworkers-specific:** Yes
-**Prerequisite:** IT-CW-03 complete
+**Prerequisite:** IT-CW-03 complete. Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-CW-06).
 
 **Steps:**
 
@@ -257,10 +256,32 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-06 — Narrative Question Extraction with "Approx." Word Limits
+### IT-CW-06 — Preparation Checklist and Start Writing
+
+**Clothworkers-specific:** Yes
+**Prerequisite:** IT-CW-05 complete (eligibility and AI summary content reviewed while still on Step 3)
+
+**Steps:**
+
+1. Click **Continue** to proceed to Step 4
+2. Confirm the **"Before you begin writing"** preparation checklist screen appears
+3. Click **"I have what I need — start writing"**
+
+**Expected result:**
+
+- Preparation checklist screen appears on clicking Continue
+- Q&A interface loads
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
+### IT-CW-07 — Narrative Question Extraction with "Approx." Word Limits
 
 **Clothworkers-specific:** Yes — GAP-27 variant: Clothworkers uses "approx. X words" not exact word counts
-**Prerequisite:** IT-CW-03 complete
+**Prerequisite:** IT-CW-06 complete
 
 **Expected questions and limits (from Small Grants sample form):**
 
@@ -296,10 +317,10 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-07 — Budget and Non-Narrative Question Handling
+### IT-CW-08 — Budget and Non-Narrative Question Handling
 
 **Clothworkers-specific:** Yes — GAP-28: Clothworkers has a high proportion of non-narrative questions
-**Prerequisite:** IT-CW-03 complete
+**Prerequisite:** IT-CW-06 complete
 
 **Non-narrative questions expected in the Clothworkers Small Grants form:**
 
@@ -341,10 +362,10 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-08 — Narrative Answer Writing and AI Assist
+### IT-CW-09 — Narrative Answer Writing and AI Assist
 
 **Clothworkers-specific:** No
-**Prerequisite:** IT-CW-06 complete (questions visible)
+**Prerequisite:** IT-CW-07 complete (questions visible)
 
 **Steps:**
 
@@ -374,10 +395,10 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-09 — Answer Approval and Step 5 Navigation
+### IT-CW-10 — Answer Approval and Step 5 Navigation
 
 **Clothworkers-specific:** No
-**Prerequisite:** IT-CW-08 complete (at least Q2 and Q9 approved)
+**Prerequisite:** IT-CW-09 complete (at least Q2 and Q9 approved)
 
 **Steps:**
 
@@ -403,10 +424,10 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-10 — Word Document Export — Structure and Content
+### IT-CW-11 — Word Document Export — Structure and Content
 
 **Clothworkers-specific:** No
-**Prerequisite:** IT-CW-09 complete (application approved)
+**Prerequisite:** IT-CW-10 complete (application approved)
 
 **Steps:**
 
@@ -438,9 +459,10 @@ Additional checks:
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                    |
-| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Clothworkers' Foundation Small Grants Programme, Bridge Support MK test charity, 10 test cases including GAP-27 ("approx." word limit) and GAP-28 observations                                                                                                                                                                        |
-| 1.1     | 2026-06-02 | Rapidglobe Ltd | All 10 tests completed — 10/10 Pass. D-CW-01 found and fixed during test. Defect log, results, and observations recorded.                                                                                                                                                                                                                                 |
-| 1.2     | 2026-06-05 | Rapidglobe Ltd | ADR-AI-010 performance retest. Initial ceiling of 20,000 chars truncated 97,906-char PDF — questions not extracted (0/9). Ceiling raised to 50,000 via PREPROCESS_CHAR_CEILING env var. Second run: 30s, 9 questions extracted correctly. D-CWF-01 added: faith affiliation conditional question (Q1) appears as standard writing card for all charities. |
-| 1.3     | 2026-06-07 | Rapidglobe Ltd | D-CWF-01 retest verified. Faith/religion question no longer extracted — 8 questions confirmed. Expected questions table updated to reflect verified output. IT-CW-06 expected result updated. D-CWF-01 status updated to Fixed — verified.                                                                                                                |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Clothworkers' Foundation Small Grants Programme, Bridge Support MK test charity, 10 test cases including GAP-27 ("approx." word limit) and GAP-28 observations                                                                                                                                                                                                                                                                                                                                 |
+| 1.1     | 2026-06-02 | Rapidglobe Ltd | All 10 tests completed — 10/10 Pass. D-CW-01 found and fixed during test. Defect log, results, and observations recorded.                                                                                                                                                                                                                                                                                                                                                                                          |
+| 1.2     | 2026-06-05 | Rapidglobe Ltd | ADR-AI-010 performance retest. Initial ceiling of 20,000 chars truncated 97,906-char PDF — questions not extracted (0/9). Ceiling raised to 50,000 via PREPROCESS_CHAR_CEILING env var. Second run: 30s, 9 questions extracted correctly. D-CWF-01 added: faith affiliation conditional question (Q1) appears as standard writing card for all charities.                                                                                                                                                          |
+| 1.3     | 2026-06-07 | Rapidglobe Ltd | D-CWF-01 retest verified. Faith/religion question no longer extracted — 8 questions confirmed. Expected questions table updated to reflect verified output. IT-CW-06 expected result updated. D-CWF-01 status updated to Fixed — verified.                                                                                                                                                                                                                                                                         |
+| 1.4     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): IT-CW-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so IT-CW-04/IT-CW-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of IT-CW-03 into a new IT-CW-06 ("Preparation Checklist and Start Writing"), which now runs after IT-CW-04/IT-CW-05. Old IT-CW-06–10 renumbered to IT-CW-07–11; now 11 test cases total. |

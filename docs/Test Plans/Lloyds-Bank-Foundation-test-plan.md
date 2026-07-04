@@ -1,7 +1,7 @@
 # Lloyds Bank Foundation — Specialist Programme Test Plan
 
-**Version:** 1.14
-**Date:** 2026-06-04
+**Version:** 1.15
+**Date:** 2026-07-04
 **Status:** In progress
 **Tester:** WJ
 **Test accounts:** grantpathway+idle1@gmail.com (Harry's Rainbow — eligibility mismatch test) · grantpathway+lloyds1@gmail.com (New Leaf — happy path, new account)
@@ -92,14 +92,15 @@ Download the Lloyds Bank Foundation example application form:
 
 ## Known Expected Behaviours
 
-| Ref                     | Description                                                                                                                                                                                                          |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IT-LBF-02               | Harry's Rainbow is expected to trigger an eligibility mismatch. Bereavement support for children is not in Lloyds E&W's focus areas (homelessness, domestic abuse, addiction, care leavers, offending, trafficking). |
-| D-WF-01 (fixed)         | Optional sections now show the approve button even when empty, and do not block the assembly gate. Verify the fix is working during IT-LBF-10.                                                                       |
-| D-WF-04 (fixed)         | Re-export warning now appears after re-open/re-approve cycle. Verify during IT-LBF-13.                                                                                                                               |
-| D-WF-05 (fixed)         | Export date now includes HH:MM timestamp. Verify in exported document.                                                                                                                                               |
-| Non-narrative questions | Lloyds form includes many data-entry, dropdown, financial, and file-upload fields. These should be absent from Step 4. Key narrative questions listed below.                                                         |
-| DOCX upload path        | This is the first test plan to use a DOCX file as the primary guidelines source. Step 2 file upload (not paste) is the input method.                                                                                 |
+| Ref                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-LBF-02               | Harry's Rainbow is expected to trigger an eligibility mismatch. Bereavement support for children is not in Lloyds E&W's focus areas (homelessness, domestic abuse, addiction, care leavers, offending, trafficking).                                                                                                                                                                                                                                                       |
+| D-WF-01 (fixed)         | Optional sections now show the approve button even when empty, and do not block the assembly gate. Verify the fix is working during IT-LBF-10.                                                                                                                                                                                                                                                                                                                             |
+| D-WF-04 (fixed)         | Re-export warning now appears after re-open/re-approve cycle. Verify during IT-LBF-13.                                                                                                                                                                                                                                                                                                                                                                                     |
+| D-WF-05 (fixed)         | Export date now includes HH:MM timestamp. Verify in exported document.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Non-narrative questions | Lloyds form includes many data-entry, dropdown, financial, and file-upload fields. These should be absent from Step 4. Key narrative questions listed below.                                                                                                                                                                                                                                                                                                               |
+| DOCX upload path        | This is the first test plan to use a DOCX file as the primary guidelines source. Step 2 file upload (not paste) is the input method.                                                                                                                                                                                                                                                                                                                                       |
+| Test order              | IT-LBF-07 (AI summary content accuracy) must run **before** IT-LBF-08 (eligibility check/checklist/start writing) — clicking "I have what I need — start writing" in the old IT-LBF-07 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly. Both were already marked Pass under the old order — results carried over with the content, not the ID. |
 
 ---
 
@@ -158,8 +159,8 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | IT-LBF-04 | New Leaf account registration and profile setup                             | No           | N/A             | ✅ Pass             | Registration number omitted (optional field) — profile saved successfully without it                                                                                                                                                              |
 | IT-LBF-05 | New Leaf — Lloyds funder picker                                             | Yes          | N/A             | ✅ Pass             |                                                                                                                                                                                                                                                   |
 | IT-LBF-06 | New Leaf — DOCX upload and AI summary                                       | Yes          | 24s             | ✅ Pass             | 10 questions extracted. Question set differs from test plan expectation — actual form has 500/600-word narrative questions. IT-LBF-09 table updated to reflect actual questions. Q3 (quality marks, 150 words) borderline — monitor in IT-LBF-10. |
-| IT-LBF-07 | New Leaf — eligibility check passes                                         | Yes          | N/A             | ✅ Pass             | Preparation checklist appeared correctly                                                                                                                                                                                                          |
-| IT-LBF-08 | New Leaf — AI summary content accuracy                                      | Yes          | N/A             | ✅ Pass             | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected                                                                                                                                                     |
+| IT-LBF-07 | New Leaf — AI summary content accuracy                                      | Yes          | N/A             | ✅ Pass             | Grant amount, 8 themes, eligibility, exclusions, and key requirements all correctly reflected                                                                                                                                                     |
+| IT-LBF-08 | New Leaf — eligibility check passes                                         | Yes          | N/A             | ✅ Pass             | Preparation checklist appeared correctly                                                                                                                                                                                                          |
 | IT-LBF-09 | New Leaf — narrative question extraction and word limits                    | Yes          | N/A             | ✅ Pass             | All 10 questions present with correct word limits. Q3 (quality marks, 150 words) included as writing card — borderline but acceptable as form assigns word limit                                                                                  |
 | IT-LBF-10 | New Leaf — non-narrative question handling; optional section fix (D-WF-01)  | Yes          | N/A             | ✅ Pass             | No financial questions displayed. Ready to assemble visible with Q10 empty — D-WF-01 fix confirmed. D-LBF-01 raised: optional label buried in Q10 question text, not visible as a card badge                                                      |
 | IT-LBF-11 | New Leaf — narrative answer writing and AI assist                           | No           | N/A             | ✅ Pass             | D-LBF-02 (over-limit approval) and D-LBF-03 (optional Q10 blocks assembly) found during this test                                                                                                                                                 |
@@ -352,10 +353,36 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 ---
 
-### IT-LBF-07 — New Leaf — Eligibility Check Passes; Preparation Checklist
+### IT-LBF-07 — New Leaf — AI Summary Content Accuracy
 
 **LBF-specific:** Yes
-**Prerequisite:** IT-LBF-06 complete
+**Prerequisite:** IT-LBF-06 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-LBF-08).
+
+**Verify the summary includes:**
+
+- Funder description: grants for charities tackling complex social issues / social exclusion and disadvantage
+- Eligibility: charities with annual income £25k–£500k; focus on complex social issues
+- What is funded: core operating costs or specific roles (unrestricted); 3-year funding
+- Key exclusions: religious activity as core service; families as predominant focus for addiction charities; retroactive funding
+- Outcome focus: measurable differences in lives of people supported
+- Application sections listed with word limits
+
+**Expected result:**
+
+- Summary accurately reflects Lloyds E&W Specialist Programme criteria
+- No hallucinated conditions
+- Word limits extracted correctly for narrative questions
+
+**Result:** ✅ Pass
+
+**Notes:** Grant amount (£75k/3 years), eight specialist themes, eligibility criteria, "what the funder is looking for", and key requirements all correctly reflected. No hallucinated conditions observed.
+
+---
+
+### IT-LBF-08 — New Leaf — Eligibility Check Passes; Preparation Checklist
+
+**LBF-specific:** Yes
+**Prerequisite:** IT-LBF-07 complete (AI summary content reviewed while still on Step 3)
 
 > **Where the eligibility warning appears:** On Step 3 (AI Summary page), replacing the summary cards entirely. Reaching the preparation checklist confirms no mismatch was detected.
 
@@ -385,36 +412,10 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 
 ---
 
-### IT-LBF-08 — New Leaf — AI Summary Content Accuracy
-
-**LBF-specific:** Yes
-**Prerequisite:** IT-LBF-06 complete
-
-**Verify the summary includes:**
-
-- Funder description: grants for charities tackling complex social issues / social exclusion and disadvantage
-- Eligibility: charities with annual income £25k–£500k; focus on complex social issues
-- What is funded: core operating costs or specific roles (unrestricted); 3-year funding
-- Key exclusions: religious activity as core service; families as predominant focus for addiction charities; retroactive funding
-- Outcome focus: measurable differences in lives of people supported
-- Application sections listed with word limits
-
-**Expected result:**
-
-- Summary accurately reflects Lloyds E&W Specialist Programme criteria
-- No hallucinated conditions
-- Word limits extracted correctly for narrative questions
-
-**Result:** ✅ Pass
-
-**Notes:** Grant amount (£75k/3 years), eight specialist themes, eligibility criteria, "what the funder is looking for", and key requirements all correctly reflected. No hallucinated conditions observed.
-
----
-
 ### IT-LBF-09 — New Leaf — Narrative Question Extraction and Word Limits
 
 **LBF-specific:** Yes
-**Prerequisite:** IT-LBF-06 complete; preparation checklist confirmed
+**Prerequisite:** IT-LBF-08 complete; preparation checklist confirmed
 
 **Steps:**
 
@@ -599,3 +600,4 @@ Key narrative questions from the Lloyds Specialist Programme example form:
 | 1.12    | 2026-06-04 | Rapidglobe Ltd | IT-LBF-11, IT-LBF-12, IT-LBF-13 complete. All 13 tests passed. D-LBF-04 (re-export dialog missing HH:MM) and D-LBF-05 (plain text download produces no file) raised. Testing complete — 5 defects open: D-LBF-01 through D-LBF-05.                                                                                                                                                                                                                       |
 | 1.13    | 2026-06-04 | Rapidglobe Ltd | All 5 defects fixed: D-LBF-01/03 optional detection (isOptionalQ covers both patterns), D-LBF-02 hard stop for over-limit answers, D-LBF-04 formatExportDate includes HH:MM, D-LBF-05 per-format download state. Full retest cycle to follow.                                                                                                                                                                                                            |
 | 1.14    | 2026-06-04 | Rapidglobe Ltd | All 5 defects verified fixed in retest. D-LBF-02 hard stop confirmed (approve hidden at 505/500w). D-LBF-01/03 confirmed (Q10 empty — approve section visible, Ready to assemble active at 9/10). D-LBF-04 confirmed (re-export dialog shows "4 June 2026, 09:57"). D-LBF-05 confirmed (.txt file downloads with timestamp). Note: re-export dialog also appears when switching from docx to txt — minor wording improvement desirable but not a defect. |
+| 1.15    | 2026-07-04 | Rapidglobe Ltd | Swapped IT-LBF-07/IT-LBF-08 order: AI summary content accuracy now runs first (while still on Step 3), eligibility check/checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Results carried over with the content (both already Pass). Updated Test Results Summary, IT-LBF-09 prerequisite, and added Known Expected Behaviours row.                                                                 |

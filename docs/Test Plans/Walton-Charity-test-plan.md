@@ -1,7 +1,7 @@
 # Walton Charity — Community Grants Test Plan
 
-**Version:** 1.4
-**Date:** 2026-06-04
+**Version:** 1.5
+**Date:** 2026-07-04
 **Status:** Ready for execution
 **Tester:** WJ
 **Test accounts:** grantpathway+idle1@gmail.com (Harry's Rainbow — geographic mismatch) · grantpathway+walton1@gmail.com (Elmbridge Families Together — happy path, new account)
@@ -91,14 +91,15 @@ Register `grantpathway+walton1@gmail.com` and set up the following charity profi
 
 ## Known Expected Behaviours
 
-| Ref                     | Description                                                                                                                                                                                                                                                   |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| IT-WC-02                | Harry's Rainbow is expected to trigger an eligibility mismatch. Milton Keynes is outside Elmbridge, Surrey — Walton Charity's geographic restriction is absolute.                                                                                             |
-| Word limits             | Walton Charity describes word counts as suggestions, not hard limits. The app enforces them as hard stops (D-LBF-02). Note whether the AI labels them as "suggested" or "required" in the summary.                                                            |
-| No AI policy            | Walton Charity has no published AI policy. The AI summary should flag this absence rather than fabricating a policy statement.                                                                                                                                |
-| Non-narrative questions | The application includes data fields (Living Wage confirmation, legal status dropdown, registered charity number, financial information). These should be absent from Step 4 writing cards.                                                                   |
-| Application form        | Walton Charity's actual application form is online-only, issued after an initial enquiry. The guidelines PDF covers eligibility and priorities. If the PDF alone does not yield application questions, test the paste path using the published guidance text. |
-| Optional questions      | Q5 (plan to continue beyond the grant period) is phrased as a conditional narrative ("if yes... if no..."). Monitor whether it is treated as optional.                                                                                                        |
+| Ref                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| IT-WC-02                | Harry's Rainbow is expected to trigger an eligibility mismatch. Milton Keynes is outside Elmbridge, Surrey — Walton Charity's geographic restriction is absolute.                                                                                                                                                                                                                                                                                     |
+| Word limits             | Walton Charity describes word counts as suggestions, not hard limits. The app enforces them as hard stops (D-LBF-02). Note whether the AI labels them as "suggested" or "required" in the summary.                                                                                                                                                                                                                                                    |
+| No AI policy            | Walton Charity has no published AI policy. The AI summary should flag this absence rather than fabricating a policy statement.                                                                                                                                                                                                                                                                                                                        |
+| Non-narrative questions | The application includes data fields (Living Wage confirmation, legal status dropdown, registered charity number, financial information). These should be absent from Step 4 writing cards.                                                                                                                                                                                                                                                           |
+| Application form        | Walton Charity's actual application form is online-only, issued after an initial enquiry. The guidelines PDF covers eligibility and priorities. If the PDF alone does not yield application questions, test the paste path using the published guidance text.                                                                                                                                                                                         |
+| Optional questions      | Q5 (plan to continue beyond the grant period) is phrased as a conditional narrative ("if yes... if no..."). Monitor whether it is treated as optional.                                                                                                                                                                                                                                                                                                |
+| Test order              | IT-WC-07 (AI summary content accuracy) must run **before** IT-WC-08 (checklist/start writing) — clicking "I have what I need — start writing" in the old IT-WC-07 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly. Both were already marked Pass under the old order — results carried over with the content, not the ID. |
 
 ---
 
@@ -142,8 +143,8 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | IT-WC-04 | Elmbridge Families Together account registration and profile setup                         | No          | N/A             | ✅ Pass |                                                                                                                                                                                                                                                                                            |
 | IT-WC-05 | Elmbridge Families Together — Walton Charity funder picker                                 | Yes         | N/A             | ✅ Pass |                                                                                                                                                                                                                                                                                            |
 | IT-WC-06 | Elmbridge Families Together — PDF upload and AI summary                                    | Yes         | 25s (PDF)       | ✅ Pass | PDF upload alone extracts only section headings — not specific questions. Paste from application guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) + explicit questions required for correct extraction. 5 questions extracted with correct word limits. |
-| IT-WC-07 | Elmbridge Families Together — eligibility check passes; preparation checklist              | Yes         | N/A             | ✅ Pass | Eligibility passed. Preparation checklist displayed correctly.                                                                                                                                                                                                                             |
-| IT-WC-08 | Elmbridge Families Together — AI summary content accuracy                                  | Yes         | N/A             | ✅ Pass | Summary accurate — Elmbridge restriction, poverty focus, grant amount, income limits, Who can apply, key requirements all correct. No AI policy flagged (absent from Walton Charity guidelines — handled gracefully).                                                                      |
+| IT-WC-07 | Elmbridge Families Together — AI summary content accuracy                                  | Yes         | N/A             | ✅ Pass | Summary accurate — Elmbridge restriction, poverty focus, grant amount, income limits, Who can apply, key requirements all correct. No AI policy flagged (absent from Walton Charity guidelines — handled gracefully).                                                                      |
+| IT-WC-08 | Elmbridge Families Together — eligibility check passes; preparation checklist              | Yes         | N/A             | ✅ Pass | Eligibility passed. Preparation checklist displayed correctly.                                                                                                                                                                                                                             |
 | IT-WC-09 | Elmbridge Families Together — narrative question extraction and word limits                | Yes         | N/A             | ✅ Pass | All 5 questions present with correct word limits. D-LBF-02 fix confirmed at 500/500w boundary.                                                                                                                                                                                             |
 | IT-WC-10 | Elmbridge Families Together — non-narrative question handling; optional question behaviour | Yes         | N/A             | ✅ Pass | No non-narrative fields in Step 4. Q5 treated as mandatory — answered and approved. Ready to assemble active at 5/5.                                                                                                                                                                       |
 | IT-WC-11 | Elmbridge Families Together — narrative answer writing and AI assist                       | No          | N/A             | ✅ Pass | Answers written across 300 and 500-word fields. Approve button correct at word limit.                                                                                                                                                                                                      |
@@ -334,37 +335,10 @@ Questions from the Walton Charity application guidance page (word counts are sug
 
 ---
 
-### IT-WC-07 — Elmbridge Families Together — Eligibility Check Passes; Preparation Checklist
+### IT-WC-07 — Elmbridge Families Together — AI Summary Content Accuracy
 
 **WC-specific:** Yes
-**Prerequisite:** IT-WC-06 complete
-
-**Steps:**
-
-1. If normal summary cards appeared and Continue was possible — confirm eligibility passed
-2. Verify the **"Before you begin writing"** preparation checklist appears correctly
-3. Click **"I have what I need — start writing"**
-
-**Expected result:**
-
-- Elmbridge Families Together passes eligibility — financial hardship in Elmbridge is a clear fit
-- Preparation checklist displays correctly
-- "I have what I need — start writing" navigates to Step 4
-
-**If mismatch appears (unexpected):**
-
-- Record the mismatch reason as a defect and investigate before proceeding
-
-**Result:** ✅ Pass
-
-**Notes:** Eligibility passed. Preparation checklist displayed correctly.
-
----
-
-### IT-WC-08 — Elmbridge Families Together — AI Summary Content Accuracy
-
-**WC-specific:** Yes
-**Prerequisite:** IT-WC-06 complete
+**Prerequisite:** IT-WC-06 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-WC-08).
 
 **Verify the summary includes:**
 
@@ -389,10 +363,37 @@ Questions from the Walton Charity application guidance page (word counts are sug
 
 ---
 
+### IT-WC-08 — Elmbridge Families Together — Eligibility Check Passes; Preparation Checklist
+
+**WC-specific:** Yes
+**Prerequisite:** IT-WC-07 complete (AI summary content reviewed while still on Step 3)
+
+**Steps:**
+
+1. If normal summary cards appeared and Continue was possible — confirm eligibility passed
+2. Verify the **"Before you begin writing"** preparation checklist appears correctly
+3. Click **"I have what I need — start writing"**
+
+**Expected result:**
+
+- Elmbridge Families Together passes eligibility — financial hardship in Elmbridge is a clear fit
+- Preparation checklist displays correctly
+- "I have what I need — start writing" navigates to Step 4
+
+**If mismatch appears (unexpected):**
+
+- Record the mismatch reason as a defect and investigate before proceeding
+
+**Result:** ✅ Pass
+
+**Notes:** Eligibility passed. Preparation checklist displayed correctly.
+
+---
+
 ### IT-WC-09 — Elmbridge Families Together — Narrative Question Extraction and Word Limits
 
 **WC-specific:** Yes
-**Prerequisite:** IT-WC-06 complete; preparation checklist confirmed
+**Prerequisite:** IT-WC-08 complete; preparation checklist confirmed
 
 **Steps:**
 
@@ -553,3 +554,4 @@ Questions from the Walton Charity application guidance page (word counts are sug
 | 1.2     | 2026-06-04 | Rapidglobe Ltd | IT-WC-04 passed — Elmbridge Families Together account registered and profile saved.                                                                                                                                                                                                                                                                                                                                               |
 | 1.3     | 2026-06-04 | Rapidglobe Ltd | IT-WC-05–08 passed. Key finding: Walton Charity PDF guidelines do not contain application questions — paste from guidance page (waltoncharity.org.uk/education-community-grant-application-guidance) required. 5 questions extracted with correct word limits. Eligibility passed, summary accurate.                                                                                                                              |
 | 1.4     | 2026-06-04 | Rapidglobe Ltd | IT-WC-09–13 passed. Testing complete — 13/13. No defects found. D-LBF-02/04/05 fixes all confirmed working. Button label corrected to "Download as Word document (.docx)" / "Download as plain text (.txt)".                                                                                                                                                                                                                      |
+| 1.5     | 2026-07-04 | Rapidglobe Ltd | Swapped IT-WC-07/IT-WC-08 order: AI summary content accuracy now runs first (while still on Step 3), checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Results carried over with the content (both already Pass). Updated Test Results Summary, IT-WC-09 prerequisite, and added Known Expected Behaviours row.                                                               |

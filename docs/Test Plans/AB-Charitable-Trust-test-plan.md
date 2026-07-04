@@ -1,7 +1,7 @@
 # A B Charitable Trust Test Plan
 
-**Version:** 1.0
-**Date:** 2026-06-01
+**Version:** 1.1
+**Date:** 2026-07-04
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+ABC@gmail.com
@@ -54,22 +54,23 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
 | Complete end-to-end flow mandatory                   | All steps 1–5 covered including prep checklist                                  |
 | Record AI summary timing                             | Stopwatch step included in ABC-03                                               |
-| Prep checklist must be explicitly confirmed          | Step included in ABC-03                                                         |
+| Prep checklist must be explicitly confirmed          | Step included in ABC-06                                                         |
 | PDF table format causes extraction failure (D-IT-01) | AB format is numbered list — expect clean extraction; paste fallback documented |
 | No indication of which file was loaded               | Known limitation — noted in ABC-03 expected result                              |
 | Eligibility mismatch should be surfaced              | ABC-04 tests for POSITIVE eligibility match (Harry's Rainbow IS eligible)       |
-| Non-narrative questions should not appear in Step 4  | ABC-06 explicitly verifies only narrative questions shown                       |
+| Non-narrative questions should not appear in Step 4  | ABC-07 explicitly verifies only narrative questions shown                       |
 
 ---
 
 ## Known Expected Behaviours
 
-| Ref               | Description                                                                                                                                                                                                                                                                                         |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Prior test        | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). Document has sections A–D. Only 2–3 questions require narrative prose (B3, B4, possibly C11). D5 is a file upload instruction (Word/PDF proposal, 2–2½ pages) — must NOT appear as a text writing card. |
-| B4 word limit     | B4 asks for a summary in "no more than 15 words" — the tightest word limit of any funder tested. Counter should show "X / 15 words".                                                                                                                                                                |
-| Grant amount      | AB does not ask applicants to specify a grant amount. Open Programme range is £10,000–£30,000 pa.                                                                                                                                                                                                   |
-| No file indicator | The Step 3 summary page does not currently show which guidelines file was uploaded. This is a known limitation logged as a product improvement.                                                                                                                                                     |
+| Ref               | Description                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prior test        | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). Document has sections A–D. Only 2–3 questions require narrative prose (B3, B4, possibly C11). D5 is a file upload instruction (Word/PDF proposal, 2–2½ pages) — must NOT appear as a text writing card.                                                                                                                               |
+| B4 word limit     | B4 asks for a summary in "no more than 15 words" — the tightest word limit of any funder tested. Counter should show "X / 15 words".                                                                                                                                                                                                                                                                                              |
+| Grant amount      | AB does not ask applicants to specify a grant amount. Open Programme range is £10,000–£30,000 pa.                                                                                                                                                                                                                                                                                                                                 |
+| No file indicator | The Step 3 summary page does not currently show which guidelines file was uploaded. This is a known limitation logged as a product improvement.                                                                                                                                                                                                                                                                                   |
+| Test order        | ABC-04 (eligibility mismatch) and ABC-05 (content accuracy) must run **before** ABC-06 (preparation checklist/start writing) — clicking "start writing" navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); fixed here by splitting the Step 4 navigation out of ABC-03 into its own ABC-06, renumbering old ABC-06–10 to ABC-07–11. |
 
 ---
 
@@ -81,14 +82,15 @@ Complete after running all tests.
 | ------- | ---------------------------------------------------------------- | ------------------------------------------------- | --------------- | ------- | ----------------------------------------------------------------- |
 | ABC-01  | Account registration and charity profile                         | No                                                | N/A             | ✅ Pass |                                                                   |
 | ABC-02  | A B Charitable Trust funder picker                               | No                                                | N/A             | ✅ Pass |                                                                   |
-| ABC-03  | PDF upload, AI summary and prep checklist                        | Yes — timing, prep checklist                      | Not recorded    | ✅ Pass | Paste text used; PDF extraction issue (D-IT-01) still open        |
+| ABC-03  | PDF upload and AI summary                                        | Yes — timing                                      | Not recorded    | ✅ Pass | Paste text used; PDF extraction issue (D-IT-01) still open        |
 | ABC-04  | AI eligibility mismatch — Harry's Rainbow NOT eligible           | Yes — social justice focus vs bereavement charity | N/A             | ✅ Pass | Summary clearly states social justice categories required         |
 | ABC-05  | AI summary content accuracy                                      | No                                                | N/A             | ✅ Pass | All sections accurate; grant amount correct                       |
-| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering                     | N/A             | ✅ Pass | 3 questions shown (B3, B4, C11); D5 absent                        |
-| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | Yes — limit type correct                          | N/A             | ✅ Pass | "15 words" badge and "0 / 15 words" counter correct               |
-| ABC-08  | Narrative answer writing and AI assist                           | No                                                | N/A             | ✅ Pass | AI assist working; spelling correction fix applied mid-test       |
-| ABC-09  | Answer approval and Step 5 navigation                            | No                                                | N/A             | ✅ Pass | Senior review screen; Step 5 review checkboxes and approval modal |
-| ABC-10  | Word document export — structure and content                     | No                                                | N/A             | ✅ Pass | Both .docx and .txt downloaded; all content correct               |
+| ABC-06  | Preparation checklist and start writing                          | Yes — prep checklist                              | N/A             | ✅ Pass | Prep checklist screen confirmed before Q&A interface              |
+| ABC-07  | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering                     | N/A             | ✅ Pass | 3 questions shown (B3, B4, C11); D5 absent                        |
+| ABC-08  | Word limit extraction — B4 is 15 words (tightest limit tested)   | Yes — limit type correct                          | N/A             | ✅ Pass | "15 words" badge and "0 / 15 words" counter correct               |
+| ABC-09  | Narrative answer writing and AI assist                           | No                                                | N/A             | ✅ Pass | AI assist working; spelling correction fix applied mid-test       |
+| ABC-10  | Answer approval and Step 5 navigation                            | No                                                | N/A             | ✅ Pass | Senior review screen; Step 5 review checkboxes and approval modal |
+| ABC-11  | Word document export — structure and content                     | No                                                | N/A             | ✅ Pass | Both .docx and .txt downloaded; all content correct               |
 
 ---
 
@@ -167,9 +169,9 @@ Complete after running all tests.
 
 ---
 
-### ABC-03 — PDF Upload, AI Summary and Prep Checklist
+### ABC-03 — PDF Upload and AI Summary
 
-**Idlewild lesson applied:** Yes — timing recorded; prep checklist explicitly confirmed; paste fallback documented
+**Idlewild lesson applied:** Yes — timing recorded; paste fallback documented
 **Prerequisite:** ABC-02 complete
 
 **Steps:**
@@ -183,11 +185,10 @@ Complete after running all tests.
 7. Observe the loading indicator and staged progress messages
 8. **Stop the stopwatch** when the summary appears — record the time in the results table above
 9. Review the generated AI summary
-10. Click **Continue** to proceed to Step 4
-11. Confirm the **"Before you begin writing"** preparation checklist screen appears
-12. Click **"I have what I need — start writing"** to enter the Q&A interface
 
-**If PDF extraction fails (no questions shown in Step 4):**
+**Do not click Continue yet** — the eligibility mismatch review (ABC-04) and content-accuracy review (ABC-05) both need the AI summary visible on Step 3. Continuing to Step 4 happens in ABC-06, after both reviews are complete.
+
+**If PDF extraction fails (no questions shown after continuing in ABC-06):**
 
 - Return to Step 2 using the **Back** button
 - Select **paste text** instead
@@ -199,7 +200,6 @@ Complete after running all tests.
 - PDF uploads successfully (no format or size error — AB document is .pdf)
 - AI summary generates without error within 30 seconds
 - Summary content covers AB Charitable Trust's focus areas, eligibility, and requirements
-- Prep checklist screen confirmed before Q&A interface
 - _(Known limitation: no filename indicator shown on Step 3 — this is expected)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -211,7 +211,7 @@ Complete after running all tests.
 ### ABC-04 — AI Eligibility Mismatch — Harry's Rainbow Likely NOT Eligible
 
 **Idlewild lesson applied:** Yes — same pattern as IT-04. AB Charitable Trust funds specific social justice causes; Harry's Rainbow does not operate in these areas
-**Prerequisite:** ABC-03 complete (AI summary generated)
+**Prerequisite:** ABC-03 complete (AI summary generated). Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see ABC-06).
 
 **Background:** AB Charitable Trust funds organisations working in: Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform (these are the categories in the B1 dropdown). Harry's Rainbow provides bereavement support to children — this does not fall within these categories.
 
@@ -243,7 +243,7 @@ Complete after running all tests.
 ### ABC-05 — AI Summary Content Accuracy
 
 **Idlewild lesson applied:** No
-**Prerequisite:** ABC-03 complete
+**Prerequisite:** ABC-03 complete. Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see ABC-06).
 
 **Steps:**
 
@@ -270,10 +270,32 @@ Complete after running all tests.
 
 ---
 
-### ABC-06 — Narrative Question Extraction — Only 2–3 Expected
+### ABC-06 — Preparation Checklist and Start Writing
+
+**Idlewild lesson applied:** Yes — prep checklist explicitly confirmed
+**Prerequisite:** ABC-05 complete (AI summary content and eligibility reviewed while still on Step 3)
+
+**Steps:**
+
+1. Click **Continue** to proceed to Step 4
+2. Confirm the **"Before you begin writing"** preparation checklist screen appears
+3. Click **"I have what I need — start writing"** to enter the Q&A interface
+
+**Expected result:**
+
+- Prep checklist screen confirmed before Q&A interface
+- Step 4 loads with writing cards
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
+
+---
+
+### ABC-07 — Narrative Question Extraction — Only 2–3 Expected
 
 **Idlewild lesson applied:** Yes — directly tests non-narrative question filtering
-**Prerequisite:** ABC-03 complete (Q&A interface entered)
+**Prerequisite:** ABC-06 complete (Q&A interface entered)
 
 **Background:** The A B Charitable Trust document has questions across four sections (A, B, C, D). The vast majority are data-entry, financial, dropdown, or file upload fields. Only 2–3 require a narrative prose answer:
 
@@ -306,10 +328,10 @@ Complete after running all tests.
 
 ---
 
-### ABC-07 — Word Limit Extraction and Counter Display
+### ABC-08 — Word Limit Extraction and Counter Display
 
 **Idlewild lesson applied:** Yes — Idlewild used character limits; AB uses word limits. Also tests B4's unique 15-word limit — the tightest tested so far
-**Prerequisite:** ABC-06 complete
+**Prerequisite:** ABC-07 complete
 
 **Steps:**
 
@@ -336,10 +358,10 @@ Complete after running all tests.
 
 ---
 
-### ABC-08 — Narrative Answer Writing and AI Assist
+### ABC-09 — Narrative Answer Writing and AI Assist
 
 **Idlewild lesson applied:** No — core writing interface test
-**Prerequisite:** ABC-07 complete
+**Prerequisite:** ABC-08 complete
 
 **Steps:**
 
@@ -372,10 +394,10 @@ Complete after running all tests.
 
 ---
 
-### ABC-09 — Answer Approval and Step 5 Navigation
+### ABC-10 — Answer Approval and Step 5 Navigation
 
 **Idlewild lesson applied:** No
-**Prerequisite:** ABC-08 complete (at least one answer approved)
+**Prerequisite:** ABC-09 complete (at least one answer approved)
 
 **Steps:**
 
@@ -400,10 +422,10 @@ Complete after running all tests.
 
 ---
 
-### ABC-10 — Word Document Export — Structure and Content
+### ABC-11 — Word Document Export — Structure and Content
 
 **Idlewild lesson applied:** No — blocked in Idlewild due to D-IT-01; this is the first successful export test
-**Prerequisite:** ABC-09 complete
+**Prerequisite:** ABC-10 complete
 
 **Steps:**
 
@@ -436,6 +458,7 @@ Additional checks:
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                          |
-| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons                                                                                                                                                                                                                                                                                                                                                                                  |
+| 1.1     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): ABC-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so ABC-04/ABC-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of ABC-03 into a new ABC-06 ("Preparation Checklist and Start Writing"), which now runs after ABC-04/ABC-05. Old ABC-06–10 renumbered to ABC-07–11; now 11 test cases total. |

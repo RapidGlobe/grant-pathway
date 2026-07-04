@@ -1,7 +1,7 @@
 # Wolfson Foundation — Health & Disability Stage 1 Test Plan
 
-**Version:** 1.4
-**Date:** 2026-06-03
+**Version:** 1.5
+**Date:** 2026-07-04
 **Status:** Ready for execution
 **Tester:** WJ
 **Test account:** grantpathway+wf1@gmail.com (new account — see pre-test setup below)
@@ -72,15 +72,16 @@ Stage 1 questions must be copied from the Wolfson website before beginning the t
 
 ## Known Expected Behaviours
 
-| Ref                       | Description                                                                                                                                                                                                               |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Stage 1 only              | This test covers Stage 1 only. Wolfson's two-stage process means Stage 1 is a brief screening application. A separate test plan should be prepared for Stage 2 if an invitation is received.                              |
-| Paste path                | Step 2 uses the text paste area, not file upload. Verify the paste input accepts the copied question text and passes it to the AI.                                                                                        |
-| Sector-specific questions | Wolfson publishes different question sets for each sector. This test uses the Health & Disability set. Questions for Science & Medicine, Heritage, and Secondary Education are different and are not covered here.        |
-| Non-narrative questions   | Timetable, location, ownership/tenure/planning permission, financial figures (cost/raised/shortfall), audited accounts, signed covering letter, and CQC report fields are non-narrative and should be absent from Step 4. |
-| Short word limits         | The 50-word "previous support" field and 25-word "project title" field are unusually short. The AI may extract these as narrative questions or skip them. Record the outcome.                                             |
-| Optional question         | "Any other information" (200 words) is explicitly marked optional on the Wolfson website. It may or may not be extracted. Record the outcome.                                                                             |
-| No AI policy              | Wolfson Foundation publishes no AI restriction or guidance. No mismatch on that basis is expected.                                                                                                                        |
+| Ref                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stage 1 only              | This test covers Stage 1 only. Wolfson's two-stage process means Stage 1 is a brief screening application. A separate test plan should be prepared for Stage 2 if an invitation is received.                                                                                                                                                                                                                                                                            |
+| Paste path                | Step 2 uses the text paste area, not file upload. Verify the paste input accepts the copied question text and passes it to the AI.                                                                                                                                                                                                                                                                                                                                      |
+| Sector-specific questions | Wolfson publishes different question sets for each sector. This test uses the Health & Disability set. Questions for Science & Medicine, Heritage, and Secondary Education are different and are not covered here.                                                                                                                                                                                                                                                      |
+| Non-narrative questions   | Timetable, location, ownership/tenure/planning permission, financial figures (cost/raised/shortfall), audited accounts, signed covering letter, and CQC report fields are non-narrative and should be absent from Step 4.                                                                                                                                                                                                                                               |
+| Short word limits         | The 50-word "previous support" field and 25-word "project title" field are unusually short. The AI may extract these as narrative questions or skip them. Record the outcome.                                                                                                                                                                                                                                                                                           |
+| Optional question         | "Any other information" (200 words) is explicitly marked optional on the Wolfson website. It may or may not be extracted. Record the outcome.                                                                                                                                                                                                                                                                                                                           |
+| No AI policy              | Wolfson Foundation publishes no AI restriction or guidance. No mismatch on that basis is expected.                                                                                                                                                                                                                                                                                                                                                                      |
+| Test order                | IT-WF-04 (AI summary content accuracy) must run **before** IT-WF-05 (eligibility check/checklist/start writing) — clicking "I have what I need — start writing" in the old IT-WF-04 navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); reordered here accordingly. Both were already marked Pass under the old order — results carried over with the content, not the ID. |
 
 ---
 
@@ -118,8 +119,8 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 | IT-WF-01 | Account registration and profile setup                                   | No               | N/A             | ☐ Pass ☐ Fail ☐ Blocked |                                                                                                                                       |
 | IT-WF-02 | Wolfson Foundation funder picker                                         | Yes              | N/A             | ✅ Pass                 | "Request it to be added" link generates email correctly                                                                               |
 | IT-WF-03 | Guidelines paste and AI summary                                          | Yes              | Not recorded    | ✅ Pass                 | Auto-generates on load — no button. 7 sections extracted correctly. Sections path (free_form classification).                         |
-| IT-WF-04 | Eligibility check and preparation checklist                              | Yes              | N/A             | ✅ Pass                 | Branch A — no mismatch. Checklist displayed correctly with financial advisory.                                                        |
-| IT-WF-05 | AI summary content accuracy                                              | Yes              | N/A             | ✅ Pass                 | Accurate for source text. Capital-only scope absent — not in Stage 1 questions page (expected).                                       |
+| IT-WF-04 | AI summary content accuracy                                              | Yes              | N/A             | ✅ Pass                 | Accurate for source text. Capital-only scope absent — not in Stage 1 questions page (expected).                                       |
+| IT-WF-05 | Eligibility check and preparation checklist                              | Yes              | N/A             | ✅ Pass                 | Branch A — no mismatch. Checklist displayed correctly with financial advisory.                                                        |
 | IT-WF-06 | Narrative question extraction and word limits                            | Yes              | N/A             | ✅ Pass                 | All 7 sections present, word limits correct. Timetable/location as prose cards — correct.                                             |
 | IT-WF-07 | Non-narrative question handling                                          | Yes              | N/A             | ✅ Pass                 | Data/file fields absent. Financial info correctly Budget-flagged, AI disabled.                                                        |
 | IT-WF-08 | Narrative answer writing and AI assist                                   | No               | N/A             | ✅ Pass                 | AI assist corrected spelling and improved tone. Approval flow correct. D-WF-01 found (optional section).                              |
@@ -237,10 +238,36 @@ Narrative questions from the Wolfson Health & Disability Stage 1 question set:
 
 ---
 
-### IT-WF-04 — Eligibility Check — Observe Outcome
+### IT-WF-04 — AI Summary Content Accuracy
+
+**Wolfson-specific:** Yes
+**Prerequisite:** IT-WF-03 complete. Review this **before** continuing past Step 3 (AI Summary) — the summary is no longer easily visible once you proceed to Step 4 and start writing (see IT-WF-05).
+
+**Verify the summary includes:**
+
+- Funder description: Health & Disability programme supporting charitable projects ✅ (note: the pasted Stage 1 questions page does not detail capital-only scope or exclusions, so these will not appear — this is expected given the source text)
+- Grant range: "Not specified" is the correct result — Wolfson does not publish figures on the Stage 1 questions page ✅
+- Who can apply: UK registered charities; organisations working in health and disability; special schools with modified accounts requirement ✅
+- What the funder is looking for: health and disability projects; clear timetable and defined location; track record via inspection reports ✅
+- Key requirements: audited accounts; project location separate from org address; ownership/tenure/planning permission; head of organisation confirmation; CQC/Ofsted report if applicable ✅
+- 7 application sections listed with correct word limits on narrative sections ✅
+
+**Expected result:**
+
+- Summary accurately reflects the content of the pasted Stage 1 questions page
+- No hallucinated eligibility conditions or invented exclusions
+- "Not specified" for grant amount is correct
+
+**Result:** ✅ Pass
+
+**Notes:** Summary accurately reflects the Stage 1 questions page. Capital-only scope and exclusions not extracted — these are not present in the Stage 1 questions source text, so absence is correct. The AI has not invented any criteria. All sections, word limits, who can apply, and key requirements are accurate.
+
+---
+
+### IT-WF-05 — Eligibility Check — Observe Outcome
 
 **Wolfson-specific:** Yes — Compass Wellbeing should be a strong fit for Health & Disability; a mismatch would indicate a prompt issue
-**Prerequisite:** IT-WF-03 complete
+**Prerequisite:** IT-WF-04 complete (AI summary content reviewed while still on Step 3)
 
 > **Where to look for the eligibility warning:** The red mismatch warning appears on **Step 3 (AI Summary page)**, replacing the normal summary cards entirely. It shows a red warning card with the mismatch reason and an "I understand — return to my dashboard" button. If you reached the normal summary cards and were able to click Continue, eligibility passed — you will never see a mismatch warning on the preparation checklist page.
 
@@ -275,36 +302,10 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 
 ---
 
-### IT-WF-05 — AI Summary Content Accuracy
-
-**Wolfson-specific:** Yes
-**Prerequisite:** IT-WF-03 complete
-
-**Verify the summary includes:**
-
-- Funder description: Health & Disability programme supporting charitable projects ✅ (note: the pasted Stage 1 questions page does not detail capital-only scope or exclusions, so these will not appear — this is expected given the source text)
-- Grant range: "Not specified" is the correct result — Wolfson does not publish figures on the Stage 1 questions page ✅
-- Who can apply: UK registered charities; organisations working in health and disability; special schools with modified accounts requirement ✅
-- What the funder is looking for: health and disability projects; clear timetable and defined location; track record via inspection reports ✅
-- Key requirements: audited accounts; project location separate from org address; ownership/tenure/planning permission; head of organisation confirmation; CQC/Ofsted report if applicable ✅
-- 7 application sections listed with correct word limits on narrative sections ✅
-
-**Expected result:**
-
-- Summary accurately reflects the content of the pasted Stage 1 questions page
-- No hallucinated eligibility conditions or invented exclusions
-- "Not specified" for grant amount is correct
-
-**Result:** ✅ Pass
-
-**Notes:** Summary accurately reflects the Stage 1 questions page. Capital-only scope and exclusions not extracted — these are not present in the Stage 1 questions source text, so absence is correct. The AI has not invented any criteria. All sections, word limits, who can apply, and key requirements are accurate.
-
----
-
 ### IT-WF-06 — Narrative Question Extraction and Word Limits
 
 **Wolfson-specific:** Yes
-**Prerequisite:** IT-WF-03 complete; preparation checklist confirmed on Step 4 entry
+**Prerequisite:** IT-WF-05 complete; preparation checklist confirmed on Step 4 entry
 
 **Steps:**
 
@@ -572,3 +573,4 @@ If a red mismatch warning appeared on Step 3 instead of the normal summary cards
 | 1.2     | 2026-06-03 | Rapidglobe Ltd | IT-WF-03 corrected — summary auto-generates on page load, no Generate Summary button exists. IT-WF-03 and IT-WF-05 marked Pass with results recorded. IT-WF-05 expected results revised to reflect Stage 1 questions page as source (capital-only scope and exclusions not present in source text — absence correct). Sections/free_form classification by AI noted as expected given pasted content format. |
 | 1.3     | 2026-06-03 | Rapidglobe Ltd | IT-WF-04 expanded — clarified that eligibility warning appears on Step 3 (AI Summary), not on the preparation checklist. Added explicit verification steps for the "Before you begin writing" checklist (financial advisory, four checklist items, "I have what I need" button). IT-WF-04 marked Pass (Branch A). Test case renamed to reflect checklist coverage.                                           |
 | 1.4     | 2026-06-03 | Rapidglobe Ltd | IT-WF-06 and IT-WF-07 marked Pass with observed results recorded. IT-WF-07 expected table corrected — timetable and location are correctly present as prose cards (Wolfson open text fields, not structured data). IT-WF-06 table filled with actuals.                                                                                                                                                       |
+| 1.5     | 2026-07-04 | Rapidglobe Ltd | Swapped IT-WF-04/IT-WF-05 order: AI summary content accuracy now runs first (while still on Step 3), eligibility check/checklist/start-writing now runs second — same step-ordering defect found and fixed in the MKCF plan. Results carried over with the content (both already Pass). Updated Test Results Summary, IT-WF-06 prerequisite, and added Known Expected Behaviours row.                        |
