@@ -1,8 +1,8 @@
 # Clothworkers' Foundation Test Plan — Small Grants Programme
 
-**Version:** 1.5
+**Version:** 1.6
 **Date:** 2026-07-04
-**Status:** Ready for a full clean execution. Corrected against the current service and `grant-pathway-user-guide-v1_15.docx` (2026-07-04) — see Document History for the full list of corrections. All results below have been cleared; retest from IT-CW-01.
+**Status:** Ready for a full clean execution. All outstanding TODOs from v1.5 applied — see Document History. All results below have been cleared; retest from IT-CW-01.
 **Tester:** WJ
 **Test account:** grantpathway+cloth1@gmail.com
 
@@ -12,7 +12,7 @@
 
 This test plan covers an end-to-end test of Grant Pathway using The Clothworkers' Foundation Open Grants Programme (Small Grants, up to £15,000) as the target funder.
 
-Clothworkers is a **Structured** funder. Their Small Grants form uses **word limits** with an "approx. X words" format (not exact limits), and contains a significant number of non-narrative questions (dropdowns, numbers, percentages, yes/no, file uploads). These make Clothworkers the primary test case for "approx." word limit extraction (GAP-27 variant) and non-narrative question filtering (GAP-28).
+Clothworkers publishes a sample application form with discrete, numbered questions. Their Small Grants form uses **word limits** with an "approx. X words" format (not exact limits), and contains a significant number of non-narrative questions (dropdowns, numbers, percentages, yes/no, file uploads). These make Clothworkers the primary test case for "approx." word limit extraction (GAP-27 variant) and non-narrative question filtering (GAP-28).
 
 This is the first test using a **capital funder** — Clothworkers funds equipment, buildings, vehicles, and digital infrastructure only. Programme areas focus on disadvantaged communities. Harry's Rainbow is not used for this test as it does not clearly map to Clothworkers' programme areas. A purpose-designed test charity (Bridge Support MK) is used instead.
 
@@ -45,11 +45,12 @@ This is the first test using a **capital funder** — Clothworkers funds equipme
 
 ## Known Expected Behaviours
 
-| Ref            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| GAP-27 variant | Clothworkers uses "approx. X words" format (not exact word counts). Observe whether the AI extracts these as word limits and what value it records (e.g., "approx. 250 words" → 250 words).                                                                                                                                                                                                                                                  |
-| GAP-28         | Non-narrative questions (religion affiliation yes/no, Living Wage accredited yes/no, programme area multi-select, percentage fields for lived experience, income/expenditure numbers, file uploads for accounts and project budget, project type dropdown, marketing consent yes/no) may appear as text areas. Observe and record.                                                                                                           |
-| Test order     | IT-CW-04 (eligibility check) and IT-CW-05 (content accuracy) must run **before** IT-CW-06 (preparation checklist/start writing) — clicking "start writing" navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); fixed here by splitting the Step 4 navigation out of IT-CW-03 into its own IT-CW-06, renumbering old IT-CW-06–10 to IT-CW-07–11. |
+| Ref                               | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| GAP-27 variant                    | Clothworkers uses "approx. X words" format (not exact word counts). Observe whether the AI extracts these as word limits and what value it records (e.g., "approx. 250 words" → 250 words).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| GAP-28                            | Non-narrative questions (religion affiliation yes/no, Living Wage accredited yes/no, programme area multi-select, percentage fields for lived experience, income/expenditure numbers, file uploads for accounts and project budget, project type dropdown, marketing consent yes/no) may appear as text areas. Observe and record.                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Test order                        | IT-CW-04 (eligibility check) and IT-CW-05 (content accuracy) must run **before** IT-CW-06 (preparation checklist/start writing) — clicking "start writing" navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); fixed here by splitting the Step 4 navigation out of IT-CW-03 into its own IT-CW-06, renumbering old IT-CW-06–10 to IT-CW-07–11.                                                                                                                                                                                                                                                                                                     |
+| Large-document truncation warning | Confirmed live 2026-07-04 (IT-CW-03): a yellow warning banner appears on Step 3 — "Your guidelines document is very large and was partially summarised. The AI reviewed the first section of the document. If key questions or eligibility criteria appear near the end of the document, consider pasting the most relevant sections as text instead." This is expected, designed behaviour, not a defect — the Clothworkers guidance PDF is large (1.1MB, ~30 pages) and previously required a raised preprocessing ceiling to extract questions correctly (see v1.2, PREPROCESS_CHAR_CEILING). Given the warning appeared, double-check in IT-CW-05/IT-CW-07 that no key content or questions were missed from later sections of the document. |
 
 ---
 
@@ -85,7 +86,7 @@ Complete after running all tests.
 | IT-CW-05 | AI summary content accuracy                                     | Yes                   | N/A             |        |       |
 | IT-CW-06 | Preparation checklist and start writing                         | Yes                   | N/A             |        |       |
 | IT-CW-07 | Narrative question extraction with "approx." word limits        | Yes                   | N/A             |        |       |
-| IT-CW-08 | Budget and non-narrative question handling                      | Yes                   | N/A             |        |       |
+| IT-CW-08 | Budget question flagging and non-narrative question absence     | Yes                   | N/A             |        |       |
 | IT-CW-09 | Narrative answer writing and AI assist                          | No                    | N/A             |        |       |
 | IT-CW-10 | Answer approval and assembly                                    | No                    | N/A             |        |       |
 | IT-CW-11 | Word document export; Word document verified; re-export warning | No                    | N/A             |        |       |
@@ -94,10 +95,11 @@ Complete after running all tests.
 
 ## Defect Log
 
-| ID       | Test     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Severity | Status           |
-| -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ---------------- |
-| D-CW-01  | IT-CW-08 | AI assist ("Help me improve this") not disabled when answer exceeded the word limit. Client-side `isOver` flag was not reliably preventing the button click due to React rendering timing. Server-side word limit guard added to `/api/refine-answer`; client-side early-return guard added to `handleRefine`. Both layers now enforce the word limit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Medium   | Fixed            |
-| D-CWF-01 | IT-CW-06 | Question 1 ("Please provide further information about your organisation's religious affiliation…") extracted as a standard writing card. This is a conditional question that only applies to faith-based organisations. The existing conditional question exclusion rule in `lib/prompts.ts` targets project-type conditionals ("only required if applying for a vehicle") — it does not detect faith-affiliation conditionals. Non-faith organisations see this as a mandatory writing card with no guidance that it is optional. Fixed (2026-06-05): FAITH AND RELIGION QUESTIONS rule added to `lib/prompts.ts` — questions asking primarily about religious affiliation, the role of faith in activities, or faith requirements for staff/trustees are now excluded as inherently conditional. Verified (2026-06-07): retest confirms faith affiliation question no longer appears — 8 questions extracted, none relating to faith or religion. | Medium   | Fixed — verified |
+| ID       | Test     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | Severity | Status                            |
+| -------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------- |
+| D-CW-01  | IT-CW-08 | AI assist ("Help me improve this") not disabled when answer exceeded the word limit. Client-side `isOver` flag was not reliably preventing the button click due to React rendering timing. Server-side word limit guard added to `/api/refine-answer`; client-side early-return guard added to `handleRefine`. Both layers now enforce the word limit.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Medium   | Fixed                             |
+| D-CWF-01 | IT-CW-06 | Question 1 ("Please provide further information about your organisation's religious affiliation…") extracted as a standard writing card. This is a conditional question that only applies to faith-based organisations. The existing conditional question exclusion rule in `lib/prompts.ts` targets project-type conditionals ("only required if applying for a vehicle") — it does not detect faith-affiliation conditionals. Non-faith organisations see this as a mandatory writing card with no guidance that it is optional. Fixed (2026-06-05): FAITH AND RELIGION QUESTIONS rule added to `lib/prompts.ts` — questions asking primarily about religious affiliation, the role of faith in activities, or faith requirements for staff/trustees are now excluded as inherently conditional. Verified (2026-06-07): retest confirms faith affiliation question no longer appears — 8 questions extracted, none relating to faith or religion.                                                                                                                                                                                                                                                                                                                   | Medium   | Fixed — verified                  |
+| D-CW-02  | IT-CW-09 | AI assist ("Help me improve this") on an over-limit answer did not reliably compress the answer to fit. A 344-word answer against a 250-word limit (38% over) was returned by AI assist almost completely unchanged — no words removed. A smaller earlier case (60 words against a 50-word limit, 20% over) was partially compressed but still left over. Root cause: `buildRefinePrompt` in `lib/prompts.ts` told the model both "must not exceed N words" and "do not change facts... the claims being made," with no instruction on how to actually cut length — the model appears to have prioritised preserving all content over meeting the limit, more so as the excess grew. Fixed (2026-07-04): prompt now detects when the answer is already over the limit and adds an explicit hard-requirement instruction to cut less essential detail, combine sentences, and remove repetition/examples; the "don't change facts" instruction now explicitly scopes to facts that are _kept_, and explicitly permits omitting less essential detail to meet the limit. Verified: `npx tsc --noEmit` clean, existing `__tests__/prompts.test.ts` (9 tests) and full suite (24 tests) pass. **Not yet re-verified live** — pending WJ's next over-limit AI assist test. | High     | Fixed — pending live verification |
 
 ---
 
@@ -123,7 +125,7 @@ Complete after running all tests.
 9. Complete all fields manually:
    - Charity name: Bridge Support MK
    - What does your charity do: Bridge Support MK provides practical support, food, and emergency resources to young people aged 16–25 facing economic disadvantage and homelessness risk in Milton Keynes, including a drop-in centre, digital skills workshops, and employment support
-   - Who do you help: Young people aged 16–25 at risk of homelessness or in economic hardship in Milton Keynes
+   - Who does your charity help: Young people aged 16–25 at risk of homelessness or in economic hardship in Milton Keynes
    - Where do you work: Milton Keynes
 10. Click **Save**
 
@@ -150,7 +152,7 @@ Complete after running all tests.
 2. On Step 1 (Application Details), click into the funder picker field
 3. Type **"Clothworkers"**
 4. Observe the filtered dropdown list
-5. Confirm **The Clothworkers' Foundation** appears with a **Structured** badge
+5. Confirm **The Clothworkers' Foundation** appears in the dropdown
 6. Select **The Clothworkers' Foundation**
 7. Enter grant name: **"Open Grants Programme — Small Grant 2026"**
 8. Click **Continue**
@@ -158,7 +160,6 @@ Complete after running all tests.
 **Expected result:**
 
 - "Clothworkers" search returns The Clothworkers' Foundation in the dropdown
-- **Structured** badge is displayed alongside the name
 - Application created and Step 2 (Uploaded Guidelines) displayed
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -190,6 +191,7 @@ Complete after running all tests.
 - AI summary generates without error
 - **No eligibility mismatch warning** — Bridge Support MK qualifies under Young People Facing Disadvantage and Economic Disadvantage
 - Summary cards displayed (about the grant, grant amount, who can apply, what funder is looking for, questions, key requirements)
+- A large-document truncation warning may appear (expected — see Known Expected Behaviours); if so, note it and double-check in IT-CW-05/IT-CW-07 that no content from later in the document was missed
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -250,6 +252,10 @@ Complete after running all tests.
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
+
+**Observation (not a defect, 2026-07-04):** The 10 programme areas are not surfaced as their own labelled section/card — they're folded into the third bullet of "What the funder is looking for" ("Projects supporting communities experiencing racial inequalities, disabled people, domestic and sexual abuse survivors, economic disadvantage, homelessness, LGBT+ communities, older people, prison and rehabilitation, substance misuse, or young people facing disadvantage"). All 10 are present and accurate (confirmed exactly 10 items, including both of Bridge Support MK's programme areas), satisfying "listed or summarised" as worded — but it's easy to miss on a skim since there's no dedicated heading.
+
+**Enhancement (not a defect, 2026-07-04):** "Income eligibility: under £2 million" appears in the "Who can apply" bullets ("Organisations with annual income of £2 million or less (Small Grants) or under £10 million (Large Grants)") with the same visual weight as every other bullet — no bold, no distinct styling — despite being a hard eligibility cutoff. Same underlying issue as the 20% match requirement flagged on IT-MKCF-07 (MKCF plan) — treat as one recurring pattern, not two separate enhancements: hard eligibility/financial thresholds aren't visually distinguished from softer, descriptive content in the AI summary. Reinforces the case for a general design pattern (DDR) covering all funder-specific "hard conditions," rather than a one-off fix per funder.
 
 ---
 
@@ -314,12 +320,14 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-08 — Budget and Non-Narrative Question Handling
+### IT-CW-08 — Budget Question Flagging and Non-Narrative Question Absence
 
 **Clothworkers-specific:** Yes — GAP-28: Clothworkers has a high proportion of non-narrative questions
 **Prerequisite:** IT-CW-06 complete
 
-**Non-narrative questions expected in the Clothworkers Small Grants form:**
+**Rewritten 2026-07-04** — the previous version of this test case asked the tester to "record how Grant Pathway displays" each non-narrative question type, which doesn't fit the actual behaviour: these types are filtered out entirely at AI extraction and never reach Step 4 in any form (not pre-filled, not shown as a reminder). This is confirmed, current, deliberate behaviour — not a defect — though it falls short of the originally-decided BD-03 pre-fill/reminder mechanism, which remains an **open product decision** (see `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.5.md`, Section 10, BD-03 note). This test now verifies the current behaviour is at least consistent (non-narrative absent, budget questions correctly flagged), rather than testing for a display mechanism that doesn't exist.
+
+**Non-narrative questions present in the Clothworkers Small Grants form (for reference — expected to be entirely absent from Step 4):**
 
 | Question                                           | Type                  |
 | -------------------------------------------------- | --------------------- |
@@ -344,14 +352,14 @@ Complete after running all tests.
 
 **Steps:**
 
-1. On Step 4, review the full list of displayed questions
-2. For each non-narrative question type above, record how Grant Pathway displays it
-3. Confirm budget questions (financial position, financial difficulties, shortfall) are visually flagged amber with AI assist disabled
+1. On Step 4, review the full list of displayed question cards
+2. Confirm **none** of the 18 non-narrative question types listed above appear anywhere at Step 4 — not as a writing card, not pre-filled, not as a read-only reminder
+3. Confirm budget questions (financial position, financial difficulties) **do** appear as ordinary writing cards, visually flagged amber, with AI assist disabled and a word limit shown
 
 **Expected result:**
 
-- Budget questions flagged amber with AI assist disabled
-- _(GAP-28 observation: record how non-narrative types are displayed)_
+- None of the 18 listed non-narrative question types appear at Step 4 in any form
+- Budget questions appear as writing cards (not pre-filled), flagged amber, with AI assist disabled
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -373,14 +381,14 @@ Complete after running all tests.
 5. Review the AI-refined answer — verify it does not add invented facts
 6. Review the three mandatory confirmation prompts
 7. Click **Approve**
-8. Navigate to **Q9 — Please describe your project** (approx. 250 words)
+8. Navigate to **Q8 — Please describe your project** (approx. 250 words)
 9. Write a short answer describing the laptop/tablet purchase for the digital skills centre
 10. Click **Help me improve this**, review, and approve
 
 **Expected result:**
 
 - Word counter updates in real time
-- Counter shows "X / 200 words" for Q2 and "X / 250 words" for Q9
+- Counter shows "X / 200 words" for Q2 and "X / 250 words" for Q8
 - AI assist returns a refined answer without adding new facts
 - Mandatory review prompts displayed before approval
 - Approved answers visually marked
@@ -395,11 +403,11 @@ Complete after running all tests.
 ### IT-CW-10 — Answer Approval and Assembly
 
 **Clothworkers-specific:** No
-**Prerequisite:** IT-CW-09 complete (Q2 and Q9 approved)
+**Prerequisite:** IT-CW-09 complete (Q2 and Q8 approved)
 
 **Steps:**
 
-1. Approve all remaining mandatory question cards (Q2 and Q9 already approved in IT-CW-09)
+1. Approve all remaining mandatory question cards (Q2 and Q8 already approved in IT-CW-09)
 2. Verify the progress bar shows all questions approved
 3. Click **Ready to assemble**
 4. Verify the **"Before we put it together"** senior review screen appears, confirming the financial content has been reviewed by a senior colleague
@@ -468,3 +476,4 @@ Complete after running all tests.
 | 1.3     | 2026-06-07 | Rapidglobe Ltd | D-CWF-01 retest verified. Faith/religion question no longer extracted — 8 questions confirmed. Expected questions table updated to reflect verified output. IT-CW-06 expected result updated. D-CWF-01 status updated to Fixed — verified.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 1.4     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): IT-CW-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so IT-CW-04/IT-CW-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of IT-CW-03 into a new IT-CW-06 ("Preparation Checklist and Start Writing"), which now runs after IT-CW-04/IT-CW-05. Old IT-CW-06–10 renumbered to IT-CW-07–11; now 11 test cases total.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 1.5     | 2026-07-04 | Rapidglobe Ltd | Corrected against the current service and `grant-pathway-user-guide-v1_15.docx`, found while cross-checking test plans in parallel with live MKCF/ABC testing. IT-CW-01: updated verification flow for D-012 (2026-07-02) — link now auto-confirms passively, "Email verified" screen button is now **Sign in** (normal credentials sign-in), not **Go to my dashboard**; removed the unsourced "Dashboard shows profile complete — Start button enabled" bullet. IT-CW-02: empty-state dashboard button is **Start your first application**, not **+ New Application**, for this freshly registered account; corrected the post-Continue expected result to Step 2 display rather than "visible on the dashboard". IT-CW-03: removed a stray "Open the application from the dashboard" step that didn't follow from IT-CW-02 (Continue already lands on Step 2); removed "select Upload a file" / "click Generate summary" wording — the guidelines screen has no such toggle or button, and the AI summary auto-generates on page load. IT-CW-10/IT-CW-11 rewritten: the old IT-CW-10 described a separate "Approve my application" button and confirmation modal that no longer exist since the 2026-06-12 approve+download merge (D-WF-04) — IT-CW-10 now covers approval and assembly only (including the previously-missing "Before we put it together" senior review screen, per the user guide's Section 8), and IT-CW-11 covers the merged tick-and-download approval, Word export verification (timestamp, footer, page numbering), the re-export warning dialog, and the plain-text export, matching IT-MKCF-13's current template. Results cleared; retest from IT-CW-01. |
+| 1.6     | 2026-07-04 | Rapidglobe Ltd | Applied the v1.5 TODO batch, ready for tomorrow's full clean retest. IT-CW-01: "Who do you help" corrected to "Who does your charity help" to match the actual UI field label. IT-CW-08 rewritten (renamed "Budget Question Flagging and Non-Narrative Question Absence"): the previous version tested for a non-existent display mechanism (FR-45/BD-03 pre-fill or reminder for non-narrative questions) — now tests the actual, confirmed-current behaviour instead (non-narrative questions entirely absent from Step 4; budget questions correctly flagged amber). The bigger question of whether to build BD-03 as originally decided remains open and is tracked separately in `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.5.md`, Section 10. IT-CW-09/IT-CW-10: corrected "Q9" to "Q8" throughout (only 8 questions exist per IT-CW-07's table). All results cleared for a full clean re-run from IT-CW-01.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
