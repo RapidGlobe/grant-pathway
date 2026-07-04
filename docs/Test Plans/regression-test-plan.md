@@ -1,9 +1,9 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.3
+**Version:** 2.4
 **Date:** 2026-06-15
-**Last updated:** 2026-07-04 (added RT-12/RT-13/RT-14 — account housekeeping had no coverage)
-**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-01–14 results are still blank as of this update
+**Last updated:** 2026-07-04 (added RT-15 — session timeout, confirmed live)
+**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-15 confirmed live 2026-07-04; RT-01–14 results are still blank as of this update
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
@@ -14,7 +14,7 @@
 On 2026-07-01, a full audit found that `grant-pathway-dev` and `grant-pathway-prod` had been silently missing critical schema for weeks: the AI usage-cap RPC functions (`reserve_ai_slot` and friends — used by **every** AI call) were absent from **both** projects, and the transactional `approve_application`/`reopen_application` RPCs were absent from **prod**. This has now been fixed and verified on both projects (see `docs/Implementation Plan/CHANGELOG.md`, 2026-07-01 entries) — but it means:
 
 - **Every "passed" result recorded against any funder test plan in this folder predates the fix** (all funder testing finished by 2026-06-17; the AI-cap RPC dependency was only introduced into the route code on 2026-06-22, and the approve/reopen RPC on 2026-06-29). None of those passes are evidence that the _current_ codebase works end-to-end.
-- **This regression plan had zero recorded executions until 2026-07-03**, when RT-00 was run and passed against `grant-pathway-dev`. RT-01–14 remain unrun.
+- **This regression plan had zero recorded executions until 2026-07-03**, when RT-00 was run and passed against `grant-pathway-dev`. RT-15 was confirmed live 2026-07-04; RT-01–14 remain unrun.
 - RT-00 below is new — run it **first**, every time, before trusting any other result in this plan or any funder plan.
 
 ## Purpose
@@ -90,6 +90,7 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 | RT-12   | Change password                           | Full  |        |            |                                                                                  |
 | RT-13   | Sign out                                  | Full  |        |            |                                                                                  |
 | RT-14   | Delete account                            | Full  |        |            |                                                                                  |
+| RT-15   | Session timeout (inactivity)              | Full  | Pass   | 2026-07-04 | Confirmed live during Clothworkers testing — see RT-15 notes.                    |
 
 ---
 
@@ -597,6 +598,35 @@ Run these after all Tier 1 tests pass.
 
 ---
 
+### RT-15 — Session Timeout (Inactivity) [FULL]
+
+**User guide reference:** Not currently documented in the user guide (gap — the guide has no "session timeout" section; consider adding one)
+**Spec reference:** `docs/Technical Decision and Design/ADR-SEC-003-session-timeout.md`; NFR (`docs/non-functional-requirements.md`, "Session timeout — automatic logout after 60 minutes of inactivity"); acceptance criteria FR-06 (`docs/PRD inputs/acceptance-criteria.md`)
+**What this tests:** That an authenticated session is automatically ended after 60 minutes of inactivity, that the warning modal appears beforehand, and that in-progress work is not lost when the user signs back in.
+
+**Steps:**
+
+1. Sign in and open an application at Step 4 (Draft Answers) with at least one question in progress
+2. Leave the session idle (no mouse movement, keypresses, clicks, or touches) for 55 minutes
+3. Confirm a warning modal appears with a countdown and an **"I'm still here"** button
+4. Let the countdown run out without interacting (or skip ahead to test the 60-minute mark directly)
+5. Confirm you are signed out and redirected to the sign-in page with a message indicating you were signed out due to inactivity
+6. Sign back in
+7. Confirm you return to the same application at the same step, with all previously-entered data and approval state intact
+
+**Expected result:**
+
+- Warning modal appears at 55 minutes, dismissible via "I'm still here"
+- Automatic sign-out occurs at 60 minutes of inactivity
+- Redirect lands on the sign-in page with an explanatory message
+- No data loss — in-progress answers and application state are exactly as left before the timeout
+
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:** Confirmed live 2026-07-04 during Clothworkers testing (not a scripted run of this exact test case — WJ was genuinely away from the session for over an hour). On return, the sign-in page was shown as expected; after signing back in, the Clothworkers application was exactly as left — "In progress" at Step 4, all 8 questions present, 0 approved (matching state before the break). The 55-minute warning modal itself was not directly observed this time (WJ was away from the screen), so that specific behaviour is unconfirmed — only the 60-minute sign-out and state-preservation-on-return are confirmed. Functions as designed per ADR-SEC-003.
+
+---
+
 ## Defect Log
 
 | ID    | Test   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | Severity | Status                                                                  |
@@ -639,9 +669,10 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers. |
-| 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| 2.3     | 2026-07-04 | Rapidglobe Ltd | Added RT-12 (Change Password), RT-13 (Sign Out), and RT-14 (Delete Account) — account housekeeping had no regression coverage at all (guide Section 15, "Managing Your Account"). RT-12 mutates the shared regression account's password and includes an explicit revert step. RT-14 requires a disposable throwaway account, never the shared regression account or an in-use funder test account, since deletion is permanent. 14 test cases across 3 tiers.                                                                                                                                                                                                                                      |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers.                         |
+| 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 2.3     | 2026-07-04 | Rapidglobe Ltd | Added RT-12 (Change Password), RT-13 (Sign Out), and RT-14 (Delete Account) — account housekeeping had no regression coverage at all (guide Section 15, "Managing Your Account"). RT-12 mutates the shared regression account's password and includes an explicit revert step. RT-14 requires a disposable throwaway account, never the shared regression account or an in-use funder test account, since deletion is permanent. 14 test cases across 3 tiers.                                                                                                                                                                                                                                                              |
+| 2.4     | 2026-07-04 | Rapidglobe Ltd | Added RT-15 (Session Timeout — Inactivity), covering the documented 60-minute inactivity timeout (ADR-SEC-003, NFR, FR-06) that had no test coverage. Recorded as Pass based on a genuine live occurrence during Clothworkers testing — WJ was away over an hour, was signed out as expected, and on signing back in the in-progress application was exactly as left. The 55-minute warning modal itself was not directly observed this time (WJ was away from the screen) — flagged as unconfirmed in RT-15's notes, only the 60-minute sign-out and state preservation are confirmed. Also noted the user guide has no session-timeout section — a documentation gap, not a product defect. 15 test cases across 3 tiers. |
