@@ -121,7 +121,6 @@ export async function deleteApplication(applicationId: string): Promise<DeleteAp
 export type FunderOption = {
   id: string
   name: string
-  funderType: 'structured' | 'narrative'
 }
 
 /**
@@ -130,13 +129,21 @@ export type FunderOption = {
  *
  * Called server-side in the Step 1 page component so the list is
  * available on first render with no client-side fetch.
+ *
+ * Does not select `funder_type` — that column is a pre-committed,
+ * per-funder guess (DR-FD-001) that turned out not to reflect a stable
+ * property of the funder (the same funder can produce both a
+ * discrete-question form and free-form guidance, depending on which
+ * document is uploaded). The actual classification that drives Step 3/4/5
+ * behaviour is derived fresh from the uploaded guidelines each time (see
+ * `ai_summary.funder_type` in this file) and is unaffected by this change.
  */
 export async function getActiveFunders(): Promise<FunderOption[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('funders')
-    .select('id, name, funder_type')
+    .select('id, name')
     .eq('is_active', true)
     .order('name', { ascending: true })
 
@@ -145,7 +152,6 @@ export async function getActiveFunders(): Promise<FunderOption[]> {
   return data.map((f) => ({
     id: f.id,
     name: f.name,
-    funderType: f.funder_type as 'structured' | 'narrative',
   }))
 }
 

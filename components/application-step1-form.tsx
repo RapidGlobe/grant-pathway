@@ -212,16 +212,13 @@ export function ApplicationStep1Form({
                         e.preventDefault() // prevent blur before click
                         handleFunderSelect(funder)
                       }}
-                      className={`flex cursor-pointer items-center justify-between px-3 py-2 text-[14px] hover:bg-[#F0FAFA] ${
+                      className={`flex cursor-pointer items-center px-3 py-2 text-[14px] hover:bg-[#F0FAFA] ${
                         selectedFunder?.id === funder.id
                           ? 'bg-[#F0FAFA] font-medium text-[#0D6E6E]'
                           : 'text-[#1E293B]'
                       }`}
                     >
                       <span>{funder.name}</span>
-                      <span className="ml-3 shrink-0 rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[11px] text-[#64748B]">
-                        {funder.funderType === 'structured' ? 'Structured' : 'Narrative'}
-                      </span>
                     </li>
                   ))
                 ) : (

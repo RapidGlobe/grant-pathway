@@ -1,6 +1,6 @@
 # DR-FD-001 — Funder Directory and Access Control Model
 
-**Version:** 1.0
+**Version:** 1.2
 **Date:** 2026-06-01
 **Status:** Decided ✓
 **Author:** Rapidglobe Ltd
@@ -55,6 +55,9 @@ The `funders` table in Supabase is the authoritative source of approved funders.
 ### Immediate build tasks (Phase 5 — Pre-Launch)
 
 1. Create `funders` table in Supabase with columns: `id`, `name`, `funder_type` (`structured | narrative`), `grant_range`, `guidelines_url`, `is_active`, `created_at`
+
+   **Amendment (2026-07-04):** `funder_type` picked a fixed `structured`/`narrative` label per funder without ever defining what the terms meant, and was decided here — as a database-schema convenience — two days after the actual product decisions (Mark Two BRD, BD-01–BD-07, 2026-05-29), which never mention it. Reviewing the real funder guidelines documents in `docs/Grant Org Guidelines/` found the label doesn't reflect a stable property of the funder at all: several funders (Henry Smith, Idlewild) have _both_ a discrete-question form and free-form guidance, depending on which document happens to be uploaded — the "same" funder can be either. Separately, the picker's `funderType` badge was never connected to the mechanism that actually matters for processing: Step 3/4/5 behaviour is driven by a _different_, dynamically-derived `funder_type` (`structured`/`free_form`) parsed fresh from each application's own `ai_summary`, not from this DB column — so the column was purely a cosmetic, pre-committed guess with no functional role beyond the picker badge. Removed the column from the Step 1 picker query and dropped the "Structured"/"Narrative" badge from the funder picker UI (`getActiveFunders()` in `actions/applications.ts`; `components/application-step1-form.tsx`) — the `funder_type` DB column itself is left in place, unused, as low-priority cleanup rather than an urgent migration. The dynamic per-application classification is unaffected and continues to drive actual behaviour correctly.
+
 2. Seed the table with the 12 approved funders from `docs/Test Plans/target-funder-list.md`
 3. Add RLS policy: all authenticated users can read active funders; only service role can insert/update/delete
 4. Replace the free-text funder name field in Step 1 (Application Details) with a searchable picker component wired to the `funders` table
@@ -78,7 +81,8 @@ The `funders` table in Supabase is the authoritative source of approved funders.
 
 ## Document history
 
-| Version | Date       | Author         | Change                                                                                                                                                      |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review                                                                                  |
-| 1.1     | 2026-06-11 | Rapidglobe Ltd | Updated funder count reference — now refers to target-funder-list.md v1.3 (19 entries, 18 active) following addition of MKCF ×4, Baily Thomas ×3, CPF Trust |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                          |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review                                                                                                                                                                                                                      |
+| 1.1     | 2026-06-11 | Rapidglobe Ltd | Updated funder count reference — now refers to target-funder-list.md v1.3 (19 entries, 18 active) following addition of MKCF ×4, Baily Thomas ×3, CPF Trust                                                                                                                                     |
+| 1.2     | 2026-07-04 | Rapidglobe Ltd | Retired the `funder_type` picker badge (see amendment under consequence 1) — found not to reflect a stable property of the funder, and disconnected from the mechanism that actually drives Step 3/4/5 behaviour. Badge removed from the Step 1 funder picker; DB column left in place, unused. |

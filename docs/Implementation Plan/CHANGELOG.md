@@ -10,6 +10,27 @@
 
 ---
 
+## 2026-07-04 — DR-FD-001 amended: retired the funder picker's "Structured"/"Narrative" badge
+
+Traced during a deep review of the funder-type/question-type terminology prompted by IT-CW-08 (Clothworkers testing). The Step 1 funder picker showed a "Structured" or "Narrative" pill badge next to each funder name, sourced from a `funder_type` column on the `funders` table. Reviewing the real guideline documents in `docs/Grant Org Guidelines/` (22 files, ~15 funders/programmes) found this label doesn't reflect a stable property of the funder: several funders with multiple documents (Henry Smith, Idlewild) have _both_ a discrete-question application form (structured) and free-form background guidance (narrative) — the "same" funder produces both, depending on which document happens to be uploaded in a given session.
+
+Separately, this DB column turned out to be functionally disconnected from what actually matters: Step 3/4/5 behaviour (which UI mode renders, how the export is assembled) is driven by a _different_ `funder_type` value (`structured`/`free_form`), derived fresh from each application's own AI summary at Step 3 — not from this pre-committed DB column. The column was purely cosmetic, driving only the picker badge.
+
+Also traced the terminology's origin: `funder_type` (`structured`/`narrative`) was introduced in `DR-FD-001` (2026-06-01) as a database-schema convenience, two days _after_ the actual product decisions (Mark Two BRD's BD-01–BD-07, 2026-05-29), which never mention it and never define what either term means. The name also collides with an unrelated, well-defined concept — `narrative` as a _question-level_ type (BD-04) — which was a likely source of ongoing confusion.
+
+**Fix:** Removed `funder_type` from the Step 1 picker query and dropped the badge from the UI.
+
+- `actions/applications.ts` — `FunderOption` type no longer carries `funderType`; `getActiveFunders()` selects only `id, name`
+- `components/application-step1-form.tsx` — removed the badge `<span>` from each picker list item; the funder name renders alone
+
+The `funders.funder_type` DB column itself is left in place, unused — dropping it is low-priority cleanup, not urgent. The dynamic, per-application `ai_summary.funder_type` classification is completely unaffected and continues to correctly drive Step 3/4/5 behaviour.
+
+**Verified:** `npx tsc --noEmit` clean; full test suite (24 tests) passes unchanged; confirmed no other code references `FunderOption.funderType`.
+
+Full amendment recorded in `docs/decisions/DR-FD-001-funder-directory-model.md` (v1.0 → v1.2).
+
+---
+
 ## 2026-07-04 — D-CW-02: AI assist not reliably compressing over-limit answers
 
 Found live during Clothworkers Foundation testing (IT-CW-09): a 344-word answer against a 250-word limit (38% over) was returned by "Help me improve this" almost completely unchanged — no words removed. An earlier, smaller case that same session (60 words against a 50-word limit, 20% over) was partially compressed but still left over the limit.
