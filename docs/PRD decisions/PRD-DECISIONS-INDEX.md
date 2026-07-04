@@ -64,14 +64,14 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ## Related Documents
 
-| Document                                 | Location                                           |
-| ---------------------------------------- | -------------------------------------------------- |
-| Business Decision Records Index          | `business/decisions/DECISIONS-INDEX.md`            |
-| Business Requirements Document           | `business/BRD-Grant-Pathway-v1.md`                 |
-| Functional Requirements (FR-01 to FR-44) | `business/BRD-Grant-Pathway-v1.md` — Section 9     |
-| User Personas, Journeys & Use Cases      | `business/user-personas-journeys-and-use-cases.md` |
-| Non-Functional Requirements              | `business/non-functional-requirements.md`          |
-| Technology Stack                         | `business/technology-stack.md`                     |
+| Document                                 | Location                                                                                    |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Business Decision Records Index          | `business/decisions/DECISIONS-INDEX.md`                                                     |
+| Business Requirements Document           | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.5.md` — main reference going forward |
+| Functional Requirements (FR-01 to FR-47) | `docs/moscow-feature-register.md`                                                           |
+| User Personas, Journeys & Use Cases      | `business/user-personas-journeys-and-use-cases.md`                                          |
+| Non-Functional Requirements              | `business/non-functional-requirements.md`                                                   |
+| Technology Stack                         | `business/technology-stack.md`                                                              |
 
 ---
 
