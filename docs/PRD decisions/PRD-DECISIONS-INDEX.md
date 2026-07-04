@@ -10,7 +10,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 | Status         | Count |
 | -------------- | ----- |
-| ✅ Decided     | 16    |
+| ✅ Decided     | 17    |
 | 🔄 In Progress | 0     |
 | ⏳ Pending     | 0     |
 | ⏸ Deferred     | 0     |
@@ -41,13 +41,14 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ## AI Integration (AI)
 
-| ID                                                    | Question                                                                                                      | Status     |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------- |
-| [PDR-AI-001](PDR-AI-001-claude-model-selection.md)    | Which Anthropic Claude model will be used for AI summarisation and draft generation in v1?                    | ✅ Decided |
-| [PDR-AI-002](PDR-AI-002-prompt-strategy.md)           | Will AI prompts be hardcoded, stored in the database, or managed through a configuration file?                | ✅ Decided |
-| [PDR-AI-003](PDR-AI-003-streaming-vs-batch.md)        | Should AI-generated content stream to the screen word by word, or appear all at once when complete?           | ✅ Decided |
-| [PDR-AI-004](PDR-AI-004-context-window-management.md) | How will the application handle funder guidelines that are too long for a single API context window?          | ✅ Decided |
-| [PDR-AI-005](PDR-AI-005-cost-controls.md)             | Will there be a limit on AI requests per user per day or session, and what happens when the limit is reached? | ✅ Decided |
+| ID                                                            | Question                                                                                                      | Status     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ---------- |
+| [PDR-AI-001](PDR-AI-001-claude-model-selection.md)            | Which Anthropic Claude model will be used for AI summarisation and draft generation in v1?                    | ✅ Decided |
+| [PDR-AI-002](PDR-AI-002-prompt-strategy.md)                   | Will AI prompts be hardcoded, stored in the database, or managed through a configuration file?                | ✅ Decided |
+| [PDR-AI-003](PDR-AI-003-streaming-vs-batch.md)                | Should AI-generated content stream to the screen word by word, or appear all at once when complete?           | ✅ Decided |
+| [PDR-AI-004](PDR-AI-004-context-window-management.md)         | How will the application handle funder guidelines that are too long for a single API context window?          | ✅ Decided |
+| [PDR-AI-005](PDR-AI-005-cost-controls.md)                     | Will there be a limit on AI requests per user per day or session, and what happens when the limit is reached? | ✅ Decided |
+| [PDR-AI-006](PDR-AI-006-word-limit-compression-disclosure.md) | When AI assist can't fully compress an over-limit answer to fit, how should Grant Pathway tell the user?      | ✅ Decided |
 
 ---
 
@@ -74,5 +75,5 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ---
 
-_Last updated: 2026-04-16_
-_Status: 16 of 16 decisions made_
+_Last updated: 2026-07-04_
+_Status: 17 of 17 decisions made_
