@@ -1,8 +1,8 @@
 # Clothworkers' Foundation Test Plan — Small Grants Programme
 
-**Version:** 1.4
+**Version:** 1.5
 **Date:** 2026-07-04
-**Status:** Ready for execution
+**Status:** Ready for a full clean execution. Corrected against the current service and `grant-pathway-user-guide-v1_15.docx` (2026-07-04) — see Document History for the full list of corrections. All results below have been cleared; retest from IT-CW-01.
 **Tester:** WJ
 **Test account:** grantpathway+cloth1@gmail.com
 
@@ -76,19 +76,19 @@ The following narrative questions should be extracted from the Small Grants form
 
 Complete after running all tests.
 
-| Test ID  | Test Name                                                | Clothworkers-Specific | AI Summary Time | Result  | Notes                                                                                                                                                                                                                                |
-| -------- | -------------------------------------------------------- | --------------------- | --------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| IT-CW-01 | Account registration and charity profile                 | No                    | N/A             | ✅ Pass |                                                                                                                                                                                                                                      |
-| IT-CW-02 | Clothworkers' Foundation funder picker                   | Yes                   | N/A             | ✅ Pass |                                                                                                                                                                                                                                      |
-| IT-CW-03 | PDF upload and AI summary                                | Yes                   | 40–47s          | ✅ Pass | Load time within revised NFR-01 large-document target (≤45s) but approaches upper limit. Large multi-form PDF (1.1MB, 30 pages). Pre-launch performance improvement recommended. Prompt fixes required during test (see defect log). |
-| IT-CW-04 | Eligibility check — Bridge Support MK passes             | Yes                   | N/A             | ✅ Pass | No mismatch warning — FR-47 correctly did not flag Bridge Support MK                                                                                                                                                                 |
-| IT-CW-05 | AI summary content accuracy                              | Yes                   | N/A             | ✅ Pass | All key content accurate — capital-only, programme areas, grant tiers, exclusions                                                                                                                                                    |
-| IT-CW-06 | Preparation checklist and start writing                  | Yes                   | N/A             | ✅ Pass | Preparation checklist screen appeared correctly on clicking Continue                                                                                                                                                                 |
-| IT-CW-07 | Narrative question extraction with "approx." word limits | Yes                   | N/A             | ✅ Pass | 11 questions extracted after prompt fixes; "approx." limits correctly extracted as numbers; faith affiliation Q1 still extracted (GAP-28 Layer 2 — open)                                                                             |
-| IT-CW-08 | Budget and non-narrative question handling               | Yes                   | N/A             | ✅ Pass | Q7, Q8, Q10 amber with Budget badge and AI assist disabled; non-narrative questions correctly absent from Step 4                                                                                                                     |
-| IT-CW-09 | Narrative answer writing and AI assist                   | No                    | N/A             | ✅ Pass | Word counter correct; AI assist blocked over word limit (D-CW-01 found and fixed during test)                                                                                                                                        |
-| IT-CW-10 | Answer approval and Step 5 navigation                    | No                    | N/A             | ✅ Pass | Assembly and Step 5 approval flow correct                                                                                                                                                                                            |
-| IT-CW-11 | Word document export — structure and content             | No                    | N/A             | ✅ Pass | Both .docx and .txt exported; all required sections present; clean and readable                                                                                                                                                      |
+| Test ID  | Test Name                                                       | Clothworkers-Specific | AI Summary Time | Result | Notes |
+| -------- | --------------------------------------------------------------- | --------------------- | --------------- | ------ | ----- |
+| IT-CW-01 | Account registration and charity profile                        | No                    | N/A             |        |       |
+| IT-CW-02 | Clothworkers' Foundation funder picker                          | Yes                   | N/A             |        |       |
+| IT-CW-03 | PDF upload and AI summary                                       | Yes                   |                 |        |       |
+| IT-CW-04 | Eligibility check — Bridge Support MK passes                    | Yes                   | N/A             |        |       |
+| IT-CW-05 | AI summary content accuracy                                     | Yes                   | N/A             |        |       |
+| IT-CW-06 | Preparation checklist and start writing                         | Yes                   | N/A             |        |       |
+| IT-CW-07 | Narrative question extraction with "approx." word limits        | Yes                   | N/A             |        |       |
+| IT-CW-08 | Budget and non-narrative question handling                      | Yes                   | N/A             |        |       |
+| IT-CW-09 | Narrative answer writing and AI assist                          | No                    | N/A             |        |       |
+| IT-CW-10 | Answer approval and assembly                                    | No                    | N/A             |        |       |
+| IT-CW-11 | Word document export; Word document verified; re-export warning | No                    | N/A             |        |       |
 
 ---
 
@@ -116,8 +116,8 @@ Complete after running all tests.
 2. Click **Register**
 3. Enter first name, last name, email `grantpathway+cloth1@gmail.com`, password (12+ characters, must include letters and digits), accept Terms and Privacy Policy
 4. Click **Create account**
-5. Open the verification email and click the verification link
-6. Click **Go to my dashboard**
+5. Open the verification email and click the verification link — this auto-confirms on page load (no button click required) and expires after 1 hour (D-012, 2026-07-02)
+6. On the "Email verified" screen, click **Sign in** and enter the registered email and password (the verification flow signs the session out — this is a normal credentials sign-in, not an automatic redirect to the dashboard)
 7. Click **Charity Profile** in the navigation
 8. Enter charity registration number field — leave blank (fictional charity)
 9. Complete all fields manually:
@@ -130,8 +130,8 @@ Complete after running all tests.
 **Expected result:**
 
 - Account created and email verified without errors
+- Sign-in with credentials succeeds
 - Profile saves successfully with all fields populated
-- Dashboard shows profile complete — Start button enabled
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -146,7 +146,7 @@ Complete after running all tests.
 
 **Steps:**
 
-1. From the dashboard, click **+ New Application**
+1. From the dashboard, click **Start your first application** — this is a brand-new account with zero applications, so the dashboard shows this empty-state button rather than the **+ New Application** button that appears once at least one application already exists
 2. On Step 1 (Application Details), click into the funder picker field
 3. Type **"Clothworkers"**
 4. Observe the filtered dropdown list
@@ -159,7 +159,7 @@ Complete after running all tests.
 
 - "Clothworkers" search returns The Clothworkers' Foundation in the dropdown
 - **Structured** badge is displayed alongside the name
-- Application created and visible on the dashboard
+- Application created and Step 2 (Uploaded Guidelines) displayed
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -174,16 +174,13 @@ Complete after running all tests.
 
 **Steps:**
 
-1. Open the application from the dashboard
-2. On Step 2 (Funder Guidelines), select **Upload a file**
-3. Upload `clothworkers-open-grants-guidance-and-sample-forms.pdf`
-4. Confirm the file is accepted (name displayed, no error)
-5. Click **Continue**
-6. On Step 3, start a stopwatch then click **Generate summary**
-7. Observe the loading indicator and staged progress messages
-8. Stop the stopwatch when the summary appears — record the time in the results table
-9. Review the generated AI summary
-10. Confirm **no red eligibility mismatch warning** appears — Bridge Support MK should be eligible
+1. On Step 2, upload `clothworkers-open-grants-guidance-and-sample-forms.pdf`
+2. Confirm the file is accepted (name displayed, no error)
+3. Click **Continue**
+4. On Step 3, start a stopwatch — AI summary auto-generates on page load
+5. Stop when summary cards appear — record the time
+6. Review the generated AI summary
+7. Confirm **no red eligibility mismatch warning** appears — Bridge Support MK should be eligible
 
 **Do not click Continue yet** — the eligibility check (IT-CW-04) and content-accuracy review (IT-CW-05) both need the AI summary visible on Step 3. Continuing to Step 4 happens in IT-CW-06, after both reviews are complete.
 
@@ -395,28 +392,28 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-10 — Answer Approval and Step 5 Navigation
+### IT-CW-10 — Answer Approval and Assembly
 
 **Clothworkers-specific:** No
-**Prerequisite:** IT-CW-09 complete (at least Q2 and Q9 approved)
+**Prerequisite:** IT-CW-09 complete (Q2 and Q9 approved)
 
 **Steps:**
 
-1. On Step 4, ensure at least Q2 and Q9 are approved
-2. Click **Ready to assemble** (enabled when all questions answered and approved)
-3. On the assembly screen, confirm answers are assembled correctly
-4. Proceed to Step 5 (Approve & Export)
-5. Review the three application-level confirmation checkboxes
-6. Tick all three checkboxes
-7. Click **Approve my application**
-8. Confirm the approval modal appears and complete it
+1. Approve all remaining mandatory question cards (Q2 and Q9 already approved in IT-CW-09)
+2. Verify the progress bar shows all questions approved
+3. Click **Ready to assemble**
+4. Verify the **"Before we put it together"** senior review screen appears, confirming the financial content has been reviewed by a senior colleague
+5. Click **Yes — assemble my draft**
+6. On Step 5, verify:
+   - Correct funder (The Clothworkers' Foundation) and grant name ("Open Grants Programme — Small Grant 2026") displayed
+   - All approved answers shown in read-only view
 
 **Expected result:**
 
-- Ready to assemble button enabled after all answers approved
-- Assembly completes without error
-- Step 5 shows all three review checkboxes
-- Application can be approved
+- Ready to assemble button enabled once all answers are approved
+- Senior review confirmation screen appears before assembly
+- Assembly completes correctly
+- Step 5 displays correct funder and grant name
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -424,31 +421,35 @@ Complete after running all tests.
 
 ---
 
-### IT-CW-11 — Word Document Export — Structure and Content
+### IT-CW-11 — Word Document Export; Word Document Verified; Re-export Warning
 
 **Clothworkers-specific:** No
-**Prerequisite:** IT-CW-10 complete (application approved)
+**Prerequisite:** IT-CW-10 complete
 
 **Steps:**
 
-1. From Step 5, click **Export as Word document**
-2. Open the downloaded .docx file
-3. Review the document structure and content
+1. Tick all three review checkboxes on Step 5
+2. Click **Download as Word document (.docx)** — this both approves and downloads in one action (no separate Approve button/modal since 2026-06-12); confirm a persistent "Application approved" banner replaces the checklist
+3. Open the downloaded .docx file and verify:
+   - Title: **"Open Grants Programme — Small Grant 2026"**
+   - Funder: **"The Clothworkers' Foundation"** (or similar)
+   - Export date includes time
+   - AI disclaimer present and correctly worded
+   - Footer reads "Prepared using Grant Pathway v[version] — grantpathway.org.uk" plus a "Page N of NN" line
+   - All approved answers present
+4. Click **Download as Word document (.docx)** again
+5. Verify the re-export warning dialog appears with the prior export timestamp
+6. Cancel — do not re-export
+7. Click **Download as plain text (.txt)** — because the application was already exported as Word in step 2, the re-export confirmation dialog will appear again here too (D-WF-04, expected, not a defect); confirm through it
+8. Verify a .txt file is downloaded, with the same footer line but no page numbers (plain text has no concept of pages)
 
 **Expected result:**
-The exported Word document contains, in order:
 
-- Document title and grant name: **"Open Grants Programme — Small Grant 2026"**
-- Funder name: **"The Clothworkers' Foundation"**
-- Export date
-- AI disclaimer statement
-- Q&A body — each approved question followed by its approved answer
-- Footer: _"Prepared using Grant Pathway v[version] — grantpathway.org.uk"_
-
-Additional checks:
-
-- Only approved answers are included
-- Word limits are not shown in the exported document
+- Word export opens correctly in Microsoft Word
+- Export date includes a timestamp
+- Only approved answers are included; word limits are not shown in the exported document
+- Re-export warning shows the prior export timestamp on both the second Word download and the plain-text download
+- Plain text download works
 - Document is clean and readable
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -459,10 +460,11 @@ Additional checks:
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Clothworkers' Foundation Small Grants Programme, Bridge Support MK test charity, 10 test cases including GAP-27 ("approx." word limit) and GAP-28 observations                                                                                                                                                                                                                                                                                                                                 |
-| 1.1     | 2026-06-02 | Rapidglobe Ltd | All 10 tests completed — 10/10 Pass. D-CW-01 found and fixed during test. Defect log, results, and observations recorded.                                                                                                                                                                                                                                                                                                                                                                                          |
-| 1.2     | 2026-06-05 | Rapidglobe Ltd | ADR-AI-010 performance retest. Initial ceiling of 20,000 chars truncated 97,906-char PDF — questions not extracted (0/9). Ceiling raised to 50,000 via PREPROCESS_CHAR_CEILING env var. Second run: 30s, 9 questions extracted correctly. D-CWF-01 added: faith affiliation conditional question (Q1) appears as standard writing card for all charities.                                                                                                                                                          |
-| 1.3     | 2026-06-07 | Rapidglobe Ltd | D-CWF-01 retest verified. Faith/religion question no longer extracted — 8 questions confirmed. Expected questions table updated to reflect verified output. IT-CW-06 expected result updated. D-CWF-01 status updated to Fixed — verified.                                                                                                                                                                                                                                                                         |
-| 1.4     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): IT-CW-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so IT-CW-04/IT-CW-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of IT-CW-03 into a new IT-CW-06 ("Preparation Checklist and Start Writing"), which now runs after IT-CW-04/IT-CW-05. Old IT-CW-06–10 renumbered to IT-CW-07–11; now 11 test cases total. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-02 | Rapidglobe Ltd | Initial test plan — Clothworkers' Foundation Small Grants Programme, Bridge Support MK test charity, 10 test cases including GAP-27 ("approx." word limit) and GAP-28 observations                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 1.1     | 2026-06-02 | Rapidglobe Ltd | All 10 tests completed — 10/10 Pass. D-CW-01 found and fixed during test. Defect log, results, and observations recorded.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 1.2     | 2026-06-05 | Rapidglobe Ltd | ADR-AI-010 performance retest. Initial ceiling of 20,000 chars truncated 97,906-char PDF — questions not extracted (0/9). Ceiling raised to 50,000 via PREPROCESS_CHAR_CEILING env var. Second run: 30s, 9 questions extracted correctly. D-CWF-01 added: faith affiliation conditional question (Q1) appears as standard writing card for all charities.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 1.3     | 2026-06-07 | Rapidglobe Ltd | D-CWF-01 retest verified. Faith/religion question no longer extracted — 8 questions confirmed. Expected questions table updated to reflect verified output. IT-CW-06 expected result updated. D-CWF-01 status updated to Fixed — verified.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 1.4     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): IT-CW-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so IT-CW-04/IT-CW-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of IT-CW-03 into a new IT-CW-06 ("Preparation Checklist and Start Writing"), which now runs after IT-CW-04/IT-CW-05. Old IT-CW-06–10 renumbered to IT-CW-07–11; now 11 test cases total.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 1.5     | 2026-07-04 | Rapidglobe Ltd | Corrected against the current service and `grant-pathway-user-guide-v1_15.docx`, found while cross-checking test plans in parallel with live MKCF/ABC testing. IT-CW-01: updated verification flow for D-012 (2026-07-02) — link now auto-confirms passively, "Email verified" screen button is now **Sign in** (normal credentials sign-in), not **Go to my dashboard**; removed the unsourced "Dashboard shows profile complete — Start button enabled" bullet. IT-CW-02: empty-state dashboard button is **Start your first application**, not **+ New Application**, for this freshly registered account; corrected the post-Continue expected result to Step 2 display rather than "visible on the dashboard". IT-CW-03: removed a stray "Open the application from the dashboard" step that didn't follow from IT-CW-02 (Continue already lands on Step 2); removed "select Upload a file" / "click Generate summary" wording — the guidelines screen has no such toggle or button, and the AI summary auto-generates on page load. IT-CW-10/IT-CW-11 rewritten: the old IT-CW-10 described a separate "Approve my application" button and confirmation modal that no longer exist since the 2026-06-12 approve+download merge (D-WF-04) — IT-CW-10 now covers approval and assembly only (including the previously-missing "Before we put it together" senior review screen, per the user guide's Section 8), and IT-CW-11 covers the merged tick-and-download approval, Word export verification (timestamp, footer, page numbering), the re-export warning dialog, and the plain-text export, matching IT-MKCF-13's current template. Results cleared; retest from IT-CW-01. |
