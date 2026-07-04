@@ -1,8 +1,8 @@
 # MK Community Foundation — Oak Grants Test Plan
 
-**Version:** 1.2
-**Date:** 2026-07-03
-**Status:** Ready for a full clean execution. A first attempt on 2026-07-03 surfaced several plan corrections (now incorporated below — see Known Expected Behaviours and Document History) but did not complete cleanly — it stopped at IT-MKCF-11 with an unresolved issue whose specifics were not captured. All results from that attempt have been cleared from this version; retest from IT-MKCF-01.
+**Version:** 1.3
+**Date:** 2026-07-04
+**Status:** Complete — clean full retest executed 2026-07-04. All 13 test cases (IT-MKCF-01–13) passed. RT-00 passed, confirmed against `grant-pathway-dev` (via `sb-stanwaejdvlvremtffkf-auth-token` cookie). The unresolved issue that stopped the 2026-07-03 attempt at IT-MKCF-11 did not reproduce. A batch of plan-quality TODOs (redundant/inconsistent steps and expected results found during this run) is pending a follow-up amendment — see inline "TODO (next amendment...)" notes under IT-MKCF-06, 08, 09, and 10.
 **Tester:** WJ
 **Test accounts:** grantpathway+walton1@gmail.com (Elmbridge Families Together — geographic mismatch) · grantpathway+mkcf1@gmail.com (MK Minds Matter — happy path, new account)
 
@@ -136,19 +136,19 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 
 | Test ID    | Test Name                                                               | MKCF-specific | AI Summary Time | Result | Notes |
 | ---------- | ----------------------------------------------------------------------- | ------------- | --------------- | ------ | ----- |
-| IT-MKCF-01 | Elmbridge Families Together sign in and profile verification            | No            | N/A             |        |       |
-| IT-MKCF-02 | Elmbridge Families Together — MKCF funder picker and guidelines upload  | Yes           |                 |        |       |
-| IT-MKCF-03 | Elmbridge Families Together — geographic eligibility mismatch confirmed | Yes           | N/A             |        |       |
-| IT-MKCF-04 | MK Minds Matter account registration and profile setup                  | No            | N/A             |        |       |
-| IT-MKCF-05 | MK Minds Matter — MKCF Oak Grants funder picker                         | Yes           | N/A             |        |       |
-| IT-MKCF-06 | MK Minds Matter — guidelines upload/paste and AI summary                | Yes           |                 |        |       |
-| IT-MKCF-07 | MK Minds Matter — AI summary content accuracy and 20% match requirement | Yes           | N/A             |        |       |
-| IT-MKCF-08 | MK Minds Matter — eligibility check passes; preparation checklist       | Yes           | N/A             |        |       |
-| IT-MKCF-09 | MK Minds Matter — narrative question extraction and word limits         | Yes           | N/A             |        |       |
-| IT-MKCF-10 | MK Minds Matter — non-narrative question handling                       | Yes           | N/A             |        |       |
-| IT-MKCF-11 | MK Minds Matter — narrative answer writing and AI assist                | No            | N/A             |        |       |
-| IT-MKCF-12 | MK Minds Matter — answer approval and assembly                          | No            | N/A             |        |       |
-| IT-MKCF-13 | MK Minds Matter — export; Word document verified; re-export warning     | No            | N/A             |        |       |
+| IT-MKCF-01 | Elmbridge Families Together sign in and profile verification            | No            | N/A             | Pass   |       |
+| IT-MKCF-02 | Elmbridge Families Together — MKCF funder picker and guidelines upload  | Yes           | 28s             | Pass   |       |
+| IT-MKCF-03 | Elmbridge Families Together — geographic eligibility mismatch confirmed | Yes           | N/A             | Pass   |       |
+| IT-MKCF-04 | MK Minds Matter account registration and profile setup                  | No            | N/A             | Pass   |       |
+| IT-MKCF-05 | MK Minds Matter — MKCF Oak Grants funder picker                         | Yes           | N/A             | Pass   |       |
+| IT-MKCF-06 | MK Minds Matter — guidelines upload/paste and AI summary                | Yes           | 26s             | Pass   |       |
+| IT-MKCF-07 | MK Minds Matter — AI summary content accuracy and 20% match requirement | Yes           | N/A             | Pass   |       |
+| IT-MKCF-08 | MK Minds Matter — eligibility check passes; preparation checklist       | Yes           | N/A             | Pass   |       |
+| IT-MKCF-09 | MK Minds Matter — narrative question extraction and word limits         | Yes           | N/A             | Pass   |       |
+| IT-MKCF-10 | MK Minds Matter — non-narrative question handling                       | Yes           | N/A             | Pass   |       |
+| IT-MKCF-11 | MK Minds Matter — narrative answer writing and AI assist                | No            | N/A             | Pass   |       |
+| IT-MKCF-12 | MK Minds Matter — answer approval and assembly                          | No            | N/A             | Pass   |       |
+| IT-MKCF-13 | MK Minds Matter — export; Word document verified; re-export warning     | No            | N/A             | Pass   |       |
 
 ---
 
@@ -181,9 +181,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Profile shows Elmbridge Families Together (Surrey) correctly
 - Dashboard accessible
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** Sign-in succeeded, profile confirmed as Elmbridge Families Together (Elmbridge, Surrey), dashboard accessible.
 
 ---
 
@@ -212,9 +212,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Guidelines accepted
 - AI summary generates without error
 
-**Result:**
+**Result:** Pass
 
-**Notes (record summary time and whether mismatch warning appears):**
+**Notes (record summary time and whether mismatch warning appears):** Structured badge confirmed. AI summary generated in 28 seconds. Red eligibility mismatch warning appeared on Step 3.
 
 ---
 
@@ -240,9 +240,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Application marked Ineligible on dashboard
 - FR-47 hard stop confirmed
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** Red mismatch card correctly cited Milton Keynes-only geographic criterion and Elmbridge/Surrey location; Continue button hidden, only "I understand — return to my dashboard" available. Dashboard confirmed application marked Ineligible after acknowledgement. FR-47 hard stop confirmed.
 
 ---
 
@@ -265,9 +265,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Charity profile saves successfully
 - Dashboard shows profile complete (no incomplete banner)
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** Registration and email verification completed without error. Charity profile saved successfully ("Profile saved" confirmation screen). Dashboard confirmed ready for first application.
 
 ---
 
@@ -290,9 +290,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - MK Community Foundation — Oak Grants appears with Structured badge
 - Application created and Step 2 displayed
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** Empty-state "Start your first application" button confirmed on fresh account. Structured badge confirmed. Application created, Step 2 (Uploaded Guidelines) displayed correctly with grant name "Community Mental Health Drop-In Programme 2026–27 - Retest 040726".
 
 ---
 
@@ -318,9 +318,11 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Summary reflects Milton Keynes focus, grant range, 20% match requirement, and application priorities
 - MK Minds Matter should pass eligibility
 
-**Result:**
+**Result:** Pass
 
-**Notes (record input method used and whether PDF or paste was needed for question extraction):**
+**Notes (record input method used and whether PDF or paste was needed for question extraction):** AI summary generated in 26 seconds.
+
+**TODO (next amendment):** Remove steps 7 and 8 — WJ flagged as redundant 2026-07-04.
 
 ---
 
@@ -343,9 +345,13 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - 20% match requirement present and clearly stated
 - No hallucinated conditions
 
-**Result:**
+**Result:** Pass
 
-**Notes (record whether 20% match requirement was extracted and where it appeared in the summary):**
+**Notes (record whether 20% match requirement was extracted and where it appeared in the summary):** 20% match requirement confirmed present and correctly stated in the summary.
+
+**Enhancement (not a defect):** WJ suggested displaying the 20% match requirement in bold/larger font given it's a hard eligibility condition. Recommend scoping this as a general pattern for all funder-specific "hard conditions" (match %, hard deadlines, exclusions) rather than an MKCF-only tweak — worth a DDR before implementing.
+
+**Testing limitation noted (2026-07-04):** "No hallucinated conditions" cannot be reliably tested by a human reviewer at the depth this check implies — guidelines documents can run to 9+ pages, and Grant Pathway's value proposition is specifically removing the burden of digesting documents that size. The tester cross-checking the full guidelines against the AI summary line-by-line isn't practical or repeatable. The mandatory Step 4 "Are all figures, dates, and facts correct?" checklist remains valid and necessary, but does not substitute for a hallucination check at Step 3. See DR-AI-003 (chose human review over automated fact-checking for v1; automated validation flagged there as a future enhancement) — this test plan will continue treating IT-MKCF-07's "no hallucinated conditions" criterion as a spot-check only, not exhaustive verification.
 
 ---
 
@@ -363,7 +369,6 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 
 **Expected result:**
 
-- MK Minds Matter passes eligibility — Milton Keynes-based mental health charity is a clear geographic fit
 - Preparation checklist displays correctly
 - Step 4 loads with writing cards
 
@@ -371,9 +376,11 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 
 - Record the mismatch reason as a defect and investigate before proceeding
 
-**Result:**
+**Result:** Pass
 
 **Notes:**
+
+**TODO (next amendment):** Remove step 1 ("Confirm no mismatch warning appeared — eligibility passed") — redundant, since reaching IT-MKCF-07 already proves no mismatch occurred (FR-47's mismatch state and the Step 3 summary view are mutually exclusive). Also removed the "MK Minds Matter passes eligibility..." expected-result bullet for the same reason — flagged by WJ 2026-07-04.
 
 ---
 
@@ -396,9 +403,11 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Match funding question present (Q7 or equivalent)
 - No data-entry or administrative fields appearing as writing cards
 
-**Result:**
+**Result:** Pass
 
-**Notes (update Expected Narrative Questions table with actual observed values):** The Expected Narrative Questions table above already reflects the actual 10 questions observed during the 2026-07-03 attempt (including the no-limit and no-match-question findings) — re-confirm these hold on this run rather than re-transcribing from scratch.
+**Notes (update Expected Narrative Questions table with actual observed values):** The Expected Narrative Questions table above already reflects the actual 10 questions observed during the 2026-07-03 attempt (including the no-limit and no-match-question findings) — re-confirmed these hold on this run.
+
+**TODO (next amendment, end-of-testing batch):** Expected result bullet "Match funding question present (Q7 or equivalent)" contradicts the Expected Narrative Questions section's own recorded finding ("No dedicated match-funding question found" — folded into Q6 sustainability answer instead). Update the bullet to reflect that finding. Flagged by WJ 2026-07-04.
 
 ---
 
@@ -420,9 +429,11 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Any financial/budget question correctly flagged with amber budget card
 - Assembly gate not affected by administrative fields
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** Steps 1-2 pass — non-narrative/administrative fields absent from Step 4.
+
+**TODO (next amendment, end-of-testing batch):** Remove step 3 ("Note whether any budget-related question is flagged with the amber budget card...") and step 4 ("Verify the budget card warning message if present...") — not applicable to this funder. MKCF Oak Grants has no budget/financial field among its 10 questions (confirmed in IT-MKCF-09/11); these steps belong in a generalised test plan template, not this one. Flagged by WJ 2026-07-04. WJ also suggested IT-MKCF-10 could be merged into another test case in the same amendment (candidate: fold into IT-MKCF-09, since both are about Step 4 question extraction/typing) — decide exact merge shape when doing the amendment pass.
 
 ---
 
@@ -450,9 +461,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - AI assist works on narrative questions, corrects spelling/grammar, does not invent facts
 - Q6 answer covers both sustainability and the 20% match reference; AI assist available (not flagged as budget)
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** No issues. The unresolved issue from the aborted 2026-07-03 attempt did not reproduce on this clean retest.
 
 ---
 
@@ -477,9 +488,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Assembly completes correctly
 - Step 5 displays correct funder and grant name
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** No issues. Step 5 correctly displays MK Community Foundation — Oak Grants and grant name "Community Mental Health Drop-In Programme 2026–27 - Retest 040726".
 
 ---
 
@@ -512,9 +523,9 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 - Re-export warning shows full timestamp on both the second Word download and the plain-text download
 - Plain text download works
 
-**Result:**
+**Result:** Pass
 
-**Notes:**
+**Notes:** Title, funder, and export date/time (04 July 2026, 09:14) all correct. AI disclaimer present and correctly worded. Footer "Prepared using Grant Pathway v2026.07.04-5afc638 — grantpathway.org.uk" with "Page 1 of 3" confirmed. Re-export warning dialog appeared correctly on both the second Word download and the plain-text download, citing the 4 July 2026, 09:14 prior export timestamp. Plain-text download completed with matching footer line, no page numbers (as expected — plain text has no page concept).
 
 ---
 
@@ -525,3 +536,4 @@ The indicative list below (based on typical MKCF Oak Grants applications) has be
 | 1.0     | 2026-06-17 | Rapidglobe Ltd | Initial test plan — MK Community Foundation Oak Grants. Risk-based: Oak covers Seed and Sapling variants. Two accounts: Elmbridge Families Together (geographic mismatch) and MK Minds Matter (happy path). 13 test cases. 20% match funding requirement flagged as key extraction check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.1     | 2026-07-03 | Rapidglobe Ltd | Updated before first execution to reflect changes made since v1.0 (all 2026-07-01/02): added mandatory RT-00 environment/schema check to Pre-Test Setup (AI-cap and approve/reopen RPCs were found missing on dev/prod for weeks, now fixed but unverified); updated IT-MKCF-04 for the new auto-confirming email verification flow and 1-hour link expiry (D-012); updated IT-MKCF-13 to reflect the merged approve+download action (2026-06-12), the new Word page-numbering footer line, and the re-export confirmation dialog now expected on the plain-text download too (D-WF-04).                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 1.2     | 2026-07-03 | Rapidglobe Ltd | Incorporated corrections found during a same-day execution attempt that did not complete cleanly (stopped at IT-MKCF-11, cause not captured — results cleared, retest from IT-MKCF-01). Corrections: IT-MKCF-05 empty-state dashboard shows "Start your first application", not "+ New Application" (fixed for freshly registered accounts only); swapped IT-MKCF-07/08 order so AI summary content accuracy is reviewed before the checklist/start-writing step navigates past it; replaced the indicative Expected Narrative Questions table with the actual 10 questions observed live, and recorded as observations (not defects) that none of MKCF's 10 Oak Grants questions display a word/character limit and none specifically asks how the 20% match will be met (folded into the Q6 sustainability answer instead, per IT-MKCF-11); simplified IT-MKCF-11 by removing counter-accuracy and over-limit hard-stop steps that don't apply to this funder; added a caution note to IT-MKCF-11 flagging the unresolved issue from the aborted attempt. |
+| 1.3     | 2026-07-04 | Rapidglobe Ltd | Clean full retest executed — all 13 test cases (IT-MKCF-01–13) passed; the unresolved IT-MKCF-11 issue from the 2026-07-03 attempt did not reproduce. Recorded results, notes, and timings throughout. Flagged (not yet actioned — pending a follow-up amendment): 20% match requirement bold/larger-font treatment logged as an enhancement, not a defect, on IT-MKCF-07; a testing-methodology limitation noted on IT-MKCF-07 that "no hallucinated conditions" cannot be rigorously human-verified against large guidelines documents (see DR-AI-003); a batch of plan-quality TODOs collected for the next amendment pass — remove IT-MKCF-06 steps 7–8 (redundant), remove IT-MKCF-08 step 1 and its related expected-result bullet (redundant given IT-MKCF-07's prerequisite), correct IT-MKCF-09's "Match funding question present" bullet to match the already-recorded finding that no dedicated match question exists, remove IT-MKCF-10 steps 3–4 (no budget/financial field on this funder) and consider merging IT-MKCF-10 into IT-MKCF-09.   |
