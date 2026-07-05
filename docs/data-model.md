@@ -176,6 +176,8 @@ The approved funder directory. This table is **not user-scoped** — it is a glo
 - RLS: authenticated users can SELECT where `is_active = true`; INSERT/UPDATE/DELETE restricted to service role only
 - Seeded with the approved funders tracked in `docs/Test Plans/TEST-DASHBOARD.md` (20 as of 2026-07-01, up from the original 12 — `target-funder-list.md` was retired for being out of sync with the live dropdown)
 
+**Forward reference:** `funder_type` was already found not to reflect a stable property of any funder and dropped from the Step 1 picker UI (DR-FD-001, 2026-07-04) — the column was left in place, unused, as low-priority cleanup. **ADR-DATA-006** (2026-07-05) formally supersedes it as part of a broader rearchitecture (a typed item-graph model, not yet built); the column may now be dropped entirely once that work lands rather than retained. This table describes the schema as it exists in production today.
+
 ---
 
 ## 3. applications
@@ -232,6 +234,8 @@ Stores the individual question-and-answer pairs for each application. Each row r
 - An application cannot be exported (status → `exported`) until the parent `applications.status` is `approved`
 - When an approved or exported application is re-opened, `is_approved` on all answers is reset to `false` and `applications.status` reverts to `in_progress`
 - `question_order` must be unique within an application
+
+**Forward reference:** `question_type` was added for BD-04 (question-level typing) but only `narrative` is ever populated in practice — the AI extraction prompt (`lib/prompts.ts`) explicitly discards non-narrative and conditional questions rather than classifying them. A nine-funder review (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found this flat, narrative-only model false in twenty distinct ways. **ADR-DATA-006** (2026-07-05) decides a typed item-graph model to replace this table — not yet built; see the linked build plan for phased sequencing. This section describes the schema as it exists in production today.
 
 ---
 

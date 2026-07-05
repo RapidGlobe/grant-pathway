@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.7
+**Version:** 1.8
 **Date:** 2026-04-21
-**Last updated:** 2026-07-01
+**Last updated:** 2026-07-05
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -35,7 +35,7 @@
 
 ## 1. Purpose and Scope
 
-This document describes the technical design of Grant Pathway v1 — a free AI-assisted grant writing tool for UK charities. It synthesises all 42 architectural decisions recorded in the ADR files in this directory into a unified, actionable reference for development.
+This document describes the technical design of Grant Pathway v1 — a free AI-assisted grant writing tool for UK charities. It synthesises the architectural decisions recorded in the ADR files in this directory (47 as of 2026-07-05, see `ADR-INDEX.md`) into a unified, actionable reference for development.
 
 **This document answers:** How is Grant Pathway built, how do its components fit together, and what does a developer need to know to start working on it?
 
@@ -337,6 +337,8 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 | `is_active`      | `boolean`     | Not null, default `true`                     |
 | `created_at`     | `timestamptz` | Default `now()`                              |
 
+**Forward reference:** `funder_type` was dropped from the Step 1 picker UI (DR-FD-001, 2026-07-04) after being found not to reflect a stable property of any funder; the column was left in place, unused. **ADR-DATA-006** (2026-07-05) formally supersedes it as part of a broader rearchitecture (a typed item-graph model, not yet built) — the column may now be dropped entirely once that work lands. This table describes the schema as it exists in production today.
+
 #### `applications`
 
 | Column             | Type          | Constraints                                                                        |
@@ -376,6 +378,8 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 | `updated_at`         | `timestamptz` | Default `now()`                                                           |
 
 **Note on free_form funders:** For narrative (free_form) funders, `question_text` stores the section title (e.g. "About your organisation"). Section guidance text is re-derived on each Step 4 page load from `applications.ai_summary.sections[i].guidance`, matched by `question_order`. This avoids data duplication and keeps guidance in sync with the AI summary.
+
+**Forward reference:** `question_type` exists for BD-04 (question-level typing) but only `narrative` is populated in practice — extraction (`lib/prompts.ts`) explicitly discards non-narrative and conditional questions rather than classifying them. A nine-funder review (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found this flat, narrative-only model false in twenty distinct ways (R1–R20). **ADR-DATA-006** (2026-07-05) decides a typed item-graph model to replace this table — items of multiple types (narrative, data, date, number, table, file, consent, eligibility gate, scoring criterion, manual action), visibility conditions for branching, hard-vs-judgement rule flags, rubric-criterion links, and a decision-maker-visibility flag — populated via AI-drafted, human-reviewed playbooks per funder rather than live unsupervised extraction. Not yet built; see `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` for phased sequencing. This section describes the schema as it exists in production today.
 
 #### `ai_usage_log`
 
@@ -1070,6 +1074,7 @@ The following one-time tasks must be completed before the first production deplo
 | 1.5     | 2026-07-01 | Rapidglobe Ltd | Removed 3 phantom `/mfa` TOTP references (project tree, protected routes, routes table) reintroduced in error by the 1.4 gap-analysis pass — MFA was actually removed from the codebase 2026-06-12 and demoted to Won't Have in `moscow-feature-register.md`; see CHANGELOG.md 2026-07-01                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 1.6     | 2026-07-01 | Rapidglobe Ltd | Fixed `/application/[id]` → `/applications/[id]` route-naming inconsistency (project tree merged from two separate top-level entries into one; 12 occurrences across §4 and §7 route tables) to match the actual codebase and decision D1 in `IMPLEMENTATION-PLAN.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | 1.7     | 2026-07-01 | Rapidglobe Ltd | Removed the 1.4 pass's incorrect "restored /api/generate-draft as active" claim — the route was confirmed genuinely orphaned (zero callers anywhere in the codebase) and deleted entirely 2026-07-01. Corrected §4 project tree, §9 API routes table (`/api/refine-answer` config corrected from "Default timeout" to `maxDuration = 60`), and §13 rate-limiting table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 1.8     | 2026-07-05 | Rapidglobe Ltd | Added forward-reference notes to the `funders` and `application_answers` schema sections pointing at ADR-DATA-006 (Application Item-Graph Model) — a decided but not-yet-built rearchitecture superseding `funder_type` and the flat `application_answers` structure. No schema change; the tables documented here remain the accurate current-production state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ---
 
