@@ -1639,34 +1639,100 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 
 ---
 
+## Phase 6 — Application Item-Graph Rearchitecture
+
+**This phase does not gate Phase 5 or launch.** Grant Pathway v1 launches on the current flat `application_answers` model. Phase 6 is a separate, parallel track that begins whenever capacity allows, sequenced by ongoing funder testing rather than blocking it. Decided in `ADR-DATA-006-application-item-graph-model.md`; full requirements (R1–R20) in `docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md`; this section summarises `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` — that document is authoritative for detail.
+
+**Sequencing principle (no big-bang cutover):** every task below must prove itself against one existing funder with zero behavioural regression before any other funder is migrated onto it.
+
+### P6.1 — Profile Schema Extension
+
+- Add governance facts to `charity_profiles`: trustee relatedness, bank-signatory count/relatedness
+- Add fields needed to compute derived ratios (e.g. reserves ÷ monthly expenditure)
+- Surface at least one derived ratio during profile setup
+- Depends on: nothing — additive, can start immediately and independently of the rest of Phase 6
+
+### P6.2 — Item-Graph Data Model (compatibility mode)
+
+- Design the typed item schema: item type (narrative / data / date / number / table / file / consent / eligibility gate / scoring criterion / manual action), visibility condition, source of truth, validation mode (`hard_check` / `judgement_flag`), rubric-criterion link, `decision_maker_visible` flag, output mapping
+- Migrate `application_answers` into the new shape using only today's item types (narrative, budget-flagged narrative) — no new capability yet, this is re-platforming
+- Pick the simplest already-tested funder and prove it end to end (extraction, storage, Step 4 rendering, export) with zero regression against that funder's existing test plan
+- Depends on: nothing (can run in parallel with P6.1)
+- **This is the highest-risk task in Phase 6 — nothing in P6.3–P6.7 can meaningfully start before this is proven**
+
+### P6.3 — Extraction Rewrite
+
+- Rewrite `lib/prompts.ts` and the extraction route to produce the graph shape
+- First milestone: same item types as today, new shape only — validate against the P6.2 test funder with no information loss versus the current prompt
+- Subsequent milestones: extend to new item types one at a time, driven by whichever funder is next in the curation queue (P6.5), not built speculatively ahead of need
+- Depends on: P6.2
+
+### P6.4 — Step 4 Rendering Rework
+
+- Rework Step 4 to walk the graph — respecting visibility conditions (branching) — rather than rendering a flat narrative-card list
+- First milestone: render exactly what compatibility-mode items produce, matching current production behaviour for the P6.2 test funder
+- Subsequent milestones: add rendering for each new item type as P6.3 adds it — checklist-style reminders for data/date/file/consent items first, then flexible budget shapes, then rubric-coaching display, then the `decision_maker_visible` treatment
+- Depends on: P6.2; P6.3 for each new item type
+
+### P6.5 — Playbook Infrastructure and Curation Workflow
+
+- New table(s) holding a versioned, human-reviewed playbook per funder (item graph, rubric mapping, budget shape, rules, output mode, manual actions)
+- Lightweight review step to start — a reviewed record approved before a funder is marked supported; does not need a built admin UI initially
+- Runtime prefers an approved playbook over live extraction; falls back to today's live-extraction behaviour, visibly flagged as unreviewed, if none exists
+- Depends on: P6.2
+- Exit criteria: one funder has an approved, versioned playbook the live application flow reads instead of running extraction fresh each time
+
+### P6.6 — Transparency Status
+
+- Add a support-status field per funder/playbook (fully supported / partially supported with flagged gaps / guidance-only, use with caution)
+- Surface it in the Step 1 funder picker and the Step 3 summary screen
+- Depends on: P6.5
+
+### P6.7 — Funder-by-Funder Capability Extension (ongoing)
+
+- Not a single task — the ongoing mode of work once P6.1–P6.6 exist
+- Each new or re-curated funder pulls in whichever capabilities it actually needs: flexible budget shapes, rubric coaching, the `compose` output mode and document-level limits for proposal-style funders, `link_acceptable` in its replace/supplement modes, `manual_action` tracking, a pre-application fit-assessment stage for no-form funders, multi-stream selection
+- Priority set by the live-testing queue, not built speculatively ahead of need
+- Depends on: P6.1–P6.6
+
+### Parked — not scheduled under Phase 6
+
+- **Native-document output** (a funder's own Word template or portal fields, e.g. Stony Stratford) — a distinct, non-trivial technical problem deserving its own design pass; does not block, and is not blocked by, anything above.
+- **Scoring criteria driven by cross-application funder history** (e.g. MK Community Foundation's Group Profile Score) — requires reversing BD-06 ("multi-stage applications are separate records; no automated linkage"), a business decision that has not been made. No engineering work should be scheduled here until BD-06 is explicitly revisited.
+
+---
+
 ## Timeline Summary
 
-| Phase      | Content                    | Estimated Duration | Target Start     |
-| ---------- | -------------------------- | ------------------ | ---------------- |
-| Phase 0    | Project Bootstrap          | 2 days             | Week 1 (May 8)   |
-| Phase 1    | Static UI Shell            | 10 days            | Week 1 (May 11)  |
-| Phase 2    | Risk-First Spikes          | 4 days             | Week 3 (May 26)  |
-| Phase 3    | Infrastructure Setup       | 4 days             | Week 4 (Jun 1)   |
-| Phase 4    | Vertical Slices (8 slices) | 6–7 weeks          | Week 4 (Jun 8)   |
-| Phase 5    | Pre-Launch                 | 2 weeks            | Week 11 (Jul 17) |
-| **Launch** |                            |                    | **31 July 2026** |
+| Phase      | Content                                                                      | Estimated Duration             | Target Start       |
+| ---------- | ---------------------------------------------------------------------------- | ------------------------------ | ------------------ |
+| Phase 0    | Project Bootstrap                                                            | 2 days                         | Week 1 (May 8)     |
+| Phase 1    | Static UI Shell                                                              | 10 days                        | Week 1 (May 11)    |
+| Phase 2    | Risk-First Spikes                                                            | 4 days                         | Week 3 (May 26)    |
+| Phase 3    | Infrastructure Setup                                                         | 4 days                         | Week 4 (Jun 1)     |
+| Phase 4    | Vertical Slices (8 slices)                                                   | 6–7 weeks                      | Week 4 (Jun 8)     |
+| Phase 5    | Pre-Launch                                                                   | 2 weeks                        | Week 11 (Jul 17)   |
+| **Launch** |                                                                              |                                | **31 July 2026**   |
+| Phase 6    | Application Item-Graph Rearchitecture (parallel track, does not gate launch) | Not estimated — see build plan | Capacity-dependent |
 
 ---
 
 ## Key References
 
-| Document                  | Path                                                         |
-| ------------------------- | ------------------------------------------------------------ |
-| BRD                       | `business/BRD-Grant-Pathway-v0.2.md`                         |
-| PRD                       | `business/PRD-Grant-Pathway-v1.md`                           |
-| Screen Requirements       | `business/PRD inputs/screen-requirements.md`                 |
-| Acceptance Criteria       | `business/PRD inputs/acceptance-criteria.md`                 |
-| Technical Design          | `business/Technical Decision and Design/technical-design.md` |
-| ADR Index                 | `business/Technical Decision and Design/ADR-INDEX.md`        |
-| Information Architecture  | `business/information-architecture-and-navigation.md`        |
-| MoSCoW Feature Register   | `business/moscow-feature-register.md`                        |
-| Constraints & Assumptions | `business/constraints-and-assumptions.md`                    |
-| Data Model                | `business/data-model.md`                                     |
+| Document                  | Path                                                                              |
+| ------------------------- | --------------------------------------------------------------------------------- |
+| BRD                       | `business/BRD-Grant-Pathway-v0.2.md`                                              |
+| PRD                       | `business/PRD-Grant-Pathway-v1.md`                                                |
+| Screen Requirements       | `business/PRD inputs/screen-requirements.md`                                      |
+| Acceptance Criteria       | `business/PRD inputs/acceptance-criteria.md`                                      |
+| Technical Design          | `business/Technical Decision and Design/technical-design.md`                      |
+| ADR Index                 | `business/Technical Decision and Design/ADR-INDEX.md`                             |
+| Information Architecture  | `business/information-architecture-and-navigation.md`                             |
+| MoSCoW Feature Register   | `business/moscow-feature-register.md`                                             |
+| Constraints & Assumptions | `business/constraints-and-assumptions.md`                                         |
+| Data Model                | `business/data-model.md`                                                          |
+| Phase 6 Build Plan        | `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`            |
+| Phase 6 Decision Record   | `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md` |
 
 ---
 
@@ -1674,30 +1740,31 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                 |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 3.1     | 2026-07-05 | Rapidglobe Ltd | GAP-12 amended: go-live tag corrected from `v1.0` to `v1.0.0` (three-part semver, consistent with `package.json` and pre-launch `v0.x.x` tags); added pre-launch baseline tag convention note to P5.4                                                              |
-| 1.0     | 2026-05-07 | Rapidglobe Ltd | Initial plan — phases 0–5 with route reference, discrepancy table (D1–D7), and all slice specifications                                                                                                                                                            |
-| 1.1     | 2026-05-07 | Rapidglobe Ltd | Corrected 13 inconsistencies against screen-requirements.md (D1–D7)                                                                                                                                                                                                |
-| 1.2     | 2026-05-07 | Rapidglobe Ltd | Corrected 10 inconsistencies against PRD inputs (D8–D10)                                                                                                                                                                                                           |
-| 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                                                                                                                         |
-| 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                                                                                                                       |
-| 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                                                                                                                     |
-| 3.0     | 2026-06-30 | Rapidglobe Ltd | Added P5.5b — /admin service dashboard page (live Supabase data, operator-only access, design ref dashboard-sketch-2026-06-30.html)                                                                                                                                |
-| 2.9     | 2026-06-30 | Rapidglobe Ltd | Added Axiom log management setup step to P5.4 (technology stack review recommendation)                                                                                                                                                                             |
-| 2.8     | 2026-06-17 | Rapidglobe Ltd | Phase 4→5 gate signed off by WJ (2026-06-17); gate checklist ticked; legal docs consolidated to `docs/legal/` (privacy-policy.md + terms-of-service.md); 7-day backup disclosure corrected in privacy policy; monthly AI cap aligned to 50 across all three routes |
-| 2.7     | 2026-06-16 | Rapidglobe Ltd | Added inactivity cron reliability step to P5.3 (GAP-31); added Sentry P95 alert, v1.0 git tag, and rollback procedure steps to P5.4 (GAP-03/12/28)                                                                                                                 |
-| 2.6     | 2026-06-16 | Rapidglobe Ltd | Added Zod validation step for Server Actions to P5.3 (GAP-25)                                                                                                                                                                                                      |
-| 2.5     | 2026-06-16 | Rapidglobe Ltd | Added export disclaimer wording fix to P5.3 (GAP-24)                                                                                                                                                                                                               |
-| 2.4     | 2026-06-16 | Rapidglobe Ltd | Added loading.tsx per authenticated route step to P5.3 (GAP-23)                                                                                                                                                                                                    |
-| 2.3     | 2026-06-16 | Rapidglobe Ltd | Added session timeout inactivity banner step to P5.3 (GAP-22)                                                                                                                                                                                                      |
-| 2.2     | 2026-06-16 | Rapidglobe Ltd | Added Sentry route tagging step to P5.3 (GAP-21)                                                                                                                                                                                                                   |
-| 2.1     | 2026-06-16 | Rapidglobe Ltd | Added mobile viewport banner step to P5.3 (GAP-05)                                                                                                                                                                                                                 |
-| 2.0     | 2026-06-16 | Rapidglobe Ltd | Added cross-user RLS test step to P5.2 (GAP-17)                                                                                                                                                                                                                    |
-| 1.9     | 2026-06-16 | Rapidglobe Ltd | Added Performance section (P5.PERF1) to Phase 5 — task implemented 2026-06-05 but missing from plan; added for audit trail completeness (ADR-AI-010)                                                                                                               |
-| 1.8     | 2026-06-16 | Rapidglobe Ltd | Added Funder Directory section (P5.FD1–FD6) to Phase 5 — tasks implemented 2026-06-01 but missing from plan; added for audit trail completeness (DR-FD-001)                                                                                                        |
-| 1.7     | 2026-06-16 | Rapidglobe Ltd | Added bundle size / Core Web Vitals check to P5.4 checklist (ADR-STACK-001 consequence)                                                                                                                                                                            |
-| 1.6     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table                                                                                                  |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                   |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 3.2     | 2026-07-05 | Rapidglobe Ltd | Added Phase 6 — Application Item-Graph Rearchitecture (P6.1–P6.7), expanding `build-plan-any-guideline-or-form.md` into this plan's tracked task format per ADR-DATA-006. Parallel track — does not gate Phase 5 or the 31 July launch. Timeline Summary and Key References updated. |
+| 3.1     | 2026-07-05 | Rapidglobe Ltd | GAP-12 amended: go-live tag corrected from `v1.0` to `v1.0.0` (three-part semver, consistent with `package.json` and pre-launch `v0.x.x` tags); added pre-launch baseline tag convention note to P5.4                                                                                |
+| 1.0     | 2026-05-07 | Rapidglobe Ltd | Initial plan — phases 0–5 with route reference, discrepancy table (D1–D7), and all slice specifications                                                                                                                                                                              |
+| 1.1     | 2026-05-07 | Rapidglobe Ltd | Corrected 13 inconsistencies against screen-requirements.md (D1–D7)                                                                                                                                                                                                                  |
+| 1.2     | 2026-05-07 | Rapidglobe Ltd | Corrected 10 inconsistencies against PRD inputs (D8–D10)                                                                                                                                                                                                                             |
+| 1.3     | 2026-05-07 | Rapidglobe Ltd | Corrected 9 inconsistencies against data-model.md, non-functional-requirements.md, user-personas, PDR-DH-002/003, PDR-AI-003/005 (D11–D19)                                                                                                                                           |
+| 1.4     | 2026-05-07 | Rapidglobe Ltd | Corrected 3 inconsistencies against PDR-AI-002/004, PDR-DH-001, PDR-UI-004/005/006 (D20–D22)                                                                                                                                                                                         |
+| 1.5     | 2026-05-20 | Rapidglobe Ltd | Corrected 8 inconsistencies against all 42 ADRs and technical-design.md (D23–D30); added P3.12 gap resolutions                                                                                                                                                                       |
+| 3.0     | 2026-06-30 | Rapidglobe Ltd | Added P5.5b — /admin service dashboard page (live Supabase data, operator-only access, design ref dashboard-sketch-2026-06-30.html)                                                                                                                                                  |
+| 2.9     | 2026-06-30 | Rapidglobe Ltd | Added Axiom log management setup step to P5.4 (technology stack review recommendation)                                                                                                                                                                                               |
+| 2.8     | 2026-06-17 | Rapidglobe Ltd | Phase 4→5 gate signed off by WJ (2026-06-17); gate checklist ticked; legal docs consolidated to `docs/legal/` (privacy-policy.md + terms-of-service.md); 7-day backup disclosure corrected in privacy policy; monthly AI cap aligned to 50 across all three routes                   |
+| 2.7     | 2026-06-16 | Rapidglobe Ltd | Added inactivity cron reliability step to P5.3 (GAP-31); added Sentry P95 alert, v1.0 git tag, and rollback procedure steps to P5.4 (GAP-03/12/28)                                                                                                                                   |
+| 2.6     | 2026-06-16 | Rapidglobe Ltd | Added Zod validation step for Server Actions to P5.3 (GAP-25)                                                                                                                                                                                                                        |
+| 2.5     | 2026-06-16 | Rapidglobe Ltd | Added export disclaimer wording fix to P5.3 (GAP-24)                                                                                                                                                                                                                                 |
+| 2.4     | 2026-06-16 | Rapidglobe Ltd | Added loading.tsx per authenticated route step to P5.3 (GAP-23)                                                                                                                                                                                                                      |
+| 2.3     | 2026-06-16 | Rapidglobe Ltd | Added session timeout inactivity banner step to P5.3 (GAP-22)                                                                                                                                                                                                                        |
+| 2.2     | 2026-06-16 | Rapidglobe Ltd | Added Sentry route tagging step to P5.3 (GAP-21)                                                                                                                                                                                                                                     |
+| 2.1     | 2026-06-16 | Rapidglobe Ltd | Added mobile viewport banner step to P5.3 (GAP-05)                                                                                                                                                                                                                                   |
+| 2.0     | 2026-06-16 | Rapidglobe Ltd | Added cross-user RLS test step to P5.2 (GAP-17)                                                                                                                                                                                                                                      |
+| 1.9     | 2026-06-16 | Rapidglobe Ltd | Added Performance section (P5.PERF1) to Phase 5 — task implemented 2026-06-05 but missing from plan; added for audit trail completeness (ADR-AI-010)                                                                                                                                 |
+| 1.8     | 2026-06-16 | Rapidglobe Ltd | Added Funder Directory section (P5.FD1–FD6) to Phase 5 — tasks implemented 2026-06-01 but missing from plan; added for audit trail completeness (DR-FD-001)                                                                                                                          |
+| 1.7     | 2026-06-16 | Rapidglobe Ltd | Added bundle size / Core Web Vitals check to P5.4 checklist (ADR-STACK-001 consequence)                                                                                                                                                                                              |
+| 1.6     | 2026-05-29 | Rapidglobe Ltd | Added AiSummarySection type and sections? field to S6.1 (free_form funders); updated AI usage cap from 20 to 50 in P1.6 and Slice 2; added document history table                                                                                                                    |
 
 ---
 
