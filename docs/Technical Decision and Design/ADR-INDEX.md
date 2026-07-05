@@ -167,7 +167,7 @@ Grant Pathway has no remaining architectural blockers to production deployment.
 
 ## All Decisions Complete
 
-All 46 original architectural decisions have been decided, and Grant Pathway moved into development on that basis. A 47th, ADR-DATA-006, was added on 2026-07-05 — this one is different in kind: it decides the architecture for a significant rearchitecture (the item-graph model, replacing `application_answers`) that has not been built yet. See `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` for its phased implementation sequence; it does not gate anything currently in production.
+All 46 original architectural decisions have been decided, and Grant Pathway moved into development on that basis. A 47th, ADR-DATA-006, was added on 2026-07-05 — this one is different in kind: it decides the architecture for a significant rearchitecture (the item-graph model, replacing `application_answers`) that has not been built yet. It does not change anything currently running in production — the flat model stays live until this is built. See `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` for its phased implementation sequence. **Revised the same day: this rearchitecture now gates go-live** — see the Phase 6 → Go-Live Gate in `docs/Implementation Plan/IMPLEMENTATION-PLAN.md`. Target launch is no longer 31 July 2026.
 
 **Key implementation reminders before writing code:**
 

@@ -50,7 +50,7 @@ This Product Requirements Document defines exactly what must be built for the v1
 
 The document synthesises requirements from the Business Requirements Document, 16 PRD decision records, and 5 PRD input documents. Where this document and any source document differ, this PRD takes precedence. Known divergences from the BRD are documented in the MoSCoW Feature Register.
 
-**Target launch date: 31 July 2026.**
+**Target launch date: not committed (revised 2026-07-05; was 31 July 2026).** Launch now requires Phase 6 (`ADR-DATA-006`, the application item-graph rearchitecture) to complete — see the Phase 6 → Go-Live Gate in `docs/Implementation Plan/IMPLEMENTATION-PLAN.md`. Working estimate: August–September 2026.
 
 ---
 

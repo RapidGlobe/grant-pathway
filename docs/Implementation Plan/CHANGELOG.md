@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-05 — Launch gated on Phase 6; target date no longer 31 July 2026
+
+Same day ADR-DATA-006 was decided and Phase 6 was first added to `IMPLEMENTATION-PLAN.md` as a non-gating parallel track, WJ revised that framing: **Phase 6 (P6.1–P6.6) must now be complete before Grant Pathway launches.** Reasoning: launching on the current flat, narrative-only model while knowingly aware of R1–R20 — in particular, that non-narrative fields are currently silently invisible to the user, who finishes the Step 4 writing flow believing the form is complete when it may not be — risks the "trusted partner" objective established earlier in the day more than a later launch does. There is no commercial deadline forcing 31 July 2026 and no customers waiting; the cost of waiting is acceptable, the cost of a trust failure at launch is not.
+
+Added a **Phase 6 → Go-Live Gate** to `IMPLEMENTATION-PLAN.md`, immediately before P5.6 (DNS and Go-Live) — mirroring the existing Phase 3→4 and Phase 4→5 gate pattern. Requires P5.1–P5.5 (the existing pre-launch checklist, unaffected and free to proceed independently) and P6.1–P6.6 complete. P6.7 (the ongoing funder-by-funder capability extension) is explicitly excepted — it has no completion state by design and does not block launch, nor do the two parked items (native-document output, R16).
+
+**Target launch changed from 31 July 2026 to "not committed — working estimate August–September 2026"** everywhere it was recorded: `IMPLEMENTATION-PLAN.md`, `IMPLEMENTATION-STATUS.md`, `docs/constraints-and-assumptions.md` (C2), `docs/PRD-Grant-Pathway-v1.md`. `ADR-DATA-006` and `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` amended with same-day notes recording the reversal, rather than silently edited, so the record shows what was actually decided and when it changed.
+
+**Direction given:** work begins on P6.1 (profile schema extension) immediately — tonight or 2026-07-06.
+
 ## 2026-07-05 — ADR-DATA-006 decided: Application Item-Graph Model
 
 Formalises the recommendation from a day-long design exercise: a review of nine funders' actual guidance and application materials (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found the flat, narrative-only `application_answers` model (ADR-DATA-001) false in twenty distinct, recurring ways (R1–R20) — mixes of narrative and non-narrative fields, branching and multi-stage forms, published scoring rubrics, sensitive-data handling, at least four budget shapes, guidance split across documents, hard-vs-judgement rules, funder-native output requirements, manual actions Grant Pathway can never complete, guidance with no form to extract at all, and items of unequal importance to an actual decision-maker, among others.

@@ -16,6 +16,8 @@ It is grounded in [question-coverage-analysis.md](question-coverage-analysis.md)
 
 This plan is built on a proposal, not a decision. Per this project's own conventions (`AGENTS.md` Step 3), an architectural choice of this size should be captured as a formal ADR under `docs/Technical Decision and Design/` before implementation begins — the same way DR-FD-001 captured the funder-directory model change. This build plan does not substitute for that. Recommended: draft the ADR alongside Phase 1, not after it, so the record reflects what was actually decided rather than being reconstructed later.
 
+**Update (2026-07-05):** Formalised as `ADR-DATA-006-application-item-graph-model.md`, and this plan expanded into `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md` as Phase 6 (P6.1–P6.7, mapping the phases below in order). **WJ additionally decided the same day that this rearchitecture now gates launch** — Phases 0–5 below (P6.1–P6.6) must complete before go-live; only Phase 6 (P6.7, the ongoing funder-by-funder extension) remains genuinely open-ended and non-blocking. See the Phase 6 → Go-Live Gate in `IMPLEMENTATION-PLAN.md`. Target launch is no longer 31 July 2026 — working estimate August–September 2026, not committed.
+
 ## 3. Sequencing principle
 
 The proposal already states the phasing instinct: build the graph model, populate it with today's item types first so nothing regresses, then extend funder by funder. Two rules follow from that, applied throughout this plan:
