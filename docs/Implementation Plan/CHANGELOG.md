@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-05 — Established git version-tagging convention; tagged v0.2.0 baseline before the any-guideline-or-form rearchitecture
+
+Following a design proposal (`docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md`) and build plan (`docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`) for a significant rearchitecture of guideline/application handling, decided to mark the pre-rearchitecture state in git history before Phase 1 of the build plan begins.
+
+Checked `IMPLEMENTATION-PLAN.md` P5.4 (GAP-12) first, which already specifies a `git tag` step for the go-live commit — found it used two-part `v1.0`, inconsistent with the three-part semver `package.json` requires. Amended GAP-12 to `v1.0.0` and added a note establishing that pre-launch checkpoints use `v0.x.x` tags (no stability guarantee, standard semver meaning of a `0.x` major version), so the full tag history stays in one consistent format from now through go-live.
+
+**Actioned:** `package.json` version bumped `0.1.0` → `0.2.0`; commit tagged `v0.2.0` and pushed; GitHub Release created linking the analysis, proposal, and build plan documents. The next `package.json` bump, to `0.3.0`, will mark the start of Phase 1 of the build plan.
+
 ## 2026-07-04 — DR-FD-001 amended: retired the funder picker's "Structured"/"Narrative" badge
 
 Traced during a deep review of the funder-type/question-type terminology prompted by IT-CW-08 (Clothworkers testing). The Step 1 funder picker showed a "Structured" or "Narrative" pill badge next to each funder name, sourced from a `funder_type` column on the `funders` table. Reviewing the real guideline documents in `docs/Grant Org Guidelines/` (22 files, ~15 funders/programmes) found this label doesn't reflect a stable property of the funder: several funders with multiple documents (Henry Smith, Idlewild) have _both_ a discrete-question application form (structured) and free-form background guidance (narrative) — the "same" funder produces both, depending on which document happens to be uploaded in a given session.
