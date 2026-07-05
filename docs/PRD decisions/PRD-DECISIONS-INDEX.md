@@ -64,16 +64,19 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ## Related Documents
 
-| Document                                 | Location                                                                                    |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Business Decision Records Index          | `business/decisions/DECISIONS-INDEX.md`                                                     |
-| Business Requirements Document           | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.5.md` — main reference going forward |
-| Functional Requirements (FR-01 to FR-47) | `docs/moscow-feature-register.md`                                                           |
-| User Personas, Journeys & Use Cases      | `business/user-personas-journeys-and-use-cases.md`                                          |
-| Non-Functional Requirements              | `business/non-functional-requirements.md`                                                   |
-| Technology Stack                         | `business/technology-stack.md`                                                              |
+| Document                                 | Location                                                                                                                                                                                   |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Business Decision Records Index          | `business/decisions/DECISIONS-INDEX.md`                                                                                                                                                    |
+| Business Requirements Document           | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.5.md` — main reference going forward                                                                                                |
+| Functional Requirements (FR-01 to FR-47) | `docs/moscow-feature-register.md`                                                                                                                                                          |
+| User Personas, Journeys & Use Cases      | `business/user-personas-journeys-and-use-cases.md`                                                                                                                                         |
+| Non-Functional Requirements              | `business/non-functional-requirements.md`                                                                                                                                                  |
+| Technology Stack                         | `business/technology-stack.md`                                                                                                                                                             |
+| Architectural Decision Records Index     | `docs/Technical Decision and Design/ADR-INDEX.md` — includes ADR-DATA-006 (2026-07-05), a not-yet-built rearchitecture of question/answer handling that supersedes BD-03/BD-04's mechanism |
+
+**Note (2026-07-05):** No new PDR added for ADR-DATA-006. That decision is architectural (data model, extraction pipeline, rendering) and belongs in the ADR series per this index's own scope note above — it's cross-referenced here because it will eventually affect how the AI/data-handling PDRs above are implemented, not because it is itself a pre-PRD product decision.
 
 ---
 
-_Last updated: 2026-07-04_
+_Last updated: 2026-07-05_
 _Status: 17 of 17 decisions made_
