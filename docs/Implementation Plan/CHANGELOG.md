@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-05 — ADR-DATA-006 decided: Application Item-Graph Model
+
+Formalises the recommendation from a day-long design exercise: a review of nine funders' actual guidance and application materials (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found the flat, narrative-only `application_answers` model (ADR-DATA-001) false in twenty distinct, recurring ways (R1–R20) — mixes of narrative and non-narrative fields, branching and multi-stage forms, published scoring rubrics, sensitive-data handling, at least four budget shapes, guidance split across documents, hard-vs-judgement rules, funder-native output requirements, manual actions Grant Pathway can never complete, guidance with no form to extract at all, and items of unequal importance to an actual decision-maker, among others.
+
+Four architectural options were considered (`docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md` §5): a universal typed item-graph, bolt-on modules added piecemeal to the existing core, AI-drafted/human-reviewed playbooks per funder, and a declared scope boundary that simply excludes unsupported funders. **Decision: a combination — the item-graph as the data model, populated the playbook way, with the scope-boundary transparency principle applied unconditionally on top.** Bolt-on modules were explicitly rejected as the default failure mode this decision is meant to avoid repeating — it is, functionally, what BD-03/BD-04/BD-07 already were, and BD-08 already had to retire one of them (the funder-type badge) once it collided with a case it wasn't built for.
+
+The recommendation was stress-tested against two further funders (Garfield Weston, Heritage Fund) after being drafted, specifically to check whether it would hold or need revision. It absorbed both with incremental additions (R18–R20) rather than a rewrite.
+
+**Formally recorded as `ADR-DATA-006-application-item-graph-model.md`**, superseding `application_answers`' structure (ADR-DATA-001) in part and formally retiring the unused `funders.funder_type` column (DR-FD-001) rather than leaving it as low-priority cleanup. This is a decision, not an implementation — nothing in production changes as a result. Phased build sequencing is recorded separately in `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`; R16 (scoring criteria driven by cross-application funder history) is explicitly parked pending a separate decision on whether to reverse BD-06.
+
 ## 2026-07-05 — Established git version-tagging convention; tagged v0.2.0 baseline before the any-guideline-or-form rearchitecture
 
 Following a design proposal (`docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md`) and build plan (`docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`) for a significant rearchitecture of guideline/application handling, decided to mark the pre-rearchitecture state in git history before Phase 1 of the build plan begins.

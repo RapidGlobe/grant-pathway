@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-06-30
+**Last updated:** 2026-07-05
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -66,13 +66,14 @@ Security decisions that must be in place before any protected pages are built.
 
 Data model, retention, and migration decisions. Must be decided before the database is created.
 
-| ID           | Title                    | Status     | File                                                                       |
-| ------------ | ------------------------ | ---------- | -------------------------------------------------------------------------- |
-| ADR-DATA-001 | Data Model               | ✅ Decided | [ADR-DATA-001-data-model.md](ADR-DATA-001-data-model.md)                   |
-| ADR-DATA-002 | Data That Is Not Stored  | ✅ Decided | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md)         |
-| ADR-DATA-003 | Data Retention           | ✅ Decided | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md)           |
-| ADR-DATA-004 | Database Migrations      | ✅ Decided | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md) |
-| ADR-DATA-005 | Database Backup Strategy | ✅ Decided | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md)         |
+| ID           | Title                        | Status     | File                                                                                         |
+| ------------ | ---------------------------- | ---------- | -------------------------------------------------------------------------------------------- |
+| ADR-DATA-001 | Data Model                   | ✅ Decided | [ADR-DATA-001-data-model.md](ADR-DATA-001-data-model.md)                                     |
+| ADR-DATA-002 | Data That Is Not Stored      | ✅ Decided | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md)                           |
+| ADR-DATA-003 | Data Retention               | ✅ Decided | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md)                             |
+| ADR-DATA-004 | Database Migrations          | ✅ Decided | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md)                   |
+| ADR-DATA-005 | Database Backup Strategy     | ✅ Decided | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md)                           |
+| ADR-DATA-006 | Application Item-Graph Model | ✅ Decided | [ADR-DATA-006-application-item-graph-model.md](ADR-DATA-006-application-item-graph-model.md) |
 
 ---
 
@@ -143,12 +144,12 @@ Infrastructure, deployment, and operational decisions.
 | Stack          | 6      | 6       | 0       | 0        |
 | Architecture   | 5      | 5       | 0       | 0        |
 | Security       | 6      | 6       | 0       | 0        |
-| Data           | 5      | 5       | 0       | 0        |
+| Data           | 6      | 6       | 0       | 0        |
 | File Handling  | 4      | 4       | 0       | 0        |
 | AI Integration | 10     | 10      | 0       | 0        |
 | Export         | 2      | 2       | 0       | 0        |
 | Operations     | 8      | 8       | 0       | 0        |
-| **Total**      | **46** | **46**  | **0**   | **0**    |
+| **Total**      | **47** | **47**  | **0**   | **0**    |
 
 ---
 
@@ -166,7 +167,7 @@ Grant Pathway has no remaining architectural blockers to production deployment.
 
 ## All Decisions Complete
 
-All 46 architectural decisions have been decided. Grant Pathway is ready to move into the development phase.
+All 46 original architectural decisions have been decided, and Grant Pathway moved into development on that basis. A 47th, ADR-DATA-006, was added on 2026-07-05 — this one is different in kind: it decides the architecture for a significant rearchitecture (the item-graph model, replacing `application_answers`) that has not been built yet. See `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` for its phased implementation sequence; it does not gate anything currently in production.
 
 **Key implementation reminders before writing code:**
 
