@@ -10,6 +10,10 @@
 
 ---
 
+## 2026-07-05 — P6.1 complete: charity profile governance and reserves fields
+
+First implementation work on Phase 6. Added `total_expenditure`, `reserves`, `trustees_related`, `bank_signatory_count`, and `bank_signatories_related` to `charity_profiles` (migration `20260705000000`), extended `actions/charity.ts` and the profile-setup form, and surfaced a live "months of reserve cover" ratio (`reserves ÷ (total_expenditure ÷ 12)`) once both figures are entered — closing R13 (Walton, MK Community Foundation) for the profile side. Scoped deliberately minimally, per WJ's decision, to only what R13 needs — not the rest of the documented-but-never-built "thick profile" fields already sitting in `data-model.md` (address/contact, remaining financial fields, supporting-doc status), which is a separate, pre-existing gap left untouched here. Applied to `grant-pathway-dev` only; `grant-pathway-prod` remains unlinked and untouched, consistent with prod not being re-entered until P5.4. All five new fields are nullable and optional — existing profiles and the rest of the product are unaffected. Verified via `tsc --noEmit`, `eslint`, the full Vitest suite, and `next build`, all clean; not yet verified in a live browser session.
+
 ## 2026-07-05 — Launch gated on Phase 6; target date no longer 31 July 2026
 
 Same day ADR-DATA-006 was decided and Phase 6 was first added to `IMPLEMENTATION-PLAN.md` as a non-gating parallel track, WJ revised that framing: **Phase 6 (P6.1–P6.6) must now be complete before Grant Pathway launches.** Reasoning: launching on the current flat, narrative-only model while knowingly aware of R1–R20 — in particular, that non-narrative fields are currently silently invisible to the user, who finishes the Step 4 writing flow believing the form is complete when it may not be — risks the "trusted partner" objective established earlier in the day more than a later launch does. There is no commercial deadline forcing 31 July 2026 and no customers waiting; the cost of waiting is acceptable, the cost of a trust failure at launch is not.

@@ -38,6 +38,16 @@ export type CharityProfileData = {
   whatDoes: string
   whoHelps: string
   whereWorks: string
+  /** Total expenditure from latest signed accounts (£). P6.1 / R13. */
+  totalExpenditure: number | null
+  /** Unrestricted/free reserves held by the charity (£). P6.1 / R13. */
+  reserves: number | null
+  /** Whether any trustees are related to each other by family or business relationship. P6.1 / R13. */
+  trusteesRelated: boolean | null
+  /** Number of people authorised as bank signatories. P6.1 / R13. */
+  bankSignatoryCount: number | null
+  /** Whether any bank signatories are related to each other or to a trustee. P6.1 / R13. */
+  bankSignatoriesRelated: boolean | null
 }
 
 /**
@@ -56,7 +66,7 @@ export async function getCharityProfile(): Promise<CharityProfileData | null> {
   const { data } = await supabase
     .from('charity_profiles')
     .select(
-      'charity_name, registration_number, what_charity_does, who_charity_helps, where_charity_works',
+      'charity_name, registration_number, what_charity_does, who_charity_helps, where_charity_works, total_expenditure, reserves, trustees_related, bank_signatory_count, bank_signatories_related',
     )
     .eq('user_id', user.id)
     .maybeSingle()
@@ -69,6 +79,11 @@ export async function getCharityProfile(): Promise<CharityProfileData | null> {
     whatDoes: data.what_charity_does,
     whoHelps: data.who_charity_helps,
     whereWorks: data.where_charity_works,
+    totalExpenditure: data.total_expenditure,
+    reserves: data.reserves,
+    trusteesRelated: data.trustees_related,
+    bankSignatoryCount: data.bank_signatory_count,
+    bankSignatoriesRelated: data.bank_signatories_related,
   }
 }
 
@@ -84,6 +99,14 @@ const saveProfileSchema = z.object({
   whereWorks: z.string().min(1, 'Please tell us where your charity works'),
   /** True when Bedrock paraphrased the charitable objects on the most recent lookup */
   paraphrasedFromLookup: z.boolean(),
+  // P6.1 / R13 — governance facts and derived-ratio inputs. All optional:
+  // existing profiles have none of these set, and they are not required to
+  // use the rest of the product.
+  totalExpenditure: z.number().nonnegative().optional(),
+  reserves: z.number().nonnegative().optional(),
+  trusteesRelated: z.boolean().optional(),
+  bankSignatoryCount: z.number().nonnegative().optional(),
+  bankSignatoriesRelated: z.boolean().optional(),
 })
 
 export type SaveProfileInput = z.infer<typeof saveProfileSchema>
@@ -105,8 +128,19 @@ export async function saveCharityProfile(data: SaveProfileInput): Promise<SavePr
     return { ok: false, error: 'Invalid profile data. Please check the form.' }
   }
 
-  const { charityName, registrationNumber, whatDoes, whoHelps, whereWorks, paraphrasedFromLookup } =
-    parsed.data
+  const {
+    charityName,
+    registrationNumber,
+    whatDoes,
+    whoHelps,
+    whereWorks,
+    paraphrasedFromLookup,
+    totalExpenditure,
+    reserves,
+    trusteesRelated,
+    bankSignatoryCount,
+    bankSignatoriesRelated,
+  } = parsed.data
 
   const supabase = await createClient()
 
@@ -137,6 +171,11 @@ export async function saveCharityProfile(data: SaveProfileInput): Promise<SavePr
       who_charity_helps: whoHelps,
       where_charity_works: whereWorks,
       lookup_source: paraphrasedFromLookup ? 'charity_commission' : 'manual',
+      total_expenditure: totalExpenditure ?? null,
+      reserves: reserves ?? null,
+      trustees_related: trusteesRelated ?? null,
+      bank_signatory_count: bankSignatoryCount ?? null,
+      bank_signatories_related: bankSignatoriesRelated ?? null,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' },

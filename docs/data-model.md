@@ -80,6 +80,8 @@ Stores application-level user data that Supabase Auth does not hold natively.
 
 Stores the charity's full organisational information — the "thick profile" introduced in Mark Two (BD-02). Used as context for all AI-generated content and as a pre-fill source for non-narrative fields on funder forms.
 
+**Implementation note (2026-07-05):** sections 2.2–2.5 below document the target "thick profile," not all of which has been built. The fields actually persisted in the live `charity_profiles` table and profile-setup form today are: `charity_name`, `registration_number`, `what_charity_does`, `who_charity_helps`, `where_charity_works`, `lookup_source` (2.1/2.3), plus `total_expenditure`, `reserves`, `trustees_related`, `bank_signatory_count`, `bank_signatories_related` (2.4/2.4a, added by migration `20260705000000` as part of P6.1 / ADR-DATA-006 R13). Address/contact (2.2), the remaining financial fields (`accounts_date`, `total_income`, employee/volunteer/trustee counts, salary bands, `government_funding`, `main_non_govt_funders`), and supporting-document status (2.5) remain documented but unbuilt — a pre-existing gap between this document and the codebase, not something P6.1 was scoped to close.
+
 ### 2.1 Identity
 
 | Field                 | Type    | Required | Notes                                                                                   |
@@ -117,18 +119,31 @@ Stores the charity's full organisational information — the "thick profile" int
 
 **Note:** Financial fields default from Charity Commission annual return data where available. This data is typically 12–18 months behind the charity's current position. The charity must review and confirm every financial field before using the profile in an application. All financial data must be verified by the charity (ideally the treasurer or finance lead).
 
-| Field                     | Type    | Required | Notes                                                                     |
-| ------------------------- | ------- | -------- | ------------------------------------------------------------------------- |
-| `accounts_date`           | Date    | No       | Date of latest signed accounts; charity confirms                          |
-| `total_income`            | Integer | No       | Total income from latest signed accounts (£)                              |
-| `total_expenditure`       | Integer | No       | Total expenditure from latest signed accounts (£)                         |
-| `number_of_employees_fte` | Integer | No       | Full-time equivalent employee count                                       |
-| `number_of_volunteers`    | Integer | No       | Volunteer count (not in Charity Commission data; charity enters directly) |
-| `number_of_trustees`      | Integer | No       | Trustee count                                                             |
-| `average_employee_salary` | Integer | No       | Cost of salaries ÷ FTE, excl. employer NI (£)                             |
-| `top_salary_band`         | String  | No       | e.g. "£40,000–£50,000"                                                    |
-| `government_funding`      | Integer | No       | Government / local authority funding from latest accounts (£)             |
-| `main_non_govt_funders`   | Text    | No       | Trust and foundation names; up to 5; charity enters directly              |
+| Field                     | Type    | Required | Notes                                                                                                                                     |
+| ------------------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `accounts_date`           | Date    | No       | Date of latest signed accounts; charity confirms                                                                                          |
+| `total_income`            | Integer | No       | Total income from latest signed accounts (£)                                                                                              |
+| `total_expenditure`       | Integer | No       | Total expenditure from latest signed accounts (£). **Implemented** (P6.1)                                                                 |
+| `number_of_employees_fte` | Integer | No       | Full-time equivalent employee count                                                                                                       |
+| `number_of_volunteers`    | Integer | No       | Volunteer count (not in Charity Commission data; charity enters directly)                                                                 |
+| `number_of_trustees`      | Integer | No       | Trustee count                                                                                                                             |
+| `average_employee_salary` | Integer | No       | Cost of salaries ÷ FTE, excl. employer NI (£)                                                                                             |
+| `top_salary_band`         | String  | No       | e.g. "£40,000–£50,000"                                                                                                                    |
+| `government_funding`      | Integer | No       | Government / local authority funding from latest accounts (£)                                                                             |
+| `main_non_govt_funders`   | Text    | No       | Trust and foundation names; up to 5; charity enters directly                                                                              |
+| `reserves`                | Integer | No       | Unrestricted/free reserves held by the charity (£), charity-entered. **Implemented** (P6.1, ADR-DATA-006 R13) — not previously documented |
+
+### 2.4a Governance facts (P6.1, ADR-DATA-006 R13)
+
+Added to support eligibility tests found in funder guidance that depend on governance facts a profile didn't previously capture (Walton Charity, MK Community Foundation). All fields optional; used to compute and display a derived reserves-cover ratio and to surface governance flags during profile setup.
+
+| Field                      | Type    | Required | Notes                                                                             |
+| -------------------------- | ------- | -------- | --------------------------------------------------------------------------------- |
+| `trustees_related`         | Boolean | No       | Whether any trustees are related to each other by family or business relationship |
+| `bank_signatory_count`     | Integer | No       | Number of people authorised as bank signatories                                   |
+| `bank_signatories_related` | Boolean | No       | Whether any bank signatories are related to each other or to a trustee            |
+
+**Derived ratio:** months of reserve cover = `reserves ÷ (total_expenditure ÷ 12)`. Computed client-side in the profile-setup form and displayed once both `reserves` and `total_expenditure` are entered; not stored.
 
 ### 2.5 Supporting document status
 
@@ -316,6 +331,7 @@ The following are explicitly **not** stored in the database:
 | 1.1     | 2026-05-29 | Rapidglobe Ltd | Section 2 (charity_profiles) replaced with thick profile structure (BD-02): identity, address/contact, mission/work, financial fields, supporting document status. OSCR/CCNI register coverage note added. `question_type` and `limit_type`/`word_limit`/`char_limit` fields added to `application_answers` (BD-04, BD-05). `is_budget_question` field added. `answer_source` enum updated (`ai_generated` → `ai_assisted`). AI cap corrected 20 → 50 in ai_usage_log constraints. |
 | 1.2     | 2026-06-01 | Rapidglobe Ltd | Section 2a added: `funders` table (DR-FD-001) — approved funder directory, global/non-user-scoped, seeded with 12 approved orgs. `funder_id` nullable FK added to `applications`. Entity overview and relationships summary updated.                                                                                                                                                                                                                                               |
 | 1.3     | 2026-06-30 | Rapidglobe Ltd | `ai_usage_log.request_type` enum updated: `charity_paraphrase` added as third value (migration 20260622000001 — applied via SQL Editor as ALTER TYPE ADD VALUE cannot run in a transaction).                                                                                                                                                                                                                                                                                       |
+| 1.4     | 2026-07-05 | Rapidglobe Ltd | P6.1 (ADR-DATA-006, R13): `total_expenditure`, `reserves`, and new section 2.4a (governance facts: `trustees_related`, `bank_signatory_count`, `bank_signatories_related`) added to `charity_profiles` — migration `20260705000000`, dev only. Implementation note added clarifying which section-2 fields are actually built versus documented-but-unimplemented target state (a pre-existing gap, not introduced by this change).                                                |
 
-_Last updated: 2026-06-30_
+_Last updated: 2026-07-05_
 _Status: Updated — reflects Mark Two decisions BD-02, BD-04, BD-05; funder directory DR-FD-001_
