@@ -8,7 +8,7 @@ status: Decided
 
 ## Context
 
-Grant Pathway exposes API routes for AI generation (Step 3 AI Summary, Step 4 Draft Answers). These routes call the Anthropic API and incur direct cost per call. Without rate limiting, a single user or a bad actor could trigger unlimited AI calls, resulting in uncontrolled cost.
+Grant Pathway exposes API routes for AI generation (Step 3 AI Summary, Step 4 Draft Answers). These routes call Amazon Bedrock and incur direct cost per call. Without rate limiting, a single user or a bad actor could trigger unlimited AI calls, resulting in uncontrolled cost.
 
 A soft limit is already defined in the product: 50 AI requests per user per month (`ai_usage_log` table, PDR-AI-005). This is an application-level business rule. A separate technical rate limit may be needed to prevent abuse at the API layer.
 
@@ -16,9 +16,9 @@ A soft limit is already defined in the product: 50 AI requests per user per mont
 
 ### Option A — Application-level rate limiting only (via `ai_usage_log` check)
 
-- **What it is:** Before each AI API call, the server checks the `ai_usage_log` table for the current user's monthly count. If at 20, the request is rejected with a user-friendly message.
+- **What it is:** Before each AI API call, the server checks the `ai_usage_log` table for the current user's monthly count. If at 50, the request is rejected with a user-friendly message.
 - **Strengths:** Already required by product spec (PDR-AI-005). Zero additional infrastructure. Sufficient for the expected user volume at launch.
-- **Weaknesses:** Does not protect against rapid-fire requests within the limit (e.g., 20 requests in 60 seconds from a script). Does not protect non-AI routes.
+- **Weaknesses:** Does not protect against rapid-fire requests within the limit (e.g., 50 requests in 60 seconds from a script). Does not protect non-AI routes.
 
 ### Option B — Vercel Edge Middleware rate limiting (IP-based)
 
@@ -36,7 +36,7 @@ A soft limit is already defined in the product: 50 AI requests per user per mont
 
 - **What it is:** Rely on authentication (unauthenticated users cannot call AI routes) and the monthly usage cap.
 - **Strengths:** Zero additional infrastructure.
-- **Weaknesses:** A compromised or malicious authenticated user can still make 20 AI calls rapidly.
+- **Weaknesses:** A compromised or malicious authenticated user can still make 50 AI calls rapidly.
 
 ## Decision
 
@@ -57,7 +57,7 @@ This prevents rapid-fire automated requests within a user's monthly allowance wh
 
 - `@upstash/ratelimit` and `@upstash/redis` packages installed
 - `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` added to environment variables (ADR-SEC-006)
-- Rate limit check applied in each AI API route handler before the `ai_usage_log` check and Anthropic API call
+- Rate limit check applied in each AI API route handler before the `ai_usage_log` check and Bedrock API call
 - If the rate limit is exceeded, respond with HTTP 429 and the message: "Too many requests. Please wait a moment before trying again."
 - Rate limiting is implemented alongside the AI route build — not as a standalone task
 
@@ -78,6 +78,7 @@ PDR-AI-005, ADR-AI-008, NFR-04 (Security).
 
 ## Revision History
 
-| Date       | Change                                                                                                                                                                                                                      |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-06-17 | Monthly cap raised from 20 → 50 across all three AI routes (`generate-summary`, `generate-draft`, `refine-answer`) to align with product usage patterns. `generate-draft` was the last route still at 20; updated to match. |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-06-17 | Monthly cap raised from 20 → 50 across all three AI routes (`generate-summary`, `generate-draft`, `refine-answer`) to align with product usage patterns. `generate-draft` was the last route still at 20; updated to match.                                                                                                                                                                                  |
+| 2026-07-10 | Corrected stale "20"-based figures in Context and Options Considered (missed by the 2026-06-17 cap change, which only updated the Decision section) to 50, matching `ADR-AI-002`'s equivalent fix. Also corrected two stale "Anthropic API" references (Context, Implementation) to "Amazon Bedrock" / "Bedrock API", matching the delivery-mechanism change already reflected in `ADR-AI-001`/`ADR-AI-002`. |

@@ -47,10 +47,10 @@ _The export completion rate is the single most important product metric — it c
 
 ## 5. Operational — Is the service sustainable?
 
-| Metric                                        | Indicative target | Notes                                                                    |
-| --------------------------------------------- | ----------------- | ------------------------------------------------------------------------ |
-| Monthly AI API spend                          | Within £100/month | Primary cost constraint (C1); monitored via Amazon Bedrock / AWS console |
-| Average AI requests per active user per month | Fewer than 10     | Well within the 20-request per user monthly limit (PDR-AI-005)           |
+| Metric                                        | Indicative target | Notes                                                                                                                                                               |
+| --------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monthly AI API spend                          | Within £100/month | Primary cost constraint (C1); monitored via Amazon Bedrock / AWS console                                                                                            |
+| Average AI requests per active user per month | Fewer than 10     | Well within the 50-request per user monthly limit (PDR-AI-005) _(corrected 2026-07-10, was 20 -- the cap was raised 2026-06-17, see PDR-AI-005's Revision History)_ |
 
 ---
 
@@ -66,12 +66,12 @@ _If FR-08 is not implemented in v1, this metric is deferred to the first phase i
 
 ## Measurement Approach
 
-| Metric category          | How measured                                                             |
-| ------------------------ | ------------------------------------------------------------------------ |
-| Acquisition & activation | Supabase user records and profile/application creation timestamps        |
-| Completion & retention   | Application status records and login history in Supabase                 |
-| Operational              | Anthropic API dashboard spend; `ai_usage` table in Supabase (PDR-AI-005) |
-| User feedback            | Manual — notes from opt-in feedback interviews (FR-08)                   |
+| Metric category          | How measured                                                                                                                                                                                                                                                                                   |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Acquisition & activation | Supabase user records and profile/application creation timestamps                                                                                                                                                                                                                              |
+| Completion & retention   | Application status records and login history in Supabase                                                                                                                                                                                                                                       |
+| Operational              | Amazon Bedrock / AWS console spend; `ai_usage` table in Supabase (PDR-AI-005) _(corrected 2026-07-10, was "Anthropic API dashboard" -- stale since the 2026-05-07 Bedrock migration; inconsistent with this document's own Operational section above, which already said Bedrock/AWS console)_ |
+| User feedback            | Manual — notes from opt-in feedback interviews (FR-08)                                                                                                                                                                                                                                         |
 
 _No third-party analytics platform (e.g. Google Analytics) is included in v1 scope. All metrics are derived from existing Supabase data._
 
@@ -87,4 +87,4 @@ _No third-party analytics platform (e.g. Google Analytics) is included in v1 sco
 
 ---
 
-_Last updated: 2026-04-16_
+_Last updated: 2026-07-10_
