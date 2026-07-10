@@ -9,7 +9,7 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.6 Draft                                         |
+| **Version**        | 0.7 Draft                                         |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
@@ -25,7 +25,8 @@
 | 0.3     | 2026-07-10 | Rapidglobe Ltd | Full correction pass against `moscow-feature-register.md` (v1.10), screen requirements, data model, and the live implementation, following two months of drift since 0.2. Key corrections: launch date de-committed to match Section 1 (OBJ-01, Section 15); FR-02/12.4 password policy corrected to the actual 12-character, letters-and-digits, leaked-password-check policy (a live front-end/back-end inconsistency was found during this check -- see report); FR-07 (MFA) corrected to Won't Have throughout (demoted 2026-06-12); monthly AI limit corrected 20 → 50 (80% threshold 16 → 40) throughout; Section 6.6 rewritten for the charity-authored Q&A model (FR-28-31), replacing the abandoned auto-generation model; FR-45, FR-46, and FR-47 added as new Functional Requirements subsections (previously entirely missing); Section 6.7 extended to cover the per-question Step 4 approval flow alongside the existing Step 5 flow; FR-15 and Screen 7 Step 1 updated for the funder picker (DR-FD-001); Screen 7 Step 4 rewritten for the preparation checklist and per-question Q&A interface; Screen 7 Step 5 updated for the three-checkbox approval gate; Section 9.1 Entities table updated to include `funders`; Section 9.3/6.4 (FR-22) updated to reflect ADR-DATA-002's 2026-07-10 reversal, with a forward note pending Phase 6; Section 15 updated for AWS DPA, Terms of Service, and Privacy Policy status; Section 16 no longer hardcodes an FR count; Document Control and Appendix B document paths corrected from a stale `business/...` prefix to the actual `docs/...` locations, including two relocations. |
 | 0.4     | 2026-07-10 | Rapidglobe Ltd | Closed out the discrepancies 0.3 flagged but did not fix: Section 6.1's password front-end/back-end inconsistency is resolved (register/reset/account-settings forms now enforce 12 characters + letters and digits, matching the server-side policy; `actions/auth.ts` surfaces a specific `weak_password` state) -- Section 12.4 and Section 6.1 both updated accordingly. Section 10.2's `ai_usage_log.request_type` discrepancy resolved (`docs/data-model.md` now lists all five enum values including `refine_answer`); `buildDraftPrompt` confirmed genuinely dead code (zero callers), flagged as a separate follow-up cleanup rather than fixed here. Section 16's note on `acceptance-criteria.md` updated -- FR-45/46/47, the FR-29 priority fix, and the FR-31A numbering flag are now all in place there. Section 6.11 (FR-46) verification note upgraded from "could not be confirmed, appears likely not built" to "confirmed not built," now that `moscow-feature-register.md` and BRD v0.6 independently agree.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 0.5     | 2026-07-10 | Rapidglobe Ltd | Closed out the `buildDraftPrompt` follow-up flagged in 0.4: the dead function and its unused `ApplicationQuestion` type were removed from `lib/prompts.ts` along with the dedicated tests in `__tests__/prompts.test.ts`; confirmed zero remaining references, `tsc --noEmit`/lint/vitest all clean. Section 10.2 updated to record the removal.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 0.6     | 2026-07-10 | Rapidglobe Ltd | Section 3 review surfaced a real gap: the guideline source-reference/citation feature ("Option 2"), blended into Phase 6 on 2026-07-10, had no FR, PDR, or ADR of its own -- Section 3.1 had no scope-list entry for a capability that gates launch. Formalised with new `PDR-DH-004` (design decision) and `ADR-DATA-007` (architecture, consolidating forward-notes already scattered across `ADR-FILE-003`/`ADR-AI-007`/`ADR-SEC-004`/`ADR-OPS-006`); added FR-48 to `moscow-feature-register.md` and acceptance criteria to `acceptance-criteria.md` Section 9.11; added Section 6.13 and a new Section 3.1 row here; Section 3.3 MoSCoW counts updated (43 -> 44 Must Have, 47 -> 48 total). Also fixed in passing: Section 3.3's footnote about the register's summary table being stale no longer applied (already corrected in the register's own v1.11 pass) -- removed; `moscow-feature-register.md`'s own FR-22 row had never been updated for `ADR-DATA-002`'s reversal (fixed elsewhere in this PRD and in `acceptance-criteria.md`, but missed in the register itself) -- now corrected there too; Section 6.4's FR-22 status note still said "21-document corpus" -- corrected to 23 documents / 14 funders, matching `ADR-DATA-002`.                                                                                                                                                                                                                                                                                                                                                                                            |     |
+| 0.6     | 2026-07-10 | Rapidglobe Ltd | Section 3 review surfaced a real gap: the guideline source-reference/citation feature ("Option 2"), blended into Phase 6 on 2026-07-10, had no FR, PDR, or ADR of its own -- Section 3.1 had no scope-list entry for a capability that gates launch. Formalised with new `PDR-DH-004` (design decision) and `ADR-DATA-007` (architecture, consolidating forward-notes already scattered across `ADR-FILE-003`/`ADR-AI-007`/`ADR-SEC-004`/`ADR-OPS-006`); added FR-48 to `moscow-feature-register.md` and acceptance criteria to `acceptance-criteria.md` Section 9.11; added Section 6.13 and a new Section 3.1 row here; Section 3.3 MoSCoW counts updated (43 -> 44 Must Have, 47 -> 48 total). Also fixed in passing: Section 3.3's footnote about the register's summary table being stale no longer applied (already corrected in the register's own v1.11 pass) -- removed; `moscow-feature-register.md`'s own FR-22 row had never been updated for `ADR-DATA-002`'s reversal (fixed elsewhere in this PRD and in `acceptance-criteria.md`, but missed in the register itself) -- now corrected there too; Section 6.4's FR-22 status note still said "21-document corpus" -- corrected to 23 documents / 14 funders, matching `ADR-DATA-002`.                                                                                                                                                                                                                                                                                                                                                                                            |
+| 0.7     | 2026-07-10 | Rapidglobe Ltd | Section 5 review found it predated the 2026-06-09/2026-06-10 nav and legal-page changes and was never updated -- corrected against the live `components/nav-public.tsx`/`nav-authenticated.tsx` and `docs/information-architecture-and-navigation.md` v1.7. Fixes: `/terms` and `/privacy` were entirely missing from the route tables (5.2) despite being live pages -- added, plus an access-control row (5.3) and page-title rows (5.7); 5.1's auth-aware-routing principle didn't note the legal-page exception -- added; 5.4 described a "Sign in" nav link that was removed 2026-06-09, and an unconditional Register link that is actually hidden on `/register`, `/verify-email`, and the legal pages -- both corrected; 5.6's footer didn't note the legal links open in a new tab (added 2026-06-10) -- added. 5.5 (authenticated nav) checked out accurate against `nav-authenticated.tsx`, no change needed. Also fixed the trailing document-status line, still reading "Version 0.3 Draft" since that section was introduced.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### Related Documents
 
@@ -162,13 +163,13 @@ The product is designed for Margaret and David. A third persona (Priya -- a less
 
 ### 5.1 Design Principles
 
-| Principle                | Application                                                                                                            |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| Minimal navigation       | Three primary nav items plus an account dropdown. Non-technical users should never feel lost                           |
-| Auth-aware routing       | Every route is either public-only or authenticated-only                                                                |
-| Focused application flow | The five-step journey lives within a single route. Steps are not separate nav pages                                    |
-| Predictable redirects    | Authenticated users on public pages redirect to `/dashboard`. Unauthenticated users on protected pages redirect to `/` |
-| No dead ends             | Every error state and confirmation page provides a clear next action                                                   |
+| Principle                | Application                                                                                                                                          |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Minimal navigation       | Three primary nav items plus an account dropdown. Non-technical users should never feel lost                                                         |
+| Auth-aware routing       | Every route is either public-only or authenticated-only, with one exception: the legal pages (`/terms`, `/privacy`) are accessible in any auth state |
+| Focused application flow | The five-step journey lives within a single route. Steps are not separate nav pages                                                                  |
+| Predictable redirects    | Authenticated users on public pages redirect to `/dashboard`. Unauthenticated users on protected pages redirect to `/`                               |
+| No dead ends             | Every error state and confirmation page provides a clear next action                                                                                 |
 
 ### 5.2 Route Structure
 
@@ -192,24 +193,35 @@ The product is designed for Margaret and David. A third persona (Priya -- a less
 | `/account`           | Account Settings | Change password; access account deletion             |
 | `/account/delete`    | Delete Account   | Deletion confirmation screen                         |
 
+**Legal routes (accessible in any auth state) -- added 2026-06-10**
+
+| URL        | Page             | Purpose                                                                    |
+| ---------- | ---------------- | -------------------------------------------------------------------------- |
+| `/terms`   | Terms of Service | Full Terms of Service, statically rendered from `docs/terms-of-service.md` |
+| `/privacy` | Privacy Policy   | Full Privacy Policy, statically rendered from `docs/privacy-policy.md`     |
+
 ### 5.3 Access Control & Redirects
 
-| Scenario                                                        | Behaviour                             |
-| --------------------------------------------------------------- | ------------------------------------- |
-| Authenticated user visits a public route                        | Redirected to `/dashboard`            |
-| Unauthenticated user visits an authenticated route              | Redirected to `/`                     |
-| User visits `/applications/[id]` for another user's application | Redirected to `/dashboard`            |
-| Session expires while on a protected page                       | Redirected to `/` on next interaction |
+| Scenario                                                        | Behaviour                                         |
+| --------------------------------------------------------------- | ------------------------------------------------- |
+| Authenticated user visits a public route                        | Redirected to `/dashboard`                        |
+| Unauthenticated user visits an authenticated route              | Redirected to `/`                                 |
+| User visits `/applications/[id]` for another user's application | Redirected to `/dashboard`                        |
+| Session expires while on a protected page                       | Redirected to `/` on next interaction             |
+| Any user (signed in or not) visits `/terms` or `/privacy`       | Page is shown -- legal pages are never redirected |
 
 ### 5.4 Navigation Bar -- Unauthenticated
 
-Displayed on all public routes.
+**Corrected 2026-07-10 -- this section was stale, describing the nav bar as it existed before the 2026-06-09/2026-06-10 changes; corrected to match the live `components/nav-public.tsx` and `docs/information-architecture-and-navigation.md` v1.7.**
 
-| Element                   | Behaviour                        |
-| ------------------------- | -------------------------------- |
-| Grant Pathway logo (left) | No link -- stays on current page |
-| Sign in                   | Links to `/`                     |
-| Register                  | Links to `/register`             |
+Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-password`) and on the legal pages (`/terms`, `/privacy`).
+
+| Element                   | Behaviour                                                                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Grant Pathway logo (left) | Links to `/` -- gives pages reached directly (e.g. `/terms` from a search result) a route back; signed-in users redirected to `/dashboard` |
+| Register -- it's free     | Links to `/register`; hidden on `/register` (circular), `/verify-email` (user has just registered), and the legal pages (out of context)   |
+
+**No standalone "Sign in" nav link exists** -- it was removed 2026-06-09; every public-facing form already carries a contextual sign-in link.
 
 ### 5.5 Navigation Bar -- Authenticated
 
@@ -226,11 +238,12 @@ Displayed on all authenticated routes.
 
 Displayed on all routes.
 
-| Element   | Detail                                               |
-| --------- | ---------------------------------------------------- |
-| Tagline   | "Your free grant writing companion for UK charities" |
-| Links     | Privacy Policy \| Terms of Service                   |
-| Copyright | (c) RapidGlobe Ltd [current year]                    |
+| Element          | Detail                                                                                                                 |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Tagline          | "Your free grant writing companion for UK charities"                                                                   |
+| Privacy Policy   | Links to `/privacy` -- opens in a new tab so the user never loses a form or in-progress application (added 2026-06-10) |
+| Terms of Service | Links to `/terms` -- opens in a new tab, same reason (added 2026-06-10)                                                |
+| Copyright        | (c) RapidGlobe Ltd [current year]                                                                                      |
 
 ### 5.7 Page Titles
 
@@ -245,6 +258,8 @@ Displayed on all routes.
 | `/profile`                                  | Charity Profile -- Grant Pathway               |
 | `/account`                                  | Account Settings -- Grant Pathway              |
 | `/account/delete`                           | Delete Account -- Grant Pathway                |
+| `/terms`                                    | Terms of Service -- Grant Pathway              |
+| `/privacy`                                  | Privacy Policy -- Grant Pathway                |
 
 ---
 
@@ -1363,6 +1378,6 @@ Criteria are organised by the same functional sections used in this document. Sh
 
 ---
 
-_Document status: Version 0.3 Draft_
+_Document status: Version 0.7 Draft_
 _Compliance section (Section 15) -- AWS DPA confirmed 2026-06-22; Terms of Service and Privacy Policy are live, with effective dates and solicitor review still outstanding before P5.1 can close. See Section 15 for full detail._
 _Last updated: 2026-07-10_
