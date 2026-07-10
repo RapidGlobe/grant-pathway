@@ -1125,7 +1125,7 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 - **Given** the AI summary has been generated
 - **And** the guidelines contain identifiable application questions
 - **When** I view Step 3
-- **Then** I see a note in the format: _"We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."_
+- **Then** I see a note in the format: _"We found [n] application questions in these guidelines. You'll answer each one in the next step."_ (corrected 2026-07-10 -- matched `components/application-step3-summary.tsx`; previously referenced "generate your draft answers," a holdover from the abandoned auto-draft model)
 - **And** the extracted questions are listed within the summary
 
 ---
@@ -1245,7 +1245,7 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 
 - **Given** the AI service has been disabled via the `AI_ENABLED` kill-switch
 - **When** I arrive at Step 3 and summary generation is attempted
-- **Then** I see the message: _"The AI service is temporarily unavailable. Please try again later."_
+- **Then** I see the message: _"The AI service is busy right now. Please try again in a moment."_ -- the same generic `overloaded` message as real overload, not a dedicated "temporarily unavailable" message (corrected 2026-07-10, matched `lib/ai-error-handler.ts`)
 - **And** a "Try again" button is shown
 - **And** no AI request is logged against my monthly allowance
 - **And** the application remains at `in_progress` status — no data is lost
@@ -1256,7 +1256,7 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 
 - **Given** the AI service has been disabled via the `AI_ENABLED` kill-switch
 - **When** I click "Help me improve this" on a question card in Step 4
-- **Then** an inline error is shown on that card: _"The AI service is temporarily unavailable. Please try again later."_
+- **Then** an inline error is shown on that card: _"The AI service is busy right now. Please try again in a moment."_ -- same generic `overloaded` message, not dedicated (corrected 2026-07-10)
 - **And** no AI request is logged against my monthly allowance
 - **And** my existing answer is preserved
 
@@ -1313,9 +1313,9 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 - **When** I view the Q&A interface
 - **Then** I see named narrative sections (e.g., "About your organisation", "Project description")
 - **And** each section has a textarea for my own answer
-- **And** a note is displayed: _"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."_
+- **And** each section shows its AI-extracted guidance text (`q.guidance`) where present, rather than a fixed static note
 
-_Note (2026-07-10): this criterion previously read "the Step 3 summary identified **the funder** as a free-form narrative funder", implying a stable trait of the funder itself. Per `ADR-DATA-006` and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` (BD-08 note, confirmed 2026-07-04), the persistent funder-level "Structured"/"Narrative" badge (the `funders.funder_type` column, from `DR-FD-001`) was retired because it does not reflect a stable property of any funder. What actually drives this screen is a **per-application** classification derived dynamically from that application's own Step 3 AI summary (`applications.ai_summary.funder_type`) — corrected above accordingly. Separately, per `ADR-DATA-006` and moscow register FR-45: extraction is narrative-only in practice regardless of this classification — every extracted question defaults to `question_type = narrative`; the only other question-level distinction actually built is the `is_budget_question` flag (see FR-31, FR-45), not a broader structured/free-form question-type split._
+_Note (2026-07-10): this criterion previously claimed a fixed static note is displayed -- *"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."* This message does not exist anywhere in the codebase. The real per-section guidance is dynamic AI-extracted text (`q.guidance` in `components/application-step4-draft.tsx`), shown only when present and the section isn't a budget question -- there is no fixed narrative-document note. Separately, this criterion previously read "the Step 3 summary identified **the funder** as a free-form narrative funder", implying a stable trait of the funder itself. Per `ADR-DATA-006` and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` (BD-08 note, confirmed 2026-07-04), the persistent funder-level "Structured"/"Narrative" badge (the `funders.funder_type` column, from `DR-FD-001`) was retired because it does not reflect a stable property of any funder. What actually drives this screen is a **per-application** classification derived dynamically from that application's own Step 3 AI summary (`applications.ai_summary.funder_type`) — corrected above accordingly. Separately, per `ADR-DATA-006` and moscow register FR-45: extraction is narrative-only in practice regardless of this classification — every extracted question defaults to `question_type = narrative`; the only other question-level distinction actually built is the `is_budget_question` flag (see FR-31, FR-45), not a broader structured/free-form question-type split._
 
 ---
 
@@ -1323,7 +1323,7 @@ _Note (2026-07-10): this criterion previously read "the Step 3 summary identifie
 
 - **Given** I have used 40 or more of my 50 monthly AI requests
 - **When** I am on Step 4
-- **Then** I see the soft warning banner: _"You've used most of your monthly AI allowance."_
+- **Then** I see the soft warning banner: _"You've used most of your monthly AI allowance. 'Help me improve this' may not be available for all questions/sections."_ (corrected 2026-07-10 -- this AC previously quoted only the first sentence)
 
 ---
 
@@ -1332,7 +1332,7 @@ _Note (2026-07-10): this criterion previously read "the Step 3 summary identifie
 - **Given** I have used all 50 of my monthly AI requests
 - **When** I am on Step 4
 - **Then** all "Help me improve this" buttons are disabled
-- **And** I see the message: _"You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch."_
+- **And** I see the message: _"You've reached your monthly AI limit. You can still write and edit your answers — AI writing assistance is unavailable until next month."_ (corrected 2026-07-10 -- previously claimed a specific reset date and a "get in touch" prompt, neither of which exist in `components/application-step4-draft.tsx`)
 - **And** I can still write and save my own answers without restriction
 
 ---
