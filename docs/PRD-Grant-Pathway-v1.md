@@ -9,7 +9,7 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.14 Draft                                        |
+| **Version**        | 0.15 Draft                                        |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
@@ -34,6 +34,7 @@
 | 0.12    | 2026-07-10 | Rapidglobe Ltd | Section 6.5 review found a third Step 3 progress message ("Identifying key information...") missing from the staged-message list (`components/application-step3-summary.tsx`'s `LOADING_MESSAGES` has three stages, this doc and `screen-requirements.md`/`acceptance-criteria.md` (AC-FR-26-01) only listed two) -- added to all three. Also corrected "each application question explained in plain English" -- verified against the live summary schema and rendering: questions/sections are shown verbatim as extracted (with word limit where stated), not with an added plain-English explanation per question; that bullet overstated what's built. Separately flagged (not a doc fix): the AI extracts a `supportingDocuments` field on every summary call that is never rendered anywhere -- spun off as a product decision (display it, or stop extracting it).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 0.13    | 2026-07-10 | Rapidglobe Ltd | Section 6.6 review found four fabricated/stale message quotes, matched against `components/application-step4-draft.tsx` and `lib/ai-error-handler.ts`: the 80%/100% monthly-limit banners were misquoted (truncated and inventing a specific reset date + "get in touch" prompt that don't exist); the kill-switch's "temporarily unavailable" message doesn't exist -- it reuses the generic `overloaded` message, indistinguishable from real AI overload; the "we found N questions" note still referenced "generate your draft answers," a holdover from the abandoned auto-draft model; and the assembly description still claimed free-form funders get "a flowing narrative" distinct from structured funders' "Q&A list" -- both produce the same format, differing only by a number prefix (already corrected elsewhere in `acceptance-criteria.md`'s FR-31A section, missed here). Same four issues found and fixed in `screen-requirements.md` and `acceptance-criteria.md` (AC-FR-24-03, AC-FR-27-03/04, AC-FR-28-04/05/06) -- the kill-switch and monthly-limit message errors appeared in four and two places respectively across the two documents. Verified accurate: the preparation checklist's exact quoted copy (heading, message, all four checklist items, warning note, button text) and the per-question "Before you approve, check:" panel.                                                                                                                                                                                                                                                                            |
 | 0.14    | 2026-07-10 | Rapidglobe Ltd | Section 6.7 review: the three Step 5 confirmation checkboxes and the download-approves-in-one-action logic verified accurate against `components/application-step5-approve.tsx`. Found the re-opening prompt can actually be triggered from two places with slightly different wording (dashboard card vs. a re-open action on the Step 5 page itself, which omits "this application") -- this doc previously described only one. Corrected to note both. Noticed in passing while checking the download logic: a `txt` download format exists in code alongside `docx` -- to investigate in Section 6.8, since FR-38 (plain text export) is currently listed as "Should Have -- build if time permits."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 0.15    | 2026-07-10 | Rapidglobe Ltd | Section 6.8 review confirmed FR-38 (plain text export) is fully built and live (`app/api/export/[applicationId]/route.ts`'s `?format=txt`, a "Download as plain text (.txt)" button in `application-step5-approve.tsx`) -- the same pattern as FR-08: correctly Should Have priority, but the "build if time permits" / "these criteria apply only if implemented" hedges were stale. Corrected here, in `moscow-feature-register.md` (both its FR-38 row and Should Have build-conditions table), and in `acceptance-criteria.md`'s FR-38 intro. Also found and fixed the re-export warning message, which was misquoted in this doc, `screen-requirements.md`, and `acceptance-criteria.md` (AC-FR-37-05) -- the real dialog is titled "Download again?", has a no-date fallback case, and reads "if you intend to submit a revised version" rather than the more presumptive "to let them know a revised version is being submitted."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ### Related Documents
 
@@ -126,11 +127,11 @@ _48 functional requirements are defined in total (FR-01 to FR-48; no gaps in the
 
 FR-29 (word/character limits displayed per question) and FR-31 (budget-question flagging) were both promoted from Should Have to Must Have on 2026-05-28, once the charity-authored Q&A model made them integral to Step 4 rather than optional extras -- see Section 6.6. FR-45 to FR-47 were added later (2026-05-29 and 2026-06-02) and FR-48 later still (2026-07-10); all four are Must Have from introduction. The three remaining Should Have requirements and their build conditions:
 
-| Ref   | Requirement                     | Build condition                                           |
-| ----- | ------------------------------- | --------------------------------------------------------- |
-| FR-08 | Feedback opt-in at registration | Build if feedback interview programme confirmed at launch |
-| FR-38 | Plain text (.txt) export        | Build if time permits                                     |
-| FR-44 | Deletion confirmation email     | Build if transactional email confirmed in scope           |
+| Ref   | Requirement                     | Build condition                                                            |
+| ----- | ------------------------------- | -------------------------------------------------------------------------- |
+| FR-08 | Feedback opt-in at registration | Build if feedback interview programme confirmed at launch                  |
+| FR-38 | Plain text (.txt) export        | **Confirmed built** (2026-07-10) -- no longer conditional, see Section 6.8 |
+| FR-44 | Deletion confirmation email     | Build if transactional email confirmed in scope                            |
 
 **FR-07 (optional MFA) -- Won't Have, demoted 2026-06-12.** Originally Should Have. A risk analysis found the worst-case impact of a password compromise is limited to viewing draft applications and charity profile data (all publicly registered information) -- there is no payment data and no submission capability -- so the mandatory friction MFA would add for non-technical volunteer users was judged to outweigh the marginal security benefit. See `docs/moscow-feature-register.md` Section 9.1 for the full reasoning.
 
@@ -511,11 +512,13 @@ Review and approval happens at **two levels**: a per-question approval on each S
 
 ### 6.8 Export
 
-| Ref   | Requirement                                                                                  | Priority    |
-| ----- | -------------------------------------------------------------------------------------------- | ----------- |
-| FR-37 | The system shall allow users to export all approved content as a Microsoft Word (.docx) file | Must Have   |
-| FR-38 | The system shall allow users to export all approved content as a plain text (.txt) file      | Should Have |
-| FR-39 | The system shall prevent export where no content has been approved                           | Must Have   |
+| Ref   | Requirement                                                                                  | Priority                                            |
+| ----- | -------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| FR-37 | The system shall allow users to export all approved content as a Microsoft Word (.docx) file | Must Have                                           |
+| FR-38 | The system shall allow users to export all approved content as a plain text (.txt) file      | Should Have -- **confirmed built** (see note below) |
+| FR-39 | The system shall prevent export where no content has been approved                           | Must Have                                           |
+
+**FR-38 status corrected 2026-07-10:** confirmed built and live -- `app/api/export/[applicationId]/route.ts` supports `?format=txt`, and Step 5 (`components/application-step5-approve.tsx`) shows a "Download as plain text (.txt)" button alongside the Word download, gated on the same three checkboxes. This doc, `moscow-feature-register.md` (both its FR-38 row and Should Have build-conditions table), and `acceptance-criteria.md`'s FR-38 intro all previously described it as conditional/not-yet-decided ("build if time permits" / "these criteria apply only if implemented") -- corrected in all three. The .txt structure matches `PDR-DH-003`: title, funder, date, disclaimer, Q&A pairs (or the assembled draft) separated by a rule, footer attribution -- same content as the Word export, reduced to plain text.
 
 **Exported Word document structure (PDR-DH-003):**
 
@@ -528,9 +531,9 @@ Review and approval happens at **two levels**: a per-question approval on each S
 | Q&A body       | Each question as a heading, followed by its approved answer                                  |
 | Footer         | "Prepared using Grant Pathway v[version number] -- grantpathway.org.uk"                      |
 
-**Re-export warning (shown when downloading an already-exported application):**
+**Re-export warning (shown when downloading an already-exported application) -- corrected 2026-07-10, verified against `components/application-step5-approve.tsx`:**
 
-"You exported this application on [date]. If you have already submitted that version to the funder, please contact them to let them know a revised version is being submitted. Funders may treat multiple submissions as separate applications."
+Dialog title: "Download again?" Body: "You last exported this application on [date]." (or "You have already exported this application." if no export date is recorded) followed by "If you have already submitted that version to the funder, please contact them if you intend to submit a revised version -- funders may treat multiple submissions as separate applications." This previously misquoted the wording (e.g. "please contact them to let them know a revised version is being submitted" instead of the actual, more conditional "if you intend to submit a revised version") and omitted the no-date fallback case.
 
 Actions: Download anyway / Cancel
 
@@ -1402,6 +1405,6 @@ Criteria are organised by the same functional sections used in this document. Sh
 
 ---
 
-_Document status: Version 0.14 Draft_
+_Document status: Version 0.15 Draft_
 _Compliance section (Section 15) -- AWS DPA confirmed 2026-06-22; Terms of Service and Privacy Policy are live, with effective dates and solicitor review still outstanding before P5.1 can close. See Section 15 for full detail._
 _Last updated: 2026-07-10_

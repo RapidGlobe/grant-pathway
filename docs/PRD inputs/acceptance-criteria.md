@@ -1356,6 +1356,15 @@ _Note (2026-07-10): this criterion previously claimed a fixed static note is dis
 
 ---
 
+**AC-FR-28-09 — Preparation checklist shows funder-specific supporting documents** _(Added 2026-07-10)_
+
+- **Given** the Step 3 AI summary extracted one or more supporting document categories for this funder
+- **When** I arrive at the preparation checklist on first entry to Step 4
+- **Then** I see a second checklist headed "[Funder name] also asks you to submit:" listing those categories, alongside the standing financial-prep checklist
+- **And** if no supporting document categories were extracted, this second checklist is not shown
+
+---
+
 ### FR-29 — Must Have
 
 **Requirement:** Word limits extracted from the funder guidelines shall be displayed alongside each question, and answers shall display a word/character counter.
@@ -1791,7 +1800,7 @@ _Note: The "Regenerate all answers" action no longer exists. Users write their o
 
 - **Given** my application has status `exported`
 - **When** I click _"Download as Word document"_ again
-- **Then** I see the re-export warning: _"You exported this application on [date]. If you have already submitted that version to the funder, please contact them to let them know a revised version is being submitted. Funders may treat multiple submissions as separate applications."_
+- **Then** I see the re-export warning (titled "Download again?"): _"You last exported this application on [date]. If you have already submitted that version to the funder, please contact them if you intend to submit a revised version — funders may treat multiple submissions as separate applications."_ (corrected 2026-07-10 to match `application-step5-approve.tsx`)
 - **And** I am presented with _"Download anyway"_ and _"Cancel"_ actions
 - **And** the date shown in the warning is the date of the most recent previous export
 
@@ -1819,7 +1828,7 @@ _Note: The "Regenerate all answers" action no longer exists. Users write their o
 
 **Requirement:** The system shall allow users to export all approved application content as a plain text (.txt) file.
 
-_These criteria apply only if FR-38 is implemented in v1._
+**Confirmed built (2026-07-10)** -- live in `app/api/export/[applicationId]/route.ts` and `components/application-step5-approve.tsx`. The criteria below are not conditional; this note previously read "these criteria apply only if FR-38 is implemented in v1," which understated what's actually shipped.
 
 ---
 
@@ -2253,4 +2262,4 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 ---
 
 _Last updated: 2026-07-10_
-_Status: Complete — all 11 sections done. Changes in this version: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway-v1.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component)._
+_Status: Complete — all 11 sections done. Changes in this version: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway-v1.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component). New AC-FR-28-09 added: the previously-extracted-but-unused `summary_json.supportingDocuments` field is now surfaced on the Step 4 preparation checklist as a funder-specific document list alongside the standing financial-prep checklist (`PDR-UI-007`)._

@@ -115,11 +115,11 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 ## 9.8 Export
 
-| Ref   | Requirement (summary)                               | Priority        | Notes                                                                                                              |
-| ----- | --------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
-| FR-37 | Export approved content as a Word (.docx) file      | **Must Have**   | Document structure defined in PDR-DH-003: title, funder, date, AI disclaimer, Q&A body, footer with version number |
-| FR-38 | Export approved content as a plain text (.txt) file | **Should Have** | Not present in screen requirements for Step 5; deferred if time-constrained                                        |
-| FR-39 | Prevent export if no content has been approved      | **Must Have**   |                                                                                                                    |
+| Ref   | Requirement (summary)                               | Priority        | Notes                                                                                                                                                                                                                                                                                 |
+| ----- | --------------------------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-37 | Export approved content as a Word (.docx) file      | **Must Have**   | Document structure defined in PDR-DH-003: title, funder, date, AI disclaimer, Q&A body, footer with version number                                                                                                                                                                    |
+| FR-38 | Export approved content as a plain text (.txt) file | **Should Have** | **Confirmed built (2026-07-10):** live in `app/api/export/[applicationId]/route.ts` (`?format=txt`) and `components/application-step5-approve.tsx`; also documented in `screen-requirements.md` Step 5. The previous "not present in screen requirements... deferred" note was stale. |
+| FR-39 | Prevent export if no content has been approved      | **Must Have**   |                                                                                                                                                                                                                                                                                       |
 
 ---
 
@@ -143,7 +143,7 @@ The three remaining Should Have requirements and their build conditions are summ
 | ----- | ------------------------------- | ------------------------------------------------------------------------------------------------- |
 | FR-07 | Optional MFA                    | Removed 2026-06-12 — demoted to Won't Have (see FR-07 row above)                                  |
 | FR-08 | Feedback opt-in at registration | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-08 row above                    |
-| FR-38 | Plain text (.txt) export        | Build if time permits; low complexity addition to Step 5 export options                           |
+| FR-38 | Plain text (.txt) export        | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-38 row above                    |
 | FR-44 | Deletion confirmation email     | Build if transactional email service is confirmed as in scope; depends on FR-40–43 being complete |
 
 ---
