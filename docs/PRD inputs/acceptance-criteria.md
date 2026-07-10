@@ -24,6 +24,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 | 9.8 Export                                                   | FR-37 to FR-39 | ✅ Complete                                                                        |
 | 9.9 Account Deletion                                         | FR-40 to FR-44 | ✅ Complete                                                                        |
 | 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47 | ⚠️ Partial — FR-45 and FR-46 not confirmed built; FR-47 confirmed                  |
+| 9.11 Guideline Source-Reference (Citations)                  | FR-48          | ⚠️ Not built — Phase 6 target behaviour (`P6.2a`–`P6.5`), not yet started          |
 
 ---
 
@@ -1489,7 +1490,7 @@ _Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previ
 
 **Requirement:** Before the final assembly, the user shall see a senior review prompt recommending they confirm that a senior colleague has reviewed the budget answers.
 
-_Numbering note (2026-07-10): FR-31A is not present in the canonical FR-01 to FR-47 numbering used by `docs/moscow-feature-register.md` or `docs/PRD-Grant-Pathway-v1.md` — both flag this as a gap in those documents (see `docs/PRD-Grant-Pathway-v1.md`, note below the acceptance-criteria cross-reference), not something resolved here. It is kept as its own entry here, rather than folded into FR-30 or FR-31, because it is a real, built, separately-identified requirement: the screen exists in production (`components/application-step4-senior-review.tsx`, spec ref S6.7) and both that file and `actions/applications.ts` (`assembleAndAdvance()`) cite "AC-FR-31A" directly in code comments as the criteria the behaviour was built against. The four criteria below have been corrected to match what is actually implemented — the original three (AC-FR-31A-01 through -04) described a three-point checkbox-style prompt and a structured/free-form assembly split that do not match the shipped screen or the shipped `assembleAndAdvance()` logic. This is a judgement call: retiring the FR-31A label entirely was considered, but since it is already load-bearing in code comments, correcting its content in place was judged less disruptive than removing it and renumbering downstream FRs._
+_Numbering note (2026-07-10): FR-31A is not present in the canonical FR-01 to FR-48 numbering used by `docs/moscow-feature-register.md` or `docs/PRD-Grant-Pathway-v1.md` — both flag this as a gap in those documents (see `docs/PRD-Grant-Pathway-v1.md`, note below the acceptance-criteria cross-reference), not something resolved here. It is kept as its own entry here, rather than folded into FR-30 or FR-31, because it is a real, built, separately-identified requirement: the screen exists in production (`components/application-step4-senior-review.tsx`, spec ref S6.7) and both that file and `actions/applications.ts` (`assembleAndAdvance()`) cite "AC-FR-31A" directly in code comments as the criteria the behaviour was built against. The four criteria below have been corrected to match what is actually implemented — the original three (AC-FR-31A-01 through -04) described a three-point checkbox-style prompt and a structured/free-form assembly split that do not match the shipped screen or the shipped `assembleAndAdvance()` logic. This is a judgement call: retiring the FR-31A label entirely was considered, but since it is already load-bearing in code comments, correcting its content in place was judged less disruptive than removing it and renumbering downstream FRs._
 
 ---
 
@@ -2189,5 +2190,62 @@ _Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-regi
 
 ---
 
+---
+
+## 9.11 Guideline Source-Reference (Citations)
+
+_Added 2026-07-10. FR-48 was introduced the same day this section was added — `PDR-DH-004` and `ADR-DATA-007` formalise the "Option 2" design and architecture; `ADR-DATA-006` hosts the citation field in the item-graph schema. None of the build-plan tasks this feature depends on (`P6.2a`–`P6.5`) have started. Every criterion below describes target behaviour once built, not current behaviour — none of it should be treated as currently passing, and test plans should not report against it as a defect until Phase 6 lands._
+
+### FR-48 — Must Have
+
+**Requirement:** Each AI summary bullet, eligibility criterion, and extracted question shall carry a citation to a specific page (PDF) or heading/section (docx, pasted text) of the funder's guidelines. A "view original guidelines" panel shall let the user click a citation to jump to and highlight the cited page/section.
+
+**Not built — as of 2026-07-10, none of this exists in the codebase.** Confirmed: no citation/reference field appears in `application_answers` or anywhere in `lib/database.types.ts`; `lib/extract-text.ts` still calls `unpdf` with `mergePages: true` (flattening all pages into one string, the opposite of the page-preserving extraction this FR requires); no "view original guidelines" panel or PDF-viewer component exists in `components/` or `app/`. This FR depends on Phase 6 work not yet started (`P6.2a`–`P6.5`, per `IMPLEMENTATION-PLAN.md`) and is part of the Phase 6 → Go-Live Gate.
+
+---
+
+**AC-FR-48-01 — Summary bullets carry a page/section citation** _(target behaviour — not built)_
+
+- **Given** the AI has generated a guideline summary on Step 3
+- **When** I view a summary bullet
+- **Then** it is shown alongside a citation to the specific page (PDF) or heading/section (docx, pasted text) of the guidelines it was drawn from
+- **And** the citation references a chunk of guideline text that structurally exists — never a free-typed page number with no guarantee of correctness
+
+---
+
+**AC-FR-48-02 — Extracted questions carry a page/section citation** _(target behaviour — not built)_
+
+- **Given** the AI has extracted application questions from the funder guidelines
+- **When** I view a question on Step 4
+- **Then** it is shown alongside a citation to the specific page or section of the guidelines it was drawn from
+
+---
+
+**AC-FR-48-03 — "View original guidelines" panel jumps to and highlights the cited location** _(target behaviour — not built)_
+
+- **Given** I am viewing a summary bullet or question with a citation
+- **When** I click the citation
+- **Then** a "view original guidelines" panel opens, rendering the retained guideline text
+- **And** the panel scrolls to and highlights the specific cited page or section
+
+---
+
+**AC-FR-48-04 — A human curator has confirmed the citation before it reaches an application** _(target behaviour — not built)_
+
+- **Given** a funder has an approved playbook (`P6.5`)
+- **When** an application is built from that playbook
+- **Then** each item's citation was confirmed or corrected by a human curator once for that funder
+- **And** it is not a fresh, unverified AI guess generated separately for this specific application
+
+---
+
+**AC-FR-48-05 — No citation feature exists in the current build** _(reflects actual 2026-07-10 behaviour)_
+
+- **Given** I use Grant Pathway as it exists today, on Step 3 or Step 4
+- **When** I look for any citation, page/section reference, or "view original guidelines" panel
+- **Then** I do not find one anywhere — summary bullets and extracted questions carry no source reference of any kind
+
+---
+
 _Last updated: 2026-07-10_
-_Status: Complete — all 10 sections done. Changes in this version: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway-v1.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration._
+_Status: Complete — all 11 sections done. Changes in this version: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway-v1.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component)._

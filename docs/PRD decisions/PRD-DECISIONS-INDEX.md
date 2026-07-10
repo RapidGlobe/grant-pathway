@@ -10,7 +10,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 | Status         | Count |
 | -------------- | ----- |
-| ✅ Decided     | 17    |
+| ✅ Decided     | 18    |
 | 🔄 In Progress | 0     |
 | ⏳ Pending     | 0     |
 | ⏸ Deferred     | 0     |
@@ -54,11 +54,12 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ## Data & File Handling (DH)
 
-| ID                                                         | Question                                                                                         | Status     |
-| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ---------- |
-| [PDR-DH-001](PDR-DH-001-file-upload-limits-and-formats.md) | What is the maximum file size for uploaded funder guidelines and which formats will be accepted? | ✅ Decided |
-| [PDR-DH-002](PDR-DH-002-data-retention-policy.md)          | How long will data be retained for inactive accounts and will users be notified before deletion? | ✅ Decided |
-| [PDR-DH-003](PDR-DH-003-export-format-and-structure.md)    | What exactly does the exported document contain and how is it structured?                        | ✅ Decided |
+| ID                                                            | Question                                                                                                                              | Status     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [PDR-DH-001](PDR-DH-001-file-upload-limits-and-formats.md)    | What is the maximum file size for uploaded funder guidelines and which formats will be accepted?                                      | ✅ Decided |
+| [PDR-DH-002](PDR-DH-002-data-retention-policy.md)             | How long will data be retained for inactive accounts and will users be notified before deletion?                                      | ✅ Decided |
+| [PDR-DH-003](PDR-DH-003-export-format-and-structure.md)       | What exactly does the exported document contain and how is it structured?                                                             | ✅ Decided |
+| [PDR-DH-004](PDR-DH-004-guideline-source-reference-design.md) | Should the user be able to trace an AI summary bullet or extracted question back to the specific guideline page/section it came from? | ✅ Decided |
 
 ---
 

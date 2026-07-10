@@ -66,14 +66,15 @@ Security decisions that must be in place before any protected pages are built.
 
 Data model, retention, and migration decisions. Must be decided before the database is created.
 
-| ID           | Title                        | Status                                                                                           | File                                                                                         |
-| ------------ | ---------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| ADR-DATA-001 | Data Model                   | ✅ Decided                                                                                       | [ADR-DATA-001-data-model.md](ADR-DATA-001-data-model.md)                                     |
-| ADR-DATA-002 | Data That Is Not Stored      | ✅ Decided — reversed 2026-07-10, guidelines now retained; see file's "Revised Decision" section | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md)                           |
-| ADR-DATA-003 | Data Retention               | ✅ Decided                                                                                       | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md)                             |
-| ADR-DATA-004 | Database Migrations          | ✅ Decided                                                                                       | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md)                   |
-| ADR-DATA-005 | Database Backup Strategy     | ✅ Decided                                                                                       | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md)                           |
-| ADR-DATA-006 | Application Item-Graph Model | ✅ Decided                                                                                       | [ADR-DATA-006-application-item-graph-model.md](ADR-DATA-006-application-item-graph-model.md) |
+| ID           | Title                                           | Status                                                                                           | File                                                                                                         |
+| ------------ | ----------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| ADR-DATA-001 | Data Model                                      | ✅ Decided                                                                                       | [ADR-DATA-001-data-model.md](ADR-DATA-001-data-model.md)                                                     |
+| ADR-DATA-002 | Data That Is Not Stored                         | ✅ Decided — reversed 2026-07-10, guidelines now retained; see file's "Revised Decision" section | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md)                                           |
+| ADR-DATA-003 | Data Retention                                  | ✅ Decided                                                                                       | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md)                                             |
+| ADR-DATA-004 | Database Migrations                             | ✅ Decided                                                                                       | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md)                                   |
+| ADR-DATA-005 | Database Backup Strategy                        | ✅ Decided                                                                                       | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md)                                           |
+| ADR-DATA-006 | Application Item-Graph Model                    | ✅ Decided                                                                                       | [ADR-DATA-006-application-item-graph-model.md](ADR-DATA-006-application-item-graph-model.md)                 |
+| ADR-DATA-007 | Guideline Source-Reference (Citation) Mechanism | ✅ Decided — not yet built, Phase 6 (P6.2a-P6.5)                                                 | [ADR-DATA-007-guideline-source-reference-mechanism.md](ADR-DATA-007-guideline-source-reference-mechanism.md) |
 
 ---
 
@@ -144,12 +145,12 @@ Infrastructure, deployment, and operational decisions.
 | Stack          | 6      | 6       | 0       | 0        |
 | Architecture   | 5      | 5       | 0       | 0        |
 | Security       | 6      | 6       | 0       | 0        |
-| Data           | 6      | 6       | 0       | 0        |
+| Data           | 7      | 7       | 0       | 0        |
 | File Handling  | 4      | 4       | 0       | 0        |
 | AI Integration | 10     | 10      | 0       | 0        |
 | Export         | 2      | 2       | 0       | 0        |
 | Operations     | 8      | 8       | 0       | 0        |
-| **Total**      | **47** | **47**  | **0**   | **0**    |
+| **Total**      | **48** | **48**  | **0**   | **0**    |
 
 ---
 
@@ -168,6 +169,8 @@ Grant Pathway has no remaining architectural blockers to production deployment.
 ## All Decisions Complete
 
 All 46 original architectural decisions have been decided, and Grant Pathway moved into development on that basis. A 47th, ADR-DATA-006, was added on 2026-07-05 — this one is different in kind: it decides the architecture for a significant rearchitecture (the item-graph model, replacing `application_answers`) that has not been built yet. It does not change anything currently running in production — the flat model stays live until this is built. See `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` for its phased implementation sequence. **Revised the same day: this rearchitecture now gates go-live** — see the Phase 6 → Go-Live Gate in `docs/Implementation Plan/IMPLEMENTATION-PLAN.md`. Target launch is no longer 31 July 2026.
+
+A 48th, **ADR-DATA-007**, was added on 2026-07-10 — the guideline source-reference (citation) mechanism, formalising the "Option 2" design (`PDR-DH-004`) that was folded into Phase 6 the same day it was first discussed. Also not yet built; part of the same Phase 6 → Go-Live Gate as ADR-DATA-006, since it depends on that item-graph model and on `ADR-DATA-002`'s guideline-retention reversal.
 
 **Key implementation reminders before writing code:**
 
