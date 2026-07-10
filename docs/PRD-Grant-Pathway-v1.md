@@ -9,7 +9,7 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.11 Draft                                        |
+| **Version**        | 0.12 Draft                                        |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
@@ -31,6 +31,7 @@
 | 0.9     | 2026-07-10 | Rapidglobe Ltd | Section 6.2 review found the "Charity profile fields" table missing five fields live since P6.1 (2026-07-05, `ADR-DATA-006` R13, migration `20260705000000`): total annual expenditure, reserves, trustees related, bank signatory count, bank signatories related -- confirmed against `charity-profile-form.tsx` and `data-model.md`. Added a "Governance and reserves" fields table here, matching the same fix in `screen-requirements.md` Screen 6 (also missing, Tier 1). Noted the fields are dev-only pending prod re-sync at P5.4, per the accepted schema-drift decision. `moscow-feature-register.md`'s FR-12 entry checked -- defers to `data-model.md` for the field list, which is already current, no fix needed there.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | 0.10    | 2026-07-10 | Rapidglobe Ltd | Section 6.3 review: two small wording corrections against live code. The "funder isn't listed" link's quoted text didn't match the live wording in `application-step1-form.tsx` ("Can't find your funder? Request it to be added", a `mailto:` link) -- corrected. The auto-save note only mentioned the 60-second background save; `actions/applications.ts` confirms Step 4 answers are also saved via a 400ms-debounced save on typing pause -- added as the primary mechanism, with the 60-second save as a safety net. Verified accurate: the dashboard's "four status counts" (mismatch is a fifth status with its own pill but isn't in the summary strip count) and the absence of a deadline field.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 0.11    | 2026-07-10 | Rapidglobe Ltd | Section 6.4 review found all three file-error messages stale against the live `components/application-step2-form.tsx` -- the previous quotes matched `lib/file-validation.ts`'s simpler messages, not the richer copy the user actually sees (which suggests checking the funder's website and pasting key sections). Corrected all three, added the previously-undocumented generic "server" processing error, and matched the same fix into `screen-requirements.md` and `acceptance-criteria.md` (AC-FR-23-01/02/03). Deeper finding: traced the 200-page-cap and 30-second extraction-timeout cases through `lib/extract-text.ts` and the client's error mapping -- both fall through to the generic processing-error message, not the page-count/timeout-specific messages `screen-requirements.md` and `acceptance-criteria.md` (AC-FR-23-04/05) previously claimed. Corrected both documents; no test plans referenced the stale strings.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 0.12    | 2026-07-10 | Rapidglobe Ltd | Section 6.5 review found a third Step 3 progress message ("Identifying key information...") missing from the staged-message list (`components/application-step3-summary.tsx`'s `LOADING_MESSAGES` has three stages, this doc and `screen-requirements.md`/`acceptance-criteria.md` (AC-FR-26-01) only listed two) -- added to all three. Also corrected "each application question explained in plain English" -- verified against the live summary schema and rendering: questions/sections are shown verbatim as extracted (with word limit where stated), not with an added plain-English explanation per question; that bullet overstated what's built. Separately flagged (not a doc fix): the AI extracts a `supportingDocuments` field on every summary call that is never rendered anywhere -- spun off as a product decision (display it, or stop extracting it).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 
 ### Related Documents
 
@@ -408,19 +409,20 @@ All five fields are optional and grouped under a "Governance and reserves" secti
 | FR-26 | The system shall display a visible staged progress indicator while AI processing is underway                                 | Must Have |
 | FR-27 | In the event of an API error or timeout, the system shall display a plain-language error message and allow the user to retry | Must Have |
 
-**Summary content areas:**
+**Summary content areas (corrected 2026-07-10 against the live `summary_json` schema and `components/application-step3-summary.tsx`):**
 
 - What the grant is for
 - Grant amount (if stated)
 - Who can apply (eligible organisations)
 - What the funder is looking for (priorities and project types)
-- Key evidence expectations
-- Each application question explained in plain English
+- Key requirements/restrictions
+- Each application question or section, shown verbatim as extracted (word limit shown alongside where stated) -- **not** a separate plain-English explanation per question; this bullet previously overstated what's built
 
-**Progress indicator messages (Step 3):**
+**Progress indicator messages (Step 3) -- corrected 2026-07-10, a third stage was missing:**
 
 1. "Reading your funder guidelines..."
-2. "Almost there..."
+2. "Identifying key information..."
+3. "Almost there..."
 
 **API error message (Step 3):** "We couldn't generate your summary right now. This is usually temporary -- please try again." with a Try again button.
 
@@ -1396,6 +1398,6 @@ Criteria are organised by the same functional sections used in this document. Sh
 
 ---
 
-_Document status: Version 0.11 Draft_
+_Document status: Version 0.12 Draft_
 _Compliance section (Section 15) -- AWS DPA confirmed 2026-06-22; Terms of Service and Privacy Policy are live, with effective dates and solicitor review still outstanding before P5.1 can close. See Section 15 for full detail._
 _Last updated: 2026-07-10_

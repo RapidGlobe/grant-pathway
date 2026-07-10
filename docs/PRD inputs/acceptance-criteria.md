@@ -1193,6 +1193,7 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 - **Given** I have arrived at Step 3 and summary generation is underway
 - **When** I watch the screen during processing
 - **Then** I see the first staged message: _"Reading your funder guidelines…"_
+- **And** this transitions to _"Identifying key information…"_ partway through (added 2026-07-10 -- this AC previously omitted this middle stage, per `components/application-step3-summary.tsx`'s `LOADING_MESSAGES`)
 - **And** this transitions to _"Almost there…"_ as processing nears completion
 
 ---
