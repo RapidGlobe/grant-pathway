@@ -41,7 +41,7 @@ Grant Pathway's database schema (ADR-DATA-001) including tables, indexes, RLS po
 
 The Supabase CLI manages all schema changes. Migration files are SQL, committed to the `supabase/migrations/` directory, and version-controlled in Git from day one. Local development uses Docker Desktop (WSL2 backend on Windows) to run a full isolated Supabase stack — no remote project credentials required for day-to-day development.
 
-This approach is chosen with open source and future CIC contributor experience in mind. Any contributor can clone the repository and get a fully working local environment with three commands:
+This approach is chosen with a low-friction onboarding experience in mind for any future named contributor (e.g. a CIC co-maintainer or an escrow-activated successor, per `DR-BM-002`) — codebase visibility is not a prerequisite for this benefit, only repository access is. Anyone with access can clone the repository and get a fully working local environment with three commands:
 
 ```bash
 supabase start        # spins up local Supabase stack in Docker

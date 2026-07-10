@@ -4,8 +4,8 @@
 **Volatility:** Medium
 **Update when:** Any change to technology choices, libraries, services, or infrastructure
 
-**Version:** 1.4
-**Last updated:** 2026-07-01
+**Version:** 1.5
+**Last updated:** 2026-07-10
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
 
@@ -19,7 +19,7 @@ This document captures the agreed technology stack for the v1 build. These decis
 | Language  | TypeScript |
 
 **Rationale:**
-Next.js is a full-stack React framework — it handles both the user interface and server-side logic (API calls to Amazon Bedrock for Claude AI, Charity Commission lookups, database operations) within a single codebase. TypeScript is a typed superset of JavaScript that makes the codebase more self-documenting, directly supporting the open and documented codebase requirement (C18) and future handover to a successor organisation (DR-BM-002).
+Next.js is a full-stack React framework — it handles both the user interface and server-side logic (API calls to Amazon Bedrock for Claude AI, Charity Commission lookups, database operations) within a single codebase. TypeScript is a typed superset of JavaScript that makes the codebase more self-documenting, directly supporting the documented-codebase requirement (C18) and future handover to a successor organisation (DR-BM-002).
 
 **Key benefits for this project:**
 
@@ -166,17 +166,17 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 
 ### Registered and active
 
-| Item              | Status    | Notes                                                                        |
-| ----------------- | --------- | ---------------------------------------------------------------------------- |
-| Domain name       | ✅ Active | **grantpathway.org.uk** — registered; DNS to be pointed to Vercel pre-launch |
-| AWS cloud account | ✅ Active | Amazon Bedrock (Claude Sonnet 4.6, eu-west-2) configured                     |
-| GitHub account    | ✅ Active | Public repository at github.com/RapidGlobe/grant-pathway                     |
-| Supabase account  | ✅ Active | Two projects: grant-pathway-dev and grant-pathway-prod (London)              |
-| Vercel account    | ✅ Active | Pro plan; linked to GitHub; auto-deploys on push to master                   |
-| Resend account    | ✅ Active | Domain verified; transactional emails live                                   |
-| Sentry account    | ✅ Active | EU region; client and server error tracking live                             |
-| Upstash account   | ✅ Active | Redis instance; rate limiting live on all AI routes                          |
-| VS Code           | ✅ Active | Primary development environment                                              |
+| Item              | Status    | Notes                                                                                             |
+| ----------------- | --------- | ------------------------------------------------------------------------------------------------- |
+| Domain name       | ✅ Active | **grantpathway.org.uk** — registered; DNS to be pointed to Vercel pre-launch                      |
+| AWS cloud account | ✅ Active | Amazon Bedrock (Claude Sonnet 4.6, eu-west-2) configured                                          |
+| GitHub account    | ✅ Active | Private repository at github.com/RapidGlobe/grant-pathway (proprietary licence — `ADR-STACK-005`) |
+| Supabase account  | ✅ Active | Two projects: grant-pathway-dev and grant-pathway-prod (London)                                   |
+| Vercel account    | ✅ Active | Pro plan; linked to GitHub; auto-deploys on push to master                                        |
+| Resend account    | ✅ Active | Domain verified; transactional emails live                                                        |
+| Sentry account    | ✅ Active | EU region; client and server error tracking live                                                  |
+| Upstash account   | ✅ Active | Redis instance; rate limiting live on all AI routes                                               |
+| VS Code           | ✅ Active | Primary development environment                                                                   |
 
 ---
 
@@ -197,7 +197,7 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 | CI pipeline             | GitHub Actions                                             |
 | Test framework          | Vitest                                                     |
 | Charity register        | Charity Commission for England and Wales public API        |
-| Source control          | GitHub (public repository)                                 |
+| Source control          | GitHub (private repository, proprietary licence)           |
 | Development environment | VS Code                                                    |
 | Domain                  | grantpathway.org.uk                                        |
 
@@ -223,3 +223,4 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 | 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                                                                            |
 | 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2.                                                        |
 | 1.3     | 2026-06-29 | Rapidglobe Ltd | Added TS-05 (Resend), TS-06 (Sentry), TS-07 (Upstash Redis), TS-08 (GitHub Actions CI), TS-09 (Vitest). Retired "To Be Set Up" table — all accounts now active; replaced with current status table. Stack Summary updated with all new services. |
+| 1.5     | 2026-07-10 | Rapidglobe Ltd | TS-10 and Stack Summary corrected: GitHub repository is private under a proprietary licence, not public — `DR-BM-003` (open source) reversed 2026-07-10; `ADR-STACK-005` (private repo, proprietary licence) is the standing decision.           |

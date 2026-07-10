@@ -42,3 +42,7 @@ BRD Section 1 (Company — Rapidglobe Ltd).
 ## Date Decided
 
 2026-04-17
+
+## Reaffirmed 2026-07-10
+
+This decision was actively revisited, not silently left unexamined, after it came to light that `DR-BM-003` (2026-04-09, decided eight days before this ADR) had recorded the opposite conclusion — fully open source under the MIT Licence — with no note reconciling the two records. On review, this ADR's decision (private repository, proprietary licence) was confirmed as correct going forward; no content change was needed here. `DR-BM-003` has been updated to record the reversal on its own page, and `DR-BM-002` (succession plan) has had its continuity mechanism swapped from public hosting to escrow with a named sector body accordingly. See `DR-BM-003` and `DR-BM-002` for the full reasoning.

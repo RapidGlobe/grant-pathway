@@ -2,9 +2,25 @@
 id: DR-BM-003
 category: Build & Maintenance
 status: Decided
+superseded_by: ADR-STACK-005
 ---
 
 # DR-BM-003 — Open Source vs. Closed Source
+
+> ## Reversed 2026-07-10 — Closed Source Confirmed
+>
+> This decision is superseded. **Closed source is the standing decision** — formalised eight days after the record below, in [`ADR-STACK-005 — Source Control and Licence`](../Technical%20Decision%20and%20Design/ADR-STACK-005-source-control-and-licence.md) (2026-04-17: private GitHub repository, proprietary licence, all rights reserved), and actively reconsidered and reaffirmed on 2026-07-10. The live repository is private with no licence file, matching `ADR-STACK-005`, not this record.
+>
+> The Decision, Options, and Rationale below are preserved unchanged as the historical record of what was decided on 2026-04-09 — they no longer reflect the current position and must not be relied on as current.
+>
+> **Why the reversal stands (2026-07-10):**
+>
+> 1. **The "no commercial value to protect" premise in the Rationale below does not hold.** The AI prompt engineering (`lib/prompts.ts`) and the item-graph/playbook curation design (Phase 6, `ADR-DATA-006`) are genuinely differentiated, hard-won product work worth protecting — not a thin wrapper with nothing underneath.
+> 2. **Open source and closed source are not symmetrically reversible.** Closed → open is a trivial decision to make later, at no cost. Open → closed is not: once code is public it can be cloned, forked, or mirrored, and can never be fully retracted. The reversible option is the sound default absent a specific reason to open up.
+> 3. **Free-to-charities (C5) and closed source are not in tension.** C5 governs what charities pay to use the app; this decision governs who can see the source code. The two are independent — closing the source does not touch the free-to-use commitment.
+> 4. **The succession plan's actual goal does not require public code.** The goal is continuity if the maintainer can no longer continue — not public code specifically. `DR-BM-002` already listed Option C (escrow with a sector body) and Option B (named co-maintainer with standing access) as alternatives that achieve the same continuity without giving up IP protection. `DR-BM-002` has been updated (2026-07-10) to adopt escrow as the succession mechanism in place of public hosting — the goal is unchanged, only the mechanism moved.
+>
+> This reversal does not touch `DR-OD-001` (CIC transition) or `DR-OD-002`/`DR-OD-003` (donation ethos, free access to the app) — those stand as decided. Only the source-visibility mechanism changes.
 
 ## Question
 

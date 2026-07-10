@@ -4,7 +4,7 @@
 
 Grant Pathway helps non-specialist staff at UK charitable organisations write stronger, more consistent grant applications. It summarises funder guidelines in plain English, extracts the questions a funder wants answered, and provides AI-assisted writing support — while keeping the charity's own voice at the centre. The charity writes every answer; AI refines on request only. Every answer requires explicit human approval before export.
 
-Provided free of charge by **RapidGlobe Ltd** (company no. 05615649). Source code is open source under the MIT Licence.
+Provided free of charge by **RapidGlobe Ltd** (company no. 05615649). Source code is proprietary and closed source — all rights reserved.
 
 **Live app:** https://grant-pathway-three.vercel.app
 
@@ -116,5 +116,5 @@ Pushing to `master` triggers a GitHub Actions CI run (type-check, lint, format:c
 
 ## Licence
 
-Source code: [MIT Licence](https://opensource.org/licenses/MIT).
-Grant Pathway name, logo, and brand materials: © RapidGlobe Ltd — not covered by the MIT Licence.
+Source code: proprietary — © RapidGlobe Ltd, all rights reserved. This is a closed-source, private repository; no open-source licence applies to Grant Pathway's own code (third-party dependencies retain their own licences). See `ADR-STACK-005` and `DR-BM-003` (reversed 2026-07-10).
+Grant Pathway name, logo, and brand materials: © RapidGlobe Ltd.

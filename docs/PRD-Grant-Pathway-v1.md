@@ -1035,15 +1035,15 @@ Architecture should scale from launch to 12-18 month target without a major rebu
 
 ### 12.4 Security
 
-| Control               | Requirement                                                          |
-| --------------------- | -------------------------------------------------------------------- |
-| Encryption in transit | TLS 1.2 or higher; HTTPS enforced across all pages and API calls     |
-| Encryption at rest    | Database-level encryption enabled on all data stores                 |
-| Passwords             | Minimum 10 characters; no mandatory complexity rules (NCSC guidance) |
-| MFA                   | Available as opt-in (FR-07, Should Have); not mandatory              |
-| Session timeout       | Automatic logout after 60 minutes of inactivity                      |
-| Security baseline     | OWASP Top 10                                                         |
-| Secrets management    | No credentials or API keys committed to the public repository        |
+| Control               | Requirement                                                                           |
+| --------------------- | ------------------------------------------------------------------------------------- |
+| Encryption in transit | TLS 1.2 or higher; HTTPS enforced across all pages and API calls                      |
+| Encryption at rest    | Database-level encryption enabled on all data stores                                  |
+| Passwords             | Minimum 10 characters; no mandatory complexity rules (NCSC guidance)                  |
+| MFA                   | Available as opt-in (FR-07, Should Have); not mandatory                               |
+| Session timeout       | Automatic logout after 60 minutes of inactivity                                       |
+| Security baseline     | OWASP Top 10                                                                          |
+| Secrets management    | No credentials or API keys committed to the repository (private, proprietary licence) |
 
 ### 12.5 Browser & Device Support
 

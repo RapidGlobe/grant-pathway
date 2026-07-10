@@ -76,7 +76,7 @@ The main risk before the first marketing push is unmeasured AI route latency und
 | Multi-factor authentication (MFA) | Not offered. Removed 2026-06-12 (FR-07 demoted to Won't Have). Risk analysis confirmed worst-case password compromise is low severity — no payment data, no submission capability, charity profile data is publicly registered. |
 | Session timeout                   | Automatic logout after 60 minutes of inactivity                                                                                                                                                                                 |
 | Security baseline                 | OWASP Top 10 used as the standard checklist for web application security                                                                                                                                                        |
-| Secrets management                | No credentials, API keys, or secrets committed to the public repository (aligned with C17 — MIT open source licence)                                                                                                            |
+| Secrets management                | No credentials, API keys, or secrets committed to the repository, public or private (aligned with C17 — proprietary, closed-source licence)                                                                                     |
 
 **Notes:** MFA removed 2026-06-12. The OWASP Top 10 provides a practical, well-recognised baseline for a solo developer.
 

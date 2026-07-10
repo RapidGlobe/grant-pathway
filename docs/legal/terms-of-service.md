@@ -1,8 +1,10 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.2
+**Version:** 1.3
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 2 July 2026**
+**Last updated: 10 July 2026**
+
+> **Change from v1.2 (2 July 2026):** Section 8 (Intellectual Property) corrected — Grant Pathway's source code is closed and proprietary, not open source. This was a stale claim carried over from `DR-BM-003`'s original 2026-04-09 position, which was reversed on 2026-07-10 (see `DR-BM-003`, `ADR-STACK-005`); the live GitHub repository has in fact been private with no open-source licence throughout.
 
 > **Change from v1.1 (26 May 2026):** Section 5 corrected to describe the actual AI model — the charity writes every answer; AI refines and improves on request only, and does not generate answers from scratch. This corrects a stale claim left over from an earlier product model abandoned on 2026-05-28.
 
@@ -107,7 +109,7 @@ For full details of how we handle your data, please read our **Privacy Policy**.
 
 ## 8. Intellectual Property
 
-Grant Pathway's source code is open source and is publicly available. It may be used, modified, and distributed in accordance with the terms of its open-source licence.
+Grant Pathway's source code is proprietary and closed source. All rights are reserved by RapidGlobe Ltd; the source code is not publicly available and may not be used, copied, modified, or distributed without our prior written permission.
 
 The Grant Pathway name, logo, and brand materials are owned by RapidGlobe Ltd. You may not use them without our prior written permission.
 

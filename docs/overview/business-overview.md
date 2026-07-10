@@ -111,7 +111,7 @@ The Privacy Policy and Terms of Service set all of this out clearly, in plain En
 
 Grant Pathway is being built by a single developer based in the UK, motivated by a straightforward belief: that the quality of a charity's grant application should not depend on the size of its fundraising budget.
 
-The intention is to donate the tool to the charity sector through a Community Interest Company — a legal structure that permanently locks the asset for public benefit and prevents it from ever being sold for private gain. The code is open source, which means that even in a worst-case scenario, the tool can be picked up, maintained, and improved by others.
+The intention is to donate the tool to the charity sector through a Community Interest Company — a legal structure that permanently locks the asset for public benefit and prevents it from ever being sold for private gain. The source code is closed and proprietary, protecting the product's AI prompt engineering and design work; continuity is instead assured through a named successor arrangement, so that even in a worst-case scenario the tool can be picked up, maintained, and improved by others _(reversed 2026-07-10 — see `DR-BM-003`, `DR-BM-002`)_.
 
 ---
 

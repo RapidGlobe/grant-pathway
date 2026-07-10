@@ -33,3 +33,7 @@ Solo development is pragmatic and realistic for a focused v1 with the scope defi
 ## Date Decided
 
 2026-04-09
+
+## Note (2026-07-10)
+
+The intention noted above to transition toward Option E ("hybrid... open-sourcing the codebase") and the open-sourcing reference in the Rationale both depended on `DR-BM-003`'s original open-source decision. `DR-BM-003` was reversed on 2026-07-10 — closed source, proprietary licence is now the standing decision (`ADR-STACK-005`). This record's core decision (solo developer for v1) is unaffected, but the future-state references to open-sourcing the codebase above no longer reflect the current position; single-point-of-failure risk is now mitigated by the succession plan's escrow mechanism (`DR-BM-002`, updated 2026-07-10) rather than by opening the codebase.
