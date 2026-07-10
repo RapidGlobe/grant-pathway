@@ -116,7 +116,7 @@ The data model comprises six tables:
 
 ## Source
 
-FR-06 to FR-22, PDR-AI-005, BRD Section 9.
+FR-06 to FR-22, PDR-AI-005, PRD-Grant-Pathway-v1.md (Section 9 — Data Requirements).
 
 ## Date Decided
 

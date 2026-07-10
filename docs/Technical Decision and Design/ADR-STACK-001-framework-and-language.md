@@ -38,7 +38,7 @@ Next.js with TypeScript is the application framework. TypeScript is used through
 
 ## Source
 
-BRD Section 7 (Technology Stack), Product Decision PDR-STACK-001.
+technology-stack.md (TS-01 — Programming Language & Framework), Product Decision PDR-STACK-001.
 
 ## Date Decided
 

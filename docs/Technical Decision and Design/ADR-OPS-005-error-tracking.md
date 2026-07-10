@@ -97,7 +97,7 @@ This allows filtering in the Sentry dashboard to distinguish "Anthropic had a bl
 
 ## Source
 
-BRD Section 9 (Data Privacy & Security), NFR (operational requirements).
+NFR-04 (Security), NFR (operational requirements).
 
 ## Date Decided
 

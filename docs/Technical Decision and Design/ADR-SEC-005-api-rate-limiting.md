@@ -70,7 +70,7 @@ This prevents rapid-fire automated requests within a user's monthly allowance wh
 
 ## Source
 
-PDR-AI-005, ADR-AI-008, BRD Section 9 (Data Privacy & Security).
+PDR-AI-005, ADR-AI-008, NFR-04 (Security).
 
 ## Date Decided
 

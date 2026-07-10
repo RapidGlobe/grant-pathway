@@ -8,7 +8,7 @@ status: Decided
 
 ## Context
 
-Grant Pathway stores user profiles, charity profiles, applications, answers, and AI usage logs. A data retention policy is required for GDPR compliance (BRD Section 9). The policy must define how long data is held, when it is deleted, and what happens when a user deletes their account.
+Grant Pathway stores user profiles, charity profiles, applications, answers, and AI usage logs. A data retention policy is required for GDPR compliance (PRD-Grant-Pathway-v1.md Section 9.4 — Data Retention). The policy must define how long data is held, when it is deleted, and what happens when a user deletes their account.
 
 ## Options Considered
 
@@ -41,7 +41,7 @@ The `ai_usage_log` monthly request counter is reset at the start of each calenda
 
 ## Source
 
-BRD Section 9 (Data Privacy & Security), FR-29 to FR-32 (Account management), PDR-AI-005.
+PRD-Grant-Pathway-v1.md (Section 9.4 — Data Retention), FR-29 to FR-32 (Account management), PDR-AI-005.
 
 ## Date Decided
 

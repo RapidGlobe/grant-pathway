@@ -27,7 +27,7 @@ Supabase is the database and backend service. All data is stored in the EU-West-
 
 - PostgreSQL is a proven, standards-compliant database with strong JSON support for flexible AI output storage.
 - Supabase bundles Auth, RLS, Storage, and a generated REST/realtime API, reducing the number of third-party services to manage.
-- London region satisfies UK GDPR data residency requirements (BRD Section 9).
+- London region satisfies UK GDPR data residency requirements (C13 — UK-region data hosting).
 - RLS policies enforce tenant data isolation at the database level, reducing application-layer security risk.
 - Free tier covers the development and early launch phases; paid tier scales predictably.
 
@@ -40,7 +40,7 @@ Supabase is the database and backend service. All data is stored in the EU-West-
 
 ## Source
 
-BRD Section 7 (Technology Stack), BRD Section 9 (Data Privacy), Product Decision PDR-STACK-001.
+technology-stack.md (TS-02 — Database), C13 (UK-region data hosting), Product Decision PDR-STACK-001.
 
 ## Date Decided
 

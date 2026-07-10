@@ -40,7 +40,7 @@ Vercel is the hosting platform. The Pro plan is required to configure `maxDurati
 
 ## Source
 
-BRD Section 7 (Technology Stack), NFR-01 (AI response time targets), C1 (Operating cost budget).
+technology-stack.md (TS-04 — Hosting Platform), NFR-01 (AI response time targets), C1 (Operating cost budget).
 
 ## Date Decided
 

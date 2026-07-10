@@ -47,7 +47,7 @@ Secrets are stored in Vercel's environment variable store, scoped per environmen
 
 ## Source
 
-BRD Section 7 (Technology Stack), BRD Section 9 (Data Privacy & Security).
+technology-stack.md (TS-04 — Hosting Platform), NFR-04 (Security).
 
 ## Date Decided
 

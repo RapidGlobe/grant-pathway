@@ -39,7 +39,7 @@ Supabase Auth default session duration is used as the base. Activity tracking (m
 
 ## Source
 
-BRD Section 9 (Data Privacy & Security), DDR-INT-002 (Auto-save).
+NFR-04 (Security), DDR-INT-002 (Auto-save).
 
 ## Date Decided
 

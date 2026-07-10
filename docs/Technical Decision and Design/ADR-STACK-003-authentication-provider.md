@@ -39,7 +39,7 @@ Supabase Auth handles all authentication: registration, login, email verificatio
 
 ## Source
 
-BRD Section 7 (Technology Stack), FR-01 to FR-05 (Registration and Login).
+technology-stack.md (TS-03 — Authentication Provider), FR-01 to FR-05 (Registration and Login).
 
 ## Date Decided
 
