@@ -9,7 +9,7 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.4 Draft                                         |
+| **Version**        | 0.5 Draft                                         |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
@@ -62,9 +62,9 @@ The document synthesises requirements from the Business Requirements Document, 1
 
 ### 2.1 Vision Statement
 
-> To be the trusted, free writing companion for UK charities -- helping non-specialists produce stronger, more consistent grant applications through charity-authored writing with on-request AI assistance, guideline summarisation, and mandatory human review.
+> To be the trusted, free preparation tool for UK charities -- helping non-specialists produce stronger, more consistent grant applications through AI-assisted writing, plain-English guideline summarisation, and mandatory human review.
 >
-> _Wording updated 2026-07-10 to match the current product model (Section 6.6): "AI-powered drafting" read as AI generating content, which was abandoned 2026-05-28. The canonical `docs/vision-statement.md` (Tier 3) has not been checked or updated as part of this pass -- only this PRD's citation of it._
+> _Corrected 2026-07-10: this PRD's own quote had drifted from the canonical `docs/vision-statement.md` -- an earlier pass here paraphrased it as "writing companion... charity-authored writing with on-request AI assistance" instead of quoting the source verbatim. `docs/vision-statement.md` (Tier 3) already carries the correct, current wording (revised 2026-05-29, replacing "AI-powered drafting" with "AI-assisted writing" for the same reason -- AI generating content was abandoned). Restored to an exact quote of the canonical text; no change made to `docs/vision-statement.md` itself._
 
 ### 2.2 Objectives for v1
 
@@ -1039,7 +1039,9 @@ All AI prompts are centralised in a single file: `lib/prompts.ts`. Prompts are v
 | `refine_answer`      | Step 4        | The charity's own written answer text + the question + its word/character limit (if any) -- **not** funder summary or charity profile; the assist may only restructure/clarify what the charity already wrote, not draw on new context |
 | `charity_paraphrase` | Profile setup | Charity Commission lookup result text, paraphrased for the profile fields (authenticated and metered since 2026-06-22)                                                                                                                 |
 
-**Discrepancy resolved 2026-07-10:** `docs/data-model.md`'s documented `ai_usage_log.request_type` enum previously omitted `refine_answer` (the value the live `refine-answer` route actually writes, confirmed in `app/api/refine-answer/route.ts`) — corrected there to list all five DB enum values, with a note on which are live vs. dead. Separately, `lib/prompts.ts` still exports a `buildDraftPrompt` function alongside `buildSummaryPrompt` and `buildRefinePrompt`; confirmed to have zero callers anywhere in the codebase now that `/api/generate-draft` (its presumed caller) was deleted 2026-07-01 — this is genuinely dead code, flagged separately as a follow-up cleanup item, not resolved as part of this documentation pass.
+**Discrepancy resolved 2026-07-10:** `docs/data-model.md`'s documented `ai_usage_log.request_type` enum previously omitted `refine_answer` (the value the live `refine-answer` route actually writes, confirmed in `app/api/refine-answer/route.ts`) — corrected there to list all five DB enum values, with a note on which are live vs. dead.
+
+**Dead code removed 2026-07-10:** the follow-up flagged in 0.4 is now closed. `lib/prompts.ts` no longer exports `buildDraftPrompt` (or the `ApplicationQuestion` type used only by it) — removed along with its dedicated tests in `__tests__/prompts.test.ts`; confirmed zero remaining references, `tsc --noEmit`/lint/test suite all clean. `lib/prompts.ts` now exports exactly the two prompt builders actually used by live routes: `buildSummaryPrompt` and `buildRefinePrompt`.
 
 ### 10.3 Processing Mode
 
