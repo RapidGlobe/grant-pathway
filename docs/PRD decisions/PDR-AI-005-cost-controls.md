@@ -32,12 +32,12 @@ A dedicated `ai_usage` table in Supabase will record each AI request with the fo
 Before each AI request, the application will:
 
 1. Query `ai_usage` for the user's request count in the current calendar month
-2. If count is at or above 80% of the limit (e.g. 16 of 20), display a soft advisory banner: _"You've used most of your monthly AI allowance."_
+2. If count is at or above 80% of the limit (e.g. 40 of 50), display a soft advisory banner: _"You've used most of your monthly AI allowance."_
 3. If count has reached the limit, disable AI action buttons and display: _"You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch."_
 
 ### Monthly limit
 
-**20 AI requests per user per month** for v1. This is well above the realistic usage of any single user (David's persona writes 8–12 applications per year, each requiring 2 AI calls — approximately 2 requests per month). The limit will be reviewed post-launch based on actual usage data.
+**50 AI requests per user per month** for v1. This is well above the realistic usage of any single user (David's persona writes 8–12 applications per year; each application involves 1 guideline summary generation plus zero or more optional per-question "refine my answer" calls — a variable count, not a fixed number of calls per application). The limit will be reviewed post-launch based on actual usage data.
 
 ### Backstop
 
@@ -50,3 +50,9 @@ At launch scale (~10 concurrent users), AI costs are estimated at £5–£10/mon
 ## Date Decided
 
 2026-04-16
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-07-10 | Corrected stale "20 requests/month" figure to 50 in "Monthly limit", and the "16 of 20" approaching-limit example in the Implementation section to "40 of 50", to match the monthly cap raised from 20 → 50 across all three AI routes on 2026-06-17 (see `ADR-SEC-005`'s Revision History) — this PDR, the source decision those ADRs derive from, had never itself been updated to reflect that change. Also corrected the "Monthly limit" usage-derivation sentence: the original "each requiring 2 AI calls" assumed the abandoned auto-generated-draft model, superseded 2026-05-28 by the charity-authored Q&A model (see `ADR-AI-003`/`ADR-AI-004`'s 2026-07-10 revision notes). Actual usage per application is 1 guideline summary (Step 3) plus zero or more optional per-question refine-answer calls (Step 4) — a variable count, not a fixed 2. |
