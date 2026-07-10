@@ -1035,7 +1035,7 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 - **Given** I am on Step 2 of the application flow
 - **When** I attempt to upload a file in an unsupported format (e.g. .xlsx, .pptx, .jpg, .txt)
 - **Then** the file is rejected
-- **And** I see the error: _"We can only accept PDF or Word (.docx) files. Please convert your document or paste the text directly."_
+- **And** I see the error: _"We can only accept PDF or Word (.docx) files. Check the funder's website for a version in one of these formats. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."_ (corrected 2026-07-10 to match live wording in `components/application-step2-form.tsx`)
 - **And** I am not advanced to Step 3
 
 ---
@@ -1045,7 +1045,7 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 - **Given** I am on Step 2 of the application flow
 - **When** I attempt to upload a file larger than 10MB
 - **Then** the file is rejected
-- **And** I see the error: _"Your file is over 10MB. Please upload a smaller file or paste the text directly."_
+- **And** I see the error: _"Your file is over 10MB. Some funders publish a shorter summary version of their guidelines — check their website first. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."_ (corrected 2026-07-10)
 - **And** I am not advanced to Step 3
 
 ---
@@ -1055,27 +1055,31 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 - **Given** I am on Step 2 of the application flow
 - **When** I upload a PDF that contains only scanned images with no extractable text
 - **Then** the file is rejected
-- **And** I see the error: _"We couldn't read the text in your PDF — it may be a scanned document. Please try copying and pasting the text directly instead."_
+- **And** I see the error: _"We couldn't read the text in your PDF — it looks like a scanned document rather than a digital one. Some funders also publish a Word version of their guidelines — check their website. If not, you can paste the key sections — such as eligibility criteria and application questions — into the text box below."_ (corrected 2026-07-10)
 - **And** I am not advanced to Step 3
 
 ---
 
 **AC-FR-23-04 — PDF exceeding 200 pages rejected** _(Added 2026-06-22)_
 
+**Corrected 2026-07-10:** the specific message this AC previously quoted is never shown. Traced through the code (`lib/extract-text.ts` returns the generic `extraction_failed` reason for a >200-page PDF; `components/application-step2-form.tsx`'s error mapping has no case for `extraction_failed`, so it falls through to the generic `server` message, same as any other processing failure). Corrected below to match actual behaviour.
+
 - **Given** I am on Step 2 of the application flow
 - **When** I upload a PDF with more than 200 pages
 - **Then** the file is rejected
-- **And** I see the error: _"This PDF is too large to process (over 200 pages). Please upload a shorter document or paste the relevant sections as text."_
+- **And** I see the generic error: _"Something went wrong while processing your document. Please try again, or paste the guidelines text directly."_ — not a page-count-specific message
 - **And** I am not advanced to Step 3
 
 ---
 
 **AC-FR-23-05 — Extraction timeout handled gracefully** _(Added 2026-06-22)_
 
+**Corrected 2026-07-10:** same issue as AC-FR-23-04 — `extraction_timeout` is not a case in the client's error mapping either, so it also falls through to the generic `server` message.
+
 - **Given** I am on Step 2 of the application flow
 - **When** I upload a file and text extraction takes longer than 30 seconds
 - **Then** the upload is rejected
-- **And** I see the error: _"We couldn't read your document in time. Please try again, or paste the text directly."_
+- **And** I see the generic error: _"Something went wrong while processing your document. Please try again, or paste the guidelines text directly."_ — not a timeout-specific message
 - **And** I am not advanced to Step 3
 - **And** no incomplete data is written to the database
 
