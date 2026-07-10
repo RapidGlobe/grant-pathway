@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 3.1
+**Version:** 3.2
 **Date:** 2026-05-07
-**Last updated:** 2026-07-01
+**Last updated:** 2026-07-10
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -1645,6 +1645,8 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 
 **Revised 2026-07-05: this phase now gates launch.** P6.1–P6.6 must be complete before P5.6 (Go-Live) executes — see the Phase 6 → Go-Live Gate at the end of this section. (Originally framed as a non-gating parallel track; WJ decided the same day it was first documented that launching on the current flat model, with known gaps like non-narrative fields being silently invisible to the user, risks the "trusted partner" objective more than a later launch does — there is no commercial deadline forcing 31 July 2026.) P6.7 (the ongoing funder-by-funder extension) remains open-ended by design and does not block launch. Decided in `ADR-DATA-006-application-item-graph-model.md`; full requirements (R1–R20) in `docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md`; this section summarises `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` — that document is authoritative for detail.
 
+**Added 2026-07-10:** the Phase 3/4 guideline source-reference feature (page/section citation for each summary bullet and question, previously discussed as a standalone "Option 2" design) is blended into this phase rather than run as a separate track — it touches the exact same data model, extraction prompt, and Step 4 rendering that P6.2–P6.5 are already rewriting, so building it first would mean rebuilding it twice. See P6.2a below, plus the added bullets under P6.2, P6.3, P6.4 and P6.5.
+
 **Sequencing principle (no big-bang cutover):** every task below must prove itself against one existing funder with zero behavioural regression before any other funder is migrated onto it.
 
 ### P6.1 — Profile Schema Extension
@@ -1654,17 +1656,27 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 - Surface at least one derived ratio during profile setup
 - Depends on: nothing — additive, can start immediately and independently of the rest of Phase 6
 
+### P6.2a — Guideline Page/Section Reference Extraction (groundwork)
+
+- Preserve page boundaries when extracting PDF guideline text (currently flattened into one string) so each page's text can be tagged with its page number
+- Stop the pre-processing step (`lib/preprocess-text.ts`) stripping page-number markers before they can be attached to the extracted text
+- For docx and pasted guidelines (no fixed pages), preserve heading/section structure as the fallback reference
+- Depends on: nothing — independent of P6.1 and P6.2, can start immediately
+- Feeds into: P6.3 (extraction consumes the page-tagged text to produce citations) and P6.4/P6.5 (reference display and curation)
+
 ### P6.2 — Item-Graph Data Model (compatibility mode)
 
 - Design the typed item schema: item type (narrative / data / date / number / table / file / consent / eligibility gate / scoring criterion / manual action), visibility condition, source of truth, validation mode (`hard_check` / `judgement_flag`), rubric-criterion link, `decision_maker_visible` flag, output mapping
+- Add a guideline reference field (page number or section/heading, from P6.2a) to each item in the new schema
 - Migrate `application_answers` into the new shape using only today's item types (narrative, budget-flagged narrative) — no new capability yet, this is re-platforming
 - Pick the simplest already-tested funder and prove it end to end (extraction, storage, Step 4 rendering, export) with zero regression against that funder's existing test plan
-- Depends on: nothing (can run in parallel with P6.1)
+- Depends on: nothing (can run in parallel with P6.1 and P6.2a)
 - **This is the highest-risk task in Phase 6 — nothing in P6.3–P6.7 can meaningfully start before this is proven**
 
 ### P6.3 — Extraction Rewrite
 
 - Rewrite `lib/prompts.ts` and the extraction route to produce the graph shape
+- Extraction also records which guideline page/section each item was drawn from — citing a specific chunk of the page-tagged text (P6.2a) rather than free-typing a page number, so a citation can't point at a page/section that doesn't exist
 - First milestone: same item types as today, new shape only — validate against the P6.2 test funder with no information loss versus the current prompt
 - Subsequent milestones: extend to new item types one at a time, driven by whichever funder is next in the curation queue (P6.5), not built speculatively ahead of need
 - Depends on: P6.2
@@ -1672,6 +1684,7 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 ### P6.4 — Step 4 Rendering Rework
 
 - Rework Step 4 to walk the graph — respecting visibility conditions (branching) — rather than rendering a flat narrative-card list
+- Show each item's guideline reference next to it; add a "view original guidelines" panel so clicking a reference jumps to and highlights the cited page/section
 - First milestone: render exactly what compatibility-mode items produce, matching current production behaviour for the P6.2 test funder
 - Subsequent milestones: add rendering for each new item type as P6.3 adds it — checklist-style reminders for data/date/file/consent items first, then flexible budget shapes, then rubric-coaching display, then the `decision_maker_visible` treatment
 - Depends on: P6.2; P6.3 for each new item type
@@ -1680,6 +1693,7 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 
 - New table(s) holding a versioned, human-reviewed playbook per funder (item graph, rubric mapping, budget shape, rules, output mode, manual actions)
 - Lightweight review step to start — a reviewed record approved before a funder is marked supported; does not need a built admin UI initially
+- Human review also confirms or corrects each item's guideline reference before a playbook is approved, so applications built from that playbook reuse a verified reference rather than a fresh AI guess every time
 - Runtime prefers an approved playbook over live extraction; falls back to today's live-extraction behaviour, visibly flagged as unreviewed, if none exists
 - Depends on: P6.2
 - Exit criteria: one funder has an approved, versioned playbook the live application flow reads instead of running extraction fresh each time
@@ -1712,6 +1726,7 @@ Checklist:
 
 - [ ] P5.1–P5.5 complete (the existing pre-launch checklist — unaffected by this gate, can and should proceed independently)
 - [ ] P6.1 — Profile schema extension complete
+- [ ] P6.2a — Guideline page/section reference extraction (groundwork) complete
 - [ ] P6.2 — Item-graph data model (compatibility mode) complete, proven against the test funder with zero regression
 - [ ] P6.3 — Extraction rewrite complete
 - [ ] P6.4 — Step 4 rendering rework complete
