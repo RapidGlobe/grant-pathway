@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-10 — Dead code removed: `buildDraftPrompt`
+
+`PRD-Grant-Pathway-v1.md` v0.4 (Section 10.2) had confirmed `lib/prompts.ts`'s `buildDraftPrompt` function had zero callers anywhere in the codebase, since its presumed caller, the `/api/generate-draft` route, was deleted 2026-07-01 — but flagged the removal as a separate follow-up rather than fixing it in that pass. This closes that follow-up.
+
+Removed `buildDraftPrompt` and the `ApplicationQuestion` type (used only by it) from `lib/prompts.ts`, and the three dedicated tests (`buildDraftPrompt — XML fencing` describe block and its import) from `__tests__/prompts.test.ts`. Re-confirmed zero remaining references via a full-codebase grep before removing. `tsc --noEmit`, `eslint . --max-warnings 0`, and the full Vitest suite (22 tests, 4 files) all pass clean afterward. `lib/prompts.ts` now exports exactly the two prompt builders live routes actually use: `buildSummaryPrompt` and `buildRefinePrompt`.
+
+**Files changed:** `lib/prompts.ts`, `__tests__/prompts.test.ts`, `docs/PRD-Grant-Pathway-v1.md` (bumped to v0.5 — Section 10.2 updated, revision history row added).
+
+---
+
 ## 2026-07-10 — Open source vs. closed source conflict found and reversed: closed source confirmed
 
 A review surfaced a standing conflict between two decision records dated eight days apart in April: `DR-BM-003` (2026-04-09) decided Grant Pathway would be fully open source under the MIT Licence, reasoning that the succession plan (`DR-BM-002`) depended on public hosting and that there was "no commercial value to protect." `ADR-STACK-005` (2026-04-17) decided the opposite — private GitHub repository, proprietary licence, all rights reserved — with no note linking it to or reversing `DR-BM-003`. The live repository has in fact been private with no licence file throughout, matching `ADR-STACK-005`, but several other docs (this codebase's own README, Terms of Service, business overview, constraints register, technology stack) still described the open-source position as current.

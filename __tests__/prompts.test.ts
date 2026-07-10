@@ -5,7 +5,6 @@ import {
   AI_SYSTEM_PROMPT,
   buildSummaryPrompt,
   buildRefinePrompt,
-  buildDraftPrompt,
 } from '@/lib/prompts'
 
 describe('constants', () => {
@@ -56,27 +55,5 @@ describe('buildRefinePrompt — XML fencing', () => {
     expect(prompt).toContain('<original_answer>')
     expect(prompt).toContain('</original_answer>')
     expect(prompt).toContain('We help people.')
-  })
-})
-
-describe('buildDraftPrompt — XML fencing', () => {
-  const charity = {
-    charityName: 'Test Charity',
-    whatCharityDoes: 'Helps people',
-    whoCharityHelps: 'Everyone',
-    whereCharityWorks: 'London',
-  }
-  const question = { id: 'q1', questionText: 'What is your aim?', questionOrder: 1, wordLimit: 300 }
-
-  it('wraps funder summary in <funder_summary> tags', () => {
-    const prompt = buildDraftPrompt([question], charity, 'Fund community projects')
-    expect(prompt).toContain('<funder_summary>')
-    expect(prompt).toContain('</funder_summary>')
-  })
-
-  it('wraps questions in <questions> tags', () => {
-    const prompt = buildDraftPrompt([question], charity, 'Fund community projects')
-    expect(prompt).toContain('<questions>')
-    expect(prompt).toContain('</questions>')
   })
 })
