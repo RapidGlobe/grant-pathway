@@ -1,4 +1,4 @@
-// Email 2 — User-initiated account deletion confirmation (S8.2 / FR-44)
+// Email 5 — User-initiated account deletion confirmation (S8.2 / FR-44)
 // Subject: "Your Grant Pathway account has been deleted"
 // Sent immediately after a user deletes their own account.
 
