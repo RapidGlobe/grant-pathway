@@ -9,7 +9,7 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.15 Draft                                        |
+| **Version**        | 0.16 Draft                                        |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
@@ -35,6 +35,7 @@
 | 0.13    | 2026-07-10 | Rapidglobe Ltd | Section 6.6 review found four fabricated/stale message quotes, matched against `components/application-step4-draft.tsx` and `lib/ai-error-handler.ts`: the 80%/100% monthly-limit banners were misquoted (truncated and inventing a specific reset date + "get in touch" prompt that don't exist); the kill-switch's "temporarily unavailable" message doesn't exist -- it reuses the generic `overloaded` message, indistinguishable from real AI overload; the "we found N questions" note still referenced "generate your draft answers," a holdover from the abandoned auto-draft model; and the assembly description still claimed free-form funders get "a flowing narrative" distinct from structured funders' "Q&A list" -- both produce the same format, differing only by a number prefix (already corrected elsewhere in `acceptance-criteria.md`'s FR-31A section, missed here). Same four issues found and fixed in `screen-requirements.md` and `acceptance-criteria.md` (AC-FR-24-03, AC-FR-27-03/04, AC-FR-28-04/05/06) -- the kill-switch and monthly-limit message errors appeared in four and two places respectively across the two documents. Verified accurate: the preparation checklist's exact quoted copy (heading, message, all four checklist items, warning note, button text) and the per-question "Before you approve, check:" panel.                                                                                                                                                                                                                                                                            |
 | 0.14    | 2026-07-10 | Rapidglobe Ltd | Section 6.7 review: the three Step 5 confirmation checkboxes and the download-approves-in-one-action logic verified accurate against `components/application-step5-approve.tsx`. Found the re-opening prompt can actually be triggered from two places with slightly different wording (dashboard card vs. a re-open action on the Step 5 page itself, which omits "this application") -- this doc previously described only one. Corrected to note both. Noticed in passing while checking the download logic: a `txt` download format exists in code alongside `docx` -- to investigate in Section 6.8, since FR-38 (plain text export) is currently listed as "Should Have -- build if time permits."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | 0.15    | 2026-07-10 | Rapidglobe Ltd | Section 6.8 review confirmed FR-38 (plain text export) is fully built and live (`app/api/export/[applicationId]/route.ts`'s `?format=txt`, a "Download as plain text (.txt)" button in `application-step5-approve.tsx`) -- the same pattern as FR-08: correctly Should Have priority, but the "build if time permits" / "these criteria apply only if implemented" hedges were stale. Corrected here, in `moscow-feature-register.md` (both its FR-38 row and Should Have build-conditions table), and in `acceptance-criteria.md`'s FR-38 intro. Also found and fixed the re-export warning message, which was misquoted in this doc, `screen-requirements.md`, and `acceptance-criteria.md` (AC-FR-37-05) -- the real dialog is titled "Download again?", has a no-date fallback case, and reads "if you intend to submit a revised version" rather than the more presumptive "to let them know a revised version is being submitted."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 0.16    | 2026-07-10 | Rapidglobe Ltd | Section 6.9 review found FR-44 (deletion confirmation email) is also fully built and live -- third instance of the FR-08/FR-38 pattern (Should Have, correctly prioritised, but described as conditional when it isn't). `app/api/account/delete/route.ts` sends the confirmation email via `lib/emails/account-deleted-user.ts` on every deletion; corrected the "if FR-44 is implemented" hedge here, in `moscow-feature-register.md` (FR-44 row + build-conditions table), `acceptance-criteria.md`'s FR-44 intro (which already contradicted its own Status table listing this section "Complete"), and `screen-requirements.md`. Also corrected the post-deletion message, which omitted its second sentence ("We've sent you a confirmation email.") in this doc and `screen-requirements.md`, confirmed against `components/sign-in-form.tsx`. Flagged separately (code, not a doc fix): the email's own code comment mislabels it "Email 2" instead of "Email 5" per `email-notifications.md`'s canonical numbering.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 ### Related Documents
 
@@ -541,13 +542,13 @@ Actions: Download anyway / Cancel
 
 ### 6.9 Account Deletion
 
-| Ref   | Requirement                                                                                                        | Priority    |
-| ----- | ------------------------------------------------------------------------------------------------------------------ | ----------- |
-| FR-40 | The system shall allow users to permanently delete their account from Account Settings                             | Must Have   |
-| FR-41 | Before deletion, the system shall display a plain-language warning explaining all data will be permanently deleted | Must Have   |
-| FR-42 | The user shall be required to type DELETE (uppercase, case-sensitive) to confirm deletion                          | Must Have   |
-| FR-43 | On confirmation, the system shall permanently delete all data associated with the account                          | Must Have   |
-| FR-44 | The system shall send a confirmation email to the user once deletion is complete                                   | Should Have |
+| Ref   | Requirement                                                                                                        | Priority                                            |
+| ----- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- |
+| FR-40 | The system shall allow users to permanently delete their account from Account Settings                             | Must Have                                           |
+| FR-41 | Before deletion, the system shall display a plain-language warning explaining all data will be permanently deleted | Must Have                                           |
+| FR-42 | The user shall be required to type DELETE (uppercase, case-sensitive) to confirm deletion                          | Must Have                                           |
+| FR-43 | On confirmation, the system shall permanently delete all data associated with the account                          | Must Have                                           |
+| FR-44 | The system shall send a confirmation email to the user once deletion is complete                                   | Should Have -- **confirmed built** (see note below) |
 
 **Data deleted on confirmation:**
 
@@ -560,8 +561,10 @@ Actions: Download anyway / Cancel
 
 1. All data permanently deleted
 2. User session ended immediately
-3. User redirected to `/` with message: "Your account has been deleted."
-4. Confirmation email sent (Email 5) if FR-44 is implemented
+3. User redirected to `/` with message: "Your account has been deleted. We've sent you a confirmation email." (corrected 2026-07-10 -- previously omitted the second sentence, confirmed against `components/sign-in-form.tsx`)
+4. Confirmation email sent (Email 5, subject "Your Grant Pathway account has been deleted")
+
+**FR-44 status corrected 2026-07-10:** confirmed built and live -- `app/api/account/delete/route.ts` sends the confirmation email via `lib/emails/account-deleted-user.ts` on every deletion, not conditionally. This doc, `moscow-feature-register.md` (both its FR-44 row and Should Have build-conditions table), and `acceptance-criteria.md`'s FR-44 intro all previously described it as conditional ("if FR-44 is implemented" / "only implemented if... in v1 build scope") -- corrected in all three, consistent with how `acceptance-criteria.md`'s own Status table already listed this section "✅ Complete." Separately noted: the email's own code comment calls it "Email 2," not "Email 5" as `email-notifications.md`'s canonical numbering has it -- a stale code comment, not a doc error, flagged for a follow-up fix.
 
 **Implementation note:** The BRD specified re-entering the email address as the confirmation mechanism. The screen requirements supersede this -- the implemented confirmation is typing the word DELETE (uppercase, exact match, case-sensitive).
 
@@ -1405,6 +1408,6 @@ Criteria are organised by the same functional sections used in this document. Sh
 
 ---
 
-_Document status: Version 0.15 Draft_
+_Document status: Version 0.16 Draft_
 _Compliance section (Section 15) -- AWS DPA confirmed 2026-06-22; Terms of Service and Privacy Policy are live, with effective dates and solicitor review still outstanding before P5.1 can close. See Section 15 for full detail._
 _Last updated: 2026-07-10_

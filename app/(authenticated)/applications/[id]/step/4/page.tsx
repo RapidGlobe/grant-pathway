@@ -35,9 +35,28 @@ export default async function Step4Page({ params }: Props) {
   // Step locking: redirects to current step if current_step < 4
   const { aiSummary, draftStatus, funderName, grantName } = await getApplicationOrRedirect(id, 4)
 
-  // S6.4 — Show preparation checklist on first visit (AC-FR-28-01)
+  // ── Parse ai_summary once — used for the prep checklist, funder_type, and question population ──
+  let funderType: 'structured' | 'free_form' = 'structured'
+  let parsedSummary: AiSummaryData | null = null
+
+  if (aiSummary) {
+    try {
+      parsedSummary = JSON.parse(aiSummary) as AiSummaryData
+      funderType = parsedSummary.funder_type ?? 'structured'
+    } catch {
+      // ai_summary parse failed — funderType stays 'structured'
+    }
+  }
+
+  // S6.4 — Show preparation checklist on first visit (AC-FR-28-01, AC-FR-28-09)
   if (draftStatus === 'not_started') {
-    return <ApplicationStep4PrepChecklist applicationId={id} />
+    return (
+      <ApplicationStep4PrepChecklist
+        applicationId={id}
+        funderName={funderName}
+        supportingDocuments={parsedSummary?.supportingDocuments ?? []}
+      />
+    )
   }
 
   // S6.7 — Show senior review confirmation before assembly
@@ -57,19 +76,6 @@ export default async function Step4Page({ params }: Props) {
 
   // getApplicationOrRedirect already redirects unauthenticated users — type guard only
   if (!user) return null
-
-  // ── Parse ai_summary once — used for both funder_type and question population ──
-  let funderType: 'structured' | 'free_form' = 'structured'
-  let parsedSummary: AiSummaryData | null = null
-
-  if (aiSummary) {
-    try {
-      parsedSummary = JSON.parse(aiSummary) as AiSummaryData
-      funderType = parsedSummary.funder_type ?? 'structured'
-    } catch {
-      // ai_summary parse failed — funderType stays 'structured'
-    }
-  }
 
   // ── S6.1: Fetch existing question rows ────────────────────────────────────
   const { data: existingRows } = await supabase

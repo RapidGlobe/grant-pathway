@@ -6,6 +6,13 @@
 // Prompts Margaret to gather financial documents before starting the Q&A interview,
 // and to involve a senior colleague before reaching budget questions.
 //
+// Funder-specific supporting documents (AC-FR-28-09): the Step 3 AI summary extracts
+// a list of supporting documents this funder requires (e.g. governing document, most
+// recent accounts) into summary_json.supportingDocuments. When non-empty, it is shown
+// as a second checklist alongside the standing financial-prep advice above — the two
+// lists can overlap (e.g. both may mention annual accounts) since one is Grant Pathway's
+// general advice and the other is this specific funder's stated requirement.
+//
 // On "I have what I need — start writing": calls setDraftInProgress(), which sets
 // draft_status = 'in_progress' AND syncs application_answers from ai_summary, then
 // returns { ok: true }. The client uses window.location.href for a hard navigation
@@ -21,6 +28,8 @@ import { setDraftInProgress } from '@/actions/applications'
 
 interface ApplicationStep4PrepChecklistProps {
   applicationId: string
+  funderName?: string
+  supportingDocuments?: string[]
 }
 
 const CHECKLIST_ITEMS = [
@@ -32,6 +41,8 @@ const CHECKLIST_ITEMS = [
 
 export function ApplicationStep4PrepChecklist({
   applicationId,
+  funderName,
+  supportingDocuments = [],
 }: ApplicationStep4PrepChecklistProps) {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
@@ -67,17 +78,26 @@ export function ApplicationStep4PrepChecklist({
 
         <ul className="mb-5 space-y-3">
           {CHECKLIST_ITEMS.map((item, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <span
-                className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#0D6E6E] text-[11px] font-bold text-[#0D6E6E]"
-                aria-hidden="true"
-              >
-                {i + 1}
-              </span>
-              <span className="text-[14px] text-[#374151]">{item}</span>
-            </li>
+            <ChecklistItem key={i} index={i + 1}>
+              {item}
+            </ChecklistItem>
           ))}
         </ul>
+
+        {supportingDocuments.length > 0 && (
+          <>
+            <p className="mb-4 text-[15px] text-[#374151]">
+              {funderName || 'This funder'} also asks you to submit:
+            </p>
+            <ul className="mb-5 space-y-3">
+              {supportingDocuments.map((item, i) => (
+                <ChecklistItem key={i} index={i + 1}>
+                  {item}
+                </ChecklistItem>
+              ))}
+            </ul>
+          </>
+        )}
 
         <div className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
@@ -114,5 +134,19 @@ export function ApplicationStep4PrepChecklist({
         </Button>
       </div>
     </div>
+  )
+}
+
+function ChecklistItem({ index, children }: { index: number; children: React.ReactNode }) {
+  return (
+    <li className="flex items-start gap-3">
+      <span
+        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#0D6E6E] text-[11px] font-bold text-[#0D6E6E]"
+        aria-hidden="true"
+      >
+        {index}
+      </span>
+      <span className="text-[14px] text-[#374151]">{children}</span>
+    </li>
   )
 }

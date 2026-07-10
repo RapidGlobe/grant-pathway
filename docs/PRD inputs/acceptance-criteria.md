@@ -2052,7 +2052,7 @@ _Note: the screen requirements specify that the user must type the word DELETE (
 
 **Requirement:** The system shall send a confirmation email to the user once deletion is complete.
 
-_These criteria apply only if FR-44 is implemented in v1._
+**Confirmed built (2026-07-10)** -- live in `app/api/account/delete/route.ts` via `lib/emails/account-deleted-user.ts`, sent on every deletion. The criteria below are not conditional; this note previously read "these criteria apply only if FR-44 is implemented in v1," consistent with `acceptance-criteria.md`'s own Status table already marking this section "✅ Complete."
 
 ---
 

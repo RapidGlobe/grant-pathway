@@ -600,12 +600,12 @@ Shown once, on first entry to Step 4 (`draft_status = 'not_started'`); bypassed 
 
 ### Post-Deletion Behaviour
 
-| Step | Action                                                                                                                        |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------- |
-| 1    | All user data deleted immediately — account, charity profile, applications, uploaded files, AI usage records (FR-40 to FR-43) |
-| 2    | User session ended                                                                                                            |
-| 3    | User redirected to `/` with inline message: _"Your account has been deleted."_                                                |
-| 4    | Confirmation email sent (Email 5) if FR-44 is implemented                                                                     |
+| Step | Action                                                                                                                                                                                                                    |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1    | All user data deleted immediately — account, charity profile, applications, uploaded files, AI usage records (FR-40 to FR-43)                                                                                             |
+| 2    | User session ended                                                                                                                                                                                                        |
+| 3    | User redirected to `/` with inline message: _"Your account has been deleted. We've sent you a confirmation email."_ _(corrected 2026-07-10 -- second sentence previously omitted; matched `components/sign-in-form.tsx`)_ |
+| 4    | Confirmation email sent (Email 5) -- **confirmed built (2026-07-10)**, not conditional; sent on every deletion via `lib/emails/account-deleted-user.ts`                                                                   |
 
 ### Notes
 

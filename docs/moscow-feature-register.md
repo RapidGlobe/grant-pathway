@@ -125,13 +125,13 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 ## 9.9 Account Deletion
 
-| Ref   | Requirement (summary)                                                 | Priority        | Notes                                                                                                                                                          |
-| ----- | --------------------------------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-40 | Allow users to permanently delete their account from account settings | **Must Have**   |                                                                                                                                                                |
-| FR-41 | Display plain-language warning before deletion                        | **Must Have**   |                                                                                                                                                                |
-| FR-42 | Require explicit confirmation before deletion                         | **Must Have**   | BRD specifies re-entering email address. Screen requirements specify typing the word `DELETE` (uppercase, case-sensitive). Screen requirements take precedence |
-| FR-43 | Permanently delete all user data on confirmation                      | **Must Have**   | Deletes: user account, charity profile, all applications and answers, AI usage records                                                                         |
-| FR-44 | Send confirmation email after deletion                                | **Should Have** | Email 5 in email notifications spec. Only implemented if FR-44 is in v1 build scope                                                                            |
+| Ref   | Requirement (summary)                                                 | Priority        | Notes                                                                                                                                                                                                                                                 |
+| ----- | --------------------------------------------------------------------- | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-40 | Allow users to permanently delete their account from account settings | **Must Have**   |                                                                                                                                                                                                                                                       |
+| FR-41 | Display plain-language warning before deletion                        | **Must Have**   |                                                                                                                                                                                                                                                       |
+| FR-42 | Require explicit confirmation before deletion                         | **Must Have**   | BRD specifies re-entering email address. Screen requirements specify typing the word `DELETE` (uppercase, case-sensitive). Screen requirements take precedence                                                                                        |
+| FR-43 | Permanently delete all user data on confirmation                      | **Must Have**   | Deletes: user account, charity profile, all applications and answers, AI usage records                                                                                                                                                                |
+| FR-44 | Send confirmation email after deletion                                | **Should Have** | **Confirmed built (2026-07-10):** Email 5 in `email-notifications.md`'s spec, live in `app/api/account/delete/route.ts` via `lib/emails/account-deleted-user.ts`, sent on every deletion. The "only implemented if in build scope" framing was stale. |
 
 ---
 
@@ -139,12 +139,12 @@ Priorities are derived from the BRD (Section 9), PRD decision records, screen re
 
 The three remaining Should Have requirements and their build conditions are summarised below.
 
-| Ref   | Requirement                     | Build condition                                                                                   |
-| ----- | ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| FR-07 | Optional MFA                    | Removed 2026-06-12 — demoted to Won't Have (see FR-07 row above)                                  |
-| FR-08 | Feedback opt-in at registration | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-08 row above                    |
-| FR-38 | Plain text (.txt) export        | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-38 row above                    |
-| FR-44 | Deletion confirmation email     | Build if transactional email service is confirmed as in scope; depends on FR-40–43 being complete |
+| Ref   | Requirement                     | Build condition                                                                |
+| ----- | ------------------------------- | ------------------------------------------------------------------------------ |
+| FR-07 | Optional MFA                    | Removed 2026-06-12 — demoted to Won't Have (see FR-07 row above)               |
+| FR-08 | Feedback opt-in at registration | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-08 row above |
+| FR-38 | Plain text (.txt) export        | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-38 row above |
+| FR-44 | Deletion confirmation email     | **Built** (confirmed 2026-07-10) -- no longer conditional, see FR-44 row above |
 
 ---
 

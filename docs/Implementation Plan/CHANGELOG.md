@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-10 — `supportingDocuments` surfaced on the Step 4 preparation checklist
+
+A code review found the Step 3 AI summary prompt (`lib/prompts.ts`, `buildSummaryPrompt`) extracts a `supportingDocuments` field (list of document categories the funder requires) on every summarisation call, typed and Zod-validated, but never rendered anywhere — unlike `funderAiPolicy`, which has an explicit "deliberately not displayed" comment, this field had no such comment and looked like dead extraction work.
+
+Presented WJ two options — display it on Step 3, or remove it from the prompt to cut extraction scope — and while investigating found a third: Step 4 already shows a hardcoded, generic "Before you begin writing" preparation checklist (`components/application-step4-prep-checklist.tsx`, S6.4) with the same four items for every funder. WJ chose to merge the extracted list into that screen instead, as a second, funder-specific checklist shown alongside (not replacing) the standing one — see `PDR-UI-007`.
+
+`app/(authenticated)/applications/[id]/step/4/page.tsx` now parses `ai_summary` before the `draft_status === 'not_started'` branch (previously parsed later, only for question sync) and passes `funderName` + `supportingDocuments` into `ApplicationStep4PrepChecklist`. The component renders the extracted list under "[Funder name] also asks you to submit:" only when non-empty; the four hardcoded financial-prep items are unchanged. `tsc --noEmit` and `eslint` both clean; not yet verified in a live browser session (reaching this screen requires a real AI summarisation call against monthly quota, so left for WJ's own testing per the project's usual verification approach for this app).
+
+**Files changed:** `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-prep-checklist.tsx`, `docs/PRD decisions/PDR-UI-007-supporting-documents-checklist.md` (new), `docs/PRD decisions/PRD-DECISIONS-INDEX.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-28-09), `docs/PRD inputs/screen-requirements.md` (new "Step 4 — Preparation Checklist" section — this screen had no prior entry in this doc).
+
+---
+
 ## 2026-07-10 — Dead code removed: `buildDraftPrompt`
 
 `PRD-Grant-Pathway-v1.md` v0.4 (Section 10.2) had confirmed `lib/prompts.ts`'s `buildDraftPrompt` function had zero callers anywhere in the codebase, since its presumed caller, the `/api/generate-draft` route, was deleted 2026-07-01 — but flagged the removal as a separate follow-up rather than fixing it in that pass. This closes that follow-up.

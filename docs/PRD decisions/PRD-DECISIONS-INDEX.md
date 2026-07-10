@@ -10,7 +10,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 | Status         | Count |
 | -------------- | ----- |
-| ✅ Decided     | 18    |
+| ✅ Decided     | 19    |
 | 🔄 In Progress | 0     |
 | ⏳ Pending     | 0     |
 | ⏸ Deferred     | 0     |
@@ -28,14 +28,15 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ## User Interface & Experience (UI)
 
-| ID                                                        | Question                                                                                                 | Status     |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ---------- |
-| [PDR-UI-001](PDR-UI-001-ui-component-library.md)          | Will Grant Pathway use a pre-built accessible UI component library or build components from scratch?     | ✅ Decided |
-| [PDR-UI-002](PDR-UI-002-design-first-or-code-first.md)    | Will wireframes or mockups be created before coding begins, or will the UI be designed directly in code? | ✅ Decided |
-| [PDR-UI-003](PDR-UI-003-mobile-first-or-desktop-first.md) | Will the UI be designed mobile-first or desktop-first?                                                   | ✅ Decided |
-| [PDR-UI-004](PDR-UI-004-navigation-structure.md)          | What are the main pages and navigation structure of the application?                                     | ✅ Decided |
-| [PDR-UI-005](PDR-UI-005-dashboard-design.md)              | What does a user see on their dashboard when they log in, and how is it laid out?                        | ✅ Decided |
-| [PDR-UI-006](PDR-UI-006-api-failure-user-experience.md)   | What does the user see when the Charity Commission API or Claude API is unavailable?                     | ✅ Decided |
+| ID                                                         | Question                                                                                                                          | Status     |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [PDR-UI-001](PDR-UI-001-ui-component-library.md)           | Will Grant Pathway use a pre-built accessible UI component library or build components from scratch?                              | ✅ Decided |
+| [PDR-UI-002](PDR-UI-002-design-first-or-code-first.md)     | Will wireframes or mockups be created before coding begins, or will the UI be designed directly in code?                          | ✅ Decided |
+| [PDR-UI-003](PDR-UI-003-mobile-first-or-desktop-first.md)  | Will the UI be designed mobile-first or desktop-first?                                                                            | ✅ Decided |
+| [PDR-UI-004](PDR-UI-004-navigation-structure.md)           | What are the main pages and navigation structure of the application?                                                              | ✅ Decided |
+| [PDR-UI-005](PDR-UI-005-dashboard-design.md)               | What does a user see on their dashboard when they log in, and how is it laid out?                                                 | ✅ Decided |
+| [PDR-UI-006](PDR-UI-006-api-failure-user-experience.md)    | What does the user see when the Charity Commission API or Claude API is unavailable?                                              | ✅ Decided |
+| [PDR-UI-007](PDR-UI-007-supporting-documents-checklist.md) | The Step 3 summary extracts a list of funder-required supporting documents but never displays it — should it be shown, and where? | ✅ Decided |
 
 ---
 
@@ -79,5 +80,5 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ---
 
-_Last updated: 2026-07-05_
-_Status: 17 of 17 decisions made_
+_Last updated: 2026-07-10_
+_Status: 19 of 19 decisions made. PDR-UI-007 added: supporting-documents checklist merged into the Step 4 preparation checklist._
