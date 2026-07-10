@@ -289,7 +289,7 @@ Displayed in both states whenever the user's charity profile is incomplete — w
 | Charity profile banner | Shown if profile incomplete or partial (see above)                                                                                                               |
 | Empty state message    | _"You don't have any applications yet."_                                                                                                                         |
 | Start button           | **Start your first application** — primary action, teal. If profile is incomplete, button is disabled with tooltip: _"Please set up your charity profile first"_ |
-| Three-step explainer   | Three sequential steps with icons: _"1. Add funder guidelines"_ → _"2. Get an AI summary"_ → _"3. Generate your draft"_                                          |
+| Three-step explainer   | Three sequential steps with icons: _"1. Add funder guidelines"_ → _"2. Get an AI summary"_ → _"3. Write your answers"_                                           |
 
 ---
 
@@ -305,14 +305,14 @@ Displayed in both states whenever the user's charity profile is incomplete — w
 
 ### Application Card Contents
 
-| Element                | Detail                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Funder name            | Bold, prominent — top of card                                                                                       |
-| Grant name             | Below funder name                                                                                                   |
-| Status label           | Colour-coded pill: Not started (slate) · In progress (amber) · Approved (green) · Exported (teal)                   |
-| Last updated           | _"Last updated [date]"_ — formatted as DD Month YYYY (e.g. _"Last updated 14 April 2026"_)                          |
-| Continue / View button | **Continue** for Not started and In progress statuses; **View** for Approved and Exported statuses — primary action |
-| Delete button          | Secondary action — red text link. Triggers confirmation prompt per the application status model                     |
+| Element                | Detail                                                                                                                                                                                                                                                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Funder name            | Bold, prominent — top of card                                                                                                                                                                                                                                                                                                            |
+| Grant name             | Below funder name                                                                                                                                                                                                                                                                                                                        |
+| Status label           | Colour-coded pill: Not started (slate) · In progress (amber) · Approved (green) · Exported (teal) · Ineligible (red, `mismatch` status) — fifth status added 2026-07-10, previously missing; see `docs/PRD inputs/application-status-model.md`                                                                                           |
+| Last updated           | _"Last updated [date]"_ — formatted as DD Month YYYY (e.g. _"Last updated 14 April 2026"_)                                                                                                                                                                                                                                               |
+| Continue / View button | **Continue** for Not started and In progress statuses; **View** for Approved and Exported statuses; **no button at all** for Ineligible (`mismatch`) applications — only the delete option remains, matching FR-47's no-override-path design (added 2026-07-10, confirmed against `components/dashboard-populated.tsx`) — primary action |
+| Delete button          | Secondary action — red text link. Triggers confirmation prompt per the application status model                                                                                                                                                                                                                                          |
 
 ### Notes
 

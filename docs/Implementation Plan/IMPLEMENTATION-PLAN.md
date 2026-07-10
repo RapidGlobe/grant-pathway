@@ -349,7 +349,7 @@ Two states, toggled in the static shell:
 - **Start your first application** button (teal):
   - Disabled when profile incomplete, with tooltip: "Please set up your charity profile first"
   - Enabled when profile complete
-- Three-step explainer with icons: "1. Add funder guidelines" → "2. Get an AI summary" → "3. Generate your draft"
+- Three-step explainer with icons: "1. Add funder guidelines" → "2. Get an AI summary" → "3. Write your answers"
 
 **Populated state (one or more applications):**
 

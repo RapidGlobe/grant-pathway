@@ -87,7 +87,7 @@ export function DashboardEmpty({
           <ArrowRight className="mt-5 h-4 w-4 flex-shrink-0 text-[#CBD5E1]" aria-hidden="true" />
           <Step
             icon={<FileText className="h-5 w-5 text-[#0D6E6E]" />}
-            label="Generate your draft"
+            label="Write your answers"
             step="3"
           />
         </div>

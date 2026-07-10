@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-10 — Stale "Generate your draft" copy corrected to "Write your answers"
+
+The dashboard empty-state three-step explainer (`components/dashboard-empty.tsx`) still labelled Step 3 "Generate your draft," a holdover from the auto-generation model abandoned in the 2026-05-28 Step 4 redesign (`PRD-Grant-Pathway-v1.md` Section 6.6): the app no longer auto-generates a draft, the charity writes every answer, and AI only assists on request via "Help me improve this." The same stale phrase had propagated into six other documents that were never updated when that redesign shipped.
+
+Relabelled to "Write your answers" (paired description where one accompanies the label: "You write every answer — AI can help if you ask") in the component and in `PRD-Grant-Pathway-v1.md` (bumped to v0.18), `screen-requirements.md`, `IMPLEMENTATION-PLAN.md`, `PDR-UI-005-dashboard-design.md`, `DDR-CS-006-empty-state.md`, `design-requirements.md`, and `Business Design/mockup.html`.
+
+**Files changed:** `components/dashboard-empty.tsx`, `docs/PRD-Grant-Pathway-v1.md`, `docs/PRD inputs/screen-requirements.md`, `docs/Implementation Plan/IMPLEMENTATION-PLAN.md`, `docs/PRD decisions/PDR-UI-005-dashboard-design.md`, `docs/Business Design/DDR-CS-006-empty-state.md`, `docs/Business Design/design-requirements.md`, `docs/Business Design/mockup.html`.
+
+---
+
 ## 2026-07-10 — `supportingDocuments` surfaced on the Step 4 preparation checklist
 
 A code review found the Step 3 AI summary prompt (`lib/prompts.ts`, `buildSummaryPrompt`) extracts a `supportingDocuments` field (list of document categories the funder requires) on every summarisation call, typed and Zod-validated, but never rendered anywhere — unlike `funderAiPolicy`, which has an explicit "deliberately not displayed" comment, this field had no such comment and looked like dead extraction work.

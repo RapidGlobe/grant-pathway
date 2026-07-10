@@ -29,7 +29,7 @@ The dashboard is the first screen a logged-in user sees. For a first-time user i
 - Welcome message: _"Welcome to Grant Pathway, [name]"_
 - Prompt to complete charity profile if incomplete, with a **Set up charity profile** button
 - **Start your first application** button (greyed out with tooltip if profile not yet complete)
-- Brief three-step explainer: _Add funder guidelines → Get an AI summary → Generate your draft_
+- Brief three-step explainer: _Add funder guidelines → Get an AI summary → Write your answers_
 
 ### Populated state (returning user)
 

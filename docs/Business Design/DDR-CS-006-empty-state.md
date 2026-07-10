@@ -16,7 +16,7 @@ The dashboard empty state is the first screen a newly registered user sees after
 
 - Welcome the user warmly by name
 - Guide them clearly towards starting their first application
-- Explain the three-step process (Add funder guidelines -> Get AI summary -> Generate draft) without being overwhelming
+- Explain the three-step process (Add funder guidelines -> Get AI summary -> Write your answers) without being overwhelming
 - Convey that Grant Pathway is easy to use and they are in the right place
 
 The empty state is a critical first impression and directly influences whether a new user feels confident enough to start. For the Margaret persona -- a volunteer with no prior AI experience -- this moment is especially important.
@@ -37,11 +37,11 @@ The screen requirements specify the exact content: welcome message, charity prof
 
 The three-step explainer on the dashboard empty state uses three equal-width columns, each containing a large icon (48--64px) in a branded icon container, a bold step number, a short step label, and a one-line description.
 
-| Step | Label                 | Description                                          | Lucide icon candidate    |
-| ---- | --------------------- | ---------------------------------------------------- | ------------------------ |
-| 1    | Add funder guidelines | Upload or paste your funder's guidelines             | `Upload` or `FileText`   |
-| 2    | Get an AI summary     | We'll read and summarise the guidelines for you      | `Sparkles` or `Wand2`    |
-| 3    | Generate your draft   | We'll write draft answers using your charity profile | `FileCheck` or `PenLine` |
+| Step | Label                 | Description                                      | Lucide icon candidate    |
+| ---- | --------------------- | ------------------------------------------------ | ------------------------ |
+| 1    | Add funder guidelines | Upload or paste your funder's guidelines         | `Upload` or `FileText`   |
+| 2    | Get an AI summary     | We'll read and summarise the guidelines for you  | `Sparkles` or `Wand2`    |
+| 3    | Write your answers    | You write every answer -- AI can help if you ask | `FileCheck` or `PenLine` |
 
 **Icon container colour per mockup direction:**
 

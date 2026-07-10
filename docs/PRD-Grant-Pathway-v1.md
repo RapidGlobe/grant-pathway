@@ -9,7 +9,7 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.17 Draft                                        |
+| **Version**        | 0.18 Draft                                        |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
@@ -37,6 +37,7 @@
 | 0.15    | 2026-07-10 | Rapidglobe Ltd | Section 6.8 review confirmed FR-38 (plain text export) is fully built and live (`app/api/export/[applicationId]/route.ts`'s `?format=txt`, a "Download as plain text (.txt)" button in `application-step5-approve.tsx`) -- the same pattern as FR-08: correctly Should Have priority, but the "build if time permits" / "these criteria apply only if implemented" hedges were stale. Corrected here, in `moscow-feature-register.md` (both its FR-38 row and Should Have build-conditions table), and in `acceptance-criteria.md`'s FR-38 intro. Also found and fixed the re-export warning message, which was misquoted in this doc, `screen-requirements.md`, and `acceptance-criteria.md` (AC-FR-37-05) -- the real dialog is titled "Download again?", has a no-date fallback case, and reads "if you intend to submit a revised version" rather than the more presumptive "to let them know a revised version is being submitted."                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | 0.16    | 2026-07-10 | Rapidglobe Ltd | Section 6.9 review found FR-44 (deletion confirmation email) is also fully built and live -- third instance of the FR-08/FR-38 pattern (Should Have, correctly prioritised, but described as conditional when it isn't). `app/api/account/delete/route.ts` sends the confirmation email via `lib/emails/account-deleted-user.ts` on every deletion; corrected the "if FR-44 is implemented" hedge here, in `moscow-feature-register.md` (FR-44 row + build-conditions table), `acceptance-criteria.md`'s FR-44 intro (which already contradicted its own Status table listing this section "Complete"), and `screen-requirements.md`. Also corrected the post-deletion message, which omitted its second sentence ("We've sent you a confirmation email.") in this doc and `screen-requirements.md`, confirmed against `components/sign-in-form.tsx`. Flagged separately (code, not a doc fix): the email's own code comment mislabels it "Email 2" instead of "Email 5" per `email-notifications.md`'s canonical numbering.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 0.17    | 2026-07-10 | Rapidglobe Ltd | Section 7 review found it largely duplicates Section 6's now-fixed content, but the duplicates hadn't been fixed here -- corrected 7 recurrences of already-confirmed issues (FR-08 hedge, funder-request link wording, FR-46 "not confirmed" phrasing, missing Step 3 progress stage, "generate your draft answers" phrasing, kill-switch message, monthly-limit messages, post-deletion message). Two new findings specific to this section: (1) Screens 10 and 11 (Terms of Service, Privacy Policy) were entirely missing -- this section stopped at Screen 9, never updated when the legal pages shipped 2026-06-10; added, matching `screen-requirements.md`. (2) The dashboard status-pill list and Screen 6's charity-profile fields both had the same gaps already found and fixed elsewhere (missing `mismatch`/"Ineligible" pill per `dashboard-populated.tsx`'s `STATUS_CONFIG`, and the missing P6.1 governance/reserves fields) -- fixed here too. Noted Section 8's status tables have the same missing-`mismatch` gap, to fix when reviewing that section next.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 0.18    | 2026-07-10 | Rapidglobe Ltd | Screen 5 dashboard empty-state explainer's Step 3 label, "Generate your draft," was stale in `components/dashboard-empty.tsx` and six other documents -- a leftover from the auto-generation model abandoned in the 2026-05-28 Step 4 redesign documented in Section 6.6. Relabelled to "Write your answers" (with description "You write every answer -- AI can help if you ask" where a description accompanies the label) in the component, this doc (Section 5), `screen-requirements.md`, `IMPLEMENTATION-PLAN.md`, `PDR-UI-005-dashboard-design.md`, `DDR-CS-006-empty-state.md`, `design-requirements.md`, and `Business Design/mockup.html`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ### Related Documents
 
@@ -765,7 +766,7 @@ On success: "Your password has been updated." with Sign in button. On expired li
 | Heading              | "Welcome to Grant Pathway, [first name]"                                                                               |
 | Empty state message  | "You don't have any applications yet."                                                                                 |
 | Start button         | "Start your first application" -- disabled if profile incomplete (tooltip: "Please set up your charity profile first") |
-| Three-step explainer | "1. Add funder guidelines" / "2. Get an AI summary" / "3. Generate your draft"                                         |
+| Three-step explainer | "1. Add funder guidelines" / "2. Get an AI summary" / "3. Write your answers"                                          |
 
 **State 2 -- Populated (one or more applications):**
 
@@ -783,7 +784,7 @@ On success: "Your password has been updated." with Sign in button. On expired li
 | Grant name             | Below funder name                                                                                                                                                                                                                                                                                     |
 | Status label           | Colour-coded pill: Not started (slate) / In progress (amber) / Approved (green) / Exported (teal) / Ineligible (red, for `mismatch` status -- see Section 6.12) -- fifth status added 2026-07-10, previously missing from this row; not included in the four-status summary strip above (Section 6.3) |
 | Last updated           | "Last updated [DD Month YYYY]"                                                                                                                                                                                                                                                                        |
-| Continue / View button | "Continue" for Not started and In progress; "View" for Approved and Exported                                                                                                                                                                                                                          |
+| Continue / View button | "Continue" for Not started and In progress; "View" for Approved and Exported; no button at all for Ineligible (`mismatch`) -- only the delete option remains, matching FR-47's no-override-path design (added 2026-07-10, confirmed against `components/dashboard-populated.tsx`)                     |
 | Delete button          | Red text link -- triggers confirmation prompt per application status model                                                                                                                                                                                                                            |
 
 ---
@@ -1005,40 +1006,46 @@ Full Privacy Policy, statically rendered at build time from `docs/privacy-policy
 
 ### 8.1 Statuses
 
-| Status        | Display label | Meaning                                             |
-| ------------- | ------------- | --------------------------------------------------- |
-| `not_started` | Not started   | Application record created; no guidelines added yet |
-| `in_progress` | In progress   | Guidelines added; user is working through the flow  |
-| `approved`    | Approved      | User has reviewed and formally approved all content |
-| `exported`    | Exported      | Approved content has been downloaded at least once  |
+| Status        | Display label | Meaning                                                                                                                                                           |
+| ------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `not_started` | Not started   | Application record created; no guidelines added yet                                                                                                               |
+| `in_progress` | In progress   | Guidelines added; user is working through the flow                                                                                                                |
+| `approved`    | Approved      | User has reviewed and formally approved all content                                                                                                               |
+| `exported`    | Exported      | Approved content has been downloaded at least once                                                                                                                |
+| `mismatch`    | Ineligible    | AI detected a clear eligibility mismatch on Step 3 (FR-47); terminal -- no override path (added 2026-07-10, previously missing from this table; see Section 6.12) |
 
 ### 8.2 Transition Rules
 
-| From          | To            | Trigger                                         |
-| ------------- | ------------- | ----------------------------------------------- |
-| `not_started` | `in_progress` | User saves funder guidelines on Step 2          |
-| `in_progress` | `approved`    | User approves application on Step 5             |
-| `approved`    | `exported`    | User downloads Word document for the first time |
-| `approved`    | `in_progress` | User re-opens approved application for editing  |
-| `exported`    | `in_progress` | User re-opens exported application for editing  |
+| From          | To            | Trigger                                                                                                                                              |
+| ------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `not_started` | `in_progress` | User saves funder guidelines on Step 2                                                                                                               |
+| `in_progress` | `approved`    | User approves application on Step 5                                                                                                                  |
+| `in_progress` | `mismatch`    | AI detects an eligibility mismatch on Step 3 and user acknowledges the warning (added 2026-07-10, previously missing) -- terminal, no transition out |
+| `approved`    | `exported`    | User downloads Word document for the first time                                                                                                      |
+| `approved`    | `in_progress` | User re-opens approved application for editing                                                                                                       |
+| `exported`    | `in_progress` | User re-opens exported application for editing                                                                                                       |
 
 ### 8.3 Deletion Confirmation Prompts
 
-| Status        | Confirmation prompt                                                                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `not_started` | "Are you sure you want to delete this application? This cannot be undone."                                                                              |
-| `in_progress` | "Are you sure you want to delete this application? This cannot be undone."                                                                              |
-| `approved`    | "Are you sure you want to delete this approved application? Your answers will be permanently removed and cannot be recovered."                          |
-| `exported`    | "Are you sure you want to delete this application? Your answers will be permanently removed. Make sure you have kept a copy of your exported document." |
+| Status        | Confirmation prompt                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `not_started` | "Are you sure you want to delete this application? This cannot be undone."                                                                                                                                                      |
+| `in_progress` | "Are you sure you want to delete this application? This cannot be undone."                                                                                                                                                      |
+| `approved`    | "Are you sure you want to delete this approved application? Your answers will be permanently removed and cannot be recovered."                                                                                                  |
+| `exported`    | "Are you sure you want to delete this application? Your answers will be permanently removed. Make sure you have kept a copy of your exported document."                                                                         |
+| `mismatch`    | Same generic prompt as `not_started`/`in_progress` -- "Are you sure you want to delete this application? This cannot be undone." (`deleteModalText()` has no special case for `mismatch`; added 2026-07-10, previously missing) |
 
 ### 8.4 Dashboard Status Colours
 
+**Corrected 2026-07-10 -- verified against `dashboard-populated.tsx`'s `STATUS_CONFIG`; "Not started" was misquoted and `mismatch` was missing entirely.**
+
 | Status      | Colour          |
 | ----------- | --------------- |
-| Not started | Slate (#1E293B) |
+| Not started | Slate (#64748B) |
 | In progress | Amber (#D97706) |
 | Approved    | Green (#16A34A) |
 | Exported    | Teal (#0D6E6E)  |
+| Ineligible  | Red (#DC2626)   |
 
 ---
 

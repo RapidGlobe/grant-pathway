@@ -602,11 +602,11 @@ Padding: `3px 10px`. The dot is a `6px × 6px` circle, `border-radius: 50%`.
 
 **Step content:**
 
-| Step | Step label  | Title                       | Description                                          | Lucide icon |
-| ---- | ----------- | --------------------------- | ---------------------------------------------------- | ----------- |
-| 1    | Steps 1 & 2 | Add funder guidelines       | Upload or paste your funder's guidelines document    | `Upload`    |
-| 2    | Step 3      | Get an AI summary           | We'll read and summarise the key questions for you   | `Sparkles`  |
-| 3    | Step 4      | Generate your draft answers | We'll write draft answers using your charity profile | `FileCheck` |
+| Step | Step label  | Title                 | Description                                        | Lucide icon |
+| ---- | ----------- | --------------------- | -------------------------------------------------- | ----------- |
+| 1    | Steps 1 & 2 | Add funder guidelines | Upload or paste your funder's guidelines document  | `Upload`    |
+| 2    | Step 3      | Get an AI summary     | We'll read and summarise the key questions for you | `Sparkles`  |
+| 3    | Step 4      | Write your answers    | You write every answer — AI can help if you ask    | `FileCheck` |
 
 **Step label:** 11px, 700 weight, `#64748B`, uppercase, `letter-spacing: 0.06em`
 **Title:** 14px, 600 weight, `#1E293B`

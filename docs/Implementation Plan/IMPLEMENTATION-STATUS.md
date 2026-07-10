@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** After every task — mark complete, update counts, add notes for deviations
 
-**Last updated:** 2026-07-10 (`supportingDocuments` surfaced on the Step 4 preparation checklist, PDR-UI-007; dead `buildDraftPrompt` function removed from `lib/prompts.ts`; blended guideline source-reference plan added to Phase 6 — planning only, no code yet; ADR-DATA-002 "never store guidelines" decision formally reversed — see Notes)
+**Last updated:** 2026-07-10 (stale "Generate your draft" dashboard-explainer copy corrected to "Write your answers" across the component and 7 docs; `supportingDocuments` surfaced on the Step 4 preparation checklist, PDR-UI-007; dead `buildDraftPrompt` function removed from `lib/prompts.ts`; blended guideline source-reference plan added to Phase 6 — planning only, no code yet; ADR-DATA-002 "never store guidelines" decision formally reversed — see Notes)
 **Plan version:** 3.4
 **Overall status:** In progress
 **Target launch:** Not committed — was 31 July 2026; WJ decided 2026-07-05 that launch will not happen until Phase 6 (P6.1–P6.6) is complete. No commercial deadline forces the original date. Working estimate: August–September 2026.
