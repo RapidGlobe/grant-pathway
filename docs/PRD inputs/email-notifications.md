@@ -87,21 +87,17 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 | **Subject**    | Your Grant Pathway account will be deleted in 30 days |
 | **Handled by** | Application scheduled job (Supabase)                  |
 
-**Body:**
+**Body (corrected 2026-07-10 -- verified against `lib/emails/inactivity-warning.ts`; previous body text below did not match the live email):**
 
 > Hi [First name],
 >
-> We noticed you haven't logged in to Grant Pathway for a while. To keep your account and any saved applications, simply log in before [deletion date — 30 days from send date].
+> We haven't seen you on Grant Pathway for nearly two years. To protect your privacy, we automatically delete inactive accounts after 24 months.
 >
-> **[Log in to Grant Pathway]** _(button — links to sign-in page)_
+> **Your account will be permanently deleted on [deletion date].** If you'd like to keep it, simply sign in before that date.
 >
-> If we don't hear from you, your account and all associated data — including your charity profile and saved applications — will be permanently deleted on [deletion date]. This cannot be undone.
+> **[Sign in to keep my account]** _(button — links to homepage)_
 >
-> If you no longer need your account, you don't need to do anything.
->
-> —
-> Grant Pathway
-> grantpathway.org.uk
+> If you no longer need your account, you don't need to do anything — it will be deleted automatically on [deletion date].
 
 **Notes:**
 
@@ -120,19 +116,15 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 | **Subject**    | Your Grant Pathway account has been deleted                                                |
 | **Handled by** | Application scheduled job (Supabase)                                                       |
 
-**Body:**
+**Body (corrected 2026-07-10 -- verified against `lib/emails/account-deleted-inactivity.ts`):**
 
 > Hi [First name],
 >
-> As we mentioned in our previous email, your Grant Pathway account has now been deleted due to inactivity. All data associated with your account — including your charity profile and saved applications — has been permanently removed.
+> As we notified you previously, your Grant Pathway account has now been permanently deleted due to 24 months of inactivity.
 >
-> If you'd like to use Grant Pathway in the future, you're welcome to register again at any time.
+> All your data, including your charity profile and saved applications, has been removed. If you'd like to use Grant Pathway again, you're welcome to create a new free account.
 >
-> **[Register a new account]** _(button — links to registration page)_
->
-> —
-> Grant Pathway
-> grantpathway.org.uk
+> **[Create a new account]** _(button — links to registration page; corrected from "Register a new account")_
 
 **Notes:**
 
@@ -144,29 +136,25 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 
 ## Email 5 — Account Deleted (User Initiated)
 
-| Field          | Detail                                                                 |
-| -------------- | ---------------------------------------------------------------------- |
-| **Trigger**    | User completes the account deletion flow in the application            |
-| **Recipient**  | The email address associated with the now-deleted account              |
-| **Subject**    | Your Grant Pathway account has been deleted                            |
-| **Status**     | Should Have — FR-44. Only implemented if FR-44 is included in v1 build |
-| **Handled by** | Application (triggered on successful deletion)                         |
+| Field          | Detail                                                                                                                       |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Trigger**    | User completes the account deletion flow in the application                                                                  |
+| **Recipient**  | The email address associated with the now-deleted account                                                                    |
+| **Subject**    | Your Grant Pathway account has been deleted                                                                                  |
+| **Status**     | Should Have — FR-44. **Confirmed built (2026-07-10)**, no longer conditional; see `docs/PRD-Grant-Pathway-v1.md` Section 6.9 |
+| **Handled by** | Application (triggered on successful deletion)                                                                               |
 
-**Body:**
+**Body (corrected 2026-07-10 -- verified against `lib/emails/account-deleted-user.ts`):**
 
 > Hi [First name],
 >
-> This confirms that your Grant Pathway account has been permanently deleted, as you requested. All data associated with your account — including your charity profile and saved applications — has been removed.
+> Your Grant Pathway account has been permanently deleted. All your data, including your charity profile and saved applications, has been removed.
 >
-> If you change your mind in the future, you're welcome to register again at any time.
+> If you change your mind, you can create a new account at any time — it's free.
 >
-> **[Register a new account]** _(button — links to registration page)_
+> **[Create a new account]** _(button — links to registration page; corrected from "Register a new account")_
 >
-> Thank you for using Grant Pathway. We hope it was useful.
->
-> —
-> Grant Pathway
-> grantpathway.org.uk
+> _The previous closing line, "Thank you for using Grant Pathway. We hope it was useful," does not exist in the live email — removed._
 
 **Notes:**
 
@@ -178,14 +166,14 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 
 ## Summary
 
-| #   | Email                            | Trigger                      | Expiry   | FR reference        |
-| --- | -------------------------------- | ---------------------------- | -------- | ------------------- |
-| 1   | Email verification               | Registration                 | 24 hours | FR-03               |
-| 2   | Password reset                   | Forgot password request      | 1 hour   | FR-06               |
-| 3   | Inactivity warning               | 23 months no login           | —        | PDR-DH-002          |
-| 4   | Account deleted (inactivity)     | 24 months no login           | —        | PDR-DH-002          |
-| 5   | Account deleted (user initiated) | User completes deletion flow | —        | FR-44 (Should Have) |
+| #   | Email                            | Trigger                      | Expiry   | FR reference                          |
+| --- | -------------------------------- | ---------------------------- | -------- | ------------------------------------- |
+| 1   | Email verification               | Registration                 | 24 hours | FR-03                                 |
+| 2   | Password reset                   | Forgot password request      | 1 hour   | FR-06                                 |
+| 3   | Inactivity warning               | 23 months no login           | —        | PDR-DH-002                            |
+| 4   | Account deleted (inactivity)     | 24 months no login           | —        | PDR-DH-002                            |
+| 5   | Account deleted (user initiated) | User completes deletion flow | —        | FR-44 (Should Have — confirmed built) |
 
 ---
 
-_Last updated: 2026-04-16_
+_Last updated: 2026-07-10_

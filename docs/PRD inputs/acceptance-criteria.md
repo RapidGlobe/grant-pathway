@@ -2071,7 +2071,7 @@ _Note: the screen requirements specify that the user must type the word DELETE (
 - **When** I read the email
 - **Then** it confirms that my account has been permanently deleted
 - **And** it confirms that all associated data has been removed
-- **And** it includes a _"Register a new account"_ link for users who wish to use Grant Pathway again in the future
+- **And** it includes a _"Create a new account"_ link for users who wish to use Grant Pathway again in the future _(corrected 2026-07-10 -- previously said "Register a new account"; verified against `lib/emails/account-deleted-user.ts`)_
 
 ---
 
