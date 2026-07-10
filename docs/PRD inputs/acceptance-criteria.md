@@ -6,23 +6,24 @@
 
 This document defines testable Given/When/Then acceptance criteria for every functional requirement in Grant Pathway v1. Criteria are grouped by the same sections used in the BRD (Section 9).
 
-Each requirement is marked **Must Have** or **Should Have**. Should Have requirements are included for completeness — acceptance criteria for a Should Have requirement only apply if that requirement is built in v1.
+Each requirement is marked **Must Have** or **Should Have**. Should Have requirements are included for completeness — acceptance criteria for a Should Have requirement only apply if that requirement is built in v1. Where a Must Have requirement's criteria describe behaviour that is not confirmed as built, this is flagged explicitly at the start of that FR's section — such criteria should not be treated as currently passing, and test plans should not report against them as defects until the flag is resolved.
 
 ---
 
 ## Status
 
-| Section                         | FRs covered    | Status      |
-| ------------------------------- | -------------- | ----------- |
-| 9.1 Authentication & Accounts   | FR-01 to FR-08 | ✅ Complete |
-| 9.2 Charity Profile             | FR-09 to FR-14 | ✅ Complete |
-| 9.3 Application Management      | FR-15 to FR-20 | ✅ Complete |
-| 9.4 Funder Guideline Handling   | FR-21 to FR-23 | ✅ Complete |
-| 9.5 AI Guideline Summarisation  | FR-24 to FR-27 | ✅ Complete |
-| 9.6 AI Draft Answer Generation  | FR-28 to FR-31 | ✅ Complete |
-| 9.7 Mandatory Review & Approval | FR-32 to FR-36 | ✅ Complete |
-| 9.8 Export                      | FR-37 to FR-39 | ✅ Complete |
-| 9.9 Account Deletion            | FR-40 to FR-44 | ✅ Complete |
+| Section                                                      | FRs covered    | Status                                                                             |
+| ------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------- |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08 | ✅ Complete                                                                        |
+| 9.2 Charity Profile                                          | FR-09 to FR-14 | ✅ Complete                                                                        |
+| 9.3 Application Management                                   | FR-15 to FR-20 | ✅ Complete                                                                        |
+| 9.4 Funder Guideline Handling                                | FR-21 to FR-23 | ⚠️ Partial — FR-22 target retention model not yet built; FR-21 and FR-23 confirmed |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27 | ✅ Complete                                                                        |
+| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31 | ✅ Complete                                                                        |
+| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36 | ✅ Complete                                                                        |
+| 9.8 Export                                                   | FR-37 to FR-39 | ✅ Complete                                                                        |
+| 9.9 Account Deletion                                         | FR-40 to FR-44 | ✅ Complete                                                                        |
+| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47 | ⚠️ Partial — FR-45 and FR-46 not confirmed built; FR-47 confirmed                  |
 
 ---
 
@@ -39,7 +40,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 **AC-FR-01-01 — Successful registration**
 
 - **Given** I am an unauthenticated user on `/register`
-- **When** I enter a valid first name, last name, email address, and a password of 10 or more characters
+- **When** I enter a valid first name, last name, email address, and a password of 12 or more characters containing both letters and digits
 - **And** I check the Terms of Service and Privacy Policy checkbox
 - **And** I click "Create account"
 - **Then** my account is created in the system
@@ -290,7 +291,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 **AC-FR-05-04 — Successful password reset**
 
 - **Given** I am on the password reset form with a valid, unexpired link
-- **When** I enter a new password of 10 or more characters
+- **When** I enter a new password of 12 or more characters containing both letters and digits
 - **And** I enter the same value in the confirm password field
 - **And** I click "Save new password"
 - **Then** I see the confirmation: _"Your password has been updated."_
@@ -978,33 +979,47 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ### FR-22 — Must Have
 
-**Requirement:** Funder guidelines shall be used for AI processing only and shall not be permanently stored after the application session.
+**Requirement:** Funder guideline text shall be retained for the life of the application it belongs to (cascade-deleting with that application, per `ADR-DATA-003`), or indefinitely where it backs an approved playbook (`P6.5`). Only extracted, page/section-tagged text is stored in Postgres — the raw uploaded PDF or Word file is never stored in Supabase Storage.
+
+_Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" section, which formally reverses this ADR's original 2026-04-17 "never store" decision (kept intact in that ADR for the historical record, not rewritten). The original claim that funder guidelines "may contain commercially sensitive information provided by the funder" was checked against the real 21-document corpus Grant Pathway processes (`docs/Grant Org Guidelines/`) and found unsupported — these are funders' own publicly published application guidance, not confidential material._
+
+**Not yet built — as of 2026-07-10, this is a documentation-level decision reversal only; no code has changed.** Verified against the live codebase: the app still uses `sessionStorage` (`lib/guidelines-session.ts`) to hold guideline text client-side and discards it once the AI summary call returns, exactly as the original "never store" decision specified. No guideline-storage table exists in any `supabase/migrations/*.sql` file. Retention will only take effect once the Phase 6 groundwork lands (`P6.2a` — guideline page/section reference extraction, then `P6.2`/`P6.3`/`P6.5`), all of which show as "Not started" in `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` at the time of writing. The criteria below describe the target behaviour once built — they should not be treated as currently passing, and test plans should not report against them as defects until the Phase 6 work lands. AC-FR-22-04 documents actual current behaviour (still the discard model) for as long as that remains true.
 
 ---
 
-**AC-FR-22-01 — Guidelines not pre-populated when returning to Step 2**
+**AC-FR-22-01 — Guideline text retained for the life of the application, not the raw file** _(target behaviour — not yet built)_
 
-- **Given** I uploaded or pasted guidelines during a previous session
+- **Given** I uploaded or pasted guidelines on Step 2
+- **When** the guideline text is processed
+- **Then** the extracted, page/section-tagged guideline text is stored in Postgres, linked to my application
+- **And** the original uploaded PDF or Word file is never stored in Supabase Storage — only its extracted text is retained
+
+---
+
+**AC-FR-22-02 — Retained guideline text is deleted when its application is deleted** _(target behaviour — not yet built)_
+
+- **Given** I have an application with retained guideline text
+- **When** I delete that application (FR-19)
+- **Then** the retained guideline text is cascade-deleted along with it, the same way `application_answers` rows are deleted today
+
+---
+
+**AC-FR-22-03 — Guideline text backing an approved playbook is retained independently of any single application** _(target behaviour — not yet built)_
+
+- **Given** a funder's guideline text has been curated into an approved playbook (`P6.5`)
+- **When** the application that originally supplied that text is later deleted
+- **Then** the playbook's copy of the guideline text is retained indefinitely
+- **And** it is unaffected by the deletion of any single user's application or account
+
+---
+
+**AC-FR-22-04 — Current behaviour until Phase 6 lands: guidelines are still discarded, not retained** _(reflects actual 2026-07-10 behaviour)_
+
+- **Given** I uploaded or pasted guidelines during a previous session, using the app as it exists today
 - **When** I return to that application in a new session and navigate to Step 2
 - **Then** the guidelines input area is empty
-- **And** the previously uploaded file or pasted text is not displayed or retrievable
-
----
-
-**AC-FR-22-02 — Guidelines not accessible outside the input step**
-
-- **Given** I have submitted guidelines on Step 2 and advanced to Step 3 or beyond
-- **When** I review my application at any step, on the dashboard, or in an export
-- **Then** the raw guidelines text or file is not shown or accessible anywhere in the application
-
----
-
-**AC-FR-22-03 — AI-generated outputs are retained; raw guidelines are not**
-
-- **Given** I have generated an AI summary and draft answers from my guidelines
-- **When** I return to the application in a future session
-- **Then** the AI summary and draft answers are present
-- **And** the original guidelines text or file is not available
+- **And** the previously uploaded file or pasted text is not displayed or retrievable — it was held only in `sessionStorage` and discarded once the AI summary call returned
+- **And** this remains true until `P6.2a`/`P6.2`/`P6.3` are built, at which point AC-FR-22-01 to AC-FR-22-03 above take effect instead
 
 ---
 
@@ -1286,13 +1301,15 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-**AC-FR-28-04 — Free-form funder shows narrative sections instead of discrete questions**
+**AC-FR-28-04 — Free-form guidelines show narrative sections instead of numbered questions** _(Corrected 2026-07-10 — see note below)_
 
-- **Given** the Step 3 summary identified the funder as a free-form narrative funder (no numbered questions)
+- **Given** this application's Step 3 AI summary classified the guidelines as free-form (no numbered questions)
 - **When** I view the Q&A interface
 - **Then** I see named narrative sections (e.g., "About your organisation", "Project description")
 - **And** each section has a textarea for my own answer
 - **And** a note is displayed: _"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."_
+
+_Note (2026-07-10): this criterion previously read "the Step 3 summary identified **the funder** as a free-form narrative funder", implying a stable trait of the funder itself. Per `ADR-DATA-006` and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` (BD-08 note, confirmed 2026-07-04), the persistent funder-level "Structured"/"Narrative" badge (the `funders.funder_type` column, from `DR-FD-001`) was retired because it does not reflect a stable property of any funder. What actually drives this screen is a **per-application** classification derived dynamically from that application's own Step 3 AI summary (`applications.ai_summary.funder_type`) — corrected above accordingly. Separately, per `ADR-DATA-006` and moscow register FR-45: extraction is narrative-only in practice regardless of this classification — every extracted question defaults to `question_type = narrative`; the only other question-level distinction actually built is the `is_budget_question` flag (see FR-31, FR-45), not a broader structured/free-form question-type split._
 
 ---
 
@@ -1333,11 +1350,13 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-### FR-29 — Should Have
+### FR-29 — Must Have
 
 **Requirement:** Word limits extracted from the funder guidelines shall be displayed alongside each question, and answers shall display a word/character counter.
 
 _Word limits are extracted automatically from the guidelines in Step 3 — they are not manually entered by the user._
+
+_Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previous version of this document. `docs/moscow-feature-register.md` §9.6 (row FR-29, "Revisions since initial publication" table) and `docs/PRD-Grant-Pathway-v1.md` §6.6/Summary both record FR-29 as promoted to **Must Have** on 2026-05-28, once the charity-authored Q&A model made word/character limits integral to Step 4 rather than an optional extra. Corrected here to match both sources._
 
 ---
 
@@ -1468,42 +1487,52 @@ _Word limits are extracted automatically from the guidelines in Step 3 — they 
 
 ### FR-31A — Must Have
 
-**Requirement:** Before the final assembly, the user shall see a senior review prompt recommending they check the budget figures and project description with a senior colleague.
+**Requirement:** Before the final assembly, the user shall see a senior review prompt recommending they confirm that a senior colleague has reviewed the budget answers.
+
+_Numbering note (2026-07-10): FR-31A is not present in the canonical FR-01 to FR-47 numbering used by `docs/moscow-feature-register.md` or `docs/PRD-Grant-Pathway-v1.md` — both flag this as a gap in those documents (see `docs/PRD-Grant-Pathway-v1.md`, note below the acceptance-criteria cross-reference), not something resolved here. It is kept as its own entry here, rather than folded into FR-30 or FR-31, because it is a real, built, separately-identified requirement: the screen exists in production (`components/application-step4-senior-review.tsx`, spec ref S6.7) and both that file and `actions/applications.ts` (`assembleAndAdvance()`) cite "AC-FR-31A" directly in code comments as the criteria the behaviour was built against. The four criteria below have been corrected to match what is actually implemented — the original three (AC-FR-31A-01 through -04) described a three-point checkbox-style prompt and a structured/free-form assembly split that do not match the shipped screen or the shipped `assembleAndAdvance()` logic. This is a judgement call: retiring the FR-31A label entirely was considered, but since it is already load-bearing in code comments, correcting its content in place was judged less disruptive than removing it and renumbering downstream FRs._
 
 ---
 
 **AC-FR-31A-01 — Senior review prompt shown before assembly**
 
-- **Given** all questions are answered and I have clicked "Ready to assemble"
-- **When** I view the next screen
-- **Then** I see a prompt recommending I check with my CEO, treasurer, or a trustee that:
-  - _"The budget figures are accurate and approved"_
-  - _"The project description reflects your current priorities"_
-  - _"You have authority to submit this application"_
+- **Given** I have answered all mandatory questions/sections and clicked "Ready to assemble" on Step 4
+- **When** the senior review screen loads
+- **Then** I see the heading _"Before we put it together"_
+- **And** I see a prompt asking me to confirm that a senior colleague — such as my CEO, treasurer, or a trustee — has reviewed my budget answers
+- **And** I see a supporting note explaining that inaccurate budget answers are a common reason grant applications are unsuccessful or withdrawn
 
 ---
 
-**AC-FR-31A-02 — Assembly begins only after senior review confirmation**
+**AC-FR-31A-02 — Assembly begins only after confirmation**
 
-- **Given** I am viewing the senior review prompt
-- **When** I click _"I've reviewed this — assemble my draft"_
-- **Then** the assembly API is called and the assembled draft is saved to the application
-
----
-
-**AC-FR-31A-03 — Structured funder assembly produces a Q&A formatted draft**
-
-- **Given** the funder is a structured funder (discrete questions)
-- **When** the assembly API completes
-- **Then** the assembled draft contains each answer formatted under its question heading
+- **Given** I am viewing the senior review screen
+- **When** I click _"Yes — assemble my draft"_
+- **Then** the assembly action runs, formatting all answered questions into the application's `assembled_draft`
+- **And** the application's `draft_status` is set to `assembled` and `current_step` advances to 5
+- **And** I am redirected to Step 5
 
 ---
 
-**AC-FR-31A-04 — Free-form assembly produces a flowing narrative**
+**AC-FR-31A-03 — Returning to editing from the senior review screen**
 
-- **Given** the funder is a free-form narrative funder
-- **When** the assembly API completes
-- **Then** the assembled draft is a coherent flowing narrative — not a Q&A list
+- **Given** I am viewing the senior review screen
+- **When** I click _"Back to editing"_ instead
+- **Then** the application's `draft_status` reverts to `in_progress`
+- **And** I am returned to the Step 4 Q&A interface with no draft assembled
+
+---
+
+**AC-FR-31A-04 — Assembly formats each answered question under its question or section text, verbatim**
+
+- **Given** the assembly action runs
+- **When** the `assembled_draft` is generated
+- **Then** each answered question appears as its question (or section) text followed by the charity's own answer text, with entries separated by a divider
+- **And** where this application's Step 3 AI summary classified the guidelines as structured (numbered questions), each entry is additionally prefixed with its question number
+- **And** where the summary classified the guidelines as free-form, no number prefix is added — otherwise the format is identical
+- **And** unanswered questions are omitted from the assembled draft
+- **And** no AI is used in this step — the charity's own words are reproduced exactly as written
+
+_Note (2026-07-10): this replaces the previous AC-FR-31A-03/04, which claimed free-form assembly produces "a coherent flowing narrative — not a Q&A list", distinct in kind from structured assembly. Per `actions/applications.ts` `assembleAndAdvance()`, both formats produce the same question-then-answer structure joined by the same `---` divider; the only actual difference is whether a number prefix is added. This also corrects the earlier framing of "the funder is a structured/free-form funder" as an inherent funder trait — see the equivalent note on AC-FR-28-04 above; the same per-application, not per-funder, classification applies here._
 
 ---
 
@@ -2031,5 +2060,134 @@ _These criteria apply only if FR-44 is implemented in v1._
 
 ---
 
-_Last updated: 2026-07-01_
-_Status: Complete — all 9 sections done. Changes in this version: FR-07 (MFA) marked Won't Have — criteria retained for historical reference only, matching the 2026-06-12 removal already recorded in `docs/moscow-feature-register.md` (2026-07-01). FR-02 requirement updated (password 10→12 chars, letters + digits required); AC-FR-02-02 updated, AC-FR-02-02b added (2026-06-29). AC-FR-23-04 (200-page PDF cap) and AC-FR-23-05 (extraction timeout) added (2026-06-22). AC-FR-24-06 (truncation warning) added (2026-06-22). AC-FR-27-03 (kill-switch Step 3) and AC-FR-27-04 (kill-switch Step 4 AI assist) added (2026-06-29)._
+---
+
+## 9.10 Question Typing, Funder Coverage & Eligibility Mismatch
+
+_Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway-v1.md` between 2026-05-29 and 2026-06-02 but this document had not yet been updated with real acceptance criteria for them. The criteria below were written from a direct check of the live codebase (`app/`, `components/`, `lib/`, `supabase/migrations/`) against each FR's requirement text, not assumed from the requirement alone._
+
+---
+
+### FR-45 — Must Have
+
+**Requirement:** Each extracted application question shall carry a `question_type` of `narrative`, `data_entry`, `financial`, `dropdown`, `date`, or `file_upload`, driving different handling per type — narrative questions show a writing card; data-entry and financial questions are pre-filled from the charity profile; dropdown, date, and file_upload questions are displayed as read-only reminders only.
+
+**Not built as originally specified — see `docs/moscow-feature-register.md` FR-45 and `ADR-DATA-006` (2026-07-05).** Verified directly against `lib/prompts.ts`: the extraction prompt instructs the AI to extract "ONLY... questions that require a NARRATIVE TEXT answer" and explicitly lists data-entry fields, dropdown/selection questions, number fields, file-upload instructions, and consent questions as items that must NOT be extracted. `docs/data-model.md`'s `application_answers.question_type` column defaults to `narrative` "for backwards compatibility" — in practice no other value is ever produced. The only question-level distinction that is actually built and enforced is the boolean `is_budget_question` flag (amber styling, AI assist disabled — see FR-31). The criteria below describe the behaviour genuinely implemented today; they do not describe the multi-type `question_type` system as originally specified, which `ADR-DATA-006`'s item-graph model is intended to eventually replace it with (not yet built — see that ADR's Consequences).
+
+---
+
+**AC-FR-45-01 — Every extracted question defaults to narrative type**
+
+- **Given** the AI has extracted application questions or sections from the funder guidelines on Step 3
+- **When** the questions are saved to `application_answers`
+- **Then** every row is saved with `question_type = narrative`
+- **And** no row is ever saved with `question_type` of `data_entry`, `financial`, `dropdown`, `date`, or `file_upload`
+
+---
+
+**AC-FR-45-02 — Non-narrative fields are silently discarded, not shown as reminders**
+
+- **Given** the funder's guidelines contain non-narrative fields (e.g. a dropdown for region, a date field, a file-upload instruction, a consent checkbox)
+- **When** the AI summary is generated on Step 3
+- **Then** those fields do not appear anywhere in the Q&A interface on Step 4 — neither as a writing card, a pre-filled field, nor a read-only reminder
+- **And** nothing in the app indicates to the user that those fields exist in the original guidelines
+
+---
+
+**AC-FR-45-03 — Budget questions are distinguished by the `is_budget_question` flag, not a separate question type**
+
+- **Given** an extracted question concerns budget, income, expenditure, or funding breakdown
+- **When** the question is saved
+- **Then** it is still saved with `question_type = narrative`
+- **And** `is_budget_question` is set to `true`, which drives the amber styling and disabled AI assist described in FR-31 — this is the only per-question behavioural split that is actually built
+
+---
+
+### FR-46 — Must Have
+
+**Requirement:** The system shall display a three-tier funder coverage model to the user: Tier 1 (Full) — narrative questions with profile pre-fill; Tier 2 (Partial) — a narrative subset of a portal form; Tier 3 (Guidance) — a free-form narrative document. The coverage tier shall be shown on the new-application screen, the Step 3 summary card, and the export screen.
+
+**Not confirmed as built — as of 2026-07-10, this is not implemented anywhere in the codebase.** Confirmed by three independent checks: (1) `docs/moscow-feature-register.md` FR-46 and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` Section 3.3, which is marked "⚠ Not implemented (confirmed 2026-07-04)"; (2) a direct search of `app/`, `components/`, and `lib/` for "tier", "Tier 1/2/3", or "Full/Partial/Guidance coverage" returned no matches anywhere in the codebase; (3) the `funders` table (`supabase/migrations/20260601000000_add_funders_table.sql`) has no tier or coverage-level column — only `name`, `funder_type`, `grant_range`, `guidelines_url`, and `is_active`. The following criteria describe target behaviour once built; as of 2026-07-10 this is not implemented. They should not be treated as currently passing, and test plans should not report against them as defects until a decision is made on whether to build this feature — it remains an open product question (see `docs/moscow-feature-register.md` FR-46), not a scheduled-but-incomplete build.
+
+---
+
+**AC-FR-46-01 — Coverage tier shown on the new-application screen** _(target behaviour — not built)_
+
+- **Given** I am on Step 1 selecting a funder from the picker
+- **When** I select a funder
+- **Then** the funder's coverage tier (Tier 1 Full / Tier 2 Partial / Tier 3 Guidance) is shown alongside the selected funder
+
+---
+
+**AC-FR-46-02 — Coverage tier shown on the Step 3 summary card** _(target behaviour — not built)_
+
+- **Given** the AI summary has been generated on Step 3
+- **When** I view the summary card
+- **Then** I see the funder's coverage tier displayed, with a plain-language explanation of what that tier means for my application
+
+---
+
+**AC-FR-46-03 — Coverage tier shown on the export screen** _(target behaviour — not built)_
+
+- **Given** I am on Step 5 with an approved application
+- **When** I view the export screen
+- **Then** I see the funder's coverage tier displayed alongside the export options
+
+---
+
+**AC-FR-46-04 — No tier concept is exposed anywhere in the current build** _(reflects actual 2026-07-10 behaviour)_
+
+- **Given** I use Grant Pathway as it exists today, on any screen
+- **When** I look for any mention of coverage tiers, "Tier 1/2/3", or "Full/Partial/Guidance coverage"
+- **Then** I do not find one anywhere — the new-application screen, Step 3 summary card, and export screen show no tier or coverage-level indicator of any kind
+
+---
+
+### FR-47 — Must Have
+
+**Requirement:** On Step 3, if the AI detects a clear mismatch between the charity's profile and the funder's eligibility criteria, the system shall display a hard stop: a red warning card, with the Continue button hidden.
+
+**Confirmed built** — verified directly in `components/application-step3-summary.tsx`, `lib/prompts.ts`, and `actions/applications.ts`.
+
+---
+
+**AC-FR-47-01 — Eligibility mismatch warning shown on Step 3**
+
+- **Given** I have a completed charity profile and have provided funder guidelines
+- **When** the AI summary is generated on Step 3 and detects a clear, unambiguous mismatch between my charity's stated work and the funder's eligibility criteria
+- **Then** I see a red warning card headed _"Eligibility mismatch — this application cannot proceed"_
+- **And** a plain-language explanation is shown covering what the funder specifically supports, what my charity does, and why the two do not align
+- **And** the "Continue" button is not shown
+
+---
+
+**AC-FR-47-02 — Acknowledging the mismatch sets a terminal status**
+
+- **Given** I am viewing the eligibility mismatch warning on Step 3
+- **When** I acknowledge the warning
+- **Then** my application's status is set to `mismatch`
+- **And** I am returned to `/dashboard`
+- **And** the application card shows the _"Ineligible"_ status label
+
+---
+
+**AC-FR-47-03 — No override path exists**
+
+- **Given** my application has status `mismatch`
+- **When** I attempt to continue or re-open that application
+- **Then** I cannot advance it to Step 4 or beyond
+- **And** the only route forward is to correct my charity profile and start a new application
+
+---
+
+**AC-FR-47-04 — Mismatch is not flagged for borderline or partially-aligned cases**
+
+- **Given** my charity's profile only partially aligns with the funder's focus, or the charity might plausibly qualify
+- **When** the AI summary is generated
+- **Then** `eligibilityMismatch` is not set to true
+- **And** I am not blocked from proceeding to Step 4
+
+---
+
+_Last updated: 2026-07-10_
+_Status: Complete — all 10 sections done. Changes in this version: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway-v1.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration._

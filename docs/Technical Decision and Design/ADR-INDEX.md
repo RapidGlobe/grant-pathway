@@ -2,7 +2,7 @@
 
 **Product:** Grant Pathway v1
 **Created:** 2026-04-17
-**Last updated:** 2026-07-05
+**Last updated:** 2026-07-10
 
 This index lists all Architectural Decision Records (ADRs) for Grant Pathway, grouped in the recommended decision order. ADRs marked ⚠️ **BLOCKER** must be resolved before production deployment.
 
@@ -66,14 +66,14 @@ Security decisions that must be in place before any protected pages are built.
 
 Data model, retention, and migration decisions. Must be decided before the database is created.
 
-| ID           | Title                        | Status     | File                                                                                         |
-| ------------ | ---------------------------- | ---------- | -------------------------------------------------------------------------------------------- |
-| ADR-DATA-001 | Data Model                   | ✅ Decided | [ADR-DATA-001-data-model.md](ADR-DATA-001-data-model.md)                                     |
-| ADR-DATA-002 | Data That Is Not Stored      | ✅ Decided | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md)                           |
-| ADR-DATA-003 | Data Retention               | ✅ Decided | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md)                             |
-| ADR-DATA-004 | Database Migrations          | ✅ Decided | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md)                   |
-| ADR-DATA-005 | Database Backup Strategy     | ✅ Decided | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md)                           |
-| ADR-DATA-006 | Application Item-Graph Model | ✅ Decided | [ADR-DATA-006-application-item-graph-model.md](ADR-DATA-006-application-item-graph-model.md) |
+| ID           | Title                        | Status                                                                                           | File                                                                                         |
+| ------------ | ---------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| ADR-DATA-001 | Data Model                   | ✅ Decided                                                                                       | [ADR-DATA-001-data-model.md](ADR-DATA-001-data-model.md)                                     |
+| ADR-DATA-002 | Data That Is Not Stored      | ✅ Decided — reversed 2026-07-10, guidelines now retained; see file's "Revised Decision" section | [ADR-DATA-002-data-not-stored.md](ADR-DATA-002-data-not-stored.md)                           |
+| ADR-DATA-003 | Data Retention               | ✅ Decided                                                                                       | [ADR-DATA-003-data-retention.md](ADR-DATA-003-data-retention.md)                             |
+| ADR-DATA-004 | Database Migrations          | ✅ Decided                                                                                       | [ADR-DATA-004-database-migrations.md](ADR-DATA-004-database-migrations.md)                   |
+| ADR-DATA-005 | Database Backup Strategy     | ✅ Decided                                                                                       | [ADR-DATA-005-backup-strategy.md](ADR-DATA-005-backup-strategy.md)                           |
+| ADR-DATA-006 | Application Item-Graph Model | ✅ Decided                                                                                       | [ADR-DATA-006-application-item-graph-model.md](ADR-DATA-006-application-item-graph-model.md) |
 
 ---
 

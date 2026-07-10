@@ -31,7 +31,7 @@ The codebase is hosted in a private GitHub repository under Rapidglobe Ltd owner
 
 ## Consequences
 
-- Branch protection rules should be configured on the `main` branch (require PR review or status checks before merge, even for solo development).
+- Branch protection rules should be configured on the `master` branch (require PR review or status checks before merge, even for solo development).
 - A `.gitignore` must exclude `.env.local` and other files containing secrets.
 - Dependency licences (MIT, Apache 2.0, etc.) must be reviewed to confirm compatibility with a proprietary product.
 
@@ -46,3 +46,5 @@ BRD Section 1 (Company — Rapidglobe Ltd).
 ## Reaffirmed 2026-07-10
 
 This decision was actively revisited, not silently left unexamined, after it came to light that `DR-BM-003` (2026-04-09, decided eight days before this ADR) had recorded the opposite conclusion — fully open source under the MIT Licence — with no note reconciling the two records. On review, this ADR's decision (private repository, proprietary licence) was confirmed as correct going forward; no content change was needed here. `DR-BM-003` has been updated to record the reversal on its own page, and `DR-BM-002` (succession plan) has had its continuity mechanism swapped from public hosting to escrow with a named sector body accordingly. See `DR-BM-003` and `DR-BM-002` for the full reasoning.
+
+**Correction 2026-07-10:** the Consequences bullet above referred to the `main` branch; the repository's default branch has always been `master`. Corrected to match (same stale reference already fixed in `ADR-OPS-002`).

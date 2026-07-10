@@ -55,14 +55,14 @@ A single cron job runs every 30 minutes and deletes any objects in the `guidelin
 {
   "crons": [
     {
-      "path": "/api/cron/cleanup-storage",
+      "path": "/api/cron/cleanup-guidelines",
       "schedule": "*/30 * * * *"
     }
   ]
 }
 ```
 
-The route (`app/api/cron/cleanup-storage/route.ts`):
+The route (`app/api/cron/cleanup-guidelines/route.ts`):
 
 - Verifies the `Authorization: Bearer [CRON_SECRET]` header — rejects unauthorised calls with 401
 - Uses the Supabase service role client to list objects in `guidelines-temp`
@@ -71,16 +71,37 @@ The route (`app/api/cron/cleanup-storage/route.ts`):
 
 **Environment variable:** `CRON_SECRET` — a random secret string added to Vercel environment variables and `.env.local`. Added to the pre-launch checklist in ADR-OPS-002.
 
-**Future tasks:**
+**Implemented — inactivity notification cron jobs (Slice 8, S8.3):**
 
-- Application-level tasks (usage summary emails, inactivity notifications): additional Vercel Cron Job entries in `vercel.json`
-- Pure database maintenance (pruning `ai_usage_log` entries older than 3 months): Supabase pg_cron is the better fit for SQL-only operations
+The inactivity-notification tasks originally speculated about below under "Future tasks" are now built and live, as two further Vercel Cron Job entries alongside the Storage cleanup job:
+
+```json
+// vercel.json
+{
+  "crons": [
+    { "path": "/api/cron/cleanup-guidelines", "schedule": "*/30 * * * *" },
+    { "path": "/api/cron/inactivity-warning", "schedule": "0 8 * * *" },
+    { "path": "/api/cron/inactivity-deletion", "schedule": "0 9 * * *" }
+  ]
+}
+```
+
+- `app/api/cron/inactivity-warning/route.ts` — runs daily at 08:00 UTC; pages through `auth.admin.listUsers()` and sends an inactivity-warning email (Email 3, `lib/emails/inactivity-warning.ts`) to any user whose `auth.users.last_sign_in_at` falls in the 23-month window (≥23 and <24 months ago). No custom "last active" column was added — `last_sign_in_at` on the existing Supabase Auth user record is used directly.
+- `app/api/cron/inactivity-deletion/route.ts` — runs daily at 09:00 UTC; same pagination pattern; cascade-deletes any account with `last_sign_in_at` ≥24 months ago (same cascade order as the user-initiated deletion in ADR-DATA-003/S8.2), then sends the account-deleted email (Email 4, `lib/emails/account-deleted-inactivity.ts`). Deletion failures are logged and skipped so the next run retries.
+- Both routes follow the same `CRON_SECRET` authentication pattern as the Storage cleanup job.
+- Emails are sent via the direct Resend REST API path (`lib/emails/send.ts`), not Supabase Auth SMTP — see `ADR-OPS-003`'s 2026-07-10 addition.
+- Both jobs were confirmed complete and active in the Vercel dashboard per `IMPLEMENTATION-STATUS.md` (S8.3), which was completed no later than the Phase 4 → Phase 5 gate sign-off on 2026-06-17 — the exact completion date for S8.3 specifically is not recorded in `IMPLEMENTATION-STATUS.md` or `CHANGELOG.md` beyond that bound.
+
+**Future tasks (still speculative):**
+
+- Usage summary emails: an additional Vercel Cron Job entry in `vercel.json`, not yet built
+- Pure database maintenance (pruning `ai_usage_log` entries older than 3 months): Supabase pg_cron is the better fit for SQL-only operations; not yet built
 
 ## Consequences
 
-- No immediate consequences for v1 if no scheduled jobs are required.
-- If a Vercel Cron Job is added, the route it calls must authenticate the request (e.g., check a `CRON_SECRET` header to prevent unauthorised calls).
+- If a Vercel Cron Job is added, the route it calls must authenticate the request (e.g., check a `CRON_SECRET` header to prevent unauthorised calls). **Confirmed satisfied** by `cleanup-guidelines`, `inactivity-warning`, and `inactivity-deletion`.
 - Cron job endpoints should be excluded from user-facing rate limiting (ADR-SEC-005).
+- **Added 2026-07-10:** the inactivity-notification cron jobs are implemented and live (`inactivity-warning`, `inactivity-deletion` — S8.3); this ADR's "Future tasks" section previously described them as not-yet-built speculation, which was stale.
 
 ## Source
 
@@ -89,3 +110,10 @@ ADR-DATA-003 (data retention), ADR-OPS-001.
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Inactivity-notification cron jobs (previously listed under "Future tasks" as speculative) moved into a new "Implemented" section: `inactivity-warning` (daily 08:00 UTC) and `inactivity-deletion` (daily 09:00 UTC), built in Slice 8 (S8.3) and confirmed active in the Vercel dashboard. Usage-summary emails and `ai_usage_log` pruning remain future/not-yet-built. Exact completion date for S8.3 not separately recorded; bounded by the Phase 4 → Phase 5 gate sign-off (2026-06-17). |
+| 2026-07-10 | Corrected the Storage cleanup job's route name in the `vercel.json` example and route description — both said `/api/cron/cleanup-storage`, but the route was always implemented at `app/api/cron/cleanup-guidelines/`. Stale name, no behaviour change.                                                                                                                                                                                                                                       |

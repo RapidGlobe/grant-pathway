@@ -19,7 +19,7 @@ The Mark One BRD was written before Grant Pathway had been tested against real f
 
 Mark Two (v0.1–v0.4, May 2026) re-based the product on what was actually observed at that point, not on what was assumed. It was written before Phase 5 (Pre-Launch) testing began.
 
-**This revision (v0.5, July 2026) exists for the same reason Mark Two did: real testing surfaced a gap between what was decided and what was actually built.** During Phase 5 funder testing (MKCF, A B Charitable Trust, Clothworkers' Foundation), several parts of Mark Two turned out to describe intended behaviour that was never implemented, or behaviour that has since changed without the BRD being updated:
+**This revision (v0.6, July 2026) exists for the same reason Mark Two did: real testing surfaced a gap between what was decided and what was actually built.** During Phase 5 funder testing (MKCF, A B Charitable Trust, Clothworkers' Foundation), several parts of Mark Two turned out to describe intended behaviour that was never implemented, or behaviour that has since changed without the BRD being updated:
 
 - Non-narrative question handling (BD-03, BD-04, Section 3.2, Section 5.5) was never built — non-narrative questions are filtered out at AI extraction and never reach the application at all, not pre-filled or shown as reminders as decided. This is flagged as an open decision, not silently resolved — see Section 10.
 - The "Structured"/"Narrative" funder-level badge (introduced in `DR-FD-001`, after this BRD's original decisions and never actually defined) turned out not to reflect a stable property of any funder — see the amendment on BD-04 in Section 10. It has been retired from the funder picker.

@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.8
+**Version:** 1.9
 **Date:** 2026-04-21
-**Last updated:** 2026-07-05
+**Last updated:** 2026-07-10
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -409,13 +409,17 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 The monthly usage check is performed via a Supabase RPC call (`reserve_ai_slot`) rather than a bare client count. This provides an atomic advisory lock — preventing race conditions where two concurrent AI requests could both pass the cap check simultaneously.
 
-### Data not stored
+### Data not stored (superseded 2026-07-10 — see note below)
 
-Funder guidelines text is **never** written to the database or to Supabase Storage permanently. It is extracted from the uploaded file, held in `sessionStorage` during the session, passed in the POST body to the AI API route, and discarded after the response returns. (ADR-DATA-002)
+Funder guidelines text is **never** written to the database or to Supabase Storage permanently. It is extracted from the uploaded file, held in `sessionStorage` during the session, passed in the POST body to the AI API route, and discarded after the response returns. This remains the accurate description of current production behaviour — the paragraph above is not yet superseded in code.
+
+**Reversal note (ADR-DATA-002, 2026-07-10):** The premise behind "never store" — that funder guidelines "may contain commercially sensitive information" — was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false: these are funders' own publicly published application guidance. The decision is formally reversed: once the Phase 6 guideline source-reference feature ships (P6.2a groundwork, then P6.2/P6.3), extracted/page-tagged guideline **text** (never the raw PDF/Word file) will be stored in Postgres — for the life of the owning application (cascade-deletes per `ADR-DATA-003`, same as `application_answers`), or indefinitely when the text backs an approved playbook (`P6.5`), independent of any user's lifecycle. No calendar-based expiry job is introduced. Until P6.2a/P6.2 are built, the `sessionStorage` behaviour described above continues to apply unchanged; the raw-file handling in "Orphaned file protection" below is likewise unaffected — no raw guideline file is ever stored under either the old or new decision.
 
 ### Data retention
 
 All data is retained for the lifetime of the user account. Account deletion cascades through all tables in order: `application_answers` → `applications` → `charity_profiles` → `ai_usage_log` → `user_profiles` → Supabase Auth user. Deletion is permanent and immediate. (ADR-DATA-003)
+
+**Forward reference (ADR-DATA-003, 2026-07-10):** The cascade rule above is planned to extend to two Phase 6 tables not yet built (names TBD until `P6.2`/`P6.5` land): retained guideline-chunk rows will cascade-delete with their owning application like `application_answers`; playbook rows will be excluded from any single user's cascade, matching the non-user-scoped `funders` table today. This section describes the schema and cascade order as they exist in production today.
 
 ### Migrations
 
@@ -611,6 +615,8 @@ export const clearGuidelines = (applicationId: string) =>
 ```
 
 The `sessionStorage` entry is cleared when Step 3 completes successfully. If the user closes the tab, the browser clears `sessionStorage` automatically — no guidelines data persists across sessions.
+
+**Forward reference (ADR-FILE-004, ADR-ARCH-004, 2026-07-10):** This remains exactly how the product works today. However, its underlying premise — consistency with ADR-DATA-002's "never store" decision — no longer holds, since that decision was reversed on 2026-07-10 (see "Data not stored" above). Once the Phase 6 guideline source-reference feature ships (P6.2a onward), guideline text will be retained server-side in Postgres, and this client-side `sessionStorage` round-trip is expected to become unnecessary for restoring Step 2 state — the retained server-side copy could be read directly instead. Nothing here changes until then.
 
 ---
 
@@ -1075,6 +1081,8 @@ The following one-time tasks must be completed before the first production deplo
 | 1.6     | 2026-07-01 | Rapidglobe Ltd | Fixed `/application/[id]` → `/applications/[id]` route-naming inconsistency (project tree merged from two separate top-level entries into one; 12 occurrences across §4 and §7 route tables) to match the actual codebase and decision D1 in `IMPLEMENTATION-PLAN.md`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | 1.7     | 2026-07-01 | Rapidglobe Ltd | Removed the 1.4 pass's incorrect "restored /api/generate-draft as active" claim — the route was confirmed genuinely orphaned (zero callers anywhere in the codebase) and deleted entirely 2026-07-01. Corrected §4 project tree, §9 API routes table (`/api/refine-answer` config corrected from "Default timeout" to `maxDuration = 60`), and §13 rate-limiting table                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | 1.8     | 2026-07-05 | Rapidglobe Ltd | Added forward-reference notes to the `funders` and `application_answers` schema sections pointing at ADR-DATA-006 (Application Item-Graph Model) — a decided but not-yet-built rearchitecture superseding `funder_type` and the flat `application_answers` structure. No schema change; the tables documented here remain the accurate current-production state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+
+| 1.9 | 2026-07-10 | Rapidglobe Ltd | Documented the reversal of ADR-DATA-002 ("never store" funder guidelines): the "commercially sensitive information" premise was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false — these are funders' own publicly published guidance. Added a reversal note under "Data not stored" and a forward-reference note under "Guidelines session storage" explaining that extracted guideline text will be retained in Postgres (application-scoped cascade per ADR-DATA-003, or indefinite for approved playbooks) once the Phase 6 P6.2a/P6.2/P6.3 work ships; also added a forward-reference note under "Data retention" for the two new Phase 6 tables. No code has changed — `sessionStorage` and "never stored" remain the accurate current-production behaviour until that Phase 6 work lands |
 
 ---
 
