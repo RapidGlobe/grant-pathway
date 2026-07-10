@@ -99,18 +99,18 @@ The following elements appear on all screens unless otherwise noted.
 
 ### Content
 
-| Element                   | Detail                                                                                                                                           |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Page heading              | _"Create your free account"_                                                                                                                     |
-| First name                | Text input, required                                                                                                                             |
-| Last name                 | Text input, required                                                                                                                             |
-| Email address             | Text input, required                                                                                                                             |
-| Password                  | Password input, required, show/hide toggle                                                                                                       |
-| Password confirmation     | Password input, required, show/hide toggle                                                                                                       |
-| Terms acceptance checkbox | _"I have read and agree to the [Terms of Service] and [Privacy Policy]"_ — both linked, open in new tab — required                               |
-| Feedback opt-in checkbox  | _"I'm happy to be contacted occasionally to share feedback about Grant Pathway"_ — optional (FR-08, Should Have — omit if FR-08 not built in v1) |
-| Create account button     | Primary action — teal background, full width                                                                                                     |
-| Sign in prompt            | Below button: _"Already have an account? Sign in"_ — links to `/`                                                                                |
+| Element                   | Detail                                                                                                                                         |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page heading              | _"Create your free account"_                                                                                                                   |
+| First name                | Text input, required                                                                                                                           |
+| Last name                 | Text input, required                                                                                                                           |
+| Email address             | Text input, required                                                                                                                           |
+| Password                  | Password input, required, show/hide toggle                                                                                                     |
+| Password confirmation     | Password input, required, show/hide toggle                                                                                                     |
+| Terms acceptance checkbox | _"I have read and agree to the [Terms of Service] and [Privacy Policy]"_ — both linked, open in new tab — required                             |
+| Feedback opt-in checkbox  | _"I'm happy to be contacted occasionally to share feedback about Grant Pathway"_ — optional (FR-08, Should Have — confirmed built, 2026-07-10) |
+| Create account button     | Primary action — teal background, full width                                                                                                   |
+| Sign in prompt            | Below button: _"Already have an account? Sign in"_ — links to `/`                                                                              |
 
 ### Validation Rules
 
