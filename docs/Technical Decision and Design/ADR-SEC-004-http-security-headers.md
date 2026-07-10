@@ -54,10 +54,17 @@ Headers are defined in the `headers()` async function in `next.config.js` and ap
 - Headers are defined in `next.config.js` under the `headers()` async function.
 - CSP must be tested against all pages to ensure no resources are blocked.
 - If nonce-based CSP is implemented, Next.js middleware must inject the nonce into each request.
+- **Added 2026-07-10:** the Phase 6 guideline source-reference feature (P6.4's "view original guidelines" viewer) requires jump-to-page _and_ highlight-on-click (decided when the feature was scoped) — this rules out a simple `<iframe>`/`<object>` PDF embed (no highlighting API) and implies canvas-based rendering instead (fetch the file as bytes, render pages to `<canvas>`, draw the highlight manually — the pattern used by libraries like pdf.js). Consequence: **`worker-src 'self' blob:` must be added to the CSP** to permit the rendering library's web worker (typically loaded from a `blob:` URL). No other directive changes are needed — `connect-src` already includes `https://*.supabase.co` for fetching the file, and no `frame-src`/`object-src` allowance is required since the PDF is never embedded via `<iframe>`/`<object>`.
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                               |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Added `worker-src 'self' blob:` consequence for the P6.4 guideline viewer (canvas-based PDF rendering). No change to the CSP value in the Decision table above yet — that happens when P6.4 is implemented; this records the requirement in advance. |
 
 ## Source
 
-BRD Section 9 (Data Privacy & Security).
+NFR-04 (Security).
 
 ## Date Decided
 

@@ -4,7 +4,7 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 3.2
+**Version:** 3.3
 **Date:** 2026-05-07
 **Last updated:** 2026-07-10
 **Status:** Ready for development
@@ -106,7 +106,7 @@ Before writing any code, confirm all external accounts are ready:
 
 | Item           | Action                                                             |
 | -------------- | ------------------------------------------------------------------ |
-| GitHub         | Create account; create public repository `grant-pathway`           |
+| GitHub         | Create account; create private repository `grant-pathway`          |
 | Vercel         | Create account; link to GitHub repository                          |
 | Node.js 20+    | Verify installed (`node --version`)                                |
 | Docker Desktop | Install with WSL2 backend (required for local Supabase in Phase 3) |
@@ -1684,7 +1684,8 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 ### P6.4 — Step 4 Rendering Rework
 
 - Rework Step 4 to walk the graph — respecting visibility conditions (branching) — rather than rendering a flat narrative-card list
-- Show each item's guideline reference next to it; add a "view original guidelines" panel so clicking a reference jumps to and highlights the cited page/section
+- Show each item's guideline reference next to it; add a "view original guidelines" panel so clicking a reference jumps to and highlights the cited page/section — canvas-based PDF rendering (not `<iframe>`/`<object>`, which can't highlight), per ADR-SEC-004's 2026-07-10 consequence note
+- **Update the CSP in `next.config.js` to add `worker-src 'self' blob:`** for the rendering library's web worker (ADR-SEC-004) — `connect-src` already covers the Supabase Storage fetch, no other directive change needed
 - First milestone: render exactly what compatibility-mode items produce, matching current production behaviour for the P6.2 test funder
 - Subsequent milestones: add rendering for each new item type as P6.3 adds it — checklist-style reminders for data/date/file/consent items first, then flexible budget shapes, then rubric-coaching display, then the `decision_maker_visible` treatment
 - Depends on: P6.2; P6.3 for each new item type

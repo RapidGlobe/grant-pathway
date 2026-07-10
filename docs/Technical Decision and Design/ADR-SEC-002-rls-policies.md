@@ -40,17 +40,20 @@ RLS is enabled on all five tables with default-deny (no access unless explicitly
 
 **Policy matrix:**
 
-| Table                 | SELECT                                   | INSERT              | UPDATE              | DELETE              |
-| --------------------- | ---------------------------------------- | ------------------- | ------------------- | ------------------- |
-| `funders`             | All active rows (any authenticated user) | ✗ Service role only | ✗ Service role only | ✗ Service role only |
-| `user_profiles`       | Own rows                                 | Own rows            | Own rows            | Own rows            |
-| `charity_profiles`    | Own rows                                 | Own rows            | Own rows            | Own rows            |
-| `applications`        | Own rows                                 | Own rows            | Own rows            | Own rows            |
-| `application_answers` | Own rows                                 | Own rows            | Own rows            | Own rows            |
-| `ai_usage_log`        | Own rows                                 | Own rows            | ✗ Denied            | ✗ Denied            |
+| Table                                       | SELECT                                     | INSERT              | UPDATE              | DELETE              |
+| ------------------------------------------- | ------------------------------------------ | ------------------- | ------------------- | ------------------- |
+| `funders`                                   | All active rows (any authenticated user)   | ✗ Service role only | ✗ Service role only | ✗ Service role only |
+| `user_profiles`                             | Own rows                                   | Own rows            | Own rows            | Own rows            |
+| `charity_profiles`                          | Own rows                                   | Own rows            | Own rows            | Own rows            |
+| `applications`                              | Own rows                                   | Own rows            | Own rows            | Own rows            |
+| `application_answers`                       | Own rows                                   | Own rows            | Own rows            | Own rows            |
+| `ai_usage_log`                              | Own rows                                   | Own rows            | ✗ Denied            | ✗ Denied            |
+| Retained guideline chunks (P6.2, table TBD) | Own rows                                   | Own rows            | Own rows            | Own rows            |
+| Playbooks (P6.5, table TBD)                 | All approved rows (any authenticated user) | ✗ Service role only | ✗ Service role only | ✗ Service role only |
 
 "Own rows" = `user_id = auth.uid()`.
 "All active rows" = `is_active = true` — any authenticated user may read the approved funder list; no user may insert, update, or delete funder records (service role only).
+"All approved rows" (playbooks) = same non-user-scoped pattern as `funders` — playbooks are curated per-funder and shared across every user applying to that funder, not owned by any single user.
 
 The Supabase service role key bypasses all RLS policies. It is used server-side only for admin operations: account deletion cascade (ADR-DATA-003) and any scheduled maintenance tasks. It must never appear in client-side code (ADR-SEC-006).
 
@@ -64,7 +67,7 @@ All policies are defined in the initial database migration file (ADR-DATA-004) a
 
 ## Source
 
-ADR-STACK-002, ADR-DATA-001, BRD Section 9 (Data Privacy & Security).
+ADR-STACK-002, ADR-DATA-001, NFR-04 (Security).
 
 ## Date Decided
 
@@ -72,6 +75,7 @@ ADR-STACK-002, ADR-DATA-001, BRD Section 9 (Data Privacy & Security).
 
 ## Revision History
 
-| Date       | Change                                                                                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-06-01 | `funders` table added to context and policy matrix (DR-FD-001). Non-user-scoped pattern documented: SELECT all active rows for any authenticated user; INSERT/UPDATE/DELETE restricted to service role only. |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-06-01 | `funders` table added to context and policy matrix (DR-FD-001). Non-user-scoped pattern documented: SELECT all active rows for any authenticated user; INSERT/UPDATE/DELETE restricted to service role only.                                                                                                                                                                                                                                                                                                                                                                       |
+| 2026-07-10 | Pattern decided in advance for two Phase 6 tables not yet built (table names TBD until P6.2/P6.5 land). Retained guideline chunks (P6.2, guideline source-reference feature) follow the standard own-rows pattern, same as `application_answers` — they belong to a specific application. Playbooks (P6.5) follow the `funders` non-user-scoped pattern — SELECT all approved rows for any authenticated user, INSERT/UPDATE/DELETE service-role only — since a playbook is curated per-funder and shared across every user applying to that funder, not owned by any single user. |
