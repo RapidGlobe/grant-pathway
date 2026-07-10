@@ -74,3 +74,17 @@ ADR-DATA-002, FR-22, ADR-ARCH-004.
 ## Date Decided
 
 2026-04-21
+
+## Note — 2026-07-10
+
+This ADR's `sessionStorage` approach is still exactly how the product works today and remains accurate as a description of current production behaviour. However, its premise — "consistent with the spirit of ADR-DATA-002" — no longer holds: `ADR-DATA-002` reversed the "guidelines are never stored" decision on 2026-07-10. Guideline text is now retained server-side in Postgres (extracted, page-tagged text, per the P6.2a groundwork), not merely held client-side for the duration of a session.
+
+This ADR will need a real update once P6.2a ships. At that point, the client-side `sessionStorage` round-trip described above likely becomes unnecessary for returning to Step 2 — the retained server-side copy could be read directly instead, removing the need to restore state from the browser at all. Until P6.2a is built, nothing here changes: this note is a forward pointer, not a revision of the Decision.
+
+This should be updated together with `ADR-ARCH-004`, which currently shares the same "guidelines can't be stored" assumption (see that ADR's matching 2026-07-10 note).
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Added forward-looking note: `ADR-DATA-002`'s reversal means guideline text is now retained server-side, so the `sessionStorage` round-trip described here — still accurate today — likely becomes unnecessary once P6.2a ships. To be updated together with `ADR-ARCH-004`, which shares the same now-outdated "guidelines can't be stored" assumption. |

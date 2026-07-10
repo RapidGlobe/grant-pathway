@@ -83,6 +83,7 @@ A scheduled job runs every 30–60 minutes and deletes any objects in the `guide
 - A storage RLS policy or service-role-only access must prevent users from accessing other users' temporary uploads.
 - Client-side upload progress can be shown during the direct-to-Storage upload (browser `fetch` progress event or `XMLHttpRequest`).
 - PDF text extraction library must be selected (ADR-FILE-003).
+- **Added 2026-07-10:** the raw uploaded file (PDF/Word) in the `guidelines-temp` Supabase Storage bucket remains fully ephemeral — deleted in the `try/finally` block above and by the scheduled cleanup job, unchanged by anything below. `ADR-DATA-002`'s 2026-07-10 reversal only retains _extracted, page-tagged text_ in Postgres (the P6.2a groundwork); it never retains the raw file in Storage. A reader of this ADR alone should not conclude guidelines are still fully ephemeral end-to-end — see `ADR-DATA-002` for what is now retained downstream of this upload flow.
 
 ## Source
 
@@ -91,3 +92,9 @@ PDR-DH-001, FR-07, FR-08, ADR-DATA-002.
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Added Consequences bullet cross-referencing `ADR-DATA-002`'s reversal: the raw file in `guidelines-temp` Storage remains fully ephemeral (deleted via `try/finally` and the scheduled cleanup job, unchanged by this update) — only _extracted text_ is now retained in Postgres, never the raw file here. |

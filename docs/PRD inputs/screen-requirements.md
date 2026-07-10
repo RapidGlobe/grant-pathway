@@ -247,10 +247,10 @@ User has clicked the reset link from Email 2. Link is valid and unexpired (1-hou
 
 ### Validation Rules (State 2)
 
-| Field                | Rule                                     | Inline error message                             |
-| -------------------- | ---------------------------------------- | ------------------------------------------------ |
-| New password         | Required, minimum 10 characters (NFR-04) | _"Your password must be at least 10 characters"_ |
-| Confirm new password | Must match new password                  | _"Your passwords do not match"_                  |
+| Field                | Rule                                                                                          | Inline error message                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| New password         | Required, minimum 12 characters, must contain letters and digits (NFR-04, updated 2026-06-29) | _"Your password must be at least 12 characters and include both letters and numbers"_ |
+| Confirm new password | Must match new password                                                                       | _"Your passwords do not match"_                                                       |
 
 ### Post-Submission Behaviour (State 2)
 
@@ -533,11 +533,11 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ### Validation Rules
 
-| Field                | Rule                                                    | Inline error message                             |
-| -------------------- | ------------------------------------------------------- | ------------------------------------------------ |
-| Current password     | Required, must match existing password                  | _"Your current password is incorrect"_           |
-| New password         | Required, minimum 10 characters (NCSC guidance, NFR-04) | _"Your password must be at least 10 characters"_ |
-| Confirm new password | Must match new password field                           | _"Your passwords do not match"_                  |
+| Field                | Rule                                                                                          | Inline error message                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Current password     | Required, must match existing password                                                        | _"Your current password is incorrect"_                                                |
+| New password         | Required, minimum 12 characters, must contain letters and digits (NFR-04, updated 2026-06-29) | _"Your password must be at least 12 characters and include both letters and numbers"_ |
+| Confirm new password | Must match new password field                                                                 | _"Your passwords do not match"_                                                       |
 
 ### Post-Save Behaviour
 
@@ -549,7 +549,7 @@ This ensures no work is lost if the user closes their browser or navigates away 
 ### Notes
 
 - Email address is displayed as read-only. Email change is not supported in v1 — users who need to change their email address must delete their account and re-register
-- Password policy follows NCSC guidance: 10-character minimum length only, no mandatory complexity rules (NFR-04)
+- Password policy: 12-character minimum length, must contain both letters and digits (NFR-04, updated 2026-06-29). This is one global policy enforced identically on Register, Reset Password, and Account Settings.
 - Page title (browser tab): _"Account Settings — Grant Pathway"_
 
 ---
@@ -626,6 +626,6 @@ This ensures no work is lost if the user closes their browser or navigates away 
 
 ---
 
-_Last updated: 2026-06-30_
+_Last updated: 2026-07-10_
 
-_Changes in this version: Register screen — password minimum raised to 12 characters, letters + digits required (2026-06-29). Step 2 — extraction timeout and 200-page cap error states added (2026-06-22). Step 3 — truncation warning banner added (2026-06-22); AI kill-switch unavailable state added (2026-06-29). Step 4 — AI kill-switch unavailable state added for AI assist button (2026-06-29)._
+_Changes in this version: Reset Password (State 2) and Account Settings — password policy corrected to match the Register screen: minimum raised from 10 to 12 characters, letters + digits now required (2026-07-10). This closes a gap from the 2026-06-29 correction, which updated the Register screen only even though the policy is global across all three password-entry flows. Register screen — password minimum raised to 12 characters, letters + digits required (2026-06-29). Step 2 — extraction timeout and 200-page cap error states added (2026-06-22). Step 3 — truncation warning banner added (2026-06-22); AI kill-switch unavailable state added (2026-06-29). Step 4 — AI kill-switch unavailable state added for AI assist button (2026-06-29)._

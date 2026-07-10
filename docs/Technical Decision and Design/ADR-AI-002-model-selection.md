@@ -13,7 +13,7 @@ Anthropic offers multiple Claude models with different capability and cost profi
 1. **Step 3 — AI Summary:** Summarise and structure funder guidelines. Medium complexity — requires good document comprehension and structured output.
 2. **Step 4 — Draft Answers:** Write draft answers to multiple application questions using charity profile + AI summary as context. High complexity — requires instructed writing, charity voice matching, and word limit awareness.
 
-The model selection must balance output quality against per-request cost, within the 20 requests/user/month limit (PDR-AI-005). All models are accessed via Amazon Bedrock eu-west-2 (ADR-AI-001).
+The model selection must balance output quality against per-request cost, within the 50 requests/user/month limit (PDR-AI-005). All models are accessed via Amazon Bedrock eu-west-2 (ADR-AI-001).
 
 ## Options Considered
 
@@ -41,7 +41,7 @@ Model selection should be reviewed periodically as Anthropic releases new models
 - The quality of the AI summary directly affects the quality of draft answers — a low-quality summary produces low-quality drafts. Using the same capable model for both maintains consistency.
 - Claude Sonnet 4.6 provides the best balance of quality and cost for the use case, with a 1M token context window that eliminates any practical concern about long funder guidelines.
 - PDR-AI-001 specifies Claude Sonnet 4.6.
-- The 20 requests/month limit means the absolute monthly cost per user is bounded regardless of model choice.
+- The 50 requests/month limit means the absolute monthly cost per user is bounded regardless of model choice.
 
 ## Consequences
 
@@ -60,3 +60,9 @@ Product Decision PDR-AI-002.
 ## Date Decided
 
 2026-04-17
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-07-10 | Corrected stale "20 requests/user/month" figure to 50 in Context and Rationale. The monthly cap was raised from 20 → 50 across all three AI routes on 2026-06-17 — see `ADR-SEC-005`'s Revision History for that change; this ADR had never been updated to match. |

@@ -54,6 +54,8 @@ The route verifies the user's session (middleware — ADR-SEC-001), confirms `ap
 
 **Styling:** Inter font, teal headings for question titles, consistent with the design system (design-requirements.md).
 
+**Correction (2026-07-10):** the styling above does not match what was actually built. Per `PDR-DH-003` (the authoritative export structure/styling spec) and the S7.2 entry in `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`, the implemented `.docx` export uses: Calibri as the default font (not Inter); A4 page size (11906×16838 twips) with 2.54cm margins; an 18pt bold, centred title; a funder name + export date sub-header; a horizontal rule; an italic 10pt disclaimer; 14pt bold underline question headings with 11pt answer body text (not teal); and a 9pt grey, centred footer (with page number "Page N of NN", added 2026-07-02). No Grant Pathway logo or brand colours appear in the document body.
+
 Document generation takes milliseconds — no `maxDuration` extension needed. The Vercel default 10-second timeout is ample.
 
 ## Consequences
@@ -64,8 +66,14 @@ Document generation takes milliseconds — no `maxDuration` extension needed. Th
 
 ## Source
 
-ADR-EXPORT-001, PDR-EX-001.
+ADR-EXPORT-001, PDR-EX-001. See `PDR-DH-003` for the authoritative export document structure and formatting spec (both .docx and .txt).
 
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Corrected the "Styling" line: documented as Inter font with teal headings, but the actual implementation (per S7.2 in `IMPLEMENTATION-STATUS.md` and `PDR-DH-003`) uses Calibri throughout, with A4/2.54cm margins, 18pt bold centred title, funder+date sub-header, horizontal rule, italic 10pt disclaimer, 14pt bold underline question / 11pt answer body, and a 9pt grey centred footer. Added a reference to `PDR-DH-003` as the authoritative structure spec, which neither this ADR nor `ADR-EXPORT-001` previously cited. |

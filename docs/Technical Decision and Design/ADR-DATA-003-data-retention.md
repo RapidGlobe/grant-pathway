@@ -25,6 +25,8 @@ Account deletion removes, in order: `application_answers`, `applications`, `char
 
 The `ai_usage_log` monthly request counter is reset at the start of each calendar month. Historical log entries older than 3 months may be deleted by a scheduled job to keep the table size manageable (post-v1).
 
+**Added 2026-07-10 — Phase 6 tables (table names TBD until P6.2/P6.5 land):** retained guideline chunks (P6.2, guideline source-reference feature) are application-owned data — they cascade-delete alongside `application_answers` in the account-deletion order above. Playbooks (P6.5) are **not** included in any user's cascade delete — they are curator-owned, shared across every user applying to that funder (same non-user-scoped status as `funders`), with their own independent lifecycle managed through the curation workflow, not tied to any single user's account.
+
 ## Rationale
 
 - Account deletion with immediate cascade is the most user-friendly and GDPR-compliant approach.
@@ -38,6 +40,7 @@ The `ai_usage_log` monthly request counter is reset at the start of each calenda
 - The account deletion flow (Page 13 in ui-inventory-and-data-contracts.md) must include a confirmation step and clear messaging about what is deleted.
 - Supabase Auth user record deletion must be performed using the service role key (ADR-SEC-006) as only the service role can delete auth users.
 - A GDPR-compliant privacy policy must document the retention period ("for the lifetime of your account").
+- Retained guideline chunks (P6.2) must be included in the account-deletion cascade once that table exists; playbooks (P6.5) must explicitly not be, and need their own retirement/versioning process independent of user account deletion.
 
 ## Source
 
@@ -46,3 +49,9 @@ PRD-Grant-Pathway-v1.md (Section 9.4 — Data Retention), FR-29 to FR-32 (Accoun
 ## Date Decided
 
 2026-04-17
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Retention rule extended to two Phase 6 tables not yet built (table names TBD until P6.2/P6.5 land), as part of reversing `ADR-DATA-002`'s "never store guidelines" decision. Retained guideline chunks (P6.2) cascade-delete with their owning application, same as `application_answers`. Playbooks (P6.5) are excluded from any user's cascade — curator-owned, independent lifecycle, same non-user-scoped status as `funders`. |

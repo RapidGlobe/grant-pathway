@@ -9,36 +9,40 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.2 Draft                                         |
+| **Version**        | 0.4 Draft                                         |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
-| **Last updated**   | 2026-05-07                                        |
+| **Last updated**   | 2026-07-10                                        |
 | **Review date**    | Prior to development start                        |
 
 ### Revision History
 
-| Version | Date       | Author         | Summary of Changes                                                                                                                                                                                                                                                                                                                               |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 0.1     | 2026-04-16 | Rapidglobe Ltd | Initial draft                                                                                                                                                                                                                                                                                                                                    |
-| 0.2     | 2026-05-07 | Rapidglobe Ltd | AI delivery mechanism changed from Anthropic direct API to Amazon Bedrock Claude Sonnet 4.6 (eu-west-2). Model updated from claude-sonnet-4 to claude-sonnet-4-6. Compliance section updated: Anthropic DPA replaced by AWS DPA review. Privacy Policy disclosure updated. Sections 9.3, 10.1, 10.5, 15, and Appendix A updated for consistency. |
+| Version | Date       | Author         | Summary of Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.1     | 2026-04-16 | Rapidglobe Ltd | Initial draft                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 0.2     | 2026-05-07 | Rapidglobe Ltd | AI delivery mechanism changed from Anthropic direct API to Amazon Bedrock Claude Sonnet 4.6 (eu-west-2). Model updated from claude-sonnet-4 to claude-sonnet-4-6. Compliance section updated: Anthropic DPA replaced by AWS DPA review. Privacy Policy disclosure updated. Sections 9.3, 10.1, 10.5, 15, and Appendix A updated for consistency.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 0.3     | 2026-07-10 | Rapidglobe Ltd | Full correction pass against `moscow-feature-register.md` (v1.10), screen requirements, data model, and the live implementation, following two months of drift since 0.2. Key corrections: launch date de-committed to match Section 1 (OBJ-01, Section 15); FR-02/12.4 password policy corrected to the actual 12-character, letters-and-digits, leaked-password-check policy (a live front-end/back-end inconsistency was found during this check -- see report); FR-07 (MFA) corrected to Won't Have throughout (demoted 2026-06-12); monthly AI limit corrected 20 → 50 (80% threshold 16 → 40) throughout; Section 6.6 rewritten for the charity-authored Q&A model (FR-28-31), replacing the abandoned auto-generation model; FR-45, FR-46, and FR-47 added as new Functional Requirements subsections (previously entirely missing); Section 6.7 extended to cover the per-question Step 4 approval flow alongside the existing Step 5 flow; FR-15 and Screen 7 Step 1 updated for the funder picker (DR-FD-001); Screen 7 Step 4 rewritten for the preparation checklist and per-question Q&A interface; Screen 7 Step 5 updated for the three-checkbox approval gate; Section 9.1 Entities table updated to include `funders`; Section 9.3/6.4 (FR-22) updated to reflect ADR-DATA-002's 2026-07-10 reversal, with a forward note pending Phase 6; Section 15 updated for AWS DPA, Terms of Service, and Privacy Policy status; Section 16 no longer hardcodes an FR count; Document Control and Appendix B document paths corrected from a stale `business/...` prefix to the actual `docs/...` locations, including two relocations. |
+| 0.4     | 2026-07-10 | Rapidglobe Ltd | Closed out the discrepancies 0.3 flagged but did not fix: Section 6.1's password front-end/back-end inconsistency is resolved (register/reset/account-settings forms now enforce 12 characters + letters and digits, matching the server-side policy; `actions/auth.ts` surfaces a specific `weak_password` state) -- Section 12.4 and Section 6.1 both updated accordingly. Section 10.2's `ai_usage_log.request_type` discrepancy resolved (`docs/data-model.md` now lists all five enum values including `refine_answer`); `buildDraftPrompt` confirmed genuinely dead code (zero callers), flagged as a separate follow-up cleanup rather than fixed here. Section 16's note on `acceptance-criteria.md` updated -- FR-45/46/47, the FR-29 priority fix, and the FR-31A numbering flag are now all in place there. Section 6.11 (FR-46) verification note upgraded from "could not be confirmed, appears likely not built" to "confirmed not built," now that `moscow-feature-register.md` and BRD v0.6 independently agree.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Related Documents
 
-| Document                              | Location                                              |
-| ------------------------------------- | ----------------------------------------------------- |
-| Business Requirements Document        | `business/BRD-Grant-Pathway-v1.md`                    |
-| MoSCoW Feature Register               | `business/moscow-feature-register.md`                 |
-| Screen Requirements                   | `business/PRD inputs/screen-requirements.md`          |
-| Acceptance Criteria                   | `business/PRD inputs/acceptance-criteria.md`          |
-| Application Status Model              | `business/PRD inputs/application-status-model.md`     |
-| Email Notifications                   | `business/PRD inputs/email-notifications.md`          |
-| Success Metrics                       | `business/PRD inputs/success-metrics.md`              |
-| Information Architecture & Navigation | `business/information-architecture-and-navigation.md` |
-| Data Model                            | `business/data-model.md`                              |
-| Non-Functional Requirements           | `business/non-functional-requirements.md`             |
-| PRD Decisions Index                   | `business/PRD decisions/PRD-DECISIONS-INDEX.md`       |
-| User Personas, Journeys & Use Cases   | `business/user-personas-journeys-and-use-cases.md`    |
+| Document                              | Location                                                     |
+| ------------------------------------- | ------------------------------------------------------------ |
+| Business Requirements Document        | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` |
+| MoSCoW Feature Register               | `docs/moscow-feature-register.md`                            |
+| Screen Requirements                   | `docs/PRD inputs/screen-requirements.md`                     |
+| Acceptance Criteria                   | `docs/PRD inputs/acceptance-criteria.md`                     |
+| Application Status Model              | `docs/PRD inputs/application-status-model.md`                |
+| Email Notifications                   | `docs/PRD inputs/email-notifications.md`                     |
+| Success Metrics                       | `docs/PRD inputs/success-metrics.md`                         |
+| Information Architecture & Navigation | `docs/information-architecture-and-navigation.md`            |
+| Data Model                            | `docs/data-model.md`                                         |
+| Non-Functional Requirements           | `docs/non-functional-requirements.md`                        |
+| PRD Decisions Index                   | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`                  |
+| User Personas, Journeys & Use Cases   | `docs/user-personas-journeys-and-use-cases.md`               |
+
+**Note:** The Business Requirements Document above was previously filed as `BRD-Grant-Pathway-v0.5.md` despite its internal header stating Version 0.6 -- a filename/version mismatch. Corrected 2026-07-10: the file was renamed to `BRD-Grant-Pathway-v0.6.md` to match its internal header, and all references to the old filename were updated.
 
 ---
 
@@ -58,18 +62,20 @@ The document synthesises requirements from the Business Requirements Document, 1
 
 ### 2.1 Vision Statement
 
-> To be the trusted, free writing companion for UK charities -- helping non-specialists produce stronger, more consistent grant applications through AI-powered drafting, guideline summarisation, and mandatory human review.
+> To be the trusted, free writing companion for UK charities -- helping non-specialists produce stronger, more consistent grant applications through charity-authored writing with on-request AI assistance, guideline summarisation, and mandatory human review.
+>
+> _Wording updated 2026-07-10 to match the current product model (Section 6.6): "AI-powered drafting" read as AI generating content, which was abandoned 2026-05-28. The canonical `docs/vision-statement.md` (Tier 3) has not been checked or updated as part of this pass -- only this PRD's citation of it._
 
 ### 2.2 Objectives for v1
 
-| Ref    | Objective                                                                             | Measure                                             |
-| ------ | ------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| OBJ-01 | Launch a stable, accessible web application by 31 July 2026                           | Live deployment by target date                      |
-| OBJ-02 | Enable any UK charity to register and complete an application within a single session | Confirmed through user testing                      |
-| OBJ-03 | Reduce the time a non-specialist spends writing a grant application                   | Evidenced through user feedback interviews          |
-| OBJ-04 | Achieve WCAG 2.2 Level AA accessibility from day one                                  | Internal testing and checklist review pre-launch    |
-| OBJ-05 | Operate within a monthly running cost of £100                                         | Monthly cost monitoring                             |
-| OBJ-06 | Gather sufficient early user feedback to inform v2 planning                           | Feedback interviews with opted-in users post-launch |
+| Ref    | Objective                                                                                                                               | Measure                                                                                |
+| ------ | --------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| OBJ-01 | Launch a stable, accessible web application (target launch date not committed; working estimate August-September 2026 -- see Section 1) | Live deployment once Phase 6 (`ADR-DATA-006`) completes and the Go-Live Gate is passed |
+| OBJ-02 | Enable any UK charity to register and complete an application within a single session                                                   | Confirmed through user testing                                                         |
+| OBJ-03 | Reduce the time a non-specialist spends writing a grant application                                                                     | Evidenced through user feedback interviews                                             |
+| OBJ-04 | Achieve WCAG 2.2 Level AA accessibility from day one                                                                                    | Internal testing and checklist review pre-launch                                       |
+| OBJ-05 | Operate within a monthly running cost of £100                                                                                           | Monthly cost monitoring                                                                |
+| OBJ-06 | Gather sufficient early user feedback to inform v2 planning                                                                             | Feedback interviews with opted-in users post-launch                                    |
 
 ---
 
@@ -77,43 +83,45 @@ The document synthesises requirements from the Business Requirements Document, 1
 
 ### 3.1 In Scope for v1
 
-| #   | Capability                                                             |
-| --- | ---------------------------------------------------------------------- |
-| 1   | User registration, email verification, login, and account management   |
-| 2   | Charity profile creation with Charity Commission API lookup            |
-| 3   | Grant application creation, editing, saving, deletion, and export      |
-| 4   | Funder guideline input by paste or file upload                         |
-| 5   | AI-powered plain-English summarisation of funder guidelines            |
-| 6   | AI-powered draft answer generation for application questions           |
-| 7   | Mandatory human review and approval before any content can be exported |
-| 8   | Export of approved content to Word (.docx)                             |
-| 9   | Full account and data deletion by the user                             |
-| 10  | WCAG 2.2 Level AA accessibility                                        |
-| 11  | UK-region data hosting                                                 |
-| 12  | Basic passive usage metrics via database records                       |
+| #   | Capability                                                                                                                                 |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | User registration, email verification, login, and account management                                                                       |
+| 2   | Charity profile creation with Charity Commission API lookup                                                                                |
+| 3   | Grant application creation, editing, saving, deletion, and export                                                                          |
+| 4   | Funder guideline input by paste or file upload                                                                                             |
+| 5   | AI-powered plain-English summarisation of funder guidelines                                                                                |
+| 6   | Charity-authored Q&A writing interface, with on-request AI assist to improve structure and clarity (revised 2026-05-28 -- see Section 6.6) |
+| 7   | Mandatory human review and approval before any content can be exported, at both per-question (Step 4) and application level (Step 5)       |
+| 8   | Export of approved content to Word (.docx)                                                                                                 |
+| 9   | Full account and data deletion by the user                                                                                                 |
+| 10  | WCAG 2.2 Level AA accessibility                                                                                                            |
+| 11  | UK-region data hosting                                                                                                                     |
+| 12  | Basic passive usage metrics via database records                                                                                           |
 
 ### 3.2 Out of Scope for v1
 
-Grant discovery, eligibility matching, grant tracking, post-grant reporting, EU/international grants, live grant databases, CRM integrations, open-ended AI chat, native mobile application, multi-region hosting, and formal survey infrastructure are all explicitly out of scope. Full detail in `business/v1-out-of-scope.md`.
+Grant discovery, eligibility matching, grant tracking, post-grant reporting, EU/international grants, live grant databases, CRM integrations, open-ended AI chat, native mobile application, multi-region hosting, and formal survey infrastructure are all explicitly out of scope. Full detail in `docs/v1-out-of-scope.md`.
 
 ### 3.3 MoSCoW Feature Priorities
 
-| Priority        | Count | Functional requirements                                               |
-| --------------- | ----- | --------------------------------------------------------------------- |
-| Must Have       | 39    | FR-01 to FR-06, FR-09 to FR-28, FR-30, FR-32 to FR-37, FR-39 to FR-43 |
-| Should Have     | 5     | FR-07, FR-08, FR-29, FR-38, FR-44                                     |
-| Could Have      | 0     | --                                                                    |
-| Won't Have (v1) | 0     | See `business/v1-out-of-scope.md`                                     |
+| Priority        | Count | Functional requirements                                                        |
+| --------------- | ----- | ------------------------------------------------------------------------------ |
+| Must Have       | 43    | FR-01 to FR-06, FR-09 to FR-31, FR-32 to FR-37, FR-39 to FR-43, FR-45 to FR-47 |
+| Should Have     | 3     | FR-08, FR-38, FR-44                                                            |
+| Could Have      | 0     | --                                                                             |
+| Won't Have (v1) | 1     | FR-07 -- demoted from Should Have 2026-06-12. See `docs/v1-out-of-scope.md`    |
 
-The five Should Have requirements and their build conditions:
+_47 functional requirements are defined in total (FR-01 to FR-47; no gaps in the numbering). Counts corrected against `docs/moscow-feature-register.md` v1.10 -- note that register's own summary table currently totals a stale "42" Must Have / "0" Won't Have, which has not tracked FR-07's 2026-06-12 demotion or the arithmetic of its own listed FR range; flagged, not corrected in that file by this pass._
 
-| Ref   | Requirement                          | Build condition                                           |
-| ----- | ------------------------------------ | --------------------------------------------------------- |
-| FR-07 | Optional MFA                         | Build if authentication roadmap supports it               |
-| FR-08 | Feedback opt-in at registration      | Build if feedback interview programme confirmed at launch |
-| FR-29 | Word limit input on draft generation | Build if time permits                                     |
-| FR-38 | Plain text (.txt) export             | Build if time permits                                     |
-| FR-44 | Deletion confirmation email          | Build if transactional email confirmed in scope           |
+FR-29 (word/character limits displayed per question) and FR-31 (budget-question flagging) were both promoted from Should Have to Must Have on 2026-05-28, once the charity-authored Q&A model made them integral to Step 4 rather than optional extras -- see Section 6.6. FR-45 to FR-47 were added later (2026-05-29 and 2026-06-02) and are Must Have from introduction. The three remaining Should Have requirements and their build conditions:
+
+| Ref   | Requirement                     | Build condition                                           |
+| ----- | ------------------------------- | --------------------------------------------------------- |
+| FR-08 | Feedback opt-in at registration | Build if feedback interview programme confirmed at launch |
+| FR-38 | Plain text (.txt) export        | Build if time permits                                     |
+| FR-44 | Deletion confirmation email     | Build if transactional email confirmed in scope           |
+
+**FR-07 (optional MFA) -- Won't Have, demoted 2026-06-12.** Originally Should Have. A risk analysis found the worst-case impact of a password compromise is limited to viewing draft applications and charity profile data (all publicly registered information) -- there is no payment data and no submission capability -- so the mandatory friction MFA would add for non-technical volunteer users was judged to outweigh the marginal security benefit. See `docs/moscow-feature-register.md` Section 9.1 for the full reasoning.
 
 ---
 
@@ -241,7 +249,7 @@ Displayed on all routes.
 
 Requirements are grouped by the nine functional areas defined in the BRD. Each requirement states its MoSCoW priority. Should Have requirements are only built if their stated build condition is met.
 
-Full testable acceptance criteria for all requirements are in `business/PRD inputs/acceptance-criteria.md`.
+Full testable acceptance criteria for all requirements are in `docs/PRD inputs/acceptance-criteria.md`.
 
 ---
 
@@ -250,17 +258,19 @@ Full testable acceptance criteria for all requirements are in `business/PRD inpu
 | Ref   | Requirement                                                                                                                                                                                          | Priority    |
 | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | FR-01 | The system shall allow new users to register with their full name, email address, and a password                                                                                                     | Must Have   |
-| FR-02 | The system shall validate email format and enforce a minimum password length of 10 characters at registration                                                                                        | Must Have   |
+| FR-02 | The system shall validate email format and enforce a minimum password length of 12 characters, containing both letters and digits, at registration                                                   | Must Have   |
 | FR-03 | The system shall send a verification email upon registration; accounts shall not be activated until the email link is clicked                                                                        | Must Have   |
 | FR-04 | The system shall allow registered users to log in with their email address and password                                                                                                              | Must Have   |
 | FR-05 | The system shall provide a self-service password reset flow triggered by email                                                                                                                       | Must Have   |
 | FR-06 | The system shall automatically log out users after 60 minutes of inactivity                                                                                                                          | Must Have   |
-| FR-07 | The system shall provide optional MFA as an opt-in feature; MFA shall not be mandatory in v1                                                                                                         | Should Have |
+| FR-07 | ~~The system shall provide optional MFA as an opt-in feature; MFA shall not be mandatory in v1~~ -- **Won't Have.** Demoted 2026-06-12; see implementation note below                                | Won't Have  |
 | FR-08 | During registration, the system shall present a plain-language prompt asking the user if they are willing to participate in a feedback interview; the response shall be recorded against the account | Should Have |
 
 **Implementation notes:**
 
-- Password policy follows NCSC guidance: 10-character minimum length only, no mandatory complexity rules
+- **Password policy (updated 2026-06-29, VQ-009):** minimum 12 characters, must contain both letters and digits; leaked-password check enabled (checked against the HaveIBeenPwned database); secure password change enabled; current password required to change password. This replaces the original 10-character-minimum, no-complexity policy, which followed pure NCSC minimalism -- see Appendix A for the updated NCSC glossary note. This is configured at the Supabase Auth project level and applies uniformly to registration, password reset, and password change.
+  - **Discrepancy resolved 2026-07-10:** the client-side validation and hint text in `components/register-form.tsx`, `components/reset-password-form.tsx`, and `components/account-settings-form.tsx` previously still enforced and displayed a 10-character minimum, uniformly across all three forms. This has been corrected in code — all three forms now validate 12 characters plus letters and digits client-side, matching Supabase Auth's server-side policy, and `actions/auth.ts` now surfaces a specific `weak_password` state (rather than a generic error) if the server-side check ever rejects a password the client-side check let through.
+- **FR-07 (MFA) -- Won't Have, demoted 2026-06-12.** MFA was fully removed from the codebase (`/mfa` route, enrolment/verification actions, and the Account Settings MFA section all deleted). See Section 3.3 for the reasoning.
 - Email verification link expires after 24 hours. Resend is rate-limited to 3 per hour
 - Password reset link expires after 1 hour
 - Sign-in errors must never confirm whether an email address is registered (same message for wrong password and unknown email)
@@ -302,14 +312,14 @@ Full testable acceptance criteria for all requirements are in `business/PRD inpu
 
 ### 6.3 Application Management
 
-| Ref   | Requirement                                                                                                                       | Priority  |
-| ----- | --------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| FR-15 | The system shall allow a user to create a new grant application by entering the grant name and funder name                        | Must Have |
-| FR-16 | The system shall display all saved applications on the user dashboard with grant name, funder name, status, and date last updated | Must Have |
-| FR-17 | The system shall allow a user to open and continue any saved application from their dashboard                                     | Must Have |
-| FR-18 | The system shall auto-save application progress; save also occurs on every Continue action                                        | Must Have |
-| FR-19 | The system shall allow a user to delete a saved application                                                                       | Must Have |
-| FR-20 | A single user account shall support multiple saved applications simultaneously                                                    | Must Have |
+| Ref   | Requirement                                                                                                                                                                                    | Priority  |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| FR-15 | The system shall allow a user to create a new grant application by selecting a funder from a searchable, curated picker (seeded from the `funders` database table) and entering the grant name | Must Have |
+| FR-16 | The system shall display all saved applications on the user dashboard with grant name, funder name, status, and date last updated                                                              | Must Have |
+| FR-17 | The system shall allow a user to open and continue any saved application from their dashboard                                                                                                  | Must Have |
+| FR-18 | The system shall auto-save application progress; save also occurs on every Continue action                                                                                                     | Must Have |
+| FR-19 | The system shall allow a user to delete a saved application                                                                                                                                    | Must Have |
+| FR-20 | A single user account shall support multiple saved applications simultaneously                                                                                                                 | Must Have |
 
 **Implementation notes:**
 
@@ -319,16 +329,17 @@ Full testable acceptance criteria for all requirements are in `business/PRD inpu
 - Dashboard application cards are sorted by most recently updated, descending
 - The summary strip on the dashboard always shows all four status counts, even when some are zero
 - The application deadline field mentioned in the BRD is not included in v1
+- **Revised 2026-06-01 (DR-FD-001):** the funder is selected from a searchable, curated picker seeded from the `funders` database table, not entered as free text. A "My funder isn't listed -- request it" link is displayed below the picker for funders not yet in the directory. See Screen 7 Step 1 (Section 7) for the full UI specification.
 
 ---
 
 ### 6.4 Funder Guideline Handling
 
-| Ref   | Requirement                                                                                                                             | Priority  |
-| ----- | --------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| FR-21 | The system shall allow users to input funder guidelines by pasting text or uploading a PDF or .docx file                                | Must Have |
-| FR-22 | Funder guidelines shall be used for AI processing only and shall not be permanently stored                                              | Must Have |
-| FR-23 | The system shall display a plain-language error if an unsupported file format is uploaded and prompt the user to paste the text instead | Must Have |
+| Ref   | Requirement                                                                                                                                                                                    | Priority  |
+| ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| FR-21 | The system shall allow users to input funder guidelines by pasting text or uploading a PDF or .docx file                                                                                       | Must Have |
+| FR-22 | Funder guidelines shall be used for AI processing only and shall not be permanently stored. **True of the product as it exists in production today; changing under Phase 6 -- see note below** | Must Have |
+| FR-23 | The system shall display a plain-language error if an unsupported file format is uploaded and prompt the user to paste the text instead                                                        | Must Have |
 
 **File upload rules:**
 
@@ -347,6 +358,8 @@ Full testable acceptance criteria for all requirements are in `business/PRD inpu
 | Scanned / image PDF | "We couldn't read the text in your PDF -- it may be a scanned document. Please try copying and pasting the text directly instead." |
 
 **Implementation note:** Vercel free tier has a 4.5 MB API route limit. A 10 MB file upload requires either Vercel Pro or a client-side upload direct to Supabase Storage, bypassing the API route entirely. This is a pre-development technical decision.
+
+**FR-22 status note (added 2026-07-10):** `ADR-DATA-002` originally decided funder guidelines would never be stored, on the basis that they "may contain commercially sensitive information provided by the funder." On 2026-07-10 that ADR was formally revised: checked against the actual 21-document corpus Grant Pathway processes, the commercial-sensitivity premise did not hold -- these are funders' own publicly published application guidance. The revised decision is that guideline text **will** be retained (extracted, page/section-tagged text in Postgres, cascade-deleting with its owning application; retained indefinitely where it backs an approved playbook), once Phase 6 (P6.2a onward) ships. **As of this pass, that retention mechanism has not been built.** FR-22 as stated above, and the "not permanently stored" behaviour described throughout this PRD, remain true of the live production product today. Treat this FR the same way `ADR-DATA-001` treats the superseded `application_answers` model: an accurate description of what exists now, not a permanent design commitment. See Section 9.3 and `ADR-DATA-002`'s 2026-07-10 revision for full detail.
 
 ---
 
@@ -377,53 +390,80 @@ Full testable acceptance criteria for all requirements are in `business/PRD inpu
 
 ---
 
-### 6.6 AI Draft Answer Generation
+### 6.6 Q&A Interview and Application Assembly
 
-| Ref   | Requirement                                                                                                                      | Priority    |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| FR-28 | On advancing to Step 4, the system shall generate a draft answer for each extracted application question                         | Must Have   |
-| FR-29 | Before generating a draft, the user shall be able to specify a word limit for the answer                                         | Should Have |
-| FR-30 | AI draft generation shall use the application question, word limit (if specified), funder summary, and charity profile as inputs | Must Have   |
-| FR-31 | If the generated draft significantly exceeds the specified word limit, the system shall flag this prominently                    | Should Have |
+**Revised 2026-05-28.** The originally specified model -- AI auto-generates a draft answer for each question on arrival at Step 4 -- was abandoned. Funder AI-guidance research (Henry Smith, National Lottery Community Fund) found that AI-generated answers disadvantage charities in practice. The replacement model, in production today: **the charity writes every answer**; AI assists only on request, improving structure and clarity of what the charity has already written. AI never generates application content from scratch. The old `/api/generate-draft` route and the "Regenerate all answers" action no longer exist -- both were removed 2026-07-01 after being confirmed to have zero callers. Full design rationale: `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`.
 
-**Progress indicator messages (Step 4):**
+| Ref   | Requirement                                                                                                                                                                                                                                                       | Priority  |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| FR-28 | The charity shall write each application answer from scratch, section by section; on arriving at Step 4 for the first time, the user shall see a preparation checklist before beginning the Q&A interview                                                         | Must Have |
+| FR-29 | Word limits and character limits shall be auto-extracted from the funder guidelines and displayed alongside each question; each answer shall show a live word/character counter as the user types                                                                 | Must Have |
+| FR-30 | A per-question "Help me improve this" AI assist action shall be available on request, using the charity's own written answer as its only input; it shall correct spelling and grammar and improve structure and clarity, and shall not add facts or change claims | Must Have |
+| FR-31 | Budget questions and sections shall be visually flagged (amber) and the AI assist action shall be disabled on them; the user must enter their own figures                                                                                                         | Must Have |
 
-1. "Reviewing your guidelines and charity profile..."
-2. "Writing your draft answers..."
-3. "Almost there..."
+**The preparation checklist (shown once, on first arrival at Step 4):**
 
-**Monthly AI request limit (PDR-AI-005):**
+Heading: _"Before you begin writing."_ Message: _"The financial sections of this application cannot be completed by AI. Before you start, gather:"_ followed by a checklist:
 
-| Threshold                     | Action                                                                                                                             |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| 16 of 20 requests used (80%)  | Soft warning banner: "You've used most of your monthly AI allowance."                                                              |
-| 20 of 20 requests used (100%) | Generation blocked. Message: "You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch." |
+1. Most recent annual accounts or financial statements
+2. Projected budget for the grant period (income and planned expenditure)
+3. Details of other funding secured or applied for
+4. Input from your treasurer, finance lead, or a trustee who understands the budget
 
-Each summarisation (including regeneration) and each draft generation (including regeneration) counts as one AI request. Monthly limit resets on the first day of the calendar month.
+A warning note follows: _"It is worth involving a senior colleague -- such as your CEO, treasurer, or a trustee -- before reaching the financial questions."_ Button: _"I have what I need -- start writing."_ The checklist is shown only once per application; returning users go directly to the Q&A interface. See Screen 7 Step 4 (Section 7) for the full Q&A interface specification.
 
-**API error message (Step 4):** "We couldn't generate your draft right now. This is usually temporary -- please try again." with a Try again button.
+**Word and character limits (FR-29):** limits are extracted automatically from the funder guidelines during Step 3 -- the user never enters a limit manually. Both word limits and character limits are supported (`limit_type: words | characters | none`); the counter on each question displays "X / N words" or "X / N characters" as appropriate, or a plain word count with no limit shown where the funder sets none.
+
+**Over-limit hard stop (FR-29, updated 2026-06-04, D-LBF-02):** when an answer exceeds its word or character limit, the "Approve this answer" panel and button are hidden, and a red message is shown: _"Your answer exceeds the funder's word limit. Please trim it or use AI to bring it within the limit before approving."_ The approve panel reappears automatically once the answer is brought back within the limit. This replaced an earlier "warn but allow" behaviour (removed 2026-06-04) -- grant portals uniformly reject over-limit submissions, so allowing approval of an over-limit answer would give false confidence.
+
+**AI assist limitation (PDR-AI-006, found live during Clothworkers testing, 2026-07-04):** LLMs cannot reliably hit an exact word or character count when compressing an over-limit answer -- a 200-word answer against a 50-word limit was refined to 60 words by the AI assist, still over limit. When the AI's suggestion remains over limit after refining, a conditional inline message naming the shortfall and prompting further trimming is planned but **not yet implemented** as of this pass. Do not describe this as guaranteed to bring an answer within limit in any user-facing copy or test plan.
+
+**Budget question treatment (FR-31):** budget questions/sections are shown with an amber border and a "Budget" badge; the "Help me improve this" button is absent; a label reads: _"This section requires your actual financial data -- do not use AI-generated figures."_ Budget questions require a user-entered answer before the application can be assembled.
+
+**AI assist mechanics (FR-30):** "Help me improve this" is available on non-budget questions once the user has written something. On success, a "SUGGESTED IMPROVEMENT" card shows the refined text alongside the original, with two actions: **"Use this improved version"** (replaces the answer) and **"Keep my original"** (discards the suggestion). The refine prompt always corrects spelling and grammar, even for very short answers, and is instructed never to add facts, statistics, or claims not present in the charity's own text.
+
+**Assembly:** once all mandatory questions are approved (optional questions -- those containing "(optional)" or beginning "This question is optional" -- do not block the gate), a senior-review prompt asks the user to confirm with a CEO, treasurer, or trustee that the budget figures are accurate and approved, the project description reflects current priorities, and they have authority to submit. Assembly then formats the charity's own words (or AI-refined words where the charity chose to use them) into the funder's required output -- a Q&A list for structured funders, a flowing narrative for free-form funders -- without adding any content.
+
+**Progress/status indicators (Step 4):** each question card shows green (complete), amber (partial), or grey (not started) depending on answer state, rather than a single generation progress bar -- there is no AI generation step to wait for on arrival at Step 4.
+
+**Monthly AI request limit (PDR-AI-005, raised 20 → 50, aligned across every AI route by 2026-06-17):** `generate-summary` and `refine-answer` were raised to 50 on 2026-05-28 as part of the Step 4 redesign; the then-separate `generate-draft` route was missed in that change and stayed at 20 until corrected on 2026-06-17. `generate-draft` was itself deleted entirely on 2026-07-01 (zero callers, superseded by `refine-answer`) -- `generate-summary` and `refine-answer` are the two AI routes live today, both enforcing 50.
+
+| Threshold                     | Action                                                                                                                                                                                     |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 40 of 50 requests used (80%)  | Soft warning banner: "You've used most of your monthly AI allowance."                                                                                                                      |
+| 50 of 50 requests used (100%) | AI assist blocked. Message: "You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch." Writing and saving your own answers is never restricted. |
+
+Each guideline summarisation (including regeneration) and each "Help me improve this" AI assist request counts as one AI request against the monthly allowance. Writing or auto-saving an answer does not consume a request. Monthly limit resets on the first day of the calendar month.
+
+**AI service unavailable (kill switch, added 2026-06-29):** when the `AI_ENABLED` flag is set to `false`, AI routes return HTTP 503 immediately and no quota is consumed; the user sees: _"The AI service is temporarily unavailable. Please try again later."_
+
+**API error message:** "We couldn't generate your draft right now. This is usually temporary -- please try again." with a Try again button.
 
 ---
 
 ### 6.7 Mandatory Review & Approval
 
-| Ref   | Requirement                                                                                                  | Priority  |
-| ----- | ------------------------------------------------------------------------------------------------------------ | --------- |
-| FR-32 | Every draft shall be presented alongside three plain-language review prompts                                 | Must Have |
-| FR-33 | The system shall require explicit user approval before content can be exported; this step cannot be bypassed | Must Have |
-| FR-34 | The user shall be able to edit draft text directly within the review interface                               | Must Have |
-| FR-35 | The user shall be able to discard a draft and regenerate or write their own answer                           | Must Have |
-| FR-36 | Approved content shall be visually marked as approved and saved to the application record                    | Must Have |
+Review and approval happens at **two levels**: a per-question approval on each Step 4 question card, and a final application-level approval gate on Step 5. Both are mandatory; neither can be bypassed.
 
-**Three review prompts (displayed on Step 5):**
+| Ref   | Requirement                                                                                                                                                                               | Priority  |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| FR-32 | Every answer shall be presented alongside plain-language review prompts, both per-question on Step 4 and application-wide on Step 5, before it can be approved                            | Must Have |
+| FR-33 | The system shall require explicit user approval, at both the per-question level (Step 4) and the application level (Step 5), before content can be exported; neither step can be bypassed | Must Have |
+| FR-34 | The user shall be able to edit their answer text directly within the Step 4 interface at any time before assembly                                                                         | Must Have |
+| FR-35 | The user shall be able to clear and rewrite any answer at any time before assembly; there is no "regenerate" action, since content is user-written, not AI-generated                      | Must Have |
+| FR-36 | Approved content shall be visually marked as approved and saved to the application record, at both the per-question and application level                                                 | Must Have |
 
-1. Does this accurately describe your charity and project?
-2. Are all figures, dates, and facts correct?
-3. Does this answer the question that was asked?
+**Level 1 -- per-question approval (Step 4, implemented 2026-06-01):** each question card carries its own "Before you approve, check:" review prompts and its own "Approve this answer" button. The approval panel is shown once the answer is non-empty (or, for a question marked optional, even when empty), and is hidden while the answer is over its word/character limit (Section 6.6). Editing an approved answer clears its approval -- the question must be re-approved. The "Ready to assemble" button on Step 4 is gated on the approved count (all mandatory questions approved), not merely the answered count.
 
-**Approval confirmation prompt:** "Are you sure you want to approve this application? You can re-open it to make changes at any time."
+**Level 2 -- application-level approval (Step 5):** the assembled draft is shown read-only, alongside **three mandatory confirmation checkboxes** that must all be ticked before the approval/export action activates (see FR-32/33's implementation detail and Screen 7 Step 5 in Section 7):
 
-**Re-opening prompt (shown when opening an approved or exported application):** "Re-opening this application will remove your approval. You will need to review and approve your answers again before you can export."
+1. "I have reviewed all responses in full and am satisfied with their content."
+2. "The information provided is accurate and complete to the best of my knowledge."
+3. "I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted."
+
+**Revised 2026-06-12:** the separate "Approve my application" button and confirmation modal were removed to reduce friction. Ticking all three checkboxes and clicking a download button now approves the application (sets status to `approved`) and begins the download in a single action -- there is no intermediate confirmation modal.
+
+**Re-opening prompt (shown when opening an approved or exported application):** "Re-opening this application will remove your approval. You will need to review and approve your answers again before you can export." Confirming reverts the application to `in_progress`, clears the assembled draft, and resets every question's per-question approval, requiring both levels of approval to be completed again.
 
 ---
 
@@ -482,9 +522,45 @@ Actions: Download anyway / Cancel
 
 ---
 
+### 6.10 Question-Level Typing (FR-45)
+
+**Added 2026-05-29 (BD-04); status corrected 2026-07-10.**
+
+| Ref   | Requirement                                                                                                                                                                                                                                                                                                                                                              | Priority  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
+| FR-45 | Each extracted application question shall carry a `question_type` of `narrative`, `data_entry`, `financial`, `dropdown`, `date`, or `file_upload`, driving different handling per type (narrative questions get a writing card; data-entry and financial are pre-filled from the charity profile; dropdown, date, and file_upload are shown as read-only reminders only) | Must Have |
+
+**Not built as described.** In practice, only `narrative` is ever extracted -- the AI extraction prompt in `lib/prompts.ts` discards every other question type entirely rather than classifying it. A nine-funder review (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found this typing mechanism too narrow in twenty distinct ways. `ADR-DATA-006` (2026-07-05) supersedes FR-45's mechanism with a typed item-graph model (`docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md`) -- not yet built; see that ADR's linked build plan. FR-45 is retained here as the current formal requirement and should be revised or retired once the item-graph work lands, not before. Do not present question-level typing as working in any user-facing material or test plan on the strength of this FR.
+
+---
+
+### 6.11 Three-Tier Funder Coverage Model (FR-46)
+
+**Added 2026-05-29 (BD-07).**
+
+| Ref   | Requirement                                                                                                                                                                                                                                                                                                                                                                         | Priority  |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| FR-46 | The system shall display a three-tier funder coverage model to the user: **Tier 1 (Full)** -- narrative questions with profile pre-fill; **Tier 2 (Partial)** -- a narrative subset of a portal form; **Tier 3 (Guidance)** -- a free-form narrative document. The coverage tier shall be shown on the new-application screen, on the Step 3 summary card, and on the export screen | Must Have |
+
+**Confirmed not built (2026-07-10):** a code search for "Tier 1", "Tier 2", "Tier 3", and a `coverage_tier`-style field found no trace of this model anywhere in `components/`, `app/`, or `lib/database.types.ts`. The `funders` table (Section 9.1) has no coverage-tier column. This is now independently confirmed by three sources in agreement: this code search, `docs/moscow-feature-register.md` (FR-46, "Not built"), and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` Section 3.3 ("never built — no tier/coverage column exists... no tier badge appears anywhere in the app," confirmed 2026-07-04). FR-46 is carried forward here per the moscow register as the current formal requirement, but the underlying product decision on whether to build it, defer it, or retire it remains open — see `docs/moscow-feature-register.md` FR-46 for that open question.
+
+---
+
+### 6.12 Eligibility Mismatch Detection (FR-47)
+
+**Added 2026-06-02 (DR-EL-001).**
+
+| Ref   | Requirement                                                                                                                                                                                                  | Priority  |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- |
+| FR-47 | On Step 3, if the AI detects a clear mismatch between the charity's profile and the funder's eligibility criteria, the system shall display a hard stop: a red warning card, with the Continue button hidden | Must Have |
+
+Confirmed built and matching the register description: acknowledging the warning sets the application status to `mismatch` (a terminal state -- no transition to Step 4 or 5 is permitted) and returns the user to the dashboard. There is no override path. The only route forward is for the user to correct their charity profile and start a new application. Default message if no specific reason is available: _"Your charity's focus does not appear to meet this funder's eligibility criteria."_
+
+---
+
 ## 7. Screen Specifications
 
-This section defines the content, fields, validation rules, error states, and post-submission behaviour for each of the nine screens. Full detail is also held in `business/PRD inputs/screen-requirements.md`.
+This section defines the content, fields, validation rules, error states, and post-submission behaviour for each screen. Full detail is also held in `docs/PRD inputs/screen-requirements.md`.
 
 ---
 
@@ -532,15 +608,15 @@ This section defines the content, fields, validation rules, error states, and po
 
 **Validation:**
 
-| Field                 | Rule                            | Error message                                                       |
-| --------------------- | ------------------------------- | ------------------------------------------------------------------- |
-| First name            | Required                        | "Please enter your first name"                                      |
-| Last name             | Required                        | "Please enter your last name"                                       |
-| Email                 | Required, valid format          | "Please enter a valid email address"                                |
-| Email                 | Not already registered          | "An account with this email address already exists"                 |
-| Password              | Required, minimum 10 characters | "Your password must be at least 10 characters"                      |
-| Password confirmation | Must match password             | "Your passwords do not match"                                       |
-| Terms checkbox        | Must be checked                 | "Please accept the Terms of Service and Privacy Policy to continue" |
+| Field                 | Rule                                                             | Error message                                                                       |
+| --------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| First name            | Required                                                         | "Please enter your first name"                                                      |
+| Last name             | Required                                                         | "Please enter your last name"                                                       |
+| Email                 | Required, valid format                                           | "Please enter a valid email address"                                                |
+| Email                 | Not already registered                                           | "An account with this email address already exists"                                 |
+| Password              | Required, minimum 12 characters, must contain letters and digits | "Your password must be at least 12 characters and include both letters and numbers" |
+| Password confirmation | Must match password                                              | "Your passwords do not match"                                                       |
+| Terms checkbox        | Must be checked                                                  | "Please accept the Terms of Service and Privacy Policy to continue"                 |
 
 **On success:** Account created, Email 1 sent, user redirected to `/verify-email`.
 
@@ -603,10 +679,10 @@ On submission (regardless of whether email is registered): "If an account exists
 
 **Validation (State 2):**
 
-| Field                | Rule                            | Error message                                  |
-| -------------------- | ------------------------------- | ---------------------------------------------- |
-| New password         | Required, minimum 10 characters | "Your password must be at least 10 characters" |
-| Confirm new password | Must match                      | "Your passwords do not match"                  |
+| Field                | Rule                                                             | Error message                                                                       |
+| -------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| New password         | Required, minimum 12 characters, must contain letters and digits | "Your password must be at least 12 characters and include both letters and numbers" |
+| Confirm new password | Must match                                                       | "Your passwords do not match"                                                       |
 
 On success: "Your password has been updated." with Sign in button. On expired link: "This reset link has expired. Please request a new one." with link back to State 1.
 
@@ -701,15 +777,19 @@ A five-step flow with a step indicator at the top showing all five steps at all 
 
 **Step 1 -- Application Details**
 
-| Element     | Detail                                                                                                   |
-| ----------- | -------------------------------------------------------------------------------------------------------- |
-| Heading     | "Start a new application"                                                                                |
-| Funder name | Text, required. Label: "Who is offering this grant?" Placeholder: "e.g. National Lottery Community Fund" |
-| Grant name  | Text, required. Label: "What is the grant called?" Placeholder: "e.g. Awards for All England"            |
-| Continue    | Creates application record (`not_started`), advances to Step 2                                           |
-| Cancel      | Returns to `/dashboard` -- no record created                                                             |
+**Revised 2026-06-01 (DR-FD-001):** the funder name field was replaced with a searchable picker over the approved `funders` directory (FR-15, FR-46).
 
-**Validation:** Funder name: "Please enter the funder's name" / Grant name: "Please enter the grant name"
+| Element                       | Detail                                                                                                                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heading                       | "Start a new application" (new application); "Continue your application" (returning to an existing application)                                                         |
+| Funder picker                 | Searchable dropdown/combobox populated from the active `funders` table, required. Label: "Who is offering this grant?" Placeholder: "Search for a funder..."            |
+| "My funder isn't listed" link | Below the picker: "My funder isn't listed -- request it" -- opens a funder-request form (mailto or Tally in v1)                                                         |
+| Coverage tier (FR-46)         | The funder's coverage tier (Tier 1 Full / Tier 2 Partial / Tier 3 Guidance) is shown alongside the selected funder. **Build status not confirmed -- see Section 6.11.** |
+| Grant name                    | Text, required. Label: "What is the grant called?" Placeholder: "e.g. Awards for All England"                                                                           |
+| Continue                      | Creates application record (`not_started`), advances to Step 2                                                                                                          |
+| Cancel                        | Returns to `/dashboard` -- no record created                                                                                                                            |
+
+**Validation:** Funder: "Please select a funder from the list" (must be selected from the directory, free text is no longer accepted) / Grant name: "Please enter the grant name"
 
 ---
 
@@ -728,48 +808,71 @@ A five-step flow with a step indicator at the top showing all five steps at all 
 
 **Step 3 -- AI Summary**
 
-| Element             | Detail                                                                                                                                                   |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Heading             | "Your funder guidelines -- summary"                                                                                                                      |
-| Progress            | "Reading your funder guidelines..." then "Almost there..."                                                                                               |
-| Summary content     | AI-generated plain-English digest: what the grant is for, who can apply, funder priorities, evidence expectations, extracted questions with explanations |
-| Questions found     | "We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."                               |
-| Questions not found | "We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."               |
-| Regenerate          | "Regenerate summary" -- secondary action, counts as one AI request                                                                                       |
-| Continue            | "This looks right -- continue" -- advances to Step 4                                                                                                     |
-| Back                | Returns to Step 2                                                                                                                                        |
-| API failure         | "We couldn't generate your summary right now. This is usually temporary -- please try again." with Try again button                                      |
+| Element                                        | Detail                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heading                                        | "Your funder guidelines -- summary"                                                                                                                                                                                                                                                                                                                                              |
+| Progress                                       | "Reading your funder guidelines..." then "Almost there..."                                                                                                                                                                                                                                                                                                                       |
+| Summary content                                | AI-generated plain-English digest: what the grant is for, who can apply, funder priorities, evidence expectations, extracted questions with explanations                                                                                                                                                                                                                         |
+| Questions found                                | "We found [n] application questions in these guidelines. We'll use these to generate your draft answers in the next step."                                                                                                                                                                                                                                                       |
+| Questions not found                            | "We couldn't identify specific application questions in this document. In the next step, you'll be able to enter your questions manually."                                                                                                                                                                                                                                       |
+| Coverage tier (FR-46)                          | Summary card shows the funder's coverage tier (Tier 1 Full / Tier 2 Partial / Tier 3 Guidance). **Build status not confirmed -- see Section 6.11.**                                                                                                                                                                                                                              |
+| Eligibility mismatch (FR-47, added 2026-06-02) | If the AI detects a clear mismatch between the charity profile and the funder's eligibility criteria, Continue is hidden and a red warning card is shown instead: "Eligibility mismatch -- this application cannot proceed" with a specific or default reason. Acknowledging sets status to `mismatch` (terminal -- no override) and returns to the dashboard. See Section 6.12. |
+| Regenerate                                     | "Regenerate summary" -- secondary action, counts as one AI request                                                                                                                                                                                                                                                                                                               |
+| Continue                                       | "This looks right -- continue" -- advances to Step 4                                                                                                                                                                                                                                                                                                                             |
+| Back                                           | Returns to Step 2                                                                                                                                                                                                                                                                                                                                                                |
+| API failure                                    | "We couldn't generate your summary right now. This is usually temporary -- please try again." with Try again button                                                                                                                                                                                                                                                              |
 
 ---
 
-**Step 4 -- Draft Answers**
+**Step 4 -- Draft Answers (rewritten 2026-05-28 for the Q&A model; updated 2026-06-04)**
 
-| Element       | Detail                                                                                                                                     |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Heading       | "Your draft answers"                                                                                                                       |
-| Progress      | "Reviewing your guidelines and charity profile..." then "Writing your draft answers..." then "Almost there..."                             |
-| Draft content | Each question as bold heading; AI-generated answer in editable textarea below                                                              |
-| Manual entry  | If no questions extracted in Step 3, user sees manual question entry field                                                                 |
-| Regenerate    | "Regenerate all answers" -- secondary action, counts as one AI request                                                                     |
-| Continue      | "I've reviewed my answers -- continue" -- advances to Step 5                                                                               |
-| Back          | Returns to Step 3                                                                                                                          |
-| API failure   | "We couldn't generate your draft right now. This is usually temporary -- please try again." with Try again button                          |
-| Usage warning | "You've used most of your monthly AI allowance." (at 80% of limit)                                                                         |
-| Limit reached | "You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch." Generate/regenerate buttons disabled |
+The auto-generation model originally specified here (AI writes a draft for every question on arrival) was abandoned -- see Section 6.6. Step 4 is now a charity-authored Q&A interview, preceded by a one-time preparation checklist.
+
+**Preparation checklist (shown once, on first arrival at Step 4 only):**
+
+| Element         | Detail                                                                                                                                                                                                                                                                  |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heading         | "Before you begin writing"                                                                                                                                                                                                                                              |
+| Message         | "The financial sections of this application cannot be completed by AI. Before you start, gather:"                                                                                                                                                                       |
+| Checklist       | 1. Most recent annual accounts or financial statements 2. Projected budget for the grant period (income and planned expenditure) 3. Details of other funding secured or applied for 4. Input from your treasurer, finance lead, or a trustee who understands the budget |
+| Warning note    | "It is worth involving a senior colleague -- such as your CEO, treasurer, or a trustee -- before reaching the financial questions."                                                                                                                                     |
+| Continue button | "I have what I need -- start writing" -- advances to the Q&A interface; not shown again on return visits                                                                                                                                                                |
+| Back            | Returns to Step 3                                                                                                                                                                                                                                                       |
+
+**Q&A interface (shown on every visit after the checklist is passed once):**
+
+| Element                 | Detail                                                                                                                                                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Heading                 | "Your draft answers"                                                                                                                                                                                               |
+| Sub-heading             | "Answer each question below. Your work is saved automatically as you type." (structured funder) or the free-form equivalent                                                                                        |
+| Progress indicator      | Sticky bar at top: "X of N questions approved"                                                                                                                                                                     |
+| Question/section cards  | One card per extracted question (or narrative section for free-form funders); textarea starts **empty** -- there is no AI-generated text to edit                                                                   |
+| Word/character counter  | Below each textarea: "X / N words" or "X / N characters" where the funder sets a limit (FR-29); a plain word count where it does not                                                                               |
+| Over-limit hard stop    | When the answer exceeds its limit, the approve panel is hidden and a red message shown: "Your answer exceeds the funder's word limit. Please trim it or use AI to bring it within the limit before approving."     |
+| "Help me improve this"  | Shown on non-budget questions once the answer is non-empty. Returns a "SUGGESTED IMPROVEMENT" card with **"Use this improved version"** and **"Keep my original"** actions. Counts as one AI request               |
+| Budget question styling | Amber border, "Budget" badge, no AI assist button. Label: "This section requires your actual financial data -- do not use AI-generated figures." Must be filled in before assembly                                 |
+| Per-question approval   | "Before you approve, check:" prompts plus an "Approve this answer" button on each card (Section 6.7). Editing an approved answer clears its approval                                                               |
+| Optional questions      | Questions containing "(optional)" show the approve panel even when empty, letting the user explicitly skip them; excluded from the assembly gate                                                                   |
+| Manual entry            | If no questions/sections were extracted in Step 3, the user sees a manual entry field to add a question and write their own answer                                                                                 |
+| Ready to assemble       | Active once every mandatory question is approved (greyed out otherwise); leads to the senior-review prompt, then assembly, then Step 5                                                                             |
+| AI service unavailable  | When the AI kill switch is active: "The AI service is temporarily unavailable. Please try again later." shown inline on the card; no quota consumed                                                                |
+| Back                    | Returns to Step 3                                                                                                                                                                                                  |
+| API failure             | "We couldn't generate your draft right now. This is usually temporary -- please try again." with Try again button (shown on an AI-assist failure, not on page load -- there is no page-load AI call in this model) |
+| Usage warning           | "You've used most of your monthly AI allowance." (at 40 of 50 requests, 80% of limit)                                                                                                                              |
+| Limit reached           | "You've reached your monthly AI limit. This resets on [date]. If you need more, please get in touch." "Help me improve this" buttons disabled; writing and saving answers is never restricted                      |
 
 ---
 
-**Step 5 -- Approve & Export**
+**Step 5 -- Approve & Export (checkboxes added 2026-06-01; approve+download collapsed into one action 2026-06-12)**
 
-| Element           | Detail                                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------------------------- |
-| Heading           | "Review and approve your application"                                                                   |
-| Content           | Read-only view of all questions and answers                                                             |
-| Review prompts    | Three prompts displayed before approval action (see Section 6.7)                                        |
-| Approve button    | "Approve my application" -- sets status to `approved`. Requires confirmation prompt                     |
-| Export button     | "Download as Word document" -- enabled after approval only. Sets status to `exported` on first download |
-| Re-export warning | Shown if previously exported (see Section 6.8 for wording)                                              |
-| Back              | Returns to Step 4                                                                                       |
+| Element                 | Detail                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Heading                 | "Review and approve your application"                                                                                                                                                                                                                                                                                                                                                                                        |
+| Content                 | Read-only view of the assembled draft -- all questions and approved answers                                                                                                                                                                                                                                                                                                                                                  |
+| Confirmation checkboxes | **Three mandatory checkboxes, all of which must be ticked** before the download buttons activate (Section 6.7): (1) "I have reviewed all responses in full and am satisfied with their content." (2) "The information provided is accurate and complete to the best of my knowledge." (3) "I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted." |
+| Export buttons          | "Download as Word document (.docx)" and "Download as plain text (.txt)" -- both disabled until all three checkboxes are ticked. On first click: the application is approved (status → `approved`) and the download begins immediately in the same action -- there is no separate "Approve my application" button or intermediate confirmation modal                                                                          |
+| Re-export warning       | Shown if previously exported (see Section 6.8 for wording)                                                                                                                                                                                                                                                                                                                                                                   |
+| Re-open link            | "Re-open application to make changes" -- always shown; opens a confirmation modal; on confirm, resets status to `in_progress`, clears the assembled draft and all per-question approvals, and redirects to Step 4. This is the only route back to Step 4 from Step 5 -- there is no plain Back link                                                                                                                          |
 
 ---
 
@@ -792,11 +895,11 @@ A five-step flow with a step indicator at the top showing all five steps at all 
 
 **Password change validation:**
 
-| Field                | Rule                                 | Error                                          |
-| -------------------- | ------------------------------------ | ---------------------------------------------- |
-| Current password     | Required, must match stored password | "Your current password is incorrect"           |
-| New password         | Required, minimum 10 characters      | "Your password must be at least 10 characters" |
-| Confirm new password | Must match new password              | "Your passwords do not match"                  |
+| Field                | Rule                                                             | Error                                                                               |
+| -------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Current password     | Required, must match stored password                             | "Your current password is incorrect"                                                |
+| New password         | Required, minimum 12 characters, must contain letters and digits | "Your password must be at least 12 characters and include both letters and numbers" |
+| Confirm new password | Must match new password                                          | "Your passwords do not match"                                                       |
 
 On success: "Your password has been updated." Form fields cleared.
 
@@ -862,18 +965,21 @@ On success: "Your password has been updated." Form fields cleared.
 
 ## 9. Data Requirements
 
-All data is stored in PostgreSQL via Supabase (London region). Authentication is managed by Supabase Auth. No persistent data is held at the application layer. Full field-level detail is in `business/data-model.md`.
+All data is stored in PostgreSQL via Supabase (London region). Authentication is managed by Supabase Auth. No persistent data is held at the application layer. Full field-level detail is in `docs/data-model.md`.
 
 ### 9.1 Entities
 
-| Entity                | Type              | Purpose                                                    |
-| --------------------- | ----------------- | ---------------------------------------------------------- |
-| `auth.users`          | Supabase Auth     | Authentication credentials and email verification          |
-| `user_profiles`       | Application table | First name, last name, feedback consent                    |
-| `charity_profiles`    | Application table | Charity organisational information used as AI context      |
-| `applications`        | Application table | Application records with status and step tracking          |
-| `application_answers` | Application table | Question and answer pairs per application                  |
-| `ai_usage_log`        | Application table | Per-user AI request tracking for monthly limit enforcement |
+**Updated 2026-07-10** to add the `funders` table (added 2026-06-01, DR-FD-001, missing from this table since) and to reflect the current field picture per `docs/data-model.md` v1.4.
+
+| Entity                | Type              | Purpose                                                                                                                                                                                                                                                                       |
+| --------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `auth.users`          | Supabase Auth     | Authentication credentials and email verification                                                                                                                                                                                                                             |
+| `user_profiles`       | Application table | First name, last name, feedback consent                                                                                                                                                                                                                                       |
+| `funders`             | Application table | The approved funder directory used to populate the Step 1 picker (FR-15). Global reference table, not user-scoped -- users can read active funders but not write to it. **Added 2026-06-01 (DR-FD-001)**                                                                      |
+| `charity_profiles`    | Application table | Charity organisational information used as AI context. Extended 2026-05-29 into a "thick profile" (identity, mission/work, financial fields, governance facts) -- see `docs/data-model.md` Section 2 for exactly which of these fields are built versus still documented-only |
+| `applications`        | Application table | Application records with status (including the `mismatch` terminal status, FR-47) and step tracking; `funder_id` links to `funders`                                                                                                                                           |
+| `application_answers` | Application table | Question and answer pairs per application, including `question_type`, `word_limit`/`char_limit`/`limit_type`, `is_budget_question`, and `is_approved` fields added for the Q&A model (Section 6.6, 6.7)                                                                       |
+| `ai_usage_log`        | Application table | Per-user AI request tracking for monthly limit enforcement (50/month -- Section 10.5)                                                                                                                                                                                         |
 
 ### 9.2 Relationships
 
@@ -882,10 +988,14 @@ All data is stored in PostgreSQL via Supabase (London region). Authentication is
 | User to user_profile               | One-to-one  |
 | User to charity_profile            | One-to-one  |
 | User to applications               | One-to-many |
+| Funder to applications             | One-to-many |
 | Application to application_answers | One-to-many |
 | User to ai_usage_log               | One-to-many |
+| Application to ai_usage_log        | One-to-many |
 
 ### 9.3 Data Not Stored
+
+**True today; changing under Phase 6 -- see note below the table.**
 
 | Item                                       | Reason                                                 |
 | ------------------------------------------ | ------------------------------------------------------ |
@@ -893,6 +1003,8 @@ All data is stored in PostgreSQL via Supabase (London region). Authentication is
 | Raw AI prompts                             | Held in `lib/prompts.ts` in the codebase               |
 | Raw API responses beyond extracted outputs | Only processed outputs are stored                      |
 | Beneficiary personal data                  | Out of scope                                           |
+
+**Forward note (added 2026-07-10):** `ADR-DATA-002` originally justified never storing funder guidelines on the grounds that they "may contain commercially sensitive information." That premise was checked on 2026-07-10 against the real 21-document corpus Grant Pathway processes and found unsupported -- these are funders' own publicly published guidance. The ADR was formally revised the same day: guideline text **will** be retained (extracted, page/section-tagged text in Postgres, cascade-deleting with the owning application; retained indefinitely where it backs an approved playbook) once Phase 6 (P6.2a onward) ships. As of this pass, that retention mechanism **has not been built** -- the table above remains an accurate description of the product as it exists in production today. This mirrors how `ADR-DATA-001` treats the item-graph model superseding `application_answers`: a documented future direction, not yet a change to what is live. Track this via `ADR-DATA-002`'s 2026-07-10 revision and the Phase 6 build plan.
 
 ### 9.4 Data Retention
 
@@ -919,12 +1031,15 @@ All data is stored in PostgreSQL via Supabase (London region). Authentication is
 
 All AI prompts are centralised in a single file: `lib/prompts.ts`. Prompts are version-controlled alongside the codebase. Changes to prompts are deployed via standard Vercel deployment (under 2 minutes). No database storage of prompts is required.
 
-Two prompt types are defined:
+**Updated 2026-07-10** to reflect the Q&A model (Section 6.6) and the actual `request_type` values used in the live `generate-summary` and `refine-answer` routes:
 
-| Type                | Used at | Inputs                                                                                   |
-| ------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `guideline_summary` | Step 3  | Funder guidelines text + charity profile                                                 |
-| `draft_generation`  | Step 4  | Application question(s) + funder summary + charity profile + word limit (if FR-29 built) |
+| Type                 | Used at       | Inputs                                                                                                                                                                                                                                 |
+| -------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `guideline_summary`  | Step 3        | Funder guidelines text + charity profile                                                                                                                                                                                               |
+| `refine_answer`      | Step 4        | The charity's own written answer text + the question + its word/character limit (if any) -- **not** funder summary or charity profile; the assist may only restructure/clarify what the charity already wrote, not draw on new context |
+| `charity_paraphrase` | Profile setup | Charity Commission lookup result text, paraphrased for the profile fields (authenticated and metered since 2026-06-22)                                                                                                                 |
+
+**Discrepancy resolved 2026-07-10:** `docs/data-model.md`'s documented `ai_usage_log.request_type` enum previously omitted `refine_answer` (the value the live `refine-answer` route actually writes, confirmed in `app/api/refine-answer/route.ts`) — corrected there to list all five DB enum values, with a note on which are live vs. dead. Separately, `lib/prompts.ts` still exports a `buildDraftPrompt` function alongside `buildSummaryPrompt` and `buildRefinePrompt`; confirmed to have zero callers anywhere in the codebase now that `/api/generate-draft` (its presumed caller) was deleted 2026-07-01 — this is genuinely dead code, flagged separately as a follow-up cleanup item, not resolved as part of this documentation pass.
 
 ### 10.3 Processing Mode
 
@@ -940,22 +1055,23 @@ The user may proceed with the full document. The warning is informational only.
 
 ### 10.5 Cost Controls
 
-| Control                | Detail                                                                                        |
-| ---------------------- | --------------------------------------------------------------------------------------------- |
-| Per-user monthly limit | 20 AI requests per user per calendar month                                                    |
-| Warning threshold      | Soft warning shown at 16 requests (80%)                                                       |
-| Hard limit             | AI generation blocked at 20 requests                                                          |
-| Monitoring             | Usage tracked in `ai_usage_log` table; Amazon Bedrock / AWS console spend cap set as backstop |
-| Monthly target         | Under £100/month total API spend (C1)                                                         |
+| Control                | Detail                                                                                                |
+| ---------------------- | ----------------------------------------------------------------------------------------------------- |
+| Per-user monthly limit | 50 AI requests per user per calendar month (raised from 20 on 2026-06-17, across all three AI routes) |
+| Warning threshold      | Soft warning shown at 40 requests (80%)                                                               |
+| Hard limit             | AI assist blocked at 50 requests; writing and saving answers is never restricted                      |
+| Monitoring             | Usage tracked in `ai_usage_log` table; Amazon Bedrock / AWS console spend cap set as backstop         |
+| Monthly target         | Under £100/month total API spend (C1)                                                                 |
 
 ### 10.6 Error Handling
 
-| Scenario                          | User-facing behaviour                                                            |
-| --------------------------------- | -------------------------------------------------------------------------------- |
-| API error or timeout (Step 3)     | Progress indicator replaced with error message and Try again button              |
-| API error or timeout (Step 4)     | Progress indicator replaced with error message and Try again button              |
-| Monthly limit reached             | Generate/regenerate buttons disabled; limit message shown                        |
-| No manual fallback for AI failure | Users cannot manually trigger alternative processing -- retry is the only option |
+| Scenario                             | User-facing behaviour                                                                                                                                                                 |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API error or timeout (Step 3)        | Progress indicator replaced with error message and Try again button                                                                                                                   |
+| API error or timeout (Step 4)        | Inline error shown on the affected question card ("Help me improve this" call failed) with a Try again option -- there is no page-load AI call to fail in the Q&A model (Section 6.6) |
+| Monthly limit reached                | "Help me improve this" buttons disabled across Step 4; limit message shown. Writing and saving your own answers is never restricted                                                   |
+| No manual fallback for AI failure    | Users cannot manually trigger alternative AI processing -- retry is the only option; writing an answer manually is always available regardless of AI status                           |
+| AI service unavailable (kill switch) | When `AI_ENABLED=false`, AI routes return HTTP 503 immediately; message: "The AI service is temporarily unavailable. Please try again later." No quota consumed. Added 2026-06-29     |
 
 ---
 
@@ -1011,11 +1127,14 @@ Note: The subject line is identical to Email 4. A user will only ever receive on
 
 ### 12.1 Performance
 
-| Metric                     | Target           |
-| -------------------------- | ---------------- |
-| Page loads and navigation  | Under 3 seconds  |
-| AI guideline summarisation | Under 30 seconds |
-| AI draft answer generation | Under 60 seconds |
+**Updated to reflect the Q&A model (Section 6.6) -- there is no longer a single "AI draft answer generation" step to time; the equivalent live metric is the per-question "Help me improve this" refine action.**
+
+| Metric                                                            | Target           |
+| ----------------------------------------------------------------- | ---------------- |
+| Page loads and navigation                                         | Under 3 seconds  |
+| AI guideline summarisation -- standard documents (up to ~8 pages) | Under 30 seconds |
+| AI guideline summarisation -- large documents (over 8 pages)      | Under 45 seconds |
+| AI answer refine ("Help me improve this", per question)           | Under 15 seconds |
 
 ### 12.2 Availability
 
@@ -1035,15 +1154,15 @@ Architecture should scale from launch to 12-18 month target without a major rebu
 
 ### 12.4 Security
 
-| Control               | Requirement                                                                           |
-| --------------------- | ------------------------------------------------------------------------------------- |
-| Encryption in transit | TLS 1.2 or higher; HTTPS enforced across all pages and API calls                      |
-| Encryption at rest    | Database-level encryption enabled on all data stores                                  |
-| Passwords             | Minimum 10 characters; no mandatory complexity rules (NCSC guidance)                  |
-| MFA                   | Available as opt-in (FR-07, Should Have); not mandatory                               |
-| Session timeout       | Automatic logout after 60 minutes of inactivity                                       |
-| Security baseline     | OWASP Top 10                                                                          |
-| Secrets management    | No credentials or API keys committed to the repository (private, proprietary licence) |
+| Control               | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Encryption in transit | TLS 1.2 or higher; HTTPS enforced across all pages and API calls                                                                                                                                                                                                                                                                                                                                                                 |
+| Encryption at rest    | Database-level encryption enabled on all data stores                                                                                                                                                                                                                                                                                                                                                                             |
+| Passwords             | Minimum 12 characters, must contain both letters and digits; leaked-password check enabled (HaveIBeenPwned); secure password change enabled; current password required to change password. Hardened 2026-06-29 (VQ-009), up from a 6-character minimum with no complexity rules. Client-side forms (register, reset, account settings) enforce the same 12-character/letters-and-digits rule as of 2026-07-10 -- see Section 6.1 |
+| MFA                   | ~~Available as opt-in (FR-07, Should Have); not mandatory~~ -- **Not offered.** FR-07 demoted to Won't Have 2026-06-12; fully removed from the codebase. See Section 3.3 for the risk analysis                                                                                                                                                                                                                                   |
+| Session timeout       | Automatic logout after 60 minutes of inactivity                                                                                                                                                                                                                                                                                                                                                                                  |
+| Security baseline     | OWASP Top 10                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Secrets management    | No credentials or API keys committed to the repository (private, proprietary licence)                                                                                                                                                                                                                                                                                                                                            |
 
 ### 12.5 Browser & Device Support
 
@@ -1110,7 +1229,7 @@ The 6 screens requiring lightweight design before build: dashboard, charity prof
 
 ## 14. Success Metrics
 
-Full detail in `business/PRD inputs/success-metrics.md`. All metrics are derived from Supabase data records. No third-party analytics platform is included in v1.
+Full detail in `docs/PRD inputs/success-metrics.md`. All metrics are derived from Supabase data records. No third-party analytics platform is included in v1.
 
 ### 14.1 Acquisition
 
@@ -1162,66 +1281,71 @@ Applies to users who opt in to feedback interviews (FR-08, Should Have). Deferre
 
 ## 15. Compliance & Pre-Launch Requirements
 
-The following items are blocking -- the product cannot launch until all three are resolved.
+**Updated 2026-07-10 -- status corrected against `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` (P5.1).** All three items have progressed substantially since this section was last written; none is now fully closed, but none is "to be confirmed" or "to be drafted" from a standing start either.
 
-| Item                         | Requirement                                                                                                                                                                                                                                                                            | Status          |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| AWS Data Processing Addendum | Confirm that the AWS Data Processing Addendum covers Amazon Bedrock usage and satisfies UK GDPR obligations before launch. AI processing occurs within UK/EEA via Bedrock eu-west-2 (In-Region primary, EU Geo fallback) -- no international transfer or SCCs are required (DR-DP-002) | To be confirmed |
-| Terms of Service             | Draft and publish Terms of Service before launch. Must state: Grant Pathway does not guarantee funding outcomes; does not submit applications on behalf of charities; makes no representations to funders                                                                              | To be drafted   |
-| Privacy Policy               | Draft and publish Privacy Policy before launch. Must cover: data collected, Supabase London hosting, Vercel global edge, AI processing via Amazon Bedrock eu-west-2 (UK/EEA -- data does not leave UK/EEA), no-AI-training commitment, user rights, retention periods                  | To be drafted   |
+| Item                         | Requirement                                                                                                                                                                                                                                                                            | Status                                                                                                                                                                                                                                                                       |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS Data Processing Addendum | Confirm that the AWS Data Processing Addendum covers Amazon Bedrock usage and satisfies UK GDPR obligations before launch. AI processing occurs within UK/EEA via Bedrock eu-west-2 (In-Region primary, EU Geo fallback) -- no international transfer or SCCs are required (DR-DP-002) | **Confirmed (2026-06-22).** Model invocation logging confirmed disabled in the Bedrock eu-west-2 console; the AWS DPA is automatically in force via AWS Service Terms, no separate acceptance required. See `docs/legal/AWS-DPA-reference.md` and the DR-DP-003 review note. |
+| Terms of Service             | Publish Terms of Service before launch. Must state: Grant Pathway does not guarantee funding outcomes; does not submit applications on behalf of charities; makes no representations to funders                                                                                        | **Live (built 2026-06-10).** `/terms` renders `docs/legal/terms-of-service.md` (v1.2). **Outstanding before P5.1 can close:** the effective date is still `[TO BE CONFIRMED]` in the source document, and solicitor review has not yet taken place.                          |
+| Privacy Policy               | Publish Privacy Policy before launch. Must cover: data collected, Supabase London hosting, Vercel global edge, AI processing via Amazon Bedrock eu-west-2 (UK/EEA -- data does not leave UK/EEA), no-AI-training commitment, user rights, retention periods                            | **Live (built 2026-06-10).** `/privacy` renders `docs/legal/privacy-policy.md` (v1.4). Same two items outstanding: effective date `[TO BE CONFIRMED]`, solicitor review pending.                                                                                             |
 
-A two-week compliance review window is reserved in the project timeline prior to the 31 July 2026 launch date.
+A compliance review window remains reserved in the project timeline ahead of launch; the launch date itself is not committed (see Section 1) and is no longer tied to a fixed calendar date.
 
 ---
 
 ## 16. Acceptance Criteria
 
-Testable Given/When/Then acceptance criteria for all 44 functional requirements are defined in:
+Testable Given/When/Then acceptance criteria for all functional requirements are defined in:
 
-`business/PRD inputs/acceptance-criteria.md`
+`docs/PRD inputs/acceptance-criteria.md`
 
-Criteria are organised by the same nine functional sections used in this document. Should Have requirements include criteria that apply only if the requirement is built.
+Criteria are organised by the same functional sections used in this document. Should Have requirements include criteria that apply only if the requirement is built. **Updated 2026-07-10:** that document now includes a full FR-45/46/47 section (Section 9.10), FR-29 is corrected to Must Have, and the FR-31A numbering gap against the canonical FR-01 to FR-47 list is explicitly flagged there (not silently resolved, since it is real, built, and already load-bearing in code comments -- see that document's FR-31A note).
 
 ---
 
 ## Appendix A -- Glossary
 
-| Term                   | Definition                                                                                                                                  |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| AWS DPA                | AWS Data Processing Addendum -- governs how Amazon Web Services (including Bedrock) processes customer data, satisfying UK GDPR obligations |
-| Charity Commission API | The public API provided by the Charity Commission for England and Wales, used to look up registered charity details                         |
-| CIC                    | Community Interest Company -- the intended long-term legal structure for owning and operating Grant Pathway                                 |
-| CVS                    | Council for Voluntary Service -- local infrastructure bodies that support charities and voluntary organisations                             |
-| NCSC                   | National Cyber Security Centre -- source of UK password guidance referenced in NFR-04                                                       |
-| OWASP Top 10           | Open Worldwide Application Security Project's list of the ten most critical web application security risks                                  |
-| SCCs                   | Standard Contractual Clauses -- contractual mechanisms used to legitimise international data transfers under UK GDPR                        |
-| WCAG 2.2 AA            | Web Content Accessibility Guidelines version 2.2, Level AA -- the accessibility standard the application must meet                          |
-| shadcn/ui              | UI component library built on Radix UI primitives and Tailwind CSS -- the chosen component library for v1                                   |
-| Supabase               | Managed PostgreSQL database and authentication service used for all data storage (London region)                                            |
+| Term                   | Definition                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AWS DPA                | AWS Data Processing Addendum -- governs how Amazon Web Services (including Bedrock) processes customer data, satisfying UK GDPR obligations                                                                                                                                                                                                 |
+| Charity Commission API | The public API provided by the Charity Commission for England and Wales, used to look up registered charity details                                                                                                                                                                                                                         |
+| CIC                    | Community Interest Company -- the intended long-term legal structure for owning and operating Grant Pathway                                                                                                                                                                                                                                 |
+| CVS                    | Council for Voluntary Service -- local infrastructure bodies that support charities and voluntary organisations                                                                                                                                                                                                                             |
+| HaveIBeenPwned         | A public database of passwords known to have been exposed in prior data breaches -- Supabase Auth checks new passwords against it as a leaked-password check (enabled 2026-06-29, VQ-009)                                                                                                                                                   |
+| NCSC                   | National Cyber Security Centre -- source of the original UK password guidance referenced in NFR-04 (10-character minimum, no complexity rules). The live policy has since been hardened beyond pure NCSC minimalism to a 12-character minimum with mandatory letters and digits, plus the HaveIBeenPwned leaked-password check (2026-06-29) |
+| OWASP Top 10           | Open Worldwide Application Security Project's list of the ten most critical web application security risks                                                                                                                                                                                                                                  |
+| SCCs                   | Standard Contractual Clauses -- contractual mechanisms used to legitimise international data transfers under UK GDPR                                                                                                                                                                                                                        |
+| WCAG 2.2 AA            | Web Content Accessibility Guidelines version 2.2, Level AA -- the accessibility standard the application must meet                                                                                                                                                                                                                          |
+| shadcn/ui              | UI component library built on Radix UI primitives and Tailwind CSS -- the chosen component library for v1                                                                                                                                                                                                                                   |
+| Supabase               | Managed PostgreSQL database and authentication service used for all data storage (London region)                                                                                                                                                                                                                                            |
 
 ---
 
 ## Appendix B -- Related Documents
 
-| Document                            | Location                                              | Purpose                                                |
-| ----------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| Business Requirements Document      | `business/BRD-Grant-Pathway-v1.md`                    | Business context, constraints, risks, and stakeholders |
-| Non-Functional Requirements         | `business/non-functional-requirements.md`             | Full NFR detail                                        |
-| Data Model                          | `business/data-model.md`                              | Entity definitions, field-level detail, relationships  |
-| MoSCoW Feature Register             | `business/moscow-feature-register.md`                 | Consolidated feature priorities and BRD divergences    |
-| IA & Navigation                     | `business/information-architecture-and-navigation.md` | Route structure, nav components, user flows            |
-| Screen Requirements                 | `business/PRD inputs/screen-requirements.md`          | Full screen-level field and validation detail          |
-| Acceptance Criteria                 | `business/PRD inputs/acceptance-criteria.md`          | Given/When/Then criteria for all 44 FRs                |
-| Application Status Model            | `business/PRD inputs/application-status-model.md`     | Status definitions, transitions, deletion prompts      |
-| Email Notifications                 | `business/PRD inputs/email-notifications.md`          | Full email body content and trigger rules              |
-| Success Metrics                     | `business/PRD inputs/success-metrics.md`              | Full metrics detail with measurement approach          |
-| PRD Decisions Index                 | `business/PRD decisions/PRD-DECISIONS-INDEX.md`       | All 16 PRD decision records                            |
-| User Personas, Journeys & Use Cases | `business/user-personas-journeys-and-use-cases.md`    | Full persona and journey detail                        |
-| Technology Stack                    | `business/technology-stack.md`                        | Full technology stack detail                           |
-| Future Phases                       | `business/future-phases.md`                           | Post-v1 roadmap items                                  |
+**Paths corrected 2026-07-10.** All entries below used a stale `business/...` prefix; the live repository holds these under `docs/...`. Two entries have also moved to a different subfolder, not just a prefix swap: the Business Requirements Document and the Technology Stack document (see notes below the table).
+
+| Document                            | Location                                                     | Purpose                                                  |
+| ----------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
+| Business Requirements Document      | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` | Business context, constraints, risks, and stakeholders   |
+| Non-Functional Requirements         | `docs/non-functional-requirements.md`                        | Full NFR detail                                          |
+| Data Model                          | `docs/data-model.md`                                         | Entity definitions, field-level detail, relationships    |
+| MoSCoW Feature Register             | `docs/moscow-feature-register.md`                            | Consolidated feature priorities and BRD divergences      |
+| IA & Navigation                     | `docs/information-architecture-and-navigation.md`            | Route structure, nav components, user flows              |
+| Screen Requirements                 | `docs/PRD inputs/screen-requirements.md`                     | Full screen-level field and validation detail            |
+| Acceptance Criteria                 | `docs/PRD inputs/acceptance-criteria.md`                     | Given/When/Then criteria for all functional requirements |
+| Application Status Model            | `docs/PRD inputs/application-status-model.md`                | Status definitions, transitions, deletion prompts        |
+| Email Notifications                 | `docs/PRD inputs/email-notifications.md`                     | Full email body content and trigger rules                |
+| Success Metrics                     | `docs/PRD inputs/success-metrics.md`                         | Full metrics detail with measurement approach            |
+| PRD Decisions Index                 | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`                  | PRD decision records                                     |
+| User Personas, Journeys & Use Cases | `docs/user-personas-journeys-and-use-cases.md`               | Full persona and journey detail                          |
+| Technology Stack                    | `docs/Technical Decision and Design/technology-stack.md`     | Full technology stack detail                             |
+| Future Phases                       | `docs/future-phases.md`                                      | Post-v1 roadmap items                                    |
+
+**Notes on relocations:** the Business Requirements Document is not at a top-level `docs/BRD-Grant-Pathway-v1.md` path -- the current, authoritative BRD lives in the `docs/BRD plus decisions Mark Two/` subfolder as `BRD-Grant-Pathway-v0.6.md` (see the filename/version mismatch correction note under Document Control). The Technology Stack document is not at a top-level `docs/technology-stack.md` path -- it lives in `docs/Technical Decision and Design/technology-stack.md`.
 
 ---
 
-_Document status: Version 0.2 Draft_
-_Compliance section (Section 15) is outstanding pending AWS DPA review (Bedrock), Terms of Service drafting, and Privacy Policy drafting._
-_Last updated: 2026-05-07_
+_Document status: Version 0.3 Draft_
+_Compliance section (Section 15) -- AWS DPA confirmed 2026-06-22; Terms of Service and Privacy Policy are live, with effective dates and solicitor review still outstanding before P5.1 can close. See Section 15 for full detail._
+_Last updated: 2026-07-10_

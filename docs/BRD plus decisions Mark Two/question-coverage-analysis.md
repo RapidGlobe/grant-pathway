@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-`BRD-Grant-Pathway-v0.5.md` Section 10 records BD-03 ("non-narrative questions are pre-filled from profile where possible; shown as reminders otherwise") as **never built**, and flags it as an open decision rather than a resolved gap — see the BD-03 note in that document.
+`BRD-Grant-Pathway-v0.6.md` Section 10 records BD-03 ("non-narrative questions are pre-filled from profile where possible; shown as reminders otherwise") as **never built**, and flags it as an open decision rather than a resolved gap — see the BD-03 note in that document.
 
 This document is the working analysis behind resolving that open decision properly, rather than funder-by-funder. It is not itself a decision record. It exists so the reasoning survives past this session and the next funder test doesn't have to rediscover it from scratch.
 

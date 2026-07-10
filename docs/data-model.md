@@ -258,14 +258,16 @@ Stores the individual question-and-answer pairs for each application. Each row r
 
 Tracks every AI API request made by each user. Used to enforce the monthly per-user request limit (50 requests/month) and to monitor running costs (PDR-AI-005).
 
-| Field            | Type      | Required | Notes                                                                                                             |
-| ---------------- | --------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `id`             | UUID      | Yes      | Primary key                                                                                                       |
-| `user_id`        | UUID      | Yes      | Foreign key → `auth.users.id`                                                                                     |
-| `application_id` | UUID      | No       | Foreign key → `applications.id`. Null for any AI calls not tied to a specific application                         |
-| `request_type`   | Enum      | Yes      | One of: `guideline_summary`, `draft_generation`, `charity_paraphrase`. Identifies the type of AI call             |
-| `token_count`    | Integer   | No       | Total tokens used (prompt + completion). Populated from the Amazon Bedrock API response. Used for cost monitoring |
-| `created_at`     | Timestamp | Yes      | Timestamp of the request. Used to calculate monthly usage (calendar month window)                                 |
+| Field            | Type      | Required | Notes                                                                                                                                    |
+| ---------------- | --------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | UUID      | Yes      | Primary key                                                                                                                              |
+| `user_id`        | UUID      | Yes      | Foreign key → `auth.users.id`                                                                                                            |
+| `application_id` | UUID      | No       | Foreign key → `applications.id`. Null for any AI calls not tied to a specific application                                                |
+| `request_type`   | Enum      | Yes      | One of: `guideline_summary`, `refine_answer`, `charity_paraphrase`, `draft_generation`, `assemble_draft`. Identifies the type of AI call |
+| `token_count`    | Integer   | No       | Total tokens used (prompt + completion). Populated from the Amazon Bedrock API response. Used for cost monitoring                        |
+| `created_at`     | Timestamp | Yes      | Timestamp of the request. Used to calculate monthly usage (calendar month window)                                                        |
+
+**Correction (2026-07-10):** this row previously listed `guideline_summary`, `draft_generation`, `charity_paraphrase` and omitted `refine_answer` entirely — meaning the documented enum did not include the value actually inserted by the live `/api/refine-answer` route (`p_request_type: 'refine_answer'`, confirmed in `app/api/refine-answer/route.ts`). Only three of the five DB enum values are written by any live code path today: `guideline_summary` (`/api/generate-summary`), `refine_answer` (`/api/refine-answer`), and `charity_paraphrase` (`actions/charity.ts`). `draft_generation` was written only by `/api/generate-draft`, deleted 2026-07-01 (see `CHANGELOG.md`), and `assemble_draft` has never been written by any route. Both dead values remain in the Postgres enum type — removing an enum value is a separate, riskier migration — so they are listed above for schema accuracy but are not in active use.
 
 **Key constraints:**
 
@@ -332,6 +334,7 @@ The following are explicitly **not** stored in the database:
 | 1.2     | 2026-06-01 | Rapidglobe Ltd | Section 2a added: `funders` table (DR-FD-001) — approved funder directory, global/non-user-scoped, seeded with 12 approved orgs. `funder_id` nullable FK added to `applications`. Entity overview and relationships summary updated.                                                                                                                                                                                                                                               |
 | 1.3     | 2026-06-30 | Rapidglobe Ltd | `ai_usage_log.request_type` enum updated: `charity_paraphrase` added as third value (migration 20260622000001 — applied via SQL Editor as ALTER TYPE ADD VALUE cannot run in a transaction).                                                                                                                                                                                                                                                                                       |
 | 1.4     | 2026-07-05 | Rapidglobe Ltd | P6.1 (ADR-DATA-006, R13): `total_expenditure`, `reserves`, and new section 2.4a (governance facts: `trustees_related`, `bank_signatory_count`, `bank_signatories_related`) added to `charity_profiles` — migration `20260705000000`, dev only. Implementation note added clarifying which section-2 fields are actually built versus documented-but-unimplemented target state (a pre-existing gap, not introduced by this change).                                                |
+| 1.5     | 2026-07-10 | Rapidglobe Ltd | `ai_usage_log.request_type` enum row corrected: added missing `refine_answer` (the value actually inserted by the live `/api/refine-answer` route) and `assemble_draft`; row previously omitted `refine_answer` entirely. Note added clarifying which enum values are written by live code today versus dead (`draft_generation`, tied to the `/api/generate-draft` route deleted 2026-07-01).                                                                                     |
 
-_Last updated: 2026-07-05_
+_Last updated: 2026-07-10_
 _Status: Updated — reflects Mark Two decisions BD-02, BD-04, BD-05; funder directory DR-FD-001_

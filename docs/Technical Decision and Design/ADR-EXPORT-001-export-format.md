@@ -20,7 +20,7 @@ Grant Pathway's final output is a document that the user submits to their funder
 
 ## Decision
 
-**Microsoft Word (.docx) export as the primary export format. PDF is a secondary nice-to-have for v1.**
+**Microsoft Word (.docx) export as the primary export format. Plain text (.txt) is a secondary nice-to-have for v1.**
 
 The exported Word document includes:
 
@@ -34,6 +34,8 @@ The exported Word document includes:
 - PDF export requires additional server-side rendering (headless browser or PDF library) that adds complexity. Word export via a library like `docx` (npm) is simpler.
 - Product Decision PDR-EX-001 specifies Word export.
 
+**Correction (2026-07-10):** the Decision above previously named PDF as the secondary nice-to-have format. What was actually built as the secondary format is plain text (.txt, FR-38, S7.3) — see `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`'s S7.3 entry and `PDR-DH-003`, which specifies the plain-text export structure. PDF was never implemented; the Rationale bullet above (PDF adds server-side rendering complexity) was the reasoning against building it, not a description of something delivered.
+
 ## Consequences
 
 - A Word document generation library is required (ADR-EXPORT-002 determines where generation runs).
@@ -43,8 +45,14 @@ The exported Word document includes:
 
 ## Source
 
-Product Decision PDR-EX-001, FR-20 to FR-21.
+Product Decision PDR-EX-001, FR-20 to FR-21. See `PDR-DH-003` for the authoritative export document structure and formatting spec (both .docx and .txt).
 
 ## Date Decided
 
 2026-04-17
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-07-10 | Corrected the Decision statement: PDF was documented as the secondary "nice-to-have" export format, but plain text (.txt, FR-38) is what was actually built (S7.3) — PDF was never implemented. Added a reference to `PDR-DH-003` as the authoritative structure spec, which neither this ADR nor `ADR-EXPORT-002` previously cited. |

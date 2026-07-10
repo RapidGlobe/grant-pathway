@@ -85,8 +85,14 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     const errors: FieldErrors = {}
 
-    if (!password || password.length < 10) {
-      errors.password = 'Your password must be at least 10 characters'
+    if (
+      !password ||
+      password.length < 12 ||
+      !/[a-zA-Z]/.test(password) ||
+      !/[0-9]/.test(password)
+    ) {
+      errors.password =
+        'Your password must be at least 12 characters and include both letters and numbers'
     }
     if (!confirmPassword || confirmPassword !== password) {
       errors.confirmPassword = 'Your passwords do not match'
@@ -116,6 +122,19 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           <p className="text-[14px] text-[#991B1B]">
             Your new password must be different from your current password. Please choose a
             different one.
+          </p>
+        </div>
+      )}
+
+      {/* Weak password error */}
+      {state.status === 'weak_password' && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
+          <p className="text-[14px] text-[#991B1B]">
+            Your password must be at least 12 characters and include both letters and numbers.
           </p>
         </div>
       )}
@@ -171,7 +190,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             </p>
           ) : (
             <p id="new-password-hint" className="mt-1.5 text-[13px] text-[#64748B]">
-              At least 10 characters
+              At least 12 characters, including letters and numbers
             </p>
           )}
         </div>

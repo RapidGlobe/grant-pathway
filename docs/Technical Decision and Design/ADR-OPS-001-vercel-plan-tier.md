@@ -60,8 +60,10 @@ All other routes continue to use the default 10-second timeout.
 
 - Vercel Pro subscription must be activated before production deployment.
 - AI route files must include `export const maxDuration = 90`.
-- Monthly operating cost: ~£16 (Vercel Pro) + Supabase (free tier initially) + Anthropic API usage.
-- Budget headroom: ~£84/month remaining against the £100/month C1 constraint.
+- Monthly operating cost: ~~£16 (Vercel Pro) + Supabase Pro (~~£20/month) + Anthropic/Bedrock API usage.
+- Budget headroom: ~£64/month remaining against the £100/month C1 constraint.
+
+**Corrected 2026-07-10:** the two bullets above originally read "Supabase (free tier initially)" and "Budget headroom: ~£84/month remaining." Both were stale — Supabase Pro was activated 2026-06-22 (`ADR-DATA-005`), which already updated `technical-design.md`'s operating cost table accordingly, but this ADR was never updated to match. Total committed fixed costs are now ~£36/month (Vercel Pro ~£16 + Supabase Pro ~£20), leaving ~£64/month headroom against the £100/month C1 constraint for Bedrock API usage and other services.
 
 ## Source
 
@@ -70,3 +72,9 @@ ADR-STACK-004, ADR-AI-006, ADR-FILE-001, NFR-01, C1 (Operating cost budget).
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                          |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Consequences section corrected: "Supabase (free tier initially)" → "Supabase Pro (~£20/month)"; "Budget headroom: ~~£84/month remaining" → "~~£64/month remaining." Brings this ADR into line with `ADR-DATA-005` (Supabase Pro activated 2026-06-22) and the already-updated `technical-design.md` cost table. |

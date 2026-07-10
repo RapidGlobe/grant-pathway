@@ -16,7 +16,7 @@ import type { EmailOtpType } from '@supabase/supabase-js'
 // ---------------------------------------------------------------------------
 
 export type RegisterState = {
-  error: 'email_exists' | 'unknown' | null
+  error: 'email_exists' | 'weak_password' | 'unknown' | null
 }
 
 /**
@@ -24,6 +24,8 @@ export type RegisterState = {
  * On success: creates auth.users row → trigger auto-creates user_profiles row
  *             → redirects to /verify-email.
  * On duplicate email: returns { error: 'email_exists' }.
+ * On weak password (rejected by Supabase Auth's password strength check):
+ *             returns { error: 'weak_password' }.
  * On any other failure: returns { error: 'unknown' }.
  *
  * Called from RegisterForm via useActionState (React 19).
@@ -66,6 +68,14 @@ export async function registerUser(
   })
 
   if (error) {
+    // Supabase Auth rejects passwords that don't meet its configured strength
+    // requirements (min length / character variety / pwned-password check)
+    // with error.code === 'weak_password' (AuthWeakPasswordError). Client-side
+    // validation should catch this first, but the server is the source of
+    // truth, so surface a specific message rather than the generic fallback.
+    if (error.code === 'weak_password') {
+      return { error: 'weak_password' }
+    }
     Sentry.captureException(error, { tags: { action: 'registerUser' } })
     return { error: 'unknown' }
   }
@@ -187,7 +197,7 @@ export async function requestPasswordReset(
 }
 
 export type ResetPasswordState = {
-  status: 'idle' | 'success' | 'expired' | 'same_password' | 'error'
+  status: 'idle' | 'success' | 'expired' | 'same_password' | 'weak_password' | 'error'
 }
 
 /**
@@ -196,6 +206,8 @@ export type ResetPasswordState = {
  * the user clicks their reset link.
  * On success: returns { status: 'success' }.
  * On expired/missing session: returns { status: 'expired' }.
+ * On weak password (rejected by Supabase Auth's password strength check):
+ *             returns { status: 'weak_password' }.
  * On any other error: returns { status: 'error' }.
  *
  * Called from ResetPasswordForm via useActionState.
@@ -234,6 +246,11 @@ export async function resetPassword(
       error.message?.toLowerCase().includes('different from the old password')
     ) {
       return { status: 'same_password' }
+    }
+    // Supabase Auth rejects passwords that don't meet its configured strength
+    // requirements with error.code === 'weak_password' (AuthWeakPasswordError).
+    if (error.code === 'weak_password') {
+      return { status: 'weak_password' }
     }
     return { status: 'error' }
   }
@@ -289,7 +306,7 @@ export async function signIn(_prevState: SignInState, formData: FormData): Promi
 // ---------------------------------------------------------------------------
 
 export type ChangePasswordResult = {
-  status: 'success' | 'wrong_password' | 'error'
+  status: 'success' | 'wrong_password' | 'weak_password' | 'error'
 }
 
 /**
@@ -319,7 +336,14 @@ export async function changePassword(
   if (signInError) return { status: 'wrong_password' }
 
   const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
-  if (updateError) return { status: 'error' }
+  if (updateError) {
+    // Supabase Auth rejects passwords that don't meet its configured strength
+    // requirements with error.code === 'weak_password' (AuthWeakPasswordError).
+    if (updateError.code === 'weak_password') {
+      return { status: 'weak_password' }
+    }
+    return { status: 'error' }
+  }
 
   return { status: 'success' }
 }

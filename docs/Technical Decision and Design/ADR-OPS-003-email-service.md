@@ -65,11 +65,24 @@ Supabase Auth's default email templates reference "Supabase" — these must be c
 
 Templates should follow the tone and voice guide in design-requirements.md: warm, encouraging, plain English. No jargon. See ADR-OPS-002 pre-launch checklist.
 
+**Added 2026-07-10 — a second usage pattern (direct Resend REST API, not Supabase Auth SMTP):**
+
+The Decision above only covers Resend as Supabase Auth's custom SMTP provider for the two auth-flow emails (verification, password reset). Since Slice 8 (S8.2/S8.3), Grant Pathway also calls Resend directly via its REST API for three transactional emails that are not part of the Supabase Auth flow:
+
+| Email                           | Trigger                                                             | Builder function                                                                     |
+| ------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Account deleted (by user)       | User-initiated account deletion (`app/api/account/delete/route.ts`) | `buildAccountDeletedByUserEmail()` in `lib/emails/account-deleted-user.ts`           |
+| Inactivity warning              | `inactivity-warning` cron, 23-month inactivity threshold            | `buildInactivityWarningEmail()` in `lib/emails/inactivity-warning.ts`                |
+| Account deleted (by inactivity) | `inactivity-deletion` cron, 24-month inactivity threshold           | `buildAccountDeletedInactivityEmail()` in `lib/emails/account-deleted-inactivity.ts` |
+
+All three are sent via `sendEmail()` in `lib/emails/send.ts` — a thin wrapper that calls `POST https://api.resend.com/emails` directly with `fetch()` (not the `resend` npm SDK, to avoid an extra dependency), authenticated with `RESEND_API_KEY` as a Next.js server-only environment variable. This is a distinct credential and code path from the Supabase dashboard SMTP configuration described above: these emails are triggered by application code (a Route Handler or a Vercel Cron job), not by Supabase Auth, and their HTML is built in code rather than edited in the Supabase/Resend template editor — a deliberate choice recorded in `IMPLEMENTATION-STATUS.md` (P3.8 design note) because Resend's template editor does not support variable substitution needed for personalisation (first name, deletion date).
+
 ## Consequences
 
 - A Resend account (or equivalent) must be created and connected to the Rapidglobe sending domain.
 - Supabase email templates (verification, password reset) should be customised to match the Grant Pathway brand (warm, approachable tone from design-requirements.md).
 - SMTP credentials must be stored securely in the Supabase dashboard (not in the Next.js environment variables).
+- **Added 2026-07-10:** `RESEND_API_KEY` must also be stored as a server-only Next.js environment variable (in Vercel and `.env.local`) for the direct REST API path (`lib/emails/send.ts`) used by account-deletion and inactivity-cycle emails — this is separate from, and in addition to, the SMTP credential stored in the Supabase dashboard.
 
 ## Source
 
@@ -78,3 +91,9 @@ FR-01 to FR-05.
 ## Date Decided
 
 2026-04-21
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                             |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Added description of Resend's second usage pattern: direct REST API calls via `lib/emails/send.ts` (confirmed present in the codebase) for three transactional emails outside the Supabase Auth flow — account-deleted-by-user, inactivity-warning, and account-deleted-by-inactivity (Slice 8, S8.2/S8.3). Added corresponding `RESEND_API_KEY` environment-variable consequence. |

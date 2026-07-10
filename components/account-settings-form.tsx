@@ -39,8 +39,13 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
     if (!currentPassword) errors.currentPassword = 'Please enter your current password'
     if (!newPassword) {
       errors.newPassword = 'Please enter a new password'
-    } else if (newPassword.length < 10) {
-      errors.newPassword = 'Your password must be at least 10 characters'
+    } else if (
+      newPassword.length < 12 ||
+      !/[a-zA-Z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword)
+    ) {
+      errors.newPassword =
+        'Your password must be at least 12 characters and include both letters and numbers'
     }
     if (!confirmPassword) {
       errors.confirmPassword = 'Please confirm your new password'
@@ -60,6 +65,11 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
         setFieldErrors({})
       } else if (result.status === 'wrong_password') {
         setFieldErrors({ currentPassword: 'Your current password is incorrect' })
+      } else if (result.status === 'weak_password') {
+        setFieldErrors({
+          newPassword:
+            'Your password must be at least 12 characters and include both letters and numbers',
+        })
       } else {
         setServerError('Something went wrong. Please try again.')
       }
@@ -196,7 +206,7 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
               </p>
             ) : (
               <p id="newPassword-hint" className="mt-1.5 text-[13px] text-[#64748B]">
-                At least 10 characters
+                At least 12 characters, including letters and numbers
               </p>
             )}
           </div>

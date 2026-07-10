@@ -83,3 +83,17 @@ FR-22, FR-10 to FR-19 (Application flow), DDR-INT-002 (Auto-save), ui-inventory-
 ## Date Decided
 
 2026-04-21
+
+## Note — 2026-07-10
+
+This ADR's Context states that funder guidelines are "session-use only (FR-22 — not stored in the database)," and Option A's weakness above reads: "the funder guidelines (Step 2 input) cannot be stored — must be held in session/memory and re-submitted if the user navigates away and returns." This remains accurate today.
+
+However, `ADR-DATA-002` reversed the "guidelines are never stored" decision on 2026-07-10 — guideline text is now retained server-side in Postgres (extracted, page-tagged text, per the P6.2a groundwork). Once P6.2a ships, that specific Option A weakness goes away: guidelines will be retrievable server-side rather than needing re-upload or a `sessionStorage` round-trip if the user navigates away and returns.
+
+This should be updated together with `ADR-FILE-004`, which currently shares the same "guidelines can't be stored" assumption (see that ADR's matching 2026-07-10 note).
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-07-10 | Added forward-looking note: `ADR-DATA-002`'s reversal means the Option A weakness ("guidelines cannot be stored") goes away once P6.2a ships — guidelines become retrievable server-side. To be updated together with `ADR-FILE-004`, which shares the same now-outdated assumption. |

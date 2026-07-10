@@ -51,6 +51,10 @@ Grant Pathway is required to meet WCAG 2.2 Level AA from day one (DDR-AC-001). T
 - A Lighthouse CI configuration should be added to check accessibility score on each deployment.
 - Accessibility testing is part of the definition of done for each UI feature.
 - Findings must be fixed before release — accessibility violations are treated as bugs, not nice-to-haves.
+- **Added 2026-07-10:** the Phase 6 guideline source-reference feature's "view original guidelines" viewer (P6.4) is a genuinely novel accessibility surface, not covered by this ADR's shadcn/ui + Radix baseline. Per `ADR-SEC-004`'s 2026-07-10 note, the viewer renders PDFs via canvas (fetch the file as bytes, render pages to `<canvas>`, draw highlights manually) rather than via `<iframe>`/`<object>`, because jump-to-page and highlight-on-click were required and neither is available through a simple embed. A canvas element has no native text layer or semantics for assistive technology to read, so the shadcn/ui + Radix baseline (keyboard nav, ARIA roles "out of the box") does not automatically extend to it — this must be built and tested deliberately when P6.4 is implemented. Once P6.4 is built, add these manual-testing items to the pre-release checklist above:
+  - Keyboard navigation into and all the way through the viewer (open, move between pages/highlights, close) using only Tab / Shift+Tab / Enter / Space / Arrow keys.
+  - Screen reader behaviour on the canvas-rendered element (NVDA/VoiceOver) — canvas content is not exposed to assistive technology by default, so an accessible text alternative (e.g. an ARIA live region or a parallel accessible text layer describing the current page/highlight) must be verified, not assumed.
+  - Focus management when the viewer panel opens and closes — focus should move into the viewer on open and return to the triggering element on close, matching the existing modal focus-trap pattern already tested for the timeout warning modal.
 
 ## Source
 
@@ -59,3 +63,9 @@ Design Decision DDR-AC-001, design-requirements.md (Section 8 — Accessibility)
 ## Date Decided
 
 2026-04-17
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Added Consequences note: the Phase 6 guideline viewer (P6.4) will render PDFs via canvas, per `ADR-SEC-004`'s 2026-07-10 decision — a novel accessibility surface outside this ADR's shadcn/ui + Radix baseline. Once P6.4 is built, three manual-testing items must be added to the pre-release checklist: keyboard navigation into/through the viewer, screen-reader behaviour on the canvas-rendered element, and focus management on open/close. |

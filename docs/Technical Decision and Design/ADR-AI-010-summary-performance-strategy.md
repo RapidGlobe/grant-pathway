@@ -127,6 +127,7 @@ Step 4's AI assist (`/api/refine-answer`, successor to the removed `generate-dra
 - Post-v1 streaming evaluation is logged as a future enhancement — see GAP-27 update below.
 - NFR-01 large-document tier (≤45s) is retained as the performance target. If any funder exceeds this after pre-processing is applied, escalate to streaming immediately.
 - ADR-AI-005 (batch mode) remains in force for v1. This ADR does not change that decision.
+- **Added 2026-07-10:** P6.2a (guideline source-reference feature, driven by `ADR-DATA-002`'s reversal) will insert page markers (e.g. `[PAGE 3]`) into the extracted text before this pre-processing pass runs, so the AI can later cite which page a summary bullet or question came from. Consequence: the noise-stripping step in `lib/preprocess-text.ts` — which currently strips page headers/footers (Option B above), including anything resembling a page-number line — must be updated so it does not strip the newly-inserted `[PAGE N]` markers before the AI ever sees them. This is the same underlying change as `ADR-FILE-003`'s matching 2026-07-10 note, viewed from the pre-processing side (`lib/preprocess-text.ts`) rather than the extraction side (`lib/extract-text.ts`).
 
 ---
 
@@ -147,3 +148,9 @@ Step 4's AI assist (`/api/refine-answer`, successor to the removed `generate-dra
 ## Date Decided
 
 2026-06-05
+
+## Revision History
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-10 | Added Consequences note: P6.2a will insert `[PAGE N]` markers into extracted text before `lib/preprocess-text.ts`'s stripping pass runs; that pass's page-number noise-stripping logic must be updated so it doesn't strip the new markers. Same underlying change as `ADR-FILE-003`'s matching 2026-07-10 note, viewed from the pre-processing side. |

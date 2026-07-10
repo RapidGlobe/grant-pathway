@@ -43,8 +43,14 @@ export function RegisterForm() {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.email = 'Please enter a valid email address'
     }
-    if (!password || password.length < 10) {
-      errors.password = 'Your password must be at least 10 characters'
+    if (
+      !password ||
+      password.length < 12 ||
+      !/[a-zA-Z]/.test(password) ||
+      !/[0-9]/.test(password)
+    ) {
+      errors.password =
+        'Your password must be at least 12 characters and include both letters and numbers'
     }
     if (!confirmPassword || confirmPassword !== password) {
       errors.confirmPassword = 'Your passwords do not match'
@@ -87,6 +93,19 @@ export function RegisterForm() {
             >
               Sign in instead?
             </Link>
+          </p>
+        </div>
+      )}
+
+      {/* Form-level error: server rejected the password as too weak */}
+      {state.error === 'weak_password' && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
+          <p className="text-[14px] text-[#991B1B]">
+            Your password must be at least 12 characters and include both letters and numbers.
           </p>
         </div>
       )}
@@ -216,7 +235,7 @@ export function RegisterForm() {
             </p>
           ) : (
             <p id="password-hint" className="mt-1.5 text-[13px] text-[#64748B]">
-              At least 10 characters
+              At least 12 characters, including letters and numbers
             </p>
           )}
         </div>
