@@ -37,7 +37,7 @@ The funder guidelines text is extracted client-side (or server-side during the A
 
 ## Source
 
-FR-22, PRD-Grant-Pathway-v1.md (Section 9.3 — Data Not Stored).
+FR-22, PRD-Grant-Pathway.md (Section 9.3 — Data Not Stored).
 
 ## Date Decided
 

@@ -1761,7 +1761,7 @@ Checklist:
 | Document                  | Path                                                                              |
 | ------------------------- | --------------------------------------------------------------------------------- |
 | BRD                       | `business/BRD-Grant-Pathway-v0.2.md`                                              |
-| PRD                       | `business/PRD-Grant-Pathway-v1.md`                                                |
+| PRD                       | `docs/PRD-Grant-Pathway.md`                                                       |
 | Screen Requirements       | `business/PRD inputs/screen-requirements.md`                                      |
 | Acceptance Criteria       | `business/PRD inputs/acceptance-criteria.md`                                      |
 | Technical Design          | `business/Technical Decision and Design/technical-design.md`                      |

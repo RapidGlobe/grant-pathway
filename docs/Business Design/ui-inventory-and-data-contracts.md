@@ -903,4 +903,4 @@ None. Display only. Button disabling is a side effect handled by the parent page
 
 _Last updated: 2026-04-17_
 _Status: Complete_
-_Sources: screen-requirements.md, information-architecture-and-navigation.md, application-status-model.md, data-model.md, PRD-Grant-Pathway-v1.md, design decision records DDR-LA-001, DDR-LA-002, DDR-CS-005, DDR-IP-001_
+_Sources: screen-requirements.md, information-architecture-and-navigation.md, application-status-model.md, data-model.md, PRD-Grant-Pathway.md, design decision records DDR-LA-001, DDR-LA-002, DDR-CS-005, DDR-IP-001_

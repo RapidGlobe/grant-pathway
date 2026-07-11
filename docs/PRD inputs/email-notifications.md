@@ -136,13 +136,13 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 
 ## Email 5 — Account Deleted (User Initiated)
 
-| Field          | Detail                                                                                                                       |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Trigger**    | User completes the account deletion flow in the application                                                                  |
-| **Recipient**  | The email address associated with the now-deleted account                                                                    |
-| **Subject**    | Your Grant Pathway account has been deleted                                                                                  |
-| **Status**     | Should Have — FR-44. **Confirmed built (2026-07-10)**, no longer conditional; see `docs/PRD-Grant-Pathway-v1.md` Section 6.9 |
-| **Handled by** | Application (triggered on successful deletion)                                                                               |
+| Field          | Detail                                                                                                                    |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Trigger**    | User completes the account deletion flow in the application                                                               |
+| **Recipient**  | The email address associated with the now-deleted account                                                                 |
+| **Subject**    | Your Grant Pathway account has been deleted                                                                               |
+| **Status**     | Should Have — FR-44. **Confirmed built (2026-07-10)**, no longer conditional; see `docs/PRD-Grant-Pathway.md` Section 6.9 |
+| **Handled by** | Application (triggered on successful deletion)                                                                            |
 
 **Body (corrected 2026-07-10 -- verified against `lib/emails/account-deleted-user.ts`):**
 
