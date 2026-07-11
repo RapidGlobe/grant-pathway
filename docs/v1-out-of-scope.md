@@ -56,6 +56,10 @@ Charities cannot select their preferred data hosting region. All data is hosted 
 
 The app does not store uploaded funder documents, supplementary files, or attachments. Only the charity profile and application history (text content) are stored. _(DR-DP-001)_
 
+## Native Funder Document/Portal Output
+
+The app does not fill a funder's own native Word template or portal application fields. Grant Pathway always produces a generic Word/text export the charity copies from — it never attempts to correctly reproduce an arbitrary, funder-specific document format or submit directly into a funder's portal. This is consistent with the founding "preparation tool, not a submission platform" boundary (BD-01). Declared permanently out of scope 2026-07-11, not deferred to a future phase — the engineering cost of correctly parsing and populating an unbounded variety of funder-specific formats was judged disproportionate given the diversity of funder form methods. _(R9, `ADR-DATA-006`)_
+
 ## Formal Feedback and Survey Infrastructure
 
 In-app satisfaction surveys, NPS scoring, and formal feedback dashboards are not included in v1. Charity feedback will be gathered through direct user interviews. _(DR-SM-001, DR-SM-002)_
@@ -74,5 +78,5 @@ A formal third-party accessibility audit is not required before v1 launch. The a
 
 ---
 
-_Last updated: 2026-04-13_
-_Derived from decision records DR-PS-001 through DR-BM-003_
+_Last updated: 2026-07-11_
+_Derived from decision records DR-PS-001 through DR-BM-003, plus ADR-DATA-006 (2026-07-11 addition)_

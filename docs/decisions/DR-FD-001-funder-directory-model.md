@@ -1,7 +1,7 @@
 # DR-FD-001 — Funder Directory and Access Control Model
 
-**Version:** 1.2
-**Date:** 2026-06-01
+**Version:** 1.3
+**Date:** 2026-07-11
 **Status:** Decided ✓
 **Author:** Rapidglobe Ltd
 
@@ -34,6 +34,12 @@ Five options were evaluated:
 **Option 5 — Hybrid: Curated Funder Directory + "Request a Funder" escape hatch.**
 
 The `funders` table in Supabase is the authoritative source of approved funders. Step 1 (Application Details) presents a searchable picker populated from this table. Users cannot enter a funder name that is not in the approved list. A clearly labelled "My funder isn't listed — request it" link is available at the picker, routing to a simple request form (Tally or mailto in v1). Submitted requests are reviewed by Rapidglobe before a funder is added to the table.
+
+**Amendment (2026-07-11) — hard gate relaxed to free-text fallback, to be trialled in testing.** The original hard gate ("users cannot enter a funder name not in the approved list") was a testing-phase safety measure, premised on funder identity predicting whether Step 3 extraction would work reliably. That premise no longer holds: BD-04's amendment (see consequence 1 above) already established that Step 3/4/5 behaviour is driven dynamically by each application's own `ai_summary`, not by which funder was selected — extraction works on whatever guidelines text is uploaded or pasted, regardless of funder identity. The curated picker therefore no longer protects against a real risk; it only adds friction (the request-and-wait escape hatch) against the "any guideline or form" direction (`ADR-DATA-006`, `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md`).
+
+**Revised behaviour:** the searchable picker over the `funders` table is retained as the default, convenient path — it still surfaces which funders have been tested (`TEST-DASHBOARD.md`) and pre-links to `guidelines_url`/`grant_range`. But a charity may now also enter a funder name directly if it isn't found in the picker, without submitting a request and waiting for review. `applications.funder_id` remains nullable and is simply left null for a free-text entry; `funder_name` (already a required, independent text field) is populated directly. The "My funder isn't listed — request it" link is retained as a secondary path for charities who'd rather flag a funder for future curation than type it themselves.
+
+**Status: to be trialled in upcoming testing**, not yet implemented in code — see Consequences below for the build task.
 
 ---
 
@@ -77,12 +83,20 @@ The `funders` table in Supabase is the authoritative source of approved funders.
 - Step 1 UI component (`application-step1.tsx` or equivalent) requires replacing the funder text input with a picker
 - `FR-15` in `moscow-feature-register.md` is revised: funder selection is now via picker, not free-text entry
 
+### Build task — free-text fallback (2026-07-11 amendment)
+
+1. `components/application-step1-form.tsx`: when no picker match is selected, allow the typed value to be submitted directly as a free-text funder name instead of blocking with "Please select a funder from the list"
+2. `actions/applications.ts` (create-application path): accept a free-text funder name with `funder_id` left null; continue to populate `funder_name` as today
+3. `FR-15` in `moscow-feature-register.md` and the PRD to be updated to reflect the relaxed gate once this lands
+4. No database migration required — `funder_id` is already nullable, `funder_name` is already an independent required text field
+
 ---
 
 ## Document history
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                          |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review                                                                                                                                                                                                                      |
-| 1.1     | 2026-06-11 | Rapidglobe Ltd | Updated funder count reference — now refers to target-funder-list.md v1.3 (19 entries, 18 active) following addition of MKCF ×4, Baily Thomas ×3, CPF Trust                                                                                                                                     |
-| 1.2     | 2026-07-04 | Rapidglobe Ltd | Retired the `funder_type` picker badge (see amendment under consequence 1) — found not to reflect a stable property of the funder, and disconnected from the mechanism that actually drives Step 3/4/5 behaviour. Badge removed from the Step 1 funder picker; DB column left in place, unused. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial decision — funder directory model adopted following options review                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 1.1     | 2026-06-11 | Rapidglobe Ltd | Updated funder count reference — now refers to target-funder-list.md v1.3 (19 entries, 18 active) following addition of MKCF ×4, Baily Thomas ×3, CPF Trust                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 1.2     | 2026-07-04 | Rapidglobe Ltd | Retired the `funder_type` picker badge (see amendment under consequence 1) — found not to reflect a stable property of the funder, and disconnected from the mechanism that actually drives Step 3/4/5 behaviour. Badge removed from the Step 1 funder picker; DB column left in place, unused.                                                                                                                                                                                                                                                                |
+| 1.3     | 2026-07-11 | Rapidglobe Ltd | Hard gate relaxed to a free-text fallback, to be trialled in testing (see amendment under Decision, and new build task under Consequences). The original rationale — funder identity predicts whether Step 3 extraction will work — was already disproven by BD-04's finding that processing is driven dynamically per-application, not by funder identity. Picker retained as the default convenient path (still surfaces tested funders); free-text entry now allowed as a fallback instead of a request-and-wait escape hatch. Not yet implemented in code. |
