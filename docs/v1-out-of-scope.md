@@ -60,6 +60,10 @@ The app does not store uploaded funder documents, supplementary files, or attach
 
 The app does not fill a funder's own native Word template or portal application fields. Grant Pathway always produces a generic Word/text export the charity copies from — it never attempts to correctly reproduce an arbitrary, funder-specific document format or submit directly into a funder's portal. This is consistent with the founding "preparation tool, not a submission platform" boundary (BD-01). Declared permanently out of scope 2026-07-11, not deferred to a future phase — the engineering cost of correctly parsing and populating an unbounded variety of funder-specific formats was judged disproportionate given the diversity of funder form methods. _(R9, `ADR-DATA-006`)_
 
+## Funder Coverage Tier Display
+
+A per-funder "Tier 1/2/3" or "Full/Partial/Guidance" coverage badge, originally proposed 2026-05-29 (BD-07, FR-46). Withdrawn 2026-07-11 — never built, and the underlying premise (coverage level as a fixed property of a funder) was disproven: the same funder's actual support level varies by which specific guidelines document is uploaded, not by funder identity, per the finding that also led to retiring the "Structured/Narrative" picker badge (`DR-FD-001` v1.0 → v1.2). Charities are no worse off, since no such display has ever existed. If a coverage signal is wanted in future, it would need to be derived per-application from that upload's Step 3 AI summary, not pre-assigned per funder — a different, unscoped feature. _(BD-07, FR-46)_
+
 ## Formal Feedback and Survey Infrastructure
 
 In-app satisfaction surveys, NPS scoring, and formal feedback dashboards are not included in v1. Charity feedback will be gathered through direct user interviews. _(DR-SM-001, DR-SM-002)_
