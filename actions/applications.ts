@@ -510,8 +510,8 @@ export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
 
 /**
  * Saves a single answer text for an existing application_answers row.
- * Called by the debounced auto-save (400 ms) and the 60-second background
- * save in the Step 4 component.
+ * Called by the on-blur auto-save and the 60-second background save in the
+ * Step 4 component.
  *
  * answer_source must be 'user_edited' (user replaced their answer with an
  * AI-refined version via "Help me improve this") or 'user_written' (user
