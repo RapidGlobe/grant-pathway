@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-07-13 — Dashboard `mismatch` status now counted; "View" renamed to "Re-open"; re-open wording reconciled
+
+Surfaced during a full section-by-section review of `docs/PRD inputs/acceptance-criteria.md` against live code (Section 9.3, Application Management).
+
+**Dashboard summary strip didn't count `mismatch` applications.** `applications.status` has five values (`not_started`, `in_progress`, `approved`, `exported`, `mismatch` — the last set by FR-47's eligibility hard stop), but `components/dashboard-populated.tsx`'s summary strip only tallied four. A mismatched application still appeared as a card and counted toward the total shown, but was invisible in the breakdown — so the four numbers didn't sum to the total whenever a mismatch application existed. WJ decided `mismatch` should get its own fifth count so the numbers tally. Added `mismatch` to the `counts` object and a fifth "[n] ineligible" segment to the summary strip.
+
+**"View" button relabelled to "Re-open."** The button shown on `approved`/`exported` cards was labelled "View" but is not read-only — clicking it opens a confirmation modal and, on confirm, reverts status to `in_progress`, resets `draft_status`, clears the assembled draft, and un-approves every answer. Renamed to "Re-open" to match what the confirmation modal, its own button, and the underlying `reopenApplication()`/`reopen_application` RPC already call it.
+
+**Re-open confirmation wording reconciled.** Two different UI entry points for the same re-open action (the dashboard card's modal and Step 5's own "Re-open application to make changes" dialog) had slightly different confirmation text. Standardised both on: "Re-opening this application will remove your approval. You will need to review and approve your answers again before you can export."
+
+**`acceptance-criteria.md` corrected to match** across Sections 9.3, 9.6, 9.7, and 9.9 (multiple other pre-existing wording/behaviour mismatches also found and corrected in that same pass — see the document's own revision note for the full list).
+
+**Files changed:** `components/dashboard-populated.tsx`, `components/application-step5-approve.tsx`, `docs/PRD inputs/acceptance-criteria.md`, `actions/auth.ts` and `app/auth/callback/route.ts` (unrelated stale D-012 comments corrected in the same session — see below).
+
+---
+
+## 2026-07-13 — Stale D-012 code comments corrected to describe the shipped auto-submit behaviour
+
+Two comments (`actions/auth.ts`'s `confirmEmail()`, `app/auth/callback/route.ts`) still described D-012's fix as requiring "an explicit button click" on the email-confirmation page. That described an earlier version of the fix; the shipped behaviour (`components/confirm-email-form.tsx`) auto-submits via a `useEffect` on mount with no visible button at all, relying on the fact that Gmail's link-scanner fetches the raw page over HTTP and never executes JavaScript. Found during the same acceptance-criteria.md review (FR-03 check) — `acceptance-criteria.md` itself already correctly described the real behaviour; only these two code comments were stale.
+
+**Files changed:** `actions/auth.ts`, `app/auth/callback/route.ts`.
+
+---
+
 ## 2026-07-10 — Stale "Generate your draft" copy corrected to "Write your answers"
 
 The dashboard empty-state three-step explainer (`components/dashboard-empty.tsx`) still labelled Step 3 "Generate your draft," a holdover from the auto-generation model abandoned in the 2026-05-28 Step 4 redesign (`PRD-Grant-Pathway.md` Section 6.6): the app no longer auto-generates a draft, the charity writes every answer, and AI only assists on request via "Help me improve this." The same stale phrase had propagated into six other documents that were never updated when that redesign shipped.

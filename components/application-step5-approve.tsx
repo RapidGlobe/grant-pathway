@@ -503,8 +503,8 @@ export function ApplicationStep5Approve({
           <DialogHeader>
             <DialogTitle>Re-open this application?</DialogTitle>
             <DialogDescription>
-              Re-opening will remove your approval. You will need to review and approve your answers
-              again before you can export.
+              Re-opening this application will remove your approval. You will need to review and
+              approve your answers again before you can export.
             </DialogDescription>
           </DialogHeader>
           {reopenError && (

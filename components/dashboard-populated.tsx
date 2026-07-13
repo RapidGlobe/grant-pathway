@@ -73,6 +73,7 @@ export function DashboardPopulated({
     in_progress: applications.filter((a) => a.status === 'in_progress').length,
     approved: applications.filter((a) => a.status === 'approved').length,
     exported: applications.filter((a) => a.status === 'exported').length,
+    mismatch: applications.filter((a) => a.status === 'mismatch').length,
   }
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -135,6 +136,8 @@ export function DashboardPopulated({
         <span>{counts.approved} approved</span>
         <span aria-hidden="true">·</span>
         <span>{counts.exported} exported</span>
+        <span aria-hidden="true">·</span>
+        <span>{counts.mismatch} ineligible</span>
         <span aria-hidden="true" className="mx-2">
           |
         </span>
@@ -208,7 +211,10 @@ export function DashboardPopulated({
                 </button>
 
                 {isMismatch ? null : isViewMode ? (
-                  // View button opens re-open confirmation (S2.3)
+                  // "Re-open" opens the re-open confirmation (S2.3) — renamed from
+                  // "View" 2026-07-13: the action is not read-only, it reverts
+                  // status/draft_status/approval, so the label should match what
+                  // the modal and reopenApplication() already call it.
                   <Button
                     type="button"
                     onClick={() => {
@@ -217,7 +223,7 @@ export function DashboardPopulated({
                     }}
                     className="h-9 border border-[#0D6E6E] bg-white px-4 text-[13px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4]"
                   >
-                    View
+                    Re-open
                   </Button>
                 ) : (
                   // Continue navigates directly to the application's current step (S2.3)

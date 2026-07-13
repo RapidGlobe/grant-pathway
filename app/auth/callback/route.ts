@@ -18,8 +18,10 @@ import type { EmailOtpType } from '@supabase/supabase-js'
 // within seconds of the email being sent, before the real person ever saw
 // it -- confirmed across 5/5 sampled accounts going back a month, regardless
 // of browser. Loading a page is something any automated scanner does; instead
-// we redirect to /verify-email/confirm, which requires an explicit button
-// click (a real user action, not a page fetch) before the token is spent.
+// we redirect to /verify-email/confirm, which auto-submits via client-side
+// JavaScript on mount (no visible button) -- Gmail's scanner fetches the raw
+// page over HTTP and never executes that JavaScript, so this stays safe
+// against the exact behaviour that caused D-012. See components/confirm-email-form.tsx.
 // See CHANGELOG.md, 2026-07-02, D-012.
 //
 // This route is intentionally NOT in the AUTH_ONLY list in proxy.ts — it must

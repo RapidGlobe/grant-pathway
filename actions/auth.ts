@@ -105,8 +105,11 @@ export async function registerUser(
 // single-use link within seconds of every signup email being sent, before
 // the real person ever opened it. Confirmed across 5/5 sampled accounts
 // going back a month. /auth/callback now redirects here instead of
-// completing anything; this action only runs when a real person clicks the
-// "Confirm my email address" button, which an automated scanner does not do.
+// completing anything; this action runs automatically via client-side
+// JavaScript on page mount (components/confirm-email-form.tsx), with no
+// visible button -- Gmail's scanner fetches the raw page over HTTP and never
+// executes that JavaScript, so this stays safe against the exact behaviour
+// that caused D-012.
 // See CHANGELOG.md, 2026-07-02, D-012.
 // ---------------------------------------------------------------------------
 

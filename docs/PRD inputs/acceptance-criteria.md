@@ -12,19 +12,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ## Status
 
-| Section                                                      | FRs covered    | Status                                                                                            |
-| ------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------- |
-| 9.1 Authentication & Accounts                                | FR-01 to FR-08 | ✅ Complete                                                                                       |
-| 9.2 Charity Profile                                          | FR-09 to FR-14 | ✅ Complete                                                                                       |
-| 9.3 Application Management                                   | FR-15 to FR-20 | ✅ Complete                                                                                       |
-| 9.4 Funder Guideline Handling                                | FR-21 to FR-23 | ⚠️ Partial — FR-22 target retention model not yet built; FR-21 and FR-23 confirmed                |
-| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27 | ✅ Complete                                                                                       |
-| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31 | ✅ Complete                                                                                       |
-| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36 | ✅ Complete                                                                                       |
-| 9.8 Export                                                   | FR-37 to FR-39 | ✅ Complete                                                                                       |
-| 9.9 Account Deletion                                         | FR-40 to FR-44 | ✅ Complete                                                                                       |
-| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47 | ⚠️ Partial — FR-45 not confirmed built; FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed |
-| 9.11 Guideline Source-Reference (Citations)                  | FR-48          | ⚠️ Not built — Phase 6 target behaviour (`P6.2a`–`P6.5`), not yet started                         |
+| Section                                                      | FRs covered            | Status                                                                                                                                           |
+| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"                                                                             |
+| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected                                                            |
+| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria            |
+| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13 — no findings, still accurate (FR-22 correctly flagged not yet built)                                                     |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-06 flagged stale (fix deferred to Option 2/P6.2a), AC-FR-27-05 added                                           |
+| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                     |
+| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                      |
+| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                         |
+| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content                                                     |
+| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built |
+| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate (Phase 6 target, not yet started)                                                       |
 
 ---
 
@@ -390,7 +390,7 @@ _The criteria below are retained for historical reference only. FR-07 will not b
 
 **Requirement:** During registration, the system shall present a plain-language prompt asking the user if they are willing to participate in a feedback interview; the response shall be recorded against the account.
 
-_These criteria apply only if FR-08 is implemented in v1._
+**Confirmed built** — verified directly in `components/register-form.tsx` and `actions/auth.ts`. The feedback opt-in checkbox is live on `/register`, submitted as `feedbackConsent`, and persisted to `user_profiles.feedback_consent` via the signup trigger.
 
 ---
 
@@ -430,7 +430,7 @@ _These criteria apply only if FR-08 is implemented in v1._
 
 ### FR-09 — Must Have
 
-**Requirement:** Following account activation, the system shall prompt the user to enter their charity's registered number.
+**Requirement (corrected 2026-07-13):** Following account activation, the system shall prompt the user to set up their charity profile. _(Previously said "prompt the user to enter their charity's registered number" — inaccurate; registration number is just one optional field among several on the profile, not the specific thing prompted for. The AC below was already correct.)_
 
 ---
 
@@ -471,19 +471,32 @@ _These criteria apply only if FR-08 is implemented in v1._
 
 ### FR-10 — Must Have
 
-**Requirement:** The system shall query the Charity Commission for England and Wales public API and pre-fill the charity name, registered address, date of registration, and charitable objects.
+**Requirement (corrected 2026-07-13 — see revision note):** The system shall query the Charity Commission for England and Wales public API and pre-fill the charity name and registration number on a match. Where the charity's governing document contains charitable objects text, the system shall use AI to paraphrase it into plain-English "what the charity does" and "who it helps" descriptions, shown to the user for review before saving. Registered address and date of registration are not collected by the charity profile at all — see FR-12's note and `docs/moscow-feature-register.md`; date of registration is a possible future addition (Phase 6 replan), not built.
+
+**Confirmed built** — verified directly in `actions/charity.ts` (`lookupCharity()`) and `components/charity-profile-form.tsx`.
 
 ---
 
-**AC-FR-10-01 — Charity Commission lookup — match found**
+**AC-FR-10-01 — Charity Commission lookup — match found, name and registration number pre-filled**
 
 - **Given** I am on `/profile`
 - **When** I enter a charity name or registration number in the lookup field
 - **And** I click the search button
 - **And** the Charity Commission API returns a matching record
 - **Then** the charity name and registration number fields are pre-populated with the returned data
-- **And** I see the note: _"Details retrieved from the Charity Commission register."_
+- **And** I see the note: _"Details retrieved from the Charity Commission register. You can edit these fields before saving."_
 - **And** all pre-filled fields remain editable
+
+---
+
+**AC-FR-10-01b — AI-paraphrased descriptions pre-filled when available**
+
+- **Given** a Charity Commission match is found and the governing document contains charitable objects text
+- **When** the AI paraphrase (via Amazon Bedrock) succeeds
+- **Then** "What does your charity do?" and "Who does your charity help?" are pre-filled with the AI-drafted text
+- **And** I see the note: _"The descriptions below were drafted by AI from your Charity Commission entry. Please review and personalise them before saving."_
+- **And** both fields remain editable
+- **And** if the paraphrase fails or the governing document has no charitable objects text, these fields are left as they were (blank on first setup) with no error shown — the user fills them in manually
 
 ---
 
@@ -585,9 +598,48 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
+### FR-12A — Should Have (provisional)
+
+**Requirement:** The charity profile shall optionally capture financial and governance facts — total annual expenditure, reserves, whether any trustees are related to each other, the number of authorised bank signatories, and whether any bank signatories are related to each other or to a trustee — to support eligibility checks required by specific funders' guidelines that the original 5-field profile could not capture.
+
+**Added 2026-07-13 — new entry, not a correction to an existing FR.** Follows the FR-31A precedent: this is a real, shipped feature (P6.1, `ADR-DATA-006` R13, migration `20260705000000`, 2026-07-05) with no acceptance criteria anywhere in this document before now — see the Section 9.2 review finding. `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` Section 4.2.3 ("Financial and governance (P6.1, R13)") already documents these fields; this entry brings `acceptance-criteria.md` in line with that. **Priority marked "Should Have" provisionally** — all five fields are optional in the UI, but this feature has never been given a formal MoSCoW classification in `docs/moscow-feature-register.md` (checked directly: no match for these fields there at all). Worth a decision on whether it should be formally registered there too.
+
+**Confirmed built** — verified directly in `components/charity-profile-form.tsx` and `actions/charity.ts`.
+
+---
+
+**AC-FR-12A-01 — Governance and reserves fields displayed, all optional**
+
+- **Given** I am on `/profile`
+- **When** the page loads
+- **Then** I see a "Governance and reserves" section below the core profile fields
+- **And** I see the note: _"Optional for now. Some funders check these facts as part of eligibility — filling them in helps Grant Pathway flag issues before you apply."_
+- **And** I see five fields: "Total annual expenditure (£)", "Reserves (£)", "Are any of your trustees related to each other by family or business relationship?" (dropdown: Not sure yet / No / Yes), "How many people are authorised as bank signatories?" (number), and "Are any bank signatories related to each other or to a trustee?" (dropdown: Not sure yet / No / Yes)
+- **And** none of these five fields are marked as required
+
+---
+
+**AC-FR-12A-02 — Months of reserve cover calculated live, not stored**
+
+- **Given** I am on `/profile`
+- **When** I enter a value in both "Total annual expenditure" and "Reserves"
+- **Then** I see a live calculation: _"Based on the figures above, you hold approximately [N] months of reserves"_, computed as reserves ÷ (total annual expenditure ÷ 12)
+- **And** this calculated figure is not itself persisted — only the two entered figures (expenditure and reserves) are saved to the database
+
+---
+
+**AC-FR-12A-03 — Governance and reserves fields save successfully when left blank**
+
+- **Given** I am on `/profile` completing my profile for the first time, or editing an existing profile
+- **When** I leave all five governance and reserves fields blank and save
+- **Then** my profile saves successfully with no validation error
+- **And** each field is stored as not set (null), distinguished from an explicit "No" answer or a zero value
+
+---
+
 ### FR-13 — Must Have
 
-**Requirement:** The system shall allow users to update their charity profile at any time from their account settings.
+**Requirement (corrected 2026-07-13):** The system shall allow users to update their charity profile at any time via a "Charity profile" link in the main navigation. _(Previously said "from their account settings" — inaccurate; it's a top-level nav link (`components/nav-authenticated.tsx`), not nested under account settings. The AC below was already correct.)_
 
 ---
 
@@ -697,17 +749,18 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
-**AC-FR-15-04 — Application page title set correctly**
+**AC-FR-15-04 — Application page title set correctly** _(corrected 2026-07-13 — previously described a dynamic grant/funder title that was never built)_
 
 - **Given** I am working on an application
 - **When** I am on any step of the application flow
-- **Then** the browser tab title reads _"[Grant name] — [Funder name] — Grant Pathway"_
+- **Then** the browser tab title reads _"[Step name] — Grant Pathway"_, where [Step name] is fixed per step: "Application Details" (Step 1), "Upload Guidelines" (Step 2), "AI Summary" (Step 3), "Draft Answers" (Step 4), "Approve & Export" (Step 5)
+- **And** the title does not include the grant name or funder name
 
 ---
 
 ### FR-16 — Must Have
 
-**Requirement:** The system shall display all saved applications on a user dashboard, showing the grant name, funder name, and the date last edited.
+**Requirement (corrected 2026-07-13):** The system shall display all saved applications on a user dashboard, showing the grant name, funder name, and the date last edited. A fifth status, `mismatch` ("Ineligible" — set by FR-47's eligibility hard stop), also appears on the dashboard alongside the original four (`not_started`, `in_progress`, `approved`, `exported`) and is counted in the summary strip so its numbers tally against the total. _(Previously this FR and AC-FR-16-03 only accounted for four statuses; `mismatch` applications appeared as cards but were silently excluded from the summary strip's breakdown, so the four counts didn't sum to the total shown whenever a mismatch application existed. Fixed in `components/dashboard-populated.tsx` the same day.)_
 
 ---
 
@@ -732,13 +785,14 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
-**AC-FR-16-03 — Summary strip shows all four status counts**
+**AC-FR-16-03 — Summary strip shows all five status counts, and they tally**
 
-- **Given** I have one or more saved applications
+- **Given** I have one or more saved applications, at any combination of statuses including `mismatch`
 - **When** I view `/dashboard`
-- **Then** the summary strip displays the count for all four statuses: Not started, In progress, Approved, Exported
-- **And** all four status counts are shown even when some are zero
-- **And** the format is: _"[n] applications — [n] not started · [n] in progress · [n] approved · [n] exported"_
+- **Then** the summary strip displays the count for all five statuses: Not started, In progress, Approved, Exported, Ineligible (`mismatch`)
+- **And** all five status counts are shown even when some are zero
+- **And** the format is: _"[n] applications — [n] not started · [n] in progress · [n] approved · [n] exported · [n] ineligible"_
+- **And** the five counts always sum to the total number of applications shown
 
 ---
 
@@ -751,6 +805,7 @@ _Note: the final set of profile fields was refined during screen requirements. T
   - In progress — Amber
   - Approved — Green
   - Exported — Teal
+  - Ineligible (`mismatch`) — Red
 
 ---
 
@@ -768,11 +823,11 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
-**AC-FR-17-02 — View button shown for approved and exported applications**
+**AC-FR-17-02 — Re-open button shown for approved and exported applications** _(renamed from "View" 2026-07-13 — see AC-FR-17-05/06 below; the action is not read-only)_
 
 - **Given** I have an application with status `approved` or `exported`
 - **When** I view its card on `/dashboard`
-- **Then** I see a "View" button as the primary action on that card
+- **Then** I see a "Re-open" button as the primary action on that card
 
 ---
 
@@ -791,6 +846,40 @@ _Note: the final set of profile fields was refined during screen requirements. T
 - **When** I sign out and sign back in
 - **And** I return to that application from `/dashboard`
 - **Then** all previously saved content is present and unchanged
+
+---
+
+**AC-FR-17-05 — Re-open shows a confirmation before making any change** _(added 2026-07-13 — previously undocumented)_
+
+- **Given** I have an application with status `approved` or `exported`
+- **When** I click "Re-open" on its card
+- **Then** I see a confirmation dialog headed _"Re-open application"_
+- **And** it reads: _"Re-opening this application will remove your approval. You will need to review and approve your answers again before you can export."_
+- **And** I am presented with "Re-open" and "Cancel" actions
+- **And** nothing about the application changes until I confirm
+
+---
+
+**AC-FR-17-06 — Confirming re-open reverts the application to an editable draft** _(added 2026-07-13 — previously undocumented)_
+
+- **Given** I am viewing the re-open confirmation dialog for an approved or exported application
+- **When** I click "Re-open"
+- **Then** the application's status is set back to `in_progress`
+- **And** its `current_step` is set to 4 (Draft Answers)
+- **And** its `draft_status` is reset to `in_progress`, clearing any assembled draft
+- **And** every answer's approval is revoked (`is_approved` set to false on all questions)
+- **And** I am taken directly to the Step 4 Q&A interface
+- **And** clicking "Cancel" instead leaves the application entirely unchanged
+
+---
+
+**AC-FR-17-07 — Mismatch applications offer no Continue or Re-open action** _(added 2026-07-13 — previously undocumented)_
+
+- **Given** I have an application with status `mismatch`
+- **When** I view its card on `/dashboard`
+- **Then** I see only a "Delete" action on that card
+- **And** no "Continue" or "Re-open" button is shown
+- **And** there is no route back into the application flow for it — per `DR-EL-001`, I must correct my charity profile and start a new application to proceed
 
 ---
 
@@ -1150,10 +1239,12 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 
 **AC-FR-24-06 — Truncation warning shown when guidelines were pre-processed** _(Added 2026-06-22)_
 
+**Flagged 2026-07-13 — quoted message and mechanism are stale, correction deferred.** The message quoted below no longer matches `components/application-step3-summary.tsx` (the real text describes a first-portion character-ceiling cut, not relevance-based section selection — see the Section 9.5 review finding). Not corrected in place yet because `ADR-DATA-007`'s Option 2 work (`P6.2a`) is expected to change the truncation mechanism itself — `PREPROCESS_CHAR_CEILING` needs to become page-marker-aware (snapping to the nearest `[PAGE N]` boundary rather than a mid-page cut) so citations stay intact. The large-guideline-handling routine as a whole may need re-evaluating as part of that Option 2 work, not just this warning's wording. Revisit this AC once `P6.2a` lands rather than fixing it twice.
+
 - **Given** I uploaded a guidelines document that was very long
 - **And** the system pre-processed and truncated it before sending to the AI
 - **When** the AI summary is displayed on Step 3
-- **Then** I see an inline warning: _"Your guidelines document was very long, so only the most relevant sections were sent for summarisation. If anything looks incomplete, try pasting the key sections manually."_
+- **Then** I see an inline warning: _"Your guidelines document was very long, so only the most relevant sections were sent for summarisation. If anything looks incomplete, try pasting the key sections manually."_ _(stale quote — see flag above)_
 - **And** the summary is still displayed in full
 
 ---
@@ -1259,6 +1350,16 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 - **Then** an inline error is shown on that card: _"The AI service is busy right now. Please try again in a moment."_ -- same generic `overloaded` message, not dedicated (corrected 2026-07-10)
 - **And** no AI request is logged against my monthly allowance
 - **And** my existing answer is preserved
+
+---
+
+**AC-FR-27-05 — Second consecutive failure shows a different, non-retryable state** _(added 2026-07-13 — previously undocumented)_
+
+- **Given** I clicked "Try again" after a first summary-generation failure on Step 3
+- **When** that retry also fails
+- **Then** the error message changes to: _"If this keeps happening, please try again later. Your work has been saved."_
+- **And** no "Try again" button is shown — only a "Back" link to Step 2
+- **And** the application remains at `in_progress` status with no data lost
 
 ---
 
@@ -1474,29 +1575,29 @@ _Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previ
 
 ---
 
-**AC-FR-31-01 — Budget questions are visually distinct**
+**AC-FR-31-01 — Budget questions are visually distinct** _(corrected 2026-07-13 — badge text was wrong)_
 
 - **Given** a question is identified as a budget or financial question
 - **When** I view that question card on Step 4
-- **Then** the card has a distinct visual style (e.g., amber background, "£" badge) that differentiates it from non-budget questions
+- **Then** the card has a distinct visual style — amber background and border, and a "Budget" badge (text label, no "£" symbol) — that differentiates it from non-budget questions
 
 ---
 
-**AC-FR-31-02 — AI assist disabled on budget questions**
+**AC-FR-31-02 — AI assist disabled on budget questions** _(corrected 2026-07-13 — quoted label text was wrong, and there are two variants)_
 
 - **Given** I am viewing a budget question on Step 4
 - **When** I look at the AI assist area on that card
 - **Then** the "Help me improve this" button is not present
-- **And** a label is displayed: _"This section requires your actual financial data — do not use AI-generated figures"_
+- **And** a warning label is displayed: for a structured funder, _"Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding."_; for a free-form funder, the same text with "Budget sections" in place of "Budget questions"
 
 ---
 
-**AC-FR-31-03 — Budget questions require a user answer before assembly**
+**AC-FR-31-03 — Assembly is gated by approval, not a budget-specific check** _(corrected 2026-07-13 — the quoted budget-specific message does not exist)_
 
-- **Given** I have not filled in a budget question
-- **When** I attempt to click "Ready to assemble"
-- **Then** I cannot proceed
-- **And** I see the message: _"Please enter your actual budget figures before assembling"_
+- **Given** I have not approved every question, including any budget questions
+- **When** I view the "Ready to assemble" button
+- **Then** the button is disabled (not clickable) rather than showing an error on click
+- **And** a tooltip reads: _"Approve all [N] questions/sections to continue"_ — the same generic message shown for any unapproved question, not a message specific to budget questions
 
 ---
 
@@ -1559,26 +1660,30 @@ _Note (2026-07-10): this replaces the previous AC-FR-31A-03/04, which claimed fr
 
 ### FR-32 — Must Have
 
-**Requirement:** Every AI-generated draft answer shall be presented alongside three plain-language review prompts: (1) Does this accurately describe your charity and project? (2) Are all figures, dates, and facts correct? (3) Does this answer the question that was asked?
+**Requirement (corrected 2026-07-13):** Before the application content can be approved, the user shall be shown three plain-language confirmation checkboxes covering: having reviewed all responses in full, the information being accurate and complete, and accepting responsibility given the content was AI-assisted. _(Previously described three per-answer review "prompts" with invented text implying they were shown alongside each draft answer — neither the wording nor that per-answer structure exists in the codebase. Corrected to match `REVIEW_ITEMS` in `components/application-step5-approve.tsx`, which are shown once, together, at the top of Step 5 — the same three checkboxes FR-33 already refers to.)_
 
 ---
 
-**AC-FR-32-01 — Three review prompts displayed on Step 5**
+**AC-FR-32-01 — Three confirmation checkboxes displayed once at the top of Step 5**
 
-- **Given** I have generated draft answers and advanced to Step 5 (Review and approve)
+- **Given** I have reached Step 5 (Review and approve) and have not yet approved the application
 - **When** I view the page
-- **Then** I can see all three plain-language review prompts:
-  1. _"Does this accurately describe your charity and project?"_
-  2. _"Are all figures, dates, and facts correct?"_
-  3. _"Does this answer the question that was asked?"_
+- **Then** I see a panel headed _"Before you approve, please confirm:"_
+- **And** it contains exactly three checkboxes:
+  1. _"I have reviewed all responses in full and am satisfied with their content."_
+  2. _"The information provided is accurate and complete to the best of my knowledge."_
+  3. _"I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted."_
+- **And** all three are unchecked by default
 
 ---
 
-**AC-FR-32-02 — Review prompts are visible before the approval action**
+**AC-FR-32-02 — Confirmation panel is shown before the download/approval action, and disappears once approved**
 
-- **Given** I am on Step 5
+- **Given** I am on Step 5 and the application is not yet approved
 - **When** I view the screen layout
-- **Then** the three review prompts are displayed prominently alongside the content before the Approve button is reached
+- **Then** the confirmation checklist panel appears above the download buttons, before them in reading order
+- **When** the application becomes approved (FR-33)
+- **Then** the confirmation checklist panel is no longer shown — it is replaced by an approval status banner
 
 ---
 
@@ -1941,23 +2046,22 @@ _Note: The "Regenerate all answers" action no longer exists. Users write their o
 
 ---
 
-**AC-FR-41-02 — Full warning shown on the deletion confirmation screen**
+**AC-FR-41-02 — Full warning shown on the deletion confirmation screen** _(corrected 2026-07-13 — quoted text was wrong)_
 
 - **Given** I am on `/account/delete`
 - **When** I view the page
-- **Then** I see the warning: _"This will permanently delete your account and all associated data, including your charity profile and all saved applications. This cannot be undone."_
+- **Then** I see the warning: _"**This cannot be undone.** Deleting your account will permanently remove all your data from Grant Pathway."_
 
 ---
 
-**AC-FR-41-03 — Plain list of deleted data shown on confirmation screen**
+**AC-FR-41-03 — Plain list of deleted data shown on confirmation screen** _(corrected 2026-07-13 — wrong count, wording, and order; "uploaded funder guidelines" doesn't exist as a list item — consistent with FR-22, guidelines are not stored anywhere under the current model)_
 
 - **Given** I am on `/account/delete`
 - **When** I view the page
-- **Then** I see a plain list of exactly what will be deleted:
-  - _Your account and login details_
+- **Then** I see a plain list headed _"The following will be permanently deleted:"_ with exactly three items:
   - _Your charity profile_
-  - _All saved applications and draft answers_
-  - _Any uploaded funder guidelines_
+  - _All your grant applications and AI-generated content_
+  - _Your account and login details_
 
 ---
 
@@ -2022,11 +2126,11 @@ _Note: the screen requirements specify that the user must type the word DELETE (
 
 ---
 
-**AC-FR-43-02 — Session ended immediately after deletion**
+**AC-FR-43-02 — Session ended immediately after deletion** _(corrected 2026-07-13 — quoted message was incomplete)_
 
 - **Given** my account deletion has completed
 - **Then** my current session is ended immediately
-- **And** I am redirected to `/` with the inline message: _"Your account has been deleted."_
+- **And** I am redirected to `/` with the inline message: _"Your account has been deleted. We've sent you a confirmation email."_
 
 ---
 
@@ -2262,4 +2366,4 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 ---
 
 _Last updated: 2026-07-13_
-_Status: Complete — all 11 sections done. Changes in this version: Section 9.10 FR-46 updated to reflect its 2026-07-11 withdrawal (`docs/moscow-feature-register.md`, Won't Have (v1)) — re-marked from "Must Have, not confirmed built" to "Won't Have (v1) — Withdrawn", with the rationale (coverage level is not a stable per-funder property — see BD-04/BD-08) replacing the old "open product question" framing, and the dangling `BRD ... Section 3.3` citation (that section was deleted in full during the 2026-07-11 BRD review) replaced with BD-07 (BRD Section 10). AC-FR-46-01 to 03 re-annotated from "target behaviour — not built" to "withdrawn requirement — will not be built"; AC-FR-46-04 re-annotated as permanent, not provisional. Status table row for Section 9.10 updated to match. Previous changes: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component). New AC-FR-28-09 added: the previously-extracted-but-unused `summary_json.supportingDocuments` field is now surfaced on the Step 4 preparation checklist as a funder-specific document list alongside the standing financial-prep checklist (`PDR-UI-007`)._
+_Status: Complete — full section-by-section review (all 11 sections) against live code completed 2026-07-13. Summary of this pass's findings, section by section: **9.1** — FR-08 re-marked "Confirmed built" (was hedged as conditional). **9.2** — FR-10 rewritten (invented pre-fill fields removed, real AI-paraphrase behaviour documented via new AC-FR-10-01b); new **FR-12A** added in full for the previously-undocumented "Governance and reserves" field group (P6.1/R13); FR-09/FR-13 requirement wording corrected to match their own (already-accurate) ACs. **9.3** — AC-FR-15-04's invented dynamic page-title format corrected to the real static per-step title; FR-16/AC-FR-16-03 corrected for the `mismatch` status, which the dashboard summary strip now also counts (code fix, `components/dashboard-populated.tsx`); FR-17's "View" button renamed to "Re-open" (code fix) with three new ACs (05/06/07) documenting its actual (consequential, not read-only) behaviour and the mismatch-status no-action case. **9.4** — no findings. **9.5** — AC-FR-24-06's truncation warning flagged as stale but deliberately not corrected yet (Option 2/`P6.2a` is expected to change the underlying mechanism — see `[[project_large_guideline_truncation_reeval]]`-equivalent note); new AC-FR-27-05 added for the previously-undocumented second-failure state. **9.6** — FR-31's badge text, AI-assist-disabled label, and assembly-gating mechanism all corrected to match the real code (three ACs). **9.7** — FR-32 substantially rewritten (invented per-answer "review prompts" replaced with the real three-checkbox confirmation panel); re-open dialog wording reconciled between two UI entry points (code fix, `components/application-step5-approve.tsx`). **9.8** — no findings. **9.9** — AC-FR-41-02/03 and AC-FR-43-02 corrected to match the real `/account/delete` page content and post-deletion banner text. **9.10** — no new findings (FR-46 already corrected earlier the same day, FR-45/47 confirmed accurate). **9.11** — no findings. Two related code-comment fixes made in the same session, unrelated to any AC content: two stale D-012 comments (`actions/auth.ts`, `app/auth/callback/route.ts`) describing an outdated "explicit button click" version of the email-confirmation fix, corrected to describe the real auto-submit-via-JavaScript behaviour. See `docs/Implementation Plan/CHANGELOG.md`'s 2026-07-13 entries for the full rationale behind the two code changes (dashboard tally + button rename, and the D-012 comments). Earlier changes in this version: Section 9.10 FR-46 updated to reflect its 2026-07-11 withdrawal (`docs/moscow-feature-register.md`, Won't Have (v1)) — re-marked from "Must Have, not confirmed built" to "Won't Have (v1) — Withdrawn", with the rationale (coverage level is not a stable per-funder property — see BD-04/BD-08) replacing the old "open product question" framing, and the dangling `BRD ... Section 3.3` citation (that section was deleted in full during the 2026-07-11 BRD review) replaced with BD-07 (BRD Section 10). AC-FR-46-01 to 03 re-annotated from "target behaviour — not built" to "withdrawn requirement — will not be built"; AC-FR-46-04 re-annotated as permanent, not provisional. Status table row for Section 9.10 updated to match. Previous changes: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component). New AC-FR-28-09 added: the previously-extracted-but-unused `summary_json.supportingDocuments` field is now surfaced on the Step 4 preparation checklist as a funder-specific document list alongside the standing financial-prep checklist (`PDR-UI-007`)._
