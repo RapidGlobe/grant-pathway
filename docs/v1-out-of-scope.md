@@ -64,6 +64,8 @@ The app does not fill a funder's own native Word template or portal application 
 
 A per-funder "Tier 1/2/3" or "Full/Partial/Guidance" coverage badge, originally proposed 2026-05-29 (BD-07, FR-46). Withdrawn 2026-07-11 — never built, and the underlying premise (coverage level as a fixed property of a funder) was disproven: the same funder's actual support level varies by which specific guidelines document is uploaded, not by funder identity, per the finding that also led to retiring the "Structured/Narrative" picker badge (`DR-FD-001` v1.0 → v1.2). Charities are no worse off, since no such display has ever existed. If a coverage signal is wanted in future, it would need to be derived per-application from that upload's Step 3 AI summary, not pre-assigned per funder — a different, unscoped feature. _(BD-07, FR-46)_
 
+**Reconciled 2026-07-13 with P6.6 (Transparency Status, `IMPLEMENTATION-PLAN.md`):** this withdrawal was not cross-checked at the time against `ADR-DATA-006`'s own transparency consequence, specified six days earlier, which reads as the same funder-level premise. P6.6 does **not** reintroduce it: its support-status field is scoped to the specific approved playbook (pinned to a curated guideline version), not to the funder as a standalone identity — a funder with no matching approved playbook falls back to unreviewed/live-extraction status rather than any pre-assigned badge. See `ADR-DATA-006`'s matching 2026-07-13 amendment.
+
 ## Formal Feedback and Survey Infrastructure
 
 In-app satisfaction surveys, NPS scoring, and formal feedback dashboards are not included in v1. Charity feedback will be gathered through direct user interviews. _(DR-SM-001, DR-SM-002)_
@@ -82,5 +84,5 @@ A formal third-party accessibility audit is not required before v1 launch. The a
 
 ---
 
-_Last updated: 2026-07-11_
-_Derived from decision records DR-PS-001 through DR-BM-003, plus ADR-DATA-006 (2026-07-11 addition)_
+_Last updated: 2026-07-13_
+_Derived from decision records DR-PS-001 through DR-BM-003, plus ADR-DATA-006 (2026-07-11 addition, 2026-07-13 reconciliation note)_

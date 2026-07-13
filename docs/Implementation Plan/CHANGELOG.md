@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-13 — Phase 6 plan audit: P6.6/FR-46 conflict reconciled, three uncovered ADR consequences added, cross-check safeguard added to AGENTS.md
+
+A full audit of the Phase 6 plan (`IMPLEMENTATION-PLAN.md`) against the BRD, PRD, `acceptance-criteria.md`, `technical-design.md`, and `technology-stack.md` found P6.6 (Transparency Status) specified a support-status field "per funder/playbook," surfaced in the Step 1 picker — the same funder-identity-scoped premise that FR-46 (three-tier funder coverage badge) was withdrawn for on 2026-07-11, six days after `ADR-DATA-006` first specified P6.6. Neither document had been cross-checked against the other at the time.
+
+**Root cause:** the FR-46 withdrawal was reasoned entirely within `moscow-feature-register.md`/`v1-out-of-scope.md`, with no step requiring a check of the live Phase 6 task list for the same underlying concept.
+
+**Fixed:** P6.6 reworded so status is explicitly scoped to the approved _playbook_ (pinned to a specific curated guideline version), not to the funder as a standalone identity — a funder with no matching approved playbook falls back to unreviewed/live-extraction status. `ADR-DATA-006` and `v1-out-of-scope.md` both updated with matching reconciliation notes.
+
+**Also fixed during the same audit (three ADR consequences that had no covering task):** P6.2 gained an explicit bullet to drop the unused `funders.funder_type` column (`ADR-DATA-006` consequence 5) and to name the `scoring criterion` item type as R16's resolution mechanism; P6.5 gained an explicit `funder_note` field on the playbook (R17's disclosure mechanism, already documented in `clean-slate-design-proposal.md` but not named in the task list).
+
+**Process change:** AGENTS.md's Tier 2 rule for `moscow-feature-register.md` now requires grepping the live Phase 6 task list for the same concept before closing out a withdrawal or promotion, so this failure mode does not recur.
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.6), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`, `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md`, `docs/v1-out-of-scope.md`, `AGENTS.md`.
+
+---
+
 ## 2026-07-13 — Date display made consistent (zero-padded day) across dashboard, Step 5, and export
 
 Surfaced during the `PRD-Grant-Pathway.md` Section 7 (Screen Specifications) review, Screen 5 (Dashboard): the doc's own "Last updated [DD Month YYYY]" wording implies a zero-padded day, but `components/dashboard-populated.tsx`'s `formatDate()` and `components/application-step5-approve.tsx`'s `formatExportDate()` both used `day: 'numeric'` (e.g. "3 July 2026"), while the exported Word/text document's own date formatter (`app/api/export/[applicationId]/route.ts`) used `day: '2-digit'` (e.g. "03 July 2026"). WJ asked for all three to be made consistent. Changed both UI-side formatters to `day: '2-digit'` to match the export route, rather than the reverse, since the documentation's own "DD" convention already implied zero-padding.
