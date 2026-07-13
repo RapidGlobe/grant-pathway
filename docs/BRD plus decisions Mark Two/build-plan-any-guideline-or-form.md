@@ -18,6 +18,10 @@ This plan is built on a proposal, not a decision. Per this project's own convent
 
 **Update (2026-07-05):** Formalised as `ADR-DATA-006-application-item-graph-model.md`, and this plan expanded into `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md` as Phase 6 (P6.1–P6.7, mapping the phases below in order). **WJ additionally decided the same day that this rearchitecture now gates launch** — Phases 0–5 below (P6.1–P6.6) must complete before go-live; only Phase 6 (P6.7, the ongoing funder-by-funder extension) remains genuinely open-ended and non-blocking. See the Phase 6 → Go-Live Gate in `IMPLEMENTATION-PLAN.md`. Target launch is no longer 31 July 2026 — working estimate August–September 2026, not committed.
 
+**Update (2026-07-10):** the guideline source-reference (citation) feature was blended into this plan rather than run as a separate track — see the new Phase 1a and the citation-related additions to Phases 1–4 below. Formalised the same day as `PDR-DH-004` (design decision) and `ADR-DATA-007` (technical mechanism); the requirement is FR-48 in `moscow-feature-register.md`.
+
+**Update (2026-07-13):** two parked items corrected after a staleness review — native-document output (R9) was declared permanently out of scope on 2026-07-11 (not "pick up whenever needed", as this plan previously said), and R16 was resolved the same day via a disclosure pattern requiring no BD-06 reversal (not still blocked, as this plan previously said). See the amendments under Section 4's parked items.
+
 ## 3. Sequencing principle
 
 The proposal already states the phasing instinct: build the graph model, populate it with today's item types first so nothing regresses, then extend funder by funder. Two rules follow from that, applied throughout this plan:
@@ -37,6 +41,16 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 **Exit criteria:** New fields exist, are captured during profile setup, and at least one derived ratio can be computed and displayed.
 **Size:** S
 
+### Phase 1a — Guideline page/section reference extraction (groundwork)
+
+**Added 2026-07-10:** the guideline source-reference (citation) feature, previously discussed as a standalone Phase 3/4 enhancement, was blended into this plan rather than run as a separate track — see `PDR-DH-004` and `ADR-DATA-007`. This phase is its groundwork; the citation-related additions to Phases 1–4 below are the rest of it.
+**What:** PDF text extraction (`lib/extract-text.ts`) changes from merging all pages into one string to per-page extraction, with a `[PAGE N]` marker inserted between pages. Docx and pasted guidelines, which have no fixed pages, fall back to heading/section structure as the reference unit. Pre-processing's page-number noise-stripping step (`lib/preprocess-text.ts`) is updated so it does not strip these newly-inserted markers before the AI ever sees them.
+**Why first (independent):** Nothing else in the citation mechanism can be built until extraction preserves structure to cite. Independent of the item-graph itself — can start immediately, in parallel with Phase 0 and Phase 1.
+**Depends on:** Nothing.
+**Exit criteria:** PDF, docx, and pasted guidelines all preserve page/section structure through extraction with no loss of information.
+**Size:** S–M
+**Maps to:** `P6.2a` in `IMPLEMENTATION-PLAN.md`.
+
 ### Phase 1 — Item-graph data model (compatibility mode)
 
 **What:** Design and migrate the new schema — items with type, visibility condition, source-of-truth, validation mode (`hard_check` / `judgement_flag`), rubric-criterion link, `decision_maker_visible` flag (R20), output-mapping. Migrate existing data into this shape using only the item types that exist today (narrative, budget-flagged narrative). No new capability yet — this is re-platforming, not extending.
@@ -44,6 +58,7 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 **Depends on:** Nothing (can run in parallel with Phase 0).
 **Exit criteria:** One existing funder (pick the simplest already-tested one) runs end to end — extraction, storage, Step 4 rendering, export — on the new schema with zero behavioural regression versus today. Verified against that funder's existing test plan.
 **Size:** XL — the highest-risk phase in this plan.
+**Added 2026-07-10 (`ADR-DATA-007`):** the typed item schema also carries a guideline reference field (page number or section/heading, from Phase 1a) alongside its other properties — the citation field is part of this schema, not a bolt-on addition to it.
 
 ### Phase 2 — Extraction rewrite (compatibility mode, then incremental)
 
@@ -52,6 +67,7 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 **Depends on:** Phase 1.
 **Exit criteria (first milestone):** Extraction output validates against the new schema for the same funder used in Phase 1's exit test, with no loss of information versus the current prompt.
 **Size:** L for the rewrite; each additional item type thereafter is roughly S–M depending on complexity (a `data` field is cheap; a conditional branch is not).
+**Added 2026-07-10 (`ADR-DATA-007`):** the rewritten extraction prompt and route also cite a specific chunk of the page/section-tagged text (from Phase 1a) for each summary bullet, eligibility criterion, and extracted question — structurally guaranteed to reference real tagged content, never a free-typed guess.
 
 ### Phase 3 — Step 4 rendering rework
 
@@ -60,6 +76,7 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 **Depends on:** Phase 1; Phase 2 for each new item type as it's added.
 **Exit criteria (first milestone):** The same test funder renders identically to its current production behaviour.
 **Size:** L for the rework; each new item type's rendering thereafter is S–M.
+**Added 2026-07-10 (`ADR-DATA-007`):** rendering also shows each item's guideline reference alongside it, plus a "view original guidelines" panel letting the user click a reference to jump to and highlight the cited page/section (canvas-based PDF rendering — a plain `<iframe>`/`<object>` embed cannot support highlighting an arbitrary region).
 
 ### Phase 4 — Playbook infrastructure and curation workflow
 
@@ -68,6 +85,7 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 **Depends on:** Phase 1.
 **Exit criteria:** One funder has an approved, versioned playbook that the live application flow reads instead of running extraction fresh each time.
 **Size:** M
+**Added 2026-07-10 (`ADR-DATA-007`):** human curation also confirms or corrects each item's guideline citation once per funder before the playbook is approved, rather than trusting a fresh AI guess on every application.
 
 ### Phase 5 — Transparency status
 
@@ -88,31 +106,35 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 ### Parked — Native-document output (R9)
 
 **What:** Correctly filling an arbitrary funder's own Word template or portal fields (Stony Stratford-style), instead of, or alongside, the generic export.
-**Why parked, not sequenced:** Section 8 of the proposal already flags this as a distinct, non-trivial technical problem deserving its own design pass. It doesn't block anything else in this plan and nothing else blocks it — it can be picked up whenever a funder that needs it is prioritised.
+**Why parked, not sequenced:** Section 8 of the proposal already flags this as a distinct, non-trivial technical problem deserving its own design pass. It doesn't block anything else in this plan and nothing else blocks it.
+**Amendment (2026-07-11):** declared **permanently out of scope, not deferred** — see `ADR-DATA-006`'s 2026-07-11 amendment and `docs/v1-out-of-scope.md`. The engineering cost of correctly parsing and populating an unbounded, ever-changing variety of funder-specific templates and portal fields was judged disproportionate given the diversity of funder form methods observed across the nine-funder review, and it duplicates a boundary the product already committed to at launch (BD-01 — "preparation tool, not a submission platform"). This will not be picked up in a future phase; the line above is superseded.
 
 ### Parked — R16 (scored criteria driven by cross-funder history)
 
 **What:** Supporting criteria like MK Community Foundation's Group Profile Score, which depend on a charity's track record with a specific funder across applications over time.
 **Why parked, not sequenced:** This requires reversing BD-06 ("multi-stage applications are separate records; no automated linkage"). That's a business decision, not an engineering task, and it hasn't been made. Do not schedule engineering work here until BD-06 is explicitly revisited.
+**Amendment (2026-07-11):** resolved — not via a BD-06 reversal, which turned out not to be the actual barrier (`applications` already carries both `user_id` and `funder_id`, so linking a charity's own applications by funder needs no schema change, just a query). The real barrier is that Grant Pathway has no visibility into funder-side outcome or relationship data (won/lost, prior funding, relationship depth) regardless of linkage. R16 is instead handled as a disclosure — a visible, non-fillable item flagging that the criterion exists and is outside Grant Pathway's control, per the R17 "disclose, don't attempt" pattern. See `ADR-DATA-006` consequence 8 and the BRD's BD-06 note (Section 10). This is now part of the item-graph work (Phase 1 onward), not a separately parked, blocked item.
 
 ## 5. Dependency summary
 
 ```
 Phase 0 (profile schema)  ──────────────────────────────┐
                                                           │ (independent, can run anytime)
+Phase 1a (citation groundwork) ──────────────────────────┤ (independent, can run anytime)
+                                                          │
 Phase 1 (item-graph) ──┬── Phase 2 (extraction) ──┬── Phase 6 (ongoing, funder by funder)
                         │                          │
                         └── Phase 3 (Step 4 UI) ───┤
                                                     │
                         Phase 4 (playbooks) ────────┼── Phase 5 (transparency)
                                                     │
-Parked: native-document output (R9) ────────────────┘  (picked up independently, whenever needed)
-Parked: R16 (blocked on a BD-06 decision, not scheduled)
+Parked: native-document output (R9) ────────────────┘  (permanently out of scope, 2026-07-11 -- will not be built)
+R16 (scored cross-funder criteria) -- resolved 2026-07-11 via disclosure, not parked -- see Phase 1 onward
 ```
 
 ## 6. What this plan deliberately does not do
 
 - It does not estimate calendar time. Sizes (S/M/L/XL) are relative effort, not durations.
 - It does not resequence around a specific funder's deadline — Phase 6 exists precisely so that real testing priorities can drive order without disturbing Phases 0–5.
-- It does not resolve the BD-06 tension or design native-document output — both are explicitly parked, not solved here.
+- It does not design native-document output — permanently out of scope as of 2026-07-11, not a future design task. The BD-06/R16 tension referenced here originally is resolved (see the R16 amendment above) — it required no BD-06 reversal after all.
 - It does not replace the ADR this recommendation should get before Phase 1 begins in earnest (see Section 2).
