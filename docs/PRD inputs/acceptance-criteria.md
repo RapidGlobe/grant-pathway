@@ -14,7 +14,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 | Section                                                      | FRs covered            | Status                                                                                                                                           |
 | ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"                                                                             |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check)  |
 | 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected                                                            |
 | 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria            |
 | 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13 — no findings, still accurate (FR-22 correctly flagged not yet built)                                                     |
@@ -312,11 +312,12 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ---
 
-**AC-FR-05-06 — Expired reset link**
+**AC-FR-05-06 — Expired reset link** _(corrected 2026-07-13 — message text was wrong)_
 
 - **Given** I have received a password reset email
 - **When** I click the reset link after 1 hour has passed
-- **Then** I see the message: _"This reset link has expired. Please request a new one."_
+- **Then** I see the heading _"This link has expired"_
+- **And** the message: _"Your reset link is no longer valid. Please request a new one."_
 - **And** I am shown a "Request a new link" button that takes me back to the reset request form
 - **And** my password is not changed
 

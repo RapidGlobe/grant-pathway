@@ -50,7 +50,7 @@ function countWords(text: string): number {
 function formatExportDate(iso: string): string {
   const d = new Date(iso)
   const datePart = d.toLocaleDateString('en-GB', {
-    day: 'numeric',
+    day: '2-digit',
     month: 'long',
     year: 'numeric',
   })

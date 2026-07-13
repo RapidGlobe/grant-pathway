@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-13 — Date display made consistent (zero-padded day) across dashboard, Step 5, and export
+
+Surfaced during the `PRD-Grant-Pathway.md` Section 7 (Screen Specifications) review, Screen 5 (Dashboard): the doc's own "Last updated [DD Month YYYY]" wording implies a zero-padded day, but `components/dashboard-populated.tsx`'s `formatDate()` and `components/application-step5-approve.tsx`'s `formatExportDate()` both used `day: 'numeric'` (e.g. "3 July 2026"), while the exported Word/text document's own date formatter (`app/api/export/[applicationId]/route.ts`) used `day: '2-digit'` (e.g. "03 July 2026"). WJ asked for all three to be made consistent. Changed both UI-side formatters to `day: '2-digit'` to match the export route, rather than the reverse, since the documentation's own "DD" convention already implied zero-padding.
+
+**Files changed:** `components/dashboard-populated.tsx`, `components/application-step5-approve.tsx`, `docs/PRD-Grant-Pathway.md`.
+
+---
+
 ## 2026-07-13 — Dashboard `mismatch` status now counted; "View" renamed to "Re-open"; re-open wording reconciled
 
 Surfaced during a full section-by-section review of `docs/PRD inputs/acceptance-criteria.md` against live code (Section 9.3, Application Management).

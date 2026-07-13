@@ -39,7 +39,7 @@ function deleteModalText(status: ApplicationStatus): string {
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', {
-    day: 'numeric',
+    day: '2-digit',
     month: 'long',
     year: 'numeric',
   })
