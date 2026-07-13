@@ -12,19 +12,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ## Status
 
-| Section                                                      | FRs covered    | Status                                                                             |
-| ------------------------------------------------------------ | -------------- | ---------------------------------------------------------------------------------- |
-| 9.1 Authentication & Accounts                                | FR-01 to FR-08 | ✅ Complete                                                                        |
-| 9.2 Charity Profile                                          | FR-09 to FR-14 | ✅ Complete                                                                        |
-| 9.3 Application Management                                   | FR-15 to FR-20 | ✅ Complete                                                                        |
-| 9.4 Funder Guideline Handling                                | FR-21 to FR-23 | ⚠️ Partial — FR-22 target retention model not yet built; FR-21 and FR-23 confirmed |
-| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27 | ✅ Complete                                                                        |
-| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31 | ✅ Complete                                                                        |
-| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36 | ✅ Complete                                                                        |
-| 9.8 Export                                                   | FR-37 to FR-39 | ✅ Complete                                                                        |
-| 9.9 Account Deletion                                         | FR-40 to FR-44 | ✅ Complete                                                                        |
-| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47 | ⚠️ Partial — FR-45 and FR-46 not confirmed built; FR-47 confirmed                  |
-| 9.11 Guideline Source-Reference (Citations)                  | FR-48          | ⚠️ Not built — Phase 6 target behaviour (`P6.2a`–`P6.5`), not yet started          |
+| Section                                                      | FRs covered    | Status                                                                                            |
+| ------------------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------- |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08 | ✅ Complete                                                                                       |
+| 9.2 Charity Profile                                          | FR-09 to FR-14 | ✅ Complete                                                                                       |
+| 9.3 Application Management                                   | FR-15 to FR-20 | ✅ Complete                                                                                       |
+| 9.4 Funder Guideline Handling                                | FR-21 to FR-23 | ⚠️ Partial — FR-22 target retention model not yet built; FR-21 and FR-23 confirmed                |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27 | ✅ Complete                                                                                       |
+| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31 | ✅ Complete                                                                                       |
+| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36 | ✅ Complete                                                                                       |
+| 9.8 Export                                                   | FR-37 to FR-39 | ✅ Complete                                                                                       |
+| 9.9 Account Deletion                                         | FR-40 to FR-44 | ✅ Complete                                                                                       |
+| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47 | ⚠️ Partial — FR-45 not confirmed built; FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed |
+| 9.11 Guideline Source-Reference (Citations)                  | FR-48          | ⚠️ Not built — Phase 6 target behaviour (`P6.2a`–`P6.5`), not yet started                         |
 
 ---
 
@@ -2118,15 +2118,15 @@ _Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-regi
 
 ---
 
-### FR-46 — Must Have
+### FR-46 — Won't Have (v1) — Withdrawn 2026-07-11
 
-**Requirement:** The system shall display a three-tier funder coverage model to the user: Tier 1 (Full) — narrative questions with profile pre-fill; Tier 2 (Partial) — a narrative subset of a portal form; Tier 3 (Guidance) — a free-form narrative document. The coverage tier shall be shown on the new-application screen, the Step 3 summary card, and the export screen.
+**Requirement (as originally specified, now withdrawn):** The system shall display a three-tier funder coverage model to the user: Tier 1 (Full) — narrative questions with profile pre-fill; Tier 2 (Partial) — a narrative subset of a portal form; Tier 3 (Guidance) — a free-form narrative document. The coverage tier shall be shown on the new-application screen, the Step 3 summary card, and the export screen.
 
-**Not confirmed as built — as of 2026-07-10, this is not implemented anywhere in the codebase.** Confirmed by three independent checks: (1) `docs/moscow-feature-register.md` FR-46 and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` Section 3.3, which is marked "⚠ Not implemented (confirmed 2026-07-04)"; (2) a direct search of `app/`, `components/`, and `lib/` for "tier", "Tier 1/2/3", or "Full/Partial/Guidance coverage" returned no matches anywhere in the codebase; (3) the `funders` table (`supabase/migrations/20260601000000_add_funders_table.sql`) has no tier or coverage-level column — only `name`, `funder_type`, `grant_range`, `guidelines_url`, and `is_active`. The following criteria describe target behaviour once built; as of 2026-07-10 this is not implemented. They should not be treated as currently passing, and test plans should not report against them as defects until a decision is made on whether to build this feature — it remains an open product question (see `docs/moscow-feature-register.md` FR-46), not a scheduled-but-incomplete build.
+**Withdrawn — not a build gap, a retired requirement.** Per `docs/moscow-feature-register.md` FR-46 (Won't Have (v1), withdrawn 2026-07-11) and BD-07 (BRD Section 10): the three-tier model assumed coverage level is a stable property of a funder, and that premise was disproven — the same funder can be fully or partially supported depending on which specific guidelines document is uploaded for a given application (see BD-04/BD-08), not the funder's identity. A static per-funder tier badge would repeat the exact mistake the retired "Structured/Narrative" badge made (`DR-FD-001` v1.0 → v1.2). Never built since being added 2026-05-29; a direct search of `app/`, `components/`, and `lib/` for "tier", "Tier 1/2/3", or "Full/Partial/Guidance coverage" returns no matches, and the `funders` table (`supabase/migrations/20260601000000_add_funders_table.sql`) has no tier or coverage-level column. Charities are no worse off — no such display has ever existed. The criteria below (AC-FR-46-01 to 03) describe the withdrawn requirement and are retained only for the historical record — they are not target behaviour and will not be built; test plans should not report against them at all.
 
 ---
 
-**AC-FR-46-01 — Coverage tier shown on the new-application screen** _(target behaviour — not built)_
+**AC-FR-46-01 — Coverage tier shown on the new-application screen** _(withdrawn requirement — will not be built)_
 
 - **Given** I am on Step 1 selecting a funder from the picker
 - **When** I select a funder
@@ -2134,7 +2134,7 @@ _Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-regi
 
 ---
 
-**AC-FR-46-02 — Coverage tier shown on the Step 3 summary card** _(target behaviour — not built)_
+**AC-FR-46-02 — Coverage tier shown on the Step 3 summary card** _(withdrawn requirement — will not be built)_
 
 - **Given** the AI summary has been generated on Step 3
 - **When** I view the summary card
@@ -2142,7 +2142,7 @@ _Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-regi
 
 ---
 
-**AC-FR-46-03 — Coverage tier shown on the export screen** _(target behaviour — not built)_
+**AC-FR-46-03 — Coverage tier shown on the export screen** _(withdrawn requirement — will not be built)_
 
 - **Given** I am on Step 5 with an approved application
 - **When** I view the export screen
@@ -2150,7 +2150,7 @@ _Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-regi
 
 ---
 
-**AC-FR-46-04 — No tier concept is exposed anywhere in the current build** _(reflects actual 2026-07-10 behaviour)_
+**AC-FR-46-04 — No tier concept is exposed anywhere in the current build** _(reflects actual, and now permanent, behaviour)_
 
 - **Given** I use Grant Pathway as it exists today, on any screen
 - **When** I look for any mention of coverage tiers, "Tier 1/2/3", or "Full/Partial/Guidance coverage"
@@ -2261,5 +2261,5 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 
 ---
 
-_Last updated: 2026-07-10_
-_Status: Complete — all 11 sections done. Changes in this version: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component). New AC-FR-28-09 added: the previously-extracted-but-unused `summary_json.supportingDocuments` field is now surfaced on the Step 4 preparation checklist as a funder-specific document list alongside the standing financial-prep checklist (`PDR-UI-007`)._
+_Last updated: 2026-07-13_
+_Status: Complete — all 11 sections done. Changes in this version: Section 9.10 FR-46 updated to reflect its 2026-07-11 withdrawal (`docs/moscow-feature-register.md`, Won't Have (v1)) — re-marked from "Must Have, not confirmed built" to "Won't Have (v1) — Withdrawn", with the rationale (coverage level is not a stable per-funder property — see BD-04/BD-08) replacing the old "open product question" framing, and the dangling `BRD ... Section 3.3` citation (that section was deleted in full during the 2026-07-11 BRD review) replaced with BD-07 (BRD Section 10). AC-FR-46-01 to 03 re-annotated from "target behaviour — not built" to "withdrawn requirement — will not be built"; AC-FR-46-04 re-annotated as permanent, not provisional. Status table row for Section 9.10 updated to match. Previous changes: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component). New AC-FR-28-09 added: the previously-extracted-but-unused `summary_json.supportingDocuments` field is now surfaced on the Step 4 preparation checklist as a funder-specific document list alongside the standing financial-prep checklist (`PDR-UI-007`)._
