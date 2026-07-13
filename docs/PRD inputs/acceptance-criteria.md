@@ -18,7 +18,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 | 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected                                                            |
 | 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria            |
 | 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13 — no findings, still accurate (FR-22 correctly flagged not yet built)                                                     |
-| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-06 flagged stale (fix deferred to Option 2/P6.2a), AC-FR-27-05 added                                           |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-24-06 flagged stale (fix deferred), AC-FR-27-05 added       |
 | 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                     |
 | 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                      |
 | 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                         |
@@ -1071,7 +1071,7 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 **Requirement:** Funder guideline text shall be retained for the life of the application it belongs to (cascade-deleting with that application, per `ADR-DATA-003`), or indefinitely where it backs an approved playbook (`P6.5`). Only extracted, page/section-tagged text is stored in Postgres — the raw uploaded PDF or Word file is never stored in Supabase Storage.
 
-_Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" section, which formally reverses this ADR's original 2026-04-17 "never store" decision (kept intact in that ADR for the historical record, not rewritten). The original claim that funder guidelines "may contain commercially sensitive information provided by the funder" was checked against the real 21-document corpus Grant Pathway processes (`docs/Grant Org Guidelines/`) and found unsupported — these are funders' own publicly published application guidance, not confidential material._
+_Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" section, which formally reverses this ADR's original 2026-04-17 "never store" decision (kept intact in that ADR for the historical record, not rewritten). The original claim that funder guidelines "may contain commercially sensitive information provided by the funder" was checked against the real corpus of funder documents Grant Pathway processes (`docs/Grant Org Guidelines/`; corrected 2026-07-13 — previously cited a stale "21-document" count) and found unsupported — these are funders' own publicly published application guidance, not confidential material._
 
 **Not yet built — as of 2026-07-10, this is a documentation-level decision reversal only; no code has changed.** Verified against the live codebase: the app still uses `sessionStorage` (`lib/guidelines-session.ts`) to hold guideline text client-side and discards it once the AI summary call returns, exactly as the original "never store" decision specified. No guideline-storage table exists in any `supabase/migrations/*.sql` file. Retention will only take effect once the Phase 6 groundwork lands (`P6.2a` — guideline page/section reference extraction, then `P6.2`/`P6.3`/`P6.5`), all of which show as "Not started" in `docs/Implementation Plan/IMPLEMENTATION-STATUS.md` at the time of writing. The criteria below describe the target behaviour once built — they should not be treated as currently passing, and test plans should not report against them as defects until the Phase 6 work lands. AC-FR-22-04 documents actual current behaviour (still the discard model) for as long as that remains true.
 
@@ -1196,16 +1196,17 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 
 ---
 
-**AC-FR-24-02 — Summary covers all required content areas**
+**AC-FR-24-02 — Summary covers all required content areas** _(corrected 2026-07-13 — two items were missing/wrong, and questions are not individually explained)_
 
 - **Given** the AI summary has been generated on Step 3
 - **When** I read the summary
-- **Then** it includes plain-English coverage of:
+- **Then** it includes:
   - What the grant is for
+  - Grant amount, if stated (`summary.amount`)
   - Who can apply (eligible organisations)
   - What the funder is looking for (priorities and funded project types)
-  - Key evidence expectations
-  - Each application question explained in plain English
+  - Key requirements (`summary.keyRequirements`) — not "key evidence expectations", the previous wording here
+  - Each application question or section, shown **verbatim as extracted** with its word limit shown alongside where stated (`q.number`, `q.text`, `q.wordLimit`) — **not** a separate plain-English explanation per question; the previous version of this AC overstated what's built, matching the same correction already made in `PRD-Grant-Pathway.md` Section 6.5
 
 ---
 
