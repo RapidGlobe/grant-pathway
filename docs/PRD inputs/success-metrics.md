@@ -56,11 +56,11 @@ _The export completion rate is the single most important product metric — it c
 
 ## 6. User Feedback — Are users satisfied?
 
-| Metric                                                                      | Indicative target | Notes                                                                   |
-| --------------------------------------------------------------------------- | ----------------- | ----------------------------------------------------------------------- |
-| % of interviewed users who would recommend Grant Pathway to another charity | 80%               | Applies to users who opt in to feedback interviews (FR-08, Should Have) |
+| Metric                                                                      | Indicative target | Notes                                                                                      |
+| --------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------ |
+| % of interviewed users who would recommend Grant Pathway to another charity | 80%               | Applies to users who opt in to feedback interviews (FR-08, Should Have -- confirmed built) |
 
-_If FR-08 is not implemented in v1, this metric is deferred to the first phase in which feedback interviews are introduced._
+_Corrected 2026-07-13 -- removed a stale "if FR-08 is not implemented, this metric is deferred" note; FR-08 has been live since registration launched (`user_profiles.feedback_consent`, `components/register-form.tsx` -> `actions/auth.ts`)._
 
 ---
 
@@ -87,4 +87,4 @@ _No third-party analytics platform (e.g. Google Analytics) is included in v1 sco
 
 ---
 
-_Last updated: 2026-07-10_
+_Last updated: 2026-07-13_
