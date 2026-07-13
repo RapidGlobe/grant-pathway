@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 3.3
+**Version:** 3.5
 **Date:** 2026-05-07
-**Last updated:** 2026-07-10
+**Last updated:** 2026-07-13
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -1726,7 +1726,7 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 Checklist:
 
 - [ ] P5.1–P5.5 complete (the existing pre-launch checklist — unaffected by this gate, can and should proceed independently)
-- [ ] P6.1 — Profile schema extension complete
+- [x] P6.1 — Profile schema extension complete (2026-07-05, dev only — see `IMPLEMENTATION-STATUS.md`)
 - [ ] P6.2a — Guideline page/section reference extraction (groundwork) complete
 - [ ] P6.2 — Item-graph data model (compatibility mode) complete, proven against the test funder with zero regression
 - [ ] P6.3 — Extraction rewrite complete
@@ -1760,16 +1760,16 @@ Checklist:
 
 | Document                  | Path                                                                                                       |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| BRD                       | `business/BRD-Grant-Pathway-v0.2.md`                                                                       |
+| BRD                       | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md`                                                    |
 | PRD                       | `docs/PRD-Grant-Pathway.md`                                                                                |
 | Screen Specifications     | `docs/PRD-Grant-Pathway.md` (Section 7 -- merged in from the retired `screen-requirements.md`, 2026-07-13) |
-| Acceptance Criteria       | `business/PRD inputs/acceptance-criteria.md`                                                               |
-| Technical Design          | `business/Technical Decision and Design/technical-design.md`                                               |
-| ADR Index                 | `business/Technical Decision and Design/ADR-INDEX.md`                                                      |
-| Information Architecture  | `business/information-architecture-and-navigation.md`                                                      |
-| MoSCoW Feature Register   | `business/moscow-feature-register.md`                                                                      |
-| Constraints & Assumptions | `business/constraints-and-assumptions.md`                                                                  |
-| Data Model                | `business/data-model.md`                                                                                   |
+| Acceptance Criteria       | `docs/PRD inputs/acceptance-criteria.md`                                                                   |
+| Technical Design          | `docs/Technical Decision and Design/technical-design.md`                                                   |
+| ADR Index                 | `docs/Technical Decision and Design/ADR-INDEX.md`                                                          |
+| Information Architecture  | `docs/information-architecture-and-navigation.md`                                                          |
+| MoSCoW Feature Register   | `docs/moscow-feature-register.md`                                                                          |
+| Constraints & Assumptions | `docs/constraints-and-assumptions.md`                                                                      |
+| Data Model                | `docs/data-model.md`                                                                                       |
 | Phase 6 Build Plan        | `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`                                     |
 | Phase 6 Decision Record   | `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md`                          |
 
@@ -1781,6 +1781,8 @@ Checklist:
 
 | Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.5     | 2026-07-13 | Rapidglobe Ltd | Fixed three staleness findings: Key References table paths corrected (all used a non-existent `business/` prefix; BRD entry pointed at the retired `docs/Old/BRD-Grant-Pathway-v0.2.md` instead of the live `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` v0.49). Go-Live Gate checklist: P6.1 ticked complete (was showing unchecked despite being done since 2026-07-05, per `IMPLEMENTATION-STATUS.md`). Footer tagline corrected from stale "v2.8 ... Last updated: 2026-06-17" to match current version/date.                                                        |
+| 3.4     | 2026-07-10 | Rapidglobe Ltd | Guideline source-reference/citation feature (FR-48) blended into Phase 6: added P6.2a (page/section reference extraction groundwork) and new bullets under P6.2-P6.5. Formalised same day as `PDR-DH-004` and `ADR-DATA-007`. Key References updated with Phase 6 Build Plan and Decision Record rows. **Not logged at the time** — added retrospectively 2026-07-13 after this gap was found during a staleness audit; the header's "Last updated: 2026-07-10" already reflected this change, only the version-history row was missing.                                            |
 | 3.3     | 2026-07-05 | Rapidglobe Ltd | **Revised same day:** Phase 6 now gates launch. WJ decided launching on the current flat model with known gaps (R1–R20) risks the "trusted partner" objective more than a later launch does, and there is no commercial deadline forcing 31 July 2026. Added the Phase 6 → Go-Live Gate (P6.1–P6.6 required; P6.7 ongoing, does not block) immediately before P5.6; P5.6 marked blocked pending that gate. Target launch changed from 31 July 2026 to "not committed, working estimate August–September 2026" throughout. Timeline Summary reordered (Phase 6 now precedes Launch). |
 | 3.2     | 2026-07-05 | Rapidglobe Ltd | Added Phase 6 — Application Item-Graph Rearchitecture (P6.1–P6.7), expanding `build-plan-any-guideline-or-form.md` into this plan's tracked task format per ADR-DATA-006. Originally framed as a parallel track that did not gate Phase 5 or the 31 July launch — see 3.3, revised the same day. Timeline Summary and Key References updated.                                                                                                                                                                                                                                       |
 | 3.1     | 2026-07-05 | Rapidglobe Ltd | GAP-12 amended: go-live tag corrected from `v1.0` to `v1.0.0` (three-part semver, consistent with `package.json` and pre-launch `v0.x.x` tags); added pre-launch baseline tag convention note to P5.4                                                                                                                                                                                                                                                                                                                                                                               |
@@ -1808,6 +1810,6 @@ Checklist:
 
 ---
 
-_Implementation Plan v2.8 — Grant Pathway_
-_Created: 2026-05-07 | Last updated: 2026-06-17_
+_Implementation Plan v3.5 — Grant Pathway_
+_Created: 2026-05-07 | Last updated: 2026-07-13_
 _Verified against: BRD v0.2, PRD v0.2, all 42 ADRs, technical-design.md, Screen Requirements, Application Status Model, Email Notifications, Acceptance Criteria, Success Metrics, Data Model, Non-Functional Requirements, Out-of-Scope Document, User Personas & Use Cases, all 17 PDR decisions, MoSCoW Feature Register, Information Architecture, Constraints & Assumptions_
