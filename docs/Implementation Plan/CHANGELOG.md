@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-13 — P6.2 test funder chosen: MK Community Foundation — Oak Grants
+
+P6.2's exit criterion requires proving the item-graph migration "end to end... with zero regression" against an existing funder, which needs a baseline result that's actually trustworthy today. Oak Grants is the only funder at 🟢 on `docs/Test Plans/TEST-DASHBOARD.md` — fully re-verified against the current schema (13/13 test cases, 2026-07-04). Every other funder is 🔁 (passed, but predates the 2026-07-01 schema fix) or 🟡 (untested), which would mean re-establishing a baseline before P6.2 work could even start. Checked Oak Grants' own test plan for entanglement with the parked Group Profile Score (R16, MK Community Foundation's own cross-application scoring criterion) — none found, so this stays within compatibility-mode scope.
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.7), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-13 — Phase 6 plan audit: P6.6/FR-46 conflict reconciled, three uncovered ADR consequences added, cross-check safeguard added to AGENTS.md
 
 A full audit of the Phase 6 plan (`IMPLEMENTATION-PLAN.md`) against the BRD, PRD, `acceptance-criteria.md`, `technical-design.md`, and `technology-stack.md` found P6.6 (Transparency Status) specified a support-status field "per funder/playbook," surfaced in the Step 1 picker — the same funder-identity-scoped premise that FR-46 (three-tier funder coverage badge) was withdrawn for on 2026-07-11, six days after `ADR-DATA-006` first specified P6.6. Neither document had been cross-checked against the other at the time.
