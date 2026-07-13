@@ -196,6 +196,6 @@ For any questions about these terms, please contact us:
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.2_
+_Version: 1.3_
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 2 July 2026_
+_Last updated: 10 July 2026_
