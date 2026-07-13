@@ -49,22 +49,22 @@
 
 ### Related Documents
 
-| Document                              | Location                                                     |
-| ------------------------------------- | ------------------------------------------------------------ |
-| Business Requirements Document        | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` |
-| MoSCoW Feature Register               | `docs/moscow-feature-register.md`                            |
-| Screen Requirements                   | `docs/PRD inputs/screen-requirements.md`                     |
-| Acceptance Criteria                   | `docs/PRD inputs/acceptance-criteria.md`                     |
-| Application Status Model              | `docs/PRD inputs/application-status-model.md`                |
-| Email Notifications                   | `docs/PRD inputs/email-notifications.md`                     |
-| Success Metrics                       | `docs/PRD inputs/success-metrics.md`                         |
-| Information Architecture & Navigation | `docs/information-architecture-and-navigation.md`            |
-| Data Model                            | `docs/data-model.md`                                         |
-| Non-Functional Requirements           | `docs/non-functional-requirements.md`                        |
-| PRD Decisions Index                   | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`                  |
-| User Personas, Journeys & Use Cases   | `docs/user-personas-journeys-and-use-cases.md`               |
+| Document                              | Location                                                |
+| ------------------------------------- | ------------------------------------------------------- |
+| Business Requirements Document        | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` |
+| MoSCoW Feature Register               | `docs/moscow-feature-register.md`                       |
+| Screen Requirements                   | `docs/PRD inputs/screen-requirements.md`                |
+| Acceptance Criteria                   | `docs/PRD inputs/acceptance-criteria.md`                |
+| Application Status Model              | `docs/PRD inputs/application-status-model.md`           |
+| Email Notifications                   | `docs/PRD inputs/email-notifications.md`                |
+| Success Metrics                       | `docs/PRD inputs/success-metrics.md`                    |
+| Information Architecture & Navigation | `docs/information-architecture-and-navigation.md`       |
+| Data Model                            | `docs/data-model.md`                                    |
+| Non-Functional Requirements           | `docs/non-functional-requirements.md`                   |
+| PRD Decisions Index                   | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`             |
+| User Personas, Journeys & Use Cases   | `docs/user-personas-journeys-and-use-cases.md`          |
 
-**Note:** The Business Requirements Document above was previously filed as `BRD-Grant-Pathway-v0.5.md` despite its internal header stating Version 0.6 -- a filename/version mismatch. Corrected 2026-07-10: the file was renamed to `BRD-Grant-Pathway-v0.6.md` to match its internal header, and all references to the old filename were updated.
+**Note:** The Business Requirements Document was previously filed as `BRD-Grant-Pathway-v0.5.md`, then renamed to `BRD-Grant-Pathway-v0.6.md` on 2026-07-10 to match its then-current internal Version header -- which promptly drifted again as the document kept being revised (it reached Version 0.48 within a month). Renamed a second time, 2026-07-12, to drop the version number from the filename entirely (`BRD-Grant-Pathway.md`), since the doc's own internal Version field is the single source of truth and a filename tied to a point-in-time version number will always eventually mismatch it.
 
 ---
 
@@ -600,7 +600,7 @@ Actions: Download anyway / Cancel
 | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | FR-46 | The system shall display a three-tier funder coverage model to the user: **Tier 1 (Full)** -- narrative questions with profile pre-fill; **Tier 2 (Partial)** -- a narrative subset of a portal form; **Tier 3 (Guidance)** -- a free-form narrative document. The coverage tier shall be shown on the new-application screen, on the Step 3 summary card, and on the export screen | Must Have |
 
-**Confirmed not built (2026-07-10):** a code search for "Tier 1", "Tier 2", "Tier 3", and a `coverage_tier`-style field found no trace of this model anywhere in `components/`, `app/`, or `lib/database.types.ts`. The `funders` table (Section 9.1) has no coverage-tier column. This is now independently confirmed by three sources in agreement: this code search, `docs/moscow-feature-register.md` (FR-46, "Not built"), and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` Section 3.3 ("never built — no tier/coverage column exists... no tier badge appears anywhere in the app," confirmed 2026-07-04). FR-46 is carried forward here per the moscow register as the current formal requirement, but the underlying product decision on whether to build it, defer it, or retire it remains open — see `docs/moscow-feature-register.md` FR-46 for that open question.
+**Confirmed not built (2026-07-10):** a code search for "Tier 1", "Tier 2", "Tier 3", and a `coverage_tier`-style field found no trace of this model anywhere in `components/`, `app/`, or `lib/database.types.ts`. The `funders` table (Section 9.1) has no coverage-tier column. This is now independently confirmed by three sources in agreement: this code search, `docs/moscow-feature-register.md` (FR-46, "Not built"), and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` Section 3.3 ("never built — no tier/coverage column exists... no tier badge appears anywhere in the app," confirmed 2026-07-04). FR-46 is carried forward here per the moscow register as the current formal requirement, but the underlying product decision on whether to build it, defer it, or retire it remains open — see `docs/moscow-feature-register.md` FR-46 for that open question.
 
 ---
 
@@ -1423,24 +1423,24 @@ Criteria are organised by the same functional sections used in this document. Sh
 
 **Paths corrected 2026-07-10.** All entries below used a stale `business/...` prefix; the live repository holds these under `docs/...`. Two entries have also moved to a different subfolder, not just a prefix swap: the Business Requirements Document and the Technology Stack document (see notes below the table).
 
-| Document                            | Location                                                     | Purpose                                                  |
-| ----------------------------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
-| Business Requirements Document      | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway-v0.6.md` | Business context, constraints, risks, and stakeholders   |
-| Non-Functional Requirements         | `docs/non-functional-requirements.md`                        | Full NFR detail                                          |
-| Data Model                          | `docs/data-model.md`                                         | Entity definitions, field-level detail, relationships    |
-| MoSCoW Feature Register             | `docs/moscow-feature-register.md`                            | Consolidated feature priorities and BRD divergences      |
-| IA & Navigation                     | `docs/information-architecture-and-navigation.md`            | Route structure, nav components, user flows              |
-| Screen Requirements                 | `docs/PRD inputs/screen-requirements.md`                     | Full screen-level field and validation detail            |
-| Acceptance Criteria                 | `docs/PRD inputs/acceptance-criteria.md`                     | Given/When/Then criteria for all functional requirements |
-| Application Status Model            | `docs/PRD inputs/application-status-model.md`                | Status definitions, transitions, deletion prompts        |
-| Email Notifications                 | `docs/PRD inputs/email-notifications.md`                     | Full email body content and trigger rules                |
-| Success Metrics                     | `docs/PRD inputs/success-metrics.md`                         | Full metrics detail with measurement approach            |
-| PRD Decisions Index                 | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`                  | PRD decision records                                     |
-| User Personas, Journeys & Use Cases | `docs/user-personas-journeys-and-use-cases.md`               | Full persona and journey detail                          |
-| Technology Stack                    | `docs/Technical Decision and Design/technology-stack.md`     | Full technology stack detail                             |
-| Future Phases                       | `docs/future-phases.md`                                      | Post-v1 roadmap items                                    |
+| Document                            | Location                                                 | Purpose                                                  |
+| ----------------------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| Business Requirements Document      | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md`  | Business context, constraints, risks, and stakeholders   |
+| Non-Functional Requirements         | `docs/non-functional-requirements.md`                    | Full NFR detail                                          |
+| Data Model                          | `docs/data-model.md`                                     | Entity definitions, field-level detail, relationships    |
+| MoSCoW Feature Register             | `docs/moscow-feature-register.md`                        | Consolidated feature priorities and BRD divergences      |
+| IA & Navigation                     | `docs/information-architecture-and-navigation.md`        | Route structure, nav components, user flows              |
+| Screen Requirements                 | `docs/PRD inputs/screen-requirements.md`                 | Full screen-level field and validation detail            |
+| Acceptance Criteria                 | `docs/PRD inputs/acceptance-criteria.md`                 | Given/When/Then criteria for all functional requirements |
+| Application Status Model            | `docs/PRD inputs/application-status-model.md`            | Status definitions, transitions, deletion prompts        |
+| Email Notifications                 | `docs/PRD inputs/email-notifications.md`                 | Full email body content and trigger rules                |
+| Success Metrics                     | `docs/PRD inputs/success-metrics.md`                     | Full metrics detail with measurement approach            |
+| PRD Decisions Index                 | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`              | PRD decision records                                     |
+| User Personas, Journeys & Use Cases | `docs/user-personas-journeys-and-use-cases.md`           | Full persona and journey detail                          |
+| Technology Stack                    | `docs/Technical Decision and Design/technology-stack.md` | Full technology stack detail                             |
+| Future Phases                       | `docs/future-phases.md`                                  | Post-v1 roadmap items                                    |
 
-**Notes on relocations:** the Business Requirements Document is not at a top-level `docs/BRD-Grant-Pathway-v1.md` path -- the current, authoritative BRD lives in the `docs/BRD plus decisions Mark Two/` subfolder as `BRD-Grant-Pathway-v0.6.md` (see the filename/version mismatch correction note under Document Control). The Technology Stack document is not at a top-level `docs/technology-stack.md` path -- it lives in `docs/Technical Decision and Design/technology-stack.md`.
+**Notes on relocations:** the Business Requirements Document is not at a top-level `docs/BRD-Grant-Pathway-v1.md` path -- the current, authoritative BRD lives in the `docs/BRD plus decisions Mark Two/` subfolder as `BRD-Grant-Pathway.md` (see the filename/version mismatch correction note under Document Control). The Technology Stack document is not at a top-level `docs/technology-stack.md` path -- it lives in `docs/Technical Decision and Design/technology-stack.md`.
 
 ---
 
