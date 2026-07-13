@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-13 — P6.2 environment scoping confirmed: dev only
+
+Confirmed with WJ rather than assumed: P6.2 follows the same convention as P6.1 — applied only to `grant-pathway-dev`, with `grant-pathway-prod` untouched and unlinked until P5.4. Worth an explicit confirmation rather than inheriting the P6.1 precedent silently, since P6.2's migration is far larger in scope (it supersedes `application_answers` entirely, rather than adding five nullable columns) — the blast radius of getting this assumption wrong would be much bigger than it was for P6.1.
+
+This was the last of three prerequisites identified before P6.2 build could start: test funder (Oak Grants, v3.7), citation-field shape (v3.8), and this scoping decision (v3.9). All three are now settled.
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.9), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-13 — P6.2 guideline-reference field shape agreed with WJ
 
 The task list previously described the citation field vaguely ("page number or section/heading") with no concrete data shape — writing a migration against that wording would have meant guessing, with a real risk of a schema rewrite once P6.2a's actual output was known. Presented as a visual mockup (two worked examples — a PDF page-anchored citation from Idlewild Trust, a docx heading-anchored citation from Henry Smith Foundation — each shown as it would render in the app, plus the underlying data shape) rather than raw JSON, since a plain-text schema proposal isn't a format WJ can evaluate directly. Approved as proposed, with the caveat that live testing will be the real confirmation once built.
