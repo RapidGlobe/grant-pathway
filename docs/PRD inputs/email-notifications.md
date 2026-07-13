@@ -18,13 +18,13 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 
 ## Email 1 — Email Verification
 
-| Field           | Detail                                     |
-| --------------- | ------------------------------------------ |
-| **Trigger**     | User submits the registration form         |
-| **Recipient**   | The email address provided at registration |
-| **Subject**     | Verify your Grant Pathway email address    |
-| **Link expiry** | 24 hours from send                         |
-| **Handled by**  | Supabase Auth                              |
+| Field           | Detail                                                                                                                                                                                                                                                      |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Trigger**     | User submits the registration form                                                                                                                                                                                                                          |
+| **Recipient**   | The email address provided at registration                                                                                                                                                                                                                  |
+| **Subject**     | Verify your Grant Pathway email address                                                                                                                                                                                                                     |
+| **Link expiry** | 1 hour from send (corrected 2026-07-13 -- matches `supabase/config.toml`'s single global `otp_expiry = 3600`, which governs both signup confirmation and password reset links; this row previously disagreed with Email 2's own correct "1 hour" row below) |
+| **Handled by**  | Supabase Auth                                                                                                                                                                                                                                               |
 
 **Body:**
 
@@ -34,7 +34,7 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 >
 > **[Verify my email address]** _(button — links to verification URL)_
 >
-> This link expires in 24 hours. If you did not create a Grant Pathway account, you can ignore this email.
+> This link expires in 1 hour. If you did not create a Grant Pathway account, you can ignore this email.
 >
 > —
 > Grant Pathway
@@ -166,14 +166,14 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 
 ## Summary
 
-| #   | Email                            | Trigger                      | Expiry   | FR reference                          |
-| --- | -------------------------------- | ---------------------------- | -------- | ------------------------------------- |
-| 1   | Email verification               | Registration                 | 24 hours | FR-03                                 |
-| 2   | Password reset                   | Forgot password request      | 1 hour   | FR-06                                 |
-| 3   | Inactivity warning               | 23 months no login           | —        | PDR-DH-002                            |
-| 4   | Account deleted (inactivity)     | 24 months no login           | —        | PDR-DH-002                            |
-| 5   | Account deleted (user initiated) | User completes deletion flow | —        | FR-44 (Should Have — confirmed built) |
+| #   | Email                            | Trigger                      | Expiry | FR reference                          |
+| --- | -------------------------------- | ---------------------------- | ------ | ------------------------------------- |
+| 1   | Email verification               | Registration                 | 1 hour | FR-03                                 |
+| 2   | Password reset                   | Forgot password request      | 1 hour | FR-06                                 |
+| 3   | Inactivity warning               | 23 months no login           | —      | PDR-DH-002                            |
+| 4   | Account deleted (inactivity)     | 24 months no login           | —      | PDR-DH-002                            |
+| 5   | Account deleted (user initiated) | User completes deletion flow | —      | FR-44 (Should Have — confirmed built) |
 
 ---
 
-_Last updated: 2026-07-10_
+_Last updated: 2026-07-13_
