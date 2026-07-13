@@ -4,7 +4,7 @@
 **Volatility:** Medium
 **Update when:** Any change to technology choices, libraries, services, or infrastructure
 
-**Version:** 1.6
+**Version:** 1.7
 **Last updated:** 2026-07-13
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
@@ -169,7 +169,7 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 | Item              | Status    | Notes                                                                                             |
 | ----------------- | --------- | ------------------------------------------------------------------------------------------------- |
 | Domain name       | ✅ Active | **grantpathway.org.uk** — registered; DNS to be pointed to Vercel pre-launch                      |
-| AWS cloud account | ✅ Active | Amazon Bedrock (Claude Sonnet 4.6, eu-west-2) configured                                          |
+| AWS cloud account | ✅ Active | Amazon Bedrock (latest Claude Sonnet model, eu-west-2) configured                                 |
 | GitHub account    | ✅ Active | Private repository at github.com/RapidGlobe/grant-pathway (proprietary licence — `ADR-STACK-005`) |
 | Supabase account  | ✅ Active | Two projects: grant-pathway-dev and grant-pathway-prod (London)                                   |
 | Vercel account    | ✅ Active | Pro plan; linked to GitHub; auto-deploys on push to master                                        |
@@ -182,24 +182,24 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 
 ## Stack Summary
 
-| Concern                 | Technology                                                 |
-| ----------------------- | ---------------------------------------------------------- |
-| Language                | TypeScript                                                 |
-| Framework               | Next.js (App Router)                                       |
-| Database                | PostgreSQL via Supabase (London)                           |
-| Authentication          | Supabase Auth                                              |
-| File storage            | Supabase Storage (London)                                  |
-| App hosting             | Vercel (function region: London, eu-west-2 / lhr1)         |
-| AI API                  | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) |
-| Email                   | Resend                                                     |
-| Error tracking          | Sentry EU                                                  |
-| Rate limiting           | Upstash Redis                                              |
-| CI pipeline             | GitHub Actions                                             |
-| Test framework          | Vitest                                                     |
-| Charity register        | Charity Commission for England and Wales public API        |
-| Source control          | GitHub (private repository, proprietary licence)           |
-| Development environment | VS Code                                                    |
-| Domain                  | grantpathway.org.uk                                        |
+| Concern                 | Technology                                                            |
+| ----------------------- | --------------------------------------------------------------------- |
+| Language                | TypeScript                                                            |
+| Framework               | Next.js (App Router)                                                  |
+| Database                | PostgreSQL via Supabase (London)                                      |
+| Authentication          | Supabase Auth                                                         |
+| File storage            | Supabase Storage (London)                                             |
+| App hosting             | Vercel (function region: London, eu-west-2 / lhr1)                    |
+| AI API                  | Anthropic's latest Claude Sonnet model via Amazon Bedrock (eu-west-2) |
+| Email                   | Resend                                                                |
+| Error tracking          | Sentry EU                                                             |
+| Rate limiting           | Upstash Redis                                                         |
+| CI pipeline             | GitHub Actions                                                        |
+| Test framework          | Vitest                                                                |
+| Charity register        | Charity Commission for England and Wales public API                   |
+| Source control          | GitHub (private repository, proprietary licence)                      |
+| Development environment | VS Code                                                               |
+| Domain                  | grantpathway.org.uk                                                   |
 
 ---
 
@@ -217,11 +217,13 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-04-13 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                                                                                                                                                                                                                                               |
-| 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2.                                                                                                                                                                                                                           |
-| 1.3     | 2026-06-29 | Rapidglobe Ltd | Added TS-05 (Resend), TS-06 (Sentry), TS-07 (Upstash Redis), TS-08 (GitHub Actions CI), TS-09 (Vitest). Retired "To Be Set Up" table — all accounts now active; replaced with current status table. Stack Summary updated with all new services.                                                                                                                                                                    |
-| 1.5     | 2026-07-10 | Rapidglobe Ltd | TS-10 and Stack Summary corrected: GitHub repository is private under a proprietary licence, not public — `DR-BM-003` (open source) reversed 2026-07-10; `ADR-STACK-005` (private repo, proprietary licence) is the standing decision.                                                                                                                                                                              |
-| 1.6     | 2026-07-13 | Rapidglobe Ltd | TS-01's UI component library example corrected: said "shadcn/ui built on Radix UI" — the live codebase uses `@base-ui/react` throughout `components/ui/`, with no `@radix-ui/*` dependency in `package.json`. Found during a `PRD-Grant-Pathway.md` Section 13 review; same fix applied to the PRD and a new review note added to `PDR-UI-001` (decision and rationale unchanged, just the primitive library name). |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-04-13 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 1.3     | 2026-06-29 | Rapidglobe Ltd | Added TS-05 (Resend), TS-06 (Sentry), TS-07 (Upstash Redis), TS-08 (GitHub Actions CI), TS-09 (Vitest). Retired "To Be Set Up" table — all accounts now active; replaced with current status table. Stack Summary updated with all new services.                                                                                                                                                                                                                                                                                                                                                                           |
+| 1.4     | 2026-07-01 | Rapidglobe Ltd | TS-03's MFA bullet corrected -- "Optional MFA, available as opt-in" was stale; MFA was actually removed from the codebase 2026-06-12 and FR-07 demoted to Won't Have. Corrected to "MFA -- not offered. Removed 2026-06-12; FR-07 demoted to Won't Have (NFR-04)." Part of a wider same-day fix removing phantom `/mfa` references from `middleware.ts` and `technical-design.md` (`258daa9`). This row was missing from the history table until added retrospectively 2026-07-13 during a staleness audit -- the version bump and content fix both landed correctly at the time, only this table entry was never written. |
+| 1.5     | 2026-07-10 | Rapidglobe Ltd | TS-10 and Stack Summary corrected: GitHub repository is private under a proprietary licence, not public — `DR-BM-003` (open source) reversed 2026-07-10; `ADR-STACK-005` (private repo, proprietary licence) is the standing decision.                                                                                                                                                                                                                                                                                                                                                                                     |
+| 1.6     | 2026-07-13 | Rapidglobe Ltd | TS-01's UI component library example corrected: said "shadcn/ui built on Radix UI" — the live codebase uses `@base-ui/react` throughout `components/ui/`, with no `@radix-ui/*` dependency in `package.json`. Found during a `PRD-Grant-Pathway.md` Section 13 review; same fix applied to the PRD and a new review note added to `PDR-UI-001` (decision and rationale unchanged, just the primitive library name).                                                                                                                                                                                                        |
+| 1.7     | 2026-07-13 | Rapidglobe Ltd | Two findings fixed from a cross-document alignment check against `technical-design.md`, the BRD, and the PRD, per WJ: (1) TS-10 and Stack Summary both still pinned "Claude Sonnet 4.6" -- de-versioned to "the latest Claude Sonnet model" to match `technical-design.md` (corrected the same way in this same pass) and the PRD (already de-versioned). (2) The missing v1.4 Document History row (see above) added retrospectively after confirming via `git log` that v1.4 was a real, used version -- not a skipped number as initially suspected.                                                                    |
