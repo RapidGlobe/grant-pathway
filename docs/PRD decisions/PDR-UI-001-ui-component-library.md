@@ -31,6 +31,12 @@ Grant Pathway will use shadcn/ui as its UI component library. Components will be
 
 shadcn/ui directly supports the WCAG 2.2 AA accessibility requirement (C15, NFR-06) without requiring custom accessibility implementation. Unlike a traditional dependency, shadcn/ui copies component source code directly into the project — giving full ownership and the ability to customise without fighting a library's constraints. It integrates cleanly with Next.js and Tailwind CSS (already in the technology stack), and is widely used in production Next.js applications. For a solo developer on a fixed deadline, this approach delivers accessible, production-quality components quickly while keeping full design control.
 
+## Review Note (2026-07-13) — Primitive layer is actually Base UI, not Radix UI
+
+Found during a PRD Section 13 review: the live codebase's `components/ui/` (dialog, select, dropdown-menu, tooltip, separator, progress, input, button, badge) imports exclusively from `@base-ui/react`, and `package.json` has no `@radix-ui/*` dependency at all. shadcn/ui itself moved to offering Base UI-backed components at some point after this decision was made (2026-04-16) — nobody made an explicit decision to switch away from Radix UI, it happened as a side effect of installing shadcn/ui components via its CLI.
+
+This does not change the decision or its rationale: shadcn/ui remains the chosen approach (Option B), components are still copied into the codebase and owned outright, and the accessibility/customisation benefits described above still hold — Base UI provides the same category of accessible primitive behaviour (keyboard navigation, focus management, ARIA roles) that Radix UI would have. No action needed beyond correcting the documentation record, which has been updated in `PRD-Grant-Pathway.md` Section 13.1 and `docs/Technical Decision and Design/technology-stack.md`.
+
 ## Date Decided
 
 2026-04-16

@@ -4,8 +4,8 @@
 **Volatility:** Medium
 **Update when:** Any change to technology choices, libraries, services, or infrastructure
 
-**Version:** 1.5
-**Last updated:** 2026-07-10
+**Version:** 1.6
+**Last updated:** 2026-07-13
 
 This document captures the agreed technology stack for the v1 build. These decisions inform the BRD and constrain the technical architecture.
 
@@ -25,7 +25,7 @@ Next.js is a full-stack React framework — it handles both the user interface a
 
 - Single codebase covers both frontend and backend — less to manage as a solo developer (C4)
 - Both the Anthropic SDK and the AWS SDK support Amazon Bedrock integration in TypeScript
-- Excellent accessible component libraries available (e.g. shadcn/ui built on Radix UI) supporting WCAG 2.2 AA compliance (C15)
+- Excellent accessible component libraries available (e.g. shadcn/ui, built on Base UI primitives -- corrected 2026-07-13, see `PDR-UI-001`'s review note; originally decided as Radix UI, but the live codebase uses `@base-ui/react` throughout) supporting WCAG 2.2 AA compliance (C15)
 - Deploys to any Node.js host including UK-region cloud platforms (C13)
 - Largest web framework community — future maintainers or successor organisations are likely to know it
 
@@ -217,10 +217,11 @@ Vitest is a fast, Vite-native test runner with first-class TypeScript support an
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                               |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.0     | 2026-04-13 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                  |
-| 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                                                                            |
-| 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2.                                                        |
-| 1.3     | 2026-06-29 | Rapidglobe Ltd | Added TS-05 (Resend), TS-06 (Sentry), TS-07 (Upstash Redis), TS-08 (GitHub Actions CI), TS-09 (Vitest). Retired "To Be Set Up" table — all accounts now active; replaced with current status table. Stack Summary updated with all new services. |
-| 1.5     | 2026-07-10 | Rapidglobe Ltd | TS-10 and Stack Summary corrected: GitHub repository is private under a proprietary licence, not public — `DR-BM-003` (open source) reversed 2026-07-10; `ADR-STACK-005` (private repo, proprietary licence) is the standing decision.           |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-04-13 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 1.1     | 2026-05-29 | Rapidglobe Ltd | Document history table added to support multi-contributor development                                                                                                                                                                                                                                                                                                                                               |
+| 1.2     | 2026-05-29 | Rapidglobe Ltd | TS-04 updated: Vercel function region explicitly set to London (eu-west-2 / lhr1). Stack Summary table updated. Rationale updated to explain region alignment with AWS Bedrock eu-west-2.                                                                                                                                                                                                                           |
+| 1.3     | 2026-06-29 | Rapidglobe Ltd | Added TS-05 (Resend), TS-06 (Sentry), TS-07 (Upstash Redis), TS-08 (GitHub Actions CI), TS-09 (Vitest). Retired "To Be Set Up" table — all accounts now active; replaced with current status table. Stack Summary updated with all new services.                                                                                                                                                                    |
+| 1.5     | 2026-07-10 | Rapidglobe Ltd | TS-10 and Stack Summary corrected: GitHub repository is private under a proprietary licence, not public — `DR-BM-003` (open source) reversed 2026-07-10; `ADR-STACK-005` (private repo, proprietary licence) is the standing decision.                                                                                                                                                                              |
+| 1.6     | 2026-07-13 | Rapidglobe Ltd | TS-01's UI component library example corrected: said "shadcn/ui built on Radix UI" — the live codebase uses `@base-ui/react` throughout `components/ui/`, with no `@radix-ui/*` dependency in `package.json`. Found during a `PRD-Grant-Pathway.md` Section 13 review; same fix applied to the PRD and a new review note added to `PDR-UI-001` (decision and rationale unchanged, just the primitive library name). |
