@@ -13,11 +13,11 @@ This document defines the complete information architecture, URL structure, navi
 
 ## Related Documents
 
-| Document                      | Location                                                    |
-| ----------------------------- | ----------------------------------------------------------- |
-| Navigation Structure Decision | `business/PRD decisions/PDR-UI-004-navigation-structure.md` |
-| Screen Requirements           | `business/PRD inputs/screen-requirements.md`                |
-| Application Status Model      | `business/PRD inputs/application-status-model.md`           |
+| Document                      | Location                                                                                                   |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Navigation Structure Decision | `business/PRD decisions/PDR-UI-004-navigation-structure.md`                                                |
+| Screen Specifications         | `docs/PRD-Grant-Pathway.md` (Section 7 -- merged in from the retired `screen-requirements.md`, 2026-07-13) |
+| Application Status Model      | `business/PRD inputs/application-status-model.md`                                                          |
 
 ---
 

@@ -86,7 +86,7 @@ Check every Tier 1 doc below. If the task affected it, update it before committi
 | `docs/Implementation Plan/CHANGELOG.md`                  | Any significant design decision, deviation from plan, or architectural change. **Always write new entries here — never to `CHANGELOG-ARCHIVE.md`** (archive covers Phase 0–4 and is read-only) |
 | `docs/Technical Decision and Design/technical-design.md` | Any change to system architecture, data model, API contracts, or component design                                                                                                              |
 | `docs/data-model.md`                                     | Any change to database schema, table definitions, field types, constraints, or entity relationships                                                                                            |
-| `docs/PRD inputs/screen-requirements.md`                 | Any change to the content, fields, validation rules, or error states of any screen                                                                                                             |
+| `docs/PRD-Grant-Pathway.md` (Section 7)                  | Any change to the content, fields, validation rules, or error states of any screen (merged in from the retired `screen-requirements.md`, 2026-07-13)                                           |
 | `docs/PRD inputs/acceptance-criteria.md`                 | Any change to functional requirements that alters what "done" looks like                                                                                                                       |
 
 **Step 2 — Tier 2 docs (if relevant):**

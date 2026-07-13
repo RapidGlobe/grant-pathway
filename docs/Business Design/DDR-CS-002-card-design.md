@@ -34,7 +34,7 @@ The page background is off-white (#F8FAFC). Cards will sit on top of this backgr
 | Mockup 2 | Warm & Approachable    | White card, 3--4px solid teal (#0D6E6E) left border, no shadow |
 | Mockup 3 | Modern SaaS            | White card, moderate shadow (`0 2px 6px rgba(0,0,0,0.10)`)     |
 
-**Status-colour left border extension for Mockup 2:** The left border colour reflects the application status, consistent with the status pill colours in screen-requirements.md:
+**Status-colour left border extension for Mockup 2:** The left border colour reflects the application status, consistent with the status pill colours in `PRD-Grant-Pathway.md` (Section 7, Screen 5 -- previously `screen-requirements.md`, retired 2026-07-13):
 
 - Not started -- slate (#1E293B)
 - In progress -- amber (#D97706)

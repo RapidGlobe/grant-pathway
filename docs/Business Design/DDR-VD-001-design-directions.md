@@ -19,7 +19,7 @@ The following design elements are fixed across all variants and must not differ 
 - Colour palette: teal #0D6E6E, soft teal #E6F4F4, amber #D97706, success green #16A34A, slate #1E293B, off-white #F8FAFC, white #FFFFFF (app-name-and-branding.md)
 - Typography: Inter across all text roles (app-name-and-branding.md)
 - Navigation structure and page content (information-architecture-and-navigation.md)
-- All screen content, labels, and copy (screen-requirements.md)
+- All screen content, labels, and copy (`PRD-Grant-Pathway.md` Section 7 -- previously `screen-requirements.md`, retired 2026-07-13)
 - WCAG 2.2 AA accessibility compliance (NFR-06)
 
 What can vary between the three directions is the overall visual character: how the palette is applied, what the spatial rhythm feels like, the visual weight of components, and the emotional tone conveyed by the design.

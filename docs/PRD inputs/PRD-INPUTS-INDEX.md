@@ -16,13 +16,13 @@ This folder contains the five specification documents required to complete the P
 
 ## Documents
 
-| File                                                       | Purpose                                                                                | Status      |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------- |
-| [application-status-model.md](application-status-model.md) | Defines all application statuses and the rules for moving between them                 | ✅ Complete |
-| [success-metrics.md](success-metrics.md)                   | Defines measurable KPIs for v1 launch                                                  | ✅ Complete |
-| [email-notifications.md](email-notifications.md)           | Defines content, triggers, and conditions for all system emails                        | ✅ Complete |
-| [screen-requirements.md](screen-requirements.md)           | Defines required fields, labels, buttons, validation, and error states for each screen | ✅ Complete |
-| [acceptance-criteria.md](acceptance-criteria.md)           | Defines testable Given/When/Then acceptance criteria for all 39 Must Have requirements | ✅ Complete |
+| File                                                       | Purpose                                                                                                                       | Status      |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| [application-status-model.md](application-status-model.md) | Defines all application statuses and the rules for moving between them                                                        | ✅ Complete |
+| [success-metrics.md](success-metrics.md)                   | Defines measurable KPIs for v1 launch                                                                                         | ✅ Complete |
+| [email-notifications.md](email-notifications.md)           | Defines content, triggers, and conditions for all system emails                                                               | ✅ Complete |
+| ~~screen-requirements.md~~                                 | **Retired 2026-07-13** -- merged into `../PRD-Grant-Pathway.md` Section 7 (Screen Specifications); this file no longer exists | 🗄️ Merged   |
+| [acceptance-criteria.md](acceptance-criteria.md)           | Defines testable Given/When/Then acceptance criteria for all 39 Must Have requirements                                        | ✅ Complete |
 
 ---
 

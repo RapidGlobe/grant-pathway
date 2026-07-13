@@ -8,16 +8,16 @@ All requirements in this document reflect the selected design direction (**Warm 
 
 ## Related Documents
 
-| Document                                     | Location                                                      |
-| -------------------------------------------- | ------------------------------------------------------------- |
-| App Name & Branding                          | `business/app-name-and-branding.md`                           |
-| Information Architecture & Navigation        | `business/information-architecture-and-navigation.md`         |
-| Screen Requirements (all 13 pages, 3 modals) | `business/PRD inputs/screen-requirements.md`                  |
-| UI Inventory & Data Contracts                | `business/Business Design/ui-inventory-and-data-contracts.md` |
-| Tone & Voice Guide                           | `business/Business Design/tone-and-voice-guide.md`            |
-| Non-Functional Requirements                  | `business/non-functional-requirements.md`                     |
-| UI Component Library Decision (shadcn/ui)    | `business/PRD decisions/PDR-UI-001-ui-component-library.md`   |
-| Design Decisions Index                       | `business/Business Design/DESIGN-DECISIONS-INDEX.md`          |
+| Document                                  | Location                                                                                           |
+| ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| App Name & Branding                       | `business/app-name-and-branding.md`                                                                |
+| Information Architecture & Navigation     | `business/information-architecture-and-navigation.md`                                              |
+| Screen Specifications (all 11 screens)    | `docs/PRD-Grant-Pathway.md` (Section 7 -- previously `screen-requirements.md`, retired 2026-07-13) |
+| UI Inventory & Data Contracts             | `business/Business Design/ui-inventory-and-data-contracts.md`                                      |
+| Tone & Voice Guide                        | `business/Business Design/tone-and-voice-guide.md`                                                 |
+| Non-Functional Requirements               | `business/non-functional-requirements.md`                                                          |
+| UI Component Library Decision (shadcn/ui) | `business/PRD decisions/PDR-UI-001-ui-component-library.md`                                        |
+| Design Decisions Index                    | `business/Business Design/DESIGN-DECISIONS-INDEX.md`                                               |
 
 ---
 
@@ -816,7 +816,7 @@ Padding: `3px 10px`. The dot is a `6px × 6px` circle, `border-radius: 50%`.
 
 ## 6. Page Layout Reference
 
-This section defines the layout and key component composition for each page. Content requirements are in `screen-requirements.md`.
+This section defines the layout and key component composition for each page. Content requirements are in `PRD-Grant-Pathway.md` Section 7 (previously `screen-requirements.md`, retired 2026-07-13).
 
 ### Public Pages
 
@@ -867,7 +867,7 @@ All application flow pages include the authenticated nav and step indicator bar.
 - "Back" — ghost button, left-aligned
 - "Continue" — primary (teal) button, right-aligned
 - Step 1 only: "Cancel" ghost link replaces Back (returns to dashboard without saving)
-- Step 5: Approve & export actions replace Continue (see Step 5 spec in screen-requirements.md)
+- Step 5: Approve & export actions replace Continue (see Step 5 spec in `PRD-Grant-Pathway.md` Section 7, Screen 7)
 
 ---
 

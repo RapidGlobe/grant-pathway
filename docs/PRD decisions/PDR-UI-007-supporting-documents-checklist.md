@@ -27,7 +27,7 @@ Unlike `funderAiPolicy` (also extracted but deliberately not displayed, with an 
 - `app/(authenticated)/applications/[id]/step/4/page.tsx` parses `ai_summary` before the `draft_status === 'not_started'` branch (previously parsed only later, for question sync) and passes `funderName` and `supportingDocuments` into `ApplicationStep4PrepChecklist`.
 - The standing financial checklist (4 hardcoded items) is unchanged and always shown — it reflects Grant Pathway's own policy advice (treasurer involvement, budget projections), not funder-specific requirements, so it is not a candidate for replacement.
 - The funder-specific list is additive, not a replacement, and may overlap with the standing checklist (e.g. both can mention annual accounts) — this is accepted rather than deduplicated, since exact-string matching against AI-extracted phrasing is unreliable and the two lists serve different framings (general advice vs. this funder's stated requirement).
-- See AC-FR-28-09 (`docs/PRD inputs/acceptance-criteria.md`) and the new "Step 4 — Preparation Checklist" section in `docs/PRD inputs/screen-requirements.md`.
+- See AC-FR-28-09 (`docs/PRD inputs/acceptance-criteria.md`) and the "Step 4 — Preparation Checklist" content in `docs/PRD-Grant-Pathway.md` Section 7, Screen 7 (previously in the now-retired `screen-requirements.md`).
 
 ## Rationale
 

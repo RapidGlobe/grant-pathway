@@ -38,7 +38,7 @@ export function validateFile(mimeType: string, sizeBytes: number): FileValidatio
 
 /**
  * User-facing error messages for file validation failures (FR-23).
- * Match the messages defined in screen-requirements.md Step 2 error states.
+ * Match the messages defined in PRD-Grant-Pathway.md Section 7, Screen 7 Step 2 error states.
  */
 export const FILE_VALIDATION_MESSAGES = {
   invalid_type:

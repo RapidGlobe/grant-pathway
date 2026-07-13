@@ -146,7 +146,7 @@ Run this before every session, every time, no exceptions. It exists because on 2
 2. Click **Register** / **Create an account**
 3. Enter a new test email (e.g. `grantpathway+<label>@gmail.com`), a compliant password (12+ characters, letters and digits), first name, and last name. Deliberately note whether you tick or leave unticked the feedback-consent checkbox — this is needed later for P5.5's `feedback_consent` verification.
 4. Submit registration
-5. Open the verification email and click the verification link. **Note:** the link expires after 1 hour. `screen-requirements.md` and `acceptance-criteria.md` were corrected to say 1 hour on 2026-07-02 (were previously wrong, stating 24 hours) — the user guide (`grant-pathway-user-guide-*.docx`) still needs the same correction, not yet done. Don't leave this step for later in the session — it also passes through the new `/verify-email/confirm` auto-confirm step (D-012).
+5. Open the verification email and click the verification link. **Note:** the link expires after 1 hour (see `PRD-Grant-Pathway.md` Section 7, Screen 3 -- formerly `screen-requirements.md`, retired 2026-07-13 -- and `acceptance-criteria.md`, both corrected to say 1 hour on 2026-07-02, previously wrong at 24 hours) — the user guide (`grant-pathway-user-guide-*.docx`) still needs the same correction, not yet done. Don't leave this step for later in the session — it also passes through the `/verify-email/confirm` auto-confirm step (D-012).
 6. Confirm the app shows a success state after verification
 7. Sign in with the new account
 8. Complete charity profile setup — either look up the charity by name/registration number, or enter the fields manually

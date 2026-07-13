@@ -72,7 +72,7 @@ Success messages should:
 
 ### Account deleted
 
-Shown on `/` after redirect as an inline message on the sign-in page: _"Your account has been deleted."_ Uses the same inline alert style as transactional saves above. No design decision required -- handled by the redirect behaviour defined in screen-requirements.md.
+Shown on `/` after redirect as an inline message on the sign-in page: _"Your account has been deleted."_ Uses the same inline alert style as transactional saves above. No design decision required -- handled by the redirect behaviour defined in `PRD-Grant-Pathway.md` Section 7, Screen 1 (previously `screen-requirements.md`, retired 2026-07-13).
 
 ## Date Decided
 

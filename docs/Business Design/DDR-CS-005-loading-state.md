@@ -24,7 +24,7 @@ The screen requirements specify staged text messages to be shown during generati
 
 The loading state must be informative and reassuring -- users must not feel the app has crashed or stalled. For the primary persona Margaret, who has no prior AI experience, an unexplained wait with no feedback would be confusing and alarming.
 
-The visual treatment wraps around the staged text messages. The text messages themselves are fixed (screen-requirements.md); this decision is about the surrounding visual component.
+The visual treatment wraps around the staged text messages. The text messages themselves are fixed (`PRD-Grant-Pathway.md` Section 7 (previously `screen-requirements.md`, retired 2026-07-13)); this decision is about the surrounding visual component.
 
 ## Options
 
@@ -38,7 +38,7 @@ The visual treatment wraps around the staged text messages. The text messages th
 
 **Option B -- Animated progress bar with staged text.**
 
-A teal (#0D6E6E) horizontal progress bar advances in timed stages, accompanied by the staged text messages defined in screen-requirements.md. The bar and text transitions are coordinated -- each text message change triggers a bar advance.
+A teal (#0D6E6E) horizontal progress bar advances in timed stages, accompanied by the staged text messages defined in `PRD-Grant-Pathway.md` Section 7 (previously `screen-requirements.md`, retired 2026-07-13). The bar and text transitions are coordinated -- each text message change triggers a bar advance.
 
 **Step 3 progress stages (target: up to 30 seconds):**
 

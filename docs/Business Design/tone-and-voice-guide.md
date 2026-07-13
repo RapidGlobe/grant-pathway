@@ -6,12 +6,12 @@ This guide defines how Grant Pathway communicates with its users across every sc
 
 ## Related Documents
 
-| Document                             | Location                                           |
-| ------------------------------------ | -------------------------------------------------- |
-| App Name & Branding (colours, fonts) | `business/app-name-and-branding.md`                |
-| Screen Requirements (copy examples)  | `business/PRD inputs/screen-requirements.md`       |
-| User Personas                        | `business/user-personas-journeys-and-use-cases.md` |
-| Email Notifications                  | `business/PRD inputs/email-notifications.md`       |
+| Document                              | Location                                                                                           |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| App Name & Branding (colours, fonts)  | `business/app-name-and-branding.md`                                                                |
+| Screen Specifications (copy examples) | `docs/PRD-Grant-Pathway.md` (Section 7 -- previously `screen-requirements.md`, retired 2026-07-13) |
+| User Personas                         | `business/user-personas-journeys-and-use-cases.md`                                                 |
+| Email Notifications                   | `business/PRD inputs/email-notifications.md`                                                       |
 
 ---
 
@@ -315,4 +315,4 @@ Grant Pathway sounds like a knowledgeable friend who works in the sector -- warm
 
 _Last updated: 2026-04-17_
 _Status: Complete_
-_Sources: app-name-and-branding.md (BR-04), screen-requirements.md, user-personas-journeys-and-use-cases.md, PDR-UI-006, design decision records DDR-CS-005, DDR-IP-001, DDR-IP-002_
+_Sources: app-name-and-branding.md (BR-04), PRD-Grant-Pathway.md Section 7 (previously screen-requirements.md, retired 2026-07-13), user-personas-journeys-and-use-cases.md, PDR-UI-006, design decision records DDR-CS-005, DDR-IP-001, DDR-IP-002_

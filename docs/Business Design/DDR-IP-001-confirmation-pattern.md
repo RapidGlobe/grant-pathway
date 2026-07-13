@@ -70,7 +70,7 @@ A modal dialog appears when the user clicks the Delete text link on an applicati
 
 ### Out of scope for this decision
 
-Account deletion (Screen 9) uses the separate DELETE-typing confirmation mechanism defined in screen-requirements.md and is not affected by this decision.
+Account deletion (Screen 9) uses the separate DELETE-typing confirmation mechanism defined in `PRD-Grant-Pathway.md` Section 7 (previously `screen-requirements.md`, retired 2026-07-13) and is not affected by this decision.
 
 ## Date Decided
 

@@ -1758,20 +1758,20 @@ Checklist:
 
 ## Key References
 
-| Document                  | Path                                                                              |
-| ------------------------- | --------------------------------------------------------------------------------- |
-| BRD                       | `business/BRD-Grant-Pathway-v0.2.md`                                              |
-| PRD                       | `docs/PRD-Grant-Pathway.md`                                                       |
-| Screen Requirements       | `business/PRD inputs/screen-requirements.md`                                      |
-| Acceptance Criteria       | `business/PRD inputs/acceptance-criteria.md`                                      |
-| Technical Design          | `business/Technical Decision and Design/technical-design.md`                      |
-| ADR Index                 | `business/Technical Decision and Design/ADR-INDEX.md`                             |
-| Information Architecture  | `business/information-architecture-and-navigation.md`                             |
-| MoSCoW Feature Register   | `business/moscow-feature-register.md`                                             |
-| Constraints & Assumptions | `business/constraints-and-assumptions.md`                                         |
-| Data Model                | `business/data-model.md`                                                          |
-| Phase 6 Build Plan        | `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`            |
-| Phase 6 Decision Record   | `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md` |
+| Document                  | Path                                                                                                       |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| BRD                       | `business/BRD-Grant-Pathway-v0.2.md`                                                                       |
+| PRD                       | `docs/PRD-Grant-Pathway.md`                                                                                |
+| Screen Specifications     | `docs/PRD-Grant-Pathway.md` (Section 7 -- merged in from the retired `screen-requirements.md`, 2026-07-13) |
+| Acceptance Criteria       | `business/PRD inputs/acceptance-criteria.md`                                                               |
+| Technical Design          | `business/Technical Decision and Design/technical-design.md`                                               |
+| ADR Index                 | `business/Technical Decision and Design/ADR-INDEX.md`                                                      |
+| Information Architecture  | `business/information-architecture-and-navigation.md`                                                      |
+| MoSCoW Feature Register   | `business/moscow-feature-register.md`                                                                      |
+| Constraints & Assumptions | `business/constraints-and-assumptions.md`                                                                  |
+| Data Model                | `business/data-model.md`                                                                                   |
+| Phase 6 Build Plan        | `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`                                     |
+| Phase 6 Decision Record   | `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md`                          |
 
 ---
 
