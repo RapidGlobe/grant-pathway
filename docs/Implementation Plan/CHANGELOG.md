@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-13 — P6.2 guideline-reference field shape agreed with WJ
+
+The task list previously described the citation field vaguely ("page number or section/heading") with no concrete data shape — writing a migration against that wording would have meant guessing, with a real risk of a schema rewrite once P6.2a's actual output was known. Presented as a visual mockup (two worked examples — a PDF page-anchored citation from Idlewild Trust, a docx heading-anchored citation from Henry Smith Foundation — each shown as it would render in the app, plus the underlying data shape) rather than raw JSON, since a plain-text schema proposal isn't a format WJ can evaluate directly. Approved as proposed, with the caveat that live testing will be the real confirmation once built.
+
+**Shape:** a discriminated union — `source_type: 'page' | 'heading'`, `page_number` (page citations only), `heading_path: string[]` (heading citations only, an array to preserve nesting), `quote` (short verbatim excerpt, always present regardless of source type — what the P6.4 "view original guidelines" panel highlights, and a second, human-checkable guarantee against a hallucinated citation).
+
+**Files changed:** `docs/Technical Decision and Design/ADR-DATA-007-guideline-source-reference-mechanism.md`, `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.8), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-13 — P6.2 test funder chosen: MK Community Foundation — Oak Grants
 
 P6.2's exit criterion requires proving the item-graph migration "end to end... with zero regression" against an existing funder, which needs a baseline result that's actually trustworthy today. Oak Grants is the only funder at 🟢 on `docs/Test Plans/TEST-DASHBOARD.md` — fully re-verified against the current schema (13/13 test cases, 2026-07-04). Every other funder is 🔁 (passed, but predates the 2026-07-01 schema fix) or 🟡 (untested), which would mean re-establishing a baseline before P6.2 work could even start. Checked Oak Grants' own test plan for entanglement with the parked Group Profile Score (R16, MK Community Foundation's own cross-application scoring criterion) — none found, so this stays within compatibility-mode scope.

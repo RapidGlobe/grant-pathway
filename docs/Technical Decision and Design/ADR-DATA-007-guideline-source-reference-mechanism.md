@@ -26,7 +26,19 @@ This mechanism only exists because two other decisions made it possible:
 **Option B — structural chunk-anchoring, built in five parts (Build plan `P6.2a`, `P6.2`, `P6.3`, `P6.4`, `P6.5`):**
 
 1. **Extraction preserves structure (`P6.2a`):** PDF text extraction (`lib/extract-text.ts`) changes from `unpdf`'s `mergePages: true` (all pages flattened into one string) to per-page extraction, inserting a `[PAGE N]` marker between pages. For docx and pasted guidelines, which have no fixed pages, heading/section structure is preserved as the fallback reference unit. `lib/preprocess-text.ts`'s page-number noise-stripping step is updated so it does not strip these newly-inserted markers before the AI ever sees them.
-2. **Citation field on each item (`P6.2`):** `ADR-DATA-006`'s typed item schema carries a guideline reference field (page number or section/heading) alongside its other properties (type, visibility condition, validation mode, etc.).
+2. **Citation field on each item (`P6.2`):** `ADR-DATA-006`'s typed item schema carries a guideline reference field (page number or section/heading) alongside its other properties (type, visibility condition, validation mode, etc.). **Concrete shape agreed 2026-07-13** (mocked up and approved by WJ before any migration was written):
+
+   ```
+   guideline_reference: {
+     source_type: 'page' | 'heading',
+     page_number: number | null,     // set only when source_type = 'page'
+     heading_path: string[] | null,  // set only when source_type = 'heading', e.g. ['Eligibility', 'Who can refer a family']
+     quote: string                   // short verbatim excerpt — always present, either way
+   }
+   ```
+
+   A discriminated union rather than two independent nullable fields, so a citation can never end up both- or neither-populated. `heading_path` is an array, not a single string, because docx/pasted guidelines nest (a heading under a heading) and the P6.4 "view original guidelines" panel needs the full trail to jump to the right place, not just the top-level heading. `quote` is present regardless of source type — it is what the P6.4 viewer actually searches for and highlights (a page number alone doesn't say where on the page), and doubles as a second, human-checkable guarantee that the citation is real rather than an AI guess.
+
 3. **Extraction records the citation (`P6.3`):** The rewritten extraction prompt (`lib/prompts.ts`) and route cite a specific chunk of the page/section-tagged text for each summary bullet, eligibility criterion, and extracted question — structurally guaranteed to reference real tagged content, never a free-typed guess.
 4. **Reference display and viewer (`P6.4`):** Step 4 (and the Step 3 summary) shows each item's guideline reference alongside it. A "view original guidelines" panel lets the user click a reference to jump to and highlight the cited page/section. Rendered via canvas-based PDF rendering, not `<iframe>`/`<object>` (neither of which supports highlighting a specific region).
 5. **Human curation confirms accuracy (`P6.5`):** Before a funder's playbook is approved, a human curator confirms or corrects each item's citation once — so applications built from that playbook reuse a verified reference, rather than trusting a fresh AI guess on every single application.
