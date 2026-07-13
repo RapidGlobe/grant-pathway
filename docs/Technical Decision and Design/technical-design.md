@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.9
+**Version:** 1.10
 **Date:** 2026-04-21
-**Last updated:** 2026-07-10
+**Last updated:** 2026-07-13
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -80,7 +80,7 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
        ▼                              │
 ┌──────────────────────┐   ┌──────────┴───────────────┐
 │   Supabase (London)  │   │   Amazon Bedrock         │
-│   PostgreSQL + Auth  │   │   Claude Sonnet 4.6      │
+│   PostgreSQL + Auth  │   │   Claude Sonnet (latest) │
 │   Row Level Security │   │   eu-west-2 In-Region    │
 └──────────────────────┘   └──────────────────────────┘
        │
@@ -98,27 +98,27 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 
 ## 3. Technology Stack
 
-| Layer           | Technology                                                 | Decision                   |
-| --------------- | ---------------------------------------------------------- | -------------------------- |
-| Framework       | Next.js 14+ with TypeScript                                | ADR-STACK-001              |
-| Database        | Supabase PostgreSQL (London, eu-west-2)                    | ADR-STACK-002              |
-| Authentication  | Supabase Auth                                              | ADR-STACK-003              |
-| Hosting         | Vercel Pro                                                 | ADR-STACK-004, ADR-OPS-001 |
-| Source control  | GitHub (private repository)                                | ADR-STACK-005              |
-| UI components   | shadcn/ui + Radix UI + Tailwind CSS                        | ADR-STACK-006              |
-| Icons           | Lucide React (via shadcn/ui)                               | ADR-STACK-006              |
-| AI provider     | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) | ADR-AI-001                 |
-| AI model        | Claude Sonnet 4.6                                          | ADR-AI-002                 |
-| PDF extraction  | `unpdf`                                                    | ADR-FILE-003               |
-| Word extraction | `mammoth`                                                  | ADR-FILE-003               |
-| Word generation | `docx`                                                     | ADR-EXPORT-001             |
-| Rate limiting   | Upstash Redis + `@upstash/ratelimit`                       | ADR-SEC-005                |
-| Email           | Resend (via Supabase Auth SMTP)                            | ADR-OPS-003                |
-| Error tracking  | Sentry (EU region)                                         | ADR-OPS-005                |
-| Migrations      | Supabase CLI + Docker Desktop                              | ADR-DATA-004               |
-| Validation      | Zod (all API routes and Server Actions)                    | ADR-ARCH-003               |
-| Test framework  | Vitest                                                     | —                          |
-| CI              | GitHub Actions                                             | —                          |
+| Layer           | Technology                                                            | Decision                   |
+| --------------- | --------------------------------------------------------------------- | -------------------------- |
+| Framework       | Next.js 14+ with TypeScript                                           | ADR-STACK-001              |
+| Database        | Supabase PostgreSQL (London, eu-west-2)                               | ADR-STACK-002              |
+| Authentication  | Supabase Auth                                                         | ADR-STACK-003              |
+| Hosting         | Vercel Pro                                                            | ADR-STACK-004, ADR-OPS-001 |
+| Source control  | GitHub (private repository)                                           | ADR-STACK-005              |
+| UI components   | shadcn/ui + Base UI + Tailwind CSS                                    | ADR-STACK-006              |
+| Icons           | Lucide React (via shadcn/ui)                                          | ADR-STACK-006              |
+| AI provider     | Anthropic Claude (latest Sonnet model) via Amazon Bedrock (eu-west-2) | ADR-AI-001                 |
+| AI model        | Latest Claude Sonnet model                                            | ADR-AI-002                 |
+| PDF extraction  | `unpdf`                                                               | ADR-FILE-003               |
+| Word extraction | `mammoth`                                                             | ADR-FILE-003               |
+| Word generation | `docx`                                                                | ADR-EXPORT-001             |
+| Rate limiting   | Upstash Redis + `@upstash/ratelimit`                                  | ADR-SEC-005                |
+| Email           | Resend (via Supabase Auth SMTP)                                       | ADR-OPS-003                |
+| Error tracking  | Sentry (EU region)                                                    | ADR-OPS-005                |
+| Migrations      | Supabase CLI + Docker Desktop                                         | ADR-DATA-004               |
+| Validation      | Zod (all API routes and Server Actions)                               | ADR-ARCH-003               |
+| Test framework  | Vitest                                                                | —                          |
+| CI              | GitHub Actions                                                        | —                          |
 
 ### Operating costs (monthly)
 
@@ -323,6 +323,8 @@ Key design points:
 - A completed charity profile (core required fields populated) is required before a new application can be created
 - Financial fields default from Charity Commission annual return data where available; the charity must confirm all financial figures before use
 
+**Forward reference (`P6.1`, 2026-07-05):** five nullable governance/financial columns — `total_expenditure`, `reserves`, `trustees_related`, `bank_signatory_count`, `bank_signatories_related` — were added to support derived-ratio eligibility checks (R13). Applied to `grant-pathway-dev` only; not yet applied to production. Full detail in `docs/data-model.md`.
+
 #### `funders`
 
 Global reference table — not user-scoped. Seeded and maintained by Rapidglobe. Users can only SELECT active rows.
@@ -341,41 +343,44 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 #### `applications`
 
-| Column             | Type          | Constraints                                                                        |
-| ------------------ | ------------- | ---------------------------------------------------------------------------------- |
-| `id`               | `uuid`        | PK, default `gen_random_uuid()`                                                    |
-| `user_id`          | `uuid`        | FK → `auth.users(id)`                                                              |
-| `funder_id`        | `uuid`        | FK → `funders(id)`, nullable (migration safety)                                    |
-| `funder_name`      | `text`        | Not null — retained for display/export; populated from `funders.name` on selection |
-| `grant_name`       | `text`        | Not null                                                                           |
-| `status`           | `text`        | `not_started \| in_progress \| approved \| exported \| mismatch`                   |
-| `current_step`     | `integer`     | 1–5, default 1                                                                     |
-| `ai_summary`       | `text`        | Nullable — JSON string, populated in Step 3                                        |
-| `last_exported_at` | `timestamptz` | Nullable — timestamp of most recent Word export                                    |
-| `created_at`       | `timestamptz` | Default `now()`                                                                    |
-| `updated_at`       | `timestamptz` | Default `now()`                                                                    |
+| Column             | Type          | Constraints                                                                                                                                         |
+| ------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`               | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                     |
+| `user_id`          | `uuid`        | FK → `auth.users(id)`                                                                                                                               |
+| `funder_id`        | `uuid`        | FK → `funders(id)`, nullable (migration safety)                                                                                                     |
+| `funder_name`      | `text`        | Not null — retained for display/export; populated from `funders.name` on selection                                                                  |
+| `grant_name`       | `text`        | Not null                                                                                                                                            |
+| `status`           | `text`        | `not_started \| in_progress \| approved \| exported \| mismatch`                                                                                    |
+| `current_step`     | `integer`     | 1–5, default 1                                                                                                                                      |
+| `ai_summary`       | `text`        | Nullable — JSON string, populated in Step 3                                                                                                         |
+| `draft_status`     | `text`        | `not_started \| in_progress \| ready_to_assemble \| assembled \| exported`, default `not_started` — tracks progress through the Step 4 Q&A workflow |
+| `assembled_draft`  | `text`        | Nullable — final assembled application text, written by the assemble action once all questions are answered; Step 5 export reads from this column   |
+| `last_exported_at` | `timestamptz` | Nullable — timestamp of most recent Word export                                                                                                     |
+| `created_at`       | `timestamptz` | Default `now()`                                                                                                                                     |
+| `updated_at`       | `timestamptz` | Default `now()`                                                                                                                                     |
 
 `mismatch` is a terminal status — no transitions to steps 4 or 5 are permitted from this state (FR-47, DR-EL-001).
 
 #### `application_answers`
 
-| Column               | Type          | Constraints                                                               |
-| -------------------- | ------------- | ------------------------------------------------------------------------- |
-| `id`                 | `uuid`        | PK, default `gen_random_uuid()`                                           |
-| `application_id`     | `uuid`        | FK → `applications(id)`                                                   |
-| `user_id`            | `uuid`        | FK → `auth.users(id)` (denormalised for RLS)                              |
-| `question_text`      | `text`        | Not null                                                                  |
-| `question_type`      | `text`        | `narrative \| data_entry \| financial \| dropdown \| date \| file_upload` |
-| `question_order`     | `integer`     | Not null — unique per `(application_id, question_order)`                  |
-| `word_limit`         | `integer`     | Nullable — set when `limit_type = 'words'`                                |
-| `char_limit`         | `integer`     | Nullable — set when `limit_type = 'characters'`                           |
-| `limit_type`         | `text`        | `words \| characters \| none`                                             |
-| `answer_text`        | `text`        | Nullable                                                                  |
-| `answer_source`      | `text`        | `user_written \| user_edited \| ai_assisted`                              |
-| `is_budget_question` | `boolean`     | Not null, default `false` — disables AI assist on this row                |
-| `is_approved`        | `boolean`     | Not null, default `false` — set in the Step 4 review gate                 |
-| `created_at`         | `timestamptz` | Default `now()`                                                           |
-| `updated_at`         | `timestamptz` | Default `now()`                                                           |
+| Column               | Type          | Constraints                                                                                                                                                                                              |
+| -------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                 | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                                                                          |
+| `application_id`     | `uuid`        | FK → `applications(id)`                                                                                                                                                                                  |
+| `user_id`            | `uuid`        | FK → `auth.users(id)` (denormalised for RLS)                                                                                                                                                             |
+| `question_text`      | `text`        | Not null                                                                                                                                                                                                 |
+| `question_type`      | `text`        | `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`                                                                                                                                |
+| `question_order`     | `integer`     | Not null — unique per `(application_id, question_order)`                                                                                                                                                 |
+| `word_limit`         | `integer`     | Nullable — set when `limit_type = 'words'`                                                                                                                                                               |
+| `char_limit`         | `integer`     | Nullable — set when `limit_type = 'characters'`                                                                                                                                                          |
+| `limit_type`         | `text`        | `words \| characters \| none`                                                                                                                                                                            |
+| `answer_text`        | `text`        | Nullable                                                                                                                                                                                                 |
+| `answer_source`      | `text`        | `user_written \| user_edited \| ai_assisted`                                                                                                                                                             |
+| `ai_refined_answer`  | `text`        | Nullable — AI-suggested improved version, shown in the "Suggested improvement" card; kept separate from `answer_text` so the original is never overwritten without an explicit "Use this version" action |
+| `is_budget_question` | `boolean`     | Not null, default `false` — disables AI assist on this row                                                                                                                                               |
+| `is_approved`        | `boolean`     | Not null, default `false` — set in the Step 4 review gate                                                                                                                                                |
+| `created_at`         | `timestamptz` | Default `now()`                                                                                                                                                                                          |
+| `updated_at`         | `timestamptz` | Default `now()`                                                                                                                                                                                          |
 
 **Note on free_form funders:** For narrative (free_form) funders, `question_text` stores the section title (e.g. "About your organisation"). Section guidance text is re-derived on each Step 4 page load from `applications.ai_summary.sections[i].guidance`, matched by `question_order`. This avoids data duplication and keeps guidance in sync with the AI summary.
 
@@ -407,7 +412,11 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 ### Monthly AI usage count
 
-The monthly usage check is performed via a Supabase RPC call (`reserve_ai_slot`) rather than a bare client count. This provides an atomic advisory lock — preventing race conditions where two concurrent AI requests could both pass the cap check simultaneously.
+The monthly usage check is performed via three `SECURITY DEFINER` Supabase RPC functions rather than a bare client count, all using `pg_advisory_xact_lock` to prevent race conditions where two concurrent AI requests could both pass the cap check simultaneously:
+
+- `reserve_ai_slot` — checks the monthly cap and reserves a slot before the Bedrock call is made
+- `update_ai_slot_token_count` — records the actual token count against the reserved slot once the Bedrock response returns
+- `cancel_ai_slot` — releases a reserved slot without counting it, if the Bedrock call fails
 
 ### Data not stored (superseded 2026-07-10 — see note below)
 
@@ -624,8 +633,8 @@ The `sessionStorage` entry is cleared when Step 3 completes successfully. If the
 
 ### Provider and model
 
-- **Provider:** Anthropic Claude Sonnet 4.6 via Amazon Bedrock eu-west-2 (`AnthropicBedrock` client from `@anthropic-ai/sdk`) (ADR-AI-001)
-- **Model:** `anthropic.claude-sonnet-4-6` (Bedrock In-Region model ID) (ADR-AI-002)
+- **Provider:** Anthropic's latest Claude Sonnet model via Amazon Bedrock eu-west-2 (`AnthropicBedrock` client from `@anthropic-ai/sdk`) (ADR-AI-001)
+- **Model:** the latest available Claude Sonnet Bedrock In-Region model ID -- see `lib/prompts.ts`'s `MODEL` constant for the exact value currently deployed (ADR-AI-002)
 - **Response mode:** Batch (non-streaming) (ADR-AI-005)
 - **Function timeout:** `maxDuration = 90` on both AI routes (ADR-AI-006)
 
@@ -1054,7 +1063,7 @@ The following one-time tasks must be completed before the first production deplo
 - [ ] Create Resend account, verify sending domain (SPF + DKIM DNS records)
 - [ ] Configure Supabase Auth SMTP with Resend credentials
 - [ ] Customise Supabase Auth email templates (verification + password reset) — must reference "Grant Pathway", follow tone and voice guide, use teal CTA buttons
-- [ ] Configure Amazon Bedrock Claude Sonnet 4.6 model access in AWS eu-west-2 console; set monthly spend cap as a secondary safety net
+- [ ] Configure Amazon Bedrock access for the latest Claude Sonnet model in AWS eu-west-2 console; set monthly spend cap as a secondary safety net
 - [ ] Create Sentry project in EU region, configure PII scrubbing and AI route tagging, set up email alerts for new error types
 - [ ] Add `NEXT_PUBLIC_SENTRY_DSN` and `SENTRY_DSN` to Vercel production environment variables
 - [ ] Set all production environment variables in Vercel Production scope (including `AI_ENABLED=true`)
@@ -1083,6 +1092,7 @@ The following one-time tasks must be completed before the first production deplo
 | 1.8     | 2026-07-05 | Rapidglobe Ltd | Added forward-reference notes to the `funders` and `application_answers` schema sections pointing at ADR-DATA-006 (Application Item-Graph Model) — a decided but not-yet-built rearchitecture superseding `funder_type` and the flat `application_answers` structure. No schema change; the tables documented here remain the accurate current-production state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 | 1.9 | 2026-07-10 | Rapidglobe Ltd | Documented the reversal of ADR-DATA-002 ("never store" funder guidelines): the "commercially sensitive information" premise was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false — these are funders' own publicly published guidance. Added a reversal note under "Data not stored" and a forward-reference note under "Guidelines session storage" explaining that extracted guideline text will be retained in Postgres (application-scoped cascade per ADR-DATA-003, or indefinite for approved playbooks) once the Phase 6 P6.2a/P6.2/P6.3 work ships; also added a forward-reference note under "Data retention" for the two new Phase 6 tables. No code has changed — `sessionStorage` and "never stored" remain the accurate current-production behaviour until that Phase 6 work lands |
+| 1.10 | 2026-07-13 | Rapidglobe Ltd | Six findings fixed from a staleness audit, per WJ: (1) `applications` schema table was missing `draft_status` and `assembled_draft` — both live in production (`data-model.md` v1.6) and were even documented here once before (added in this doc's own v1.1) but dropped during a later schema rewrite; restored, closing an internal inconsistency with §9's `setDraftReadyToAssemble`/`assembleAndAdvance` Server Actions, which only make sense with `draft_status` present. (2) Technology Stack table corrected from "Radix UI" to "Base UI", matching the live `@base-ui/react` dependency (zero Radix in `package.json`) and the same fix already made in `PDR-UI-001` and the PRD. (3) `application_answers` schema table was missing `ai_refined_answer` — added. (4) "Monthly AI usage count" only described `reserve_ai_slot`; added the other two RPCs from the same migration (`update_ai_slot_token_count`, `cancel_ai_slot`) and named the `pg_advisory_xact_lock` mechanism specifically. (5) De-versioned three forward-looking AI-model mentions (Technology Stack table, §11 Provider/Model bullets, §16 Pre-Launch Checklist) to "the latest Claude Sonnet model" per the project's model de-versioning policy -- the `lib/prompts.ts` code snippet's literal `MODEL` constant value was correctly left as-is. (6) Added a forward-reference note under `charity_profiles` for `P6.1`'s five governance/financial columns (dev-only, not yet in production), matching this document's existing forward-reference pattern for other not-yet-built work. |
 
 ---
 
