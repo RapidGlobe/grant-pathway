@@ -1736,7 +1736,7 @@ Checklist:
 - [x] P6.2a — Guideline page/section reference extraction (groundwork) complete (2026-07-14, `grant-pathway-dev` only — see `IMPLEMENTATION-STATUS.md`)
 - [x] P6.2 — Item-graph data model (compatibility mode) complete (2026-07-14, `grant-pathway-dev` only), proven against the test funder with zero regression
 - [x] P6.3 — Extraction rewrite complete (2026-07-14, first milestone — same item types as today, new shape plus citations only). **Live browser verification against the real guideline PDF still pending WJ** — see `IMPLEMENTATION-STATUS.md`
-- [x] P6.4 — Step 4 rendering rework complete (2026-07-14, first milestone — citation badge + "view original guidelines" text panel; live browser verification pending WJ, see `IMPLEMENTATION-STATUS.md`)
+- [x] P6.4 — Step 4 rendering rework complete (2026-07-14, first milestone — citation badge + "view original guidelines" text panel; **live browser verification by WJ passed** — including a quote-highlighting bug found and fixed same-day, see `IMPLEMENTATION-STATUS.md`)
 - [ ] P6.5 — Playbook infrastructure and curation workflow complete
 - [ ] P6.6 — Transparency status complete
 - [ ] ADR-DATA-006 and this gate reviewed for any amendment needed in light of what was actually built (build often surfaces details a decision made in advance couldn't anticipate)
