@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-14 — P6.6 (Transparency Status) retired, will not be built
+
+P6.6 was designed to show a per-funder trust badge (fully supported / partially supported / guidance-only / unreviewed), keyed to whether a human curator had reviewed and approved a playbook for that funder. P6.5's pivot earlier today to private, per-charity reuse removed that basis entirely — no curator role exists or is planned. Rather than invent a substitute signal (extraction/citation quality, structured-vs-free-text parsing were both considered), WJ confirmed retiring the task: with no curation step anywhere in the product, every funder is in the identical state, so there is nothing left for a "trust tier" to differentiate.
+
+**Effect on the launch gate:** the Phase 6 → Go-Live Gate now requires P6.1–P6.5 complete (was P6.1–P6.6). Phase 6's tracked task count drops from 8 to 7.
+
+**Files changed:** `IMPLEMENTATION-PLAN.md` (v3.15), `IMPLEMENTATION-STATUS.md`, `ADR-DATA-006-application-item-graph-model.md` (new amendment), `ADR-TRACEABILITY.md` (v2.12), `docs/v1-out-of-scope.md`, `docs/constraints-and-assumptions.md`, `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md`.
+
+---
+
 ## 2026-07-14 — P6.5 live-tested: two small UI tweaks
 
 WJ live-tested P6.5 against MK Community Foundation — Oak Grants immediately after it shipped. The reuse choice, Step 2 skip, and carried-over citation/badge all worked correctly on the first try — no functional bugs found this time. Two presentation tweaks requested: the page citation badge now reads "Page N of the guidelines" (was just "Page N"); the "Carried over — please review" badge is now bold and larger, to draw more attention to the fact it needs a second look. `tsc --noEmit`, `eslint --max-warnings 0`, all 46 tests pass.

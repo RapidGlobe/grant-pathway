@@ -82,6 +82,8 @@ Consequences of this amendment:
 - **`rubric_criterion_link`'s future FK target moves from P6.5 to P6.7** (`IMPLEMENTATION-PLAN.md`'s ongoing "funder-by-funder capability extension" phase) — tracked explicitly in `ADR-TRACEABILITY.md` so it isn't lost now that the P6.5 milestone it was originally pinned to no longer builds it.
 - Full detail: `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` v0.51 (Section 5.5), `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md`/`CHANGELOG.md` (2026-07-14 entries).
 
+**Amendment (2026-07-14, later same day) — P6.6 (Transparency Status) retired, not merely re-designed.** Working through what a redesigned P6.6 would even signal (per the amendment above) surfaced that the task's entire reason for existing was to distinguish curator-reviewed funders from unreviewed ones — and with no curator role built or planned, every funder is now in the identical state (live AI extraction, never human-vetted). A badge that would read the same for 100% of funders is not a feature. WJ confirmed: retire the task rather than invent a substitute signal to keep it alive. `IMPLEMENTATION-PLAN.md`'s P6.6 section, the Phase 6 → Go-Live Gate (now requires P6.1–P6.5, not P6.1–P6.6), and `docs/v1-out-of-scope.md`'s "Funder Coverage Tier Display" entry all updated to record the retirement.
+
 ## Source
 
 `docs/BRD plus decisions Mark Two/question-coverage-analysis.md` (nine-funder findings), `docs/BRD plus decisions Mark Two/clean-slate-design-proposal.md` (options, requirements R1–R20, recommendation), `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` (phased sequencing). Supersedes ADR-DATA-001 (`application_answers` structure) in part; supersedes DR-FD-001's `funder_type` concept.
