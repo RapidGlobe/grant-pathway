@@ -25,7 +25,7 @@ interface Props {
  * sets draft_status = 'in_progress' on confirm, then redirects here so the
  * page re-renders showing the Q&A interface (AC-FR-28-01, AC-FR-28-02).
  *
- * S6.1 — Question population: if no application_answers rows exist yet,
+ * S6.1 — Question population: if no application_items rows exist yet,
  * creates them from the questions extracted in the ai_summary JSON. Uses
  * ON CONFLICT DO NOTHING so returning to Step 4 never overwrites answers.
  */
@@ -79,13 +79,13 @@ export default async function Step4Page({ params }: Props) {
 
   // ── S6.1: Fetch existing question rows ────────────────────────────────────
   const { data: existingRows } = await supabase
-    .from('application_answers')
+    .from('application_items')
     .select(
-      'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+      'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
-    .order('question_order')
+    .order('item_order')
 
   let questionRows = existingRows ?? []
 
@@ -97,18 +97,18 @@ export default async function Step4Page({ params }: Props) {
     }
   }
 
-  // ── S6.1: Sync application_answers with current ai_summary ──────────────────
+  // ── S6.1: Sync application_items with current ai_summary ─────────────────────
   // Always sync — not just on first visit — so that regenerating the summary
   // on Step 3 correctly removes questions that the new extraction dropped.
-  // Unanswered orphaned rows (question_order no longer in the summary) are
+  // Unanswered orphaned rows (item_order no longer in the summary) are
   // deleted. Answered rows are preserved even if orphaned, to avoid data loss.
   //
   // ignoreDuplicates: false (ON CONFLICT DO UPDATE) allows regenerated summaries
-  // to refresh question_text / word_limit metadata for existing rows. answer_text,
+  // to refresh item_label / word_limit metadata for existing rows. answer_text,
   // answer_source, is_approved and ai_refined_answer are NOT in the insert body
   // so they are never touched by the UPDATE — user answers are preserved.
   //
-  // D-HSF-03 hardening: filter inserts with null/undefined question_text before
+  // D-HSF-03 hardening: filter inserts with null/undefined item_label before
   // upserting (prevents silent NOT NULL constraint failures), and check the upsert
   // error explicitly so failures surface in Vercel logs rather than being swallowed.
   if (parsedSummary) {
@@ -121,16 +121,16 @@ export default async function Step4Page({ params }: Props) {
         // Free_form: sync from narrative sections
         const summaryOrders = parsedSummary.sections.map((s) => s.number)
         const orphaned = questionRows
-          .filter((r) => !summaryOrders.includes(r.question_order) && !r.answer_text)
-          .map((r) => r.question_order)
+          .filter((r) => !summaryOrders.includes(r.item_order) && !r.answer_text)
+          .map((r) => r.item_order)
 
         if (orphaned.length > 0) {
           await supabase
-            .from('application_answers')
+            .from('application_items')
             .delete()
             .eq('application_id', id)
             .eq('user_id', user.id)
-            .in('question_order', orphaned)
+            .in('item_order', orphaned)
         }
 
         const inserts = parsedSummary.sections
@@ -138,8 +138,10 @@ export default async function Step4Page({ params }: Props) {
           .map((s) => ({
             application_id: id,
             user_id: user.id,
-            question_text: s.title,
-            question_order: s.number,
+            item_type: 'narrative' as const,
+            source_of_truth: 'user_input' as const,
+            item_label: s.title,
+            item_order: s.number,
             word_limit: s.wordLimit ?? null,
             char_limit: null,
             limit_type: s.wordLimit ? 'words' : null,
@@ -147,12 +149,10 @@ export default async function Step4Page({ params }: Props) {
           }))
 
         if (inserts.length > 0) {
-          const { error: upsertError } = await supabase
-            .from('application_answers')
-            .upsert(inserts, {
-              onConflict: 'application_id,question_order',
-              ignoreDuplicates: false,
-            })
+          const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
 
           if (upsertError) {
             console.error('[step4] free_form upsert failed:', upsertError.message, {
@@ -163,29 +163,29 @@ export default async function Step4Page({ params }: Props) {
         }
 
         const { data: refreshed } = await supabase
-          .from('application_answers')
+          .from('application_items')
           .select(
-            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
-          .order('question_order')
+          .order('item_order')
 
         questionRows = refreshed ?? []
       } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
         // Structured: sync from numbered questions
         const summaryOrders = parsedSummary.questions.map((q, idx) => q.number ?? idx + 1)
         const orphaned = questionRows
-          .filter((r) => !summaryOrders.includes(r.question_order) && !r.answer_text)
-          .map((r) => r.question_order)
+          .filter((r) => !summaryOrders.includes(r.item_order) && !r.answer_text)
+          .map((r) => r.item_order)
 
         if (orphaned.length > 0) {
           await supabase
-            .from('application_answers')
+            .from('application_items')
             .delete()
             .eq('application_id', id)
             .eq('user_id', user.id)
-            .in('question_order', orphaned)
+            .in('item_order', orphaned)
         }
 
         const inserts = parsedSummary.questions
@@ -193,8 +193,10 @@ export default async function Step4Page({ params }: Props) {
           .map((q, idx) => ({
             application_id: id,
             user_id: user.id,
-            question_text: q.text,
-            question_order: q.number ?? idx + 1,
+            item_type: 'narrative' as const,
+            source_of_truth: 'user_input' as const,
+            item_label: q.text,
+            item_order: q.number ?? idx + 1,
             word_limit: q.wordLimit ?? null,
             char_limit: q.charLimit ?? null,
             limit_type: q.limitType ?? null,
@@ -202,12 +204,10 @@ export default async function Step4Page({ params }: Props) {
           }))
 
         if (inserts.length > 0) {
-          const { error: upsertError } = await supabase
-            .from('application_answers')
-            .upsert(inserts, {
-              onConflict: 'application_id,question_order',
-              ignoreDuplicates: false,
-            })
+          const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
 
           if (upsertError) {
             console.error('[step4] structured upsert failed:', upsertError.message, {
@@ -218,13 +218,13 @@ export default async function Step4Page({ params }: Props) {
         }
 
         const { data: refreshed } = await supabase
-          .from('application_answers')
+          .from('application_items')
           .select(
-            'id, question_text, question_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
-          .order('question_order')
+          .order('item_order')
 
         questionRows = refreshed ?? []
       }
@@ -252,15 +252,15 @@ export default async function Step4Page({ params }: Props) {
   // ── Map DB rows to component props ────────────────────────────────────────
   const questions: QuestionRow[] = questionRows.map((row) => ({
     id: row.id as string,
-    questionText: row.question_text as string,
-    questionOrder: row.question_order as number,
+    questionText: row.item_label as string,
+    questionOrder: row.item_order as number,
     wordLimit: (row.word_limit as number | null) ?? null,
     charLimit: (row.char_limit as number | null) ?? null,
     limitType: (row.limit_type as QuestionRow['limitType']) ?? null,
     answerText: (row.answer_text as string | null) ?? null,
     answerSource: (row.answer_source as QuestionRow['answerSource']) ?? null,
     isBudgetQuestion: (row.is_budget_question as boolean) ?? false,
-    guidance: guidanceMap[row.question_order as number] ?? null,
+    guidance: guidanceMap[row.item_order as number] ?? null,
     isApproved: (row.is_approved as boolean) ?? false,
   }))
 

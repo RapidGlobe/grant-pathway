@@ -84,7 +84,7 @@ export type DeleteApplicationResult = { ok: true } | { ok: false; error: string 
 /**
  * Hard-deletes an application owned by the authenticated user.
  *
- * application_answers rows cascade-delete automatically via the FK
+ * application_items rows cascade-delete automatically via the FK
  * constraint (ON DELETE CASCADE). ai_usage_log rows are retained with
  * application_id set to null (ON DELETE SET NULL) so usage history is
  * preserved for billing purposes.
@@ -381,7 +381,7 @@ export async function setApplicationMismatch(
 /**
  * Called when the user clicks "I have what I need — start writing" on the
  * Step 4 preparation checklist. Sets draft_status = 'in_progress' and syncs
- * application_answers from ai_summary so rows exist before the page renders
+ * application_items from ai_summary so rows exist before the page renders
  * (D-HSF-03: avoids first-load "no questions found" fallback caused by
  * Router Cache serving a stale render before the Server Component sync runs).
  *
@@ -421,9 +421,12 @@ export async function setDraftInProgress(
     return { ok: false, error: 'Could not save your progress. Please try again.' }
   }
 
-  // Sync application_answers from ai_summary so rows exist before the page
+  // Sync application_items from ai_summary so rows exist before the page
   // renders. This is the primary sync path; the Step 4 page still syncs as a
   // fallback for returning users who navigate directly without the checklist.
+  // item_type is always 'narrative' and source_of_truth always 'user_input'
+  // in compatibility mode (P6.2, ADR-DATA-006) — no other item type is
+  // produced by today's extraction prompt.
   if (appRow?.ai_summary) {
     try {
       const parsedSummary = JSON.parse(appRow.ai_summary) as AiSummaryData
@@ -439,8 +442,10 @@ export async function setDraftInProgress(
           .map((s) => ({
             application_id: applicationId,
             user_id: user!.id,
-            question_text: s.title,
-            question_order: s.number,
+            item_type: 'narrative' as const,
+            source_of_truth: 'user_input' as const,
+            item_label: s.title,
+            item_order: s.number,
             word_limit: s.wordLimit ?? null,
             char_limit: null,
             limit_type: s.wordLimit ? 'words' : null,
@@ -448,12 +453,10 @@ export async function setDraftInProgress(
           }))
 
         if (inserts.length > 0) {
-          const { error: upsertError } = await supabase
-            .from('application_answers')
-            .upsert(inserts, {
-              onConflict: 'application_id,question_order',
-              ignoreDuplicates: false,
-            })
+          const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
 
           if (upsertError) {
             console.error('[setDraftInProgress] free_form upsert failed:', upsertError.message, {
@@ -468,8 +471,10 @@ export async function setDraftInProgress(
           .map((q, idx) => ({
             application_id: applicationId,
             user_id: user!.id,
-            question_text: q.text,
-            question_order: q.number ?? idx + 1,
+            item_type: 'narrative' as const,
+            source_of_truth: 'user_input' as const,
+            item_label: q.text,
+            item_order: q.number ?? idx + 1,
             word_limit: q.wordLimit ?? null,
             char_limit: q.charLimit ?? null,
             limit_type: q.limitType ?? null,
@@ -477,12 +482,10 @@ export async function setDraftInProgress(
           }))
 
         if (inserts.length > 0) {
-          const { error: upsertError } = await supabase
-            .from('application_answers')
-            .upsert(inserts, {
-              onConflict: 'application_id,question_order',
-              ignoreDuplicates: false,
-            })
+          const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
 
           if (upsertError) {
             console.error('[setDraftInProgress] structured upsert failed:', upsertError.message, {
@@ -509,7 +512,7 @@ export async function setDraftInProgress(
 export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
 
 /**
- * Saves a single answer text for an existing application_answers row.
+ * Saves a single answer text for an existing application_items row.
  * Called by the on-blur auto-save and the 60-second background save in the
  * Step 4 component.
  *
@@ -519,7 +522,7 @@ export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
  * that value is unused; the charity-authored model has no code path that
  * generates an answer from scratch.
  *
- * user_id check is belt-and-braces in addition to RLS on application_answers.
+ * user_id check is belt-and-braces in addition to RLS on application_items.
  */
 export async function saveAnswer(
   answerId: string,
@@ -535,7 +538,7 @@ export async function saveAnswer(
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
   const { error } = await supabase
-    .from('application_answers')
+    .from('application_items')
     .update({
       answer_text: answerText,
       answer_source: answerSource,
@@ -555,7 +558,7 @@ export async function saveAnswer(
 // ---------------------------------------------------------------------------
 
 /**
- * Sets is_approved = true on a single application_answers row.
+ * Sets is_approved = true on a single application_items row.
  * Called from Step 4 when the user clicks "Approve this answer" after
  * reviewing all three FR-32 review prompts. Resets to false if the user
  * subsequently edits the answer (handled client-side via unapproveAnswer).
@@ -570,7 +573,7 @@ export async function approveAnswer(answerId: string): Promise<SaveAnswerResult>
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
   const { error } = await supabase
-    .from('application_answers')
+    .from('application_items')
     .update({ is_approved: true })
     .eq('id', answerId)
     .eq('user_id', user.id)
@@ -585,7 +588,7 @@ export async function approveAnswer(answerId: string): Promise<SaveAnswerResult>
 /**
  * Upserts a single manually-entered question + answer.
  * Used when no questions were extracted from the guidelines.
- * V1 supports one manual question (question_order = 1).
+ * V1 supports one manual question (item_order = 1).
  * ON CONFLICT updates the row so re-submitting the form is idempotent.
  */
 export async function saveManualAnswer(
@@ -605,16 +608,18 @@ export async function saveManualAnswer(
     return { ok: false, error: 'Please enter your application question.' }
   }
 
-  const { error } = await supabase.from('application_answers').upsert(
+  const { error } = await supabase.from('application_items').upsert(
     {
       application_id: applicationId,
       user_id: user.id,
-      question_text: questionText.trim(),
-      question_order: 1,
+      item_type: 'narrative',
+      source_of_truth: 'user_input',
+      item_label: questionText.trim(),
+      item_order: 1,
       answer_text: answerText.trim() || null,
       answer_source: 'user_written',
     },
-    { onConflict: 'application_id,question_order' },
+    { onConflict: 'application_id,item_order' },
   )
 
   if (error) {
@@ -710,13 +715,13 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
     return { ok: false, error: 'Application is not ready to assemble.' }
   }
 
-  // ── Fetch answered questions in order ─────────────────────────────────────
+  // ── Fetch answered items in order ──────────────────────────────────────────
   const { data: answerRows, error: answersError } = await supabase
-    .from('application_answers')
-    .select('question_order, question_text, answer_text')
+    .from('application_items')
+    .select('item_order, item_label, answer_text')
     .eq('application_id', applicationId)
     .eq('user_id', user.id)
-    .order('question_order')
+    .order('item_order')
 
   if (answersError) {
     return { ok: false, error: 'Could not load your answers. Please try again.' }
@@ -748,8 +753,8 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
     assembledDraft = answered
       .map((r) =>
         funderType === 'free_form'
-          ? `${r.question_text}\n\n${r.answer_text}`
-          : `${r.question_order}. ${r.question_text}\n\n${r.answer_text}`,
+          ? `${r.item_label}\n\n${r.answer_text}`
+          : `${r.item_order}. ${r.item_label}\n\n${r.answer_text}`,
       )
       .join('\n\n---\n\n')
   }
@@ -783,7 +788,7 @@ export type ApproveApplicationResult = { ok: true } | { ok: false; error: string
 /**
  * Approves an application:
  *   1. Sets applications.status = 'approved'
- *   2. Sets is_approved = true on all application_answers rows
+ *   2. Sets is_approved = true on all application_items rows
  *
  * The client updates local state after receiving { ok: true }.
  * updated_at is managed by the database trigger on both tables.
@@ -821,7 +826,7 @@ export type ReopenApplicationResult = { ok: true } | { ok: false; error: string 
  *   2. Sets applications.current_step = 4 (Draft Answers)
  *   3. Resets draft_status = 'in_progress' (clears 'assembled' / 'ready_to_assemble')
  *   4. Clears assembled_draft (will be regenerated when user re-assembles)
- *   5. Resets is_approved = false on all application_answers rows
+ *   5. Resets is_approved = false on all application_items rows
  *
  * draft_status must be reset so the Step 4 gate shows the Q&A interface
  * rather than immediately redirecting back to Step 5 (S6.8 gate fix).

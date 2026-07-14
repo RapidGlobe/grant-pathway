@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-14 — P6.2 built: application_answers → application_items (item-graph model, compatibility mode)
+
+Built the typed item-graph schema decided in `ADR-DATA-006` and `ADR-DATA-007`, replacing `application_answers` outright rather than extending it (migration `20260714000000`, `grant-pathway-dev` only — `grant-pathway-prod` stays untouched and unlinked until P5.4). Compatibility mode: only `item_type = 'narrative'` is populated — the new schema's other nine item types (`data`, `date`, `number`, `table`, `file`, `consent`, `eligibility_gate`, `scoring_criterion`, `manual_action`) exist in the enum but are not yet produced by any code path; that is P6.3 onward, funder by funder.
+
+**Schema:** `question_text`/`question_order` renamed to `item_label`/`item_order`. New columns: `item_type`, `visibility_condition`, `source_of_truth`, `validation_mode`, `rubric_criterion_link` (no FK yet — the rubric table doesn't exist until P6.5), `decision_maker_visible`, `output_mode`, `guideline_reference`. Two decisions enforced at the database layer rather than left to application-code convention: `output_mode` is `CHECK`-constrained to `generic_export` only (`native_template_fill` is permanently out of scope per ADR-DATA-006's 2026-07-11 amendment — this makes that boundary real, not just documented), and `guideline_reference` is `CHECK`-constrained to ADR-DATA-007's discriminated-union shape (`source_type` XOR `page_number`/`heading_path`, `quote` always required when present).
+
+**Migration approach:** new table created, all 169 existing rows copied across as `item_type = 'narrative'` with zero information loss (verified by direct query — all 13 items of the MK Community Foundation — Oak Grants test application intact: labels, order, approval state, answer source), old table dropped. Chosen over an in-place `ALTER TABLE` rename because the shape change is large enough that a side-by-side compare-then-drop is safer than reshaping in place, and this is dev-only so there's no data-preservation cost to the cleaner approach. `funders.funder_type` also dropped in the same migration — ADR-DATA-006 consequence 5, formally superseding DR-FD-001 rather than leaving the column as unused cleanup.
+
+**Blast radius:** the `approve_application`/`reopen_application` Postgres RPCs and seven application code files (`actions/applications.ts`, both Step 4/5 pages, the export/refine-answer/account-delete/cron-inactivity-deletion routes) all had to be repointed at the new table/columns in the same change, plus `supabase/seed.sql`. `tsc --noEmit`, `eslint --max-warnings 0`, and all 22 Vitest tests pass clean.
+
+**Files changed:** `supabase/migrations/20260714000000_p6_2_application_item_graph.sql` (new), `supabase/seed.sql`, `lib/database.types.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `app/(authenticated)/applications/[id]/step/5/page.tsx`, `app/api/export/[applicationId]/route.ts`, `app/api/refine-answer/route.ts`, `app/api/account/delete/route.ts`, `app/api/cron/inactivity-deletion/route.ts`, `components/application-step4-prep-checklist.tsx`, `docs/data-model.md` (v1.7), `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.10), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-13 — P6.2 environment scoping confirmed: dev only
 
 Confirmed with WJ rather than assumed: P6.2 follows the same convention as P6.1 — applied only to `grant-pathway-dev`, with `grant-pathway-prod` untouched and unlinked until P5.4. Worth an explicit confirmation rather than inheriting the P6.1 precedent silently, since P6.2's migration is far larger in scope (it supersedes `application_answers` entirely, rather than adding five nullable columns) — the blast radius of getting this assumption wrong would be much bigger than it was for P6.1.

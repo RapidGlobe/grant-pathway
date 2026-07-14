@@ -159,11 +159,11 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
   // ── Fetch answers ──────────────────────────────────────────────────────────
   const { data: answers, error: answersError } = await supabase
-    .from('application_answers')
-    .select('question_order, question_text, answer_text')
+    .from('application_items')
+    .select('item_order, item_label, answer_text')
     .eq('application_id', applicationId)
     .eq('user_id', user.id)
-    .order('question_order')
+    .order('item_order')
 
   if (answersError || !answers) {
     return NextResponse.json({ error: 'Could not fetch answers' }, { status: 500 })
@@ -216,8 +216,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       lines.push(assembledDraft)
     } else {
       for (const answer of answers) {
-        const qNum = answer.question_order as number
-        const qText = (answer.question_text as string) ?? ''
+        const qNum = answer.item_order as number
+        const qText = (answer.item_label as string) ?? ''
         const aText = (answer.answer_text as string) ?? ''
         lines.push(`Question ${qNum}: ${qText}`)
         lines.push('')
@@ -385,8 +385,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 }),
               ])
             : answers.flatMap((answer) => {
-                const qNum = answer.question_order as number
-                const qText = (answer.question_text as string) ?? ''
+                const qNum = answer.item_order as number
+                const qText = (answer.item_label as string) ?? ''
                 const aText = (answer.answer_text as string) ?? ''
                 return [
                   new Paragraph({

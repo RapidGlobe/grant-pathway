@@ -14,7 +14,7 @@
 // general advice and the other is this specific funder's stated requirement.
 //
 // On "I have what I need — start writing": calls setDraftInProgress(), which sets
-// draft_status = 'in_progress' AND syncs application_answers from ai_summary, then
+// draft_status = 'in_progress' AND syncs application_items from ai_summary, then
 // returns { ok: true }. The client uses window.location.href for a hard navigation
 // (bypasses Next.js Router Cache) so Step 4 renders fresh with the synced rows
 // (D-HSF-03 fix — AC-FR-28-01, AC-FR-28-02).

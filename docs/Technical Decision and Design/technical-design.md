@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.10
+**Version:** 1.11
 **Date:** 2026-04-21
-**Last updated:** 2026-07-13
+**Last updated:** 2026-07-14
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -333,13 +333,12 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 | ---------------- | ------------- | -------------------------------------------- |
 | `id`             | `uuid`        | PK, default `gen_random_uuid()`              |
 | `name`           | `text`        | Not null, unique                             |
-| `funder_type`    | `text`        | `structured \| narrative`                    |
 | `grant_range`    | `text`        | Nullable — display string (e.g. "£10k–£30k") |
 | `guidelines_url` | `text`        | Nullable                                     |
 | `is_active`      | `boolean`     | Not null, default `true`                     |
 | `created_at`     | `timestamptz` | Default `now()`                              |
 
-**Forward reference:** `funder_type` was dropped from the Step 1 picker UI (DR-FD-001, 2026-07-04) after being found not to reflect a stable property of any funder; the column was left in place, unused. **ADR-DATA-006** (2026-07-05) formally supersedes it as part of a broader rearchitecture (a typed item-graph model, not yet built) — the column may now be dropped entirely once that work lands. This table describes the schema as it exists in production today.
+**`funder_type` dropped (P6.2, migration `20260714000000`):** this column (`structured \| narrative`) was dropped from the Step 1 picker UI (DR-FD-001, 2026-07-04) after being found not to reflect a stable property of any funder, left in place afterwards, unused. **ADR-DATA-006** (2026-07-05) formally superseded it as part of the item-graph rearchitecture; the P6.2 migration dropped the column outright.
 
 #### `applications`
 
@@ -361,30 +360,39 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 `mismatch` is a terminal status — no transitions to steps 4 or 5 are permitted from this state (FR-47, DR-EL-001).
 
-#### `application_answers`
+#### `application_items`
 
-| Column               | Type          | Constraints                                                                                                                                                                                              |
-| -------------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                 | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                                                                          |
-| `application_id`     | `uuid`        | FK → `applications(id)`                                                                                                                                                                                  |
-| `user_id`            | `uuid`        | FK → `auth.users(id)` (denormalised for RLS)                                                                                                                                                             |
-| `question_text`      | `text`        | Not null                                                                                                                                                                                                 |
-| `question_type`      | `text`        | `narrative \| data_entry \| financial \| dropdown \| date \| file_upload`                                                                                                                                |
-| `question_order`     | `integer`     | Not null — unique per `(application_id, question_order)`                                                                                                                                                 |
-| `word_limit`         | `integer`     | Nullable — set when `limit_type = 'words'`                                                                                                                                                               |
-| `char_limit`         | `integer`     | Nullable — set when `limit_type = 'characters'`                                                                                                                                                          |
-| `limit_type`         | `text`        | `words \| characters \| none`                                                                                                                                                                            |
-| `answer_text`        | `text`        | Nullable                                                                                                                                                                                                 |
-| `answer_source`      | `text`        | `user_written \| user_edited \| ai_assisted`                                                                                                                                                             |
-| `ai_refined_answer`  | `text`        | Nullable — AI-suggested improved version, shown in the "Suggested improvement" card; kept separate from `answer_text` so the original is never overwritten without an explicit "Use this version" action |
-| `is_budget_question` | `boolean`     | Not null, default `false` — disables AI assist on this row                                                                                                                                               |
-| `is_approved`        | `boolean`     | Not null, default `false` — set in the Step 4 review gate                                                                                                                                                |
-| `created_at`         | `timestamptz` | Default `now()`                                                                                                                                                                                          |
-| `updated_at`         | `timestamptz` | Default `now()`                                                                                                                                                                                          |
+**Replaces `application_answers` (P6.2, migration `20260714000000`).** Compatibility mode: only `item_type = 'narrative'` is populated today; the other nine item types exist in the enum but are unused until P6.3 onward. See **ADR-DATA-006** (item-graph model) and **ADR-DATA-007** (guideline reference/citation shape).
 
-**Note on free_form funders:** For narrative (free_form) funders, `question_text` stores the section title (e.g. "About your organisation"). Section guidance text is re-derived on each Step 4 page load from `applications.ai_summary.sections[i].guidance`, matched by `question_order`. This avoids data duplication and keeps guidance in sync with the AI summary.
+| Column                   | Type          | Constraints                                                                                                                                                                                              |
+| ------------------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                     | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                                                                          |
+| `application_id`         | `uuid`        | FK → `applications(id)`                                                                                                                                                                                  |
+| `user_id`                | `uuid`        | FK → `auth.users(id)` (denormalised for RLS)                                                                                                                                                             |
+| `item_type`              | `text` (enum) | `narrative \| data \| date \| number \| table \| file \| consent \| eligibility_gate \| scoring_criterion \| manual_action` — always `narrative` today                                                   |
+| `item_label`             | `text`        | Not null — item's prompt/label (was `question_text`)                                                                                                                                                     |
+| `item_order`             | `integer`     | Not null — unique per `(application_id, item_order)` (was `question_order`)                                                                                                                              |
+| `visibility_condition`   | `jsonb`       | Nullable — branching condition (R2/R3); always null today                                                                                                                                                |
+| `source_of_truth`        | `text` (enum) | `user_input \| charity_profile \| derived \| disclosure` — always `user_input` today                                                                                                                     |
+| `validation_mode`        | `text` (enum) | Nullable — `hard_check \| judgement_flag`; always null today                                                                                                                                             |
+| `rubric_criterion_link`  | `uuid`        | Nullable — no FK yet, target table doesn't exist until P6.5                                                                                                                                              |
+| `decision_maker_visible` | `boolean`     | Not null, default `true` (R20) — always `true` today                                                                                                                                                     |
+| `output_mode`            | `text` (enum) | Not null, default `generic_export` — `CHECK (output_mode = 'generic_export')`; `native_template_fill` is permanently out of scope (ADR-DATA-006 2026-07-11 amendment), enforced at the DB layer          |
+| `guideline_reference`    | `jsonb`       | Nullable — ADR-DATA-007 discriminated union (`source_type`, `page_number`/`heading_path`, `quote`), `CHECK`-enforced; always null today, populated once P6.3 lands                                       |
+| `word_limit`             | `integer`     | Nullable — set when `limit_type = 'words'`                                                                                                                                                               |
+| `char_limit`             | `integer`     | Nullable — set when `limit_type = 'characters'`                                                                                                                                                          |
+| `limit_type`             | `text`        | `words \| characters \| none`                                                                                                                                                                            |
+| `is_budget_question`     | `boolean`     | Not null, default `false` — disables AI assist on this row                                                                                                                                               |
+| `answer_text`            | `text`        | Nullable                                                                                                                                                                                                 |
+| `ai_refined_answer`      | `text`        | Nullable — AI-suggested improved version, shown in the "Suggested improvement" card; kept separate from `answer_text` so the original is never overwritten without an explicit "Use this version" action |
+| `answer_source`          | `text`        | `user_written \| user_edited \| ai_generated`                                                                                                                                                            |
+| `is_approved`            | `boolean`     | Not null, default `false` — set in the Step 4 review gate                                                                                                                                                |
+| `created_at`             | `timestamptz` | Default `now()`                                                                                                                                                                                          |
+| `updated_at`             | `timestamptz` | Default `now()`                                                                                                                                                                                          |
 
-**Forward reference:** `question_type` exists for BD-04 (question-level typing) but only `narrative` is populated in practice — extraction (`lib/prompts.ts`) explicitly discards non-narrative and conditional questions rather than classifying them. A nine-funder review (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found this flat, narrative-only model false in twenty distinct ways (R1–R20). **ADR-DATA-006** (2026-07-05) decides a typed item-graph model to replace this table — items of multiple types (narrative, data, date, number, table, file, consent, eligibility gate, scoring criterion, manual action), visibility conditions for branching, hard-vs-judgement rule flags, rubric-criterion links, and a decision-maker-visibility flag — populated via AI-drafted, human-reviewed playbooks per funder rather than live unsupervised extraction. Not yet built; see `docs/BRD plus decisions Mark Two/build-plan-any-guideline-or-form.md` for phased sequencing. This section describes the schema as it exists in production today.
+**Note on free_form funders:** For narrative (free_form) funders, `item_label` stores the section title (e.g. "About your organisation"). Section guidance text is re-derived on each Step 4 page load from `applications.ai_summary.sections[i].guidance`, matched by `item_order`. This avoids data duplication and keeps guidance in sync with the AI summary.
+
+**Predecessor (`application_answers`, superseded 2026-07-14):** carried a `question_type` column for BD-04 (question-level typing) that was never populated beyond `narrative` in practice — extraction (`lib/prompts.ts`) explicitly discarded non-narrative and conditional questions rather than classifying them. A nine-funder review (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found this flat, narrative-only model false in twenty distinct ways (R1–R20), which is what **ADR-DATA-006** (2026-07-05) replaced it for. All 169 existing rows were copied across as `item_type = 'narrative'` with zero information loss, verified against the MK Community Foundation — Oak Grants test application before the old table was dropped.
 
 #### `ai_usage_log`
 
@@ -399,14 +407,14 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 ### Row Level Security policies
 
-| Table                 | SELECT                  | INSERT   | UPDATE   | DELETE   |
-| --------------------- | ----------------------- | -------- | -------- | -------- |
-| `user_profiles`       | Own rows                | Own rows | Own rows | Own rows |
-| `charity_profiles`    | Own rows                | Own rows | Own rows | Own rows |
-| `funders`             | Active rows (all users) | ✗ Denied | ✗ Denied | ✗ Denied |
-| `applications`        | Own rows                | Own rows | Own rows | Own rows |
-| `application_answers` | Own rows                | Own rows | Own rows | Own rows |
-| `ai_usage_log`        | Own rows                | Own rows | ✗ Denied | ✗ Denied |
+| Table               | SELECT                  | INSERT   | UPDATE   | DELETE   |
+| ------------------- | ----------------------- | -------- | -------- | -------- |
+| `user_profiles`     | Own rows                | Own rows | Own rows | Own rows |
+| `charity_profiles`  | Own rows                | Own rows | Own rows | Own rows |
+| `funders`           | Active rows (all users) | ✗ Denied | ✗ Denied | ✗ Denied |
+| `applications`      | Own rows                | Own rows | Own rows | Own rows |
+| `application_items` | Own rows                | Own rows | Own rows | Own rows |
+| `ai_usage_log`      | Own rows                | Own rows | ✗ Denied | ✗ Denied |
 
 "Own rows" = `user_id = auth.uid()`. UPDATE and DELETE are denied on `ai_usage_log` to prevent users from deleting their usage history to bypass the monthly AI request limit. `funders` INSERT/UPDATE/DELETE is restricted to the service role only.
 
@@ -422,13 +430,13 @@ The monthly usage check is performed via three `SECURITY DEFINER` Supabase RPC f
 
 Funder guidelines text is **never** written to the database or to Supabase Storage permanently. It is extracted from the uploaded file, held in `sessionStorage` during the session, passed in the POST body to the AI API route, and discarded after the response returns. This remains the accurate description of current production behaviour — the paragraph above is not yet superseded in code.
 
-**Reversal note (ADR-DATA-002, 2026-07-10):** The premise behind "never store" — that funder guidelines "may contain commercially sensitive information" — was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false: these are funders' own publicly published application guidance. The decision is formally reversed: once the Phase 6 guideline source-reference feature ships (P6.2a groundwork, then P6.2/P6.3), extracted/page-tagged guideline **text** (never the raw PDF/Word file) will be stored in Postgres — for the life of the owning application (cascade-deletes per `ADR-DATA-003`, same as `application_answers`), or indefinitely when the text backs an approved playbook (`P6.5`), independent of any user's lifecycle. No calendar-based expiry job is introduced. Until P6.2a/P6.2 are built, the `sessionStorage` behaviour described above continues to apply unchanged; the raw-file handling in "Orphaned file protection" below is likewise unaffected — no raw guideline file is ever stored under either the old or new decision.
+**Reversal note (ADR-DATA-002, 2026-07-10):** The premise behind "never store" — that funder guidelines "may contain commercially sensitive information" — was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false: these are funders' own publicly published application guidance. The decision is formally reversed: once the Phase 6 guideline source-reference feature ships (P6.2a groundwork, then P6.2/P6.3), extracted/page-tagged guideline **text** (never the raw PDF/Word file) will be stored in Postgres — for the life of the owning application (cascade-deletes per `ADR-DATA-003`, same as `application_items`), or indefinitely when the text backs an approved playbook (`P6.5`), independent of any user's lifecycle. No calendar-based expiry job is introduced. Until P6.2a is built, the `sessionStorage` behaviour described above continues to apply unchanged; the raw-file handling in "Orphaned file protection" below is likewise unaffected — no raw guideline file is ever stored under either the old or new decision.
 
 ### Data retention
 
-All data is retained for the lifetime of the user account. Account deletion cascades through all tables in order: `application_answers` → `applications` → `charity_profiles` → `ai_usage_log` → `user_profiles` → Supabase Auth user. Deletion is permanent and immediate. (ADR-DATA-003)
+All data is retained for the lifetime of the user account. Account deletion cascades through all tables in order: `application_items` → `applications` → `charity_profiles` → `ai_usage_log` → `user_profiles` → Supabase Auth user. Deletion is permanent and immediate. (ADR-DATA-003)
 
-**Forward reference (ADR-DATA-003, 2026-07-10):** The cascade rule above is planned to extend to two Phase 6 tables not yet built (names TBD until `P6.2`/`P6.5` land): retained guideline-chunk rows will cascade-delete with their owning application like `application_answers`; playbook rows will be excluded from any single user's cascade, matching the non-user-scoped `funders` table today. This section describes the schema and cascade order as they exist in production today.
+**Forward reference (ADR-DATA-003, 2026-07-10):** The cascade rule above is planned to extend to one further Phase 6 table not yet built (name TBD until `P6.5` lands): retained guideline-chunk rows will cascade-delete with their owning application like `application_items`; playbook rows will be excluded from any single user's cascade, matching the non-user-scoped `funders` table today. This section describes the schema and cascade order as they exist in production today.
 
 ### Migrations
 
@@ -486,8 +494,8 @@ The five-step application flow uses URL-based step routing. (ADR-ARCH-004)
 | `/applications/[id]/step/1` | Authenticated, SSR | `applications` table                      |
 | `/applications/[id]/step/2` | Authenticated, SSR | `applications` table                      |
 | `/applications/[id]/step/3` | Authenticated, SSR | `applications.ai_summary`                 |
-| `/applications/[id]/step/4` | Authenticated, SSR | `applications`, `application_answers`     |
-| `/applications/[id]/step/5` | Authenticated, SSR | `applications`, `application_answers`     |
+| `/applications/[id]/step/4` | Authenticated, SSR | `applications`, `application_items`       |
+| `/applications/[id]/step/5` | Authenticated, SSR | `applications`, `application_items`       |
 | `/account`                  | Authenticated, SSR | `user_profiles`                           |
 
 ---
@@ -782,7 +790,7 @@ Step 5 allows the user to download their completed application as a Microsoft Wo
 
 1. Middleware verifies the user session (unauthenticated → 401)
 2. Route confirms `applications.user_id = auth.uid()` for the given ID (not the owner → 403)
-3. Fetches application details and all `application_answers` rows
+3. Fetches application details and all `application_items` rows
 4. Generates `.docx` in memory using the `docx` npm library
 5. Returns the file as a streaming download
 
@@ -1092,6 +1100,7 @@ The following one-time tasks must be completed before the first production deplo
 | 1.8     | 2026-07-05 | Rapidglobe Ltd | Added forward-reference notes to the `funders` and `application_answers` schema sections pointing at ADR-DATA-006 (Application Item-Graph Model) — a decided but not-yet-built rearchitecture superseding `funder_type` and the flat `application_answers` structure. No schema change; the tables documented here remain the accurate current-production state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 | 1.9 | 2026-07-10 | Rapidglobe Ltd | Documented the reversal of ADR-DATA-002 ("never store" funder guidelines): the "commercially sensitive information" premise was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false — these are funders' own publicly published guidance. Added a reversal note under "Data not stored" and a forward-reference note under "Guidelines session storage" explaining that extracted guideline text will be retained in Postgres (application-scoped cascade per ADR-DATA-003, or indefinite for approved playbooks) once the Phase 6 P6.2a/P6.2/P6.3 work ships; also added a forward-reference note under "Data retention" for the two new Phase 6 tables. No code has changed — `sessionStorage` and "never stored" remain the accurate current-production behaviour until that Phase 6 work lands |
+| 1.11 | 2026-07-14 | Rapidglobe Ltd | **P6.2 built** — §6 `application_answers` schema section replaced with `application_items` (item-graph model, compatibility mode; migration `20260714000000`, `grant-pathway-dev` only): `question_text`/`question_order` renamed to `item_label`/`item_order`; new columns `item_type`, `visibility_condition`, `source_of_truth`, `validation_mode`, `rubric_criterion_link`, `decision_maker_visible`, `output_mode` (CHECK-constrained to `generic_export`), `guideline_reference` (ADR-DATA-007 shape, CHECK-enforced). `funders.funder_type` dropped, its forward-reference note replaced with a completion note. Cascade-deletion order, page-data-usage table, and the assemble-draft code walkthrough (§9) updated to the new table name. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14) and `docs/data-model.md` v1.7. |
 | 1.10 | 2026-07-13 | Rapidglobe Ltd | Six findings fixed from a staleness audit, per WJ: (1) `applications` schema table was missing `draft_status` and `assembled_draft` — both live in production (`data-model.md` v1.6) and were even documented here once before (added in this doc's own v1.1) but dropped during a later schema rewrite; restored, closing an internal inconsistency with §9's `setDraftReadyToAssemble`/`assembleAndAdvance` Server Actions, which only make sense with `draft_status` present. (2) Technology Stack table corrected from "Radix UI" to "Base UI", matching the live `@base-ui/react` dependency (zero Radix in `package.json`) and the same fix already made in `PDR-UI-001` and the PRD. (3) `application_answers` schema table was missing `ai_refined_answer` — added. (4) "Monthly AI usage count" only described `reserve_ai_slot`; added the other two RPCs from the same migration (`update_ai_slot_token_count`, `cancel_ai_slot`) and named the `pg_advisory_xact_lock` mechanism specifically. (5) De-versioned three forward-looking AI-model mentions (Technology Stack table, §11 Provider/Model bullets, §16 Pre-Launch Checklist) to "the latest Claude Sonnet model" per the project's model de-versioning policy -- the `lib/prompts.ts` code snippet's literal `MODEL` constant value was correctly left as-is. (6) Added a forward-reference note under `charity_profiles` for `P6.1`'s five governance/financial columns (dev-only, not yet in production), matching this document's existing forward-reference pattern for other not-yet-built work. |
 
 ---

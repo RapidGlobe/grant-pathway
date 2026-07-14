@@ -175,8 +175,8 @@ Extracted application questions:
 ON CONFLICT (id) DO NOTHING;
 
 -- Answers for Application 3
-INSERT INTO public.application_answers (
-  id, application_id, user_id, question_text, question_order,
+INSERT INTO public.application_items (
+  id, application_id, user_id, item_type, source_of_truth, item_label, item_order,
   answer_text, answer_source, is_approved
 )
 VALUES
@@ -184,6 +184,8 @@ VALUES
   'e0000000-0000-0000-0000-000000000001',
   'd0000000-0000-0000-0000-000000000003',
   'a0000000-0000-0000-0000-000000000001',
+  'narrative',
+  'user_input',
   'Who do you work with and what complex issues do they face?',
   1,
   'Helping Hands Community Trust works with older adults aged 65 and over in Harrogate and the surrounding rural villages of North Yorkshire. The people we support share a common experience of isolation and loneliness — conditions that research consistently links to serious health deterioration, including increased risk of dementia, depression, and premature death.
@@ -198,6 +200,8 @@ We currently support 87 regular beneficiaries, 62% of whom live alone. Of these,
   'e0000000-0000-0000-0000-000000000002',
   'd0000000-0000-0000-0000-000000000003',
   'a0000000-0000-0000-0000-000000000001',
+  'narrative',
+  'user_input',
   'Describe your approach and explain why it works.',
   2,
   'Our approach is built on consistent, trusted human relationships — not one-off interventions. We believe that isolation is best addressed through sustained, low-pressure connection, and that the people best placed to provide this are trained volunteers from the same community.
@@ -214,6 +218,8 @@ Our model is deliberately simple and human — no complex technology, no eligibi
   'e0000000-0000-0000-0000-000000000003',
   'd0000000-0000-0000-0000-000000000003',
   'a0000000-0000-0000-0000-000000000001',
+  'narrative',
+  'user_input',
   'What are your plans for the organisation over the next three years?',
   3,
   'Over the next three years, Helping Hands Community Trust aims to deepen the quality and reach of our existing services while building the organisational foundations needed for long-term sustainability.
