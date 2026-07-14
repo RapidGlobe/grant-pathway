@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-14 — GAP-33 found while scoping P6.4: guideline-text retention was never actually built
+
+Before writing any P6.4 code, checked what its "view original guidelines" panel would actually have to render — and found nothing to render. The raw guideline file is deleted from Storage immediately after Step 2 extraction (`ADR-FILE-001`), and the extracted text only ever lives in the browser's `sessionStorage`, cleared the moment the AI summary saves (`lib/guidelines-session.ts`, `ADR-FILE-004`). Neither is retained in Postgres — only a small citation (`application_items.guideline_reference`, built in `P6.2`) is.
+
+`ADR-DATA-002`'s 2026-07-10 reversal decided guideline text _should_ be retained precisely so a citation has something to point at. `ADR-TRACEABILITY.md` carried a task pointer for this — "P6.2a (groundwork) → P6.2 (storage)" — but that pointer was written the same day as the reversal, before `P6.2`'s real task list existed. When `P6.2`'s actual bullets were written (2026-07-13) and built (2026-07-14), they only covered the item-graph and citation-shape half; "store the guideline text itself" was never added to any task, by anyone, at any point. The pointer just sat there unreconciled.
+
+**This is a planning-process gap, not a defect in P6.2's own build.** WJ asked directly whether P6.2 had been built incorrectly — it hadn't: P6.2 was built completely and correctly against what it actually promised (a typed item-graph with a citation-shape column), which is exactly what was verified, tested, and live-tested with zero regressions. The missing piece is a different, larger feature (full guideline-text retention) that a forward-looking ADR note gestured at but no task ever formally picked up.
+
+**Fixed today:** the vague `ADR-TRACEABILITY.md` pointer replaced with a properly registered gap — **⚠️ GAP-33** (High priority, in the Gaps register) — plus two adjacent rows whose "unchanged until P6.2a/P6.2 ship" wording was now stale (both have shipped, without touching this).
+
+**Left deliberately unfixed for now:** `ADR-SEC-004`'s consequence note for the P6.4 viewer says it can "fetch the file as bytes" from Storage — which contradicts `ADR-DATA-002`'s "no raw file ever stored" decision. Correcting that wording is deferred until GAP-33's actual fix is decided, so it's corrected once rather than twice.
+
+**P6.4 is now blocked** on deciding how to plug GAP-33 — a design conversation with WJ is in progress before any P6.4 code is written.
+
+**Files changed:** `docs/Implementation Plan/ADR-TRACEABILITY.md` (v2.8), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-14 — P6.3 built (first milestone): extraction now records citations, not just questions
 
 Built the third part of `ADR-DATA-007` Option B: extraction cites a specific chunk of `P6.2a`'s tagged text for each question/section, rather than free-typing a page number. Scope confirmed with WJ before coding: questions/sections only this pass (the ones feeding `application_items`) — not the Step 3 summary bullets, which have no database column to store a citation in yet and nothing displays any citation regardless (that's `P6.4`).
