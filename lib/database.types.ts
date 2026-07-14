@@ -68,6 +68,41 @@ export type Database = {
           },
         ]
       }
+      application_guidelines: {
+        Row: {
+          application_id: string
+          created_at: string
+          guideline_text: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          guideline_text: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          guideline_text?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'application_guidelines_application_id_fkey'
+            columns: ['application_id']
+            isOneToOne: true
+            referencedRelation: 'applications'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       application_items: {
         Row: {
           ai_refined_answer: string | null

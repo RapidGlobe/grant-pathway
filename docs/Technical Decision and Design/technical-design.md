@@ -4,7 +4,7 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.13
+**Version:** 1.14
 **Date:** 2026-04-21
 **Last updated:** 2026-07-14
 **Status:** Approved — all architectural decisions decided
@@ -394,6 +394,19 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 **Predecessor (`application_answers`, superseded 2026-07-14):** carried a `question_type` column for BD-04 (question-level typing) that was never populated beyond `narrative` in practice — extraction (`lib/prompts.ts`) explicitly discarded non-narrative and conditional questions rather than classifying them. A nine-funder review (`docs/BRD plus decisions Mark Two/question-coverage-analysis.md`) found this flat, narrative-only model false in twenty distinct ways (R1–R20), which is what **ADR-DATA-006** (2026-07-05) replaced it for. All 169 existing rows were copied across as `item_type = 'narrative'` with zero information loss, verified against the MK Community Foundation — Oak Grants test application before the old table was dropped.
 
+#### `application_guidelines`
+
+**GAP-33 fix (2026-07-14), migration `20260714000001`.** Retains the marker-tagged guideline text sent to the AI and validated against for citations (`P6.3`), so `P6.4`'s "view original guidelines" viewer has something real to render. `ADR-DATA-002`'s 2026-07-10 reversal decided this retention should exist, but no task ever actually built it — found while scoping `P6.4`; a planning gap, not a defect in `P6.2`'s own build (`ADR-TRACEABILITY.md` GAP-33).
+
+| Column           | Type          | Constraints                                                                                                                                          |
+| ---------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`             | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                      |
+| `application_id` | `uuid`        | FK → `applications(id)` `on delete cascade`, unique — one row per application                                                                        |
+| `user_id`        | `uuid`        | FK → `auth.users(id)` `on delete cascade` (denormalised for RLS, same convention as `application_items`)                                             |
+| `guideline_text` | `text`        | Not null — the marker-tagged (`[PAGE N]`/`[SECTION: ...]`) text as sent to the AI, post-preprocessing (`textForPrompt`), never the raw uploaded file |
+| `created_at`     | `timestamptz` | Default `now()`                                                                                                                                      |
+| `updated_at`     | `timestamptz` | Default `now()` — refreshed whenever the summary is regenerated (upsert on `application_id`)                                                         |
+
 #### `ai_usage_log`
 
 | Column           | Type          | Constraints                                |
@@ -407,14 +420,15 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 ### Row Level Security policies
 
-| Table               | SELECT                  | INSERT   | UPDATE   | DELETE   |
-| ------------------- | ----------------------- | -------- | -------- | -------- |
-| `user_profiles`     | Own rows                | Own rows | Own rows | Own rows |
-| `charity_profiles`  | Own rows                | Own rows | Own rows | Own rows |
-| `funders`           | Active rows (all users) | ✗ Denied | ✗ Denied | ✗ Denied |
-| `applications`      | Own rows                | Own rows | Own rows | Own rows |
-| `application_items` | Own rows                | Own rows | Own rows | Own rows |
-| `ai_usage_log`      | Own rows                | Own rows | ✗ Denied | ✗ Denied |
+| Table                    | SELECT                  | INSERT   | UPDATE   | DELETE   |
+| ------------------------ | ----------------------- | -------- | -------- | -------- |
+| `user_profiles`          | Own rows                | Own rows | Own rows | Own rows |
+| `charity_profiles`       | Own rows                | Own rows | Own rows | Own rows |
+| `funders`                | Active rows (all users) | ✗ Denied | ✗ Denied | ✗ Denied |
+| `applications`           | Own rows                | Own rows | Own rows | Own rows |
+| `application_items`      | Own rows                | Own rows | Own rows | Own rows |
+| `application_guidelines` | Own rows                | Own rows | Own rows | Own rows |
+| `ai_usage_log`           | Own rows                | Own rows | ✗ Denied | ✗ Denied |
 
 "Own rows" = `user_id = auth.uid()`. UPDATE and DELETE are denied on `ai_usage_log` to prevent users from deleting their usage history to bypass the monthly AI request limit. `funders` INSERT/UPDATE/DELETE is restricted to the service role only.
 
@@ -426,17 +440,19 @@ The monthly usage check is performed via three `SECURITY DEFINER` Supabase RPC f
 - `update_ai_slot_token_count` — records the actual token count against the reserved slot once the Bedrock response returns
 - `cancel_ai_slot` — releases a reserved slot without counting it, if the Bedrock call fails
 
-### Data not stored (superseded 2026-07-10 — see note below)
+### Data not stored — raw file (still accurate); guideline text (superseded 2026-07-14 — GAP-33 fix)
 
-Funder guidelines text is **never** written to the database or to Supabase Storage permanently. It is extracted from the uploaded file, held in `sessionStorage` during the session, passed in the POST body to the AI API route, and discarded after the response returns. This remains the accurate description of current production behaviour — the paragraph above is not yet superseded in code.
+The raw uploaded guideline file (PDF/Word) is **never** written to the database or retained in Supabase Storage — this remains accurate today. It is downloaded from the `guidelines-temp` bucket, extracted, and the Storage object deleted, all within the same request (`ADR-FILE-001`).
 
-**Reversal note (ADR-DATA-002, 2026-07-10):** The premise behind "never store" — that funder guidelines "may contain commercially sensitive information" — was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false: these are funders' own publicly published application guidance. The decision is formally reversed: once the Phase 6 guideline source-reference feature ships (P6.2a groundwork, then P6.2/P6.3), extracted/page-tagged guideline **text** (never the raw PDF/Word file) will be stored in Postgres — for the life of the owning application (cascade-deletes per `ADR-DATA-003`, same as `application_items`), or indefinitely when the text backs an approved playbook (`P6.5`), independent of any user's lifecycle. No calendar-based expiry job is introduced. Until P6.2a is built, the `sessionStorage` behaviour described above continues to apply unchanged; the raw-file handling in "Orphaned file protection" below is likewise unaffected — no raw guideline file is ever stored under either the old or new decision.
+The extracted guideline **text**, however, is no longer session-only: as of `application_guidelines` (GAP-33 fix, migration `20260714000001`, 2026-07-14), the marker-tagged text sent to the AI is retained in Postgres for the life of the owning application, per `ADR-DATA-002`'s 2026-07-10 reversal. `sessionStorage` (`lib/guidelines-session.ts`) is still used client-side between Step 2 and Step 3, but the text no longer vanishes once the summary saves — it is additionally persisted server-side at that point.
+
+**Reversal note (ADR-DATA-002, 2026-07-10):** The premise behind "never store" — that funder guidelines "may contain commercially sensitive information" — was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false: these are funders' own publicly published application guidance. The decision was formally reversed the same day; **the storage half of that reversal is now built** (see above) — no raw guideline file is ever stored under either the old or new decision, only extracted text.
 
 ### Data retention
 
-All data is retained for the lifetime of the user account. Account deletion cascades through all tables in order: `application_items` → `applications` → `charity_profiles` → `ai_usage_log` → `user_profiles` → Supabase Auth user. Deletion is permanent and immediate. (ADR-DATA-003)
+All data is retained for the lifetime of the user account. Account deletion cascades through all tables in order: `application_items`, `application_guidelines` → `applications` → `charity_profiles` → `ai_usage_log` → `user_profiles` → Supabase Auth user. Deletion is permanent and immediate. (ADR-DATA-003)
 
-**Forward reference (ADR-DATA-003, 2026-07-10):** The cascade rule above is planned to extend to one further Phase 6 table not yet built (name TBD until `P6.5` lands): retained guideline-chunk rows will cascade-delete with their owning application like `application_items`; playbook rows will be excluded from any single user's cascade, matching the non-user-scoped `funders` table today. This section describes the schema and cascade order as they exist in production today.
+`application_guidelines` cascade-deletes with its owning application, same as `application_items` (both have `on delete cascade` FKs); the account-deletion route also deletes it explicitly, matching the existing explicit-deletion convention for `application_items`. Playbook rows (`P6.5`, not yet built) will be excluded from any single user's cascade, matching the non-user-scoped `funders` table today.
 
 ### Migrations
 
@@ -1107,6 +1123,7 @@ The following one-time tasks must be completed before the first production deplo
 | 1.8     | 2026-07-05 | Rapidglobe Ltd | Added forward-reference notes to the `funders` and `application_answers` schema sections pointing at ADR-DATA-006 (Application Item-Graph Model) — a decided but not-yet-built rearchitecture superseding `funder_type` and the flat `application_answers` structure. No schema change; the tables documented here remain the accurate current-production state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 | 1.9 | 2026-07-10 | Rapidglobe Ltd | Documented the reversal of ADR-DATA-002 ("never store" funder guidelines): the "commercially sensitive information" premise was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false — these are funders' own publicly published guidance. Added a reversal note under "Data not stored" and a forward-reference note under "Guidelines session storage" explaining that extracted guideline text will be retained in Postgres (application-scoped cascade per ADR-DATA-003, or indefinite for approved playbooks) once the Phase 6 P6.2a/P6.2/P6.3 work ships; also added a forward-reference note under "Data retention" for the two new Phase 6 tables. No code has changed — `sessionStorage` and "never stored" remain the accurate current-production behaviour until that Phase 6 work lands |
+| 1.14 | 2026-07-14 | Rapidglobe Ltd | **GAP-33 fixed** — new §6 `application_guidelines` table (migration `20260714000001`): retains the marker-tagged guideline text sent to the AI, so `P6.4`'s viewer has something real to render. `ADR-DATA-002`'s 2026-07-10 reversal decided this should exist; no task ever built it until now (a planning gap, not a P6.2 defect — confirmed with WJ). "Data not stored"/"Data retention" sections corrected: guideline text is no longer session-only. RLS table and account-deletion cascade order updated. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14) and `docs/data-model.md` v1.8. |
 | 1.13 | 2026-07-14 | Rapidglobe Ltd | **P6.3 built (first milestone)** — "Prompt architecture" section gained a "Citation recording" note: `buildSummaryPrompt` now requests a citation per question/section pointing at `P6.2a`'s markers; new `lib/guideline-citations.ts` validates every citation against real markers before it reaches `application_items.guideline_reference`, dropping (never trusting) any that don't check out. No API contract change beyond the new optional `citation` field on each question/section. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14). |
 | 1.12 | 2026-07-14 | Rapidglobe Ltd | **P6.2a built** — "Text extraction" section (§ under Guideline Upload Flow) gained a "Structural tagging" note: PDF extraction now per-page with `[PAGE N]` markers (was `mergePages: true`); docx now via `mammoth.convertToHtml` with `[SECTION: A > B]` markers from Word heading styles (was `extractRawText`, headingless); pasted text gets the same section markers in `lib/preprocess-text.ts` via a heading heuristic. Truncation and noise-stripping in `preprocessText` made marker-aware (ADR-AI-007). No API contract or `sessionStorage` shape change — extraction result is still a plain string, now with embedded markers; nothing consumes them yet (`P6.3`). Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14). |
 | 1.11 | 2026-07-14 | Rapidglobe Ltd | **P6.2 built** — §6 `application_answers` schema section replaced with `application_items` (item-graph model, compatibility mode; migration `20260714000000`, `grant-pathway-dev` only): `question_text`/`question_order` renamed to `item_label`/`item_order`; new columns `item_type`, `visibility_condition`, `source_of_truth`, `validation_mode`, `rubric_criterion_link`, `decision_maker_visible`, `output_mode` (CHECK-constrained to `generic_export`), `guideline_reference` (ADR-DATA-007 shape, CHECK-enforced). `funders.funder_type` dropped, its forward-reference note replaced with a completion note. Cascade-deletion order, page-data-usage table, and the assemble-draft code walkthrough (§9) updated to the new table name. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14) and `docs/data-model.md` v1.7. |

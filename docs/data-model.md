@@ -33,7 +33,8 @@ users (Supabase Auth)
   │
   ├──< applications            (many per user)
   │       │    └── funder_id → funders
-  │       └──< application_items   (many per application; item-graph model, ADR-DATA-006)
+  │       ├──< application_items       (many per application; item-graph model, ADR-DATA-006)
+  │       └──< application_guidelines  (one per application; retained guideline text, GAP-33)
   │
   └──< ai_usage_log            (many per user)
 ```
@@ -273,6 +274,29 @@ Stores the grant application record. Each application belongs to one user and tr
 
 ---
 
+## 4a. application_guidelines
+
+**GAP-33 fix (2026-07-14), migration `20260714000001`.** Stores the extracted, page/section-marker-tagged guideline text for an application — exactly the text sent to the AI and validated against for citations (P6.3), so P6.4's "view original guidelines" viewer has something real to render. One row per application, refreshed on every summary regeneration.
+
+Fixes a planning gap, not a code defect: **ADR-DATA-002**'s 2026-07-10 reversal decided this retention should exist, but no task ever actually built it until now — `application_items.guideline_reference` (P6.2) only stores a short citation, never the underlying document text. See `ADR-TRACEABILITY.md`'s GAP-33 entry for the full history.
+
+| Field            | Type      | Required | Notes                                                                                                                                                                                      |
+| ---------------- | --------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`             | UUID      | Yes      | Primary key                                                                                                                                                                                |
+| `application_id` | UUID      | Yes      | Foreign key → `applications.id`, unique (one row per application)                                                                                                                          |
+| `user_id`        | UUID      | Yes      | Foreign key → `auth.users.id`. Denormalised, same RLS convention as `application_items`                                                                                                    |
+| `guideline_text` | Text      | Yes      | The marker-tagged (`[PAGE N]`/`[SECTION: ...]`) guideline text as sent to the AI, post-preprocessing — not the raw uploaded file, which is never retained (`ADR-DATA-002`, `ADR-FILE-001`) |
+| `created_at`     | Timestamp | Yes      | Set when first retained (Step 3, summary generation)                                                                                                                                       |
+| `updated_at`     | Timestamp | Yes      | Updated whenever the summary is regenerated and the text refreshes                                                                                                                         |
+
+**Key constraints:**
+
+- `application_id` is unique — one retained-text row per application, upserted on every summary regeneration
+- Cascade-deletes with the owning `application` (`ADR-DATA-003`), and with the owning user's account deletion
+- No calendar-based expiry — retained for the life of the owning application, per `ADR-DATA-002`'s reversal
+
+---
+
 ## 5. ai_usage_log
 
 Tracks every AI API request made by each user. Used to enforce the monthly per-user request limit (50 requests/month) and to monitor running costs (PDR-AI-005).
@@ -364,6 +388,7 @@ The following are explicitly **not** stored in the database:
 | 1.4     | 2026-07-05 | Rapidglobe Ltd | P6.1 (ADR-DATA-006, R13): `total_expenditure`, `reserves`, and new section 2.4a (governance facts: `trustees_related`, `bank_signatory_count`, `bank_signatories_related`) added to `charity_profiles` — migration `20260705000000`, dev only. Implementation note added clarifying which section-2 fields are actually built versus documented-but-unimplemented target state (a pre-existing gap, not introduced by this change).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 1.5     | 2026-07-10 | Rapidglobe Ltd | `ai_usage_log.request_type` enum row corrected: added missing `refine_answer` (the value actually inserted by the live `/api/refine-answer` route) and `assemble_draft`; row previously omitted `refine_answer` entirely. Note added clarifying which enum values are written by live code today versus dead (`draft_generation`, tied to the `/api/generate-draft` route deleted 2026-07-01).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 1.6     | 2026-07-13 | Rapidglobe Ltd | Full review against live migrations. Five gaps found and fixed: (1) `applications` was missing `draft_status` and `assembled_draft` (migration `20260528000000`) -- added. (2) `application_answers` was missing `user_id` (denormalised for RLS, present since the initial schema) and `ai_refined_answer` (same migration as (1)) -- added. (3) Documented the `approve_application`/`reopen_application` Postgres functions (migration `20260701000000`) that actually drive Step 5 approval and re-opening as single transactions -- previously undocumented anywhere. (4) Corrected the `ai_usage_log` monthly-cap description, which understated the real mechanism as a simple count-then-insert check; the real enforcement is three atomic RPC functions using a Postgres advisory lock (migration `20260622000002`, a launch-blocker race-condition fix) -- documented in full. (5) Added a note on the `guidelines-temp` Supabase Storage bucket, real transient file-upload infrastructure with no prior mention in this document. |
+| 1.8     | 2026-07-14 | Rapidglobe Ltd | **GAP-33 fixed (ADR-DATA-002; migration `20260714000001`, `grant-pathway-dev` only).** New Section 4a: `application_guidelines` — retains the marker-tagged guideline text sent to the AI and validated against for citations (P6.3), so P6.4's "view original guidelines" viewer has something to render. `ADR-DATA-002`'s 2026-07-10 reversal decided this retention should exist, but no task ever actually built it — found while scoping `P6.4`, confirmed with WJ as a planning gap, not a defect in `P6.2`'s own build. One row per application, upserted on every summary regeneration, cascade-deletes with the owning application.                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.7     | 2026-07-14 | Rapidglobe Ltd | **P6.2 built (ADR-DATA-006, ADR-DATA-007; migration `20260714000000`, `grant-pathway-dev` only).** `application_answers` replaced with `application_items` (item-graph model, compatibility mode) — new table created, all rows copied across as `item_type = 'narrative'` with zero information loss, proven against MK Community Foundation — Oak Grants, old table dropped. Column renames: `question_text` → `item_label`, `question_order` → `item_order`. New columns: `item_type`, `visibility_condition`, `source_of_truth`, `validation_mode`, `rubric_criterion_link`, `decision_maker_visible`, `output_mode` (CHECK-constrained to `generic_export` only), `guideline_reference` (ADR-DATA-007 discriminated union, CHECK-enforced). `funders.funder_type` dropped (DR-FD-001 formally superseded, ADR-DATA-006 consequence 5). `approve_application`/`reopen_application` RPCs, all seven dependent application code files, and `supabase/seed.sql` repointed at the new table/columns in the same change.                        |
 
 _Last updated: 2026-07-14_

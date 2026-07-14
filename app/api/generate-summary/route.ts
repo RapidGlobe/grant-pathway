@@ -17,6 +17,11 @@
 // maxDuration = 90 seconds: Bedrock summary calls take up to ~35 s in
 // production. The default Vercel function timeout (10 s) is too short.
 // Vercel Pro required in production (ADR-AI-006, ADR-OPS-001). (🔵 P5.4)
+//
+// Also upserts application_guidelines.guideline_text (GAP-33, ADR-DATA-002
+// 2026-07-10 reversal) — the marker-tagged text citations were validated
+// against, retained so P6.4's "view original guidelines" viewer has
+// something real to render.
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
 import { z } from 'zod'
@@ -406,6 +411,25 @@ export async function POST(request: NextRequest) {
     console.error('[generate-summary] Failed to save summary:', saveError)
     // Non-fatal — return the summary to the client even if DB save failed.
     // The user can still continue; the summary will be regenerated on next visit.
+  }
+
+  // ── 8a. Retain guideline text (GAP-33, ADR-DATA-002 2026-07-10 reversal) ───
+  // Stores textForPrompt — the exact, marker-tagged text the AI was given and
+  // citations were validated against above — so P6.4's "view original
+  // guidelines" viewer has something real to render. Upserted (not inserted)
+  // so regenerating the summary refreshes the retained text, same convention
+  // as application_items. Non-fatal on failure, same as the ai_summary save.
+  const { error: guidelinesSaveError } = await supabase.from('application_guidelines').upsert(
+    {
+      application_id: applicationId,
+      user_id: user.id,
+      guideline_text: textForPrompt,
+    },
+    { onConflict: 'application_id' },
+  )
+
+  if (guidelinesSaveError) {
+    console.error('[generate-summary] Failed to retain guideline text:', guidelinesSaveError)
   }
 
   // ── 9. Commit AI usage with token count (ADR-AI-008) ──────────────────────

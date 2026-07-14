@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-14 — GAP-33 fixed: guideline-text retention built
+
+New `application_guidelines` table (migration `20260714000001`) stores `guideline_text` — the marker-tagged text sent to the AI and validated against for citations (`P6.3`'s `textForPrompt`) — one row per application, upserted in `/api/generate-summary` alongside the existing `ai_summary` save. Not the raw uploaded file, which `ADR-DATA-002`/`ADR-FILE-001` never retain.
+
+**Schema:** `id`, `application_id` (FK → `applications`, unique, cascade-deletes), `user_id` (FK → `auth.users`, cascade-deletes, denormalised for RLS same as `application_items`), `guideline_text`, `created_at`, `updated_at`. RLS restricted to own rows on all four operations, same hardened `(select auth.uid())` form as every other user-scoped table.
+
+**Verification:** since this environment has no real AWS credentials, a live Bedrock-triggered write couldn't be tested end to end. Instead, verified by direct SQL round-trip against a real test application: insert, confirm `created_at` stays fixed while `updated_at` bumps on a second upsert (proving the regeneration-refresh path), then clean up. RLS policies confirmed present and correctly scoped via `pg_policies`. `tsc --noEmit`, `eslint --max-warnings 0`, all 40 Vitest tests pass.
+
+**Also updated:** `app/api/account/delete/route.ts` now deletes `application_guidelines` explicitly alongside `application_items`, matching that route's existing explicit-deletion convention (the FK's `on delete cascade` would cover it regardless, but consistency with the documented pattern was judged worth the extra step).
+
+**New gap found, not fixed:** GAP-34 (Low priority) — Step 2/3's "guidelines are not saved" UI copy is now stale, since retention exists server-side (invisible to the user — nothing surfaces it yet, that's `P6.4`). Left for a separate, smaller pass rather than widening this fix's scope.
+
+**Files changed:** `supabase/migrations/20260714000001_gap33_application_guidelines.sql` (new), `lib/database.types.ts`, `app/api/generate-summary/route.ts`, `app/api/account/delete/route.ts`, `docs/data-model.md` (v1.8), `docs/Technical Decision and Design/technical-design.md` (v1.14), `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.13), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`, `docs/Implementation Plan/ADR-TRACEABILITY.md` (v2.9).
+
+---
+
 ## 2026-07-14 — GAP-33 found while scoping P6.4: guideline-text retention was never actually built
 
 Before writing any P6.4 code, checked what its "view original guidelines" panel would actually have to render — and found nothing to render. The raw guideline file is deleted from Storage immediately after Step 2 extraction (`ADR-FILE-001`), and the extracted text only ever lives in the browser's `sessionStorage`, cleared the moment the AI summary saves (`lib/guidelines-session.ts`, `ADR-FILE-004`). Neither is retained in Postgres — only a small citation (`application_items.guideline_reference`, built in `P6.2`) is.

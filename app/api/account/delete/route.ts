@@ -2,7 +2,7 @@
 //
 // Cascades deletion for a user-initiated account deletion request.
 // Deletion order per implementation plan:
-//   application_items → applications → charity_profiles →
+//   application_items, application_guidelines → applications → charity_profiles →
 //   ai_usage_log → user_profiles → Supabase Auth deleteUser
 //
 // Uses the service role client for admin operations and auth.admin.deleteUser.
@@ -53,7 +53,8 @@ export async function POST() {
 
   // 3. Cascade deletion in plan order
 
-  // Step 1: application_items — fetch application IDs first, then delete items
+  // Step 1: application_items, application_guidelines — fetch application IDs
+  // first, then delete both (application_guidelines added GAP-33, 2026-07-14)
   const { data: apps } = await service.from('applications').select('id').eq('user_id', userId)
 
   const appIds = apps?.map((a: { id: string }) => a.id) ?? []
@@ -66,6 +67,16 @@ export async function POST() {
 
     if (answersError) {
       console.error('[delete-account] Failed to delete application_items:', answersError)
+      return NextResponse.json({ error: 'Deletion failed. Please try again.' }, { status: 500 })
+    }
+
+    const { error: guidelinesError } = await service
+      .from('application_guidelines')
+      .delete()
+      .in('application_id', appIds)
+
+    if (guidelinesError) {
+      console.error('[delete-account] Failed to delete application_guidelines:', guidelinesError)
       return NextResponse.json({ error: 'Deletion failed. Please try again.' }, { status: 500 })
     }
   }
