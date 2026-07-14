@@ -12,19 +12,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ## Status
 
-| Section                                                      | FRs covered            | Status                                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check); AC-FR-06-04 added for the 55-minute warning dialog before auto-logout (previously undocumented, found during PRD Section 12 review) |
-| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected                                                                                                                                                                                                |
-| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria                                                                                                                                                |
-| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13; updated 2026-07-14 — FR-22 partially built (GAP-33 fix): retention itself (AC-01/02) now confirmed built, playbook-independence (AC-03) still not, AC-04 reworded to flag the resulting stale UI copy (GAP-34)                                               |
-| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-27-05 added. AC-FR-24-06 quote corrected and mechanism note updated 2026-07-14 now `P6.2a` has landed                                                                                           |
-| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                                                                                                                                                         |
-| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                                                                                                                                                          |
-| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                                                                                                                                                             |
-| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                          |
-| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                     |
-| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); summary-bullet citations and curator confirmation (`P6.5`) remain not built                                                        |
+| Section                                                      | FRs covered            | Status                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check); AC-FR-06-04 added for the 55-minute warning dialog before auto-logout (previously undocumented, found during PRD Section 12 review)                                |
+| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected                                                                                                                                                                                                                               |
+| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria                                                                                                                                                                               |
+| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13; updated 2026-07-14 — FR-22 built (GAP-33 fix): retention (AC-01/02) confirmed built; AC-03 (playbook-independent retention) permanently superseded, not pending — see `ADR-DATA-006`'s 2026-07-14 amendment; AC-04 reworded to flag the resulting stale UI copy (GAP-34)                    |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-27-05 added. AC-FR-24-06 quote corrected and mechanism note updated 2026-07-14 now `P6.2a` has landed                                                                                                                          |
+| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                                                                                                                                                                                        |
+| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                                                                                                                                                                                         |
+| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                                                                                                                                                                                            |
+| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                                                         |
+| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                                                    |
+| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); summary-bullet citations remain not built; human curator confirmation (`P6.5`) is permanently superseded, not pending — see `ADR-DATA-007`'s 2026-07-14 amendment |
 
 ---
 
@@ -1081,7 +1081,7 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ### FR-22 — Must Have
 
-**Requirement:** Funder guideline text shall be retained for the life of the application it belongs to (cascade-deleting with that application, per `ADR-DATA-003`), or indefinitely where it backs an approved playbook (`P6.5`). Only extracted, page/section-tagged text is stored in Postgres — the raw uploaded PDF or Word file is never stored in Supabase Storage.
+**Requirement:** Funder guideline text shall be retained for the life of the application it belongs to (cascade-deleting with that application, per `ADR-DATA-003`). Only extracted, page/section-tagged text is stored in Postgres — the raw uploaded PDF or Word file is never stored in Supabase Storage. (The original "or indefinitely where it backs an approved playbook" clause described a shared, curator-approved playbook concept superseded before build — see `ADR-DATA-006`'s 2026-07-14 amendment. `P6.5`'s reuse feature copies a fresh, independent, still application-scoped copy into each new application a charity chooses to carry it into, rather than one record living indefinitely.)
 
 _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" section, which formally reverses this ADR's original 2026-04-17 "never store" decision (kept intact in that ADR for the historical record, not rewritten). The original claim that funder guidelines "may contain commercially sensitive information provided by the funder" was checked against the real corpus of funder documents Grant Pathway processes (`docs/Grant Org Guidelines/`; corrected 2026-07-13 — previously cited a stale "21-document" count) and found unsupported — these are funders' own publicly published application guidance, not confidential material._
 
@@ -1106,12 +1106,12 @@ _Revised 2026-07-10 — see `ADR-DATA-002`'s "Revised Decision — 2026-07-10" s
 
 ---
 
-**AC-FR-22-03 — Guideline text backing an approved playbook is retained independently of any single application** _(target behaviour — not yet built)_
+**AC-FR-22-03 — Reused guideline text survives deletion of the application it was copied from** _(built 2026-07-14, `P6.5` — corrected from the original 2026-07-10 "approved playbook" version of this AC, permanently superseded)_
 
-- **Given** a funder's guideline text has been curated into an approved playbook (`P6.5`)
-- **When** the application that originally supplied that text is later deleted
-- **Then** the playbook's copy of the guideline text is retained indefinitely
-- **And** it is unaffected by the deletion of any single user's application or account
+- **Given** a charity chose "start from your last application to [Funder]" (`P6.5`) when starting a new application, carrying that previous application's guideline text across
+- **When** the original (source) application is later deleted
+- **Then** the new application's own copy of the guideline text is unaffected — it is a full, independent copy, not a reference to the original
+- **And** this relies on no shared, funder-wide "playbook" record — the original 2026-07-10 version of this AC described that concept, which was superseded before build (`ADR-DATA-006`'s 2026-07-14 amendment)
 
 ---
 
@@ -2331,7 +2331,7 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 
 **Requirement:** Each AI summary bullet, eligibility criterion, and extracted question shall carry a citation to a specific page (PDF) or heading/section (docx, pasted text) of the funder's guidelines. A "view original guidelines" panel shall let the user click a citation to jump to and highlight the cited page/section.
 
-**Partially built as of 2026-07-14 — extracted questions carry and display citations; summary bullets and curator confirmation do not yet.** `P6.2a` tags extraction with `[PAGE N]`/`[SECTION: A > B]` markers; `P6.3` asks the AI for a validated citation per question/section, written into `application_items.guideline_reference`; GAP-33 retains the marker-tagged text those citations were validated against (`application_guidelines`); `P6.4` (first milestone) makes it all visible — Step 4 shows a clickable badge (e.g. "Page 5") next to any question with a citation, opening a "view original guidelines" panel that highlights the cited quote in the retained text. **Corrected the same day:** this panel is a plain text panel, not a canvas-rendered PDF as three ADRs (`ADR-SEC-004`, `ADR-DATA-007`, `ADR-OPS-006`) originally assumed — only text is ever retained, never the raw file. **Still not built:** the Step 3 summary bullets (`aboutGrant`/`whoCanApply`/`lookingFor`/`keyRequirements`) are not citation-tagged at all (confirmed out of scope for `P6.3`'s first milestone), and no human curator confirmation step exists yet (`P6.5`). This FR is part of the Phase 6 → Go-Live Gate; the remaining gap is `P6.5`.
+**Partially built as of 2026-07-14 — extracted questions carry and display citations; summary bullets and curator confirmation do not yet.** `P6.2a` tags extraction with `[PAGE N]`/`[SECTION: A > B]` markers; `P6.3` asks the AI for a validated citation per question/section, written into `application_items.guideline_reference`; GAP-33 retains the marker-tagged text those citations were validated against (`application_guidelines`); `P6.4` (first milestone) makes it all visible — Step 4 shows a clickable badge (e.g. "Page 5") next to any question with a citation, opening a "view original guidelines" panel that highlights the cited quote in the retained text. **Corrected the same day:** this panel is a plain text panel, not a canvas-rendered PDF as three ADRs (`ADR-SEC-004`, `ADR-DATA-007`, `ADR-OPS-006`) originally assumed — only text is ever retained, never the raw file. **Still not built:** the Step 3 summary bullets (`aboutGrant`/`whoCanApply`/`lookingFor`/`keyRequirements`) are not citation-tagged at all (confirmed out of scope for `P6.3`'s first milestone) — this remains an open, unscheduled gap. **Permanently superseded, not pending:** a human curator confirmation step will not be built — `P6.5` (built 2026-07-14) turned out to be a private, per-charity reuse feature rather than a shared, curated playbook; see `ADR-DATA-007`'s 2026-07-14 amendment. Automated marker-validation (`P6.3`) remains the only guard against a hallucinated citation.
 
 ---
 
@@ -2363,21 +2363,20 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 
 ---
 
-**AC-FR-48-04 — A human curator has confirmed the citation before it reaches an application** _(target behaviour — not built)_
+**AC-FR-48-04 — A human curator has confirmed the citation before it reaches an application** _(permanently superseded, not pending — corrected 2026-07-14)_
 
-- **Given** a funder has an approved playbook (`P6.5`)
-- **When** an application is built from that playbook
-- **Then** each item's citation was confirmed or corrected by a human curator once for that funder
-- **And** it is not a fresh, unverified AI guess generated separately for this specific application
+- This criterion described a shared, curator-approved playbook concept that was designed but never built — see `ADR-DATA-006`'s and `ADR-DATA-007`'s 2026-07-14 amendments
+- **What's built instead:** every citation is validated against a real structural marker in the guidelines (`P6.3`, `validateCitation()`) — there is no additional human-confirmation step, and none is planned
+- This applies uniformly whether an application's questions were freshly extracted or carried across via `P6.5`'s "start from your last application" reuse feature — no application's citations are ever curator-reviewed
 
 ---
 
-**AC-FR-48-05 — Summary bullets and curator confirmation still carry no source reference** _(reflects actual 2026-07-14 behaviour, corrected from the original 2026-07-10 version of this AC)_
+**AC-FR-48-05 — Summary bullets carry no source reference, and no citation is ever human-curated** _(reflects actual 2026-07-14 behaviour, corrected from the original 2026-07-10 version of this AC)_
 
 - **Given** I use Grant Pathway as it exists today
 - **When** I view the Step 3 summary bullets (about this grant, who can apply, what they're looking for, key requirements)
-- **Then** I find no citation or page/section reference on any of them — only extracted questions on Step 4 carry one
-- **And** no citation has been confirmed or corrected by a human curator — every citation shown today is a fresh, unsupervised AI extraction, validated only against real structural markers (`P6.3`), not against a curator's review
+- **Then** I find no citation or page/section reference on any of them — only extracted questions on Step 4 carry one, and this remains an open, unscheduled gap
+- **And** no citation is ever confirmed or corrected by a human curator, permanently, not just for now — every citation shown is validated only against real structural markers (`P6.3`), never against a curator's review; see AC-FR-48-04
 
 ---
 

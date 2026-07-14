@@ -7,7 +7,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { StepIndicator } from '@/components/step-indicator'
-import { saveApplicationStep1, type FunderOption } from '@/actions/applications'
+import {
+  saveApplicationStep1,
+  getPreviousApplicationForFunder,
+  type FunderOption,
+  type PreviousApplicationOption,
+} from '@/actions/applications'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -56,6 +61,32 @@ export function ApplicationStep1Form({
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, startSaving] = useTransition()
+
+  // P6.5 — reuse a previous application to the same funder
+  const [previousApplication, setPreviousApplication] = useState<PreviousApplicationOption | null>(
+    null,
+  )
+  const [reuseChoice, setReuseChoice] = useState<'fresh' | 'reuse'>('fresh')
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (!selectedFunder) {
+      setPreviousApplication(null)
+      return
+    }
+
+    getPreviousApplicationForFunder(applicationId, selectedFunder.id).then((result) => {
+      if (!cancelled) {
+        setPreviousApplication(result)
+        setReuseChoice('fresh')
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [applicationId, selectedFunder])
 
   // ---------------------------------------------------------------------------
   // Filtered list
@@ -115,6 +146,7 @@ export function ApplicationStep1Form({
         selectedFunder!.id,
         selectedFunder!.name,
         grantName.trim(),
+        reuseChoice === 'reuse' ? previousApplication?.id : undefined,
       )
       setSaveError(result.error)
     })
@@ -279,6 +311,42 @@ export function ApplicationStep1Form({
             </p>
           )}
         </div>
+
+        {/* P6.5 — Start fresh vs reuse a previous application to this funder */}
+        {previousApplication && (
+          <div className="mb-5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+            <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+              You&apos;ve applied to {selectedFunder?.name} before
+            </p>
+            <div className="space-y-2">
+              <label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]">
+                <input
+                  type="radio"
+                  name="reuseChoice"
+                  checked={reuseChoice === 'fresh'}
+                  onChange={() => setReuseChoice('fresh')}
+                  className="mt-0.5"
+                />
+                <span>Start fresh — upload guidelines and let the AI read them again</span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]">
+                <input
+                  type="radio"
+                  name="reuseChoice"
+                  checked={reuseChoice === 'reuse'}
+                  onChange={() => setReuseChoice('reuse')}
+                  className="mt-0.5"
+                />
+                <span>
+                  Start from your last application to {selectedFunder?.name} (
+                  {previousApplication.grantName}, updated{' '}
+                  {new Date(previousApplication.updatedAt).toLocaleDateString('en-GB')}) — carries
+                  across the questions and your previous answers for you to review
+                </span>
+              </label>
+            </div>
+          </div>
+        )}
 
         {/* Server-side save error */}
         {saveError && (

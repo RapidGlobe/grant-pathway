@@ -76,9 +76,11 @@ Effort is sized relatively (S / M / L / XL) rather than in weeks, for the same r
 **Depends on:** Phase 1; Phase 2 for each new item type as it's added.
 **Exit criteria (first milestone):** The same test funder renders identically to its current production behaviour.
 **Size:** L for the rework; each new item type's rendering thereafter is S–M.
-**Added 2026-07-10 (`ADR-DATA-007`):** rendering also shows each item's guideline reference alongside it, plus a "view original guidelines" panel letting the user click a reference to jump to and highlight the cited page/section (canvas-based PDF rendering — a plain `<iframe>`/`<object>` embed cannot support highlighting an arbitrary region).
+**Added 2026-07-10 (`ADR-DATA-007`):** rendering also shows each item's guideline reference alongside it, plus a "view original guidelines" panel letting the user click a reference to jump to and highlight the cited page/section. **Corrected 2026-07-14:** built as a plain text panel, not canvas-based PDF rendering as originally assumed here — only extracted text is ever retained, never the raw file (`ADR-DATA-002`). A plain `<iframe>`/`<object>` embed remains ruled out for the original reason (no highlighting API), independent of this correction.
 
 ### Phase 4 — Playbook infrastructure and curation workflow
+
+**Superseded 2026-07-14 (`ADR-DATA-006` amendment) — left below as historical record, not built as described.** During the actual `P6.5` design walkthrough, WJ directly challenged this phase's premise: why shouldn't a charity applicant be their own curator? The feature built instead is a private, per-charity, per-funder reuse mechanism with no shared playbook, no curator role, no versioning or approval workflow — see the ADR amendment for the full reasoning. Phase 5 below (which depends on this phase's playbook concept) needs its own re-design as a result.
 
 **What:** A new table (or tables) holding a versioned, reviewed playbook per funder — the graph structure, rubric mapping, budget shape, rules, output mode, manual actions. A lightweight review step (does not need to be a built admin UI initially — a reviewed record WJ approves before a funder is marked supported is enough to start). Runtime switches to: look up an approved playbook first; fall back to live extraction (today's behaviour) if none exists, visibly flagged as unreviewed.
 **Why after Phase 1:** A playbook is a saved instance of the item-graph; the graph has to exist first.

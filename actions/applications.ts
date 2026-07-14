@@ -157,6 +157,128 @@ export async function getActiveFunders(): Promise<FunderOption[]> {
 }
 
 // ---------------------------------------------------------------------------
+// P6.5 — Reuse Previous Application (private, per-charity, per-funder)
+// ---------------------------------------------------------------------------
+
+export type PreviousApplicationOption = {
+  id: string
+  grantName: string
+  updatedAt: string
+}
+
+/**
+ * Looks up the most recent OTHER application by this user for the same
+ * funder that has reached at least Step 4 (i.e. has a question list and
+ * retained guidelines worth reusing). Returns null if none exists.
+ *
+ * Used by Step 1 to offer "Start fresh" vs "Start from your last
+ * application to [Funder]" once a funder is selected. Entirely scoped to
+ * the current user — no cross-charity sharing, no curator role (P6.5
+ * design, 2026-07-14 — supersedes the earlier "Curated Funder Playbooks"
+ * concept, see ADR-DATA-006's amendment).
+ */
+export async function getPreviousApplicationForFunder(
+  currentApplicationId: string,
+  funderId: string,
+): Promise<PreviousApplicationOption | null> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('applications')
+    .select('id, grant_name, updated_at')
+    .eq('user_id', user.id)
+    .eq('funder_id', funderId)
+    .neq('id', currentApplicationId)
+    .gte('current_step', 4)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error || !data) return null
+
+  return { id: data.id, grantName: data.grant_name, updatedAt: data.updated_at }
+}
+
+/**
+ * Copies a previous application's question list, retained guidelines, and
+ * AI summary into a new application, so Step 2 (guideline upload) can be
+ * skipped entirely. Previous answers are carried across but is_approved is
+ * always reset to false and cloned_from_application_id is set, so Step 4
+ * can show a "carried over — please review" badge rather than treating
+ * inherited answers as already reviewed for this new application.
+ *
+ * Non-fatal by design (mirrors the ai_summary/application_guidelines save
+ * pattern elsewhere): if the source application or its rows can't be read,
+ * the caller proceeds with an empty application rather than failing the
+ * whole Step 1 save.
+ */
+async function cloneApplicationForReuse(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  sourceApplicationId: string,
+  targetApplicationId: string,
+): Promise<void> {
+  const [sourceAppResult, sourceGuidelinesResult, sourceItemsResult] = await Promise.all([
+    supabase
+      .from('applications')
+      .select('ai_summary')
+      .eq('id', sourceApplicationId)
+      .eq('user_id', userId)
+      .single(),
+    supabase
+      .from('application_guidelines')
+      .select('guideline_text')
+      .eq('application_id', sourceApplicationId)
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('application_items')
+      .select(
+        'item_type, item_label, item_order, source_of_truth, validation_mode, rubric_criterion_link, decision_maker_visible, output_mode, guideline_reference, word_limit, char_limit, limit_type, is_budget_question, answer_text, ai_refined_answer, answer_source',
+      )
+      .eq('application_id', sourceApplicationId)
+      .eq('user_id', userId),
+  ])
+
+  if (sourceAppResult.data?.ai_summary) {
+    await supabase
+      .from('applications')
+      .update({ ai_summary: sourceAppResult.data.ai_summary })
+      .eq('id', targetApplicationId)
+      .eq('user_id', userId)
+  }
+
+  if (sourceGuidelinesResult.data?.guideline_text) {
+    await supabase.from('application_guidelines').upsert(
+      {
+        application_id: targetApplicationId,
+        user_id: userId,
+        guideline_text: sourceGuidelinesResult.data.guideline_text,
+      },
+      { onConflict: 'application_id' },
+    )
+  }
+
+  if (sourceItemsResult.data && sourceItemsResult.data.length > 0) {
+    const inserts = sourceItemsResult.data.map((item) => ({
+      ...item,
+      application_id: targetApplicationId,
+      user_id: userId,
+      is_approved: false,
+      cloned_from_application_id: sourceApplicationId,
+    }))
+
+    await supabase.from('application_items').insert(inserts)
+  }
+}
+
+// ---------------------------------------------------------------------------
 // S3.1 / S3.2 — Save Step 1 (Application Details)
 // ---------------------------------------------------------------------------
 
@@ -168,6 +290,12 @@ export async function getActiveFunders(): Promise<FunderOption[]> {
  * user returns to Step 1 later (current_step already >= 2), current_step
  * is left unchanged so their progress further along is not reset.
  *
+ * If reuseFromApplicationId is provided (user chose "Start from your last
+ * application to [Funder]" — P6.5), the previous application's question
+ * list, guidelines, and AI summary are cloned in, Step 2 is skipped
+ * entirely, and the user lands on Step 3 to review the (carried-over) AI
+ * summary before continuing to Step 4 as normal.
+ *
  * Returns { ok: false, error } only when the DB update fails — the
  * success path always calls redirect() and never returns normally.
  */
@@ -176,6 +304,7 @@ export async function saveApplicationStep1(
   funderId: string,
   funderName: string,
   grantName: string,
+  reuseFromApplicationId?: string,
 ): Promise<{ ok: false; error: string }> {
   const supabase = await createClient()
 
@@ -194,7 +323,9 @@ export async function saveApplicationStep1(
       .eq('user_id', user.id)
       .single()
 
-    const newStep = Math.max(existing?.current_step ?? 1, 2)
+    const newStep = reuseFromApplicationId
+      ? Math.max(existing?.current_step ?? 1, 3)
+      : Math.max(existing?.current_step ?? 1, 2)
 
     const { error } = await supabase
       .from('applications')
@@ -203,12 +334,17 @@ export async function saveApplicationStep1(
         funder_name: funderName,
         grant_name: grantName,
         current_step: newStep,
+        ...(reuseFromApplicationId ? { status: 'in_progress' as const } : {}),
       })
       .eq('id', applicationId)
       .eq('user_id', user.id)
 
     if (error) {
       return { ok: false, error: 'Could not save your application. Please try again.' }
+    }
+
+    if (reuseFromApplicationId) {
+      await cloneApplicationForReuse(supabase, user.id, reuseFromApplicationId, applicationId)
     }
   } catch {
     // Network error or Supabase unavailable
@@ -218,7 +354,7 @@ export async function saveApplicationStep1(
     }
   }
 
-  redirect(`/applications/${applicationId}/step/2`)
+  redirect(`/applications/${applicationId}/step/${reuseFromApplicationId ? 3 : 2}`)
 }
 
 // ---------------------------------------------------------------------------

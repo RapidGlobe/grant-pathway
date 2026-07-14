@@ -22,6 +22,7 @@ import {
   CheckCircle2,
   CheckCheck,
   FileText,
+  History,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -61,6 +62,8 @@ export type QuestionRow = {
   guidance: string | null
   isApproved: boolean
   guidelineReference: GuidelineCitation | null
+  /** True when this answer was carried over from a previous application via P6.5's reuse feature. */
+  isCarriedOver: boolean
 }
 
 type RefineState =
@@ -564,6 +567,12 @@ export function ApplicationStep4Draft({
                       <FileText className="h-3 w-3" aria-hidden="true" />
                       {citationLabel(q.guidelineReference)}
                     </button>
+                  )}
+                  {q.isCarriedOver && (
+                    <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-0.5 text-[11px] font-medium text-[#92400E]">
+                      <History className="h-3 w-3" aria-hidden="true" />
+                      Carried over — please review
+                    </span>
                   )}
                 </div>
               </div>

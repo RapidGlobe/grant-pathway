@@ -87,7 +87,7 @@ export default async function Step4Page({ params }: Props) {
   const { data: existingRows } = await supabase
     .from('application_items')
     .select(
-      'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference',
+      'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
@@ -172,7 +172,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference',
+            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -228,7 +228,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference',
+            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -283,6 +283,7 @@ export default async function Step4Page({ params }: Props) {
     guidance: guidanceMap[row.item_order as number] ?? null,
     isApproved: (row.is_approved as boolean) ?? false,
     guidelineReference: (row.guideline_reference as QuestionRow['guidelineReference']) ?? null,
+    isCarriedOver: (row.cloned_from_application_id as string | null) != null,
   }))
 
   return (

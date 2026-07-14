@@ -1693,30 +1693,44 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 - Subsequent milestones: add rendering for each new item type as P6.3 adds it — checklist-style reminders for data/date/file/consent items first, then flexible budget shapes, then rubric-coaching display, then the `decision_maker_visible` treatment
 - Depends on: P6.2; P6.3 for each new item type
 
-### P6.5 — Playbook Infrastructure and Curation Workflow
+### P6.5 — Reuse Previous Application (private, per-charity, per-funder)
 
-- New table(s) holding a versioned, human-reviewed playbook per funder (item graph, rubric mapping, budget shape, rules, output mode, manual actions, `funder_note`)
-- Playbook carries a `funder_note` field (R17) surfacing disclosures — due diligence exists, non-grant offerings exist, the funder checks public presence against the application — without Grant Pathway attempting to act on any of them
-- Lightweight review step to start — a reviewed record approved before a funder is marked supported; does not need a built admin UI initially
-- Human review also confirms or corrects each item's guideline reference before a playbook is approved, so applications built from that playbook reuse a verified reference rather than a fresh AI guess every time
-- Runtime prefers an approved playbook over live extraction; falls back to today's live-extraction behaviour, visibly flagged as unreviewed, if none exists
+**Rewritten 2026-07-14 — supersedes the "Playbook Infrastructure and Curation Workflow" design below before any code was written for it.** During the design walkthrough, WJ directly challenged the premise: why shouldn't a charity applicant be their own curator? A shared, curator-approved playbook's real justification is reliability for _every future applicant_, not just whoever curated it first — and a charity reviewing their own past application has no reason to notice extraction mistakes that don't affect them personally, which a shared playbook would then silently trust for every unrelated applicant afterwards. The simpler, lower-risk feature adopted instead:
+
+- **Built 2026-07-14, `grant-pathway-dev` only.** When a charity starts a new application for a funder they've already reached Step 4 with before, Step 1 offers an explicit choice: "Start fresh" or "Start from your last application to [Funder]."
+- Choosing reuse carries across, entirely within that one charity's own account: the question list (`application_items`, including their own previous answers — `is_approved` reset to `false`, `cloned_from_application_id` set), the retained guideline text (`application_guidelines`, a full independent copy), and the AI summary (`applications.ai_summary`, so Step 4's prep checklist still has content).
+- Step 2 (guideline upload) is skipped entirely; the application lands on Step 3 with the carried-over summary already in place.
+- No new table, no versioning, no approval workflow, no curator/admin role of any kind — entirely private, no cross-charity sharing. New column: `application_items.cloned_from_application_id` (nullable, `ON DELETE SET NULL`, migration `20260714000002`).
 - Depends on: P6.2
-- Exit criteria: one funder has an approved, versioned playbook the live application flow reads instead of running extraction fresh each time
+- Exit criteria (met 2026-07-14): a charity can start a new application to a funder they've previously applied to and carry across their own prior question list, guidelines, summary, and answers, marked for review.
+- Full design history: `ADR-DATA-006`'s and `ADR-DATA-007`'s 2026-07-14 amendments.
+
+~~- New table(s) holding a versioned, human-reviewed playbook per funder (item graph, rubric mapping, budget shape, rules, output mode, manual actions, `funder_note`)~~
+~~- Playbook carries a `funder_note` field (R17) surfacing disclosures — due diligence exists, non-grant offerings exist, the funder checks public presence against the application — without Grant Pathway attempting to act on any of them~~
+~~- Lightweight review step to start — a reviewed record approved before a funder is marked supported; does not need a built admin UI initially~~
+~~- Human review also confirms or corrects each item's guideline reference before a playbook is approved, so applications built from that playbook reuse a verified reference rather than a fresh AI guess every time~~
+~~- Runtime prefers an approved playbook over live extraction; falls back to today's live-extraction behaviour, visibly flagged as unreviewed, if none exists~~
+~~- Exit criteria: one funder has an approved, versioned playbook the live application flow reads instead of running extraction fresh each time~~
+
+The `funder_note` disclosure idea (R17) and the "runtime prefers a reviewed record over live extraction" framing above are not carried forward to any other task — R17 is unaffected in principle (still a real requirement) but has no current home; flag for a future task if it resurfaces.
 
 ### P6.6 — Transparency Status
 
-- Add a support-status field on each **approved playbook** (fully supported / partially supported with flagged gaps / guidance-only, use with caution) — status is derived from the specific curated playbook, not assigned to the funder as a standalone identity
-- A funder with no approved playbook, or whose uploaded guidelines don't match any reviewed playbook, shows as unreviewed/live-extraction — it never inherits another playbook's status
-- Surface it in the Step 1 funder picker (keyed to the playbook that would apply, where known) and the Step 3 summary screen (keyed to the playbook actually used for this application)
-- **Amendment (2026-07-13):** this task does not reintroduce the premise FR-46 (`moscow-feature-register.md`) was withdrawn for on 2026-07-11 — a static per-funder-identity coverage badge. Status here is playbook-scoped, not funder-identity-scoped; see `ADR-DATA-006`'s 2026-07-13 amendment for the full reconciliation.
-- Depends on: P6.5
+**Needs re-design (2026-07-14), not yet a scheduled sub-task.** This task's basis — a support-status field "derived from the specific curated playbook" — no longer applies now that P6.5 builds no playbook. An open design question, not resolved here: what does a per-funder support-status signal derive from instead (e.g. whether extraction has ever produced a clean result for that funder, a manually-maintained list, something else)? Do not start this task without first answering that question.
+
+~~- Add a support-status field on each **approved playbook** (fully supported / partially supported with flagged gaps / guidance-only, use with caution) — status is derived from the specific curated playbook, not assigned to the funder as a standalone identity~~
+~~- A funder with no approved playbook, or whose uploaded guidelines don't match any reviewed playbook, shows as unreviewed/live-extraction — it never inherits another playbook's status~~
+~~- Surface it in the Step 1 funder picker (keyed to the playbook that would apply, where known) and the Step 3 summary screen (keyed to the playbook actually used for this application)~~
+
+- **Amendment (2026-07-13):** this task does not reintroduce the premise FR-46 (`moscow-feature-register.md`) was withdrawn for on 2026-07-11 — a static per-funder-identity coverage badge. Status here was intended to be playbook-scoped, not funder-identity-scoped; see `ADR-DATA-006`'s 2026-07-13 amendment for that reconciliation (itself superseded by the 2026-07-14 amendment above).
+- Depends on: a new design decision, not P6.5 (dependency removed 2026-07-14 — P6.5 no longer produces anything for this task to key off)
 
 ### P6.7 — Funder-by-Funder Capability Extension (ongoing)
 
 - Not a single task — the ongoing mode of work once P6.1–P6.6 exist
-- Each new or re-curated funder pulls in whichever capabilities it actually needs: flexible budget shapes, rubric coaching, the `compose` output mode and document-level limits for proposal-style funders, `link_acceptable` in its replace/supplement modes, `manual_action` tracking, a pre-application fit-assessment stage for no-form funders, multi-stream selection
+- Each new or re-curated funder pulls in whichever capabilities it actually needs: flexible budget shapes, **a rubric-criteria table + scoring-coach display** (moved here from P6.5 2026-07-14 — see `ADR-DATA-006`'s amendment; named explicitly here, not left as an unscheduled mention, per WJ's concern this would otherwise get missed), the `compose` output mode and document-level limits for proposal-style funders, `link_acceptable` in its replace/supplement modes, `manual_action` tracking, a pre-application fit-assessment stage for no-form funders, multi-stream selection
 - Priority set by the live-testing queue, not built speculatively ahead of need
-- Depends on: P6.1–P6.6
+- Depends on: P6.1–P6.5 (P6.6 dependency removed 2026-07-14 pending its re-design)
 
 ### Parked — not scheduled under Phase 6
 

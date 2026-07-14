@@ -110,6 +110,7 @@ export type Database = {
           answer_text: string | null
           application_id: string
           char_limit: number | null
+          cloned_from_application_id: string | null
           created_at: string
           decision_maker_visible: boolean
           guideline_reference: Json | null
@@ -135,6 +136,7 @@ export type Database = {
           answer_text?: string | null
           application_id: string
           char_limit?: number | null
+          cloned_from_application_id?: string | null
           created_at?: string
           decision_maker_visible?: boolean
           guideline_reference?: Json | null
@@ -160,6 +162,7 @@ export type Database = {
           answer_text?: string | null
           application_id?: string
           char_limit?: number | null
+          cloned_from_application_id?: string | null
           created_at?: string
           decision_maker_visible?: boolean
           guideline_reference?: Json | null
@@ -183,6 +186,13 @@ export type Database = {
           {
             foreignKeyName: 'application_items_application_id_fkey'
             columns: ['application_id']
+            isOneToOne: false
+            referencedRelation: 'applications'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'application_items_cloned_from_application_id_fkey'
+            columns: ['cloned_from_application_id']
             isOneToOne: false
             referencedRelation: 'applications'
             referencedColumns: ['id']

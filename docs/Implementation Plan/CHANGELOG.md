@@ -10,6 +10,27 @@
 
 ---
 
+## 2026-07-14 — P6.5 built: private per-charity reuse, not the originally-designed shared "playbook"
+
+**A design pivot made live, during the walkthrough, not discovered after building the wrong thing.** P6.5 had been scoped since 2026-07-05 as "Playbook Infrastructure and Curation Workflow" — a versioned, human-reviewed record per funder, approved once by a curator, reused by every charity applying to that funder. Before writing any migration, WJ asked directly: why shouldn't a charity applicant be their own curator? Working through it surfaced the real justification for a _shared_ playbook — reliability for every future applicant, not just whoever curated it first — and that a charity reviewing their own past application has no reason to notice extraction mistakes that don't affect them personally, which a shared record would then silently trust for every unrelated applicant afterwards. That risk doesn't exist if reuse is private to one charity's own account.
+
+**What's built instead:** when a charity starts a new application for a funder they've already reached Step 4 with before, Step 1 offers an explicit choice — "Start fresh" or "Start from your last application to [Funder]." Choosing reuse carries across, entirely within that one account: the question list (`application_items`, including their own previous answers, `is_approved` reset to `false`), the retained guideline text (`application_guidelines`, a full independent copy), and the AI summary (`applications.ai_summary`, so Step 4's prep checklist isn't blank). Step 2 (guideline upload) is skipped entirely; the new application lands on Step 3 with the carried-over summary already showing. Carried-over answers are marked with a "Carried over — please review" badge on Step 4, reusing the citation-badge visual style.
+
+**Schema footprint: one nullable column, not a new table.** `application_items.cloned_from_application_id` (self-referencing FK to `applications`, `ON DELETE SET NULL`, migration `20260714000002`) records which prior application a row was cloned from. `ON DELETE SET NULL` rather than `CASCADE` was deliberate — deleting the source application must not delete the clone, only forget where it came from. Verified by direct SQL round-trip against `grant-pathway-dev`: cloned answer text and citation carried across correctly, `is_approved` reset, and deleting the source application left the clone fully intact with `cloned_from_application_id` nulled.
+
+**Two follow-on effects surfaced and tracked, not silently absorbed:**
+
+1. **P6.6 (transparency status) needs re-design.** It was scoped to derive its per-funder support-status signal from "the approved playbook" — that concept no longer exists. `IMPLEMENTATION-PLAN.md`'s P6.6 section now states this is an open design question, not yet resolved, and must be answered before that task starts.
+2. **The rubric-criteria table moved from P6.5 to P6.7.** WJ was explicit that this must not just quietly disappear as a passing mention inside P6.7's open-ended "ongoing" framing — so it's now a named, findable line item there, plus a dedicated `ADR-TRACEABILITY.md` row (⚠️ tracked, tied to `ADR-DATA-006`'s rubric-criterion-link field), plus a memory entry, as three independent tripwires against it being missed.
+
+**Documentation:** `ADR-DATA-006` and `ADR-DATA-007` both amended the same day with the full design history (superseding, not deleting, their original playbook-based text — the original reasoning is kept as historical record per this project's "corrections are dated notes, not silent rewrites" convention). `BRD-Grant-Pathway.md` (v0.51), `PRD-Grant-Pathway.md` (v0.46), `acceptance-criteria.md`, `technical-design.md` (v1.16), and `data-model.md` (v1.9) all corrected to match — every prior reference to a curator-approved, cross-charity playbook was either struck through with the real behaviour alongside it, or marked permanently superseded rather than left as a stale "not yet built" pointer.
+
+**Verification:** `tsc --noEmit`, `eslint --max-warnings 0`, all 46 Vitest tests pass, plus the SQL round-trip above. Live browser verification pending WJ.
+
+**Files changed:** `supabase/migrations/20260714000002_p6_5_reuse_previous_application.sql`, `lib/database.types.ts`, `actions/applications.ts`, `components/application-step1-form.tsx`, `components/application-step4-draft.tsx`, `app/(authenticated)/applications/[id]/step/4/page.tsx`.
+
+---
+
 ## 2026-07-14 — P6.4 live-testing bug fix: quote highlighting didn't survive PDF line-wraps
 
 Found live-testing P6.4 minutes after it shipped: WJ opened the "view original guidelines" panel and it showed the top of page 1 instead of jumping to and highlighting the cited quote on page 5. The badge and panel both opened correctly — only the highlight/scroll silently failed.
