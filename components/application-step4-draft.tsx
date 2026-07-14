@@ -86,10 +86,10 @@ interface ApplicationStep4DraftProps {
   guidelineText: string | null
 }
 
-/** A short label for a citation badge, e.g. "Page 5" or "Eligibility > Referrals". */
+/** A short label for a citation badge, e.g. "Page 5 of the guidelines" or "Eligibility > Referrals". */
 function citationLabel(citation: GuidelineCitation): string {
   return citation.source_type === 'page'
-    ? `Page ${citation.page_number}`
+    ? `Page ${citation.page_number} of the guidelines`
     : citation.heading_path.join(' > ')
 }
 
@@ -569,8 +569,8 @@ export function ApplicationStep4Draft({
                     </button>
                   )}
                   {q.isCarriedOver && (
-                    <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-0.5 text-[11px] font-medium text-[#92400E]">
-                      <History className="h-3 w-3" aria-hidden="true" />
+                    <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-1 text-[13px] font-bold text-[#92400E]">
+                      <History className="h-3.5 w-3.5" aria-hidden="true" />
                       Carried over — please review
                     </span>
                   )}

@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-14 — P6.5 live-tested: two small UI tweaks
+
+WJ live-tested P6.5 against MK Community Foundation — Oak Grants immediately after it shipped. The reuse choice, Step 2 skip, and carried-over citation/badge all worked correctly on the first try — no functional bugs found this time. Two presentation tweaks requested: the page citation badge now reads "Page N of the guidelines" (was just "Page N"); the "Carried over — please review" badge is now bold and larger, to draw more attention to the fact it needs a second look. `tsc --noEmit`, `eslint --max-warnings 0`, all 46 tests pass.
+
+**Files changed:** `components/application-step4-draft.tsx`.
+
+---
+
 ## 2026-07-14 — P6.5 built: private per-charity reuse, not the originally-designed shared "playbook"
 
 **A design pivot made live, during the walkthrough, not discovered after building the wrong thing.** P6.5 had been scoped since 2026-07-05 as "Playbook Infrastructure and Curation Workflow" — a versioned, human-reviewed record per funder, approved once by a curator, reused by every charity applying to that funder. Before writing any migration, WJ asked directly: why shouldn't a charity applicant be their own curator? Working through it surfaced the real justification for a _shared_ playbook — reliability for every future applicant, not just whoever curated it first — and that a charity reviewing their own past application has no reason to notice extraction mistakes that don't affect them personally, which a shared record would then silently trust for every unrelated applicant afterwards. That risk doesn't exist if reuse is private to one charity's own account.
