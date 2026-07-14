@@ -10,6 +10,28 @@
 
 ---
 
+## 2026-07-14 — P6.2a built: guideline extraction now tags structure instead of discarding it
+
+Built the groundwork task from `ADR-DATA-007` Option B ("the text itself carries verifiable structure — e.g. `[PAGE 3]` markers") — extraction preserves page (PDF) or heading (docx, pasted text) boundaries so a future citation can only ever point at a chunk of text that structurally exists in the source, rather than a free-typed guess. This is groundwork only: nothing consumes the markers yet, that's `P6.3`.
+
+**PDF (`lib/extract-text.ts`):** `unpdf` switched from `mergePages: true` (all pages flattened into one string, page boundaries lost) to per-page extraction, rejoined with a `[PAGE N]` marker before each page's text.
+
+**Docx (`lib/extract-text.ts`):** switched from `mammoth.extractRawText` (plain text, headings discarded) to `mammoth.convertToHtml`, which preserves Word's heading styles as `<h1>`–`<h6>` tags. A new helper walks the HTML tracking a heading-level stack and emits `[SECTION: A > B]` markers preserving the full nesting trail — docx has no fixed pages, so headings are the fallback reference unit per the task spec.
+
+**Pasted text (`lib/preprocess-text.ts`):** no file means no source of structure at all, so a new heuristic reuses the numbered ("1. Title"/"2.3 Section") and ALL-CAPS heading detection already in this file (previously only used to bound boilerplate-stripping) to insert the same `[SECTION: ...]` markers — numbered headings nest by depth, ALL-CAPS headings reset to top-level. Explicitly a guess, not a guarantee: text with no heading-like lines gets no markers. Skipped entirely if the text already carries markers from `extract-text.ts`.
+
+**Marker protection (`lib/preprocess-text.ts`):** the existing page-number/repeated-line/boilerplate-heading stripping steps are all now marker-aware — a `[PAGE N]`/`[SECTION: ...]` line is never treated as noise.
+
+**ADR consequence gap found and closed:** `ADR-DATA-007`'s consequences section names an `ADR-AI-007` follow-on that was not one of `IMPLEMENTATION-PLAN.md`'s three listed P6.2a bullets — the character-ceiling truncation safety net needs to become marker-aware, snapping to the last complete marker before the ceiling rather than the last newline, so a page/section that would be cut off is dropped in its entirety rather than left half-populated with no citation to anchor to. Added as a fourth step per AGENTS.md's mandatory ADR consequences check. The ceiling _value_ (20,000 chars dev / 50,000 prod) is unchanged — confirmed with WJ this fixes only where the cut lands, not how much is cut.
+
+**Design walkthrough:** presented item-by-item to WJ in plain, jargon-free language (re-explained after an initial pass used too much technical shorthand) before any code was written — each item confirmed as information-only except the truncation fix, which WJ explicitly approved.
+
+**Verification:** `tsc --noEmit`, `eslint --max-warnings 0`, `prettier --check` all clean. 7 new Vitest tests added (`__tests__/preprocess-text.test.ts`, 29/29 total passing) covering marker protection, pasted-text nesting including the ALL-CAPS reset case, no-double-tagging of already-marked text, and marker-aware truncation including the no-marker-in-range fallback. Live browser testing of an actual PDF/docx upload through Step 2 was not performed by Claude — per this project's convention, that is WJ's live-testing pass, not a substitute automated check.
+
+**Files changed:** `lib/extract-text.ts`, `lib/preprocess-text.ts`, `__tests__/preprocess-text.test.ts` (new), `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.11), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`, `docs/Implementation Plan/ADR-TRACEABILITY.md` (v2.6), `docs/Technical Decision and Design/technical-design.md` (v1.12).
+
+---
+
 ## 2026-07-14 — P6.2 built: application_answers → application_items (item-graph model, compatibility mode)
 
 Built the typed item-graph schema decided in `ADR-DATA-006` and `ADR-DATA-007`, replacing `application_answers` outright rather than extending it (migration `20260714000000`, `grant-pathway-dev` only — `grant-pathway-prod` stays untouched and unlinked until P5.4). Compatibility mode: only `item_type = 'narrative'` is populated — the new schema's other nine item types (`data`, `date`, `number`, `table`, `file`, `consent`, `eligibility_gate`, `scoring_criterion`, `manual_action`) exist in the enum but are not yet produced by any code path; that is P6.3 onward, funder by funder.
