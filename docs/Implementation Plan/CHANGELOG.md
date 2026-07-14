@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-14 — P6.4 built (first milestone): Step 4 shows citations, plus a live-verification finding
+
+**P6.3 live-verified first.** Before starting P6.4, WJ regenerated the Step 3 summary for the real MK Community Foundation — Oak Grants test application (re-supplying the guidelines after a session reset). Checked the result against the actual PDF: the AI found 12 questions where the previous, pre-`P6.3` baseline (recorded in the test plan, 2026-07-03) had only 10. Questions 1–10 matched verbatim; questions 11–12 are genuine, verbatim page-5 questions about additional funding and fundraising plans — both correctly flagged as budget questions, both citing real page 5 content, and both filling a gap the original test-plan baseline had explicitly noted as missing ("no dedicated match-funding question found"). **Conclusion: a correct improvement, not a regression** — `P6.3`'s citation validation works end to end against a real Bedrock call, which local automated tests alone couldn't prove (no real AWS credentials in this environment). **Follow-up agreed, not yet done:** the MK Community Foundation test plan and the user guide need refreshing to reflect the corrected 12-question baseline.
+
+**Then P6.4 built.** Step 4 now shows a small clickable badge next to any question with a validated citation (e.g. "Page 5"), opening a "view original guidelines" panel that highlights the cited quote in the retained text (`application_guidelines`, GAP-33) and auto-scrolls to it.
+
+**Design correction made before writing any UI code:** `ADR-SEC-004`, `ADR-DATA-007`, and `ADR-OPS-006` all assumed this viewer would fetch the raw PDF and render it to a `<canvas>` (pdf.js-style) — a reasonable assumption in July when it was written, but one that stopped being true the moment GAP-33's fix confirmed only _text_ is ever retained, never the raw file. Corrected all three the same day: no PDF-rendering library, no CSP change (`ADR-SEC-004`'s `worker-src 'self' blob:` consequence removed — nothing loads a rendering web worker), no novel accessibility surface (`ADR-OPS-006`'s three-item checklist reduced to two — a text panel is natively screen-reader-accessible, unlike a canvas).
+
+**Implementation:** `app/(authenticated)/applications/[id]/step/4/page.tsx` now selects `guideline_reference` (written by `P6.3`, never read back until now) and fetches `application_guidelines.guideline_text`. `components/application-step4-draft.tsx` gained the citation badge, a single reused `Dialog` (the existing `components/ui/dialog.tsx` Base UI primitive, already used for the senior-review and timeout-warning modals — no new dependency), and a `GuidelineTextPanel` helper that finds the cited quote in the retained text and highlights it — degrading gracefully to "shown but not highlighted" if the quote isn't found verbatim (citations are validated against real page/section markers, not a verbatim-substring guarantee).
+
+**Scope confirmed with WJ before coding:** "walk the graph respecting visibility conditions" is a no-op this pass — nothing produces a branching or non-narrative item yet, so there's no graph-walking logic to actually build. Adding it now would be speculative, against this project's established practice.
+
+**Verification:** `tsc --noEmit`, `eslint --max-warnings 0`, all 40 Vitest tests pass. Live browser verification is pending WJ, same pattern as `P6.2a`/`P6.3`.
+
+**Files changed:** `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `docs/Technical Decision and Design/ADR-SEC-004-http-security-headers.md`, `docs/Technical Decision and Design/ADR-DATA-007-guideline-source-reference-mechanism.md`, `docs/Technical Decision and Design/ADR-OPS-006-accessibility-testing.md`, `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.14), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`, `docs/Implementation Plan/ADR-TRACEABILITY.md` (v2.10), `docs/Technical Decision and Design/technical-design.md` (v1.15).
+
+---
+
 ## 2026-07-14 — GAP-33 fixed: guideline-text retention built
 
 New `application_guidelines` table (migration `20260714000001`) stores `guideline_text` — the marker-tagged text sent to the AI and validated against for citations (`P6.3`'s `textForPrompt`) — one row per application, upserted in `/api/generate-summary` alongside the existing `ai_summary` save. Not the raw uploaded file, which `ADR-DATA-002`/`ADR-FILE-001` never retain.

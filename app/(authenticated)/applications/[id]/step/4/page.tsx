@@ -17,6 +17,11 @@ interface Props {
 }
 
 /**
+ * P6.4 (GAP-33 follow-on): each question can carry a `guideline_reference`
+ * citation (P6.3) and the application can carry retained guideline text
+ * (`application_guidelines`) for the "view original guidelines" panel to
+ * scroll to and highlight. Text only — never the raw file (ADR-DATA-002).
+ *
  * Step 4 — Q&A Interview (S6.1–S6.8).
  *
  * getApplicationOrRedirect(id, 4) enforces step locking.
@@ -82,7 +87,7 @@ export default async function Step4Page({ params }: Props) {
   const { data: existingRows } = await supabase
     .from('application_items')
     .select(
-      'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+      'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
@@ -167,7 +172,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -223,7 +228,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved',
+            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -252,6 +257,18 @@ export default async function Step4Page({ params }: Props) {
   const approachingLimit = currentUsage >= 40
   const limitReached = currentUsage >= 50
 
+  // ── P6.4: fetch retained guideline text for the "view original guidelines"
+  // panel (GAP-33, application_guidelines) — text-only, never the raw file
+  // (ADR-DATA-002). Absent for applications created before GAP-33 shipped, or
+  // where the summary has never been (re)generated since — the panel simply
+  // has nothing to show in that case, same as any other missing citation.
+  const { data: guidelinesRow } = await supabase
+    .from('application_guidelines')
+    .select('guideline_text')
+    .eq('application_id', id)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   // ── Map DB rows to component props ────────────────────────────────────────
   const questions: QuestionRow[] = questionRows.map((row) => ({
     id: row.id as string,
@@ -265,6 +282,7 @@ export default async function Step4Page({ params }: Props) {
     isBudgetQuestion: (row.is_budget_question as boolean) ?? false,
     guidance: guidanceMap[row.item_order as number] ?? null,
     isApproved: (row.is_approved as boolean) ?? false,
+    guidelineReference: (row.guideline_reference as QuestionRow['guidelineReference']) ?? null,
   }))
 
   return (
@@ -276,6 +294,7 @@ export default async function Step4Page({ params }: Props) {
       grantName={grantName}
       approachingLimit={approachingLimit}
       limitReached={limitReached}
+      guidelineText={guidelinesRow?.guideline_text ?? null}
     />
   )
 }

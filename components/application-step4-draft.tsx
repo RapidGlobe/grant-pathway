@@ -15,11 +15,25 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, AlertCircle, Sparkles, CheckCircle2, CheckCheck } from 'lucide-react'
+import {
+  AlertTriangle,
+  AlertCircle,
+  Sparkles,
+  CheckCircle2,
+  CheckCheck,
+  FileText,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog'
 import { StepIndicator } from '@/components/step-indicator'
 import {
   saveAnswer,
@@ -27,6 +41,7 @@ import {
   saveManualAnswer,
   setDraftReadyToAssemble,
 } from '@/actions/applications'
+import type { GuidelineCitation } from '@/lib/types'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -44,6 +59,7 @@ export type QuestionRow = {
   isBudgetQuestion: boolean
   guidance: string | null
   isApproved: boolean
+  guidelineReference: GuidelineCitation | null
 }
 
 type RefineState =
@@ -60,6 +76,17 @@ interface ApplicationStep4DraftProps {
   grantName: string
   approachingLimit: boolean
   limitReached: boolean
+  /** Retained guideline text (P6.4, GAP-33) — null if never retained (older
+   * applications, or the summary has never been regenerated since). Text
+   * only, never the raw file (ADR-DATA-002). */
+  guidelineText: string | null
+}
+
+/** A short label for a citation badge, e.g. "Page 5" or "Eligibility > Referrals". */
+function citationLabel(citation: GuidelineCitation): string {
+  return citation.source_type === 'page'
+    ? `Page ${citation.page_number}`
+    : citation.heading_path.join(' > ')
 }
 
 // ---------------------------------------------------------------------------
@@ -82,10 +109,16 @@ export function ApplicationStep4Draft({
   grantName,
   approachingLimit,
   limitReached,
+  guidelineText,
 }: ApplicationStep4DraftProps) {
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
     Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
   )
+
+  // P6.4: "view original guidelines" panel — which citation is being viewed,
+  // or null if the panel is closed. A single dialog is reused for every
+  // question's citation rather than one per card.
+  const [viewingCitation, setViewingCitation] = useState<GuidelineCitation | null>(null)
 
   // FR-33: per-question approval state (initialised from DB is_approved)
   const [approved, setApproved] = useState<Record<string, boolean>>(() =>
@@ -521,6 +554,16 @@ export function ApplicationStep4Draft({
                       Budget
                     </span>
                   )}
+                  {q.guidelineReference && guidelineText && (
+                    <button
+                      type="button"
+                      onClick={() => setViewingCitation(q.guidelineReference)}
+                      className="flex items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
+                    >
+                      <FileText className="h-3 w-3" aria-hidden="true" />
+                      {citationLabel(q.guidelineReference)}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -742,6 +785,63 @@ export function ApplicationStep4Draft({
           {isAssembling ? 'Saving…' : 'Ready to assemble'}
         </Button>
       </div>
+
+      {/* "View original guidelines" panel (P6.4) — one dialog reused for every
+          question's citation, showing the retained text (GAP-33) scrolled to
+          and highlighting the cited quote. Text only, never a rendered PDF —
+          see ADR-SEC-004/ADR-DATA-007's 2026-07-14 correction. */}
+      <Dialog
+        open={viewingCitation !== null}
+        onOpenChange={(open) => !open && setViewingCitation(null)}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {viewingCitation ? `Original guidelines — ${citationLabel(viewingCitation)}` : ''}
+            </DialogTitle>
+            <DialogDescription>
+              The text below is exactly what was extracted from your uploaded guidelines.
+            </DialogDescription>
+          </DialogHeader>
+          {viewingCitation && guidelineText && (
+            <GuidelineTextPanel text={guidelineText} quote={viewingCitation.quote} />
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}
+
+/**
+ * Renders the retained guideline text (P6.4) in a scrollable panel, highlighting
+ * and auto-scrolling to the cited quote. If the quote isn't found verbatim (the
+ * citation was validated against real page/section markers, not a verbatim
+ * substring match — see lib/guideline-citations.ts), the full text is still
+ * shown, just without a highlight — a graceful degradation, not an error.
+ */
+function GuidelineTextPanel({ text, quote }: { text: string; quote: string }) {
+  const highlightRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    highlightRef.current?.scrollIntoView({ block: 'center' })
+  }, [text, quote])
+
+  const matchIndex = text.indexOf(quote)
+  const before = matchIndex === -1 ? text : text.slice(0, matchIndex)
+  const match = matchIndex === -1 ? '' : text.slice(matchIndex, matchIndex + quote.length)
+  const after = matchIndex === -1 ? '' : text.slice(matchIndex + quote.length)
+
+  return (
+    <div className="max-h-[60vh] overflow-y-auto rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+      <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#334155]">
+        {before}
+        {match && (
+          <mark ref={highlightRef} className="rounded bg-[#FDE68A] px-0.5 text-[#78350F]">
+            {match}
+          </mark>
+        )}
+        {after}
+      </p>
     </div>
   )
 }
