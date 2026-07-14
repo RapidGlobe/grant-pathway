@@ -101,3 +101,32 @@ export function toGuidelineReferenceColumn(citation: GuidelineCitation | null | 
   }
   return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
 }
+
+/**
+ * Finds where `quote` occurs in `text` (P6.4's "view original guidelines"
+ * panel), tolerating whitespace differences between them — PDF extraction
+ * often wraps a line where the AI's quote has an ordinary space (e.g.
+ * "project\nwill address" in the source vs. "project will address" in the
+ * quote), which breaks a plain exact-substring match. Matches the quote's
+ * words in order, joined by `\s+`, so any run of whitespace in the source
+ * (space, newline, multiple spaces) satisfies a single space in the quote.
+ * Returns null if no match is found — the caller shows the text unhighlighted
+ * rather than treating this as an error (quotes are validated against real
+ * markers, not a verbatim-substring guarantee — see validateCitation above).
+ */
+export function findQuoteRange(text: string, quote: string): { start: number; end: number } | null {
+  const words = quote.trim().split(/\s+/).filter(Boolean)
+  if (words.length === 0) return null
+
+  const pattern = words.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+')
+
+  let match: RegExpExecArray | null
+  try {
+    match = new RegExp(pattern).exec(text)
+  } catch {
+    return null
+  }
+  if (!match) return null
+
+  return { start: match.index, end: match.index + match[0].length }
+}

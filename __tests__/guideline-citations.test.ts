@@ -3,6 +3,7 @@ import {
   extractValidMarkers,
   validateCitation,
   toGuidelineReferenceColumn,
+  findQuoteRange,
 } from '@/lib/guideline-citations'
 
 describe('extractValidMarkers', () => {
@@ -127,5 +128,47 @@ describe('toGuidelineReferenceColumn', () => {
     expect(result.source_type).toBe('heading')
     expect(result.heading_path).toEqual(['Eligibility'])
     expect('page_number' in result).toBe(false)
+  })
+})
+
+describe('findQuoteRange', () => {
+  it('finds an exact substring match', () => {
+    const text = 'Some text before. Explain the need for your project. Some text after.'
+    const range = findQuoteRange(text, 'Explain the need for your project.')
+    expect(range).not.toBeNull()
+    expect(text.slice(range!.start, range!.end)).toBe('Explain the need for your project.')
+  })
+
+  it('tolerates a PDF line-wrap newline where the quote has a space (live bug, 2026-07-14)', () => {
+    // Real case found live-testing P6.4: the PDF wraps mid-sentence, so the
+    // retained text has a newline exactly where the AI's quote has a space.
+    const text =
+      'Explain the need for your project, how the need was identified and how this project\nwill address the need. (Need & Demand)'
+    const quote =
+      'Explain the need for your project, how the need was identified and how this project will address the need.'
+    const range = findQuoteRange(text, quote)
+    expect(range).not.toBeNull()
+    expect(text.slice(range!.start, range!.end)).toContain('project\nwill address')
+  })
+
+  it('tolerates multiple/irregular whitespace between words', () => {
+    const text = 'Some   text  with\n\nirregular   spacing here.'
+    const range = findQuoteRange(text, 'text with irregular spacing')
+    expect(range).not.toBeNull()
+  })
+
+  it('returns null when the quote is not found at all', () => {
+    expect(findQuoteRange('Some text.', 'Not present anywhere')).toBeNull()
+  })
+
+  it('returns null for an empty or whitespace-only quote', () => {
+    expect(findQuoteRange('Some text.', '')).toBeNull()
+    expect(findQuoteRange('Some text.', '   ')).toBeNull()
+  })
+
+  it('escapes regex-special characters in the quote safely', () => {
+    const text = 'The grant is between £5,001 - £15,000 (20% match required).'
+    const range = findQuoteRange(text, '£5,001 - £15,000 (20% match required)')
+    expect(range).not.toBeNull()
   })
 })

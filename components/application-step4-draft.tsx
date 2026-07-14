@@ -42,6 +42,7 @@ import {
   setDraftReadyToAssemble,
 } from '@/actions/applications'
 import type { GuidelineCitation } from '@/lib/types'
+import { findQuoteRange } from '@/lib/guideline-citations'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -814,10 +815,11 @@ export function ApplicationStep4Draft({
 
 /**
  * Renders the retained guideline text (P6.4) in a scrollable panel, highlighting
- * and auto-scrolling to the cited quote. If the quote isn't found verbatim (the
- * citation was validated against real page/section markers, not a verbatim
- * substring match — see lib/guideline-citations.ts), the full text is still
- * shown, just without a highlight — a graceful degradation, not an error.
+ * and auto-scrolling to the cited quote. If the quote isn't found even with
+ * whitespace tolerance (the citation was validated against real page/section
+ * markers, not a verbatim-substring guarantee — see lib/guideline-citations.ts),
+ * the full text is still shown, just without a highlight — a graceful
+ * degradation, not an error.
  */
 function GuidelineTextPanel({ text, quote }: { text: string; quote: string }) {
   const highlightRef = useRef<HTMLElement>(null)
@@ -826,10 +828,10 @@ function GuidelineTextPanel({ text, quote }: { text: string; quote: string }) {
     highlightRef.current?.scrollIntoView({ block: 'center' })
   }, [text, quote])
 
-  const matchIndex = text.indexOf(quote)
-  const before = matchIndex === -1 ? text : text.slice(0, matchIndex)
-  const match = matchIndex === -1 ? '' : text.slice(matchIndex, matchIndex + quote.length)
-  const after = matchIndex === -1 ? '' : text.slice(matchIndex + quote.length)
+  const range = findQuoteRange(text, quote)
+  const before = range ? text.slice(0, range.start) : text
+  const match = range ? text.slice(range.start, range.end) : ''
+  const after = range ? text.slice(range.end) : ''
 
   return (
     <div className="max-h-[60vh] overflow-y-auto rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">

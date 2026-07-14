@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-14 — P6.4 live-testing bug fix: quote highlighting didn't survive PDF line-wraps
+
+Found live-testing P6.4 minutes after it shipped: WJ opened the "view original guidelines" panel and it showed the top of page 1 instead of jumping to and highlighting the cited quote on page 5. The badge and panel both opened correctly — only the highlight/scroll silently failed.
+
+**Root cause:** the retained text preserves the PDF's own line-wrapping, so a sentence that wraps mid-line becomes `"...this project\nwill address..."` in the stored text, while the AI's quote (a clean sentence) has `"...this project will address..."` — an ordinary space where the source has a newline. `GuidelineTextPanel`'s exact `text.indexOf(quote)` match failed silently and fell back to its "no highlight" degradation path (which was working exactly as designed — the bug was that this fallback triggered far more often than expected, not that the fallback itself misbehaved).
+
+**Fix:** replaced the exact-substring match with a new `findQuoteRange()` (`lib/guideline-citations.ts`) that matches the quote's words in order joined by `\s+`, so any run of whitespace in the source — space, newline, multiple spaces — satisfies a single space in the quote. Moved out of the component and into the shared citation-logic module so it's unit-testable without a DOM environment (this codebase's test setup is Node-only, no jsdom/React Testing Library).
+
+**Verification:** 6 new Vitest tests (`__tests__/guideline-citations.test.ts`), including one that reproduces the exact reported bug verbatim (the real newline-vs-space case), plus multiple/irregular whitespace, no-match, empty-quote, and regex-special-character-in-quote cases (e.g. "£5,001 - £15,000 (20% match required)"). `tsc --noEmit`, `eslint --max-warnings 0`, all 46 tests pass.
+
+**Files changed:** `lib/guideline-citations.ts`, `components/application-step4-draft.tsx`, `__tests__/guideline-citations.test.ts`.
+
+---
+
 ## 2026-07-14 — P6.4 built (first milestone): Step 4 shows citations, plus a live-verification finding
 
 **P6.3 live-verified first.** Before starting P6.4, WJ regenerated the Step 3 summary for the real MK Community Foundation — Oak Grants test application (re-supplying the guidelines after a session reset). Checked the result against the actual PDF: the AI found 12 questions where the previous, pre-`P6.3` baseline (recorded in the test plan, 2026-07-03) had only 10. Questions 1–10 matched verbatim; questions 11–12 are genuine, verbatim page-5 questions about additional funding and fundraising plans — both correctly flagged as budget questions, both citing real page 5 content, and both filling a gap the original test-plan baseline had explicitly noted as missing ("no dedicated match-funding question found"). **Conclusion: a correct improvement, not a regression** — `P6.3`'s citation validation works end to end against a real Bedrock call, which local automated tests alone couldn't prove (no real AWS credentials in this environment). **Follow-up agreed, not yet done:** the MK Community Foundation test plan and the user guide need refreshing to reflect the corrected 12-question baseline.
