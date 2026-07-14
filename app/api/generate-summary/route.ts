@@ -37,8 +37,25 @@ import {
   type CharityContext,
 } from '@/lib/prompts'
 import { preprocessText, DEFAULT_CHAR_CEILING } from '@/lib/preprocess-text'
+import { extractValidMarkers, validateCitation } from '@/lib/guideline-citations'
 import type { AiSummaryData } from '@/lib/types'
 import { NextResponse, type NextRequest } from 'next/server'
+
+// Raw citation shape as the AI actually returns it (P6.3, ADR-DATA-007) —
+// both page_number and heading_path present, one always null, per the
+// prompt's worked examples. reconcileCitations() below (near the parse
+// logic) converts this into the strict omitted-key discriminated union
+// application_items expects, after cross-checking it against real markers
+// in the guidelines text (lib/guideline-citations.ts).
+const citationSchema = z
+  .object({
+    source_type: z.enum(['page', 'heading']),
+    page_number: z.number().nullable(),
+    heading_path: z.array(z.string()).nullable(),
+    quote: z.string(),
+  })
+  .nullable()
+  .optional()
 
 // Zod schemas for Bedrock response validation (F-02-02)
 const aiSummaryQuestionSchema = z.object({
@@ -48,6 +65,7 @@ const aiSummaryQuestionSchema = z.object({
   charLimit: z.number().nullable().optional(),
   limitType: z.enum(['words', 'characters', 'none']).nullable().optional(),
   is_budget_question: z.boolean(),
+  citation: citationSchema,
 })
 
 const aiSummarySectionSchema = z.object({
@@ -56,6 +74,7 @@ const aiSummarySectionSchema = z.object({
   guidance: z.string(),
   wordLimit: z.number().optional(),
   is_budget_section: z.boolean(),
+  citation: citationSchema,
 })
 
 const aiSummarySchema = z.object({
@@ -276,7 +295,9 @@ export async function POST(request: NextRequest) {
     .replace(/\s*```\s*$/, '')
     .trim()
 
-  let summary: AiSummaryData
+  // Typed as the raw Zod-inferred shape (citation keys not yet reconciled
+  // against real markers) until step 7a below produces the final AiSummaryData.
+  let rawSummary: z.infer<typeof aiSummarySchema>
   let rawParsed: unknown
   try {
     rawParsed = JSON.parse(cleaned)
@@ -285,7 +306,7 @@ export async function POST(request: NextRequest) {
   }
   const parseResult = aiSummarySchema.safeParse(rawParsed)
   if (parseResult.success) {
-    summary = parseResult.data
+    rawSummary = parseResult.data
   } else {
     // JSON parse or Zod validation failed — retry once with a stricter prompt (ADR-AI-004)
     console.warn('[generate-summary] JSON parse/validation failed on first attempt, retrying...')
@@ -331,7 +352,7 @@ export async function POST(request: NextRequest) {
     }
     const retryParseResult = aiSummarySchema.safeParse(retryRawParsed)
     if (retryParseResult.success) {
-      summary = retryParseResult.data
+      rawSummary = retryParseResult.data
     } else {
       console.error('[generate-summary] JSON parse/validation failed after retry')
       await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
@@ -339,6 +360,37 @@ export async function POST(request: NextRequest) {
         status: httpStatusForError('parse_error'),
       })
     }
+  }
+
+  // ── 7a. Reconcile citations against real markers (P6.3, ADR-DATA-007) ─────
+  // A citation is never trusted purely on the AI's word — cross-check every
+  // reported [PAGE N] / [SECTION: ...] citation against the markers actually
+  // present in the text the AI was given (textForPrompt, post-truncation), and
+  // drop (null out) any that don't check out. Log a warning (not a failure —
+  // nothing renders citations to a user yet) if over half of what the AI
+  // offered turns out invalid, as a signal the tagging or the model's
+  // behaviour may need attention.
+  const validMarkers = extractValidMarkers(textForPrompt)
+  let citationsOffered = 0
+  let citationsValid = 0
+
+  const reconcileCitation = (raw: (typeof rawSummary.questions)[number]['citation']) => {
+    const result = validateCitation(raw ?? null, validMarkers)
+    if (result.wasOffered) citationsOffered++
+    if (result.wasValid) citationsValid++
+    return result.citation
+  }
+
+  const summary: AiSummaryData = {
+    ...rawSummary,
+    questions: rawSummary.questions.map((q) => ({ ...q, citation: reconcileCitation(q.citation) })),
+    sections: rawSummary.sections?.map((s) => ({ ...s, citation: reconcileCitation(s.citation) })),
+  }
+
+  if (citationsOffered > 0 && citationsValid / citationsOffered < 0.5) {
+    console.warn(
+      `[generate-summary] over half of offered citations were invalid: ${citationsValid}/${citationsOffered} valid (applicationId: ${applicationId})`,
+    )
   }
 
   // ── 8. Save summary to database ────────────────────────────────────────────

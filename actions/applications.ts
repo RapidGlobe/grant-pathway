@@ -7,6 +7,7 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 // ---------------------------------------------------------------------------
@@ -426,7 +427,9 @@ export async function setDraftInProgress(
   // fallback for returning users who navigate directly without the checklist.
   // item_type is always 'narrative' and source_of_truth always 'user_input'
   // in compatibility mode (P6.2, ADR-DATA-006) — no other item type is
-  // produced by today's extraction prompt.
+  // produced by today's extraction prompt. guideline_reference is populated
+  // when the extraction route's citation validation confirmed a real one
+  // (P6.3, ADR-DATA-007) — null otherwise, never a bare unverified AI guess.
   if (appRow?.ai_summary) {
     try {
       const parsedSummary = JSON.parse(appRow.ai_summary) as AiSummaryData
@@ -450,6 +453,7 @@ export async function setDraftInProgress(
             char_limit: null,
             limit_type: s.wordLimit ? 'words' : null,
             is_budget_question: s.is_budget_section ?? false,
+            guideline_reference: toGuidelineReferenceColumn(s.citation),
           }))
 
         if (inserts.length > 0) {
@@ -479,6 +483,7 @@ export async function setDraftInProgress(
             char_limit: q.charLimit ?? null,
             limit_type: q.limitType ?? null,
             is_budget_question: q.is_budget_question ?? false,
+            guideline_reference: toGuidelineReferenceColumn(q.citation),
           }))
 
         if (inserts.length > 0) {

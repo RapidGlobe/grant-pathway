@@ -5,6 +5,7 @@ import { ApplicationStep4PrepChecklist } from '@/components/application-step4-pr
 import { ApplicationStep4SeniorReview } from '@/components/application-step4-senior-review'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
+import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 export const metadata: Metadata = {
@@ -146,6 +147,7 @@ export default async function Step4Page({ params }: Props) {
             char_limit: null,
             limit_type: s.wordLimit ? 'words' : null,
             is_budget_question: s.is_budget_section ?? false,
+            guideline_reference: toGuidelineReferenceColumn(s.citation),
           }))
 
         if (inserts.length > 0) {
@@ -201,6 +203,7 @@ export default async function Step4Page({ params }: Props) {
             char_limit: q.charLimit ?? null,
             limit_type: q.limitType ?? null,
             is_budget_question: q.is_budget_question ?? false,
+            guideline_reference: toGuidelineReferenceColumn(q.citation),
           }))
 
         if (inserts.length > 0) {

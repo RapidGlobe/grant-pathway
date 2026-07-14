@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-14 — P6.3 built (first milestone): extraction now records citations, not just questions
+
+Built the third part of `ADR-DATA-007` Option B: extraction cites a specific chunk of `P6.2a`'s tagged text for each question/section, rather than free-typing a page number. Scope confirmed with WJ before coding: questions/sections only this pass (the ones feeding `application_items`) — not the Step 3 summary bullets, which have no database column to store a citation in yet and nothing displays any citation regardless (that's `P6.4`).
+
+**Prompt (`lib/prompts.ts`):** `buildSummaryPrompt`'s JSON schema gained an optional `citation` field per question/section — `source_type` ('page'/'heading'), `page_number`, `heading_path`, `quote` — matching the shape agreed with WJ on 2026-07-13. Explicit instruction: omit the citation entirely rather than guess if no `[PAGE N]`/`[SECTION: ...]` marker clearly applies.
+
+**Validation (`lib/guideline-citations.ts`, new):** a citation is never trusted purely on the AI's word. `extractValidMarkers()` reads the real markers out of the text the AI was actually given; `validateCitation()` cross-checks the AI's reported citation against them and returns null if it doesn't check out (wrong page number, non-existent heading path, or an empty quote) — a fake or mismatched citation is dropped, not treated as a reason to fail or retry the whole response. If over half of what the AI offered for a document turns out invalid, a warning is logged (visible in error-monitoring only) as a signal worth checking, without blocking the user — threshold agreed with WJ. `toGuidelineReferenceColumn()` converts a validated citation into the exact JSONB shape `application_items.guideline_reference`'s `P6.2` CHECK constraint requires: the unused key (`page_number` or `heading_path`) must be an **absent object key**, not a `null` value, since the constraint tests key presence via the `?` operator, not value.
+
+**Wiring:** `app/api/generate-summary/route.ts` reconciles citations once, after either the first-attempt or retry-attempt JSON parse succeeds, against `textForPrompt` (post-truncation — the same text the AI saw). Both `application_items` write points (`actions/applications.ts`'s `setDraftInProgress`, and Step 4's page-load sync fallback) now pass the validated citation into `guideline_reference`. No other field or item-type change — `item_type`/`source_of_truth` stay hardcoded `'narrative'`/`'user_input'` exactly as in `P6.2`.
+
+**Design walkthrough:** presented item-by-item to WJ in plain language, as with `P6.2a`. One real decision point (silently drop an invalid citation vs. reject/retry the whole AI response) resolved in favour of dropping — a missing citation is a minor, invisible gap since nothing renders citations yet. A follow-up question (what threshold should trigger a warning) settled at >50% invalid.
+
+**Verification:** `tsc --noEmit`, `eslint --max-warnings 0`, `prettier --check` all clean. 11 new Vitest tests (`__tests__/guideline-citations.test.ts`, 40/40 total passing) cover marker extraction, valid/invalid page and heading citations (including a citation pointing at a real-looking but non-existent page/heading — the hallucination-guard case), empty-quote rejection, and the key-omission behaviour required by the CHECK constraint. **Live verification limitation:** this local environment has no real AWS credentials configured (`.env.local`'s `AWS_ACCESS_KEY_ID` is an empty placeholder) — a real Bedrock call against the actual MK Community Foundation guideline PDF could not be made from here. "No information loss versus the current prompt" and citation accuracy against real content are confirmed by code review and unit tests only; live browser verification through Step 2/3 against the real PDF is still pending WJ, same pattern as `P6.2a`.
+
+**Files changed:** `lib/prompts.ts`, `lib/types.ts`, `lib/guideline-citations.ts` (new), `app/api/generate-summary/route.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `__tests__/guideline-citations.test.ts` (new), `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.12), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`, `docs/Implementation Plan/ADR-TRACEABILITY.md` (v2.7), `docs/Technical Decision and Design/technical-design.md` (v1.13).
+
+---
+
 ## 2026-07-14 — P6.2a built: guideline extraction now tags structure instead of discarding it
 
 Built the groundwork task from `ADR-DATA-007` Option B ("the text itself carries verifiable structure — e.g. `[PAGE 3]` markers") — extraction preserves page (PDF) or heading (docx, pasted text) boundaries so a future citation can only ever point at a chunk of text that structurally exists in the source, rather than a free-typed guess. This is groundwork only: nothing consumes the markers yet, that's `P6.3`.
