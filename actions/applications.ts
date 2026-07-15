@@ -117,47 +117,6 @@ export async function deleteApplication(applicationId: string): Promise<DeleteAp
 }
 
 // ---------------------------------------------------------------------------
-// P5.FD4 — Fetch approved funder list for Step 1 picker
-// ---------------------------------------------------------------------------
-
-export type FunderOption = {
-  id: string
-  name: string
-}
-
-/**
- * Returns all active funders from the approved directory, ordered
- * alphabetically. Used to populate the searchable picker on Step 1.
- *
- * Called server-side in the Step 1 page component so the list is
- * available on first render with no client-side fetch.
- *
- * Does not select `funder_type` — that column is a pre-committed,
- * per-funder guess (DR-FD-001) that turned out not to reflect a stable
- * property of the funder (the same funder can produce both a
- * discrete-question form and free-form guidance, depending on which
- * document is uploaded). The actual classification that drives Step 3/4/5
- * behaviour is derived fresh from the uploaded guidelines each time (see
- * `ai_summary.funder_type` in this file) and is unaffected by this change.
- */
-export async function getActiveFunders(): Promise<FunderOption[]> {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('funders')
-    .select('id, name')
-    .eq('is_active', true)
-    .order('name', { ascending: true })
-
-  if (error || !data) return []
-
-  return data.map((f) => ({
-    id: f.id,
-    name: f.name,
-  }))
-}
-
-// ---------------------------------------------------------------------------
 // P6.5 — Reuse Previous Application (private, per-charity, per-funder)
 // ---------------------------------------------------------------------------
 
@@ -172,15 +131,24 @@ export type PreviousApplicationOption = {
  * funder that has reached at least Step 4 (i.e. has a question list and
  * retained guidelines worth reusing). Returns null if none exists.
  *
+ * "Same funder" is matched by a case-insensitive, trimmed comparison of
+ * the free-typed `funder_name` (the curated funder directory and its
+ * `funder_id` FK were removed 2026-07-15 — DR-FD-001 amendment — so there
+ * is no longer a stable funder identity to match on). This is a
+ * deliberate soft-miss trade-off: if a charity types the same funder's
+ * name slightly differently between applications (e.g. "Henry Smith
+ * Charity" vs "The Henry Smith Charity"), the reuse prompt simply won't
+ * offer itself — it will never wrongly match two different funders.
+ *
  * Used by Step 1 to offer "Start fresh" vs "Start from your last
- * application to [Funder]" once a funder is selected. Entirely scoped to
- * the current user — no cross-charity sharing, no curator role (P6.5
+ * application to [Funder]" once a funder name is entered. Entirely scoped
+ * to the current user — no cross-charity sharing, no curator role (P6.5
  * design, 2026-07-14 — supersedes the earlier "Curated Funder Playbooks"
  * concept, see ADR-DATA-006's amendment).
  */
 export async function getPreviousApplicationForFunder(
   currentApplicationId: string,
-  funderId: string,
+  funderName: string,
 ): Promise<PreviousApplicationOption | null> {
   const supabase = await createClient()
 
@@ -190,11 +158,19 @@ export async function getPreviousApplicationForFunder(
 
   if (!user) return null
 
+  const trimmedName = funderName.trim()
+  if (!trimmedName) return null
+
+  // Escape ILIKE wildcard characters so a funder name containing a literal
+  // "%" or "_" (e.g. "Awards for All (100%)") is matched exactly rather
+  // than treated as a pattern.
+  const escapedName = trimmedName.replace(/[\\%_]/g, (char) => `\\${char}`)
+
   const { data, error } = await supabase
     .from('applications')
     .select('id, grant_name, updated_at')
     .eq('user_id', user.id)
-    .eq('funder_id', funderId)
+    .ilike('funder_name', escapedName)
     .neq('id', currentApplicationId)
     .gte('current_step', 4)
     .order('updated_at', { ascending: false })
@@ -289,8 +265,8 @@ async function cloneApplicationForReuse(
 // ---------------------------------------------------------------------------
 
 /**
- * Saves funder_id, funder_name, and grant_name for an existing application
- * and redirects to Step 2.
+ * Saves funder_name and grant_name for an existing application and
+ * redirects to Step 2.
  *
  * current_step advances to 2 on first save (new application). If the
  * user returns to Step 1 later (current_step already >= 2), current_step
@@ -307,7 +283,6 @@ async function cloneApplicationForReuse(
  */
 export async function saveApplicationStep1(
   applicationId: string,
-  funderId: string,
   funderName: string,
   grantName: string,
   reuseFromApplicationId?: string,
@@ -336,7 +311,6 @@ export async function saveApplicationStep1(
     const { error } = await supabase
       .from('applications')
       .update({
-        funder_id: funderId,
         funder_name: funderName,
         grant_name: grantName,
         current_step: newStep,

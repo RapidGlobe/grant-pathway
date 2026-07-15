@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-15 — DR-FD-001 v1.4: curated funder picker/directory removed, free-text field restored
+
+WJ questioned whether Step 1's "Who is offering this grant?" searchable picker was still needed, six weeks after it was introduced (DR-FD-001, 2026-06-01). Investigation found the 2026-07-11 amendment relaxing the picker to a free-text fallback had never actually been built — it existed only inside the decision record, with no corresponding task in `IMPLEMENTATION-PLAN.md`'s tracked list.
+
+**Decision: go further than finishing that fallback — remove the picker/directory entirely.** With Step 3/4/5 processing already known (per the same 2026-07-11 amendment) to be driven per-application by the uploaded guidelines rather than by funder identity, a curated directory no longer serves the purpose it was built for. `Who is offering this grant?` is a plain free-text field again.
+
+**Dependency sweep before touching anything** (WJ was explicit he didn't want something else to silently break): grepped every reference to `funder_id`/`funders`/`FunderOption` across the codebase. Contained to three files: `actions/applications.ts` (`getActiveFunders()` deleted; `saveApplicationStep1()` loses its `funderId` param), `components/application-step1-form.tsx` (whole picker/dropdown/keyboard-nav/mailto-link UI replaced with a plain text input), and the Step 1 server page (stops fetching the funder list). No test file referenced any of it.
+
+**The one real compatibility question:** P6.5's "start from your last application to [Funder]" (`getPreviousApplicationForFunder`) matched "same funder" by exact `funder_id` equality. With no stable funder identity left, it now matches a trimmed, case-insensitive `funder_name` comparison instead (Postgres `ILIKE`, with `%`/`_`/`\` escaped so a funder name containing one of those characters literally isn't treated as a wildcard). Agreed with WJ as a deliberate soft-miss trade-off: typing a funder's name slightly differently between two applications means the reuse prompt just won't offer itself — it will never wrongly match two different funders' data together.
+
+**Left alone, on purpose:** the `funders` table and `applications.funder_id` column — same low-priority-cleanup treatment already given to the table's own dormant `funder_type` column, rather than an urgent drop migration. No database migration in this change at all.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 55 tests pass.
+
+**Files changed:** `actions/applications.ts`, `components/application-step1-form.tsx`, `app/(authenticated)/applications/[id]/step/1/page.tsx`, `docs/decisions/DR-FD-001-funder-directory-model.md` (v1.4), `docs/decisions/DECISIONS-INDEX.md`, `docs/PRD-Grant-Pathway.md` (v0.49), `docs/PRD inputs/acceptance-criteria.md` (FR-15), `docs/moscow-feature-register.md` (v1.17), `docs/data-model.md` (v1.11).
+
+---
+
 ## 2026-07-15 — PDR-AI-008: governance-facts placement to be reworked via guideline-driven extraction
 
 Following the £-formatting fix (next entry below), WJ's live testing prompted a bigger rethink: the fixed 5-item "Governance and reserves" block (built earlier the same day, previous entry) felt disjointed from the rest of Step 4 — no citation badge, no funder-specific rationale, shown unconditionally regardless of whether a given funder cares about any of it.

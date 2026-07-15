@@ -12,19 +12,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ## Status
 
-| Section                                                      | FRs covered            | Status                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check); AC-FR-06-04 added for the 55-minute warning dialog before auto-logout (previously undocumented, found during PRD Section 12 review)                                |
-| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected. Updated 2026-07-15 — FR-12A re-sited from `/profile` to Step 4 (all 3 ACs rewritten; see `ADR-DATA-006`'s matching amendment)                                                                                                |
-| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria                                                                                                                                                                               |
-| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13; updated 2026-07-14 — FR-22 built (GAP-33 fix): retention (AC-01/02) confirmed built; AC-03 (playbook-independent retention) permanently superseded, not pending — see `ADR-DATA-006`'s 2026-07-14 amendment; AC-04 reworded to flag the resulting stale UI copy (GAP-34)                    |
-| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-27-05 added. AC-FR-24-06 quote corrected and mechanism note updated 2026-07-14 now `P6.2a` has landed                                                                                                                          |
-| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                                                                                                                                                                                        |
-| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                                                                                                                                                                                         |
-| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                                                                                                                                                                                            |
-| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                                                         |
-| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                                                    |
-| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); summary-bullet citations remain not built; human curator confirmation (`P6.5`) is permanently superseded, not pending — see `ADR-DATA-007`'s 2026-07-14 amendment |
+| Section                                                      | FRs covered            | Status                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check); AC-FR-06-04 added for the 55-minute warning dialog before auto-logout (previously undocumented, found during PRD Section 12 review)                                                                                                             |
+| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected. Updated 2026-07-15 — FR-12A re-sited from `/profile` to Step 4 (all 3 ACs rewritten; see `ADR-DATA-006`'s matching amendment)                                                                                                                                                                             |
+| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria. Updated 2026-07-15 — FR-15 rewritten for DR-FD-001 v1.4: curated funder picker/directory removed, free-text field restored; AC-FR-15-01/02 updated; AC-FR-15-05 rewritten from "unlisted funder request link" to the new name-based reuse-match behaviour |
+| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13; updated 2026-07-14 — FR-22 built (GAP-33 fix): retention (AC-01/02) confirmed built; AC-03 (playbook-independent retention) permanently superseded, not pending — see `ADR-DATA-006`'s 2026-07-14 amendment; AC-04 reworded to flag the resulting stale UI copy (GAP-34)                                                                                                 |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-27-05 added. AC-FR-24-06 quote corrected and mechanism note updated 2026-07-14 now `P6.2a` has landed                                                                                                                                                                                                       |
+| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                                                                                                                                                                                                                                                                     |
+| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                                                                                                                                                                                                                                                                      |
+| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                                                                                                                                                                                                                                                                         |
+| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                                                                                                                                      |
+| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                                                                                                                                 |
+| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); summary-bullet citations remain not built; human curator confirmation (`P6.5`) is permanently superseded, not pending — see `ADR-DATA-007`'s 2026-07-14 amendment                                                                              |
 
 ---
 
@@ -713,7 +713,7 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ### FR-15 — Must Have
 
-**Requirement:** The system shall allow a user to create a new grant application by selecting a funder from the approved directory and entering the grant name. **Revised 2026-06-01 (DR-FD-001):** Funder is selected via searchable picker, not free-text entry.
+**Requirement (revised 2026-07-15, DR-FD-001 v1.4):** The system shall allow a user to create a new grant application by entering the funder's name as free text and entering the grant name. The 2026-06-01 curated directory picker (DR-FD-001 v1.0), and its 2026-07-11 free-text-fallback amendment (v1.3, never actually built), have both been superseded — the picker has been removed entirely rather than merely relaxed, since Step 3/4/5 processing is driven per-application by the uploaded guidelines, not by funder identity, so a curated directory no longer served a purpose. `applications.funder_id` (FK to `funders`) is left in place, unused; only `funder_name` is populated going forward.
 
 ---
 
@@ -721,11 +721,11 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 - **Given** I am a signed-in user with a completed charity profile
 - **When** I click "+ New Application" or "Start your first application" on `/dashboard`
-- **And** I select a funder from the searchable directory picker on Step 1
+- **And** I type the funder's name on Step 1
 - **And** I enter a grant name
 - **And** I click "Continue"
 - **Then** a new application record is created with status `not_started`
-- **And** the record is linked to the selected `funder_id`
+- **And** the record's `funder_name` is saved (no `funder_id` is set — the field is dormant since 2026-07-15)
 - **And** I am advanced to Step 2 (Funder Guidelines)
 
 ---
@@ -733,21 +733,20 @@ _Note: the final set of profile fields was refined during screen requirements. T
 **AC-FR-15-02 — Required fields enforced**
 
 - **Given** I am on Step 1 of the application flow
-- **When** I attempt to click "Continue" without selecting a funder or entering a grant name
+- **When** I attempt to click "Continue" without entering a funder name or grant name
 - **Then** inline error messages are shown:
-  - Funder: _"Please select a funder from the list"_
+  - Funder: _"Please enter the funder's name"_
   - Grant name: _"Please enter the grant name"_
 - **And** no application record is created
 
 ---
 
-**AC-FR-15-05 — Unlisted funder request link present**
+**AC-FR-15-05 — Reuse-match is name-based, not a stable identity** _(rewritten 2026-07-15 — the curated picker and its "unlisted funder" request link this AC previously described were removed; see FR-15's requirement note)_
 
-- **Given** I am on Step 1 of the application flow
-- **When** I look below the funder picker
-- **Then** I see the link _"My funder isn't listed — request it"_
-- **And** clicking the link opens the funder request form
-- **And** I cannot proceed with an unlisted funder name entered as free text
+- **Given** I have a previous application to a funder I've applied to before
+- **When** I start a new application and type that funder's name on Step 1
+- **Then** the app offers "Start from your last application to [Funder]" if, and only if, the typed name matches the previous application's `funder_name` on a case-insensitive, trimmed basis
+- **And** if I type the funder's name even slightly differently between the two applications (e.g. "Henry Smith Charity" vs "The Henry Smith Charity"), the reuse offer is not shown — this is an accepted soft-miss trade-off (WJ, 2026-07-15), not a bug: the app never wrongly matches two different funders as if they were the same one
 
 ---
 
