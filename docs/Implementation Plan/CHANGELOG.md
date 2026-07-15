@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-15 — PDR-AI-008: governance-facts placement to be reworked via guideline-driven extraction
+
+Following the £-formatting fix (next entry below), WJ's live testing prompted a bigger rethink: the fixed 5-item "Governance and reserves" block (built earlier the same day, previous entry) felt disjointed from the rest of Step 4 — no citation badge, no funder-specific rationale, shown unconditionally regardless of whether a given funder cares about any of it.
+
+**Decision (full record: `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`):** fold these 5 facts into the same guideline-driven extraction pipeline that already produces ordinary narrative questions with citations — shown only when a funder's guidelines actually raise the topic, not unconditionally on every application.
+
+**The key nuance, worth preserving:** the natural instinct was to require a precise, quotable citation before showing an item, with a self-serve "tick whichever of these applies" picker as the fallback for anything less precise. WJ pushed back once the conversation reached `docs/user-personas-journeys-and-use-cases.md`'s Persona 1, Margaret — no fundraising training, finds funder language confusing, already unsure whether her answers address what the funder asked. A picker that asks her to judge relevance herself just relocates the guesswork, it doesn't remove it. Also explicitly rejected: proactively suggesting a governance fact to a novice user when the AI has no signal at all — WJ's judgement was that this could make things worse for Margaret, not better, by introducing a decision point instead of removing one.
+
+**Landed on instead:** auto-show a governance item whenever the AI has _any_ signal at all, even an imprecise, unlocalised one — so a novice user is never shown a gap she's expected to notice and fill herself. The manual-add picker (plain-English explanations, not jargon labels) stays available to everyone but is designed as a rare shortcut for a more experienced user (Persona 2, David) who might know a funder-specific quirk the guidelines don't spell out — not the primary safety net.
+
+**Status: decided, not built.** This supersedes the "placement only, always show all 5 unconditionally" scope agreed earlier the same day (see the entry below) — that build stands as shipped and working, but its unconditional-display design will be reworked once this is scheduled.
+
+---
+
 ## 2026-07-15 — Governance Step 4 items: £ fields reformatted to UK currency style
 
 During his live verification pass of the governance-items redesign (previous entry below), WJ confirmed the 5 items render correctly at the top of Step 4, then asked for the two £ fields (total annual expenditure, reserves) to display in UK currency format — "£ n,nnn,nnn" — rather than a plain unformatted number input.
