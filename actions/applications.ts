@@ -940,7 +940,7 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
   // ── Fetch answered items in order ──────────────────────────────────────────
   const { data: answerRows, error: answersError } = await supabase
     .from('application_items')
-    .select('item_order, item_label, answer_text')
+    .select('item_order, item_label, answer_text, field_key')
     .eq('application_id', applicationId)
     .eq('user_id', user.id)
     .order('item_order')
@@ -974,7 +974,7 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
   } else {
     assembledDraft = answered
       .map((r) =>
-        funderType === 'free_form'
+        funderType === 'free_form' || r.field_key !== null
           ? `${r.item_label}\n\n${r.answer_text}`
           : `${r.item_order}. ${r.item_label}\n\n${r.answer_text}`,
       )

@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-15 — Step 5 assembled-draft numbering fix for governance items
+
+WJ predicted, then live-verified, that MK Community Foundation's Sapling Grants guidelines would trigger the same 3-of-5 governance facts as Oak Grants (Reserves, bank-signatory count, bank-signatories-related) — confirming the extraction logic generalises correctly across a second programme from the same funder. But he then flagged the Step 5 "Review and approve" screen showing these items with their raw internal numbering visible: "-4. Reserves (£)", "-2. How many people are authorised as bank signatories?", "-1. Are any bank signatories related to each other or to a trustee?"
+
+**Root cause:** governance items use a reserved negative `item_order` (-5 to -1) purely so they sort before a funder's own numbered questions — never meant to be shown to a user. Step 4's rendering already excludes this prefix for governance items, built during the PDR-AI-008 work. But `assembleAndAdvance()` (`actions/applications.ts`), which formats the Step 5 "assembled draft" independently by reading `item_order`/`item_label`/`answer_text` straight from the database, had no equivalent exclusion — it prefixes every structured-funder item with its raw `item_order` unconditionally.
+
+**Fix:** the query now also selects `field_key`; a governance item (identified the same way Step 4 does — `field_key !== null`) renders as a plain label with no number, exactly matching Step 4's display. `tsc --noEmit` and `eslint --max-warnings 0` both clean. No test added — `assembleAndAdvance` has no existing unit coverage (heavy Supabase-client coupling, consistent with other server actions in this file) — live re-verification of the Step 5 screen is pending WJ's own testing, per this project's established pattern for AI/UI behaviour that can't be exercised from this environment.
+
+**Files changed:** `actions/applications.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-15 — Citation-highlight fix: typographic punctuation tolerance
 
 WJ asked a direct testable question after the PDR-AI-008 build: "will the MKCF guidelines trigger a governance question?" Read the actual MK Community Foundation Oak Grants PDF and predicted 2-3 of the 5 facts would trigger (reserves policy, bank-signatory relatedness, plausibly signatory count) based on the extraction rules. WJ then live-tested it and got exactly that — 12 narrative questions + 3 governance items — confirming the detection logic works as designed. But he flagged something the prediction didn't cover: the Reserves item's citation badge linked correctly to "Page 3," but clicking it opened the viewer with no highlight and no auto-scroll, landing on Page 1.
