@@ -13,7 +13,7 @@
 // on request via "Help me improve this" (S6.6). Budget sections are blocked
 // from AI assistance at the UI level.
 
-import { useState, useEffect, useRef, useTransition } from 'react'
+import { Fragment, useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
 import {
   AlertTriangle,
@@ -53,6 +53,10 @@ export type QuestionRow = {
   id: string
   questionText: string
   questionOrder: number
+  /** 'narrative' for ordinary AI-extracted questions/sections; 'number' | 'data' for the 5 fixed governance items (fieldKey set). */
+  itemType: 'narrative' | 'data' | 'number'
+  /** Set only for the 5 governance/reserves items (2026-07-15) — null for ordinary narrative items. */
+  fieldKey: string | null
   wordLimit: number | null
   charLimit: number | null
   limitType: 'words' | 'characters' | 'none' | null
@@ -512,7 +516,10 @@ export function ApplicationStep4Draft({
 
       {/* Question / section cards */}
       <div className="mb-8 space-y-6">
-        {questions.map((q) => {
+        {questions.map((q, idx) => {
+          const isGovernanceItem = q.fieldKey != null
+          const isFirstGovernanceItem =
+            isGovernanceItem && (idx === 0 || !questions[idx - 1].fieldKey)
           const text = answers[q.id] ?? ''
           const words = countWords(text)
           const chars = text.length
@@ -529,235 +536,280 @@ export function ApplicationStep4Draft({
           const approveError = approveErrors[q.id] ?? ''
 
           return (
-            <div
-              key={q.id}
-              className={`rounded-xl border p-5 ${
-                isApprovedQ
-                  ? 'border-[#6EE7B7] bg-[#F0FDF4]'
-                  : q.isBudgetQuestion
-                    ? 'border-[#FDE68A] bg-[#FFFBEB]'
-                    : 'border-[#E2E8F0] bg-white'
-              }`}
-            >
-              {/* Card header */}
-              <div className="mb-2 flex items-start justify-between gap-3">
-                <p className="text-[15px] font-semibold leading-snug text-[#1E293B]">
-                  {funderType === 'structured' && (
-                    <span className="mr-0.5">{q.questionOrder}.&nbsp;</span>
-                  )}
-                  {q.questionText}
-                </p>
-                <div className="flex shrink-0 items-center gap-2">
-                  {limit && (
-                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]">
-                      {limit}&nbsp;{useChars ? 'characters' : 'words'}
-                    </span>
-                  )}
-                  {q.isBudgetQuestion && (
-                    <span className="rounded bg-[#FDE68A] px-2 py-0.5 text-[11px] font-semibold text-[#78350F]">
-                      Budget
-                    </span>
-                  )}
-                  {q.guidelineReference && guidelineText && (
-                    <button
-                      type="button"
-                      onClick={() => setViewingCitation(q.guidelineReference)}
-                      className="flex items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
-                    >
-                      <FileText className="h-3 w-3" aria-hidden="true" />
-                      {citationLabel(q.guidelineReference)}
-                    </button>
-                  )}
-                  {q.isCarriedOver && (
-                    <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-1 text-[13px] font-bold text-[#92400E]">
-                      <History className="h-3.5 w-3.5" aria-hidden="true" />
-                      Carried over — please review
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Guidance note — free_form non-budget sections */}
-              {funderType === 'free_form' && q.guidance && !q.isBudgetQuestion && (
-                <p className="mb-3 text-[13px] leading-relaxed text-[#64748B]">{q.guidance}</p>
-              )}
-
-              {/* Budget warning */}
-              {q.isBudgetQuestion && (
-                <div className="mb-3 flex items-start gap-2">
-                  <AlertTriangle
-                    className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
-                    aria-hidden="true"
-                  />
-                  <p className="text-[12px] text-[#78350F]">
-                    {funderType === 'free_form'
-                      ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
-                      : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
+            <Fragment key={q.id}>
+              {isFirstGovernanceItem && (
+                <div className="pt-2">
+                  <p className="text-[15px] font-semibold text-[#1E293B]">
+                    Governance and reserves
+                  </p>
+                  <p className="mb-1 text-[13px] text-[#64748B]">
+                    Some funders check these facts as part of eligibility — please answer for this
+                    application.
                   </p>
                 </div>
               )}
-
-              {/* Textarea */}
-              <Textarea
-                id={`answer-${q.id}`}
-                value={text}
-                onChange={(e) => handleAnswerChange(q.id, e.target.value)}
-                onBlur={() => handleAnswerBlur(q.id)}
-                rows={8}
-                aria-label={
-                  funderType === 'free_form'
-                    ? `Content for ${q.questionText}`
-                    : `Answer for question ${q.questionOrder}`
-                }
-                placeholder={
-                  funderType === 'free_form'
-                    ? 'Write your content here…'
-                    : 'Write your answer here…'
-                }
-                className={`text-[14px] ${q.isBudgetQuestion ? 'bg-white' : ''}`}
-              />
-
-              {/* Word count */}
-              <p
-                className={`mt-1 text-right text-[12px] ${
-                  isOver ? 'text-[#DC2626]' : isNear ? 'text-[#D97706]' : 'text-[#94A3B8]'
+              <div
+                className={`rounded-xl border p-5 ${
+                  isApprovedQ
+                    ? 'border-[#6EE7B7] bg-[#F0FDF4]'
+                    : q.isBudgetQuestion
+                      ? 'border-[#FDE68A] bg-[#FFFBEB]'
+                      : 'border-[#E2E8F0] bg-white'
                 }`}
-                aria-live="polite"
               >
-                {limit
-                  ? `${count} / ${limit} ${useChars ? 'characters' : 'words'}`
-                  : `${words} words`}
-              </p>
-
-              {/* Refine answer — non-budget only */}
-              {!q.isBudgetQuestion && (
-                <div className="mt-3">
-                  {refineState.status === 'idle' && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => void handleRefine(q)}
-                        disabled={isEmpty || limitReached || isApprovedQ}
-                        className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
-                      >
-                        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                        Help me improve this
-                      </button>
-                      {isOver && (
-                        <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer exceeds the funder&apos;s word limit. Please trim it or use AI
-                          to bring it within the limit before approving.
-                        </p>
-                      )}
-                    </>
-                  )}
-
-                  {refineState.status === 'loading' && (
-                    <p className="text-[13px] text-[#64748B]">Improving your answer&hellip;</p>
-                  )}
-
-                  {refineState.status === 'error' && (
-                    <div className="flex items-center gap-3">
-                      <p className="text-[13px] text-[#DC2626]">{refineState.message}</p>
-                      <button
-                        type="button"
-                        onClick={() => dismissRefineError(q.id)}
-                        className="text-[13px] text-[#64748B] underline hover:no-underline"
-                      >
-                        Dismiss
-                      </button>
-                    </div>
-                  )}
-
-                  {refineState.status === 'showing' && (
-                    <div className="mt-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4">
-                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1D4ED8]">
-                        Suggested improvement
-                      </p>
-                      <p className="mb-4 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1E293B]">
-                        {refineState.refinedText}
-                      </p>
-                      <div className="flex items-center gap-4">
-                        <Button
-                          type="button"
-                          onClick={() => handleUseRefined(q.id, refineState.refinedText)}
-                          className="h-8 bg-[#1D4ED8] px-4 text-[13px] font-semibold text-white hover:bg-[#1E40AF]"
-                        >
-                          Use this improved version
-                        </Button>
-                        <button
-                          type="button"
-                          onClick={() => handleKeepOriginal(q.id)}
-                          className="text-[13px] text-[#64748B] underline hover:no-underline"
-                        >
-                          Keep my original
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* FR-32 / FR-33 — Review prompts and approval step.
-                  Show when: answer is non-empty OR section is optional (optional
-                  sections may be left blank and still approved/skipped). */}
-              {(!isEmpty || isOptionalQ(q.questionText)) &&
-                !isOver &&
-                !isApprovedQ &&
-                refineState.status !== 'showing' && (
-                  <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
-                    <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
-                      Before you approve, check:
-                    </p>
-                    <ul className="mb-4 space-y-2">
-                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
-                        <CheckCircle2
-                          className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
-                          aria-hidden="true"
-                        />
-                        Does this accurately describe your charity and project?
-                      </li>
-                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
-                        <CheckCircle2
-                          className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
-                          aria-hidden="true"
-                        />
-                        Are all figures, dates, and facts correct?
-                      </li>
-                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
-                        <CheckCircle2
-                          className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
-                          aria-hidden="true"
-                        />
-                        Does this answer the question that was asked?
-                      </li>
-                    </ul>
-                    {approveError && (
-                      <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
-                        {approveError}
-                      </p>
+                {/* Card header */}
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <p className="text-[15px] font-semibold leading-snug text-[#1E293B]">
+                    {funderType === 'structured' && !isGovernanceItem && (
+                      <span className="mr-0.5">{q.questionOrder}.&nbsp;</span>
                     )}
-                    <Button
-                      type="button"
-                      onClick={() => void handleApprove(q.id)}
-                      disabled={isApprovingQ}
-                      className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
-                    >
-                      {isApprovingQ ? 'Approving…' : 'Approve this answer'}
-                    </Button>
+                    {q.questionText}
+                  </p>
+                  <div className="flex shrink-0 items-center gap-2">
+                    {limit && (
+                      <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]">
+                        {limit}&nbsp;{useChars ? 'characters' : 'words'}
+                      </span>
+                    )}
+                    {q.isBudgetQuestion && (
+                      <span className="rounded bg-[#FDE68A] px-2 py-0.5 text-[11px] font-semibold text-[#78350F]">
+                        Budget
+                      </span>
+                    )}
+                    {q.guidelineReference && guidelineText && (
+                      <button
+                        type="button"
+                        onClick={() => setViewingCitation(q.guidelineReference)}
+                        className="flex items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
+                      >
+                        <FileText className="h-3 w-3" aria-hidden="true" />
+                        {citationLabel(q.guidelineReference)}
+                      </button>
+                    )}
+                    {q.isCarriedOver && (
+                      <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-1 text-[13px] font-bold text-[#92400E]">
+                        <History className="h-3.5 w-3.5" aria-hidden="true" />
+                        Carried over — please review
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Guidance note — free_form non-budget sections */}
+                {funderType === 'free_form' && q.guidance && !q.isBudgetQuestion && (
+                  <p className="mb-3 text-[13px] leading-relaxed text-[#64748B]">{q.guidance}</p>
+                )}
+
+                {/* Budget warning */}
+                {q.isBudgetQuestion && (
+                  <div className="mb-3 flex items-start gap-2">
+                    <AlertTriangle
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
+                      aria-hidden="true"
+                    />
+                    <p className="text-[12px] text-[#78350F]">
+                      {funderType === 'free_form'
+                        ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
+                        : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
+                    </p>
                   </div>
                 )}
 
-              {/* Approved confirmation banner */}
-              {isApprovedQ && (
-                <div className="mt-4 flex items-center gap-2">
-                  <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
-                  <span className="text-[13px] font-medium text-[#059669]">
-                    Answer approved — edit above to revise
-                  </span>
-                </div>
-              )}
-            </div>
+                {/* Governance item input — number or Yes/No/Not sure yet select */}
+                {isGovernanceItem && q.itemType === 'number' && (
+                  <Input
+                    id={`answer-${q.id}`}
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    value={text}
+                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                    onBlur={() => handleAnswerBlur(q.id)}
+                    aria-label={q.questionText}
+                    className={`h-10 text-[14px] sm:w-60 ${q.isBudgetQuestion ? 'bg-white' : ''}`}
+                  />
+                )}
+                {isGovernanceItem && q.itemType === 'data' && (
+                  <select
+                    id={`answer-${q.id}`}
+                    value={text}
+                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                    onBlur={() => handleAnswerBlur(q.id)}
+                    aria-label={q.questionText}
+                    className="h-10 w-full rounded-md border border-[#D1D5DB] bg-white px-3 text-[14px] sm:w-60"
+                  >
+                    <option value="">Not sure yet</option>
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                  </select>
+                )}
+
+                {/* Textarea — ordinary narrative questions/sections only */}
+                {!isGovernanceItem && (
+                  <Textarea
+                    id={`answer-${q.id}`}
+                    value={text}
+                    onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                    onBlur={() => handleAnswerBlur(q.id)}
+                    rows={8}
+                    aria-label={
+                      funderType === 'free_form'
+                        ? `Content for ${q.questionText}`
+                        : `Answer for question ${q.questionOrder}`
+                    }
+                    placeholder={
+                      funderType === 'free_form'
+                        ? 'Write your content here…'
+                        : 'Write your answer here…'
+                    }
+                    className={`text-[14px] ${q.isBudgetQuestion ? 'bg-white' : ''}`}
+                  />
+                )}
+
+                {/* Word count — narrative questions/sections only, governance items have no limit */}
+                {!isGovernanceItem && (
+                  <p
+                    className={`mt-1 text-right text-[12px] ${
+                      isOver ? 'text-[#DC2626]' : isNear ? 'text-[#D97706]' : 'text-[#94A3B8]'
+                    }`}
+                    aria-live="polite"
+                  >
+                    {limit
+                      ? `${count} / ${limit} ${useChars ? 'characters' : 'words'}`
+                      : `${words} words`}
+                  </p>
+                )}
+
+                {/* Refine answer — non-budget narrative questions only; AI assist doesn't apply to governance facts */}
+                {!q.isBudgetQuestion && !isGovernanceItem && (
+                  <div className="mt-3">
+                    {refineState.status === 'idle' && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => void handleRefine(q)}
+                          disabled={isEmpty || limitReached || isApprovedQ}
+                          className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                        >
+                          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                          Help me improve this
+                        </button>
+                        {isOver && (
+                          <p className="mt-1 text-[12px] text-[#DC2626]">
+                            Your answer exceeds the funder&apos;s word limit. Please trim it or use
+                            AI to bring it within the limit before approving.
+                          </p>
+                        )}
+                      </>
+                    )}
+
+                    {refineState.status === 'loading' && (
+                      <p className="text-[13px] text-[#64748B]">Improving your answer&hellip;</p>
+                    )}
+
+                    {refineState.status === 'error' && (
+                      <div className="flex items-center gap-3">
+                        <p className="text-[13px] text-[#DC2626]">{refineState.message}</p>
+                        <button
+                          type="button"
+                          onClick={() => dismissRefineError(q.id)}
+                          className="text-[13px] text-[#64748B] underline hover:no-underline"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    )}
+
+                    {refineState.status === 'showing' && (
+                      <div className="mt-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4">
+                        <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1D4ED8]">
+                          Suggested improvement
+                        </p>
+                        <p className="mb-4 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1E293B]">
+                          {refineState.refinedText}
+                        </p>
+                        <div className="flex items-center gap-4">
+                          <Button
+                            type="button"
+                            onClick={() => handleUseRefined(q.id, refineState.refinedText)}
+                            className="h-8 bg-[#1D4ED8] px-4 text-[13px] font-semibold text-white hover:bg-[#1E40AF]"
+                          >
+                            Use this improved version
+                          </Button>
+                          <button
+                            type="button"
+                            onClick={() => handleKeepOriginal(q.id)}
+                            className="text-[13px] text-[#64748B] underline hover:no-underline"
+                          >
+                            Keep my original
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* FR-32 / FR-33 — Review prompts and approval step.
+                  Show when: answer is non-empty OR section is optional (optional
+                  sections may be left blank and still approved/skipped). */}
+                {(!isEmpty || isOptionalQ(q.questionText)) &&
+                  !isOver &&
+                  !isApprovedQ &&
+                  refineState.status !== 'showing' && (
+                    <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
+                      <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
+                        Before you approve, check:
+                      </p>
+                      <ul className="mb-4 space-y-2">
+                        <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                          <CheckCircle2
+                            className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+                            aria-hidden="true"
+                          />
+                          Does this accurately describe your charity and project?
+                        </li>
+                        <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                          <CheckCircle2
+                            className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+                            aria-hidden="true"
+                          />
+                          Are all figures, dates, and facts correct?
+                        </li>
+                        <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                          <CheckCircle2
+                            className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
+                            aria-hidden="true"
+                          />
+                          Does this answer the question that was asked?
+                        </li>
+                      </ul>
+                      {approveError && (
+                        <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
+                          {approveError}
+                        </p>
+                      )}
+                      <Button
+                        type="button"
+                        onClick={() => void handleApprove(q.id)}
+                        disabled={isApprovingQ}
+                        className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+                      >
+                        {isApprovingQ ? 'Approving…' : 'Approve this answer'}
+                      </Button>
+                    </div>
+                  )}
+
+                {/* Approved confirmation banner */}
+                {isApprovedQ && (
+                  <div className="mt-4 flex items-center gap-2">
+                    <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
+                    <span className="text-[13px] font-medium text-[#059669]">
+                      Answer approved — edit above to revise
+                    </span>
+                  </div>
+                )}
+              </div>
+            </Fragment>
           )
         })}
       </div>

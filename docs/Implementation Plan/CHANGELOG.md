@@ -10,6 +10,28 @@
 
 ---
 
+## 2026-07-15 — Governance/reserves facts re-sited from `charity_profiles` into `application_items`
+
+WJ asked why the 5 governance/reserves facts (P6.1, 2026-07-05) lived on the charity profile page rather than at Step 3 or Step 4. Investigation found they were never actually consumed anywhere — not by Step 3's summary/eligibility logic, not by P6.5's clone — so `/profile`'s own copy ("helps flag issues before you apply") was untrue.
+
+**Decision: Option C — re-site into the item-graph, not Step 3 or a hybrid.** The schema already had dormant scaffolding that looked purpose-built for exactly this: `item_type` values `data`/`number` and a `source_of_truth = 'charity_profile'` enum value, both defined by P6.2 but never populated. Chosen over keeping them at profile level (never wired up, no reuse of the citation/approval machinery every other item already has) and over building AI-driven per-funder relevance detection immediately (bigger scope, not asked for this round).
+
+**Scope, confirmed with WJ:**
+
+- Placement only, this round — all 5 items always shown, every application, matching today's behaviour. No AI relevance/citation detection yet; deferred.
+- `/profile`'s governance section and the 5 `charity_profiles` columns retired outright. No backfill — this is dev/test data, and the new design has no per-charity "current value" store to backfill into anyway.
+- **No seeding between applications, including P6.5 reuse.** WJ was explicit: carrying forward financial/governance figures silently risks stale data. Every application collects these 5 facts fresh, every time — no exception for the "start from your last application" reuse flow.
+
+**Implementation:** new `application_items.field_key` column (CHECK-constrained to the 5 known values) identifies these rows robustly, independent of `item_label` wording. Reserved negative `item_order` (-5 to -1) sorts them first without touching the existing AI-driven narrative numbering. Created via the same dual sync path every other item already uses (`setDraftInProgress`, Step 4's fallback sync) — a third upsert block runs unconditionally in both, `answer_text` deliberately omitted so a fresh row inserts blank and an already-answered row is never clobbered on repeat syncs. `answer_text` stores the literal display value as plain text (not a coded enum), so `saveAnswer`/`approveAnswer` and the Step 5 export needed zero changes — only the Step 4 input widget is type-aware (a number input, or a Yes/No/Not sure yet select, instead of a textarea). P6.5's clone explicitly filters out `field_key IS NOT NULL` rows so reuse never carries these forward either. Item labels end in "(optional)" deliberately, reusing Step 4's existing optional-question gate with no code change to that logic.
+
+Also fixed in passing: the Step 4 orphan-cleanup filter (deletes unanswered rows the AI summary no longer mentions) was duplicated identically in two branches — extracted into a single tested `isOrphanedItem()` helper, which also had to learn to never treat a governance item as orphaned regardless of the current AI summary's numbering.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 55 tests pass (9 new). Migration applied to `grant-pathway-dev` only (confirmed via `supabase migration list` before/after — 22/22, then 23/23); `grant-pathway-prod` remains unlinked. Live browser verification pending WJ.
+
+**Files changed:** `supabase/migrations/20260715000000_governance_items_move_to_item_graph.sql`, `lib/governance-items.ts` (new), `lib/database.types.ts`, `actions/applications.ts`, `actions/charity.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `components/charity-profile-form.tsx`, `__tests__/governance-items.test.ts` (new), `docs/data-model.md` (v1.10), `IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-15 — Step 3 extraction pinned to `temperature: 0`; anti-merge rule added
 
 Ad-hoc E2E testing found a regression: MK Community Foundation — Oak Grants extracted 10 questions on a brand-new test run, down from the 12 confirmed correct the day before (2026-07-14 P6.3 live-test). `git log` and a same-code-path check ("Regenerate summary" vs. a first-time upload) ruled out a code change or stale cache — the guideline text and route were identical between runs.

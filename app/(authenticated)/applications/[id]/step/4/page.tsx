@@ -6,6 +6,7 @@ import { ApplicationStep4SeniorReview } from '@/components/application-step4-sen
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
+import { GOVERNANCE_ITEMS, isOrphanedItem } from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 export const metadata: Metadata = {
@@ -83,11 +84,39 @@ export default async function Step4Page({ params }: Props) {
   // getApplicationOrRedirect already redirects unauthenticated users — type guard only
   if (!user) return null
 
+  // Governance/reserves items (2026-07-15): always present, every
+  // application, independent of funder_type or ai_summary — this is the
+  // fallback sync path for returning users and cloned (P6.5) applications;
+  // setDraftInProgress is the primary path. answer_text is deliberately
+  // omitted so a fresh row inserts blank and an existing answer is never
+  // touched. No seeding from a prior application — every application starts
+  // these 5 facts blank by design, run before the fetch below so the rows
+  // already exist by the time it queries.
+  const { error: governanceUpsertError } = await supabase.from('application_items').upsert(
+    GOVERNANCE_ITEMS.map((item) => ({
+      application_id: id,
+      user_id: user.id,
+      item_type: item.item_type,
+      source_of_truth: 'charity_profile' as const,
+      field_key: item.field_key,
+      item_label: item.item_label,
+      item_order: item.item_order,
+      is_budget_question: item.is_budget_question,
+    })),
+    { onConflict: 'application_id,item_order', ignoreDuplicates: false },
+  )
+
+  if (governanceUpsertError) {
+    console.error('[step4] governance item upsert failed:', governanceUpsertError.message, {
+      applicationId: id,
+    })
+  }
+
   // ── S6.1: Fetch existing question rows ────────────────────────────────────
   const { data: existingRows } = await supabase
     .from('application_items')
     .select(
-      'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+      'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
@@ -127,7 +156,7 @@ export default async function Step4Page({ params }: Props) {
         // Free_form: sync from narrative sections
         const summaryOrders = parsedSummary.sections.map((s) => s.number)
         const orphaned = questionRows
-          .filter((r) => !summaryOrders.includes(r.item_order) && !r.answer_text)
+          .filter((r) => isOrphanedItem(r, summaryOrders))
           .map((r) => r.item_order)
 
         if (orphaned.length > 0) {
@@ -172,7 +201,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -183,7 +212,7 @@ export default async function Step4Page({ params }: Props) {
         // Structured: sync from numbered questions
         const summaryOrders = parsedSummary.questions.map((q, idx) => q.number ?? idx + 1)
         const orphaned = questionRows
-          .filter((r) => !summaryOrders.includes(r.item_order) && !r.answer_text)
+          .filter((r) => isOrphanedItem(r, summaryOrders))
           .map((r) => r.item_order)
 
         if (orphaned.length > 0) {
@@ -228,7 +257,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -274,6 +303,8 @@ export default async function Step4Page({ params }: Props) {
     id: row.id as string,
     questionText: row.item_label as string,
     questionOrder: row.item_order as number,
+    itemType: (row.item_type as QuestionRow['itemType']) ?? 'narrative',
+    fieldKey: (row.field_key as QuestionRow['fieldKey']) ?? null,
     wordLimit: (row.word_limit as number | null) ?? null,
     charLimit: (row.char_limit as number | null) ?? null,
     limitType: (row.limit_type as QuestionRow['limitType']) ?? null,

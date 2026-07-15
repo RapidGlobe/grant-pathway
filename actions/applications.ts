@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
+import { GOVERNANCE_ITEMS } from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 // ---------------------------------------------------------------------------
@@ -243,7 +244,12 @@ async function cloneApplicationForReuse(
         'item_type, item_label, item_order, source_of_truth, validation_mode, rubric_criterion_link, decision_maker_visible, output_mode, guideline_reference, word_limit, char_limit, limit_type, is_budget_question, answer_text, ai_refined_answer, answer_source',
       )
       .eq('application_id', sourceApplicationId)
-      .eq('user_id', userId),
+      .eq('user_id', userId)
+      // Governance/reserves items (field_key IS NOT NULL) are deliberately
+      // excluded from reuse — every application collects these facts fresh,
+      // no exception for P6.5 reuse (WJ, 2026-07-15). The target
+      // application's own item-sync path creates them blank instead.
+      .is('field_key', null),
   ])
 
   if (sourceAppResult.data?.ai_summary) {
@@ -556,6 +562,35 @@ export async function setDraftInProgress(
 
   if (error) {
     return { ok: false, error: 'Could not save your progress. Please try again.' }
+  }
+
+  // Governance/reserves items (2026-07-15): always present, every
+  // application, independent of funder_type or ai_summary. answer_text is
+  // deliberately omitted from the upsert payload — a fresh row inserts
+  // blank, and re-running this on an already-answered row never touches
+  // its answer_text (same trick the narrative-item upserts below use).
+  // No seeding from a prior application, including P6.5 reuse — every
+  // application starts these 5 facts blank by design.
+  const { error: governanceUpsertError } = await supabase.from('application_items').upsert(
+    GOVERNANCE_ITEMS.map((item) => ({
+      application_id: applicationId,
+      user_id: user.id,
+      item_type: item.item_type,
+      source_of_truth: 'charity_profile' as const,
+      field_key: item.field_key,
+      item_label: item.item_label,
+      item_order: item.item_order,
+      is_budget_question: item.is_budget_question,
+    })),
+    { onConflict: 'application_id,item_order', ignoreDuplicates: false },
+  )
+
+  if (governanceUpsertError) {
+    console.error(
+      '[setDraftInProgress] governance item upsert failed:',
+      governanceUpsertError.message,
+      { applicationId },
+    )
   }
 
   // Sync application_items from ai_summary so rows exist before the page

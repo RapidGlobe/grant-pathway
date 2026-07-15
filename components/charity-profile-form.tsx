@@ -45,40 +45,6 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
   const [whoHelps, setWhoHelps] = useState(initialData?.whoHelps ?? '')
   const [whereWorks, setWhereWorks] = useState(initialData?.whereWorks ?? '')
 
-  // Governance facts and derived-ratio inputs (P6.1 / R13). All optional —
-  // stored as raw strings so an empty field means "not provided" rather than 0.
-  const [totalExpenditure, setTotalExpenditure] = useState(
-    initialData?.totalExpenditure != null ? String(initialData.totalExpenditure) : '',
-  )
-  const [reserves, setReserves] = useState(
-    initialData?.reserves != null ? String(initialData.reserves) : '',
-  )
-  const [trusteesRelated, setTrusteesRelated] = useState<'' | 'yes' | 'no'>(
-    initialData?.trusteesRelated == null ? '' : initialData.trusteesRelated ? 'yes' : 'no',
-  )
-  const [bankSignatoryCount, setBankSignatoryCount] = useState(
-    initialData?.bankSignatoryCount != null ? String(initialData.bankSignatoryCount) : '',
-  )
-  const [bankSignatoriesRelated, setBankSignatoriesRelated] = useState<'' | 'yes' | 'no'>(
-    initialData?.bankSignatoriesRelated == null
-      ? ''
-      : initialData.bankSignatoriesRelated
-        ? 'yes'
-        : 'no',
-  )
-
-  // Months of reserve cover = reserves ÷ (total expenditure ÷ 12), shown live
-  // once both figures are entered (Walton, MK Community Foundation — R13).
-  const parsedExpenditure = Number(totalExpenditure)
-  const parsedReserves = Number(reserves)
-  const monthsOfReserves =
-    totalExpenditure.trim() !== '' &&
-    reserves.trim() !== '' &&
-    parsedExpenditure > 0 &&
-    parsedReserves >= 0
-      ? parsedReserves / (parsedExpenditure / 12)
-      : null
-
   /**
    * True when Bedrock successfully paraphrased the charitable objects on
    * the most recent lookup. Drives the AI-generated-content review banner
@@ -146,13 +112,6 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         whoHelps: whoHelps.trim(),
         whereWorks: whereWorks.trim(),
         paraphrasedFromLookup,
-        totalExpenditure: totalExpenditure.trim() === '' ? undefined : Number(totalExpenditure),
-        reserves: reserves.trim() === '' ? undefined : Number(reserves),
-        trusteesRelated: trusteesRelated === '' ? undefined : trusteesRelated === 'yes',
-        bankSignatoryCount:
-          bankSignatoryCount.trim() === '' ? undefined : Number(bankSignatoryCount),
-        bankSignatoriesRelated:
-          bankSignatoriesRelated === '' ? undefined : bankSignatoriesRelated === 'yes',
       })
       if (result.ok) {
         if (isEdit) {
@@ -414,124 +373,6 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
               {fieldErrors.whereWorks}
             </p>
           )}
-        </div>
-
-        {/* ── Governance and reserves (P6.1 / R13 — all optional) ──────────── */}
-        <div className="mb-8 rounded-xl border border-[#EDE8E1] bg-[#FDF9F5] p-5">
-          <p className="mb-1 text-[14px] font-medium text-[#1E293B]">Governance and reserves</p>
-          <p className="mb-4 text-[13px] text-[#64748B]">
-            Optional for now. Some funders check these facts as part of eligibility — filling them
-            in helps Grant Pathway flag issues before you apply.
-          </p>
-
-          <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <Label
-                htmlFor="totalExpenditure"
-                className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-              >
-                Total annual expenditure (£){' '}
-                <span className="text-[14px] font-normal text-[#64748B]">(optional)</span>
-              </Label>
-              <Input
-                id="totalExpenditure"
-                type="number"
-                min="0"
-                inputMode="numeric"
-                value={totalExpenditure}
-                onChange={(e) => setTotalExpenditure(e.target.value)}
-                placeholder="From your latest signed accounts"
-                className="h-10 text-[14px]"
-              />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="reserves"
-                className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-              >
-                Reserves (£){' '}
-                <span className="text-[14px] font-normal text-[#64748B]">(optional)</span>
-              </Label>
-              <Input
-                id="reserves"
-                type="number"
-                min="0"
-                inputMode="numeric"
-                value={reserves}
-                onChange={(e) => setReserves(e.target.value)}
-                placeholder="Unrestricted/free reserves"
-                className="h-10 text-[14px]"
-              />
-            </div>
-          </div>
-
-          {monthsOfReserves !== null && (
-            <p className="mb-4 text-[13px] text-[#374151]">
-              Based on the figures above, you hold approximately{' '}
-              <span className="font-semibold">{monthsOfReserves.toFixed(1)} months</span> of
-              reserves.
-            </p>
-          )}
-
-          <div className="mb-4">
-            <Label
-              htmlFor="trusteesRelated"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-            >
-              Are any of your trustees related to each other by family or business relationship?{' '}
-              <span className="text-[14px] font-normal text-[#64748B]">(optional)</span>
-            </Label>
-            <select
-              id="trusteesRelated"
-              value={trusteesRelated}
-              onChange={(e) => setTrusteesRelated(e.target.value as '' | 'yes' | 'no')}
-              className="h-10 w-full rounded-md border border-[#D1D5DB] bg-white px-3 text-[14px]"
-            >
-              <option value="">Not sure yet</option>
-              <option value="no">No</option>
-              <option value="yes">Yes</option>
-            </select>
-          </div>
-
-          <div className="mb-4">
-            <Label
-              htmlFor="bankSignatoryCount"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-            >
-              How many people are authorised as bank signatories?{' '}
-              <span className="text-[14px] font-normal text-[#64748B]">(optional)</span>
-            </Label>
-            <Input
-              id="bankSignatoryCount"
-              type="number"
-              min="0"
-              inputMode="numeric"
-              value={bankSignatoryCount}
-              onChange={(e) => setBankSignatoryCount(e.target.value)}
-              className="h-10 text-[14px] sm:w-40"
-            />
-          </div>
-
-          <div>
-            <Label
-              htmlFor="bankSignatoriesRelated"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
-            >
-              Are any bank signatories related to each other or to a trustee?{' '}
-              <span className="text-[14px] font-normal text-[#64748B]">(optional)</span>
-            </Label>
-            <select
-              id="bankSignatoriesRelated"
-              value={bankSignatoriesRelated}
-              onChange={(e) => setBankSignatoriesRelated(e.target.value as '' | 'yes' | 'no')}
-              className="h-10 w-full rounded-md border border-[#D1D5DB] bg-white px-3 text-[14px]"
-            >
-              <option value="">Not sure yet</option>
-              <option value="no">No</option>
-              <option value="yes">Yes</option>
-            </select>
-          </div>
         </div>
 
         {saveError && (
