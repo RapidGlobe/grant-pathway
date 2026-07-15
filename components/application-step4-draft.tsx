@@ -105,6 +105,12 @@ function countWords(text: string): number {
   return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
 }
 
+/** Renders a raw digit string with UK thousands separators, e.g. "1234567" -> "1,234,567". */
+function formatThousands(digits: string): string {
+  if (digits === '') return ''
+  return Number(digits).toLocaleString('en-GB')
+}
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -615,8 +621,28 @@ export function ApplicationStep4Draft({
                   </div>
                 )}
 
-                {/* Governance item input — number or Yes/No/Not sure yet select */}
-                {isGovernanceItem && q.itemType === 'number' && (
+                {/* Governance item input — currency (£, UK thousands-separated), plain count, or Yes/No/Not sure yet select */}
+                {isGovernanceItem && q.itemType === 'number' && q.isBudgetQuestion && (
+                  <div className="relative sm:w-60">
+                    <span
+                      className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-[14px] text-[#64748B]"
+                      aria-hidden="true"
+                    >
+                      £
+                    </span>
+                    <Input
+                      id={`answer-${q.id}`}
+                      type="text"
+                      inputMode="numeric"
+                      value={formatThousands(text)}
+                      onChange={(e) => handleAnswerChange(q.id, e.target.value.replace(/\D/g, ''))}
+                      onBlur={() => handleAnswerBlur(q.id)}
+                      aria-label={q.questionText}
+                      className="h-10 bg-white pl-6 text-[14px]"
+                    />
+                  </div>
+                )}
+                {isGovernanceItem && q.itemType === 'number' && !q.isBudgetQuestion && (
                   <Input
                     id={`answer-${q.id}`}
                     type="number"
@@ -626,7 +652,7 @@ export function ApplicationStep4Draft({
                     onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                     onBlur={() => handleAnswerBlur(q.id)}
                     aria-label={q.questionText}
-                    className={`h-10 text-[14px] sm:w-60 ${q.isBudgetQuestion ? 'bg-white' : ''}`}
+                    className="h-10 text-[14px] sm:w-60"
                   />
                 )}
                 {isGovernanceItem && q.itemType === 'data' && (

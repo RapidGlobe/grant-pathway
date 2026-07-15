@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-15 — Governance Step 4 items: £ fields reformatted to UK currency style
+
+During his live verification pass of the governance-items redesign (previous entry below), WJ confirmed the 5 items render correctly at the top of Step 4, then asked for the two £ fields (total annual expenditure, reserves) to display in UK currency format — "£ n,nnn,nnn" — rather than a plain unformatted number input.
+
+**Fix:** `components/application-step4-draft.tsx` splits the governance number-input branch in two: the two budget fields (`is_budget_question: true`) now render a text input with a fixed "£" affix and live UK thousands-separator formatting (`toLocaleString('en-GB')`) via a new `formatThousands()` helper; the bank-signatory count field (not a budget question) keeps the original plain number input, unaffected. The underlying stored `answer_text` stays raw digits (formatting is display-only, applied on render and stripped again on input) — no change to what's saved, so `saveAnswer`, Step 5 export, and the DB column are all unaffected.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 55 tests pass. `docs/PRD-Grant-Pathway.md` (v0.48) Step 4 Q&A table row corrected to describe the three number-field input types precisely instead of grouping them all as "plain number input".
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD-Grant-Pathway.md` (v0.48).
+
+---
+
 ## 2026-07-15 — Governance/reserves facts re-sited from `charity_profiles` into `application_items`
 
 WJ asked why the 5 governance/reserves facts (P6.1, 2026-07-05) lived on the charity profile page rather than at Step 3 or Step 4. Investigation found they were never actually consumed anywhere — not by Step 3's summary/eligibility logic, not by P6.5's clone — so `/profile`'s own copy ("helps flag issues before you apply") was untrue.
