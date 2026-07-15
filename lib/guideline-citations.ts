@@ -102,14 +102,38 @@ export function toGuidelineReferenceColumn(citation: GuidelineCitation | null | 
   return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
 }
 
+// Typographic punctuation variants that are interchangeable for matching
+// purposes but not byte-identical: the AI's generated quote routinely comes
+// back with plain ASCII (straight apostrophe/quotes, hyphen) even when the
+// source PDF/docx uses proper typesetting (curly quotes, en/em dashes) — a
+// single-character mismatch that a literal match would otherwise miss
+// entirely (found live, 2026-07-15: MK Community Foundation's "six months'
+// free reserves" vs the source's "six months' free reserves"). Each entry's
+// characters are treated as equivalent to one another when building the
+// match pattern below; the ORIGINAL text is still what gets sliced/displayed,
+// so the on-screen highlight always shows the source's real typesetting.
+const EQUIVALENT_PUNCTUATION_CLASSES = [
+  ["'", '‘', '’', 'ʼ'], // straight apostrophe, curly left/right single quote, modifier-letter apostrophe
+  ['"', '“', '”'], // straight double quote, curly left/right double quote
+  ['-', '–', '—'], // hyphen, en dash, em dash
+]
+
 /**
  * Finds where `quote` occurs in `text` (P6.4's "view original guidelines"
- * panel), tolerating whitespace differences between them — PDF extraction
- * often wraps a line where the AI's quote has an ordinary space (e.g.
- * "project\nwill address" in the source vs. "project will address" in the
- * quote), which breaks a plain exact-substring match. Matches the quote's
- * words in order, joined by `\s+`, so any run of whitespace in the source
- * (space, newline, multiple spaces) satisfies a single space in the quote.
+ * panel), tolerating two classes of near-miss differences between them:
+ *
+ * 1. Whitespace — PDF extraction often wraps a line where the AI's quote has
+ *    an ordinary space (e.g. "project\nwill address" in the source vs.
+ *    "project will address" in the quote). Matches the quote's words in
+ *    order, joined by `\s+`, so any run of whitespace in the source (space,
+ *    newline, multiple spaces) satisfies a single space in the quote.
+ * 2. Typographic punctuation — the AI frequently normalises curly
+ *    quotes/apostrophes and en/em dashes to their plain-ASCII equivalents
+ *    even when quoting "verbatim" (see EQUIVALENT_PUNCTUATION_CLASSES
+ *    above). Each occurrence of one of these characters in the quote is
+ *    matched against its whole equivalence class in the source, not just
+ *    that literal character.
+ *
  * Returns null if no match is found — the caller shows the text unhighlighted
  * rather than treating this as an error (quotes are validated against real
  * markers, not a verbatim-substring guarantee — see validateCitation above).
@@ -118,7 +142,20 @@ export function findQuoteRange(text: string, quote: string): { start: number; en
   const words = quote.trim().split(/\s+/).filter(Boolean)
   if (words.length === 0) return null
 
-  const pattern = words.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('\\s+')
+  const escapeRegex = (char: string) => char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+  const toPunctuationTolerantPattern = (word: string): string => {
+    let result = ''
+    for (const char of word) {
+      const equivalenceClass = EQUIVALENT_PUNCTUATION_CLASSES.find((chars) => chars.includes(char))
+      result += equivalenceClass
+        ? `[${equivalenceClass.map(escapeRegex).join('')}]`
+        : escapeRegex(char)
+    }
+    return result
+  }
+
+  const pattern = words.map(toPunctuationTolerantPattern).join('\\s+')
 
   let match: RegExpExecArray | null
   try {

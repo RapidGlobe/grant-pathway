@@ -171,4 +171,36 @@ describe('findQuoteRange', () => {
     const range = findQuoteRange(text, '£5,001 - £15,000 (20% match required)')
     expect(range).not.toBeNull()
   })
+
+  it('matches a straight apostrophe in the quote against a curly one in the source (live bug, 2026-07-15 — MK Community Foundation "six months\' free reserves")', () => {
+    const text =
+      'Organisations with over six months’ free reserves should be prepared to explain\nwhy they need to hold this level.'
+    const quote =
+      "Organisations with over six months' free reserves should be prepared to explain why they need to hold this level."
+    const range = findQuoteRange(text, quote)
+    expect(range).not.toBeNull()
+    // The highlighted slice shows the source's real typesetting, not the quote's
+    expect(text.slice(range!.start, range!.end)).toContain('six months’ free reserves')
+  })
+
+  it('matches a curly apostrophe in the quote against a straight one in the source (tolerance is symmetric)', () => {
+    const text = "The organisation's bank account must be held in its own name."
+    const quote = 'The organisation’s bank account must be held in its own name.'
+    const range = findQuoteRange(text, quote)
+    expect(range).not.toBeNull()
+  })
+
+  it('matches straight vs curly double quotes', () => {
+    const text = 'Funders sometimes call this the “free reserves” policy.'
+    const quote = 'Funders sometimes call this the "free reserves" policy.'
+    const range = findQuoteRange(text, quote)
+    expect(range).not.toBeNull()
+  })
+
+  it('matches a hyphen in the quote against an en dash or em dash in the source', () => {
+    const text = 'Grants of £5,001–£15,000 are available (Oak Grants).'
+    const quote = 'Grants of £5,001-£15,000 are available'
+    const range = findQuoteRange(text, quote)
+    expect(range).not.toBeNull()
+  })
 })
