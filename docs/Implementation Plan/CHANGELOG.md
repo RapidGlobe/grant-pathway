@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-15 — Step 3 extraction pinned to `temperature: 0`; anti-merge rule added
+
+Ad-hoc E2E testing found a regression: MK Community Foundation — Oak Grants extracted 10 questions on a brand-new test run, down from the 12 confirmed correct the day before (2026-07-14 P6.3 live-test). `git log` and a same-code-path check ("Regenerate summary" vs. a first-time upload) ruled out a code change or stale cache — the guideline text and route were identical between runs.
+
+**Root cause:** the Step 3 Bedrock call (`app/api/generate-summary/route.ts`) never set a `temperature`, leaving the model at its non-zero API default — the same input text can legitimately produce different extraction output, including a different question count, on separate calls. This had never been decided or documented anywhere (`ADR-AI-004`, the prompt-construction ADR, said nothing about temperature). Separately, `lib/prompts.ts`'s extraction rules only forbade merging questions _across_ multiple application forms — nothing stopped the model merging two adjacent, related-but-distinct questions _within_ one form, which is the specific pair (existing funding secured / fundraising plans) that went missing.
+
+**Fixed:** `temperature: 0` pinned on the Step 3 summary call only — this is a structured-extraction task (pull out what's literally stated), not creative generation, so determinism is the correct behaviour. `/api/refine-answer` (rewording a user's own answer) is a different, more variation-tolerant task and was deliberately left unchanged. The extraction prompt gained an explicit instruction alongside the existing cross-form rule: never merge two distinct questions into one, even when adjacent or thematically related, even within the same form.
+
+This is a general reliability fix, not specific to one funder — any funder's guidelines could in principle have hit the same non-deterministic merging behaviour.
+
+`tsc --noEmit` and `eslint --max-warnings 0` both clean. No schema change. Live repeat-run verification (confirming a consistent question count across several "Regenerate summary" runs) is pending WJ, per this project's established pattern for AI-behaviour changes — no real Bedrock call can be made from this local environment.
+
+**Files changed:** `app/api/generate-summary/route.ts`, `lib/prompts.ts`, `IMPLEMENTATION-STATUS.md`, `ADR-AI-004-prompt-construction.md`.
+
+---
+
 ## 2026-07-14 — P6.6 (Transparency Status) retired, will not be built
 
 P6.6 was designed to show a per-funder trust badge (fully supported / partially supported / guidance-only / unreviewed), keyed to whether a human curator had reviewed and approved a playbook for that funder. P6.5's pivot earlier today to private, per-charity reuse removed that basis entirely — no curator role exists or is planned. Rather than invent a substitute signal (extraction/citation quality, structured-vs-free-text parsing were both considered), WJ confirmed retiring the task: with no curation step anywhere in the product, every funder is in the identical state, so there is nothing left for a "trust tier" to differentiate.

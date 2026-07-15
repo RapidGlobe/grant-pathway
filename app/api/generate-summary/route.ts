@@ -266,6 +266,9 @@ export async function POST(request: NextRequest) {
         {
           model: MODEL,
           max_tokens: SUMMARY_MAX_TOKENS,
+          // Extraction, not creative generation — the same guidelines text must
+          // always yield the same questions/sections/citations (2026-07-15 regression).
+          temperature: 0,
           system: AI_SYSTEM_PROMPT,
           messages: [{ role: 'user', content: prompt }],
         },
