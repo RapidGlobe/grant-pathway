@@ -20,7 +20,9 @@ Ad-hoc E2E testing found a regression: MK Community Foundation — Oak Grants ex
 
 This is a general reliability fix, not specific to one funder — any funder's guidelines could in principle have hit the same non-deterministic merging behaviour.
 
-`tsc --noEmit` and `eslint --max-warnings 0` both clean. No schema change. Live repeat-run verification (confirming a consistent question count across several "Regenerate summary" runs) is pending WJ, per this project's established pattern for AI-behaviour changes — no real Bedrock call can be made from this local environment.
+`tsc --noEmit` and `eslint --max-warnings 0` both clean. No schema change.
+
+**Live-verified by WJ the same day:** re-ran "Regenerate summary" three times on MK Community Foundation — Oak Grants — all three runs consistently returned 12 questions. Separately, a fresh funder (MK Community Foundation — Sapling Grants) was spot-checked: Claude's manual read of the PDF (applying the same extraction rules) predicted 6 narrative questions; the live app returned exactly 6.
 
 **Files changed:** `app/api/generate-summary/route.ts`, `lib/prompts.ts`, `IMPLEMENTATION-STATUS.md`, `ADR-AI-004-prompt-construction.md`.
 
