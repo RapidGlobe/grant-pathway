@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
-import { GOVERNANCE_ITEMS } from '@/lib/governance-items'
+import { resolveGovernanceInserts } from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 // ---------------------------------------------------------------------------
@@ -538,35 +538,6 @@ export async function setDraftInProgress(
     return { ok: false, error: 'Could not save your progress. Please try again.' }
   }
 
-  // Governance/reserves items (2026-07-15): always present, every
-  // application, independent of funder_type or ai_summary. answer_text is
-  // deliberately omitted from the upsert payload — a fresh row inserts
-  // blank, and re-running this on an already-answered row never touches
-  // its answer_text (same trick the narrative-item upserts below use).
-  // No seeding from a prior application, including P6.5 reuse — every
-  // application starts these 5 facts blank by design.
-  const { error: governanceUpsertError } = await supabase.from('application_items').upsert(
-    GOVERNANCE_ITEMS.map((item) => ({
-      application_id: applicationId,
-      user_id: user.id,
-      item_type: item.item_type,
-      source_of_truth: 'charity_profile' as const,
-      field_key: item.field_key,
-      item_label: item.item_label,
-      item_order: item.item_order,
-      is_budget_question: item.is_budget_question,
-    })),
-    { onConflict: 'application_id,item_order', ignoreDuplicates: false },
-  )
-
-  if (governanceUpsertError) {
-    console.error(
-      '[setDraftInProgress] governance item upsert failed:',
-      governanceUpsertError.message,
-      { applicationId },
-    )
-  }
-
   // Sync application_items from ai_summary so rows exist before the page
   // renders. This is the primary sync path; the Step 4 page still syncs as a
   // fallback for returning users who navigate directly without the checklist.
@@ -579,6 +550,40 @@ export async function setDraftInProgress(
     try {
       const parsedSummary = JSON.parse(appRow.ai_summary) as AiSummaryData
       const funderType = parsedSummary.funder_type ?? 'structured'
+
+      // Governance/reserves items (PDR-AI-008, 2026-07-15): only whichever of
+      // the 5 fixed facts the AI actually detected in this funder's
+      // guidelines — never all 5 unconditionally. answer_text is deliberately
+      // omitted from the upsert payload — a fresh row inserts blank, and
+      // re-running this on an already-answered row never touches its
+      // answer_text (same trick the narrative-item upserts below use). No
+      // seeding from a prior application, including P6.5 reuse — every
+      // application starts these facts blank by design.
+      const governanceInserts = resolveGovernanceInserts(
+        (parsedSummary.governanceFacts ?? []).map((f) => ({
+          field_key: f.field_key,
+          guideline_reference: toGuidelineReferenceColumn(f.citation),
+        })),
+        applicationId,
+        user.id,
+      )
+
+      if (governanceInserts.length > 0) {
+        const { error: governanceUpsertError } = await supabase
+          .from('application_items')
+          .upsert(governanceInserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
+
+        if (governanceUpsertError) {
+          console.error(
+            '[setDraftInProgress] governance item upsert failed:',
+            governanceUpsertError.message,
+            { applicationId },
+          )
+        }
+      }
 
       if (
         funderType === 'free_form' &&

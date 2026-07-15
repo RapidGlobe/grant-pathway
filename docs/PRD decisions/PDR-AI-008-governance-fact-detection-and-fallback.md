@@ -38,7 +38,7 @@ The open question was what to do when the guidelines raise a topic only vaguely,
 
 ## Status note
 
-**Not yet built.** This decision supersedes the "always show all 5 governance items unconditionally" placement built earlier the same day (commit `82e11d9` — see `ADR-DATA-006`'s 2026-07-15 amendment and `data-model.md` §4c). Implementation is a rework of that build via the guideline-extraction pipeline (`lib/prompts.ts`, `generate-summary/route.ts`), not a fresh feature; scheduling is pending.
+**Built (2026-07-15, same day as the decision).** Supersedes the "always show all 5 governance items unconditionally" placement built earlier the same day (commit `82e11d9` — see `ADR-DATA-006`'s 2026-07-15 amendments, both the original and the follow-on, and `data-model.md` §4c). A new `"governanceFacts"` extraction category (`lib/prompts.ts`, Zod-validated in `route.ts`, citation-reconciled the same way as questions/sections) now drives whether each of the 5 fixed items is created at all — `lib/governance-items.ts`'s `resolveGovernanceInserts()` builds the upsert payload only for facts actually detected, and `isOrphanedItem()`'s governance-specific carve-out was removed since a detected item is now genuinely part of the AI's own sync cycle. The dedicated "Governance and reserves" Step 4 heading was removed — a detected item renders as an ordinary card. Manual-add (the zero-signal fallback) remains explicitly out of scope, per this record's Decision above — not built, tracked as a separate future task. `tsc --noEmit`, `eslint --max-warnings 0`, all 60 tests pass (5 new). No DB migration required.
 
 ## Date Decided
 

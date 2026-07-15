@@ -10,6 +10,26 @@
 
 ---
 
+## 2026-07-15 — PDR-AI-008 built: governance facts now guideline-driven, superseding the always-on block
+
+WJ's live testing of the always-on 5-item "Governance and reserves" block (built earlier the same day, commit `82e11d9`, currency-formatted in `7e68c9a`) found it disjointed from the rest of Step 4 — no citation, no funder-specific rationale, shown regardless of whether the funder cares. Decided (`docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`) and built the same day.
+
+**The mechanism:** a new `"governanceFacts"` array joins `questions`/`sections` in the AI JSON schema (`lib/prompts.ts`), Zod-validated and citation-reconciled in `app/api/generate-summary/route.ts` through the exact same `extractValidMarkers`/`validateCitation` pipeline already used for narrative items — no new citation machinery. The key design choice: this array's extraction bar is deliberately **lower** than "questions" — a general eligibility or policy statement counts, not just a discrete question — and citation stays optional (an entry with `citation: null` is still shown, exactly like narrative questions/sections already behave). This is what delivers WJ's "auto-show on any signal" decision without needing a separate relaxed-citation tier.
+
+**What creates the rows:** `lib/governance-items.ts` gained `resolveGovernanceInserts()` — given whichever facts the AI detected this time, it looks up `item_type`/`item_label`/`item_order`/`is_budget_question` from the fixed `GOVERNANCE_ITEMS` table (still never trusted from the AI — only _whether_ a row exists at all is now guideline-driven) and dedupes by `field_key`. Both sync paths (`setDraftInProgress`, Step 4's fallback sync) now call this conditionally, replacing the unconditional "always upsert all 5" block from this morning.
+
+**Orphan cleanup simplified, not special-cased:** `isOrphanedItem()`'s `field_key` carve-out — needed this morning because governance items were never part of the AI's own numbering — is gone. A detected fact's reserved `item_order` now folds into the same `summaryOrders` set the narrative sync already builds, so a governance item whose fact the extraction no longer raises is cleaned up exactly like a dropped narrative question: deleted if unanswered, kept if already answered. This is a genuine simplification, not just new capability — one fewer special case in the codebase than this morning's build had.
+
+**Rendering:** the dedicated "Governance and reserves" section heading in `components/application-step4-draft.tsx` is removed entirely (confirmed with WJ: blend in, no special framing) — a shown item now renders as an ordinary-looking card at its reserved sort position, picking up the same citation badge every other item gets automatically once `guideline_reference` is populated. The AI's extracted wording is surfaced through the existing `guidance` text slot (previously free_form-sections-only) instead of a removed heading's blurb — loosened that render condition to also cover governance items regardless of funder type or budget-question status.
+
+**Deliberately not built this round:** a manual-add picker for the zero-signal case (WJ confirmed: auto-detection first, manual-add as a separate fast-follow — see `PDR-AI-008` for the full reasoning about why a self-serve relevance picker would ask a novice user, Persona 1 Margaret, to make a judgement call her persona says she can't reliably make).
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 60 tests pass (2 tests removed — they asserted the exact carve-out being retired — 5 new tests added, 3 for `resolveGovernanceInserts`, 2 for the simplified `isOrphanedItem`). No DB migration — `field_key`/`guideline_reference` already existed from this morning's build.
+
+**Files changed:** `lib/types.ts`, `lib/prompts.ts`, `lib/governance-items.ts`, `app/api/generate-summary/route.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `__tests__/governance-items.test.ts`, `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/PRD decisions/PRD-DECISIONS-INDEX.md`, `docs/data-model.md` (v1.12), `docs/PRD-Grant-Pathway.md` (v0.50), `docs/PRD inputs/acceptance-criteria.md`.
+
+---
+
 ## 2026-07-15 — DR-FD-001 v1.4: curated funder picker/directory removed, free-text field restored
 
 WJ questioned whether Step 1's "Who is offering this grant?" searchable picker was still needed, six weeks after it was introduced (DR-FD-001, 2026-06-01). Investigation found the 2026-07-11 amendment relaxing the picker to a free-text fallback had never actually been built — it existed only inside the decision record, with no corresponding task in `IMPLEMENTATION-PLAN.md`'s tracked list.

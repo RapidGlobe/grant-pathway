@@ -6,7 +6,7 @@ import { ApplicationStep4SeniorReview } from '@/components/application-step4-sen
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
-import { GOVERNANCE_ITEMS, isOrphanedItem } from '@/lib/governance-items'
+import { resolveGovernanceInserts, isOrphanedItem } from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 export const metadata: Metadata = {
@@ -84,34 +84,6 @@ export default async function Step4Page({ params }: Props) {
   // getApplicationOrRedirect already redirects unauthenticated users — type guard only
   if (!user) return null
 
-  // Governance/reserves items (2026-07-15): always present, every
-  // application, independent of funder_type or ai_summary — this is the
-  // fallback sync path for returning users and cloned (P6.5) applications;
-  // setDraftInProgress is the primary path. answer_text is deliberately
-  // omitted so a fresh row inserts blank and an existing answer is never
-  // touched. No seeding from a prior application — every application starts
-  // these 5 facts blank by design, run before the fetch below so the rows
-  // already exist by the time it queries.
-  const { error: governanceUpsertError } = await supabase.from('application_items').upsert(
-    GOVERNANCE_ITEMS.map((item) => ({
-      application_id: id,
-      user_id: user.id,
-      item_type: item.item_type,
-      source_of_truth: 'charity_profile' as const,
-      field_key: item.field_key,
-      item_label: item.item_label,
-      item_order: item.item_order,
-      is_budget_question: item.is_budget_question,
-    })),
-    { onConflict: 'application_id,item_order', ignoreDuplicates: false },
-  )
-
-  if (governanceUpsertError) {
-    console.error('[step4] governance item upsert failed:', governanceUpsertError.message, {
-      applicationId: id,
-    })
-  }
-
   // ── S6.1: Fetch existing question rows ────────────────────────────────────
   const { data: existingRows } = await supabase
     .from('application_items')
@@ -125,6 +97,8 @@ export default async function Step4Page({ params }: Props) {
   let questionRows = existingRows ?? []
 
   // ── Build guidance map from ai_summary sections (free_form only) ─────────
+  // Governance-fact guidance (PDR-AI-008) is added below once the detected
+  // facts' item_order slots are known (resolveGovernanceInserts).
   const guidanceMap: Record<number, string> = {}
   if (funderType === 'free_form' && parsedSummary?.sections) {
     for (const s of parsedSummary.sections) {
@@ -148,13 +122,32 @@ export default async function Step4Page({ params }: Props) {
   // error explicitly so failures surface in Vercel logs rather than being swallowed.
   if (parsedSummary) {
     try {
+      // Governance/reserves facts (PDR-AI-008, 2026-07-15): only whichever of
+      // the 5 fixed facts the AI actually detected in this funder's
+      // guidelines — never all 5 unconditionally. Computed once here and
+      // folded into whichever branch below actually runs (a funder's
+      // guidelines can raise these facts regardless of structured/free_form).
+      const governanceInserts = resolveGovernanceInserts(
+        (parsedSummary.governanceFacts ?? []).map((f) => ({
+          field_key: f.field_key,
+          guideline_reference: toGuidelineReferenceColumn(f.citation),
+        })),
+        id,
+        user.id,
+      )
+      const governanceOrders = governanceInserts.map((g) => g.item_order)
+      for (const insert of governanceInserts) {
+        const fact = parsedSummary.governanceFacts?.find((f) => f.field_key === insert.field_key)
+        if (fact?.questionText) guidanceMap[insert.item_order] = fact.questionText
+      }
+
       if (
         funderType === 'free_form' &&
         Array.isArray(parsedSummary.sections) &&
         parsedSummary.sections.length > 0
       ) {
-        // Free_form: sync from narrative sections
-        const summaryOrders = parsedSummary.sections.map((s) => s.number)
+        // Free_form: sync from narrative sections + detected governance facts
+        const summaryOrders = [...parsedSummary.sections.map((s) => s.number), ...governanceOrders]
         const orphaned = questionRows
           .filter((r) => isOrphanedItem(r, summaryOrders))
           .map((r) => r.item_order)
@@ -168,21 +161,24 @@ export default async function Step4Page({ params }: Props) {
             .in('item_order', orphaned)
         }
 
-        const inserts = parsedSummary.sections
-          .filter((s) => s.title && typeof s.number === 'number')
-          .map((s) => ({
-            application_id: id,
-            user_id: user.id,
-            item_type: 'narrative' as const,
-            source_of_truth: 'user_input' as const,
-            item_label: s.title,
-            item_order: s.number,
-            word_limit: s.wordLimit ?? null,
-            char_limit: null,
-            limit_type: s.wordLimit ? 'words' : null,
-            is_budget_question: s.is_budget_section ?? false,
-            guideline_reference: toGuidelineReferenceColumn(s.citation),
-          }))
+        const inserts = [
+          ...parsedSummary.sections
+            .filter((s) => s.title && typeof s.number === 'number')
+            .map((s) => ({
+              application_id: id,
+              user_id: user.id,
+              item_type: 'narrative' as const,
+              source_of_truth: 'user_input' as const,
+              item_label: s.title,
+              item_order: s.number,
+              word_limit: s.wordLimit ?? null,
+              char_limit: null,
+              limit_type: s.wordLimit ? 'words' : null,
+              is_budget_question: s.is_budget_section ?? false,
+              guideline_reference: toGuidelineReferenceColumn(s.citation),
+            })),
+          ...governanceInserts,
+        ]
 
         if (inserts.length > 0) {
           const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
@@ -209,8 +205,11 @@ export default async function Step4Page({ params }: Props) {
 
         questionRows = refreshed ?? []
       } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
-        // Structured: sync from numbered questions
-        const summaryOrders = parsedSummary.questions.map((q, idx) => q.number ?? idx + 1)
+        // Structured: sync from numbered questions + detected governance facts
+        const summaryOrders = [
+          ...parsedSummary.questions.map((q, idx) => q.number ?? idx + 1),
+          ...governanceOrders,
+        ]
         const orphaned = questionRows
           .filter((r) => isOrphanedItem(r, summaryOrders))
           .map((r) => r.item_order)
@@ -224,21 +223,24 @@ export default async function Step4Page({ params }: Props) {
             .in('item_order', orphaned)
         }
 
-        const inserts = parsedSummary.questions
-          .filter((q) => q.text && (q.number !== undefined || true))
-          .map((q, idx) => ({
-            application_id: id,
-            user_id: user.id,
-            item_type: 'narrative' as const,
-            source_of_truth: 'user_input' as const,
-            item_label: q.text,
-            item_order: q.number ?? idx + 1,
-            word_limit: q.wordLimit ?? null,
-            char_limit: q.charLimit ?? null,
-            limit_type: q.limitType ?? null,
-            is_budget_question: q.is_budget_question ?? false,
-            guideline_reference: toGuidelineReferenceColumn(q.citation),
-          }))
+        const inserts = [
+          ...parsedSummary.questions
+            .filter((q) => q.text && (q.number !== undefined || true))
+            .map((q, idx) => ({
+              application_id: id,
+              user_id: user.id,
+              item_type: 'narrative' as const,
+              source_of_truth: 'user_input' as const,
+              item_label: q.text,
+              item_order: q.number ?? idx + 1,
+              word_limit: q.wordLimit ?? null,
+              char_limit: q.charLimit ?? null,
+              limit_type: q.limitType ?? null,
+              is_budget_question: q.is_budget_question ?? false,
+              guideline_reference: toGuidelineReferenceColumn(q.citation),
+            })),
+          ...governanceInserts,
+        ]
 
         if (inserts.length > 0) {
           const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
@@ -252,6 +254,47 @@ export default async function Step4Page({ params }: Props) {
               rowCount: inserts.length,
             })
           }
+        }
+
+        const { data: refreshed } = await supabase
+          .from('application_items')
+          .select(
+            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+          )
+          .eq('application_id', id)
+          .eq('user_id', user.id)
+          .order('item_order')
+
+        questionRows = refreshed ?? []
+      } else if (governanceInserts.length > 0) {
+        // No narrative questions/sections at all this time, but the AI still
+        // detected governance facts — sync just those, same orphan-then-
+        // upsert-then-refetch pattern as the two branches above.
+        const orphaned = questionRows
+          .filter((r) => isOrphanedItem(r, governanceOrders))
+          .map((r) => r.item_order)
+
+        if (orphaned.length > 0) {
+          await supabase
+            .from('application_items')
+            .delete()
+            .eq('application_id', id)
+            .eq('user_id', user.id)
+            .in('item_order', orphaned)
+        }
+
+        const { error: upsertError } = await supabase
+          .from('application_items')
+          .upsert(governanceInserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
+
+        if (upsertError) {
+          console.error('[step4] governance-only upsert failed:', upsertError.message, {
+            applicationId: id,
+            rowCount: governanceInserts.length,
+          })
         }
 
         const { data: refreshed } = await supabase

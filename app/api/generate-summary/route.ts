@@ -82,6 +82,24 @@ const aiSummarySectionSchema = z.object({
   citation: citationSchema,
 })
 
+// PDR-AI-008 (2026-07-15): closed vocabulary of the 5 governance/reserves
+// facts (lib/governance-items.ts) — kept as an inline literal enum, not
+// derived from GOVERNANCE_FIELD_KEYS, since that export is a plain readonly
+// array (not a tuple) and z.enum requires a `[string, ...string[]]` tuple.
+const governanceFieldKeySchema = z.enum([
+  'governance_total_expenditure',
+  'governance_reserves',
+  'governance_trustees_related',
+  'governance_bank_signatory_count',
+  'governance_bank_signatories_related',
+])
+
+const aiSummaryGovernanceFactSchema = z.object({
+  field_key: governanceFieldKeySchema,
+  questionText: z.string(),
+  citation: citationSchema,
+})
+
 const aiSummarySchema = z.object({
   funder_type: z.enum(['structured', 'free_form']),
   aboutGrant: z.string(),
@@ -90,6 +108,7 @@ const aiSummarySchema = z.object({
   lookingFor: z.array(z.string()),
   questions: z.array(aiSummaryQuestionSchema),
   sections: z.array(aiSummarySectionSchema).optional(),
+  governanceFacts: z.array(aiSummaryGovernanceFactSchema).optional(),
   keyRequirements: z.array(z.string()),
   funderAiPolicy: z.string().nullable().optional(),
   supportingDocuments: z.array(z.string()).optional(),
@@ -393,6 +412,10 @@ export async function POST(request: NextRequest) {
     ...rawSummary,
     questions: rawSummary.questions.map((q) => ({ ...q, citation: reconcileCitation(q.citation) })),
     sections: rawSummary.sections?.map((s) => ({ ...s, citation: reconcileCitation(s.citation) })),
+    governanceFacts: rawSummary.governanceFacts?.map((f) => ({
+      ...f,
+      citation: reconcileCitation(f.citation),
+    })),
   }
 
   if (citationsOffered > 0 && citationsValid / citationsOffered < 0.5) {
@@ -458,4 +481,9 @@ export async function POST(request: NextRequest) {
 }
 
 // AiSummaryData, AiSummaryQuestion, AiSummarySection — see lib/types.ts
-export type { AiSummaryData, AiSummaryQuestion, AiSummarySection } from '@/lib/types'
+export type {
+  AiSummaryData,
+  AiSummaryQuestion,
+  AiSummarySection,
+  AiSummaryGovernanceFact,
+} from '@/lib/types'

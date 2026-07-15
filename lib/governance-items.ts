@@ -3,15 +3,25 @@
 // 20260715000000_governance_items_move_to_item_graph.sql and
 // docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md).
 //
-// Always present on every application (no per-funder relevance detection
-// yet — deliberately deferred), always start blank (no seeding between
-// applications, including P6.5 reuse — WJ was explicit that these facts
-// must be re-entered fresh every time, not carried forward silently).
+// Guideline-driven since PDR-AI-008 (2026-07-15 follow-on): a fact is only
+// created when the AI extraction actually detects the topic being raised in
+// that funder's guidelines — never unconditionally on every application.
+// Each detected fact carries a citation exactly like an ordinary narrative
+// question/section (nullable — extraction is best-effort, never forced or
+// guessed; see lib/prompts.ts and route.ts's reconciliation pass).
 //
-// item_order uses a reserved negative range so these rows always sort
+// Always start blank regardless (no seeding between applications, including
+// P6.5 reuse — WJ was explicit that these facts must be re-entered fresh
+// every time, not carried forward silently) — see cloneApplicationForReuse's
+// `.is('field_key', null)` exclusion in actions/applications.ts.
+//
+// item_order uses a reserved negative range so a detected item always sorts
 // before any AI-extracted narrative item (whose item_order comes from the
 // AI's own question numbering, starting at 1) without touching that
-// numbering logic at all.
+// numbering logic at all. Only the slots for actually-detected facts get a
+// row — never all 5 unconditionally.
+
+import type { Json } from './database.types'
 
 export type GovernanceFieldKey =
   | 'governance_total_expenditure'
@@ -81,14 +91,74 @@ export const GOVERNANCE_RELATEDNESS_OPTIONS = ['Yes', 'No', 'Not sure yet'] as c
 /**
  * Step 4's sync-with-ai-summary pass deletes any unanswered row whose
  * item_order isn't part of the current AI summary ("orphaned" — the
- * extraction dropped that question). Governance items are never part of
- * the AI summary's own numbering, so they must be excluded from orphan
- * candidacy entirely, regardless of item_order or answer state — otherwise
- * every Step 4 page load would delete and immediately recreate them.
+ * extraction dropped that question/fact). Since PDR-AI-008, a governance
+ * item's item_order is included in the caller's `summaryOrders` only when
+ * that fact was actually detected this time — so a governance fact the
+ * extraction no longer raises is orphan-cleaned exactly like a dropped
+ * narrative question (deleted if unanswered, kept if already answered).
+ * No governance-specific carve-out needed here any more.
  */
 export function isOrphanedItem(
-  row: { item_order: number; answer_text: string | null; field_key: string | null },
+  row: { item_order: number; answer_text: string | null },
   summaryOrders: readonly number[],
 ): boolean {
-  return !row.field_key && !summaryOrders.includes(row.item_order) && !row.answer_text
+  return !summaryOrders.includes(row.item_order) && !row.answer_text
+}
+
+/** A governance fact the AI extraction detected this time, with its (possibly null) citation already converted to the DB JSONB shape. */
+export type DetectedGovernanceFact = {
+  field_key: GovernanceFieldKey
+  guideline_reference: Json
+}
+
+export type GovernanceItemInsert = {
+  application_id: string
+  user_id: string
+  item_type: 'number' | 'data'
+  source_of_truth: 'charity_profile'
+  field_key: GovernanceFieldKey
+  item_label: string
+  item_order: number
+  is_budget_question: boolean
+  guideline_reference: Json
+}
+
+/**
+ * Builds the application_items upsert payload for whichever governance
+ * facts the AI actually detected in this application's guidelines (0-5) —
+ * looking up each fact's item_type/item_label/item_order/is_budget_question
+ * from the fixed GOVERNANCE_ITEMS table (never trusting the AI for that
+ * metadata). Deduplicates by field_key, keeping the first occurrence —
+ * defensive against the AI returning the same fact twice. Silently drops any
+ * field_key not found in GOVERNANCE_ITEMS — defensive against a malformed
+ * upstream value slipping past validation.
+ */
+export function resolveGovernanceInserts(
+  facts: readonly DetectedGovernanceFact[],
+  applicationId: string,
+  userId: string,
+): GovernanceItemInsert[] {
+  const seen = new Set<GovernanceFieldKey>()
+  const inserts: GovernanceItemInsert[] = []
+
+  for (const fact of facts) {
+    if (seen.has(fact.field_key)) continue
+    const def = GOVERNANCE_ITEMS.find((item) => item.field_key === fact.field_key)
+    if (!def) continue
+    seen.add(fact.field_key)
+
+    inserts.push({
+      application_id: applicationId,
+      user_id: userId,
+      item_type: def.item_type,
+      source_of_truth: 'charity_profile',
+      field_key: def.field_key,
+      item_label: def.item_label,
+      item_order: def.item_order,
+      is_budget_question: def.is_budget_question,
+      guideline_reference: fact.guideline_reference,
+    })
+  }
+
+  return inserts
 }

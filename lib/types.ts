@@ -1,3 +1,5 @@
+import type { GovernanceFieldKey } from './governance-items'
+
 // Guideline source-reference (ADR-DATA-007, P6.3): a discriminated union so a
 // citation is never both- or neither-populated. Matches the `application_items
 // .guideline_reference` JSONB shape/CHECK constraint exactly (P6.2 migration)
@@ -26,6 +28,19 @@ export type AiSummarySection = {
   citation?: GuidelineCitation | null
 }
 
+// PDR-AI-008 (2026-07-15): guideline-driven detection of the 5 fixed
+// governance/reserves facts (lib/governance-items.ts). Extracted only when
+// the guidelines actually raise the topic — never forced, never guessed.
+// `questionText` is the funder's own wording/paraphrase, surfaced as Step 4
+// guidance text — not used as the item's label (that stays the fixed,
+// controlled string from GOVERNANCE_ITEMS so the £/count/Yes-No widget
+// selection and the "(optional)" gate stay predictable).
+export type AiSummaryGovernanceFact = {
+  field_key: GovernanceFieldKey
+  questionText: string
+  citation?: GuidelineCitation | null
+}
+
 export type AiSummaryData = {
   funder_type: 'structured' | 'free_form'
   aboutGrant: string
@@ -34,6 +49,7 @@ export type AiSummaryData = {
   lookingFor: string[]
   questions: AiSummaryQuestion[]
   sections?: AiSummarySection[]
+  governanceFacts?: AiSummaryGovernanceFact[]
   keyRequirements: string[]
   funderAiPolicy?: string | null
   supportingDocuments?: string[]
