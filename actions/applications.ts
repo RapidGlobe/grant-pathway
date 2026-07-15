@@ -8,7 +8,11 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
-import { resolveGovernanceInserts } from '@/lib/governance-items'
+import {
+  resolveGovernanceInserts,
+  GOVERNANCE_FIELD_KEYS,
+  type GovernanceFieldKey,
+} from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 // ---------------------------------------------------------------------------
@@ -654,6 +658,69 @@ export async function setDraftInProgress(
       // Non-fatal: log and continue — the Step 4 page sync will retry
       console.error('[setDraftInProgress] sync threw unexpectedly:', syncErr, { applicationId })
     }
+  }
+
+  revalidatePath(`/applications/${applicationId}/step/4`)
+  return { ok: true }
+}
+
+// ---------------------------------------------------------------------------
+// PDR-AI-008 fast-follow — Manual-add governance items (zero-signal fallback)
+// ---------------------------------------------------------------------------
+
+/**
+ * Creates application_items rows for governance/reserves facts the charity
+ * selected themselves, because the AI's guideline extraction found no signal
+ * for them (PDR-AI-008's decided fallback for the zero-signal case — a rare,
+ * experienced-user-facing escape hatch, not proactively suggested).
+ *
+ * Scoped to the closed 5-field vocabulary only (never a free-text "add any
+ * question" box) — fieldKeys not in GOVERNANCE_FIELD_KEYS are rejected.
+ * added_manually is set true so Step 4 shows "Added by you" instead of a
+ * citation badge, honestly distinguishing this from an AI-detected fact.
+ *
+ * Idempotent in the common case (upsert on application_id, item_order), but
+ * note: if the AI's extraction independently detects the same fact in a
+ * later regeneration, that sync's own upsert will overwrite added_manually
+ * back to false and may populate a real citation — correct behaviour, not a
+ * bug, since the fact is then genuinely guideline-derived.
+ */
+export async function addManualGovernanceItems(
+  applicationId: string,
+  fieldKeys: GovernanceFieldKey[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  const validFieldKeys = fieldKeys.filter((key) => GOVERNANCE_FIELD_KEYS.includes(key))
+
+  if (validFieldKeys.length === 0) {
+    return { ok: false, error: 'Please select at least one item to add.' }
+  }
+
+  const inserts = resolveGovernanceInserts(
+    validFieldKeys.map((field_key) => ({
+      field_key,
+      guideline_reference: null,
+      added_manually: true,
+    })),
+    applicationId,
+    user.id,
+  )
+
+  const { error } = await supabase.from('application_items').upsert(inserts, {
+    onConflict: 'application_id,item_order',
+    ignoreDuplicates: false,
+  })
+
+  if (error) {
+    console.error('[addManualGovernanceItems] upsert failed:', error.message, { applicationId })
+    return { ok: false, error: 'Could not save your selection. Please try again.' }
   }
 
   revalidatePath(`/applications/${applicationId}/step/4`)

@@ -105,10 +105,17 @@ export function isOrphanedItem(
   return !summaryOrders.includes(row.item_order) && !row.answer_text
 }
 
-/** A governance fact the AI extraction detected this time, with its (possibly null) citation already converted to the DB JSONB shape. */
+/**
+ * A governance fact to create a row for — either the AI extraction detected
+ * it this time (citation already converted to the DB JSONB shape, possibly
+ * null), or the charity added it themselves via the manual-add picker
+ * (PDR-AI-008 fast-follow, `added_manually: true`, no citation).
+ */
 export type DetectedGovernanceFact = {
   field_key: GovernanceFieldKey
   guideline_reference: Json
+  /** True only when the charity added this themselves — the extraction found no signal for it. Defaults to false (AI-detected). */
+  added_manually?: boolean
 }
 
 export type GovernanceItemInsert = {
@@ -121,17 +128,18 @@ export type GovernanceItemInsert = {
   item_order: number
   is_budget_question: boolean
   guideline_reference: Json
+  added_manually: boolean
 }
 
 /**
  * Builds the application_items upsert payload for whichever governance
- * facts the AI actually detected in this application's guidelines (0-5) —
+ * facts should get a row (0-5) — either AI-detected or manually added —
  * looking up each fact's item_type/item_label/item_order/is_budget_question
  * from the fixed GOVERNANCE_ITEMS table (never trusting the AI for that
  * metadata). Deduplicates by field_key, keeping the first occurrence —
- * defensive against the AI returning the same fact twice. Silently drops any
- * field_key not found in GOVERNANCE_ITEMS — defensive against a malformed
- * upstream value slipping past validation.
+ * defensive against the caller returning the same fact twice. Silently drops
+ * any field_key not found in GOVERNANCE_ITEMS — defensive against a
+ * malformed upstream value slipping past validation.
  */
 export function resolveGovernanceInserts(
   facts: readonly DetectedGovernanceFact[],
@@ -157,8 +165,29 @@ export function resolveGovernanceInserts(
       item_order: def.item_order,
       is_budget_question: def.is_budget_question,
       guideline_reference: fact.guideline_reference,
+      added_manually: fact.added_manually ?? false,
     })
   }
 
   return inserts
+}
+
+/**
+ * Plain-English, non-jargon explanation of why a funder might ask about each
+ * fact — shown next to its checkbox in the manual-add picker (PDR-AI-008
+ * fast-follow). Deliberately not just a restatement of the label: the goal is
+ * to help a user who isn't sure whether this applies to them, not just to
+ * name the field again.
+ */
+export const GOVERNANCE_FIELD_EXPLANATIONS: Record<GovernanceFieldKey, string> = {
+  governance_total_expenditure:
+    "Some funders check the size of your running costs against the grant amount you're asking for.",
+  governance_reserves:
+    'Your savings — some funders check this to avoid funding a charity that already holds enough money, or that looks financially unstable.',
+  governance_trustees_related:
+    "Some funders ask this to check for conflicts of interest in how your charity's trustees make decisions.",
+  governance_bank_signatory_count:
+    "Some funders want reassurance that more than one person controls your charity's bank account.",
+  governance_bank_signatories_related:
+    'Another conflict-of-interest check some funders make, alongside the trustee-relatedness question.',
 }

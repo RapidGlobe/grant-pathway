@@ -88,7 +88,7 @@ export default async function Step4Page({ params }: Props) {
   const { data: existingRows } = await supabase
     .from('application_items')
     .select(
-      'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+      'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id, added_manually',
     )
     .eq('application_id', id)
     .eq('user_id', user.id)
@@ -141,13 +141,26 @@ export default async function Step4Page({ params }: Props) {
         if (fact?.questionText) guidanceMap[insert.item_order] = fact.questionText
       }
 
+      // Manually-added items (PDR-AI-008 fast-follow) are never guideline-driven,
+      // so their item_order must always count as "in the summary" for orphan
+      // purposes, regardless of what this extraction did or didn't detect —
+      // otherwise the very next sync would delete an unanswered one the
+      // charity just added themselves.
+      const manuallyAddedOrders = questionRows
+        .filter((r) => r.added_manually)
+        .map((r) => r.item_order)
+
       if (
         funderType === 'free_form' &&
         Array.isArray(parsedSummary.sections) &&
         parsedSummary.sections.length > 0
       ) {
-        // Free_form: sync from narrative sections + detected governance facts
-        const summaryOrders = [...parsedSummary.sections.map((s) => s.number), ...governanceOrders]
+        // Free_form: sync from narrative sections + detected/manually-added governance facts
+        const summaryOrders = [
+          ...parsedSummary.sections.map((s) => s.number),
+          ...governanceOrders,
+          ...manuallyAddedOrders,
+        ]
         const orphaned = questionRows
           .filter((r) => isOrphanedItem(r, summaryOrders))
           .map((r) => r.item_order)
@@ -197,7 +210,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id, added_manually',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -205,10 +218,11 @@ export default async function Step4Page({ params }: Props) {
 
         questionRows = refreshed ?? []
       } else if (Array.isArray(parsedSummary.questions) && parsedSummary.questions.length > 0) {
-        // Structured: sync from numbered questions + detected governance facts
+        // Structured: sync from numbered questions + detected/manually-added governance facts
         const summaryOrders = [
           ...parsedSummary.questions.map((q, idx) => q.number ?? idx + 1),
           ...governanceOrders,
+          ...manuallyAddedOrders,
         ]
         const orphaned = questionRows
           .filter((r) => isOrphanedItem(r, summaryOrders))
@@ -259,7 +273,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id, added_manually',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -270,8 +284,9 @@ export default async function Step4Page({ params }: Props) {
         // No narrative questions/sections at all this time, but the AI still
         // detected governance facts — sync just those, same orphan-then-
         // upsert-then-refetch pattern as the two branches above.
+        const summaryOrders = [...governanceOrders, ...manuallyAddedOrders]
         const orphaned = questionRows
-          .filter((r) => isOrphanedItem(r, governanceOrders))
+          .filter((r) => isOrphanedItem(r, summaryOrders))
           .map((r) => r.item_order)
 
         if (orphaned.length > 0) {
@@ -300,7 +315,7 @@ export default async function Step4Page({ params }: Props) {
         const { data: refreshed } = await supabase
           .from('application_items')
           .select(
-            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id',
+            'id, item_label, item_order, item_type, field_key, word_limit, char_limit, limit_type, answer_text, answer_source, is_budget_question, is_approved, guideline_reference, cloned_from_application_id, added_manually',
           )
           .eq('application_id', id)
           .eq('user_id', user.id)
@@ -358,6 +373,7 @@ export default async function Step4Page({ params }: Props) {
     isApproved: (row.is_approved as boolean) ?? false,
     guidelineReference: (row.guideline_reference as QuestionRow['guidelineReference']) ?? null,
     isCarriedOver: (row.cloned_from_application_id as string | null) != null,
+    addedManually: (row.added_manually as boolean) ?? false,
   }))
 
   return (

@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-15 — PDR-AI-008's manual-add fallback built (fast-follow)
+
+The auto-detection half of PDR-AI-008 (previous entry) deliberately deferred the zero-signal fallback — a manual-add picker — as a separate follow-up. WJ asked for it to be built while stepping out briefly, and asked what was needed first; answered directly (the design was already agreed in the earlier conversation) and proceeded without a blocking plan-mode approval gate, since he wouldn't be present to approve one. One real judgement call was flagged rather than silently decided: how to distinguish a manually-added item from an AI-detected one with no citation, since both otherwise look identical (`guideline_reference: null`). Resolved with a new boolean column rather than overloading an existing enum.
+
+**The mechanism:** a quiet link below the Step 4 question list — "Need to add something about your finances or governance that wasn't asked above? Add it." — appears only when at least one of the 5 governance facts isn't already shown, and disappears entirely once all 5 are present. Clicking it reveals checkboxes for just the missing facts, each carrying a plain-English explanation (`GOVERNANCE_FIELD_EXPLANATIONS`, `lib/governance-items.ts`) rather than a bare label — a novice user (Persona 1, Margaret) shouldn't have to already know what "bank signatory relatedness" means to decide whether it applies to her.
+
+**Data:** new `application_items.added_manually` boolean column (migration `20260715000001`), `false` by default. A new server action `addManualGovernanceItems` (`actions/applications.ts`) creates the selected rows via `resolveGovernanceInserts()` with `added_manually: true`, scoped to the closed 5-field vocabulary only — any value outside `GOVERNANCE_FIELD_KEYS` is silently rejected server-side, not just hidden client-side.
+
+**A real bug caught before it shipped:** the existing orphan-cleanup logic only treats a governance item's `item_order` as "in the summary" when the AI currently detects it. A manually-added item is never AI-detected by definition, so without a fix, the very next Step 4 sync (e.g. simply reloading the page) would have deleted an unanswered manually-added item as "orphaned." Fixed by folding any existing row's `added_manually` item_order into the same `summaryOrders` set used for narrative orphan-checking — a manually-added item now survives regardless of what any given extraction pass does or doesn't detect, exactly as intended.
+
+**Rendering:** a manually-added item shows a small "Added by you" badge in place of a citation badge — honest about where the question came from, matching the UX design discussed earlier the same day. On successful add, the client does a hard page reload rather than reconciling local state — consistent with this codebase's existing "mutate then hard-refresh" pattern (`setDraftInProgress`'s own caller), and avoids duplicating the server's sort/guidance/citation logic on the client for what is a rare-use feature.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 64 tests pass (4 new — explanation-map coverage and `added_manually` default/override behaviour). Migration applied to `grant-pathway-dev` only (`supabase migration list`, 24/24 matched before and after); `grant-pathway-prod` confirmed still unlinked (`supabase projects list`).
+
+**Files changed:** `supabase/migrations/20260715000001_governance_manual_add.sql` (new), `lib/database.types.ts`, `lib/governance-items.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `__tests__/governance-items.test.ts`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/PRD decisions/PRD-DECISIONS-INDEX.md`, `docs/data-model.md` (v1.13), `docs/PRD-Grant-Pathway.md` (v0.51), `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-12A-04).
+
+---
+
 ## 2026-07-15 — PDR-AI-008 built: governance facts now guideline-driven, superseding the always-on block
 
 WJ's live testing of the always-on 5-item "Governance and reserves" block (built earlier the same day, commit `82e11d9`, currency-formatted in `7e68c9a`) found it disjointed from the rest of Step 4 — no citation, no funder-specific rationale, shown regardless of whether the funder cares. Decided (`docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`) and built the same day.

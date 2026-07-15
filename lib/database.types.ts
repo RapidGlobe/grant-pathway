@@ -105,6 +105,7 @@ export type Database = {
       }
       application_items: {
         Row: {
+          added_manually: boolean
           ai_refined_answer: string | null
           answer_source: Database['public']['Enums']['answer_source'] | null
           answer_text: string | null
@@ -132,6 +133,7 @@ export type Database = {
           word_limit: number | null
         }
         Insert: {
+          added_manually?: boolean
           ai_refined_answer?: string | null
           answer_source?: Database['public']['Enums']['answer_source'] | null
           answer_text?: string | null
@@ -159,6 +161,7 @@ export type Database = {
           word_limit?: number | null
         }
         Update: {
+          added_manually?: boolean
           ai_refined_answer?: string | null
           answer_source?: Database['public']['Enums']['answer_source'] | null
           answer_text?: string | null

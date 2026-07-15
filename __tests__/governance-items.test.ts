@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   GOVERNANCE_ITEMS,
   GOVERNANCE_FIELD_KEYS,
+  GOVERNANCE_FIELD_EXPLANATIONS,
   isOrphanedItem,
   resolveGovernanceInserts,
 } from '@/lib/governance-items'
@@ -26,6 +27,22 @@ describe('GOVERNANCE_ITEMS — the 5 fixed governance/reserves items (2026-07-15
   it('marks every item_label as optional, so the Step 4 approval gate treats them as skippable-when-blank', () => {
     GOVERNANCE_ITEMS.forEach((item) => {
       expect(item.item_label.toLowerCase()).toContain('(optional)')
+    })
+  })
+})
+
+describe('GOVERNANCE_FIELD_EXPLANATIONS — plain-English text for the manual-add picker (PDR-AI-008 fast-follow)', () => {
+  it('has exactly one explanation per governance field, matching GOVERNANCE_FIELD_KEYS', () => {
+    expect(Object.keys(GOVERNANCE_FIELD_EXPLANATIONS).sort()).toEqual(
+      [...GOVERNANCE_FIELD_KEYS].sort(),
+    )
+  })
+
+  it("every explanation is non-empty and distinct from the field's item_label (it must add context, not just repeat the name)", () => {
+    GOVERNANCE_ITEMS.forEach((item) => {
+      const explanation = GOVERNANCE_FIELD_EXPLANATIONS[item.field_key]
+      expect(explanation.length).toBeGreaterThan(0)
+      expect(explanation.toLowerCase()).not.toBe(item.item_label.toLowerCase())
     })
   })
 })
@@ -87,6 +104,7 @@ describe('resolveGovernanceInserts — builds the upsert payload for detected go
       item_order: -4,
       is_budget_question: true,
       guideline_reference: { source_type: 'page', page_number: 4, quote: 'reserves policy' },
+      added_manually: false,
     })
   })
 
@@ -130,6 +148,27 @@ describe('resolveGovernanceInserts — builds the upsert payload for detected go
     )
 
     expect(inserts).toHaveLength(1)
+    expect(inserts[0].guideline_reference).toBeNull()
+  })
+
+  it('defaults added_manually to false when omitted (the AI-detected path never sets it)', () => {
+    const inserts = resolveGovernanceInserts(
+      [{ field_key: 'governance_reserves', guideline_reference: null }],
+      'app-1',
+      'user-1',
+    )
+
+    expect(inserts[0].added_manually).toBe(false)
+  })
+
+  it('sets added_manually true when the caller marks a fact as manually added (PDR-AI-008 fast-follow)', () => {
+    const inserts = resolveGovernanceInserts(
+      [{ field_key: 'governance_reserves', guideline_reference: null, added_manually: true }],
+      'app-1',
+      'user-1',
+    )
+
+    expect(inserts[0].added_manually).toBe(true)
     expect(inserts[0].guideline_reference).toBeNull()
   })
 })

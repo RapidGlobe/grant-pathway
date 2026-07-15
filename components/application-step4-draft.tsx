@@ -41,9 +41,15 @@ import {
   approveAnswer,
   saveManualAnswer,
   setDraftReadyToAssemble,
+  addManualGovernanceItems,
 } from '@/actions/applications'
 import type { GuidelineCitation } from '@/lib/types'
 import { findQuoteRange } from '@/lib/guideline-citations'
+import {
+  GOVERNANCE_ITEMS,
+  GOVERNANCE_FIELD_EXPLANATIONS,
+  type GovernanceFieldKey,
+} from '@/lib/governance-items'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,6 +74,8 @@ export type QuestionRow = {
   guidelineReference: GuidelineCitation | null
   /** True when this answer was carried over from a previous application via P6.5's reuse feature. */
   isCarriedOver: boolean
+  /** True only for a governance item the charity added themselves via the manual-add picker (PDR-AI-008 fast-follow) — shows "Added by you" instead of a citation badge. */
+  addedManually: boolean
 }
 
 type RefineState =
@@ -149,6 +157,23 @@ export function ApplicationStep4Draft({
   const [isSaving, setIsSaving] = useState(false)
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
+
+  // PDR-AI-008 fast-follow — manual-add picker for governance facts the
+  // guideline extraction found no signal for (zero-signal fallback, not
+  // proactively suggested — see docs/PRD decisions/PDR-AI-008-...md).
+  const [showManualAddPanel, setShowManualAddPanel] = useState(false)
+  const [selectedManualFieldKeys, setSelectedManualFieldKeys] = useState<Set<GovernanceFieldKey>>(
+    new Set(),
+  )
+  const [isSavingManualAdd, setIsSavingManualAdd] = useState(false)
+  const [manualAddError, setManualAddError] = useState<string | null>(null)
+
+  // Only offer facts not already shown — this is a supplement, not a
+  // duplicate-detection mechanism. Hidden entirely once all 5 are present.
+  const shownFieldKeys = new Set(questions.map((q) => q.fieldKey).filter(Boolean))
+  const missingGovernanceItems = GOVERNANCE_ITEMS.filter(
+    (item) => !shownFieldKeys.has(item.field_key),
+  )
 
   // manual entry state (no questions/sections path)
   const [manualQuestion, setManualQuestion] = useState('')
@@ -307,6 +332,37 @@ export function ApplicationStep4Draft({
     } else {
       setApproved((prev) => ({ ...prev, [answerId]: true }))
     }
+  }
+
+  // ── Manual-add governance items (PDR-AI-008 fast-follow) ──────────────────
+
+  function toggleManualFieldKey(fieldKey: GovernanceFieldKey) {
+    setSelectedManualFieldKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(fieldKey)) next.delete(fieldKey)
+      else next.add(fieldKey)
+      return next
+    })
+  }
+
+  async function handleAddManualGovernanceItems() {
+    if (selectedManualFieldKeys.size === 0) {
+      setManualAddError('Please select at least one item to add.')
+      return
+    }
+    setManualAddError(null)
+    setIsSavingManualAdd(true)
+    const result = await addManualGovernanceItems(applicationId, [...selectedManualFieldKeys])
+    setIsSavingManualAdd(false)
+    if (!result.ok) {
+      setManualAddError(result.error)
+      return
+    }
+    // Hard reload so the server re-syncs and renders the new item(s) at their
+    // correct sort position with the rest of Step 4's server-computed state
+    // (guidance, citation reconciliation, orphan logic) — same "mutate then
+    // hard-refresh" pattern setDraftInProgress's own caller already uses.
+    window.location.reload()
   }
 
   // ── Ready to assemble ─────────────────────────────────────────────────────
@@ -579,6 +635,14 @@ export function ApplicationStep4Draft({
                       {citationLabel(q.guidelineReference)}
                     </button>
                   )}
+                  {q.addedManually && (
+                    <span
+                      title="You added this — it wasn't found in the funder's guidelines"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]"
+                    >
+                      Added by you
+                    </span>
+                  )}
                   {q.isCarriedOver && (
                     <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-1 text-[13px] font-bold text-[#92400E]">
                       <History className="h-3.5 w-3.5" aria-hidden="true" />
@@ -828,6 +892,80 @@ export function ApplicationStep4Draft({
           )
         })}
       </div>
+
+      {/* Manual-add governance items (PDR-AI-008 fast-follow) — zero-signal
+          fallback only, never proactively suggested. Hidden entirely once
+          all 5 facts are already shown above. */}
+      {missingGovernanceItems.length > 0 && (
+        <div className="mb-8">
+          {!showManualAddPanel ? (
+            <button
+              type="button"
+              onClick={() => setShowManualAddPanel(true)}
+              className="text-[13px] text-[#64748B] underline-offset-2 hover:text-[#1E293B] hover:underline"
+            >
+              Need to add something about your finances or governance that wasn&apos;t asked above?
+              Add it.
+            </button>
+          ) : (
+            <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+              <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+                Add a financial or governance detail
+              </p>
+              <div className="mb-4 space-y-3">
+                {missingGovernanceItems.map((item) => (
+                  <label
+                    key={item.field_key}
+                    className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]"
+                  >
+                    <input
+                      type="checkbox"
+                      className="mt-0.5"
+                      checked={selectedManualFieldKeys.has(item.field_key)}
+                      onChange={() => toggleManualFieldKey(item.field_key)}
+                    />
+                    <span>
+                      <span className="font-medium text-[#1E293B]">
+                        {item.item_label.replace(/\s*\(optional\)$/, '')}
+                      </span>
+                      <br />
+                      <span className="text-[#64748B]">
+                        {GOVERNANCE_FIELD_EXPLANATIONS[item.field_key]}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              {manualAddError && (
+                <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
+                  {manualAddError}
+                </p>
+              )}
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  onClick={() => void handleAddManualGovernanceItems()}
+                  disabled={isSavingManualAdd}
+                  className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+                >
+                  {isSavingManualAdd ? 'Adding…' : 'Add selected'}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowManualAddPanel(false)
+                    setSelectedManualFieldKeys(new Set())
+                    setManualAddError(null)
+                  }}
+                  className="text-[13px] text-[#64748B] hover:text-[#1E293B]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Assemble error */}
       {assembleError && (
