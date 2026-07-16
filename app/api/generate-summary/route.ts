@@ -250,16 +250,23 @@ export async function POST(request: NextRequest) {
 
   let textForPrompt = guidelinesText
   let guidelinesTruncated = false
+  let formSectionPrioritized = false
   if (!skipPreprocessing) {
-    const { text, wasTruncated, originalLength, processedLength } = preprocessText(
-      guidelinesText,
-      charCeiling,
-    )
+    const {
+      text,
+      wasTruncated,
+      originalLength,
+      processedLength,
+      formSectionPrioritized: formPrioritized,
+    } = preprocessText(guidelinesText, charCeiling)
     textForPrompt = text
     guidelinesTruncated = wasTruncated
+    formSectionPrioritized = formPrioritized
     console.log(
       `[generate-summary] pre-processing: ${originalLength} → ${processedLength} chars` +
-        (wasTruncated ? ` (truncated at ${charCeiling})` : ''),
+        (wasTruncated
+          ? ` (truncated at ${charCeiling}${formPrioritized ? ', form section prioritized' : ''})`
+          : ''),
     )
     if (wasTruncated) {
       console.warn(
@@ -477,6 +484,7 @@ export async function POST(request: NextRequest) {
     questionsFound,
     approachingLimit,
     guidelinesTruncated,
+    formSectionPrioritized,
   })
 }
 
