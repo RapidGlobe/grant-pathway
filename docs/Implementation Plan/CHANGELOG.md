@@ -10,6 +10,25 @@
 
 ---
 
+## 2026-07-16 — PDR-AI-007 built: budget questions over their limit get a deterministic trim, not silence
+
+WJ live-testing Henry Smith hit a budget-flagged narrative question ("If you have not raised all the money needed, what are your plans to do so?", 300-word limit) with a deliberately over-limit 503-word test sample and asked: "I thought we had fixed this scenario... There is no AI, so therefore how do we assist the user to bring down the number of words?"
+
+**Investigation found this had, in fact, already been decided** — `PDR-AI-007-budget-over-limit-messaging.md`, decided 2026-07-04 during Clothworkers Foundation testing and formalised 2026-07-11 — but a repo-wide search turned up no trace of the decided message or "Trim to limit" button anywhere outside the PDR document itself. The decision was never turned into a tracked task in `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md`, so it sat "decided, not yet built" for 12 days and nobody noticed until WJ independently re-discovered the exact same gap. Same failure mode as `DR-FD-001`'s 2026-07-11 free-text-fallback amendment, found stale during the 2026-07-16 Phase 5 audit (see the entry further below) — a decision recorded only in its own document, with no corresponding line in the tracked task list, is invisible to anyone checking "what's left to build."
+
+**Root cause (confirmed live in code):** the entire "Help me improve this" block in `components/application-step4-draft.tsx` — including the red over-limit warning ("...trim it or use AI...") — was wrapped in `{!q.isBudgetQuestion && (...)}`. Budget questions showed no over-limit message at all, just the raw counter turning red, exactly matching what WJ described.
+
+**Built exactly as PDR-AI-007 decided** (Option C + Option E; Option F — AI assist on budget questions — remains explicitly rejected for now):
+
+1. A budget-specific over-limit message, no AI reference, shown only for `q.isBudgetQuestion && !isGovernanceItem && isOver`: _"Your answer exceeds the funder's word/character limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving."_
+2. A new `trimToLimit()` helper plus a "Trim to limit" button, entirely deterministic (no AI/LLM call, preserving the "AI never sees financial figures" guarantee): snaps to the last complete sentence that still fits within the limit, falling back to a hard word/character cut (snapped to a word boundary) if even the first sentence alone exceeds it.
+
+Verified with a standalone reproduction script against WJ's exact 502-word sample: trims to 285 words, cleanly snapped to a sentence boundary, well within the 300-word limit. Also checked a character-limit case and a no-sentence-fits hard-cut case. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — this component has no existing test coverage; verified live is the established precedent, same as prior Step 4 fixes this session).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-007-budget-over-limit-messaging.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-29-06), `docs/PRD-Grant-Pathway.md` (0.52 → 0.53), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Numbering extended to free-form funders' sections and governance items
 
 Follow-on from the Step 3 count-mismatch fix (next entry below): WJ then asked directly whether Step 4's lack of numbering on Walton Charity (a free-form funder) should also be revisited, since it looked inconsistent next to structured funders' numbered questions. Confirmed this was documented, intentional behaviour (`AC-FR-28-04`) — free-form funders were designed from the start to show unnumbered narrative sections, distinct from structured funders' numbered Q&A cards. WJ asked for it to be extended anyway, since that original premise pre-dates PDR-AI-008's governance facts (2026-07-15): a fact like "Are any of your trustees related to each other...?" reads as a discrete question regardless of the funder's own classification, not a narrative section title, so leaving it unnumbered inside a free-form item list was inconsistent even before this request.

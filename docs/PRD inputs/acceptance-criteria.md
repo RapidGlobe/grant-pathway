@@ -1556,6 +1556,22 @@ _Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previ
 
 ---
 
+**AC-FR-29-06 — Budget/financial questions over their limit get a deterministic trim, not the AI over-limit message** _(Added 2026-07-16, PDR-AI-007)_
+
+- **Given** a question is flagged `is_budget_question` and its answer exceeds the funder's word or character limit
+- **When** I view that question's card
+- **Then** the "Help me improve this" AI-assist block (including AC-FR-29-04's narrative over-limit message, which references "use AI") is not shown for this question at all — it never was, since AI assist is disabled for budget/financial questions
+- **And** instead I see: _"Your answer exceeds the funder's word/character limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving."_ (wording matches the limit type — "word" or "character" — per the funder's `limitType`)
+- **And** a "Trim to limit" button is shown alongside the message
+- **When** I click "Trim to limit"
+- **Then** my answer is mechanically cut to the last complete sentence that still fits within the limit — no AI/LLM call is made, and no figures, dates, or wording are altered by an AI
+- **And** if even the first sentence alone exceeds the limit, the answer is instead hard-cut at the limit, snapped to the nearest word boundary so no word is left truncated mid-way
+- **And** the "Approve this answer" panel and button remain hidden until the trimmed (or further manually edited) answer is within the limit, per AC-FR-29-04's existing gate
+
+_Note (2026-07-16): this closes a gap first found live during Clothworkers Foundation testing (2026-07-04) and decided the same day as `PDR-AI-007`, formalised as a PDR on 2026-07-11 -- but never actually built. WJ re-discovered the exact same gap independently on 2026-07-16 while testing Henry Smith (a budget question, "If you have not raised all the money needed, what are your plans to do so?", 300-word limit, tested with a 503-word sample), not realising it had already been decided six days earlier. Confirmed via a repo-wide search that no trace of the decided message or "Trim to limit" button existed anywhere outside the PDR document itself -- the decision was never turned into a tracked implementation task in `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md`, the same failure mode as `DR-FD-001`'s 2026-07-11 free-text-fallback amendment (also decided, never tracked, never built). Built exactly as `PDR-AI-007` specified: Option C (budget-specific message, no AI reference) + Option E (deterministic sentence-snap trim, no LLM call) -- Option F (AI assist scoped to budget questions) remains explicitly rejected for now._
+
+---
+
 ### FR-30 — Must Have
 
 **Requirement:** The AI assist feature ("Help me improve this") shall improve the structure and clarity of the user's written answer without adding facts or changing the meaning.

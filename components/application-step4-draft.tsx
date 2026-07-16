@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   AlertCircle,
   Sparkles,
+  Scissors,
   CheckCircle2,
   CheckCheck,
   FileText,
@@ -111,6 +112,44 @@ function citationLabel(citation: GuidelineCitation): string {
 
 function countWords(text: string): number {
   return text.trim() === '' ? 0 : text.trim().split(/\s+/).length
+}
+
+/**
+ * Deterministic "Trim to limit" for budget/financial questions (PDR-AI-007).
+ * No AI/LLM call — mechanically cuts to the last complete sentence that still
+ * fits within the limit, giving the charity a starting point rather than
+ * counting down from e.g. 503 to 250 words by hand. Falls back to a hard
+ * word/character cut (snapped to a word boundary) if even the first sentence
+ * alone exceeds the limit.
+ */
+function trimToLimit(text: string, limit: number, useChars: boolean): string {
+  const trimmed = text.trim()
+  if (trimmed === '') return trimmed
+
+  // Sentence boundary: ./!/? optionally followed by a closing quote, then
+  // whitespace or end of string.
+  const sentenceEndPattern = /[.!?]['"’”]?(?:\s+|$)/g
+  let bestEnd = 0
+  let match: RegExpExecArray | null
+  while ((match = sentenceEndPattern.exec(trimmed))) {
+    const candidateEnd = match.index + match[0].length
+    const candidate = trimmed.slice(0, candidateEnd).trim()
+    const size = useChars ? candidate.length : countWords(candidate)
+    if (size > limit) break
+    bestEnd = candidateEnd
+  }
+
+  if (bestEnd > 0) return trimmed.slice(0, bestEnd).trim()
+
+  // No complete sentence fits — hard cut, snapped to a word boundary so a
+  // word is never left truncated mid-way.
+  if (useChars) {
+    const slice = trimmed.slice(0, limit)
+    const lastSpace = slice.lastIndexOf(' ')
+    return (lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trim()
+  }
+
+  return trimmed.split(/\s+/).slice(0, limit).join(' ')
 }
 
 /** Renders a raw digit string with UK thousands separators, e.g. "1234567" -> "1,234,567". */
@@ -313,6 +352,24 @@ export function ApplicationStep4Draft({
 
   function dismissRefineError(answerId: string) {
     setRefineStates((prev) => ({ ...prev, [answerId]: { status: 'idle' } }))
+  }
+
+  // ── Trim to limit (PDR-AI-007) — budget/financial questions only ─────────
+  // Deterministic, no AI/LLM call: mechanically cuts to the last complete
+  // sentence within the limit. Chosen over AI assist specifically because it
+  // doesn't touch the "AI never sees financial figures" trust guarantee.
+  function handleTrimToLimit(q: QuestionRow) {
+    const limit = q.limitType === 'characters' ? q.charLimit : q.wordLimit
+    if (limit == null) return
+    const trimmed = trimToLimit(
+      latestAnswers.current[q.id] ?? '',
+      limit,
+      q.limitType === 'characters',
+    )
+    setAnswers((prev) => ({ ...prev, [q.id]: trimmed }))
+    // Editing clears approval — the user must re-approve after any change (FR-33)
+    if (approved[q.id]) setApproved((prev) => ({ ...prev, [q.id]: false }))
+    void doSave(q.id, trimmed, 'user_edited')
   }
 
   // ── Approve answer (FR-33) ────────────────────────────────────────────────
@@ -832,6 +889,28 @@ export function ApplicationStep4Draft({
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Over-limit trim assist — budget/financial questions only (PDR-AI-007).
+                  No AI reference: assist doesn't exist for these, so the narrative
+                  over-limit message above would be inaccurate here. A deterministic
+                  "Trim to limit" button gives a starting point without an LLM call,
+                  preserving the "AI never sees financial figures" guarantee. */}
+              {q.isBudgetQuestion && !isGovernanceItem && isOver && (
+                <div className="mt-3">
+                  <p className="text-[12px] text-[#DC2626]">
+                    {`Your answer exceeds the funder's ${useChars ? 'character' : 'word'} limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving.`}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => handleTrimToLimit(q)}
+                    disabled={isApprovedQ}
+                    className="mt-1 flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                  >
+                    <Scissors className="h-3.5 w-3.5" aria-hidden="true" />
+                    Trim to limit
+                  </button>
                 </div>
               )}
 
