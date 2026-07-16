@@ -578,8 +578,13 @@ export function ApplicationStep4Draft({
 
       {/* Question / section cards */}
       <div className="mb-8 space-y-6">
-        {questions.map((q) => {
+        {questions.map((q, index) => {
           const isGovernanceItem = q.fieldKey != null
+          // Sequential display number across ALL items in their existing sort
+          // order (governance items first, then narrative questions) — not
+          // q.questionOrder, which is the raw item_order used for DB sorting
+          // only (negative for governance items, meaningless to a user).
+          const displayNumber = index + 1
           const text = answers[q.id] ?? ''
           const words = countWords(text)
           const chars = text.length
@@ -609,8 +614,8 @@ export function ApplicationStep4Draft({
               {/* Card header */}
               <div className="mb-2 flex items-start justify-between gap-3">
                 <p className="text-[15px] font-semibold leading-snug text-[#1E293B]">
-                  {funderType === 'structured' && !isGovernanceItem && (
-                    <span className="mr-0.5">{q.questionOrder}.&nbsp;</span>
+                  {funderType === 'structured' && (
+                    <span className="mr-0.5">{displayNumber}.&nbsp;</span>
                   )}
                   {q.questionText}
                 </p>
@@ -735,7 +740,7 @@ export function ApplicationStep4Draft({
                   aria-label={
                     funderType === 'free_form'
                       ? `Content for ${q.questionText}`
-                      : `Answer for question ${q.questionOrder}`
+                      : `Answer for question ${displayNumber}`
                   }
                   placeholder={
                     funderType === 'free_form'

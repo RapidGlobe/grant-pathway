@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-16 — Governance items now get a real sequential number, folded in with narrative questions
+
+WJ reviewed a Clothworkers assembled draft (Step 5) showing "Total annual expenditure (£)" with no number at all, immediately followed by "1. Please describe the community/group of people you support..." — the first narrative question. He initially thought I'd misread his concern as being about truncated answer text (a red herring from investigating a different, unrelated question about deliberately-pasted word-count-testing content), then clarified: he expected the governance item to be numbered "1." and the narrative question to follow as "2.", not for governance items to be excluded from numbering entirely.
+
+This reverses part of PDR-AI-008's original rendering design (governance items render as unnumbered "ordinary cards", and the 2026-07-15 Step 5 numbering fix explicitly matched that — see this file's 2026-07-15 entry and `PDR-AI-008`'s Revision History). Confirmed the exact scope with WJ before changing established, documented behaviour: number governance items in both Step 4 (writing) and Step 5 (assembled draft), keeping their existing sort-first position rather than moving them to the end.
+
+**Fix:** both `components/application-step4-draft.tsx` and `actions/applications.ts` (`assembleAndAdvance`) now compute the displayed number from each item's **position in the already-ordered, answered list** (`index + 1`) rather than from the raw `item_order` column, which stays negative for governance items and was never meant to be user-facing. Step 4 previously suppressed the number entirely for governance items (`!isGovernanceItem`); Step 5 previously did the same via a `field_key !== null` check (the fix from 2026-07-15 that stopped it leaking the raw negative order). Both checks are removed — every structured-funder item now gets a number, governance items included, since governance items already sort before narrative questions by design (reserved negative `item_order`, -5 to -1).
+
+Also removed `field_key` from `assembleAndAdvance`'s query — it was only ever read for the now-removed numbering condition.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 75 tests pass (unchanged — neither file has existing unit coverage, same precedent as the original 2026-07-15 fix: tightly coupled to the Supabase client / DOM rendering, verified live instead). **Files changed:** `components/application-step4-draft.tsx`, `actions/applications.ts`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Repeated-line stripping was deleting genuine questions that recur verbatim across a funder's multiple forms
 
 Follow-on from the form-aware truncation fix (next entry below): while verifying that fix against the real Clothworkers PDF, found that "Please describe the difference you expect your capital project to make" was missing from the cleaned text **even with no truncation ceiling applied at all** — a separate, pre-existing bug, not caused by truncation. WJ called it a serious bug and asked to fix it immediately rather than deferring, while he continued testing.

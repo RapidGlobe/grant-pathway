@@ -940,7 +940,7 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
   // ── Fetch answered items in order ──────────────────────────────────────────
   const { data: answerRows, error: answersError } = await supabase
     .from('application_items')
-    .select('item_order, item_label, answer_text, field_key')
+    .select('item_order, item_label, answer_text')
     .eq('application_id', applicationId)
     .eq('user_id', user.id)
     .order('item_order')
@@ -966,17 +966,20 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
 
   // ── Format assembled_draft ────────────────────────────────────────────────
   // free_form: section title then answer (no number prefix — narrative flow)
-  // structured: numbered Q&A pairs
+  // structured: numbered Q&A pairs, governance items included in the same
+  // sequence as narrative questions (not the raw item_order, which is a
+  // negative internal sort key for governance items — the display number is
+  // just each item's position in this already-ordered, answered list).
   let assembledDraft: string
 
   if (answered.length === 0) {
     assembledDraft = ''
   } else {
     assembledDraft = answered
-      .map((r) =>
-        funderType === 'free_form' || r.field_key !== null
+      .map((r, index) =>
+        funderType === 'free_form'
           ? `${r.item_label}\n\n${r.answer_text}`
-          : `${r.item_order}. ${r.item_label}\n\n${r.answer_text}`,
+          : `${index + 1}. ${r.item_label}\n\n${r.answer_text}`,
       )
       .join('\n\n---\n\n')
   }
