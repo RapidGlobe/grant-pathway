@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-16 — Phase 5 audit follow-up: migration-push task added, ToS/Privacy/Vercel Pro/cron status corrected
+
+Second pass on the Phase 5 review begun earlier the same day (see the entry directly below). Three more findings from that review, all approved for fixing by WJ:
+
+**1. P5.4 had no task for pushing Phase 6's migrations to production.** Every Phase 6 migration since P6.1 (2026-07-05) has been deliberately scoped to `grant-pathway-dev` only, with each task's own scoping note promising `grant-pathway-prod` would be "re-entered at P5.4" — but P5.4's actual checklist never contained a line item for that re-entry, and neither did the Phase 6 → Go-Live Gate. By the time Phase 5 starts, roughly 10 migrations (P6.1, P6.2a, P6.2, P6.3, P6.4, P6.5, both PDR-AI-008 migrations, GAP-33, the manual-add fallback) will need applying to prod. Added an explicit task to P5.4 (`supabase db push` against prod, verified via `supabase migration list` matching Local/Remote on both projects) and a matching checklist line to the Phase 6 → Go-Live Gate.
+
+**2. P5.1's Terms of Service / Privacy Policy rows read as not-yet-drafted.** Both are in fact live — `/terms` since 2026-07-10, `/privacy` since 2026-07-02 (confirmed via `app/(public)/terms`, `app/(public)/privacy`, and the `docs/legal/*.md` sources). Updated both rows and the section preamble to reflect this, calling out the two items that genuinely remain open: the `Effective date` placeholder in both documents (currently `[TO BE CONFIRMED]`, confirmed by reading the actual files) and the solicitor review neither has had yet.
+
+**3. P5.4's "Activate Vercel Pro" and cron-confirmation bullets read as pending.** Vercel Pro is active and all three crons in `vercel.json` are confirmed running (`cleanup-guidelines` every 30 min, `inactivity-warning`/`inactivity-deletion` daily) — corroborated independently, not just from memory: a 30-minute cron is not possible on Vercel's Hobby plan (once-daily crons only), so its presence in production confirms Pro is active. Both bullets marked done.
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.16 → v3.17), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Phase 5 factual audit: Funder Directory section superseded, Admin Dashboard query fixed
 
 WJ asked for a review of `IMPLEMENTATION-PLAN.md`'s Phase 5 section while stepping away, given a week of heavy Phase 6 changes — wanted confirmation it was still "intact and factual" ahead of Phase 5 starting next week.
