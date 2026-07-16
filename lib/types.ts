@@ -23,7 +23,7 @@ export type AiSummarySection = {
   number: number
   title: string
   guidance: string
-  wordLimit?: number
+  wordLimit?: number | null
   is_budget_section: boolean
   citation?: GuidelineCitation | null
 }

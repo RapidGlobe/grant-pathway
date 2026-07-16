@@ -77,7 +77,7 @@ const aiSummarySectionSchema = z.object({
   number: z.number(),
   title: z.string(),
   guidance: z.string(),
-  wordLimit: z.number().optional(),
+  wordLimit: z.number().nullable().optional(),
   is_budget_section: z.boolean(),
   citation: citationSchema,
 })
