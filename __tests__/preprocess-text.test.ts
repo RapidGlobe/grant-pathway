@@ -1,6 +1,80 @@
 import { describe, it, expect } from 'vitest'
 import { preprocessText } from '@/lib/preprocess-text'
 
+describe('preprocessText — repeated-line stripping only removes genuine running headers/footers (2026-07-16, Clothworkers regression)', () => {
+  it('strips a line that repeats as the first line after every page marker (a true running header)', () => {
+    const text = [
+      '[PAGE 1]',
+      'THE FOUNDATION: OPEN GRANTS PROGRAMME GUIDANCE',
+      'Content unique to page one.',
+      '',
+      '[PAGE 2]',
+      'THE FOUNDATION: OPEN GRANTS PROGRAMME GUIDANCE',
+      'Content unique to page two.',
+      '',
+      '[PAGE 3]',
+      'THE FOUNDATION: OPEN GRANTS PROGRAMME GUIDANCE',
+      'Content unique to page three.',
+    ].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).not.toContain('THE FOUNDATION: OPEN GRANTS PROGRAMME GUIDANCE')
+    expect(out).toContain('Content unique to page one.')
+    expect(out).toContain('Content unique to page two.')
+    expect(out).toContain('Content unique to page three.')
+  })
+
+  it('keeps a genuine question repeated verbatim across multiple forms, embedded mid-page each time', () => {
+    const question = 'Please describe the difference you expect your capital project to make.'
+    const text = [
+      '[PAGE 19]',
+      'SAMPLE SMALL GRANTS PROGRAMME APPLICATION',
+      'What is the title of your project?',
+      question,
+      'Please upload your project budget.',
+      '',
+      '[PAGE 28]',
+      'SAMPLE LARGE GRANTS PROGRAMME FIRST STAGE',
+      'What is the title of your project?',
+      question,
+      'Please upload your project budget.',
+      '',
+      '[PAGE 35]',
+      'SAMPLE LARGE GRANTS PROGRAMME STAGE TWO',
+      'What is the title of your project?',
+      question,
+      'Please upload your project budget.',
+    ].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain(question)
+  })
+
+  it('keeps a repeated line at all when even one occurrence is not marker-adjacent (errs toward keeping content)', () => {
+    const line = 'Please refer to our guidance document for more information.'
+    const text = [
+      '[PAGE 1]',
+      line, // marker-adjacent (header-like) here
+      'Content on page one.',
+      '',
+      '[PAGE 2]',
+      'Content on page two.',
+      line, // marker-adjacent (footer-like) here too
+      '',
+      '[PAGE 3]',
+      'Some content before.',
+      line, // embedded mid-page here — NOT marker-adjacent
+      'Some content after.',
+    ].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain(line)
+  })
+})
+
 describe('preprocessText — structural marker protection (ADR-DATA-007, P6.2a)', () => {
   it('does not strip [PAGE N] markers as page-number noise', () => {
     const text = '[PAGE 1]\nEligibility criteria here.\n\n[PAGE 2]\nMore detail on page two.'

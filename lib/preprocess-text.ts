@@ -88,20 +88,58 @@ function isPageNumber(line: string): boolean {
   )
 }
 
-// Lines appearing 3+ times in identical form and shorter than 120 characters
-// are treated as PDF header/footer artefacts and removed. Structural markers
-// are excluded even if a heading title happens to repeat verbatim elsewhere.
+// Returns true if the line at `index` sits immediately next to a structural
+// marker — i.e. it is the first non-blank line after a [PAGE N]/[SECTION: ...]
+// boundary (a running header) or the last non-blank line before the next one
+// (a running footer). Blank lines in between are skipped, since PDF
+// extraction commonly leaves a blank line before/after a page's header/footer.
+function isAdjacentToMarker(lines: string[], index: number): boolean {
+  let before = index - 1
+  while (before >= 0 && lines[before].trim() === '') before--
+  if (before >= 0 && STRUCTURAL_MARKER.test(lines[before].trim())) return true
+
+  let after = index + 1
+  while (after < lines.length && lines[after].trim() === '') after++
+  if (after < lines.length && STRUCTURAL_MARKER.test(lines[after].trim())) return true
+
+  return false
+}
+
+// Lines appearing 3+ times in identical form, shorter than 120 characters,
+// and — critically — sitting at a page/section boundary on EVERY occurrence
+// are treated as PDF running header/footer artefacts and removed. Structural
+// markers are excluded even if a heading title happens to repeat verbatim
+// elsewhere.
+//
+// The marker-adjacency requirement (2026-07-16) guards against a real bug
+// found on Clothworkers' Foundation guidelines: a genuine, load-bearing
+// question ("Please describe the difference you expect your capital project
+// to make") is repeated verbatim across the funder's 3 separate application
+// forms, embedded mid-page each time — a plain "identical 3+ times" rule
+// stripped it everywhere, including from the one form that actually needed
+// it. A true running header/footer, by contrast, reliably sits as the first
+// or last line of every page it appears on. If even one occurrence of a
+// repeated line is NOT marker-adjacent, none of its occurrences are
+// stripped — erring toward keeping content over losing it.
 function detectRepeatedLines(lines: string[]): Set<string> {
-  const counts = new Map<string, number>()
-  for (const line of lines) {
+  const positions = new Map<string, number[]>()
+  lines.forEach((line, index) => {
     const t = line.trim()
     if (t && t.length < 120 && !STRUCTURAL_MARKER.test(t)) {
-      counts.set(t, (counts.get(t) ?? 0) + 1)
+      const existing = positions.get(t)
+      if (existing) {
+        existing.push(index)
+      } else {
+        positions.set(t, [index])
+      }
     }
-  }
+  })
+
   const repeated = new Set<string>()
-  for (const [text, count] of counts) {
-    if (count >= 3) repeated.add(text)
+  for (const [text, indices] of positions) {
+    if (indices.length >= 3 && indices.every((index) => isAdjacentToMarker(lines, index))) {
+      repeated.add(text)
+    }
   }
   return repeated
 }

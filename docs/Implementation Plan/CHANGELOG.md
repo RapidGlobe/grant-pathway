@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-16 — Repeated-line stripping was deleting genuine questions that recur verbatim across a funder's multiple forms
+
+Follow-on from the form-aware truncation fix (next entry below): while verifying that fix against the real Clothworkers PDF, found that "Please describe the difference you expect your capital project to make" was missing from the cleaned text **even with no truncation ceiling applied at all** — a separate, pre-existing bug, not caused by truncation. WJ called it a serious bug and asked to fix it immediately rather than deferring, while he continued testing.
+
+**Root cause:** `detectRepeatedLines()` (`lib/preprocess-text.ts`) treated any line appearing 3+ times identically (under 120 characters) as a PDF running header/footer and stripped it everywhere. Clothworkers repeats this exact question verbatim across all 3 of its forms (Small Grants, Large Grants stages 1 and 2) — a plain "identical 3+ times" rule can't distinguish that from an actual repeated header like "THE CLOTHWORKERS' FOUNDATION: OPEN GRANTS PROGRAMME GUIDANCE" (which legitimately appears near-identically on most pages and should be stripped).
+
+**Fix:** added a marker-adjacency requirement. A genuine running header/footer reliably sits as the very first non-blank line after a `[PAGE N]`/`[SECTION: ...]` boundary, or the very last non-blank line before the next one — `isAdjacentToMarker()` checks this for every occurrence of a repeated line, and a line is only stripped if **all** of its occurrences qualify. Clothworkers' repeated question is embedded mid-page in each of its 3 forms (never adjacent to a page boundary), so it now survives; the genuine running header still strips cleanly since every one of its occurrences sits immediately after a page marker. Deliberately conservative: if even one occurrence isn't marker-adjacent, none of that line's occurrences are stripped — erring toward keeping content, consistent with this file's existing "when in doubt, omit a pattern" philosophy for boilerplate-heading stripping.
+
+Verified against the real Clothworkers PDF (both fixes combined): the whole Small Grants form, including this question and the funding-shortfall question, now survives the 50,000-char production ceiling intact. Also spot-checked the cleaning step (no truncation, isolating this change's effect) against 7 other scheduled-funder guideline PDFs (A B Charitable Trust, Walton Charity, Idlewild, Garfield Weston, Nationwide, Heritage Fund, MK Community Foundation) — reductions stayed modest (0–2%) with no crashes or obviously broken output, per ADR-AI-010's requirement to test any pre-processing change across all scheduled funders. Full end-to-end (live AI extraction) re-verification per funder remains WJ's live-testing responsibility, same as always — this was a text-level sanity check only, not a substitute for it.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 75 tests pass (3 new: a true header still strips correctly; a genuine cross-form repeated question survives; a repeated line with mixed marker-adjacency is kept entirely).
+
+**Files changed:** `lib/preprocess-text.ts`, `__tests__/preprocess-text.test.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Form-aware truncation: large multi-form guideline PDFs were losing their actual application questions
 
 WJ was live-testing Clothworkers' Foundation (Harry's Rainbow) — a scheduled ADR-AI-010 test funder whose 54-page guidance-plus-sample-forms PDF has always hit the truncation warning ("very large... reviewed the first section") — and asked directly: how many questions should this document actually produce, and can the message/process be improved rather than just accepted? Investigation confirmed the guidance was accurate but the underlying process was actively losing content: production's `PREPROCESS_CHAR_CEILING` (50,000, per this ADR's 2026-06-05 decision) truncated in raw document order, which meant a "keep the first N characters" cut systematically favoured front-loaded eligibility/overview prose over the actual Sample Small Grants Programme Application Form — landing mid-way through the form's most important narrative questions ("describe your project," "how you will raise the shortfall") on the real document.
