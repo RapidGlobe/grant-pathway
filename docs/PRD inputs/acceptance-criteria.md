@@ -1572,6 +1572,19 @@ _Note (2026-07-16): this closes a gap first found live during Clothworkers Found
 
 ---
 
+**AC-FR-29-07 — "Trim to limit" also offered on ordinary narrative questions, alongside AI refine** _(Added 2026-07-16, PDR-AI-007 extension)_
+
+- **Given** a non-budget narrative question's answer exceeds its word or character limit
+- **When** I view that question's card
+- **Then** I see the existing AC-FR-29-04 message and "Help me improve this" button, AND a "Trim to limit" button alongside them
+- **When** I click "Trim to limit"
+- **Then** my answer is mechanically cut the same way as AC-FR-29-06 describes for budget questions -- no AI/LLM call, last complete sentence within the limit, hard word-boundary cut as a fallback
+- **And** clicking "Help me improve this" instead still behaves exactly as before (AC-FR-30 family) -- this is an additional option, not a replacement
+
+_Note (2026-07-16): while testing the AC-FR-29-06 fix, WJ separately hit a non-budget narrative question over its limit and found "Help me improve this" declined to help at all -- correct behaviour, since the test answer was deliberately unrelated filler text and the refine prompt is instructed never to invent facts, but it left no way forward. Combined with `PDR-AI-006`'s already-documented finding that AI refine can undershoot and leave an answer still over limit, narrative questions had two known ways to leave a charity stuck, unlike budget questions which by this point always had a fallback. WJ agreed to extend the same deterministic trim as a secondary option here too. No new logic needed -- `trimToLimit()`/`handleTrimToLimit()` were already generic, keyed only on the question's limit type, never on `is_budget_question`._
+
+---
+
 ### FR-30 — Must Have
 
 **Requirement:** The AI assist feature ("Help me improve this") shall improve the structure and clarity of the user's written answer without adding facts or changing the meaning.

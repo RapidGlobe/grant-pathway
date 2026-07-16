@@ -838,10 +838,25 @@ export function ApplicationStep4Draft({
                         Help me improve this
                       </button>
                       {isOver && (
-                        <p className="mt-1 text-[12px] text-[#DC2626]">
-                          Your answer exceeds the funder&apos;s word limit. Please trim it or use AI
-                          to bring it within the limit before approving.
-                        </p>
+                        <>
+                          <p className="mt-1 text-[12px] text-[#DC2626]">
+                            Your answer exceeds the funder&apos;s word limit. Please trim it or use
+                            AI to bring it within the limit before approving.
+                          </p>
+                          {/* Deterministic fallback alongside AI refine (2026-07-16):
+                              AI refine can undershoot the limit (PDR-AI-006) or, as WJ
+                              found live-testing, decline entirely when there's nothing
+                              genuine to refine — this guarantees a way forward either way. */}
+                          <button
+                            type="button"
+                            onClick={() => handleTrimToLimit(q)}
+                            disabled={isApprovedQ}
+                            className="mt-1 flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                          >
+                            <Scissors className="h-3.5 w-3.5" aria-hidden="true" />
+                            Trim to limit
+                          </button>
+                        </>
                       )}
                     </>
                   )}

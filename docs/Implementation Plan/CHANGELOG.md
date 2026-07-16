@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-16 — "Trim to limit" extended to ordinary narrative questions, alongside AI refine
+
+Follow-on from PDR-AI-007's budget-only trim button (previous entry below). While live-testing Henry Smith, WJ hit an ordinary (non-budget) narrative question over its word limit, clicked "Help me improve this," and got back: _"The original answer provided does not contain any information about safeguarding processes or procedures for the planned trip. There is no relevant content to refine or improve. Please provide an answer that addresses the question so that it can be reviewed and refined appropriately."_ — correct behaviour (the refine prompt is instructed never to invent facts, and WJ's test answer was deliberately unrelated word-count-testing filler text, not real content), but it left him with no way forward at all: no rewritten answer, and no fallback.
+
+Discussed the tradeoff directly: AI refine tries to genuinely improve the prose while staying in-limit (better result when it works) but has two known failure modes now confirmed in testing — it can undershoot and land the answer still over limit (`PDR-AI-006`), or it can decline to engage at all when there's nothing genuine to refine (found live, above). A deterministic trim guarantees a way forward either way, at effectively zero cost since `trimToLimit()` (built for PDR-AI-007) already exists and is not budget-specific. WJ agreed to add it as a secondary option, not a replacement for AI refine.
+
+**Fix:** the "Trim to limit" button (same `handleTrimToLimit()` handler, same deterministic sentence-snap logic) now also appears under the existing "trim it or use AI" message for ordinary narrative questions over their limit — previously that message pointed at "use AI" with no concrete action available if AI declined or undershot. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-007-budget-over-limit-messaging.md`, `docs/PRD inputs/acceptance-criteria.md`, `docs/PRD-Grant-Pathway.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — PDR-AI-007 built: budget questions over their limit get a deterministic trim, not silence
 
 WJ live-testing Henry Smith hit a budget-flagged narrative question ("If you have not raised all the money needed, what are your plans to do so?", 300-word limit) with a deliberately over-limit 503-word test sample and asked: "I thought we had fixed this scenario... There is no AI, so therefore how do we assist the user to bring down the number of words?"
