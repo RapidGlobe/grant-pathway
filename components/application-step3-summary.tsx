@@ -564,11 +564,18 @@ export function ApplicationStep3Summary({
           <p className="text-[13px] text-[#065F46]">
             {summary.funder_type === 'free_form' ? (
               <>
-                {`We identified ${summary.sections?.length ?? 0} ${(summary.sections?.length ?? 0) === 1 ? 'section' : 'sections'} to complete. In the next step, you'll write your content section by section.`}
+                {(() => {
+                  const total =
+                    (summary.sections?.length ?? 0) + (summary.governanceFacts?.length ?? 0)
+                  return `We identified ${total} ${total === 1 ? 'section' : 'sections'} to complete. In the next step, you'll write your content section by section.`
+                })()}
               </>
             ) : (
               <>
-                {`We found ${summary.questions.length} application ${summary.questions.length === 1 ? 'question' : 'questions'} in these guidelines. You'll answer each one in the next step.`}
+                {(() => {
+                  const total = summary.questions.length + (summary.governanceFacts?.length ?? 0)
+                  return `We found ${total} application ${total === 1 ? 'question' : 'questions'} in these guidelines. You'll answer each one in the next step.`
+                })()}
               </>
             )}
           </p>

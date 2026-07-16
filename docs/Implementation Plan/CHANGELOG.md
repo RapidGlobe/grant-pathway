@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-16 — Step 3 summary undercounted items whenever governance facts were detected
+
+WJ live-testing Walton Charity with a fictitious charity saw Step 3 announce "We identified 4 sections to complete", then Step 4 show "0 of 7 sections approved" — a jarring mismatch between two consecutive screens.
+
+**Root cause:** the Step 3 banner (`components/application-step3-summary.tsx`) computed its count from `summary.sections?.length` (free-form) or `summary.questions.length` (structured) only — it never added `summary.governanceFacts?.length`. Step 4 renders governance facts (PDR-AI-008) as ordinary items in the same list as narrative sections/questions, so its count (`questions.length` in that component, which is really "all items") always included them. Walton's guidelines raised 3 of the 5 governance facts (reserves, trustee-relatedness, bank-signatory-relatedness) alongside 4 narrative sections — 4 vs 7. The same undercount would show on any structured funder with detected governance facts too; it just hadn't been hit yet, since Lloyds Bank Foundation earlier in testing happened to have zero governance signal.
+
+**Fix:** both banner strings now add `governanceFacts?.length ?? 0` to their total before rendering, so the number Step 3 promises always matches what Step 4 actually shows.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component's banner text). Can't be verified live locally (needs a real Bedrock call; `dotenvx` redacts AWS credentials for this agent by design) — next live regeneration with governance facts detected is WJ's verification.
+
+**Separately raised, not yet actioned:** WJ also noted no numbering appears on Step 4 for this (free-form) funder. Confirmed this is documented, intentional behaviour (`AC-FR-28-04`: free-form funders show narrative sections, never numbered, in both Step 4 and the assembled draft) — not a bug. Flagged back to WJ as a design question worth revisiting now that governance facts (more question-like than a narrative section) can appear inside a free-form funder's item list too, a case `AC-FR-28-04` pre-dates.
+
+**Files changed:** `components/application-step3-summary.tsx`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Phase 5 audit follow-up: migration-push task added, ToS/Privacy/Vercel Pro/cron status corrected
 
 Second pass on the Phase 5 review begun earlier the same day (see the entry directly below). Three more findings from that review, all approved for fixing by WJ:
