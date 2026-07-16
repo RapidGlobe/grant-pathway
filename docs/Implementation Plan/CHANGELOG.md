@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-16 — Citation quote could highlight an incidental detail (e.g. a word limit) instead of the question itself
+
+WJ spotted this live-testing Lloyds Bank Foundation: the "view original guidelines" panel for "Please provide a short summary of your charity's purpose and aims" highlighted "Suggested word count: 300 - 400 words, maximum 500." instead of the question text — technically a verbatim excerpt from the correct page, but not the sentence a user actually wants jumped to.
+
+**Root cause:** the citation instruction in `buildSummaryPrompt()` (`lib/prompts.ts`) told the AI to quote "a short verbatim excerpt copied exactly from within that marker's text block — something a person could search for and find," without requiring the excerpt to come from the question/section's own wording. Any short, findable string on the cited page satisfied the instruction, including an adjacent word-limit line.
+
+**Fix:** tightened the instruction to require the quote come from the question/section's own text (its title/wording or opening words) and explicitly rule out nearby word/character limits, formatting instructions, or other incidental details — stating the purpose directly (a reader clicking the citation should land on the question, not something next to it).
+
+Prompt-only change — no code path to unit test, and the actual output can't be reproduced locally (Bedrock calls need real AWS credentials, which `dotenvx` redacts to empty strings for this agent by design). `tsc --noEmit`, `eslint --max-warnings 0`, all 75 tests pass (unchanged). Live re-verification is WJ's next Step 3 generation.
+
+**Files changed:** `lib/prompts.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Governance items now get a real sequential number, folded in with narrative questions
 
 WJ reviewed a Clothworkers assembled draft (Step 5) showing "Total annual expenditure (£)" with no number at all, immediately followed by "1. Please describe the community/group of people you support..." — the first narrative question. He initially thought I'd misread his concern as being about truncated answer text (a red herring from investigating a different, unrelated question about deliberately-pasted word-count-testing content), then clarified: he expected the governance item to be numbered "1." and the narrative question to follow as "2.", not for governance items to be excluded from numbering entirely.
