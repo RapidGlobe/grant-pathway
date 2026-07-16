@@ -233,6 +233,12 @@ export function ApplicationStep4Draft({
   // A question is optional if its text contains "(optional)" or starts with
   // "this question is optional" (e.g. Lloyds Bank Foundation Q10).
   // Optional questions that are unanswered do not block the assembly gate.
+  // Manually-added governance items (q.addedManually) are the one exception:
+  // their item_label also carries "(optional)" (matching the AI-detected
+  // form of the same fact, which is deliberately skippable-when-blank per
+  // PDR-AI-008), but a manual add is the charity actively choosing to answer
+  // that fact — so once added, it must be answered and approved like any
+  // other required question before the draft can be assembled.
   const isOptionalQ = (text: string) =>
     text.toLowerCase().includes('(optional)') ||
     text.toLowerCase().startsWith('this question is optional')
@@ -240,7 +246,9 @@ export function ApplicationStep4Draft({
   const allApproved =
     questions.length > 0 &&
     questions.every(
-      (q) => approved[q.id] || (isOptionalQ(q.questionText) && (answers[q.id] ?? '').trim() === ''),
+      (q) =>
+        approved[q.id] ||
+        (!q.addedManually && isOptionalQ(q.questionText) && (answers[q.id] ?? '').trim() === ''),
     )
 
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
@@ -951,8 +959,10 @@ export function ApplicationStep4Draft({
 
               {/* FR-32 / FR-33 — Review prompts and approval step.
                   Show when: answer is non-empty OR section is optional (optional
-                  sections may be left blank and still approved/skipped). */}
-              {(!isEmpty || isOptionalQ(q.questionText)) &&
+                  sections may be left blank and still approved/skipped). A
+                  manually-added governance item is never treated as optional
+                  here either — see allApproved's addedManually exception above. */}
+              {(!isEmpty || (isOptionalQ(q.questionText) && !q.addedManually)) &&
                 !isOver &&
                 !isApprovedQ &&
                 refineState.status !== 'showing' && (

@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-16 — Manually-added governance items no longer skip the assembly gate when blank
+
+While digesting a live Henry Smith test scenario (screenshots: "8 of 8 questions approved", "Ready to assemble" still active), WJ ticked several financial/governance facts via the "Add a financial or governance detail" manual picker, left them all blank, and found "Ready to assemble" remained clickable throughout, right up to the senior-review gate. Not a bug in the mechanism itself — `GOVERNANCE_ITEMS`' `item_label` deliberately ends in "(optional)" so the existing skippable-when-blank gate treats it like any other optional question — but the reasoning behind that skip only fits the AI-auto-detected case: `PDR-AI-008` decided that a low-signal AI detection should never become a forced question for a novice user. A manual add is the opposite — the charity actively chose to answer that fact, so leaving it blank afterwards shouldn't silently bypass approval.
+
+**Fix:** `components/application-step4-draft.tsx`'s `allApproved` computation, and the matching check that shows the "Approve this answer" panel while an answer is empty, are both now also gated on the existing `addedManually` flag (already used for the "Added by you" badge) — `!q.addedManually` is required alongside the "(optional)" text check before an empty item is treated as skippable. AI-detected governance facts (with or without a citation) are unaffected; only manually-added instances of the same 5 facts now require an answer and approval before assembly.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-29-08), `docs/PRD-Grant-Pathway.md` (0.55 → 0.56), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — PDR-AI-006 built: refined suggestions still over the limit now name the exact shortfall
 
 Third and final gap closed in this same-day cluster (see the two entries below). While discussing why AI refine sometimes can't help at all, WJ asked what benefit there was in offering both "Help me improve this" and "Trim to limit" — the answer surfaced `PDR-AI-006`'s own decision, made 2026-07-04 alongside `PDR-AI-007`: LLMs cannot reliably hit an exact word/character count when compressing (a 200-word answer against a 50-word limit was refined to 60, still over). That PDR's user-guide wording fix was built at the time, but its in-app half — a conditional message inside the "Suggested improvement" card, shown only when the suggestion is itself still over the limit — was left "decided-but-not-yet-built," the third such gap found in one session (after `DR-FD-001`'s free-text fallback and `PDR-AI-007` itself).

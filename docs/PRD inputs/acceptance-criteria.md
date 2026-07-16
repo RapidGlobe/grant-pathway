@@ -1547,12 +1547,13 @@ _Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previ
 
 ---
 
-**AC-FR-29-05 — Optional questions are excluded from the assembly gate** _(Added 2026-06-04, D-LBF-01/03)_
+**AC-FR-29-05 — Optional questions are excluded from the assembly gate** _(Added 2026-06-04, D-LBF-01/03; exception added 2026-07-16, see AC-FR-29-08)_
 
 - **Given** a question is marked as optional — either by containing "(optional)" in its text or by beginning with "This question is optional"
 - **When** I leave that question unanswered and unapproved
 - **Then** the "Ready to assemble" button remains active (not greyed out)
 - **And** the optional question shows an "Approve this answer" button even when empty, allowing the user to explicitly skip it
+- **Unless** the item was added via the manual "Add a financial or governance detail" picker — see AC-FR-29-08, which is not skippable despite carrying the same "(optional)" text
 
 ---
 
@@ -1582,6 +1583,17 @@ _Note (2026-07-16): this closes a gap first found live during Clothworkers Found
 - **And** clicking "Help me improve this" instead still behaves exactly as before (AC-FR-30 family) -- this is an additional option, not a replacement
 
 _Note (2026-07-16): while testing the AC-FR-29-06 fix, WJ separately hit a non-budget narrative question over its limit and found "Help me improve this" declined to help at all -- correct behaviour, since the test answer was deliberately unrelated filler text and the refine prompt is instructed never to invent facts, but it left no way forward. Combined with `PDR-AI-006`'s already-documented finding that AI refine can undershoot and leave an answer still over limit, narrative questions had two known ways to leave a charity stuck, unlike budget questions which by this point always had a fallback. WJ agreed to extend the same deterministic trim as a secondary option here too. No new logic needed -- `trimToLimit()`/`handleTrimToLimit()` were already generic, keyed only on the question's limit type, never on `is_budget_question`._
+
+---
+
+**AC-FR-29-08 — A manually-added governance item is not exempt from the assembly gate** _(Added 2026-07-16)_
+
+- **Given** a financial or governance item was added via the "Add a financial or governance detail" picker (`q.addedManually` true), not detected by the AI from the funder's guidelines
+- **When** I leave it unanswered and unapproved
+- **Then** the "Ready to assemble" button stays disabled, and the "Approve this answer" panel does not appear until an answer is entered — the item's `item_label` still carries the same "(optional)" suffix as the AI-detected form of the same fact, but that suffix is disregarded for the assembly gate once the item was added manually
+- **And** this exception applies only to manually-added items — an AI-detected governance fact (with or without a citation) remains skippable-when-blank exactly as AC-FR-29-05 describes
+
+_Note (2026-07-16): found live during Henry Smith testing — WJ ticked several governance facts via the manual-add picker, left them blank, and found "Ready to assemble" stayed active throughout, right up to reaching the senior-review gate with 5 blank added fields. Traced to `GOVERNANCE_ITEMS`' item_label carrying "(optional)" unconditionally (`lib/governance-items.ts`), written for the AI-auto-detected case per `PDR-AI-008` (a low-signal AI detection should never become a forced question for a novice user) but reused as-is for the manual-add path, where the opposite is true — the charity actively chose to add the item, so leaving it blank afterwards should not silently bypass approval. Fixed in `components/application-step4-draft.tsx`'s `allApproved` computation and its matching "show approve panel when empty" check, both now gated on `!q.addedManually` in addition to the existing "(optional)" text check. No database or `lib/governance-items.ts` change — the fix is entirely in how the existing `addedManually` flag (already used for the "Added by you" badge) is read._
 
 ---
 
