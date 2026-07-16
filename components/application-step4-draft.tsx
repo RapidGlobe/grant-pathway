@@ -656,6 +656,21 @@ export function ApplicationStep4Draft({
           const refineState = refineStates[q.id] ?? ({ status: 'idle' } as RefineState)
           const isEmpty = text.trim() === ''
 
+          // PDR-AI-006: LLMs can't reliably hit an exact word/character count
+          // when compressing — surface this only when the AI's own suggestion
+          // is still over the limit, not as a blanket disclaimer.
+          const refinedCount =
+            refineState.status === 'showing'
+              ? useChars
+                ? refineState.refinedText.length
+                : countWords(refineState.refinedText)
+              : 0
+          const suggestionShortfall =
+            refineState.status === 'showing' && limit != null && refinedCount > limit
+              ? refinedCount - limit
+              : 0
+          const suggestionStillOver = suggestionShortfall > 0
+
           const isApprovedQ = approved[q.id] ?? false
           const isApprovingQ = approvingId === q.id
           const approveError = approveErrors[q.id] ?? ''
@@ -886,6 +901,11 @@ export function ApplicationStep4Draft({
                       <p className="mb-4 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1E293B]">
                         {refineState.refinedText}
                       </p>
+                      {suggestionStillOver && (
+                        <p className="mb-4 text-[12px] text-[#B45309]">
+                          {`This suggestion is still ${suggestionShortfall} ${useChars ? 'character' : 'word'}${suggestionShortfall === 1 ? '' : 's'} over the limit — AI can't always hit an exact ${useChars ? 'character' : 'word'} count. Check the counter and trim it further, or try again.`}
+                        </p>
+                      )}
                       <div className="flex items-center gap-4">
                         <Button
                           type="button"

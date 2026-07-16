@@ -1618,6 +1618,18 @@ _Note (2026-07-16): while testing the AC-FR-29-06 fix, WJ separately hit a non-b
 
 ---
 
+**AC-FR-30-03A — Refined suggestion still over its limit shows an inline explanation** _(Added 2026-07-16, PDR-AI-006)_
+
+- **Given** the question has a word or character limit
+- **When** the AI's refined suggestion is itself still over that limit (LLMs cannot always hit an exact count when compressing)
+- **Then** a message appears directly under the suggested text, naming the exact shortfall: _"This suggestion is still \[N\] words over the limit — AI can't always hit an exact word count. Check the counter and trim it further, or try again."_ (wording adapts "words"/"word count" to "characters"/"character count" per the funder's `limitType`, and pluralises correctly for a shortfall of exactly 1)
+- **And** this message does not appear when the suggestion is within the limit — it is conditional, not a blanket disclaimer shown on every AI assist use
+- **And** "Use this improved version" and "Keep my original" remain available regardless — the message is informational only, it does not block either action
+
+_Note (2026-07-16): decided as `PDR-AI-006` on 2026-07-04 alongside the user-guide wording fix, but the in-app half of the decision sat unbuilt for 12 days — WJ raised it while testing the adjacent `PDR-AI-007` narrative-question trim extension and asked for it to be closed in the same pass._
+
+---
+
 **AC-FR-30-04 — Using the AI assist counts as one AI request**
 
 - **Given** I click "Help me improve this" for a question

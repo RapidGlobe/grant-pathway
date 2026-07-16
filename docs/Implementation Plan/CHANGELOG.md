@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-16 — PDR-AI-006 built: refined suggestions still over the limit now name the exact shortfall
+
+Third and final gap closed in this same-day cluster (see the two entries below). While discussing why AI refine sometimes can't help at all, WJ asked what benefit there was in offering both "Help me improve this" and "Trim to limit" — the answer surfaced `PDR-AI-006`'s own decision, made 2026-07-04 alongside `PDR-AI-007`: LLMs cannot reliably hit an exact word/character count when compressing (a 200-word answer against a 50-word limit was refined to 60, still over). That PDR's user-guide wording fix was built at the time, but its in-app half — a conditional message inside the "Suggested improvement" card, shown only when the suggestion is itself still over the limit — was left "decided-but-not-yet-built," the third such gap found in one session (after `DR-FD-001`'s free-text fallback and `PDR-AI-007` itself).
+
+**Fix:** `components/application-step4-draft.tsx` now computes the refined suggestion's own word/character count against the question's limit, inside the per-question render loop, and shows exactly the wording `PDR-AI-006` decided: _"This suggestion is still \[N\] words over the limit — AI can't always hit an exact word count. Check the counter and trim it further, or try again."_ (adapted to "characters"/"character count" per `limitType`), directly under the suggested text, only when it's actually still over.
+
+**One implementation snag, found and fixed during this task:** the first version computed this inline as an IIFE inside the JSX return (`{condition && (() => {...})()}`) and tripped the `react-hooks/refs` ESLint rule ("Cannot access refs during render"), even though nothing inside the IIFE touched a ref — almost certainly a false positive from the experimental React Compiler's static analysis misattributing an unrelated ref access elsewhere in the same render function to the IIFE's scope. Fixed by hoisting the computation to a plain `const` alongside the component's other per-question values (`isOver`, `isNear`, etc.), matching the file's existing pattern — this resolved the lint error immediately with no behaviour change.
+
+Verified message wording and pluralisation with a standalone script (10 words → "10 words", 1 word → "1 word", 25 characters → "25 characters"). `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-006-word-limit-compression-disclosure.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-30-03A), `docs/PRD-Grant-Pathway.md` (0.54 → 0.55), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — "Trim to limit" extended to ordinary narrative questions, alongside AI refine
 
 Follow-on from PDR-AI-007's budget-only trim button (previous entry below). While live-testing Henry Smith, WJ hit an ordinary (non-budget) narrative question over its word limit, clicked "Help me improve this," and got back: _"The original answer provided does not contain any information about safeguarding processes or procedures for the planned trip. There is no relevant content to refine or improve. Please provide an answer that addresses the question so that it can be reviewed and refined appropriately."_ — correct behaviour (the refine prompt is instructed never to invent facts, and WJ's test answer was deliberately unrelated word-count-testing filler text, not real content), but it left him with no way forward at all: no rewritten answer, and no fallback.
