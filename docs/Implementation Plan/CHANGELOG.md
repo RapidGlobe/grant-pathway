@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-16 — Numbering extended to free-form funders' sections and governance items
+
+Follow-on from the Step 3 count-mismatch fix (next entry below): WJ then asked directly whether Step 4's lack of numbering on Walton Charity (a free-form funder) should also be revisited, since it looked inconsistent next to structured funders' numbered questions. Confirmed this was documented, intentional behaviour (`AC-FR-28-04`) — free-form funders were designed from the start to show unnumbered narrative sections, distinct from structured funders' numbered Q&A cards. WJ asked for it to be extended anyway, since that original premise pre-dates PDR-AI-008's governance facts (2026-07-15): a fact like "Are any of your trustees related to each other...?" reads as a discrete question regardless of the funder's own classification, not a narrative section title, so leaving it unnumbered inside a free-form item list was inconsistent even before this request.
+
+**Fix:** `components/application-step4-draft.tsx`'s number span is no longer gated on `funderType === 'structured'` — every item (narrative question, narrative section, or governance item) is now numbered by its position in the ordered, answered list, matching the pattern already used for governance items on structured funders (2026-07-16, earlier fix this same day). The free-form textarea's `aria-label` now also includes the number (`Content for section N: ...`) rather than only the question text. `actions/applications.ts`'s `assembleAndAdvance()` no longer detects or branches on funder type at all — the entire "Detect funder type for assembly format" step was removed as dead code once both branches would produce the same numbered output; every answered item is simply prefixed with its position.
+
+Reverses part of a formal, documented decision (`AC-FR-28-04`, `AC-FR-31A-04`) — both corrected with revision notes rather than silently rewritten, matching this repo's practice of never editing a past decision's history away. `PRD-Grant-Pathway.md` (0.51 → 0.52) updated to match.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of either file's numbering logic; verified live is the established precedent for both, same as the earlier structured-funder governance-numbering fix). Can't be verified live locally — Step 4 needs a real application with saved item data — next live check is WJ's.
+
+**Files changed:** `components/application-step4-draft.tsx`, `actions/applications.ts`, `docs/PRD inputs/acceptance-criteria.md`, `docs/PRD-Grant-Pathway.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Step 3 summary undercounted items whenever governance facts were detected
 
 WJ live-testing Walton Charity with a fictitious charity saw Step 3 announce "We identified 4 sections to complete", then Step 4 show "0 of 7 sections approved" — a jarring mismatch between two consecutive screens.

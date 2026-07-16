@@ -901,9 +901,10 @@ export type AssembleAndAdvanceResult = { ok: true } | { ok: false; error: string
  * applications.assembled_draft, sets draft_status = 'assembled', advances
  * current_step to 5, and redirects to Step 5.
  *
- * Assembly format is funder-type-aware (AC-FR-31A):
- *   structured — numbered Q&A pairs (question then answer, separated)
- *   free_form  — same format; section headings derived from question text
+ * Assembly format (AC-FR-31A): numbered Q&A/section pairs (question or
+ * section text then answer, separated) — every item gets a number, whether
+ * the funder is structured or free_form (2026-07-16: numbering extended to
+ * free_form to match Step 4, see AC-FR-28-04's revision note).
  *
  * No AI is used — this is a pure text formatting step. The charity's words
  * are reproduced verbatim; AI is not involved in the assembly.
@@ -924,7 +925,7 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
   // ── Verify ownership and current draft_status ──────────────────────────────
   const { data: appRow, error: appError } = await supabase
     .from('applications')
-    .select('current_step, draft_status, ai_summary')
+    .select('current_step, draft_status')
     .eq('id', applicationId)
     .eq('user_id', user.id)
     .single()
@@ -953,36 +954,17 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
     (r) => typeof r.answer_text === 'string' && r.answer_text.trim() !== '',
   )
 
-  // ── Detect funder type for assembly format ────────────────────────────────
-  let funderType: 'structured' | 'free_form' = 'structured'
-  if (typeof appRow.ai_summary === 'string' && appRow.ai_summary) {
-    try {
-      const parsed = JSON.parse(appRow.ai_summary) as { funder_type?: string }
-      if (parsed.funder_type === 'free_form') funderType = 'free_form'
-    } catch {
-      // parse failed — default to structured
-    }
-  }
-
   // ── Format assembled_draft ────────────────────────────────────────────────
-  // free_form: section title then answer (no number prefix — narrative flow)
-  // structured: numbered Q&A pairs, governance items included in the same
-  // sequence as narrative questions (not the raw item_order, which is a
-  // negative internal sort key for governance items — the display number is
-  // just each item's position in this already-ordered, answered list).
-  let assembledDraft: string
-
-  if (answered.length === 0) {
-    assembledDraft = ''
-  } else {
-    assembledDraft = answered
-      .map((r, index) =>
-        funderType === 'free_form'
-          ? `${r.item_label}\n\n${r.answer_text}`
-          : `${index + 1}. ${r.item_label}\n\n${r.answer_text}`,
-      )
-      .join('\n\n---\n\n')
-  }
+  // Every item — narrative question/section or governance item, structured or
+  // free_form funder — is numbered by its position in this already-ordered,
+  // answered list (not the raw item_order, which is a negative internal sort
+  // key for governance items only, meaningless to a user).
+  const assembledDraft =
+    answered.length === 0
+      ? ''
+      : answered
+          .map((r, index) => `${index + 1}. ${r.item_label}\n\n${r.answer_text}`)
+          .join('\n\n---\n\n')
 
   // ── Save assembled_draft and advance ──────────────────────────────────────
   const newStep = Math.max(appRow.current_step ?? 4, 5)

@@ -1442,13 +1442,16 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-**AC-FR-28-04 — Free-form guidelines show narrative sections instead of numbered questions** _(Corrected 2026-07-10 — see note below)_
+**AC-FR-28-04 — Free-form guidelines show narrative sections, now numbered like structured questions** _(Corrected 2026-07-16 — see note below)_
 
-- **Given** this application's Step 3 AI summary classified the guidelines as free-form (no numbered questions)
+- **Given** this application's Step 3 AI summary classified the guidelines as free-form
 - **When** I view the Q&A interface
 - **Then** I see named narrative sections (e.g., "About your organisation", "Project description")
+- **And** each section is prefixed with a sequential number, matching the treatment of structured questions and of governance items within either funder type
 - **And** each section has a textarea for my own answer
 - **And** each section shows its AI-extracted guidance text (`q.guidance`) where present, rather than a fixed static note
+
+_Note (2026-07-16): this criterion previously read "no numbered questions" for free-form funders, matching the original design that only structured funders' Q&A cards were numbered. WJ live-tested Walton Charity (free-form) and asked for numbering to be extended to free-form sections too, for consistency with the same-day fix that added sequential numbers to governance items on structured funders. That review found the original "free-form is unnumbered narrative" premise pre-dated PDR-AI-008's governance facts (2026-07-15) — a governance item like "Are any of your trustees related to each other...?" reads as a discrete question regardless of the funder's own classification, not a narrative section title, so leaving it unnumbered inside a free-form funder's item list was inconsistent even before this request. `components/application-step4-draft.tsx`'s number span is no longer gated on `funderType === 'structured'` — every item in the ordered list gets a number, both funder types alike. See `AC-FR-31A-04`'s matching correction for the assembled draft._
 
 _Note (2026-07-10): this criterion previously claimed a fixed static note is displayed -- *"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."* This message does not exist anywhere in the codebase. The real per-section guidance is dynamic AI-extracted text (`q.guidance` in `components/application-step4-draft.tsx`), shown only when present and the section isn't a budget question -- there is no fixed narrative-document note. Separately, this criterion previously read "the Step 3 summary identified **the funder** as a free-form narrative funder", implying a stable trait of the funder itself. Per `ADR-DATA-006` and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` (BD-08 note, confirmed 2026-07-04), the persistent funder-level "Structured"/"Narrative" badge (the `funders.funder_type` column, from `DR-FD-001`) was retired because it does not reflect a stable property of any funder. What actually drives this screen is a **per-application** classification derived dynamically from that application's own Step 3 AI summary (`applications.ai_summary.funder_type`) — corrected above accordingly. Separately, per `ADR-DATA-006` and moscow register FR-45: extraction is narrative-only in practice regardless of this classification — every extracted question defaults to `question_type = narrative`; the only other question-level distinction actually built is the `is_budget_question` flag (see FR-31, FR-45), not a broader structured/free-form question-type split._
 
@@ -1672,17 +1675,18 @@ _Numbering note (2026-07-10): FR-31A is not present in the canonical FR-01 to FR
 
 ---
 
-**AC-FR-31A-04 — Assembly formats each answered question under its question or section text, verbatim**
+**AC-FR-31A-04 — Assembly formats each answered question under its numbered question or section text, verbatim**
 
 - **Given** the assembly action runs
 - **When** the `assembled_draft` is generated
-- **Then** each answered question appears as its question (or section) text followed by the charity's own answer text, with entries separated by a divider
-- **And** where this application's Step 3 AI summary classified the guidelines as structured (numbered questions), each entry is additionally prefixed with its question number
-- **And** where the summary classified the guidelines as free-form, no number prefix is added — otherwise the format is identical
+- **Then** each answered question or section appears prefixed with its sequential number, followed by its question/section text, then the charity's own answer text, with entries separated by a divider
+- **And** this applies uniformly — structured questions, free-form sections, and governance items alike, regardless of the application's Step 3 funder-type classification
 - **And** unanswered questions are omitted from the assembled draft
 - **And** no AI is used in this step — the charity's own words are reproduced exactly as written
 
-_Note (2026-07-10): this replaces the previous AC-FR-31A-03/04, which claimed free-form assembly produces "a coherent flowing narrative — not a Q&A list", distinct in kind from structured assembly. Per `actions/applications.ts` `assembleAndAdvance()`, both formats produce the same question-then-answer structure joined by the same `---` divider; the only actual difference is whether a number prefix is added. This also corrects the earlier framing of "the funder is a structured/free-form funder" as an inherent funder trait — see the equivalent note on AC-FR-28-04 above; the same per-application, not per-funder, classification applies here._
+_Note (2026-07-16): this criterion previously distinguished structured (numbered) from free-form (unnumbered) assembly. WJ asked for free-form numbering to be extended to match structured, for the same reason as `AC-FR-28-04`'s matching correction. `actions/applications.ts` `assembleAndAdvance()` no longer detects or branches on funder type at all — the entire "Detect funder type for assembly format" step was removed as dead code once both branches produced the same output; every answered item is now simply numbered by its position in the already-ordered list._
+
+_Note (2026-07-10): this replaces the previous AC-FR-31A-03/04, which claimed free-form assembly produces "a coherent flowing narrative — not a Q&A list", distinct in kind from structured assembly. Per `actions/applications.ts` `assembleAndAdvance()`, both formats produce the same question-then-answer structure joined by the same `---` divider; the only actual difference was whether a number prefix is added (itself since removed — see the note above). This also corrects the earlier framing of "the funder is a structured/free-form funder" as an inherent funder trait — see the equivalent note on AC-FR-28-04 above; the same per-application, not per-funder, classification applies here._
 
 ---
 
