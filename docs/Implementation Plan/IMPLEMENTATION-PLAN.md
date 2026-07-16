@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 3.15
+**Version:** 3.16
 **Date:** 2026-05-07
-**Last updated:** 2026-07-14
+**Last updated:** 2026-07-16
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -1489,33 +1489,37 @@ Checklist:
 **Target start:** ~17 July 2026 for the P5.1–P5.5 checklist (unaffected by the change below)
 **Estimated time:** 2 weeks for P5.1–P5.5. **Go-live itself (P5.6) is no longer targeted for 31 July 2026 — see the Phase 6 → Go-Live Gate below.** WJ decided 2026-07-05 that launch will not happen until Phase 6 (P6.1–P6.5) is complete; there is no commercial deadline forcing the original date. Working estimate: August–September 2026, not committed. (Originally P6.1–P6.6; P6.6 retired 2026-07-14.)
 
-### Funder Directory (DR-FD-001) — ✅ Complete (2026-06-01)
+### ~~Funder Directory (DR-FD-001)~~ — Superseded 2026-07-15 (picker/directory removed)
 
-Implemented prior to P5.1 to ensure all Phase 5 testing reflects the real product experience. Decision record: `docs/decisions/DR-FD-001-funder-directory-model.md`.
+**Superseded 2026-07-15.** The picker/directory build below was completed 2026-06-01 as described, but the design was fully reversed on 2026-07-15 (`DR-FD-001` v1.4): with Step 3/4/5 extraction driven entirely per-application by the uploaded guidelines rather than by funder identity (established by the 2026-07-11 amendment), a curated directory of "known" funders no longer served the purpose it was built for. Step 1's "Who is offering this grant?" is a plain free-text field again — no picker, no directory query, no "Request a Funder" escape hatch (P5.FD4/FD5/FD6 below no longer exist in the product). The `funders` table and `applications.funder_id` are left in place in the schema, unused, as low-priority cleanup rather than an urgent drop migration. `P6.5`'s `getPreviousApplicationForFunder` was updated the same day to match on `funder_name` (case-insensitive, trimmed) instead of `funder_id`, since there is no longer a stable funder identity to match on. Full detail: `docs/decisions/DR-FD-001-funder-directory-model.md`.
 
-#### P5.FD1 — Create `funders` Supabase table and RLS policy
+**Consequence for P5.5b (Admin Dashboard) below:** the "Top funders" query must group by `applications.funder_name`, not join through `funder_id` — see the note on that panel.
 
-Create the `funders` table via a migration file with columns: `id` (uuid PK), `name` (text, unique), `funder_type` (`structured | narrative`), `grant_range` (text, nullable), `guidelines_url` (text, nullable), `is_active` (boolean, default `true`), `created_at` (timestamptz). Apply RLS: all authenticated users can SELECT active funders; only service role may INSERT, UPDATE, or DELETE.
+The tasks below are retained for audit-trail purposes only (they describe what was built 2026-06-01, then removed 2026-07-15) — none of them reflect the current product.
 
-#### P5.FD2 — Seed `funders` table with approved orgs from target funder list
+~~#### P5.FD1 — Create `funders` Supabase table and RLS policy~~
 
-Seed the table with all approved funders from `docs/target-funder-list.md`. Each row must include `funder_type` and `grant_range`. Only active, tested funders are included at launch.
+~~Create the `funders` table via a migration file with columns: `id` (uuid PK), `name` (text, unique), `funder_type` (`structured | narrative`), `grant_range` (text, nullable), `guidelines_url` (text, nullable), `is_active` (boolean, default `true`), `created_at` (timestamptz). Apply RLS: all authenticated users can SELECT active funders; only service role may INSERT, UPDATE, or DELETE.~~
 
-#### P5.FD3 — Add nullable `funder_id` FK column to `applications` table
+~~#### P5.FD2 — Seed `funders` table with approved orgs from target funder list~~
 
-Add `funder_id uuid REFERENCES funders(id)` as a nullable column to `applications` via a migration file. Nullable to preserve existing records. Populated when a user selects a funder from the picker at Step 1.
+~~Seed the table with all approved funders from `docs/target-funder-list.md`. Each row must include `funder_type` and `grant_range`. Only active, tested funders are included at launch.~~
 
-#### P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker
+~~#### P5.FD3 — Add nullable `funder_id` FK column to `applications` table~~
 
-Replace the funder name text input in the Step 1 (Application Details) UI with a searchable picker component wired to the `funders` table (active funders only). On selection, write both `funder_id` and `funder_name` to the `applications` row (`funder_name` retained for display and export).
+~~Add `funder_id uuid REFERENCES funders(id)` as a nullable column to `applications` via a migration file. Nullable to preserve existing records. Populated when a user selects a funder from the picker at Step 1.~~
 
-#### P5.FD5 — Add "My funder isn't listed — request it" link below picker
+~~#### P5.FD4 — Replace free-text funder name input in Step 1 with searchable picker~~
 
-Add a clearly labelled escape hatch below the picker. V1 implementation is a mailto or Tally form link. Users who arrive with a legitimate unlisted funder are not dead-ended; their request becomes a demand signal for the funder validation backlog.
+~~Replace the funder name text input in the Step 1 (Application Details) UI with a searchable picker component wired to the `funders` table (active funders only). On selection, write both `funder_id` and `funder_name` to the `applications` row (`funder_name` retained for display and export).~~
 
-#### P5.FD6 — Wire funder request notification to Rapidglobe
+~~#### P5.FD5 — Add "My funder isn't listed — request it" link below picker~~
 
-Ensure each funder request submitted via the escape hatch generates a notification to Rapidglobe (email or equivalent) so no request is missed.
+~~Add a clearly labelled escape hatch below the picker. V1 implementation is a mailto or Tally form link. Users who arrive with a legitimate unlisted funder are not dead-ended; their request becomes a demand signal for the funder validation backlog.~~
+
+~~#### P5.FD6 — Wire funder request notification to Rapidglobe~~
+
+~~Ensure each funder request submitted via the escape hatch generates a notification to Rapidglobe (email or equivalent) so no request is missed.~~
 
 ---
 
@@ -1610,16 +1614,16 @@ Build the internal service dashboard as a live, database-connected page at `/adm
 
 **Data:** All figures are read directly from Supabase using a Server Component — no client-side fetch, no caching beyond Next.js default. The following queries cover all dashboard panels:
 
-| Panel                        | Query                                                                                                                              |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Registered users             | `SELECT COUNT(*) FROM user_profiles`                                                                                               |
-| Active last 7 days           | `SELECT COUNT(DISTINCT user_id) FROM user_profiles WHERE last_sign_in_at > now() - interval '7 days'`                              |
-| Applications created / today | `SELECT COUNT(*) FROM applications` / `WHERE created_at::date = current_date`                                                      |
-| Avg applications per user    | Derived from the two counts above                                                                                                  |
-| Top funders                  | `SELECT f.name, COUNT(*) FROM applications a JOIN funders f ON a.funder_id = f.id GROUP BY f.name ORDER BY COUNT(*) DESC LIMIT 10` |
-| AI usage this month          | `SELECT route, COUNT(*) FROM ai_usage_log WHERE created_at > date_trunc('month', now()) GROUP BY route`                            |
-| Monthly cap utilisation      | AI requests this month ÷ (50 × registered users)                                                                                   |
-| Recent registrations         | `SELECT email, created_at FROM user_profiles ORDER BY created_at DESC LIMIT 10` joined to application count per user               |
+| Panel                        | Query                                                                                                                                                                                                                                                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Registered users             | `SELECT COUNT(*) FROM user_profiles`                                                                                                                                                                                                                                                                                       |
+| Active last 7 days           | `SELECT COUNT(DISTINCT user_id) FROM user_profiles WHERE last_sign_in_at > now() - interval '7 days'`                                                                                                                                                                                                                      |
+| Applications created / today | `SELECT COUNT(*) FROM applications` / `WHERE created_at::date = current_date`                                                                                                                                                                                                                                              |
+| Avg applications per user    | Derived from the two counts above                                                                                                                                                                                                                                                                                          |
+| Top funders                  | `SELECT funder_name, COUNT(*) FROM applications GROUP BY funder_name ORDER BY COUNT(*) DESC LIMIT 10` (updated 2026-07-16 — `funder_id`/`funders` join removed: the funder directory was superseded 2026-07-15, `funder_name` is now the only funder identity `applications` carries; see the Funder Directory note above) |
+| AI usage this month          | `SELECT route, COUNT(*) FROM ai_usage_log WHERE created_at > date_trunc('month', now()) GROUP BY route`                                                                                                                                                                                                                    |
+| Monthly cap utilisation      | AI requests this month ÷ (50 × registered users)                                                                                                                                                                                                                                                                           |
+| Recent registrations         | `SELECT email, created_at FROM user_profiles ORDER BY created_at DESC LIMIT 10` joined to application count per user                                                                                                                                                                                                       |
 
 **Design:** Use the approved design at `docs/Business Design/dashboard-sketch-2026-06-30.html` as the visual reference — brand colours, layout, and panel structure are already signed off.
 
@@ -1801,6 +1805,7 @@ Checklist:
 
 | Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.16    | 2026-07-16 | Rapidglobe Ltd | **Phase 5 review: Funder Directory section marked superseded; Admin Dashboard "Top funders" query fixed.** WJ asked for a factual audit of Phase 5 given a week of Phase 6 changes. Found `P5.FD1–FD6` (funder picker/directory) still marked "✅ Complete" despite being fully reversed 2026-07-15 (`DR-FD-001` v1.4 — picker removed, Step 1 is free text again). Section re-marked `~~Funder Directory (DR-FD-001)~~ — Superseded 2026-07-15`, tasks struck through and retained for audit trail only. Knock-on fix: P5.5b's "Top funders" admin dashboard query joined `applications.funder_id → funders.id`, which no application populates since the picker was removed — changed to group by `applications.funder_name` directly. No code changed (P5.5b/admin dashboard is not yet built); this is a planning-document correction only.                                                                                                                                                                                                                                                                             |
 | 3.15    | 2026-07-14 | Rapidglobe Ltd | **P6.6 (Transparency Status) retired, will not be built.** Its entire basis — a support-status signal derived from "the specific approved playbook" — disappeared when P6.5 pivoted to private per-charity reuse with no curator role. Redesigning P6.6 around a different signal was considered and rejected: every funder is now in the identical state (live AI extraction, never human-vetted), so there is nothing left to differentiate — a badge reading the same for 100% of funders isn't a feature. WJ confirmed retirement. Phase 6 → Go-Live Gate now requires P6.1–P6.5 (was P6.1–P6.6). Full detail: `ADR-DATA-006`'s 2026-07-14 (later same day) amendment, `IMPLEMENTATION-STATUS.md`, `CHANGELOG.md`, `docs/v1-out-of-scope.md`.                                                                                                                                                                                                                                                                                                                                                                           |
 | 3.14    | 2026-07-14 | Rapidglobe Ltd | **P6.4 built (first milestone).** Step 4 now shows a small clickable citation badge (e.g. "Page 5") next to each question that has one, opening a "view original guidelines" panel with the retained text (`application_guidelines`, GAP-33) scrolled to and highlighting the cited quote. **Corrected the same day:** `ADR-SEC-004`, `ADR-DATA-007`, and `ADR-OPS-006` all assumed this viewer would render the raw PDF via canvas — that assumption predates GAP-33's fix and no longer holds, since only text is ever retained. All three ADRs corrected to describe a plain text panel: no PDF-rendering library, no CSP `worker-src` change needed, no novel accessibility surface (a normal dialog, not a canvas). No new item types or visibility-condition/branching logic — nothing yet produces a non-narrative or conditional item, so building that now would be speculative. Full detail in `IMPLEMENTATION-STATUS.md` Notes (2026-07-14). Phase 6 → Go-Live Gate checklist updated: P6.4 checked off (live browser verification pending WJ).                                                                  |
 | 3.13    | 2026-07-14 | Rapidglobe Ltd | **GAP-33 fixed, ahead of `P6.4`.** While scoping `P6.4` ("view original guidelines" panel), found it had nothing to render — guideline text was never actually retained anywhere, despite `ADR-DATA-002`'s 2026-07-10 reversal deciding it should be (a planning-note gap, not a `P6.2` defect — confirmed with WJ). Fixed: new `application_guidelines` table (migration `20260714000001`) retains the marker-tagged text sent to the AI, upserted whenever a summary is generated/regenerated. `P6.4` is now unblocked. Full detail in `IMPLEMENTATION-STATUS.md` Notes (2026-07-14), `ADR-TRACEABILITY.md` (v2.9), `docs/data-model.md` (v1.8).                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |

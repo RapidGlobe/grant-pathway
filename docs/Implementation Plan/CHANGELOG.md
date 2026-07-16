@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-16 — Phase 5 factual audit: Funder Directory section superseded, Admin Dashboard query fixed
+
+WJ asked for a review of `IMPLEMENTATION-PLAN.md`'s Phase 5 section while stepping away, given a week of heavy Phase 6 changes — wanted confirmation it was still "intact and factual" ahead of Phase 5 starting next week.
+
+**Finding:** the Funder Directory section (`P5.FD1`–`P5.FD6`) was still marked "✅ Complete (2026-06-01)", describing a searchable funder picker over a `funders` Supabase table with a "Request a Funder" escape hatch. That entire design was reversed on 2026-07-15 (`DR-FD-001` v1.4, already documented at the time but never propagated back into the Phase 5 plan) — Step 1's funder field is plain free text again, with no picker, no directory query, and no escape hatch. Root cause of the drift: `DR-FD-001` is a Tier 3 (stable) decision record, `IMPLEMENTATION-PLAN.md` is Tier 2 — the reversal was correctly logged in the Tier 3 doc on 2026-07-15 but the corresponding Tier 2 task spec was never revisited, since no task was "in progress" against it at the time.
+
+**Fix:** section re-marked `~~Funder Directory (DR-FD-001)~~ — Superseded 2026-07-15`, with a summary of what changed and why; the six `P5.FD*` task descriptions are struck through and retained underneath for audit-trail purposes only, matching the pattern already used for P6.6's retirement.
+
+**Knock-on fix:** P5.5b's Admin Dashboard "Top funders" panel query joined `applications.funder_id → funders.id` — since no application has populated `funder_id` since the picker was removed, that panel would have silently gone empty/stale for every application created from 2026-07-15 onward. Changed to `SELECT funder_name, COUNT(*) FROM applications GROUP BY funder_name ORDER BY COUNT(*) DESC LIMIT 10`. P5.5b is not yet built, so this is a planning-document correction only — no code changed.
+
+No other Phase 5 content was found to be factually broken in the same review — P5.1–P5.5's GAP items, the P5.4 migration-reconciliation history, and the Performance section were all confirmed still accurate (the Performance section describes June's timing work; July's truncation/repeated-line accuracy fixes sit underneath it as later, separately-logged refinements, not contradictions).
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.15 → v3.16), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-16 — Citation quote could highlight an incidental detail (e.g. a word limit) instead of the question itself
 
 WJ spotted this live-testing Lloyds Bank Foundation: the "view original guidelines" panel for "Please provide a short summary of your charity's purpose and aims" highlighted "Suggested word count: 300 - 400 words, maximum 500." instead of the question text — technically a verbatim excerpt from the correct page, but not the sentence a user actually wants jumped to.
