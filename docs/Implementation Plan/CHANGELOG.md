@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-16 — generate-summary fix: free_form sections with no word limit crashed Step 3 deterministically
+
+WJ was live-testing Walton Charity (a `free_form` funder) specifically to exercise the eligibility-mismatch path (Harry's Rainbow — bereavement support in Milton Keynes vs. Walton's Elmbridge-only, poverty-focused criteria) and hit "We couldn't generate your summary right now" on Step 3. He asked whether it was a Claude outage. Anthropic's status page did show a resolved "Claude Sonnet 5 errors" incident earlier that morning (08:39–08:53 UTC), which looked like a plausible match at first, but the real Vercel function logs (retrieved after installing and linking the Vercel CLI — not previously set up in this environment — `vercel logs --status-code 500`) told a different story: `stop_reason: end_turn` on every attempt, ruling out output-token truncation, and the actual failure was `[generate-summary] JSON parse/validation failed after retry`.
+
+**Root cause:** temporary diagnostic logging (added to `route.ts`, then removed once root-caused) surfaced the exact Zod error — 4× `"Invalid input: expected number, received null"`. Claude was returning `wordLimit: null` for each of Walton's narrative sections that has no stated word limit — the same convention already used and accepted for `questions[].wordLimit`. But `aiSummarySectionSchema.wordLimit` was `z.number().optional()` (missing `.nullable()`), so every section without an explicit limit failed validation. Since this route runs at `temperature: 0` (the 2026-07-15 determinism fix), the failure was 100% reproducible on this document, not transient — no amount of "Try again" could ever have worked, and the error copy's "this is usually temporary" was actively misleading for this failure mode.
+
+**Fix:** `aiSummarySectionSchema` (`app/api/generate-summary/route.ts`) and the `AiSummarySection` type (`lib/types.ts`) now accept `wordLimit: number | null`, matching `aiSummaryQuestionSchema`'s existing pattern. Downstream consumers (`actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`) already normalised with `?? null` and needed no change — only the validation boundary was wrong. Confirmed fixed by WJ's live retry: the summary generated successfully and the eligibility-mismatch result rendered exactly as expected. `tsc --noEmit`, `eslint --max-warnings 0`, all 68 tests pass.
+
+**Tooling note:** the Vercel CLI is now installed and linked to this project (`rapidglobes-projects/grant-pathway`), so `vercel logs`/`vercel ls` are available for future investigations — this was the missing piece that made root-causing this fast rather than guesswork.
+
+**Files changed:** `app/api/generate-summary/route.ts`, `lib/types.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-15 — Step 5 assembled-draft numbering fix for governance items
 
 WJ predicted, then live-verified, that MK Community Foundation's Sapling Grants guidelines would trigger the same 3-of-5 governance facts as Oak Grants (Reserves, bank-signatory count, bank-signatories-related) — confirming the extraction logic generalises correctly across a second programme from the same funder. But he then flagged the Step 5 "Review and approve" screen showing these items with their raw internal numbering visible: "-4. Reserves (£)", "-2. How many people are authorised as bank signatories?", "-1. Are any bank signatories related to each other or to a trustee?"

@@ -326,29 +326,17 @@ export async function POST(request: NextRequest) {
   // against real markers) until step 7a below produces the final AiSummaryData.
   let rawSummary: z.infer<typeof aiSummarySchema>
   let rawParsed: unknown
-  let jsonParseError: string | null = null
   try {
     rawParsed = JSON.parse(cleaned)
-  } catch (e) {
+  } catch {
     rawParsed = null
-    jsonParseError = e instanceof Error ? e.message : String(e)
   }
   const parseResult = aiSummarySchema.safeParse(rawParsed)
   if (parseResult.success) {
     rawSummary = parseResult.data
   } else {
     // JSON parse or Zod validation failed — retry once with a stricter prompt (ADR-AI-004)
-    // TEMPORARY DIAGNOSTIC LOGGING (2026-07-16): investigating a reproducible
-    // parse failure on Walton Charity guidelines — remove once root-caused.
-    console.warn(
-      '[generate-summary] JSON parse/validation failed on first attempt, retrying...',
-      jsonParseError ? { jsonParseError } : { zodError: parseResult.error.issues },
-    )
-    console.warn(
-      `[generate-summary] first-attempt cleaned length: ${cleaned.length}, stop_reason: ${bedrockResponse.stop_reason}`,
-    )
-    console.warn(`[generate-summary] first-attempt head: ${cleaned.slice(0, 500)}`)
-    console.warn(`[generate-summary] first-attempt tail: ${cleaned.slice(-500)}`)
+    console.warn('[generate-summary] JSON parse/validation failed on first attempt, retrying...')
 
     let retryResponse: Awaited<ReturnType<typeof client.messages.create>>
     try {
@@ -384,28 +372,16 @@ export async function POST(request: NextRequest) {
       .trim()
 
     let retryRawParsed: unknown
-    let retryJsonParseError: string | null = null
     try {
       retryRawParsed = JSON.parse(retryCleaned)
-    } catch (e) {
+    } catch {
       retryRawParsed = null
-      retryJsonParseError = e instanceof Error ? e.message : String(e)
     }
     const retryParseResult = aiSummarySchema.safeParse(retryRawParsed)
     if (retryParseResult.success) {
       rawSummary = retryParseResult.data
     } else {
-      // TEMPORARY DIAGNOSTIC LOGGING (2026-07-16): investigating a reproducible
-      // parse failure on Walton Charity guidelines — remove once root-caused.
-      console.error(
-        '[generate-summary] JSON parse/validation failed after retry',
-        retryJsonParseError ? { retryJsonParseError } : { zodError: retryParseResult.error.issues },
-      )
-      console.error(
-        `[generate-summary] retry cleaned length: ${retryCleaned.length}, stop_reason: ${retryResponse.stop_reason}`,
-      )
-      console.error(`[generate-summary] retry head: ${retryCleaned.slice(0, 500)}`)
-      console.error(`[generate-summary] retry tail: ${retryCleaned.slice(-500)}`)
+      console.error('[generate-summary] JSON parse/validation failed after retry')
       await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
       return NextResponse.json(aiErrorBody('parse_error'), {
         status: httpStatusForError('parse_error'),
