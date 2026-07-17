@@ -18,6 +18,8 @@ Not a new decision — the underlying versioning scheme (`YYYY.MM.DD-<short SHA>
 
 `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged, no existing coverage of this component).
 
+**Live-verified by WJ the same day:** screenshot confirmed "Grant Pathway v2026.07.17-9d8d30c" rendering correctly beneath the tagline in the deployed footer.
+
 ---
 
 ## 2026-07-17 — PDR-AI-009 built: AI refine relevance-check consistency
