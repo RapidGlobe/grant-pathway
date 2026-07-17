@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-07-17 — Step 4 sync silently broken for any funder with both governance facts and narrative items (regression since 2026-07-15)
+
+WJ regenerated Stony Stratford again and asked to check `vercel logs` per the debug logging added minutes earlier. The pull surfaced something far more serious than the citation gap it was meant to diagnose:
+
+```
+[step4] free_form upsert failed: null value in column "added_manually" of relation "application_items" violates not-null constraint
+```
+
+Root cause: `resolveGovernanceInserts()` (`lib/governance-items.ts`) always sets `added_manually` explicitly on governance-fact rows (added 2026-07-15, PDR-AI-008 fast-follow's manual-add migration). The narrative section/question insert objects in `app/(authenticated)/applications/[id]/step/4/page.tsx` — both the free_form and structured branches — never set it at all. When both get merged into a single `.upsert()` call (any funder with detected governance facts _and_ narrative items — Stony Stratford's exact case, and likely others), PostgREST needs a consistent column set across the whole batch and fills the missing key with `NULL` for the narrative rows rather than falling back to the column's default, tripping the `not null` constraint on every affected row. The entire upsert fails atomically — silently, caught in a try/catch that only logs to the server, never surfaced to the user — so Step 4 keeps showing whatever was already in the database no matter what the AI regenerates.
+
+This has almost certainly been latent since the `added_manually` migration (`20260715001`) landed 2026-07-15 and simply hadn't been re-triggered by a fresh sync of a funder with both governance facts and narrative content until now. **Retroactive implication:** any regeneration of a funder with governance signal, on or after 2026-07-15, may have silently failed to sync — worth keeping in mind if any other funder's test data looks stale despite a reported regenerate.
+
+**Fix:** added `added_manually: false` explicitly to both the free_form section inserts and the structured question inserts, matching the governance insert's explicit pattern.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no existing test coverage of this Step 4 sync code, consistent with prior fixes to this file).
+
+---
+
+## 2026-07-17 — Citation heading_path fix, corrected: assembled from two markers, not one (third attempt, same Stony Stratford gap)
+
+With the sync bug above fixed, `vercel logs` also gave direct visibility into the actual raw citations the AI was returning — something the two earlier same-day citation fixes could only speculate about. Both failing citations (the "Alignment with Council's Overarching Principles" section, and separately "Budget for this Project") turned out to share one real cause, different from either earlier hypothesis: the model was constructing a two-element `heading_path` by joining two separate, consecutive `[SECTION: ...]` marker lines that merely _read_ like parent/child in the prose (e.g. a tick-list heading immediately followed by a narrative-instruction heading) — but running the real extraction pipeline (`mammoth`/`tagSectionsFromHtml`) locally against the actual Stony Stratford `.docx` confirmed every single marker in this document is flat, single-element, with no genuine nesting anywhere at all. A heading_path assembled by combining two flat markers can never match a real one, so `validateCitation()` correctly (if unhelpfully) rejected it every time — the earlier punctuation-tolerance fix was solving a real but different problem, and remains a valid general fix in its own right.
+
+**Fix:** `buildSummaryPrompt()`'s citation rule (`lib/prompts.ts`) now explicitly says heading_path must be copied from a single marker line, split only on a " > " the marker line itself already contains — never assembled from two separate marker lines just because one heading appears to introduce the next. Corrected the prior "Fixed 2026-07-17" doc comment, which had claimed the tick-list/narrative fix resolved this — it didn't, on its own.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged). Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — WJ's next regeneration, now that the sync bug is also fixed, is the outstanding live-verification step for both the citation gap and the underlying Step 4 sync.
+
+---
+
 ## 2026-07-17 — Per-citation debug logging added (Stony Stratford gap persists after two fixes)
 
 WJ regenerated Stony Stratford again after the punctuation-tolerance fix (below) and found item 4 still had no citation badge — plus a new gap on item 6 ("Budget for this Project"), which _had_ carried a citation in the very first test round. Item 6's real marker (`5. BUDGET FOR THIS PROJECT.`) contains no apostrophe/dash, so the punctuation fix can't explain its loss — the most likely explanation is ordinary run-to-run variance in the model's citation-reporting (temperature is already 0 for this route, but this project has hit temperature-0 non-determinism before, e.g. the 2026-07-15 Step 3 extraction-determinism fix).

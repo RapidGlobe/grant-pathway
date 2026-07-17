@@ -189,6 +189,7 @@ export default async function Step4Page({ params }: Props) {
               limit_type: s.wordLimit ? 'words' : null,
               is_budget_question: s.is_budget_section ?? false,
               guideline_reference: toGuidelineReferenceColumn(s.citation),
+              added_manually: false,
             })),
           ...governanceInserts,
         ]
@@ -252,6 +253,7 @@ export default async function Step4Page({ params }: Props) {
               limit_type: q.limitType ?? null,
               is_budget_question: q.is_budget_question ?? false,
               guideline_reference: toGuidelineReferenceColumn(q.citation),
+              added_manually: false,
             })),
           ...governanceInserts,
         ]
