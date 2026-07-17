@@ -10,13 +10,13 @@
 
 ---
 
-## 2026-07-17 — Planned: show app version in the site footer (not yet built)
+## 2026-07-17 — Site footer now shows the app version
 
 WJ asked live during Henry Smith testing whether the site footer should show a build/version id, given the confusion that same session about which of two similarly-named test applications he was looking at. Agreed to add one, deferred to the next session ("in the morning").
 
-Not a new decision — the underlying versioning scheme (`YYYY.MM.DD-<short SHA>`, sourced from Vercel's build-time git commit metadata) was already proposed, approved, and built on 2026-07-02 (see that date's entries below), via `lib/version.ts`'s `getAppVersion()`. It is currently wired into only the **export document's** footer (`app/api/export/[applicationId]/route.ts`) — the live app's own footer (`components/site-footer.tsx`) has never shown a version at all. The task is to reuse the existing helper in the site footer; no new design decision is required.
+Not a new decision — the underlying versioning scheme (`YYYY.MM.DD-<short SHA>`, sourced from Vercel's build-time git commit metadata) was already proposed, approved, and built on 2026-07-02 (see that date's entries below), via `lib/version.ts`'s `getAppVersion()`. It was previously wired into only the **export document's** footer (`app/api/export/[applicationId]/route.ts`) — the live app's own footer (`components/site-footer.tsx`) had never shown a version at all. **Built:** `components/site-footer.tsx` now calls the same `getAppVersion()` helper and renders `Grant Pathway v<version>` beneath the existing tagline, in muted text consistent with the rest of the footer. No new design decision required — same helper, same format, second call site.
 
-**Not yet built** — tracked here so it isn't lost before the next session picks it up.
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged, no existing coverage of this component).
 
 ---
 

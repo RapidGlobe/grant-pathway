@@ -9,11 +9,11 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.56 Draft                                        |
+| **Version**        | 0.57 Draft                                        |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
-| **Last updated**   | 2026-07-16                                        |
+| **Last updated**   | 2026-07-17                                        |
 | **Review date**    | Prior to development start                        |
 
 ### Revision History
@@ -78,6 +78,7 @@
 | 0.53 | 2026-07-16 | Rapidglobe Ltd | PDR-AI-007 built: budget/financial questions over their word or character limit now get a budget-specific over-limit message (no AI reference) plus a deterministic "Trim to limit" button (`components/application-step4-draft.tsx`, no AI/LLM call) instead of showing no over-limit guidance at all. This PDR was decided 2026-07-04 and formalised 2026-07-11 but never actually built -- no task was ever added to `IMPLEMENTATION-PLAN.md`'s tracked list -- until WJ independently re-found the same gap live-testing Henry Smith on 2026-07-16. Section 6.6 and Section 7 Screen 7 Step 4 table updated ("Over-limit hard stop" and "Budget question styling" rows). New `acceptance-criteria.md` AC-FR-29-06. |
 | 0.54 | 2026-07-16 | Rapidglobe Ltd | PDR-AI-007 extended: the "Trim to limit" deterministic button (built earlier the same day for budget questions only) now also appears on ordinary narrative questions over their limit, alongside "Help me improve this" -- not a replacement. WJ found AI refine can decline to help entirely when there's nothing genuine to refine (a deliberately irrelevant test answer), on top of `PDR-AI-006`'s already-documented undershoot problem, leaving narrative questions with no guaranteed fallback the way budget questions now have. Section 6.6 and Section 7 Screen 7 Step 4 table's "Over-limit hard stop" row updated. New `acceptance-criteria.md` AC-FR-29-07. |
 | 0.55 | 2026-07-16 | Rapidglobe Ltd | PDR-AI-006 built: when the AI's "Help me improve this" suggestion is itself still over the funder's word/character limit, an inline message now appears under the suggested text naming the exact shortfall -- decided 2026-07-04 alongside the user-guide wording fix (already done at the time), but the in-app half sat unbuilt for 12 days until raised while testing the adjacent PDR-AI-007 extension and closed in the same pass. Section 6.6's "AI assist limitation" paragraph updated from "planned but not yet implemented" to built. New `acceptance-criteria.md` AC-FR-30-03A. |
+| 0.57 | 2026-07-17 | Rapidglobe Ltd | Section 5.6 (Global Footer) gained a new "App version" row: the site footer (`components/site-footer.tsx`) now shows "Grant Pathway v[version number]", reusing the same `getAppVersion()` helper and format already shown in the export document footer (Section 5.5) -- added so WJ can confirm which deployed build he is testing, after losing track of which of two similarly-named test applications he was viewing during live Henry Smith testing. No new design decision -- same helper, second call site. |
 | 0.56 | 2026-07-16 | Rapidglobe Ltd | A manually-added governance/finance item (via the "Add a financial or governance detail" picker, PDR-AI-008) is no longer exempt from the "Ready to assemble" gate. WJ live-tested Henry Smith, ticked several governance facts via the manual picker, left them blank, and found the button stayed active throughout -- traced to the shared `item_label`'s "(optional)" suffix, written for the AI-auto-detected case (a low-signal detection should never become a forced question) but reused as-is for manual adds, where the charity actively chose to answer the fact. `components/application-step4-draft.tsx`'s `allApproved` gate and its "show approve panel when empty" check are now both keyed on the existing `addedManually` flag in addition to the "(optional)" text check -- AI-detected items are unaffected. Section 7 Screen 7 Step 4 table ("Optional questions" and "Governance and reserves items" rows) updated. New `acceptance-criteria.md` AC-FR-29-08; `PDR-AI-008` revision history updated. |
 
 ### Related Documents
@@ -291,12 +292,13 @@ Displayed on all authenticated routes.
 
 Displayed on all routes.
 
-| Element          | Detail                                                                                                                 |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Tagline          | "Your free grant writing companion for UK charities"                                                                   |
-| Privacy Policy   | Links to `/privacy` -- opens in a new tab so the user never loses a form or in-progress application (added 2026-06-10) |
-| Terms of Service | Links to `/terms` -- opens in a new tab, same reason (added 2026-06-10)                                                |
-| Copyright        | (c) RapidGlobe Ltd [current year]                                                                                      |
+| Element          | Detail                                                                                                                                                                                    |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tagline          | "Your free grant writing companion for UK charities"                                                                                                                                      |
+| Privacy Policy   | Links to `/privacy` -- opens in a new tab so the user never loses a form or in-progress application (added 2026-06-10)                                                                    |
+| Terms of Service | Links to `/terms` -- opens in a new tab, same reason (added 2026-06-10)                                                                                                                   |
+| Copyright        | (c) RapidGlobe Ltd [current year]                                                                                                                                                         |
+| App version      | "Grant Pathway v[version number]" -- same `getAppVersion()` value and format as the export document footer (5.5), so WJ can confirm which deployed build he is testing (added 2026-07-17) |
 
 ### 5.7 Page Titles
 
@@ -1483,6 +1485,6 @@ Criteria are organised by the same functional sections used in this document. Sh
 
 ---
 
-_Document status: Version 0.51 Draft_
+_Document status: Version 0.57 Draft_
 _Compliance section (Section 15) -- AWS DPA confirmed 2026-06-22; Terms of Service and Privacy Policy are live, with effective dates and solicitor review still outstanding before P5.1 can close. See Section 15 for full detail._
-_Last updated: 2026-07-15_
+_Last updated: 2026-07-17_
