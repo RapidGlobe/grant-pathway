@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-17 — Per-citation debug logging added (Stony Stratford gap persists after two fixes)
+
+WJ regenerated Stony Stratford again after the punctuation-tolerance fix (below) and found item 4 still had no citation badge — plus a new gap on item 6 ("Budget for this Project"), which _had_ carried a citation in the very first test round. Item 6's real marker (`5. BUDGET FOR THIS PROJECT.`) contains no apostrophe/dash, so the punctuation fix can't explain its loss — the most likely explanation is ordinary run-to-run variance in the model's citation-reporting (temperature is already 0 for this route, but this project has hit temperature-0 non-determinism before, e.g. the 2026-07-15 Step 3 extraction-determinism fix).
+
+Rather than propose a third speculative fix, `app/api/generate-summary/route.ts`'s citation-reconciliation loop now logs the raw `citation` object whenever one is offered but fails validation — previously only visible in aggregate (a warning if over half of all offered citations are invalid, which a single stray miss never trips). This surfaces the actual heading_path/quote the model returned for a specific miss via `vercel logs`, without needing a reproducible local Bedrock call (`dotenvx` redacts AWS credentials for this agent). Temporary/diagnostic — intended to be removed once citation reliability is no longer under active investigation.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no test coverage of route-level logging). WJ's next regeneration plus a `vercel logs` pull is the next diagnostic step.
+
+---
+
 ## 2026-07-17 — Citation validation made punctuation-tolerant for heading paths (second fix for the same Stony Stratford gap)
 
 WJ regenerated the Stony Stratford summary after this morning's tick-list-plus-narrative-follow-up prompt fix and confirmed "Alignment with Council's Overarching Principles" still had no citation badge — the earlier fix alone didn't close the gap.

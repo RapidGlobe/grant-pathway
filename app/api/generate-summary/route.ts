@@ -404,24 +404,48 @@ export async function POST(request: NextRequest) {
   // nothing renders citations to a user yet) if over half of what the AI
   // offered turns out invalid, as a signal the tagging or the model's
   // behaviour may need attention.
+  //
+  // Per-item logging (added 2026-07-17, live-testing Stony Stratford Town
+  // Council): a citation offered-but-invalid is otherwise invisible — only
+  // caught by the aggregate >50% warning below, which a single stray miss
+  // never trips. Logs the raw citation the AI actually returned so a
+  // specific miss can be diagnosed from `vercel logs` without needing a
+  // Bedrock call reproduced locally (dotenvx redacts AWS credentials for
+  // this agent). Remove once citation reliability is no longer under
+  // active investigation.
   const validMarkers = extractValidMarkers(textForPrompt)
   let citationsOffered = 0
   let citationsValid = 0
 
-  const reconcileCitation = (raw: (typeof rawSummary.questions)[number]['citation']) => {
+  const reconcileCitation = (
+    raw: (typeof rawSummary.questions)[number]['citation'],
+    label: string,
+  ) => {
     const result = validateCitation(raw ?? null, validMarkers)
     if (result.wasOffered) citationsOffered++
     if (result.wasValid) citationsValid++
+    if (result.wasOffered && !result.wasValid) {
+      console.warn(
+        `[generate-summary] citation offered but invalid for "${label}" (applicationId: ${applicationId}):`,
+        JSON.stringify(raw),
+      )
+    }
     return result.citation
   }
 
   const summary: AiSummaryData = {
     ...rawSummary,
-    questions: rawSummary.questions.map((q) => ({ ...q, citation: reconcileCitation(q.citation) })),
-    sections: rawSummary.sections?.map((s) => ({ ...s, citation: reconcileCitation(s.citation) })),
+    questions: rawSummary.questions.map((q) => ({
+      ...q,
+      citation: reconcileCitation(q.citation, `Q${q.number}: ${q.text}`),
+    })),
+    sections: rawSummary.sections?.map((s) => ({
+      ...s,
+      citation: reconcileCitation(s.citation, `S${s.number}: ${s.title}`),
+    })),
     governanceFacts: rawSummary.governanceFacts?.map((f) => ({
       ...f,
-      citation: reconcileCitation(f.citation),
+      citation: reconcileCitation(f.citation, f.field_key),
     })),
   }
 
