@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-17 — Citation validation made punctuation-tolerant for heading paths (second fix for the same Stony Stratford gap)
+
+WJ regenerated the Stony Stratford summary after this morning's tick-list-plus-narrative-follow-up prompt fix and confirmed "Alignment with Council's Overarching Principles" still had no citation badge — the earlier fix alone didn't close the gap.
+
+Investigation ran the actual `mammoth`/`tagSectionsFromHtml` extraction pipeline (`lib/extract-text.ts`) against the real Stony Stratford `.docx` locally — no Bedrock call needed, since extraction is pure local library code — and confirmed a real `[SECTION: ...]` marker does exist for this heading: `SSTC overarching principles > Which of the Council's overarching principles do you believe your project aligns with?`, using the source's real **curly apostrophe** (’) in "Council's". This is the only heading in the entire document containing an apostrophe. `validateCitation()` (`lib/guideline-citations.ts`) compares the AI's reported `heading_path` against real markers with a byte-exact `Set.has()` — no punctuation tolerance at all — while its sibling function `findQuoteRange()` (used for on-screen quote highlighting) already tolerates exactly this curly-vs-straight-apostrophe variation, found live once before (2026-07-15, MK Community Foundation). An AI-reported heading_path using a straight apostrophe (the LLM's routine "verbatim" quoting behaviour, per that same precedent) would fail the exact match and get silently dropped to no citation — a highly plausible explanation for why this specific heading, and only this one, kept failing.
+
+**Fix:** moved `EQUIVALENT_PUNCTUATION_CLASSES` earlier in `lib/guideline-citations.ts` and added `normalizePunctuationForMatch()`, applied to both `extractValidMarkers()`'s stored heading paths and `validateCitation()`'s incoming `heading_path` lookup — the same tolerance `findQuoteRange()` already has for quotes, now applied consistently to marker matching too. New regression test reproduces the exact Stony Stratford heading and apostrophe variant. This is a general fix, not specific to this one form — any funder whose heading text contains an apostrophe, curly quote, or en/em dash was equally exposed.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (75 existing + 1 new). Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — WJ's next regeneration of this application is the outstanding live-verification step, alongside the earlier tick-list-plus-narrative-follow-up fix (both may have been needed together).
+
+---
+
 ## 2026-07-17 — PDR-AI-009 false-positive investigated: compound questions, no change made
 
 Continuing Stony Stratford Town Council live testing, WJ hit the "does not appear to address the question" warning (`PDR-AI-009`, built and live-verified earlier the same day) repeatedly enough to ask whether it needed loosening — on §5 "Application Background" (5 sub-asks bundled into one guidance paragraph: need, how identified, user involvement, headcount, duration) and §8/9 "General Activities of the Group" (3 sub-asks: activities, meeting frequency, accessibility).

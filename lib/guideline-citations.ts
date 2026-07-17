@@ -29,9 +29,40 @@ export type ValidMarkers = {
   headingPaths: Set<string>
 }
 
+// Typographic punctuation variants that are interchangeable for matching
+// purposes but not byte-identical (see findQuoteRange below for the original
+// rationale and live-bug history). A Word heading's own text can just as
+// easily contain a curly apostrophe or en/em dash as a quote can — e.g.
+// "Which of the Council’s overarching principles..." — and an AI-reported
+// heading_path routinely normalises punctuation to plain ASCII even when
+// quoting "verbatim". Both extractValidMarkers and validateCitation below
+// normalise through this table before comparing, so a heading citation isn't
+// wrongly rejected as pointing at a marker that "doesn't structurally exist"
+// purely over a punctuation-normalisation artifact of quoting via an LLM
+// (found live, 2026-07-17, Stony Stratford Town Council: this exact heading
+// never validated, silently dropping to no citation badge at all).
+const EQUIVALENT_PUNCTUATION_CLASSES = [
+  ["'", '‘', '’', 'ʼ'], // straight apostrophe, curly left/right single quote, modifier-letter apostrophe
+  ['"', '“', '”'], // straight double quote, curly left/right double quote
+  ['-', '–', '—'], // hyphen, en dash, em dash
+]
+
+/** Maps every punctuation-class character to its class's first (canonical) member. */
+function normalizePunctuationForMatch(s: string): string {
+  let result = ''
+  for (const char of s) {
+    const equivalenceClass = EQUIVALENT_PUNCTUATION_CLASSES.find((chars) => chars.includes(char))
+    result += equivalenceClass ? equivalenceClass[0] : char
+  }
+  return result
+}
+
 /**
  * Extracts the set of page numbers and heading-path strings actually present
  * in the tagged guidelines text, to validate a reported citation against.
+ * Heading paths are punctuation-normalised (see EQUIVALENT_PUNCTUATION_CLASSES
+ * above) so validateCitation's lookup tolerates the same curly/straight
+ * variation findQuoteRange already tolerates for quotes.
  */
 export function extractValidMarkers(text: string): ValidMarkers {
   const pages = new Set<number>()
@@ -41,7 +72,7 @@ export function extractValidMarkers(text: string): ValidMarkers {
     pages.add(parseInt(m[1], 10))
   }
   for (const m of text.matchAll(/^\[SECTION: (.+)\]$/gm)) {
-    headingPaths.add(m[1].trim())
+    headingPaths.add(normalizePunctuationForMatch(m[1].trim()))
   }
 
   return { pages, headingPaths }
@@ -76,7 +107,7 @@ export function validateCitation(
     raw.heading_path.length &&
     quote
   ) {
-    if (markers.headingPaths.has(raw.heading_path.join(' > '))) {
+    if (markers.headingPaths.has(normalizePunctuationForMatch(raw.heading_path.join(' > ')))) {
       return {
         citation: { source_type: 'heading', heading_path: raw.heading_path, quote },
         wasOffered: true,
@@ -101,22 +132,6 @@ export function toGuidelineReferenceColumn(citation: GuidelineCitation | null | 
   }
   return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
 }
-
-// Typographic punctuation variants that are interchangeable for matching
-// purposes but not byte-identical: the AI's generated quote routinely comes
-// back with plain ASCII (straight apostrophe/quotes, hyphen) even when the
-// source PDF/docx uses proper typesetting (curly quotes, en/em dashes) — a
-// single-character mismatch that a literal match would otherwise miss
-// entirely (found live, 2026-07-15: MK Community Foundation's "six months'
-// free reserves" vs the source's "six months' free reserves"). Each entry's
-// characters are treated as equivalent to one another when building the
-// match pattern below; the ORIGINAL text is still what gets sliced/displayed,
-// so the on-screen highlight always shows the source's real typesetting.
-const EQUIVALENT_PUNCTUATION_CLASSES = [
-  ["'", '‘', '’', 'ʼ'], // straight apostrophe, curly left/right single quote, modifier-letter apostrophe
-  ['"', '“', '”'], // straight double quote, curly left/right double quote
-  ['-', '–', '—'], // hyphen, en dash, em dash
-]
 
 /**
  * Finds where `quote` occurs in `text` (P6.4's "view original guidelines"
