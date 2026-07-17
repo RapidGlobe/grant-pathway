@@ -849,7 +849,7 @@ export function ApplicationStep4Draft({
                   onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                   onBlur={() => handleAnswerBlur(q.id)}
                   aria-label={q.questionText}
-                  className="h-10 w-full rounded-md border border-[#D1D5DB] bg-white px-3 text-[14px] sm:w-60"
+                  className="h-10 w-full rounded-md border border-[#D1D5DB] bg-transparent px-3 text-[14px] sm:w-60"
                 >
                   <option value="">Not sure yet</option>
                   <option value="No">No</option>

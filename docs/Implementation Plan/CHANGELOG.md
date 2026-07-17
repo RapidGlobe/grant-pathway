@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-17 — Governance Yes/No dropdown now reflects the approved-state tint like every other field
+
+WJ noticed once-approved cards turn green throughout Step 4 — except the Yes/No dropdown used for two of the five governance facts (trustee-relatedness, bank-signatories-relatedness), which stayed flat white regardless of approval. Compared side by side: Q3 ("Are any of your trustees related...", a `<select>`) stayed white; Q4 ("Description of Project", an ordinary `<Textarea>`) correctly turned green.
+
+Root cause: `components/ui/input.tsx` and `components/ui/textarea.tsx` both default to `bg-transparent`, letting the parent card's tint (white/amber/green depending on approval and budget status) show through underneath — that's how every ordinary answer field already reflects approval. The governance Yes/No field is a plain native `<select>`, not built on either shared component, and was hardcoded to `bg-white` — never transparent, so it could never pick up the parent's colour regardless of approval state. Not a deliberate design choice (unlike the budget fields' deliberate always-white `bg-white`, which keeps manually-entered figures looking visually distinct) — just an oversight from building the dropdown with a plain baseline background rather than matching the transparent pattern every other non-budget field already uses.
+
+**Fix:** changed the select's `bg-white` to `bg-transparent`, matching `Input`/`Textarea`'s existing pattern exactly.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no existing coverage of this component). Not verified visually in this environment — reproducing an approved governance Yes/No item needs real application data this environment doesn't have set up, and the preview tool has been unreliable for this project all session; WJ's next look at Step 4 is the verification step.
+
+---
+
 ## 2026-07-17 — Citation badges now truncate long headings
 
 WJ confirmed item 4's citation fix worked ("brilliant") but flagged item 6's as much worse — its badge rendered an entire multi-sentence instructional paragraph verbatim, because Stony Stratford's source document applies a Heading style to "a) Give details of expenditure required for your project e.g. materials, equipment, professional fees..." rather than a short title. That citation is genuinely valid (a real marker, correctly found) — the source document's own styling choice is just unusually verbose, and nothing in `components/application-step4-draft.tsx`'s `citationLabel()` bounded the badge's length at all.
