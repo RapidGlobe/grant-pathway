@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-17 — Session wrap-up: PDR-AI-010 decided and built, live-testing confirmed, one open finding logged
+
+Reviewed a fresh Stony Stratford export (`NEO_stony_first_test_0759_170726_Application.docx`) as an end-of-session sanity check. All 12 items (3 governance facts + 9 narrative sections) are present, correctly sequenced, and persisted — confirming today's Step 4 sync fix holds across a full assemble/export cycle. Footer version matches the latest push. WJ: "Job done, it looks much better."
+
+**PDR-AI-010 decided and built same day.** The "Finances of Your Group" duplication WJ flagged earlier (citing the same quote as a separate governance-fact card) is addressed via a new decision record: `buildSummaryPrompt()`'s "sections" rule now handles a themed financial section whose only content is numeric fields already captured by the 5 governance facts — still creates the section (the guidelines named the theme) but reframes its guidance as an explicit "tell us in your own words" invitation and omits its citation rather than duplicating one a governance fact already owns. Chosen over WJ's initially-proposed unconditional catch-all specifically to avoid repeating the anti-pattern `PDR-AI-008`'s original always-on governance block was corrected away from (an unconditional, guideline-unlinked card). Full detail in `docs/PRD decisions/PDR-AI-010-financial-section-catch-all.md`.
+
+**One new finding, not yet acted on:** the fresh export's item 3 ("Are any of your trustees related to each other...") appears to be a hallucinated governance fact — neither Stony Stratford source document (`Stony Stratford Grant-Application-Form-2026.docx`, `Stony-Stratford-Town-Council-Grant-Scheme-2026-27-adopted-FC0226.docx`) contains any mention of trustee relatedness, even indirectly, contradicting `PDR-AI-008`'s "do NOT extract a field_key the guidelines never raise" rule and `TEST-DASHBOARD.md`'s existing 2-of-5-signal review for this funder. WJ: formal testing (to be recorded) will cover this rather than an ad-hoc dashboard update now — logged here so it isn't lost before that test.
+
+**Temporary debug logging (added earlier today) kept deliberately, not removed.** WJ wants it retained to help diagnose any further citation-reliability issues during ongoing testing, but was explicit it must not reach production — added an explicit checklist item to the Phase 6 → Go-Live Gate (`IMPLEMENTATION-PLAN.md` v3.18) to confirm removal (or environment-gating) before DNS cutover, rather than relying on it being remembered.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged). PDR-AI-010's prompt change is not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — a future guideline upload for a wholly-numeric financial section is the outstanding live-verification step. WJ is finishing the user guide next; test plans across all funders will be revised once that's done, given today's cumulative improvements.
+
+---
+
 ## 2026-07-17 — Budget fields now also reflect the approved-state tint (extends the Yes/No dropdown fix)
 
 WJ confirmed the Yes/No dropdown fix, then pointed out the same white-regardless-of-approval problem on every **budget-flagged** field too — the two £ governance inputs (total expenditure, reserves) and any budget-flagged narrative `Textarea` (e.g. "Budget for this Project"). The earlier CHANGELOG entry above had assumed the budget fields' hardcoded `bg-white` was a deliberate choice ("keeps manually-entered figures looking visually distinct") — WJ's ask makes clear that assumption was wrong; he wants every field, budget or not, to behave consistently once approved.
