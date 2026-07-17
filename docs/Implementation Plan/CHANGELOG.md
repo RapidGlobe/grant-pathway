@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-17 — PDR-AI-009 false-positive investigated: compound questions, no change made
+
+Continuing Stony Stratford Town Council live testing, WJ hit the "does not appear to address the question" warning (`PDR-AI-009`, built and live-verified earlier the same day) repeatedly enough to ask whether it needed loosening — on §5 "Application Background" (5 sub-asks bundled into one guidance paragraph: need, how identified, user involvement, headcount, duration) and §8/9 "General Activities of the Group" (3 sub-asks: activities, meeting frequency, accessibility).
+
+Investigation found a confound before concluding the check was miscalibrated: both flagged test answers reused an identical boilerplate opening sentence copy-pasted from a different question's answer, which the prompt's own instruction already names as something that should fail the check ("boilerplate unrelated to the question"). WJ isolated the variable with a clean test — §11 "Publicity and Marketing" (a single, non-compound question) with a fresh, non-reused, on-topic answer — and got no warning at all, confirming the check works correctly for ordinary single-ask questions.
+
+**WJ's call: no prompt change.** A compound question genuinely asks for several distinct things; flagging an answer that only covers some of them is a defensible reading of "does not address the question," not the same failure mode as the original Henry Smith case (wholly irrelevant filler text) this PDR was built to fix. Recorded in `PDR-AI-009`'s revision history rather than left as an unresolved live-test complaint.
+
+---
+
 ## 2026-07-17 — Citation extraction fixed for tick-list-plus-narrative-follow-up sections
 
 WJ live-tested Stony Stratford Town Council's guideline form (a "worst case" test document) and found 10 of 11 extracted items carried a citation badge, but "Alignment with Council's Overarching Principles" — the one section built from a tick-list ("3.1 Which of the Council's overarching principles do you believe your project aligns with? [tick table]") plus a separate narrative follow-up on the same topic ("3.2 Please outline how you believe your project aligns with these aims") — had none.
