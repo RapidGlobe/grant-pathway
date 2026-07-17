@@ -48,6 +48,8 @@ No change to the `refine-answer` API response shape (`{ refinedText: string, app
 
 Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent, per established precedent) — the prompt instruction itself, the constant, and the stripping/counting logic are all verified; WJ's next live test against the original two Henry Smith scenarios (plus a genuine on-topic answer, to check for false positives) is the outstanding verification step. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of `application-step4-draft.tsx`, consistent with prior fixes to this file).
 
+**Live-verified by WJ same day, 2026-07-17.** Retested a real Henry Smith safeguarding question (300-word limit) with the same deliberately-irrelevant word-count-testing filler text from the original screenshots. Over the limit (503 words): the warning line appeared exactly as designed — _"⚠️ This answer does not appear to address the question above — please check it carefully before approving."_ — followed by a compressed, restructured suggestion within the 300-word limit (no "still over the limit" shortfall message shown, confirming it landed at or under 300). WJ separately confirmed the mid-text compression (cutting redundant sentences throughout, not just truncating the tail) is expected, pre-existing `buildRefinePrompt()` behaviour from the over-limit compression instruction — unrelated to this PDR, and distinct from `PDR-AI-007`'s deterministic "Trim to limit" mechanism. WJ: "we can safely say this has passed testing."
+
 ## Date Decided
 
 2026-07-17.
