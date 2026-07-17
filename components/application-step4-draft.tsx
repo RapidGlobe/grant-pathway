@@ -825,7 +825,7 @@ export function ApplicationStep4Draft({
                     onChange={(e) => handleAnswerChange(q.id, e.target.value.replace(/\D/g, ''))}
                     onBlur={() => handleAnswerBlur(q.id)}
                     aria-label={q.questionText}
-                    className="h-10 bg-white pl-6 text-[14px]"
+                    className="h-10 pl-6 text-[14px]"
                   />
                 </div>
               )}
@@ -875,7 +875,7 @@ export function ApplicationStep4Draft({
                       ? 'Write your content here…'
                       : 'Write your answer here…'
                   }
-                  className={`text-[14px] ${q.isBudgetQuestion ? 'bg-white' : ''}`}
+                  className="text-[14px]"
                 />
               )}
 

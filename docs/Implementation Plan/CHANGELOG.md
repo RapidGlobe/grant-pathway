@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-17 — Budget fields now also reflect the approved-state tint (extends the Yes/No dropdown fix)
+
+WJ confirmed the Yes/No dropdown fix, then pointed out the same white-regardless-of-approval problem on every **budget-flagged** field too — the two £ governance inputs (total expenditure, reserves) and any budget-flagged narrative `Textarea` (e.g. "Budget for this Project"). The earlier CHANGELOG entry above had assumed the budget fields' hardcoded `bg-white` was a deliberate choice ("keeps manually-entered figures looking visually distinct") — WJ's ask makes clear that assumption was wrong; he wants every field, budget or not, to behave consistently once approved.
+
+**Fix:** removed the `bg-white` override from the £-prefixed governance `Input` (`h-10 bg-white pl-6 text-[14px]` → `h-10 pl-6 text-[14px]`) and the budget-conditional on the ordinary narrative `Textarea` (`` `text-[14px] ${q.isBudgetQuestion ? 'bg-white' : ''}` `` → `"text-[14px]"`). Both now fall through to the shared `Input`/`Textarea` components' own `bg-transparent` default, same as every non-budget field already did.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged). Not verified visually in this environment (same constraint as the dropdown fix) — WJ's next look at Step 4 is the verification step for all three field types together (dropdown, £ input, budget textarea).
+
+---
+
 ## 2026-07-17 — Governance Yes/No dropdown now reflects the approved-state tint like every other field
 
 WJ noticed once-approved cards turn green throughout Step 4 — except the Yes/No dropdown used for two of the five governance facts (trustee-relatedness, bank-signatories-relatedness), which stayed flat white regardless of approval. Compared side by side: Q3 ("Are any of your trustees related...", a `<select>`) stayed white; Q4 ("Description of Project", an ordinary `<Textarea>`) correctly turned green.
