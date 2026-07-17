@@ -212,6 +212,7 @@ export type Database = {
           created_at: string
           current_step: number
           draft_status: string
+          first_exported_at: string | null
           funder_id: string | null
           funder_name: string
           grant_name: string
@@ -227,6 +228,7 @@ export type Database = {
           created_at?: string
           current_step?: number
           draft_status?: string
+          first_exported_at?: string | null
           funder_id?: string | null
           funder_name: string
           grant_name: string
@@ -242,6 +244,7 @@ export type Database = {
           created_at?: string
           current_step?: number
           draft_status?: string
+          first_exported_at?: string | null
           funder_id?: string | null
           funder_name?: string
           grant_name?: string

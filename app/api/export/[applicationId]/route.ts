@@ -12,13 +12,22 @@
 //
 // On every successful export:
 //   - applications.status   → 'exported'
-//   - applications.last_exported_at → now()
+//   - applications.last_exported_at → now() (always refreshed — drives the
+//     separate "you already exported this" re-export warning)
+//   - applications.first_exported_at → now(), but only the first time this
+//     application is ever exported (any format). Never overwritten again.
 //
 // Document format (PDR-DH-003):
 //   A4 page (11906 × 16838 twips), 2.54 cm margins (1440 twips)
 //   Default font: Calibri 11pt
 //   Title:      [Grant Name] — Application (18pt bold, centred)
 //   Sub-header: Prepared for: [Funder Name] | Date: [export date] (11pt, centred)
+//   NOTE (2026-07-17): [export date] is applications.first_exported_at, not
+//   the moment of this specific request — every export of this application,
+//   in either format, on any future re-download, shows the same date. Fixes
+//   a bug WJ found where a .txt and .docx export of the same application
+//   showed dates 2 minutes apart, since exportDate was previously computed
+//   live via `new Date()` on every request.
 //   Separator:  horizontal rule
 //   Disclaimer: italic disclaimer paragraph (11pt)
 //   Q&A:        Question N (14pt bold) followed by answer paragraph (11pt)
@@ -140,7 +149,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   // ── Fetch application (ownership check via user_id) ─────────────────────
   const { data: application, error: appError } = await supabase
     .from('applications')
-    .select('id, funder_name, grant_name, status, assembled_draft')
+    .select('id, funder_name, grant_name, status, assembled_draft, first_exported_at')
     .eq('id', applicationId)
     .eq('user_id', user.id)
     .single()
@@ -179,16 +188,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   const fullName = profile ? `${profile.first_name} ${profile.last_name}`.trim() : 'the applicant'
 
   // ── Mark as exported ────────────────────────────────────────────────────────
+  // first_exported_at is set only once, the first time this application is
+  // exported in any format, and never overwritten again -- every subsequent
+  // export (any format, any time) shows this same date rather than the
+  // moment of that particular request. last_exported_at is a separate
+  // column, intentionally refreshed on every export, driving the distinct
+  // "you already exported this" re-export warning (application-step5-approve.tsx).
+  const now = new Date()
+  const firstExportedAt = (application.first_exported_at as string | null) ?? now.toISOString()
+
   await supabase
     .from('applications')
     .update({
       status: 'exported',
-      last_exported_at: new Date().toISOString(),
+      last_exported_at: now.toISOString(),
+      first_exported_at: firstExportedAt,
     })
     .eq('id', applicationId)
     .eq('user_id', user.id)
 
-  const exportDate = formatDate(new Date())
+  const exportDate = formatDate(new Date(firstExportedAt))
   const funderName = application.funder_name as string
   const grantName = application.grant_name as string
   const assembledDraft = (application.assembled_draft as string | null) ?? null

@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-17 — Export date fixed to one timestamp per application
+
+WJ live-tested a real Henry Smith application export and spotted a 2-minute gap between the "Date:" shown in the .txt export ("08:24") and the .docx export ("08:22") of the same application — an inconsistency he'd caught while reviewing the exports as part of confirming the site footer version fix (below) had reached the export document too.
+
+Root cause: `app/api/export/[applicationId]/route.ts` computed `exportDate` as `new Date()` live on every request, so exporting each format separately — or re-downloading either format weeks later — showed a fresh timestamp each time, for what should read as one snapshot of the application. This is distinct from `applications.last_exported_at`, which is intentionally refreshed on every export to drive the separate "you already exported this" re-export warning — that column's behaviour is correct and unaffected.
+
+**Fix:** new nullable `applications.first_exported_at` column (migration `20260717000000`, `grant-pathway-dev` only), set once on an application's very first export in either format and never overwritten again. The export route now reads this column for the displayed date instead of computing it live. `lib/database.types.ts` regenerated via `supabase gen types typescript` — the regeneration also required manually restoring a previously-lost type refinement for the `reserve_ai_slot` RPC's `Returns` shape (the CLI still can't introspect this function's actual return columns, same limitation as when the types file was first generated 2026-06-22).
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged). New `acceptance-criteria.md` AC-FR-37-03A; `PDR-DH-003` revision history updated; `docs/data-model.md` bumped 1.13 → 1.14; `technical-design.md` bumped 1.18 → 1.19.
+
+---
+
 ## 2026-07-17 — Site footer now shows the app version
 
 WJ asked live during Henry Smith testing whether the site footer should show a build/version id, given the confusion that same session about which of two similarly-named test applications he was looking at. Agreed to add one, deferred to the next session ("in the morning").

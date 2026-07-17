@@ -1997,6 +1997,17 @@ _Note: The "Regenerate all answers" action no longer exists. Users write their o
 
 ---
 
+**AC-FR-37-03A — The date exported is the same across every export, format, and re-download** _(Added 2026-07-17)_
+
+- **Given** an application has been exported at least once, in either format
+- **When** I download the Word document and the plain text file, whether in the same session or on a later visit
+- **Then** both show the identical "Date:" — the timestamp of this application's very first export, not the moment of each individual download
+- **And** this is distinct from the re-export warning's date (AC-FR-37-05), which correctly always shows the most recent export instead
+
+_Note (2026-07-17): WJ found a .txt export and a .docx export of the same application showed dates 2 minutes apart, since `exportDate` was previously computed live via `new Date()` on every request. Fixed with a new `applications.first_exported_at` column, set once and never overwritten. See `PDR-DH-003` revision history._
+
+---
+
 **AC-FR-37-04 — Application status set to exported on first download**
 
 - **Given** my application has status `approved`
@@ -2474,6 +2485,7 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 ---
 
 _Last updated: 2026-07-17_
+_2026-07-17 second addendum: new AC-FR-37-03A added — export date fixed to one timestamp per application (`applications.first_exported_at`), not one per request._
 _2026-07-17 addendum: new AC-FR-30-03B added — `PDR-AI-009`'s AI-refine relevance-check consistency fix._
 _2026-07-15 addendum: FR-12A (Section 9.2) re-sited from `/profile` to Step 4 — the 5 governance/reserves fields were never actually consumed anywhere as `charity_profiles` columns, so AC-FR-12A-01's "helps flag issues before you apply" claim was untrue. All three ACs rewritten: AC-FR-12A-01 now describes the fixed 5-card group shown first on Step 4; AC-FR-12A-02 replaced (the live reserves-ratio calculation went with the profile-page fields) with a new criterion covering the deliberate no-seeding-between-applications behaviour, including P6.5 reuse; AC-FR-12A-03 updated for the new blank-item/orphan-cleanup mechanics. See `ADR-DATA-006`'s matching 2026-07-15 amendment and `data-model.md` §4c._
 
