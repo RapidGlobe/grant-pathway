@@ -221,12 +221,31 @@ ${guidelinesText}
 // ---------------------------------------------------------------------------
 
 /**
+ * Prepended to `refinedText`, verbatim, when the model judges the answer
+ * does not genuinely address the question (PDR-AI-009). Exported so a
+ * verification script or test can check for its exact presence rather than
+ * duplicating the literal string.
+ */
+export const REFINE_IRRELEVANT_WARNING =
+  '⚠️ This answer does not appear to address the question above — please check it carefully before approving.'
+
+/**
  * Builds the user-turn message for refining a single grant application answer.
  *
  * Constraint: structure and clarity improvement ONLY. The prompt explicitly
  * forbids adding information, changing facts, or altering claims. Budget
  * questions are blocked at the UI level and verified server-side — this
  * function is never called for them.
+ *
+ * Relevance check (PDR-AI-009): the model always performs the requested
+ * structure/clarity pass regardless of word-limit status — it never declines
+ * outright — but is also asked to judge whether the answer plausibly
+ * attempts to address the question at all. If not, it prepends
+ * REFINE_IRRELEVANT_WARNING to the returned text. This replaces an emergent,
+ * limit-dependent inconsistency (the model sometimes refused outright when
+ * asked to compress obviously-irrelevant content to fit a limit, but passed
+ * the same content through untouched when there was no limit pressure) with
+ * one consistent, always-on signal on top of DR-AI-003's human checklist.
  *
  * Returns JSON `{ "refinedText": "..." }` for consistency with other AI routes.
  *
@@ -252,10 +271,12 @@ export function buildRefinePrompt(
 
 ${limitInstruction}
 
-Always correct any spelling errors and grammatical mistakes, even if the answer is very short. If the answer is too short or unclear to meaningfully improve in terms of structure or flow, make only spelling and grammar corrections and return the answer without other changes.
+Always correct any spelling errors and grammatical mistakes, even if the answer is very short. If the answer is too short or unclear to meaningfully improve in terms of structure or flow, make only spelling and grammar corrections and return the answer without other changes. Never decline to produce a refined answer — always attempt the improvements above, regardless of the word-limit instruction above or how irrelevant the content seems.
+
+Separately, judge whether the answer in <original_answer> plausibly attempts to address the question in <question> — not whether it is well-written, complete, or within any limit, only whether it is a genuine attempt to answer that specific question. Filler or placeholder text, boilerplate unrelated to the question, or an answer clearly written for a different question would all fail this check. A short, thin, or imperfect but genuine attempt still passes it — do not fail this check merely for brevity or weak content. Apply this check the same way regardless of word count; it must never depend on whether the answer is over or under the limit. If the answer fails this check, prepend exactly this line to your refined text, verbatim, followed by a blank line, before the improved text: "${REFINE_IRRELEVANT_WARNING}"
 
 Respond with ONLY a JSON object — no preamble, no explanation, no markdown fencing. Exactly this shape:
-{ "refinedText": "the improved answer text" }
+{ "refinedText": "the improved answer text, optionally preceded by the warning line described above" }
 
 <question>
 ${questionText}

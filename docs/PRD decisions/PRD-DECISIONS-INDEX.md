@@ -10,7 +10,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 | Status         | Count |
 | -------------- | ----- |
-| ✅ Decided     | 21    |
+| ✅ Decided     | 22    |
 | 🔄 In Progress | 0     |
 | ⏳ Pending     | 0     |
 | ⏸ Deferred     | 0     |
@@ -52,6 +52,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 | [PDR-AI-006](PDR-AI-006-word-limit-compression-disclosure.md)      | When AI assist can't fully compress an over-limit answer to fit, how should Grant Pathway tell the user?                                                                                      | ✅ Decided |
 | [PDR-AI-007](PDR-AI-007-budget-over-limit-messaging.md)            | When a budget/financial question exceeds its limit, what message and trim assistance should be shown, given AI assist is disabled for these questions?                                        | ✅ Decided |
 | [PDR-AI-008](PDR-AI-008-governance-fact-detection-and-fallback.md) | When should the 5 governance/reserves facts be asked, and what happens when a funder's guidelines don't clearly raise one — should a novice user ever be asked to judge relevance themselves? | ✅ Decided |
+| [PDR-AI-009](PDR-AI-009-refine-relevance-check-consistency.md)     | When an answer doesn't genuinely address its question, what should "Help me improve this" do — consistently, regardless of word-limit status?                                                 | ✅ Decided |
 
 ---
 
@@ -82,5 +83,5 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ---
 
-_Last updated: 2026-07-15_
-_Status: 21 of 21 decisions made. PDR-AI-008: the 5 governance/reserves facts built earlier the same day as an always-on fixed block (commit `82e11d9`) have been folded into guideline-driven extraction — shown automatically whenever the AI has any signal at all (even an imprecise one), never proactively suggested to a novice user (Persona 1, Margaret) who can't be expected to judge relevance herself. The manual-add picker (rare experienced-user shortcut for the zero-signal case) has also now been built, same day — a quiet link, hidden once all 5 facts are shown, revealing plain-English-explained checkboxes for only the missing ones. Both halves of PDR-AI-008 are complete._
+_Last updated: 2026-07-17_
+_Status: 22 of 22 decisions made. PDR-AI-008: the 5 governance/reserves facts built earlier the same day as an always-on fixed block (commit `82e11d9`) have been folded into guideline-driven extraction — shown automatically whenever the AI has any signal at all (even an imprecise one), never proactively suggested to a novice user (Persona 1, Margaret) who can't be expected to judge relevance herself. The manual-add picker (rare experienced-user shortcut for the zero-signal case) has also now been built, same day — a quiet link, hidden once all 5 facts are shown, revealing plain-English-explained checkboxes for only the missing ones. Both halves of PDR-AI-008 are complete. PDR-AI-009: decided and **built same day (2026-07-17)** — "Help me improve this" always attempts a polish but prepends a flagged warning when the answer doesn't genuinely address the question, regardless of word-limit status; see that PDR for the two rejected alternatives and a UI risk found and fixed during implementation._

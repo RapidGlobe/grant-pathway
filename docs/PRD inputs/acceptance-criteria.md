@@ -1642,6 +1642,20 @@ _Note (2026-07-16): decided as `PDR-AI-006` on 2026-07-04 alongside the user-gui
 
 ---
 
+**AC-FR-30-03B — Refine flags an answer that doesn't address the question, consistently regardless of word limit** _(Added 2026-07-17, PDR-AI-009)_
+
+- **Given** I click "Help me improve this" on an answer that does not genuinely attempt to address the question (e.g. filler/placeholder text, boilerplate unrelated to the question, or content written for a different question)
+- **When** the AI assist call completes
+- **Then** I still see a refined version of my text — the AI never declines outright — but a clearly marked warning line appears at the top of the suggested text: "⚠️ This answer does not appear to address the question above — please check it carefully before approving."
+- **And** this happens the same way whether my answer is over, under, or at the question's word/character limit — the warning's presence never depends on word count
+- **And** a short, thin, or imperfect answer that is still a genuine attempt to address the question does NOT trigger the warning — it is not a quality or completeness check, only a relevance check
+- **And** if I click "Use this improved version," the warning line is stripped before it is saved as my answer — it is never adopted as part of the application text itself
+- **And** the "still over the limit" shortfall message (AC-FR-30-03A) is calculated on the suggestion text with the warning line excluded, so the warning's own length never inflates or falsely triggers that count
+
+_Note (2026-07-17): WJ found "Help me improve this" declined outright on clearly irrelevant filler text when the answer was over its word limit, but passed the same content straight through unchanged when under limit — an emergent inconsistency, since `buildRefinePrompt()` had no relevance-check instruction at all before this fix; `DR-AI-003`'s human review checklist was the only actual safeguard. Two alternatives were considered and rejected: always declining outright (would need a new API/UI shape to represent "declined," not a prompt-only fix) and always polishing silently (removes the model's only existing signal, the opposite of WJ's "make it tighter" request). Built same day as decided; see `PDR-AI-009` for full rationale._
+
+---
+
 **AC-FR-30-04 — Using the AI assist counts as one AI request**
 
 - **Given** I click "Help me improve this" for a question
@@ -2459,7 +2473,8 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 
 ---
 
-_Last updated: 2026-07-15_
+_Last updated: 2026-07-17_
+_2026-07-17 addendum: new AC-FR-30-03B added — `PDR-AI-009`'s AI-refine relevance-check consistency fix._
 _2026-07-15 addendum: FR-12A (Section 9.2) re-sited from `/profile` to Step 4 — the 5 governance/reserves fields were never actually consumed anywhere as `charity_profiles` columns, so AC-FR-12A-01's "helps flag issues before you apply" claim was untrue. All three ACs rewritten: AC-FR-12A-01 now describes the fixed 5-card group shown first on Step 4; AC-FR-12A-02 replaced (the live reserves-ratio calculation went with the profile-page fields) with a new criterion covering the deliberate no-seeding-between-applications behaviour, including P6.5 reuse; AC-FR-12A-03 updated for the new blank-item/orphan-cleanup mechanics. See `ADR-DATA-006`'s matching 2026-07-15 amendment and `data-model.md` §4c._
 
 _2026-07-15 second addendum, later the same day: FR-12A reworked again per `PDR-AI-008` — live testing of the always-on version found it disjointed from the rest of Step 4. All three ACs rewritten again: AC-FR-12A-01 now describes conditional, citation-backed, no-heading display instead of an unconditional fixed group; AC-FR-12A-02 unchanged in substance (no seeding still applies) but reworded for the conditional case; AC-FR-12A-03 extended to cover orphan-cleanup now matching ordinary narrative questions (no more governance-specific carve-out). See `ADR-DATA-006`'s second 2026-07-15 amendment and `data-model.md` §4c._

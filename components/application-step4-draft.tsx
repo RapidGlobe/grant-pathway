@@ -115,6 +115,26 @@ function countWords(text: string): number {
 }
 
 /**
+ * Must match REFINE_IRRELEVANT_WARNING in lib/prompts.ts (PDR-AI-009) —
+ * duplicated here rather than imported so this client component doesn't
+ * bundle the server-only prompt library (system prompt, full JSON schemas).
+ */
+const REFINE_IRRELEVANT_WARNING =
+  '⚠️ This answer does not appear to address the question above — please check it carefully before approving.'
+
+/**
+ * Strips a leading REFINE_IRRELEVANT_WARNING line (plus the blank line after
+ * it) before a refined suggestion is adopted as the answer text — the
+ * warning is meant to catch the reviewer's eye in the suggestion panel, not
+ * to end up saved as part of the charity's actual application answer.
+ */
+function stripRefineWarning(text: string): string {
+  return text.startsWith(REFINE_IRRELEVANT_WARNING)
+    ? text.slice(REFINE_IRRELEVANT_WARNING.length).replace(/^\s*\n+/, '')
+    : text
+}
+
+/**
  * Deterministic "Trim to limit" for budget/financial questions (PDR-AI-007).
  * No AI/LLM call — mechanically cuts to the last complete sentence that still
  * fits within the limit, giving the charity a starting point rather than
@@ -347,11 +367,12 @@ export function ApplicationStep4Draft({
   }
 
   function handleUseRefined(answerId: string, refinedText: string) {
-    setAnswers((prev) => ({ ...prev, [answerId]: refinedText }))
+    const cleanedText = stripRefineWarning(refinedText)
+    setAnswers((prev) => ({ ...prev, [answerId]: cleanedText }))
     setRefineStates((prev) => ({ ...prev, [answerId]: { status: 'idle' } }))
     // Replacing text with AI refinement clears approval — re-review required (FR-33)
     setApproved((prev) => ({ ...prev, [answerId]: false }))
-    void doSave(answerId, refinedText, 'user_edited')
+    void doSave(answerId, cleanedText, 'user_edited')
   }
 
   function handleKeepOriginal(answerId: string) {
@@ -666,12 +687,14 @@ export function ApplicationStep4Draft({
 
           // PDR-AI-006: LLMs can't reliably hit an exact word/character count
           // when compressing — surface this only when the AI's own suggestion
-          // is still over the limit, not as a blanket disclaimer.
+          // is still over the limit, not as a blanket disclaimer. Counted
+          // against the warning-stripped text (PDR-AI-009) so a prepended
+          // relevance warning never inflates this count.
           const refinedCount =
             refineState.status === 'showing'
               ? useChars
-                ? refineState.refinedText.length
-                : countWords(refineState.refinedText)
+                ? stripRefineWarning(refineState.refinedText).length
+                : countWords(stripRefineWarning(refineState.refinedText))
               : 0
           const suggestionShortfall =
             refineState.status === 'showing' && limit != null && refinedCount > limit
