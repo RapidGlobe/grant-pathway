@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-17 — Planned: show app version in the site footer (not yet built)
+
+WJ asked live during Henry Smith testing whether the site footer should show a build/version id, given the confusion that same session about which of two similarly-named test applications he was looking at. Agreed to add one, deferred to the next session ("in the morning").
+
+Not a new decision — the underlying versioning scheme (`YYYY.MM.DD-<short SHA>`, sourced from Vercel's build-time git commit metadata) was already proposed, approved, and built on 2026-07-02 (see that date's entries below), via `lib/version.ts`'s `getAppVersion()`. It is currently wired into only the **export document's** footer (`app/api/export/[applicationId]/route.ts`) — the live app's own footer (`components/site-footer.tsx`) has never shown a version at all. The task is to reuse the existing helper in the site footer; no new design decision is required.
+
+**Not yet built** — tracked here so it isn't lost before the next session picks it up.
+
+---
+
+## 2026-07-17 — Planned: tighten AI refine's relevance-check behaviour for consistency (not yet built)
+
+WJ reviewed two live scenarios from Henry Smith Step 4 testing (screenshots supplied 2026-07-16) where "Help me improve this" declined to touch clearly irrelevant/off-topic filler text when the answer was over its word limit, but passed the same kind of content straight through unchanged when the answer was under limit. Investigation found this decline behaviour is not a designed safeguard: `buildRefinePrompt()` (`lib/prompts.ts`) has no relevance-check instruction at all — the sole safety net against irrelevant AI output is `DR-AI-003`'s Option A (mandatory human review checklist before approval), not anything in the prompt itself. The inconsistency WJ found is emergent LLM behaviour, not a bug in any existing logic. WJ: "A human checklist will not be enough, let's refine the prompt to make it consistent and tighter."
+
+**Not yet designed or built** — no options or decision recorded yet; this entry exists only to track that the item was raised and agreed, so it isn't lost. Next step is to design the actual fix (what "consistent and tighter" means precisely, and whether it belongs in `buildRefinePrompt()` alone or needs a new PDR) before implementing it.
+
+---
+
 ## 2026-07-16 — Manually-added governance items no longer skip the assembly gate when blank
 
 While digesting a live Henry Smith test scenario (screenshots: "8 of 8 questions approved", "Ready to assemble" still active), WJ ticked several financial/governance facts via the "Add a financial or governance detail" manual picker, left them all blank, and found "Ready to assemble" remained clickable throughout, right up to the senior-review gate. Not a bug in the mechanism itself — `GOVERNANCE_ITEMS`' `item_label` deliberately ends in "(optional)" so the existing skippable-when-blank gate treats it like any other optional question — but the reasoning behind that skip only fits the AI-auto-detected case: `PDR-AI-008` decided that a low-signal AI detection should never become a forced question for a novice user. A manual add is the opposite — the charity actively chose to answer that fact, so leaving it blank afterwards shouldn't silently bypass approval.
