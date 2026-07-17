@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-17 — Citation badges now truncate long headings
+
+WJ confirmed item 4's citation fix worked ("brilliant") but flagged item 6's as much worse — its badge rendered an entire multi-sentence instructional paragraph verbatim, because Stony Stratford's source document applies a Heading style to "a) Give details of expenditure required for your project e.g. materials, equipment, professional fees..." rather than a short title. That citation is genuinely valid (a real marker, correctly found) — the source document's own styling choice is just unusually verbose, and nothing in `components/application-step4-draft.tsx`'s `citationLabel()` bounded the badge's length at all.
+
+**Fix:** `citationLabel()` now truncates at a word boundary past 90 characters (chosen so item 4's own 86-character citation, which WJ was happy with, renders completely unchanged). The full, untruncated text remains available via the badge button's `title` attribute (hover) and inside the "view original guidelines" panel it opens — nothing is actually lost, only the badge's own display width is bounded. General fix: any funder whose document styles a long paragraph as a heading would hit the same badge-blowout, not just this one.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no existing coverage of this component, consistent with prior fixes to this file). Verified via a standalone script: item 4's 86-character label passes through unchanged; item 6's paragraph-length label truncates cleanly at a word boundary.
+
+---
+
 ## 2026-07-17 — Step 4 sync silently broken for any funder with both governance facts and narrative items (regression since 2026-07-15)
 
 WJ regenerated Stony Stratford again and asked to check `vercel logs` per the debug logging added minutes earlier. The pull surfaced something far more serious than the citation gap it was meant to diagnose:

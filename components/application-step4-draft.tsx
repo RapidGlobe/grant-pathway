@@ -99,11 +99,34 @@ interface ApplicationStep4DraftProps {
   guidelineText: string | null
 }
 
-/** A short label for a citation badge, e.g. "Page 5 of the guidelines" or "Eligibility > Referrals". */
-function citationLabel(citation: GuidelineCitation): string {
+/** Badge/dialog-title labels stay readable even when a funder's own document
+ * styles a whole instructional paragraph as a heading (found live, 2026-07-17,
+ * Stony Stratford Town Council: "a) Give details of expenditure required for
+ * your project e.g. materials..." — a real, valid heading_path, just far too
+ * long to render as a small badge). Truncates at a word boundary; the full
+ * text is still shown via the button's title attribute and inside the "view
+ * original guidelines" panel itself. */
+const CITATION_LABEL_MAX_LENGTH = 90
+
+function truncateLabel(label: string, maxLength: number): string {
+  if (label.length <= maxLength) return label
+  const truncated = label.slice(0, maxLength)
+  const lastSpace = truncated.lastIndexOf(' ')
+  return `${(lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated).trimEnd()}…`
+}
+
+/** Untruncated citation text — used for the badge's `title` (hover) attribute
+ * so the full heading is still available even when citationLabel() below
+ * truncates the visible text. */
+function citationFullLabel(citation: GuidelineCitation): string {
   return citation.source_type === 'page'
     ? `Page ${citation.page_number} of the guidelines`
     : citation.heading_path.join(' > ')
+}
+
+/** A short label for a citation badge, e.g. "Page 5 of the guidelines" or "Eligibility > Referrals". */
+function citationLabel(citation: GuidelineCitation): string {
+  return truncateLabel(citationFullLabel(citation), CITATION_LABEL_MAX_LENGTH)
 }
 
 // ---------------------------------------------------------------------------
@@ -738,6 +761,7 @@ export function ApplicationStep4Draft({
                     <button
                       type="button"
                       onClick={() => setViewingCitation(q.guidelineReference)}
+                      title={citationFullLabel(q.guidelineReference)}
                       className="flex items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
                     >
                       <FileText className="h-3 w-3" aria-hidden="true" />
