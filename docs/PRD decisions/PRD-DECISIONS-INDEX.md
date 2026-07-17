@@ -10,7 +10,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 | Status         | Count |
 | -------------- | ----- |
-| ✅ Decided     | 22    |
+| ✅ Decided     | 23    |
 | 🔄 In Progress | 0     |
 | ⏳ Pending     | 0     |
 | ⏸ Deferred     | 0     |
