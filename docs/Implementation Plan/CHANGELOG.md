@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-17 — Citation extraction fixed for tick-list-plus-narrative-follow-up sections
+
+WJ live-tested Stony Stratford Town Council's guideline form (a "worst case" test document) and found 10 of 11 extracted items carried a citation badge, but "Alignment with Council's Overarching Principles" — the one section built from a tick-list ("3.1 Which of the Council's overarching principles do you believe your project aligns with? [tick table]") plus a separate narrative follow-up on the same topic ("3.2 Please outline how you believe your project aligns with these aims") — had none.
+
+Investigation confirmed this wasn't a display bug: `validateCitation()` (`lib/guideline-citations.ts`) only checks that the AI's reported page/heading marker exists in the source text — it never inspects the quote's content — so a missing badge means the model itself returned `"citation": null`. The most likely cause: `buildSummaryPrompt()`'s citation rule already tells the model never to quote "a nearby word limit, character limit, **formatting instruction**, or other incidental detail" next to a question/section — and a tick-list intro ("tick all that apply") reads exactly like a formatting instruction. Faced with a section synthesised from a tick-list plus a narrative follow-up, the model likely couldn't tell which part counted as the section's "own text" and defaulted to no citation at all rather than guess.
+
+**Fix:** added an explicit rule to the citation instruction in `lib/prompts.ts` — when a question/section combines a selection/tick-list instruction with a narrative follow-up on the same topic, the follow-up instruction's own wording _is_ the item's own text for citation purposes, not an incidental detail to avoid. This targets the general pattern (any funder combining a tick-list with a "please outline/explain how" follow-up), not just this one form.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of prompt string content). Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — WJ's next guideline upload for Stony Stratford is the outstanding live-verification step.
+
+---
+
 ## 2026-07-17 — Export date fixed to one timestamp per application
 
 WJ live-tested a real Henry Smith application export and spotted a 2-minute gap between the "Date:" shown in the .txt export ("08:24") and the .docx export ("08:22") of the same application — an inconsistency he'd caught while reviewing the exports as part of confirming the site footer version fix (below) had reached the export document too.
