@@ -1,20 +1,16 @@
 'use client'
 
-import { useState, useTransition, useRef, useEffect } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import Link from 'next/link'
-import { ChevronDown, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { StepIndicator } from '@/components/step-indicator'
-import { saveApplicationStep1, type FunderOption } from '@/actions/applications'
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const REQUEST_FUNDER_EMAIL = 'wjokhia@rapidglobe.com'
-const REQUEST_FUNDER_SUBJECT = 'Funder request — Grant Pathway'
+import {
+  saveApplicationStep1,
+  getPreviousApplicationForFunder,
+  type PreviousApplicationOption,
+} from '@/actions/applications'
 
 interface FieldErrors {
   funder?: string
@@ -23,8 +19,6 @@ interface FieldErrors {
 
 interface ApplicationStep1FormProps {
   applicationId: string
-  funders: FunderOption[]
-  initialFunderId?: string
   initialFunderName?: string
   initialGrantName?: string
   /** True when the application was just created and fields are empty. */
@@ -37,19 +31,11 @@ interface ApplicationStep1FormProps {
 
 export function ApplicationStep1Form({
   applicationId,
-  funders,
-  initialFunderId = '',
   initialFunderName = '',
   initialGrantName = '',
   isNew = false,
 }: ApplicationStep1FormProps) {
-  // Picker state
-  const [searchQuery, setSearchQuery] = useState(initialFunderName)
-  const [selectedFunder, setSelectedFunder] = useState<FunderOption | null>(
-    initialFunderId ? (funders.find((f) => f.id === initialFunderId) ?? null) : null,
-  )
-  const [isOpen, setIsOpen] = useState(false)
-  const pickerRef = useRef<HTMLDivElement>(null)
+  const [funderName, setFunderName] = useState(initialFunderName)
 
   // Other fields
   const [grantName, setGrantName] = useState(initialGrantName)
@@ -57,53 +43,55 @@ export function ApplicationStep1Form({
   const [saveError, setSaveError] = useState<string | null>(null)
   const [isSaving, startSaving] = useTransition()
 
-  // ---------------------------------------------------------------------------
-  // Filtered list
-  // ---------------------------------------------------------------------------
-
-  const filteredFunders = funders.filter((f) =>
-    f.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  // P6.5 — reuse a previous application to the same funder. Checked on blur
+  // (not on every keystroke) and once on mount if a funder name was already
+  // saved (returning to Step 1 of an existing application). "Same funder" is
+  // a soft, name-based match — see getPreviousApplicationForFunder's comment.
+  const [previousApplication, setPreviousApplication] = useState<PreviousApplicationOption | null>(
+    null,
   )
+  const [reuseChoice, setReuseChoice] = useState<'fresh' | 'reuse'>('fresh')
+  const [lastCheckedFunderName, setLastCheckedFunderName] = useState('')
 
-  // ---------------------------------------------------------------------------
-  // Close dropdown on outside click
-  // ---------------------------------------------------------------------------
-
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
-        // If user typed but didn't select, revert display to selected name
-        if (selectedFunder) setSearchQuery(selectedFunder.name)
-        else setSearchQuery('')
-      }
+  function checkPreviousApplication(name: string) {
+    const trimmed = name.trim()
+    if (!trimmed) {
+      setPreviousApplication(null)
+      setLastCheckedFunderName('')
+      return
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [selectedFunder])
+    if (trimmed.toLowerCase() === lastCheckedFunderName) return
+
+    setLastCheckedFunderName(trimmed.toLowerCase())
+    getPreviousApplicationForFunder(applicationId, trimmed).then((result) => {
+      setPreviousApplication(result)
+      setReuseChoice('fresh')
+    })
+  }
+
+  // Run the same check once on mount for an existing application that
+  // already has a saved funder name (mirrors the old picker's behaviour of
+  // checking as soon as a funder was known, not just on user interaction).
+  useEffect(() => {
+    if (initialFunderName.trim()) checkPreviousApplication(initialFunderName)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally mount-only
+  }, [])
 
   // ---------------------------------------------------------------------------
   // Handlers
   // ---------------------------------------------------------------------------
 
-  function handleFunderSelect(funder: FunderOption) {
-    setSelectedFunder(funder)
-    setSearchQuery(funder.name)
-    setIsOpen(false)
+  function handleFunderNameChange(value: string) {
+    setFunderName(value)
     setFieldErrors((prev) => ({ ...prev, funder: undefined }))
-  }
-
-  function handleClearFunder() {
-    setSelectedFunder(null)
-    setSearchQuery('')
-    setIsOpen(false)
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    const trimmedFunderName = funderName.trim()
     const errors: FieldErrors = {}
-    if (!selectedFunder) errors.funder = 'Please select a funder from the list'
+    if (!trimmedFunderName) errors.funder = "Please enter the funder's name"
     if (!grantName.trim()) errors.grantName = 'Please enter the grant name'
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) return
@@ -112,21 +100,13 @@ export function ApplicationStep1Form({
     startSaving(async () => {
       const result = await saveApplicationStep1(
         applicationId,
-        selectedFunder!.id,
-        selectedFunder!.name,
+        trimmedFunderName,
         grantName.trim(),
+        reuseChoice === 'reuse' ? previousApplication?.id : undefined,
       )
       setSaveError(result.error)
     })
   }
-
-  // ---------------------------------------------------------------------------
-  // Request funder mailto href
-  // ---------------------------------------------------------------------------
-
-  const requestHref = `mailto:${REQUEST_FUNDER_EMAIL}?subject=${encodeURIComponent(REQUEST_FUNDER_SUBJECT)}&body=${encodeURIComponent(
-    `Hi,\n\nI'd like to request the following funder be added to Grant Pathway:\n\nFunder name: \nGuidelines URL: \n\nThanks`,
-  )}`
 
   // ---------------------------------------------------------------------------
   // Render
@@ -142,11 +122,11 @@ export function ApplicationStep1Form({
 
       <form noValidate onSubmit={handleSubmit}>
         {/* ------------------------------------------------------------------ */}
-        {/* Funder picker                                                        */}
+        {/* Funder name                                                          */}
         {/* ------------------------------------------------------------------ */}
-        <div className="mb-5" ref={pickerRef}>
+        <div className="mb-5">
           <Label
-            htmlFor="funderSearch"
+            htmlFor="funderName"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
             Who is offering this grant?{' '}
@@ -154,100 +134,22 @@ export function ApplicationStep1Form({
               *
             </span>
           </Label>
-
-          {/* Input wrapper */}
-          <div className="relative">
-            <Input
-              id="funderSearch"
-              type="text"
-              autoComplete="off"
-              placeholder="Search for a funder…"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setSelectedFunder(null)
-                setIsOpen(true)
-              }}
-              onFocus={() => setIsOpen(true)}
-              aria-invalid={!!fieldErrors.funder || undefined}
-              aria-describedby={fieldErrors.funder ? 'funder-error' : 'funder-hint'}
-              aria-expanded={isOpen}
-              aria-haspopup="listbox"
-              aria-autocomplete="list"
-              role="combobox"
-              className="h-10 pr-16 text-[14px]"
-            />
-
-            {/* Clear button — shown when a funder is selected */}
-            {selectedFunder && (
-              <button
-                type="button"
-                onClick={handleClearFunder}
-                aria-label="Clear selected funder"
-                className="absolute right-8 top-1/2 -translate-y-1/2 rounded p-1 text-[#94A3B8] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D6E6E]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-
-            {/* Chevron */}
-            <ChevronDown
-              className={`pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#94A3B8] transition-transform ${isOpen ? 'rotate-180' : ''}`}
-            />
-
-            {/* Dropdown */}
-            {isOpen && (
-              <ul
-                role="listbox"
-                aria-label="Available funders"
-                className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#E2E8F0] bg-white py-1 shadow-lg"
-              >
-                {filteredFunders.length > 0 ? (
-                  filteredFunders.map((funder) => (
-                    <li
-                      key={funder.id}
-                      role="option"
-                      aria-selected={selectedFunder?.id === funder.id}
-                      onMouseDown={(e) => {
-                        e.preventDefault() // prevent blur before click
-                        handleFunderSelect(funder)
-                      }}
-                      className={`flex cursor-pointer items-center px-3 py-2 text-[14px] hover:bg-[#F0FAFA] ${
-                        selectedFunder?.id === funder.id
-                          ? 'bg-[#F0FAFA] font-medium text-[#0D6E6E]'
-                          : 'text-[#1E293B]'
-                      }`}
-                    >
-                      <span>{funder.name}</span>
-                    </li>
-                  ))
-                ) : (
-                  <li className="px-3 py-2 text-[13px] text-[#64748B]">
-                    No funders match your search
-                  </li>
-                )}
-              </ul>
-            )}
-          </div>
-
-          {/* Validation error */}
+          <Input
+            id="funderName"
+            type="text"
+            placeholder="e.g. Henry Smith Charity"
+            value={funderName}
+            onChange={(e) => handleFunderNameChange(e.target.value)}
+            onBlur={() => checkPreviousApplication(funderName)}
+            aria-invalid={!!fieldErrors.funder || undefined}
+            aria-describedby={fieldErrors.funder ? 'funder-error' : undefined}
+            className="h-10 text-[14px]"
+          />
           {fieldErrors.funder && (
             <p id="funder-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
               {fieldErrors.funder}
             </p>
           )}
-
-          {/* P5.FD5 — Request a funder escape hatch */}
-          <p id="funder-hint" className="mt-2 text-[13px] text-[#64748B]">
-            Can&apos;t find your funder?{' '}
-            <a
-              href={requestHref}
-              className="font-medium text-[#0D6E6E] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0D6E6E] focus-visible:ring-offset-1"
-            >
-              Request it to be added
-            </a>{' '}
-            — we&apos;ll review and add it as soon as possible.
-          </p>
         </div>
 
         {/* ------------------------------------------------------------------ */}
@@ -279,6 +181,42 @@ export function ApplicationStep1Form({
             </p>
           )}
         </div>
+
+        {/* P6.5 — Start fresh vs reuse a previous application to this funder */}
+        {previousApplication && (
+          <div className="mb-5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+            <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+              You&apos;ve applied to {funderName.trim()} before
+            </p>
+            <div className="space-y-2">
+              <label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]">
+                <input
+                  type="radio"
+                  name="reuseChoice"
+                  checked={reuseChoice === 'fresh'}
+                  onChange={() => setReuseChoice('fresh')}
+                  className="mt-0.5"
+                />
+                <span>Start fresh — upload guidelines and let the AI read them again</span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]">
+                <input
+                  type="radio"
+                  name="reuseChoice"
+                  checked={reuseChoice === 'reuse'}
+                  onChange={() => setReuseChoice('reuse')}
+                  className="mt-0.5"
+                />
+                <span>
+                  Start from your last application to {funderName.trim()} (
+                  {previousApplication.grantName}, updated{' '}
+                  {new Date(previousApplication.updatedAt).toLocaleDateString('en-GB')}) — carries
+                  across the questions and your previous answers for you to review
+                </span>
+              </label>
+            </div>
+          </div>
+        )}
 
         {/* Server-side save error */}
         {saveError && (

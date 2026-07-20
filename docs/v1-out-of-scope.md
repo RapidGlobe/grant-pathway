@@ -66,6 +66,8 @@ A per-funder "Tier 1/2/3" or "Full/Partial/Guidance" coverage badge, originally 
 
 **Reconciled 2026-07-13 with P6.6 (Transparency Status, `IMPLEMENTATION-PLAN.md`):** this withdrawal was not cross-checked at the time against `ADR-DATA-006`'s own transparency consequence, specified six days earlier, which reads as the same funder-level premise. P6.6 does **not** reintroduce it: its support-status field is scoped to the specific approved playbook (pinned to a curated guideline version), not to the funder as a standalone identity — a funder with no matching approved playbook falls back to unreviewed/live-extraction status rather than any pre-assigned badge. See `ADR-DATA-006`'s matching 2026-07-13 amendment.
 
+**Amendment (2026-07-14) — P6.6 itself has since been retired, not just reconciled.** P6.5's pivot to private, per-charity reuse (no curator role) removed the only thing P6.6's status could have been scoped to. With no curation step anywhere in the product, every funder is in the identical unreviewed state, so there is no per-funder coverage signal left to show under any name — reconciliation is now moot. `IMPLEMENTATION-PLAN.md`'s P6.6 section and `ADR-DATA-006`'s 2026-07-14 (later same day) amendment are the current record.
+
 ## Formal Feedback and Survey Infrastructure
 
 In-app satisfaction surveys, NPS scoring, and formal feedback dashboards are not included in v1. Charity feedback will be gathered through direct user interviews. _(DR-SM-001, DR-SM-002)_

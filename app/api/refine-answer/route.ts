@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
   // application matches. Also reads is_budget_question and word_limit from DB
   // rather than trusting the client.
   const { data: answerRow, error: answerError } = await supabase
-    .from('application_answers')
+    .from('application_items')
     .select('id, application_id, is_budget_question, word_limit')
     .eq('id', answerId)
     .eq('user_id', user.id)

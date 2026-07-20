@@ -2,7 +2,7 @@
 //
 // Deletes accounts where last_sign_in_at is 24 or more months ago.
 // Cascade deletion order (same as user-initiated deletion in S8.2):
-//   application_answers → applications → charity_profiles →
+//   application_items → applications → charity_profiles →
 //   ai_usage_log → user_profiles → Supabase Auth deleteUser
 //
 // Sends Email 4 (account-deleted-inactivity) immediately after each deletion.
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         const appIds = (apps ?? []).map((a: { id: string }) => a.id)
 
         if (appIds.length > 0) {
-          await service.from('application_answers').delete().in('application_id', appIds)
+          await service.from('application_items').delete().in('application_id', appIds)
         }
 
         await service.from('applications').delete().eq('user_id', userId)

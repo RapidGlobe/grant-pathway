@@ -97,6 +97,7 @@ export function ApplicationStep3Summary({
 
   const [approachingLimit, setApproachingLimit] = useState(false)
   const [guidelinesTruncated, setGuidelinesTruncated] = useState(false)
+  const [formSectionPrioritized, setFormSectionPrioritized] = useState(false)
   const [guidelinesFilename, setGuidelinesFilename] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0].text)
@@ -181,6 +182,7 @@ export function ApplicationStep3Summary({
           questionsFound?: boolean
           approachingLimit?: boolean
           guidelinesTruncated?: boolean
+          formSectionPrioritized?: boolean
           error?: string
           message?: string
         }
@@ -200,6 +202,7 @@ export function ApplicationStep3Summary({
         setQuestionsFound(data.questionsFound ?? false)
         setApproachingLimit(data.approachingLimit ?? false)
         setGuidelinesTruncated(data.guidelinesTruncated ?? false)
+        setFormSectionPrioritized(data.formSectionPrioritized ?? false)
 
         // Capture the filename label before clearing (it's cleared alongside text)
         setGuidelinesFilename(getGuidelinesFilename(applicationId))
@@ -435,9 +438,21 @@ export function ApplicationStep3Summary({
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
           <p className="text-[13px] text-[#78350F]">
-            Your guidelines document is very large and was partially summarised. The AI reviewed the
-            first section of the document. If key questions or eligibility criteria appear near the
-            end of the document, consider pasting the most relevant sections as text instead.
+            {formSectionPrioritized ? (
+              <>
+                Your guidelines document is very large and was partially summarised. We identified
+                the application form further into the document and prioritised it, along with an
+                overview of the eligibility criteria. If anything still looks incomplete, consider
+                pasting the application form section as text instead.
+              </>
+            ) : (
+              <>
+                Your guidelines document is very large and was partially summarised. The AI reviewed
+                the first section of the document. If key questions or eligibility criteria appear
+                near the end of the document, consider pasting the most relevant sections as text
+                instead.
+              </>
+            )}
           </p>
         </div>
       )}
@@ -549,11 +564,18 @@ export function ApplicationStep3Summary({
           <p className="text-[13px] text-[#065F46]">
             {summary.funder_type === 'free_form' ? (
               <>
-                {`We identified ${summary.sections?.length ?? 0} ${(summary.sections?.length ?? 0) === 1 ? 'section' : 'sections'} to complete. In the next step, you'll write your content section by section.`}
+                {(() => {
+                  const total =
+                    (summary.sections?.length ?? 0) + (summary.governanceFacts?.length ?? 0)
+                  return `We identified ${total} ${total === 1 ? 'section' : 'sections'} to complete. In the next step, you'll write your content section by section.`
+                })()}
               </>
             ) : (
               <>
-                {`We found ${summary.questions.length} application ${summary.questions.length === 1 ? 'question' : 'questions'} in these guidelines. You'll answer each one in the next step.`}
+                {(() => {
+                  const total = summary.questions.length + (summary.governanceFacts?.length ?? 0)
+                  return `We found ${total} application ${total === 1 ? 'question' : 'questions'} in these guidelines. You'll answer each one in the next step.`
+                })()}
               </>
             )}
           </p>
