@@ -36,7 +36,7 @@ Suggested wording, appearing directly under the "Suggested improvement" text whe
 
 > "Click **Help me improve this** beneath any answer to ask the AI to refine the text. The AI will refine the structure and clarity of your answer while keeping your original wording, and will try to bring it within the word or character limit if you are over. AI can't always hit an exact count, though — check the counter after accepting a suggestion, and trim further by hand if it's still over."
 
-**Implementation status:** The user guide wording is being updated now (see Document History). The in-app conditional message (Option C, inline in the Q&A interface) is a decided-but-not-yet-built product change — needs a task raised against `components/application-step4-draft.tsx` (or equivalent) to compare the suggestion's own word/character count against the limit and render the message when it's exceeded.
+**Implementation status:** The user guide wording was updated at the time (see Document History). The in-app conditional message sat as a decided-but-not-yet-built product change for 12 days, until built 2026-07-16 alongside `PDR-AI-007`'s narrative-question trim extension — WJ was testing that exact area (an over-limit answer, "Help me improve this") when the gap was raised and asked to be closed in the same pass. `components/application-step4-draft.tsx` now computes the refined suggestion's own word/character count (`refinedCount`) against the question's limit inside the per-question render loop (not inline in JSX — an inline IIFE was tried first and tripped the `react-hooks/refs` lint rule, most likely a false positive from the experimental React Compiler's static analysis misattributing an unrelated ref access elsewhere in the same render to the IIFE; hoisting the computation to a plain `const` resolved it cleanly) and shows the exact wording decided above (words/characters adapted per `limitType`) directly under the suggested text, only when the suggestion is still over. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component). Verified the message wording and pluralisation with a standalone script (10 words → "10 words", 1 word → "1 word", 25 characters → "25 characters").
 
 ## Rationale
 
@@ -44,4 +44,4 @@ Surfacing the limitation only when it's actually relevant (Option C) keeps trust
 
 ## Date Decided
 
-2026-07-04
+2026-07-04; in-app message built 2026-07-16.

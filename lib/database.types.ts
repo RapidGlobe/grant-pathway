@@ -1,10 +1,35 @@
-﻿export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: '14.5'
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -43,62 +68,137 @@ export type Database = {
           },
         ]
       }
-      application_answers: {
+      application_guidelines: {
         Row: {
+          application_id: string
+          created_at: string
+          guideline_text: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application_id: string
+          created_at?: string
+          guideline_text: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application_id?: string
+          created_at?: string
+          guideline_text?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'application_guidelines_application_id_fkey'
+            columns: ['application_id']
+            isOneToOne: true
+            referencedRelation: 'applications'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      application_items: {
+        Row: {
+          added_manually: boolean
           ai_refined_answer: string | null
           answer_source: Database['public']['Enums']['answer_source'] | null
           answer_text: string | null
           application_id: string
           char_limit: number | null
+          cloned_from_application_id: string | null
           created_at: string
+          decision_maker_visible: boolean
+          field_key: string | null
+          guideline_reference: Json | null
           id: string
           is_approved: boolean
           is_budget_question: boolean
+          item_label: string
+          item_order: number
+          item_type: Database['public']['Enums']['application_item_type']
           limit_type: string | null
-          question_order: number
-          question_text: string
+          output_mode: Database['public']['Enums']['item_output_mode']
+          rubric_criterion_link: string | null
+          source_of_truth: Database['public']['Enums']['item_source_of_truth']
           updated_at: string
           user_id: string
+          validation_mode: Database['public']['Enums']['item_validation_mode'] | null
+          visibility_condition: Json | null
           word_limit: number | null
         }
         Insert: {
+          added_manually?: boolean
           ai_refined_answer?: string | null
           answer_source?: Database['public']['Enums']['answer_source'] | null
           answer_text?: string | null
           application_id: string
           char_limit?: number | null
+          cloned_from_application_id?: string | null
           created_at?: string
+          decision_maker_visible?: boolean
+          field_key?: string | null
+          guideline_reference?: Json | null
           id?: string
           is_approved?: boolean
           is_budget_question?: boolean
+          item_label: string
+          item_order: number
+          item_type: Database['public']['Enums']['application_item_type']
           limit_type?: string | null
-          question_order: number
-          question_text: string
+          output_mode?: Database['public']['Enums']['item_output_mode']
+          rubric_criterion_link?: string | null
+          source_of_truth: Database['public']['Enums']['item_source_of_truth']
           updated_at?: string
           user_id: string
+          validation_mode?: Database['public']['Enums']['item_validation_mode'] | null
+          visibility_condition?: Json | null
           word_limit?: number | null
         }
         Update: {
+          added_manually?: boolean
           ai_refined_answer?: string | null
           answer_source?: Database['public']['Enums']['answer_source'] | null
           answer_text?: string | null
           application_id?: string
           char_limit?: number | null
+          cloned_from_application_id?: string | null
           created_at?: string
+          decision_maker_visible?: boolean
+          field_key?: string | null
+          guideline_reference?: Json | null
           id?: string
           is_approved?: boolean
           is_budget_question?: boolean
+          item_label?: string
+          item_order?: number
+          item_type?: Database['public']['Enums']['application_item_type']
           limit_type?: string | null
-          question_order?: number
-          question_text?: string
+          output_mode?: Database['public']['Enums']['item_output_mode']
+          rubric_criterion_link?: string | null
+          source_of_truth?: Database['public']['Enums']['item_source_of_truth']
           updated_at?: string
           user_id?: string
+          validation_mode?: Database['public']['Enums']['item_validation_mode'] | null
+          visibility_condition?: Json | null
           word_limit?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: 'application_answers_application_id_fkey'
+            foreignKeyName: 'application_items_application_id_fkey'
             columns: ['application_id']
+            isOneToOne: false
+            referencedRelation: 'applications'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'application_items_cloned_from_application_id_fkey'
+            columns: ['cloned_from_application_id']
             isOneToOne: false
             referencedRelation: 'applications'
             referencedColumns: ['id']
@@ -112,6 +212,7 @@ export type Database = {
           created_at: string
           current_step: number
           draft_status: string
+          first_exported_at: string | null
           funder_id: string | null
           funder_name: string
           grant_name: string
@@ -127,6 +228,7 @@ export type Database = {
           created_at?: string
           current_step?: number
           draft_status?: string
+          first_exported_at?: string | null
           funder_id?: string | null
           funder_name: string
           grant_name: string
@@ -142,6 +244,7 @@ export type Database = {
           created_at?: string
           current_step?: number
           draft_status?: string
+          first_exported_at?: string | null
           funder_id?: string | null
           funder_name?: string
           grant_name?: string
@@ -163,16 +266,11 @@ export type Database = {
       }
       charity_profiles: {
         Row: {
-          bank_signatories_related: boolean | null
-          bank_signatory_count: number | null
           charity_name: string
           created_at: string
           id: string
           lookup_source: string | null
           registration_number: string | null
-          reserves: number | null
-          total_expenditure: number | null
-          trustees_related: boolean | null
           updated_at: string
           user_id: string
           what_charity_does: string
@@ -180,16 +278,11 @@ export type Database = {
           who_charity_helps: string
         }
         Insert: {
-          bank_signatories_related?: boolean | null
-          bank_signatory_count?: number | null
           charity_name: string
           created_at?: string
           id?: string
           lookup_source?: string | null
           registration_number?: string | null
-          reserves?: number | null
-          total_expenditure?: number | null
-          trustees_related?: boolean | null
           updated_at?: string
           user_id: string
           what_charity_does: string
@@ -197,16 +290,11 @@ export type Database = {
           who_charity_helps: string
         }
         Update: {
-          bank_signatories_related?: boolean | null
-          bank_signatory_count?: number | null
           charity_name?: string
           created_at?: string
           id?: string
           lookup_source?: string | null
           registration_number?: string | null
-          reserves?: number | null
-          total_expenditure?: number | null
-          trustees_related?: boolean | null
           updated_at?: string
           user_id?: string
           what_charity_does?: string
@@ -218,7 +306,6 @@ export type Database = {
       funders: {
         Row: {
           created_at: string
-          funder_type: string
           grant_range: string | null
           guidelines_url: string | null
           id: string
@@ -227,7 +314,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          funder_type: string
           grant_range?: string | null
           guidelines_url?: string | null
           id?: string
@@ -236,7 +322,6 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          funder_type?: string
           grant_range?: string | null
           guidelines_url?: string | null
           id?: string
@@ -280,13 +365,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_application: {
+        Args: { p_application_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      cancel_ai_slot: {
+        Args: { p_log_id: string; p_user_id: string }
+        Returns: undefined
+      }
+      reopen_application: {
+        Args: { p_application_id: string; p_user_id: string }
+        Returns: undefined
+      }
       reserve_ai_slot: {
         Args: {
-          p_user_id: string
           p_application_id: string | null
-          p_request_type: Database['public']['Enums']['ai_request_type']
-          p_monthly_cap: number
           p_approaching_threshold: number
+          p_monthly_cap: number
+          p_request_type: Database['public']['Enums']['ai_request_type']
+          p_user_id: string
         }
         Returns: {
           allowed: boolean
@@ -296,32 +393,7 @@ export type Database = {
         }
       }
       update_ai_slot_token_count: {
-        Args: {
-          p_log_id: string
-          p_user_id: string
-          p_token_count: number
-        }
-        Returns: undefined
-      }
-      cancel_ai_slot: {
-        Args: {
-          p_log_id: string
-          p_user_id: string
-        }
-        Returns: undefined
-      }
-      approve_application: {
-        Args: {
-          p_application_id: string
-          p_user_id: string
-        }
-        Returns: undefined
-      }
-      reopen_application: {
-        Args: {
-          p_application_id: string
-          p_user_id: string
-        }
+        Args: { p_log_id: string; p_token_count: number; p_user_id: string }
         Returns: undefined
       }
     }
@@ -333,7 +405,21 @@ export type Database = {
         | 'assemble_draft'
         | 'charity_paraphrase'
       answer_source: 'ai_generated' | 'user_edited' | 'user_written'
+      application_item_type:
+        | 'narrative'
+        | 'data'
+        | 'date'
+        | 'number'
+        | 'table'
+        | 'file'
+        | 'consent'
+        | 'eligibility_gate'
+        | 'scoring_criterion'
+        | 'manual_action'
       application_status: 'not_started' | 'in_progress' | 'approved' | 'exported' | 'mismatch'
+      item_output_mode: 'generic_export' | 'native_template_fill'
+      item_source_of_truth: 'user_input' | 'charity_profile' | 'derived' | 'disclosure'
+      item_validation_mode: 'hard_check' | 'judgement_flag'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -453,11 +539,35 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
-      ai_request_type: ['guideline_summary', 'draft_generation', 'refine_answer', 'assemble_draft'],
+      ai_request_type: [
+        'guideline_summary',
+        'draft_generation',
+        'refine_answer',
+        'assemble_draft',
+        'charity_paraphrase',
+      ],
       answer_source: ['ai_generated', 'user_edited', 'user_written'],
+      application_item_type: [
+        'narrative',
+        'data',
+        'date',
+        'number',
+        'table',
+        'file',
+        'consent',
+        'eligibility_gate',
+        'scoring_criterion',
+        'manual_action',
+      ],
       application_status: ['not_started', 'in_progress', 'approved', 'exported', 'mismatch'],
+      item_output_mode: ['generic_export', 'native_template_fill'],
+      item_source_of_truth: ['user_input', 'charity_profile', 'derived', 'disclosure'],
+      item_validation_mode: ['hard_check', 'judgement_flag'],
     },
   },
 } as const

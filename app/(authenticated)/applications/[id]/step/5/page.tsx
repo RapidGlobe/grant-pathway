@@ -47,16 +47,16 @@ export default async function Step5Page({ params }: Props) {
 
   // ── Fetch answers for review ───────────────────────────────────────────────
   const { data: answerRows } = await supabase
-    .from('application_answers')
-    .select('id, question_order, question_text, word_limit, answer_text, answer_source')
+    .from('application_items')
+    .select('id, item_order, item_label, word_limit, answer_text, answer_source')
     .eq('application_id', id)
     .eq('user_id', user.id)
-    .order('question_order')
+    .order('item_order')
 
   const answers: AnswerRow[] = (answerRows ?? []).map((row) => ({
     id: row.id as string,
-    questionOrder: row.question_order as number,
-    questionText: row.question_text as string,
+    questionOrder: row.item_order as number,
+    questionText: row.item_label as string,
     wordLimit: (row.word_limit as number | null) ?? null,
     answerText: (row.answer_text as string | null) ?? '',
     answerSource: (row.answer_source as AnswerRow['answerSource']) ?? null,

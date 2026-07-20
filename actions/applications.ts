@@ -7,6 +7,12 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
+import {
+  resolveGovernanceInserts,
+  GOVERNANCE_FIELD_KEYS,
+  type GovernanceFieldKey,
+} from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 // ---------------------------------------------------------------------------
@@ -84,7 +90,7 @@ export type DeleteApplicationResult = { ok: true } | { ok: false; error: string 
 /**
  * Hard-deletes an application owned by the authenticated user.
  *
- * application_answers rows cascade-delete automatically via the FK
+ * application_items rows cascade-delete automatically via the FK
  * constraint (ON DELETE CASCADE). ai_usage_log rows are retained with
  * application_id set to null (ON DELETE SET NULL) so usage history is
  * preserved for billing purposes.
@@ -115,44 +121,147 @@ export async function deleteApplication(applicationId: string): Promise<DeleteAp
 }
 
 // ---------------------------------------------------------------------------
-// P5.FD4 — Fetch approved funder list for Step 1 picker
+// P6.5 — Reuse Previous Application (private, per-charity, per-funder)
 // ---------------------------------------------------------------------------
 
-export type FunderOption = {
+export type PreviousApplicationOption = {
   id: string
-  name: string
+  grantName: string
+  updatedAt: string
 }
 
 /**
- * Returns all active funders from the approved directory, ordered
- * alphabetically. Used to populate the searchable picker on Step 1.
+ * Looks up the most recent OTHER application by this user for the same
+ * funder that has reached at least Step 4 (i.e. has a question list and
+ * retained guidelines worth reusing). Returns null if none exists.
  *
- * Called server-side in the Step 1 page component so the list is
- * available on first render with no client-side fetch.
+ * "Same funder" is matched by a case-insensitive, trimmed comparison of
+ * the free-typed `funder_name` (the curated funder directory and its
+ * `funder_id` FK were removed 2026-07-15 — DR-FD-001 amendment — so there
+ * is no longer a stable funder identity to match on). This is a
+ * deliberate soft-miss trade-off: if a charity types the same funder's
+ * name slightly differently between applications (e.g. "Henry Smith
+ * Charity" vs "The Henry Smith Charity"), the reuse prompt simply won't
+ * offer itself — it will never wrongly match two different funders.
  *
- * Does not select `funder_type` — that column is a pre-committed,
- * per-funder guess (DR-FD-001) that turned out not to reflect a stable
- * property of the funder (the same funder can produce both a
- * discrete-question form and free-form guidance, depending on which
- * document is uploaded). The actual classification that drives Step 3/4/5
- * behaviour is derived fresh from the uploaded guidelines each time (see
- * `ai_summary.funder_type` in this file) and is unaffected by this change.
+ * Used by Step 1 to offer "Start fresh" vs "Start from your last
+ * application to [Funder]" once a funder name is entered. Entirely scoped
+ * to the current user — no cross-charity sharing, no curator role (P6.5
+ * design, 2026-07-14 — supersedes the earlier "Curated Funder Playbooks"
+ * concept, see ADR-DATA-006's amendment).
  */
-export async function getActiveFunders(): Promise<FunderOption[]> {
+export async function getPreviousApplicationForFunder(
+  currentApplicationId: string,
+  funderName: string,
+): Promise<PreviousApplicationOption | null> {
   const supabase = await createClient()
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const trimmedName = funderName.trim()
+  if (!trimmedName) return null
+
+  // Escape ILIKE wildcard characters so a funder name containing a literal
+  // "%" or "_" (e.g. "Awards for All (100%)") is matched exactly rather
+  // than treated as a pattern.
+  const escapedName = trimmedName.replace(/[\\%_]/g, (char) => `\\${char}`)
+
   const { data, error } = await supabase
-    .from('funders')
-    .select('id, name')
-    .eq('is_active', true)
-    .order('name', { ascending: true })
+    .from('applications')
+    .select('id, grant_name, updated_at')
+    .eq('user_id', user.id)
+    .ilike('funder_name', escapedName)
+    .neq('id', currentApplicationId)
+    .gte('current_step', 4)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
 
-  if (error || !data) return []
+  if (error || !data) return null
 
-  return data.map((f) => ({
-    id: f.id,
-    name: f.name,
-  }))
+  return { id: data.id, grantName: data.grant_name, updatedAt: data.updated_at }
+}
+
+/**
+ * Copies a previous application's question list, retained guidelines, and
+ * AI summary into a new application, so Step 2 (guideline upload) can be
+ * skipped entirely. Previous answers are carried across but is_approved is
+ * always reset to false and cloned_from_application_id is set, so Step 4
+ * can show a "carried over — please review" badge rather than treating
+ * inherited answers as already reviewed for this new application.
+ *
+ * Non-fatal by design (mirrors the ai_summary/application_guidelines save
+ * pattern elsewhere): if the source application or its rows can't be read,
+ * the caller proceeds with an empty application rather than failing the
+ * whole Step 1 save.
+ */
+async function cloneApplicationForReuse(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  sourceApplicationId: string,
+  targetApplicationId: string,
+): Promise<void> {
+  const [sourceAppResult, sourceGuidelinesResult, sourceItemsResult] = await Promise.all([
+    supabase
+      .from('applications')
+      .select('ai_summary')
+      .eq('id', sourceApplicationId)
+      .eq('user_id', userId)
+      .single(),
+    supabase
+      .from('application_guidelines')
+      .select('guideline_text')
+      .eq('application_id', sourceApplicationId)
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('application_items')
+      .select(
+        'item_type, item_label, item_order, source_of_truth, validation_mode, rubric_criterion_link, decision_maker_visible, output_mode, guideline_reference, word_limit, char_limit, limit_type, is_budget_question, answer_text, ai_refined_answer, answer_source',
+      )
+      .eq('application_id', sourceApplicationId)
+      .eq('user_id', userId)
+      // Governance/reserves items (field_key IS NOT NULL) are deliberately
+      // excluded from reuse — every application collects these facts fresh,
+      // no exception for P6.5 reuse (WJ, 2026-07-15). The target
+      // application's own item-sync path creates them blank instead.
+      .is('field_key', null),
+  ])
+
+  if (sourceAppResult.data?.ai_summary) {
+    await supabase
+      .from('applications')
+      .update({ ai_summary: sourceAppResult.data.ai_summary })
+      .eq('id', targetApplicationId)
+      .eq('user_id', userId)
+  }
+
+  if (sourceGuidelinesResult.data?.guideline_text) {
+    await supabase.from('application_guidelines').upsert(
+      {
+        application_id: targetApplicationId,
+        user_id: userId,
+        guideline_text: sourceGuidelinesResult.data.guideline_text,
+      },
+      { onConflict: 'application_id' },
+    )
+  }
+
+  if (sourceItemsResult.data && sourceItemsResult.data.length > 0) {
+    const inserts = sourceItemsResult.data.map((item) => ({
+      ...item,
+      application_id: targetApplicationId,
+      user_id: userId,
+      is_approved: false,
+      cloned_from_application_id: sourceApplicationId,
+    }))
+
+    await supabase.from('application_items').insert(inserts)
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -160,21 +269,27 @@ export async function getActiveFunders(): Promise<FunderOption[]> {
 // ---------------------------------------------------------------------------
 
 /**
- * Saves funder_id, funder_name, and grant_name for an existing application
- * and redirects to Step 2.
+ * Saves funder_name and grant_name for an existing application and
+ * redirects to Step 2.
  *
  * current_step advances to 2 on first save (new application). If the
  * user returns to Step 1 later (current_step already >= 2), current_step
  * is left unchanged so their progress further along is not reset.
+ *
+ * If reuseFromApplicationId is provided (user chose "Start from your last
+ * application to [Funder]" — P6.5), the previous application's question
+ * list, guidelines, and AI summary are cloned in, Step 2 is skipped
+ * entirely, and the user lands on Step 3 to review the (carried-over) AI
+ * summary before continuing to Step 4 as normal.
  *
  * Returns { ok: false, error } only when the DB update fails — the
  * success path always calls redirect() and never returns normally.
  */
 export async function saveApplicationStep1(
   applicationId: string,
-  funderId: string,
   funderName: string,
   grantName: string,
+  reuseFromApplicationId?: string,
 ): Promise<{ ok: false; error: string }> {
   const supabase = await createClient()
 
@@ -193,21 +308,27 @@ export async function saveApplicationStep1(
       .eq('user_id', user.id)
       .single()
 
-    const newStep = Math.max(existing?.current_step ?? 1, 2)
+    const newStep = reuseFromApplicationId
+      ? Math.max(existing?.current_step ?? 1, 3)
+      : Math.max(existing?.current_step ?? 1, 2)
 
     const { error } = await supabase
       .from('applications')
       .update({
-        funder_id: funderId,
         funder_name: funderName,
         grant_name: grantName,
         current_step: newStep,
+        ...(reuseFromApplicationId ? { status: 'in_progress' as const } : {}),
       })
       .eq('id', applicationId)
       .eq('user_id', user.id)
 
     if (error) {
       return { ok: false, error: 'Could not save your application. Please try again.' }
+    }
+
+    if (reuseFromApplicationId) {
+      await cloneApplicationForReuse(supabase, user.id, reuseFromApplicationId, applicationId)
     }
   } catch {
     // Network error or Supabase unavailable
@@ -217,7 +338,7 @@ export async function saveApplicationStep1(
     }
   }
 
-  redirect(`/applications/${applicationId}/step/2`)
+  redirect(`/applications/${applicationId}/step/${reuseFromApplicationId ? 3 : 2}`)
 }
 
 // ---------------------------------------------------------------------------
@@ -381,7 +502,7 @@ export async function setApplicationMismatch(
 /**
  * Called when the user clicks "I have what I need — start writing" on the
  * Step 4 preparation checklist. Sets draft_status = 'in_progress' and syncs
- * application_answers from ai_summary so rows exist before the page renders
+ * application_items from ai_summary so rows exist before the page renders
  * (D-HSF-03: avoids first-load "no questions found" fallback caused by
  * Router Cache serving a stale render before the Server Component sync runs).
  *
@@ -421,13 +542,52 @@ export async function setDraftInProgress(
     return { ok: false, error: 'Could not save your progress. Please try again.' }
   }
 
-  // Sync application_answers from ai_summary so rows exist before the page
+  // Sync application_items from ai_summary so rows exist before the page
   // renders. This is the primary sync path; the Step 4 page still syncs as a
   // fallback for returning users who navigate directly without the checklist.
+  // item_type is always 'narrative' and source_of_truth always 'user_input'
+  // in compatibility mode (P6.2, ADR-DATA-006) — no other item type is
+  // produced by today's extraction prompt. guideline_reference is populated
+  // when the extraction route's citation validation confirmed a real one
+  // (P6.3, ADR-DATA-007) — null otherwise, never a bare unverified AI guess.
   if (appRow?.ai_summary) {
     try {
       const parsedSummary = JSON.parse(appRow.ai_summary) as AiSummaryData
       const funderType = parsedSummary.funder_type ?? 'structured'
+
+      // Governance/reserves items (PDR-AI-008, 2026-07-15): only whichever of
+      // the 5 fixed facts the AI actually detected in this funder's
+      // guidelines — never all 5 unconditionally. answer_text is deliberately
+      // omitted from the upsert payload — a fresh row inserts blank, and
+      // re-running this on an already-answered row never touches its
+      // answer_text (same trick the narrative-item upserts below use). No
+      // seeding from a prior application, including P6.5 reuse — every
+      // application starts these facts blank by design.
+      const governanceInserts = resolveGovernanceInserts(
+        (parsedSummary.governanceFacts ?? []).map((f) => ({
+          field_key: f.field_key,
+          guideline_reference: toGuidelineReferenceColumn(f.citation),
+        })),
+        applicationId,
+        user.id,
+      )
+
+      if (governanceInserts.length > 0) {
+        const { error: governanceUpsertError } = await supabase
+          .from('application_items')
+          .upsert(governanceInserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
+
+        if (governanceUpsertError) {
+          console.error(
+            '[setDraftInProgress] governance item upsert failed:',
+            governanceUpsertError.message,
+            { applicationId },
+          )
+        }
+      }
 
       if (
         funderType === 'free_form' &&
@@ -439,21 +599,22 @@ export async function setDraftInProgress(
           .map((s) => ({
             application_id: applicationId,
             user_id: user!.id,
-            question_text: s.title,
-            question_order: s.number,
+            item_type: 'narrative' as const,
+            source_of_truth: 'user_input' as const,
+            item_label: s.title,
+            item_order: s.number,
             word_limit: s.wordLimit ?? null,
             char_limit: null,
             limit_type: s.wordLimit ? 'words' : null,
             is_budget_question: s.is_budget_section ?? false,
+            guideline_reference: toGuidelineReferenceColumn(s.citation),
           }))
 
         if (inserts.length > 0) {
-          const { error: upsertError } = await supabase
-            .from('application_answers')
-            .upsert(inserts, {
-              onConflict: 'application_id,question_order',
-              ignoreDuplicates: false,
-            })
+          const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
 
           if (upsertError) {
             console.error('[setDraftInProgress] free_form upsert failed:', upsertError.message, {
@@ -468,21 +629,22 @@ export async function setDraftInProgress(
           .map((q, idx) => ({
             application_id: applicationId,
             user_id: user!.id,
-            question_text: q.text,
-            question_order: q.number ?? idx + 1,
+            item_type: 'narrative' as const,
+            source_of_truth: 'user_input' as const,
+            item_label: q.text,
+            item_order: q.number ?? idx + 1,
             word_limit: q.wordLimit ?? null,
             char_limit: q.charLimit ?? null,
             limit_type: q.limitType ?? null,
             is_budget_question: q.is_budget_question ?? false,
+            guideline_reference: toGuidelineReferenceColumn(q.citation),
           }))
 
         if (inserts.length > 0) {
-          const { error: upsertError } = await supabase
-            .from('application_answers')
-            .upsert(inserts, {
-              onConflict: 'application_id,question_order',
-              ignoreDuplicates: false,
-            })
+          const { error: upsertError } = await supabase.from('application_items').upsert(inserts, {
+            onConflict: 'application_id,item_order',
+            ignoreDuplicates: false,
+          })
 
           if (upsertError) {
             console.error('[setDraftInProgress] structured upsert failed:', upsertError.message, {
@@ -503,13 +665,76 @@ export async function setDraftInProgress(
 }
 
 // ---------------------------------------------------------------------------
+// PDR-AI-008 fast-follow — Manual-add governance items (zero-signal fallback)
+// ---------------------------------------------------------------------------
+
+/**
+ * Creates application_items rows for governance/reserves facts the charity
+ * selected themselves, because the AI's guideline extraction found no signal
+ * for them (PDR-AI-008's decided fallback for the zero-signal case — a rare,
+ * experienced-user-facing escape hatch, not proactively suggested).
+ *
+ * Scoped to the closed 5-field vocabulary only (never a free-text "add any
+ * question" box) — fieldKeys not in GOVERNANCE_FIELD_KEYS are rejected.
+ * added_manually is set true so Step 4 shows "Added by you" instead of a
+ * citation badge, honestly distinguishing this from an AI-detected fact.
+ *
+ * Idempotent in the common case (upsert on application_id, item_order), but
+ * note: if the AI's extraction independently detects the same fact in a
+ * later regeneration, that sync's own upsert will overwrite added_manually
+ * back to false and may populate a real citation — correct behaviour, not a
+ * bug, since the fact is then genuinely guideline-derived.
+ */
+export async function addManualGovernanceItems(
+  applicationId: string,
+  fieldKeys: GovernanceFieldKey[],
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) redirect('/')
+
+  const validFieldKeys = fieldKeys.filter((key) => GOVERNANCE_FIELD_KEYS.includes(key))
+
+  if (validFieldKeys.length === 0) {
+    return { ok: false, error: 'Please select at least one item to add.' }
+  }
+
+  const inserts = resolveGovernanceInserts(
+    validFieldKeys.map((field_key) => ({
+      field_key,
+      guideline_reference: null,
+      added_manually: true,
+    })),
+    applicationId,
+    user.id,
+  )
+
+  const { error } = await supabase.from('application_items').upsert(inserts, {
+    onConflict: 'application_id,item_order',
+    ignoreDuplicates: false,
+  })
+
+  if (error) {
+    console.error('[addManualGovernanceItems] upsert failed:', error.message, { applicationId })
+    return { ok: false, error: 'Could not save your selection. Please try again.' }
+  }
+
+  revalidatePath(`/applications/${applicationId}/step/4`)
+  return { ok: true }
+}
+
+// ---------------------------------------------------------------------------
 // S6.3 — Save answer (auto-save and manual save from Step 4)
 // ---------------------------------------------------------------------------
 
 export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
 
 /**
- * Saves a single answer text for an existing application_answers row.
+ * Saves a single answer text for an existing application_items row.
  * Called by the on-blur auto-save and the 60-second background save in the
  * Step 4 component.
  *
@@ -519,7 +744,7 @@ export type SaveAnswerResult = { ok: true } | { ok: false; error: string }
  * that value is unused; the charity-authored model has no code path that
  * generates an answer from scratch.
  *
- * user_id check is belt-and-braces in addition to RLS on application_answers.
+ * user_id check is belt-and-braces in addition to RLS on application_items.
  */
 export async function saveAnswer(
   answerId: string,
@@ -535,7 +760,7 @@ export async function saveAnswer(
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
   const { error } = await supabase
-    .from('application_answers')
+    .from('application_items')
     .update({
       answer_text: answerText,
       answer_source: answerSource,
@@ -555,7 +780,7 @@ export async function saveAnswer(
 // ---------------------------------------------------------------------------
 
 /**
- * Sets is_approved = true on a single application_answers row.
+ * Sets is_approved = true on a single application_items row.
  * Called from Step 4 when the user clicks "Approve this answer" after
  * reviewing all three FR-32 review prompts. Resets to false if the user
  * subsequently edits the answer (handled client-side via unapproveAnswer).
@@ -570,7 +795,7 @@ export async function approveAnswer(answerId: string): Promise<SaveAnswerResult>
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
   const { error } = await supabase
-    .from('application_answers')
+    .from('application_items')
     .update({ is_approved: true })
     .eq('id', answerId)
     .eq('user_id', user.id)
@@ -585,7 +810,7 @@ export async function approveAnswer(answerId: string): Promise<SaveAnswerResult>
 /**
  * Upserts a single manually-entered question + answer.
  * Used when no questions were extracted from the guidelines.
- * V1 supports one manual question (question_order = 1).
+ * V1 supports one manual question (item_order = 1).
  * ON CONFLICT updates the row so re-submitting the form is idempotent.
  */
 export async function saveManualAnswer(
@@ -605,16 +830,18 @@ export async function saveManualAnswer(
     return { ok: false, error: 'Please enter your application question.' }
   }
 
-  const { error } = await supabase.from('application_answers').upsert(
+  const { error } = await supabase.from('application_items').upsert(
     {
       application_id: applicationId,
       user_id: user.id,
-      question_text: questionText.trim(),
-      question_order: 1,
+      item_type: 'narrative',
+      source_of_truth: 'user_input',
+      item_label: questionText.trim(),
+      item_order: 1,
       answer_text: answerText.trim() || null,
       answer_source: 'user_written',
     },
-    { onConflict: 'application_id,question_order' },
+    { onConflict: 'application_id,item_order' },
   )
 
   if (error) {
@@ -674,9 +901,10 @@ export type AssembleAndAdvanceResult = { ok: true } | { ok: false; error: string
  * applications.assembled_draft, sets draft_status = 'assembled', advances
  * current_step to 5, and redirects to Step 5.
  *
- * Assembly format is funder-type-aware (AC-FR-31A):
- *   structured — numbered Q&A pairs (question then answer, separated)
- *   free_form  — same format; section headings derived from question text
+ * Assembly format (AC-FR-31A): numbered Q&A/section pairs (question or
+ * section text then answer, separated) — every item gets a number, whether
+ * the funder is structured or free_form (2026-07-16: numbering extended to
+ * free_form to match Step 4, see AC-FR-28-04's revision note).
  *
  * No AI is used — this is a pure text formatting step. The charity's words
  * are reproduced verbatim; AI is not involved in the assembly.
@@ -697,7 +925,7 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
   // ── Verify ownership and current draft_status ──────────────────────────────
   const { data: appRow, error: appError } = await supabase
     .from('applications')
-    .select('current_step, draft_status, ai_summary')
+    .select('current_step, draft_status')
     .eq('id', applicationId)
     .eq('user_id', user.id)
     .single()
@@ -710,13 +938,13 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
     return { ok: false, error: 'Application is not ready to assemble.' }
   }
 
-  // ── Fetch answered questions in order ─────────────────────────────────────
+  // ── Fetch answered items in order ──────────────────────────────────────────
   const { data: answerRows, error: answersError } = await supabase
-    .from('application_answers')
-    .select('question_order, question_text, answer_text')
+    .from('application_items')
+    .select('item_order, item_label, answer_text')
     .eq('application_id', applicationId)
     .eq('user_id', user.id)
-    .order('question_order')
+    .order('item_order')
 
   if (answersError) {
     return { ok: false, error: 'Could not load your answers. Please try again.' }
@@ -726,33 +954,17 @@ export async function assembleAndAdvance(applicationId: string): Promise<Assembl
     (r) => typeof r.answer_text === 'string' && r.answer_text.trim() !== '',
   )
 
-  // ── Detect funder type for assembly format ────────────────────────────────
-  let funderType: 'structured' | 'free_form' = 'structured'
-  if (typeof appRow.ai_summary === 'string' && appRow.ai_summary) {
-    try {
-      const parsed = JSON.parse(appRow.ai_summary) as { funder_type?: string }
-      if (parsed.funder_type === 'free_form') funderType = 'free_form'
-    } catch {
-      // parse failed — default to structured
-    }
-  }
-
   // ── Format assembled_draft ────────────────────────────────────────────────
-  // free_form: section title then answer (no number prefix — narrative flow)
-  // structured: numbered Q&A pairs
-  let assembledDraft: string
-
-  if (answered.length === 0) {
-    assembledDraft = ''
-  } else {
-    assembledDraft = answered
-      .map((r) =>
-        funderType === 'free_form'
-          ? `${r.question_text}\n\n${r.answer_text}`
-          : `${r.question_order}. ${r.question_text}\n\n${r.answer_text}`,
-      )
-      .join('\n\n---\n\n')
-  }
+  // Every item — narrative question/section or governance item, structured or
+  // free_form funder — is numbered by its position in this already-ordered,
+  // answered list (not the raw item_order, which is a negative internal sort
+  // key for governance items only, meaningless to a user).
+  const assembledDraft =
+    answered.length === 0
+      ? ''
+      : answered
+          .map((r, index) => `${index + 1}. ${r.item_label}\n\n${r.answer_text}`)
+          .join('\n\n---\n\n')
 
   // ── Save assembled_draft and advance ──────────────────────────────────────
   const newStep = Math.max(appRow.current_step ?? 4, 5)
@@ -783,7 +995,7 @@ export type ApproveApplicationResult = { ok: true } | { ok: false; error: string
 /**
  * Approves an application:
  *   1. Sets applications.status = 'approved'
- *   2. Sets is_approved = true on all application_answers rows
+ *   2. Sets is_approved = true on all application_items rows
  *
  * The client updates local state after receiving { ok: true }.
  * updated_at is managed by the database trigger on both tables.
@@ -821,7 +1033,7 @@ export type ReopenApplicationResult = { ok: true } | { ok: false; error: string 
  *   2. Sets applications.current_step = 4 (Draft Answers)
  *   3. Resets draft_status = 'in_progress' (clears 'assembled' / 'ready_to_assemble')
  *   4. Clears assembled_draft (will be regenerated when user re-assembles)
- *   5. Resets is_approved = false on all application_answers rows
+ *   5. Resets is_approved = false on all application_items rows
  *
  * draft_status must be reset so the Step 4 gate shows the Q&A interface
  * rather than immediately redirecting back to Step 5 (S6.8 gate fix).

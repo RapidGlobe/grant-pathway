@@ -1,3 +1,14 @@
+import type { GovernanceFieldKey } from './governance-items'
+
+// Guideline source-reference (ADR-DATA-007, P6.3): a discriminated union so a
+// citation is never both- or neither-populated. Matches the `application_items
+// .guideline_reference` JSONB shape/CHECK constraint exactly (P6.2 migration)
+// — `page_number`/`heading_path` must be entirely OMITTED (not just null) for
+// the unused variant when writing to the database, per that constraint.
+export type GuidelineCitation =
+  | { source_type: 'page'; page_number: number; quote: string }
+  | { source_type: 'heading'; heading_path: string[]; quote: string }
+
 export type AiSummaryQuestion = {
   number: number
   text: string
@@ -5,14 +16,29 @@ export type AiSummaryQuestion = {
   charLimit?: number | null
   limitType?: 'words' | 'characters' | 'none' | null
   is_budget_question: boolean
+  citation?: GuidelineCitation | null
 }
 
 export type AiSummarySection = {
   number: number
   title: string
   guidance: string
-  wordLimit?: number
+  wordLimit?: number | null
   is_budget_section: boolean
+  citation?: GuidelineCitation | null
+}
+
+// PDR-AI-008 (2026-07-15): guideline-driven detection of the 5 fixed
+// governance/reserves facts (lib/governance-items.ts). Extracted only when
+// the guidelines actually raise the topic — never forced, never guessed.
+// `questionText` is the funder's own wording/paraphrase, surfaced as Step 4
+// guidance text — not used as the item's label (that stays the fixed,
+// controlled string from GOVERNANCE_ITEMS so the £/count/Yes-No widget
+// selection and the "(optional)" gate stay predictable).
+export type AiSummaryGovernanceFact = {
+  field_key: GovernanceFieldKey
+  questionText: string
+  citation?: GuidelineCitation | null
 }
 
 export type AiSummaryData = {
@@ -23,6 +49,7 @@ export type AiSummaryData = {
   lookingFor: string[]
   questions: AiSummaryQuestion[]
   sections?: AiSummarySection[]
+  governanceFacts?: AiSummaryGovernanceFact[]
   keyRequirements: string[]
   funderAiPolicy?: string | null
   supportingDocuments?: string[]

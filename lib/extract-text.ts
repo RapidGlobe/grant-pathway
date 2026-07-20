@@ -14,6 +14,13 @@
 // Resource bounds (POST-LAUNCH):
 //   - PDF: capped at MAX_PDF_PAGES pages to prevent unbounded memory/CPU use
 //   - Both types: hard 30-second extraction timeout to protect the Lambda budget
+//
+// Structural tagging (ADR-DATA-007, P6.2a): extraction preserves page (PDF)
+// or heading (docx) boundaries as inline markers — `[PAGE N]` / `[SECTION: A
+// > B]` — so a later citation can only ever point at a chunk of text that
+// structurally exists in the source, rather than a free-typed guess. Nothing
+// downstream consumes these markers yet (that's P6.3); lib/preprocess-text.ts
+// is responsible for not stripping them.
 
 import mammoth from 'mammoth'
 import { extractText as unpdfExtractText, getDocumentProxy } from 'unpdf'
@@ -67,17 +74,23 @@ async function doExtract(buffer: Buffer, mimeType: string): Promise<ExtractionRe
         return { ok: false, reason: 'extraction_failed' }
       }
 
-      const { text: extracted } = await unpdfExtractText(pdf, { mergePages: true })
-      text = extracted ?? ''
+      // mergePages: false (P6.2a, ADR-DATA-007) — keep pages separate so each
+      // one can be tagged with a `[PAGE N]` marker, rather than flattening
+      // page boundaries away before a citation could ever point at one.
+      const { text: pages } = await unpdfExtractText(pdf, { mergePages: false })
+      text = pages.map((pageText, i) => `[PAGE ${i + 1}]\n${pageText}`).join('\n\n')
 
       // Scanned PDF detection — very little text extracted from image-only PDF
       if (text.trim().length < SCANNED_PDF_CHAR_THRESHOLD) {
         return { ok: false, reason: 'scanned_pdf' }
       }
     } else {
-      // Word document (.docx via mammoth)
-      const result = await mammoth.extractRawText({ buffer })
-      text = result.value ?? ''
+      // Word document (.docx via mammoth) — convertToHtml (not extractRawText)
+      // so Word's heading styles survive as `[SECTION: ...]` markers instead
+      // of being discarded (P6.2a, ADR-DATA-007). Docx has no fixed pages, so
+      // headings are the fallback reference unit.
+      const result = await mammoth.convertToHtml({ buffer })
+      text = tagSectionsFromHtml(result.value ?? '')
     }
 
     const isLargeDocument = text.length > LARGE_DOCUMENT_CHAR_THRESHOLD
@@ -87,6 +100,53 @@ async function doExtract(buffer: Buffer, mimeType: string): Promise<ExtractionRe
     // Library error: corrupted file, unsupported encoding, etc.
     return { ok: false, reason: 'extraction_failed' }
   }
+}
+
+function decodeHtmlEntities(s: string): string {
+  return s
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
+}
+
+function stripTags(html: string): string {
+  return decodeHtmlEntities(html.replace(/<[^>]+>/g, ''))
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Converts mammoth's HTML output into plain text with `[SECTION: A > B]`
+ * markers inserted before each heading's content — preserving Word's heading
+ * nesting (ADR-DATA-007) rather than extractRawText's flat, headingless
+ * string. Not a full HTML parser: walks top-level block tags only, which is
+ * all mammoth's default style map produces for headings/paragraphs/lists.
+ */
+function tagSectionsFromHtml(html: string): string {
+  const blockPattern = /<(h[1-6]|p|li|td|th)[^>]*>([\s\S]*?)<\/\1>/gi
+  const stack: { level: number; title: string }[] = []
+  const lines: string[] = []
+  let match: RegExpExecArray | null
+
+  while ((match = blockPattern.exec(html)) !== null) {
+    const tag = match[1].toLowerCase()
+    const content = stripTags(match[2])
+    if (!content) continue
+
+    const headingLevel = /^h[1-6]$/.test(tag) ? parseInt(tag[1], 10) : null
+    if (headingLevel !== null) {
+      while (stack.length && stack[stack.length - 1].level >= headingLevel) stack.pop()
+      stack.push({ level: headingLevel, title: content })
+      lines.push(`[SECTION: ${stack.map((s) => s.title).join(' > ')}]`)
+    } else {
+      lines.push(content)
+    }
+  }
+
+  return lines.join('\n\n')
 }
 
 /**
