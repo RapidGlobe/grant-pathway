@@ -12,19 +12,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ## Status
 
-| Section                                                      | FRs covered            | Status                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check); AC-FR-06-04 added for the 55-minute warning dialog before auto-logout (previously undocumented, found during PRD Section 12 review)                                |
-| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected                                                                                                                                                                                                                               |
-| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria                                                                                                                                                                               |
-| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13; updated 2026-07-14 — FR-22 built (GAP-33 fix): retention (AC-01/02) confirmed built; AC-03 (playbook-independent retention) permanently superseded, not pending — see `ADR-DATA-006`'s 2026-07-14 amendment; AC-04 reworded to flag the resulting stale UI copy (GAP-34)                    |
-| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-27-05 added. AC-FR-24-06 quote corrected and mechanism note updated 2026-07-14 now `P6.2a` has landed                                                                                                                          |
-| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                                                                                                                                                                                        |
-| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                                                                                                                                                                                         |
-| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                                                                                                                                                                                            |
-| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                                                         |
-| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                                                    |
-| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); summary-bullet citations remain not built; human curator confirmation (`P6.5`) is permanently superseded, not pending — see `ADR-DATA-007`'s 2026-07-14 amendment |
+| Section                                                      | FRs covered            | Status                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 9.1 Authentication & Accounts                                | FR-01 to FR-08         | ✅ Reviewed 2026-07-13 — FR-08 status corrected to "Confirmed built"; AC-FR-05-06 expired-link message corrected (found during PRD cross-check); AC-FR-06-04 added for the 55-minute warning dialog before auto-logout (previously undocumented, found during PRD Section 12 review)                                                                                                             |
+| 9.2 Charity Profile                                          | FR-09 to FR-14, FR-12A | ✅ Reviewed 2026-07-13 — FR-10 corrected, FR-12A added, FR-09/FR-13 wording corrected. Updated 2026-07-15 — FR-12A re-sited from `/profile` to Step 4, then made guideline-driven per `PDR-AI-008` later the same day (all 3 ACs rewritten twice), then gained AC-FR-12A-04 for the manual-add fallback built the same day; see `ADR-DATA-006`'s two matching amendments                         |
+| 9.3 Application Management                                   | FR-15 to FR-20         | ✅ Reviewed 2026-07-13 — AC-FR-15-04 corrected, FR-16 mismatch tally fixed (code + doc), FR-17 View→Re-open renamed with new criteria. Updated 2026-07-15 — FR-15 rewritten for DR-FD-001 v1.4: curated funder picker/directory removed, free-text field restored; AC-FR-15-01/02 updated; AC-FR-15-05 rewritten from "unlisted funder request link" to the new name-based reuse-match behaviour |
+| 9.4 Funder Guideline Handling                                | FR-21 to FR-23         | ✅ Reviewed 2026-07-13; updated 2026-07-14 — FR-22 built (GAP-33 fix): retention (AC-01/02) confirmed built; AC-03 (playbook-independent retention) permanently superseded, not pending — see `ADR-DATA-006`'s 2026-07-14 amendment; AC-04 reworded to flag the resulting stale UI copy (GAP-34)                                                                                                 |
+| 9.5 AI Guideline Summarisation                               | FR-24 to FR-27         | ✅ Reviewed 2026-07-13 — AC-FR-24-02 corrected (found during PRD cross-check), AC-FR-27-05 added. AC-FR-24-06 quote corrected and mechanism note updated 2026-07-14 now `P6.2a` has landed                                                                                                                                                                                                       |
+| 9.6 Q&A Interview and Application Assembly                   | FR-28 to FR-31, FR-31A | ✅ Reviewed 2026-07-13 — FR-31 badge/label/gating corrected (three ACs); FR-28–30, FR-31A confirmed accurate                                                                                                                                                                                                                                                                                     |
+| 9.7 Mandatory Review & Approval                              | FR-32 to FR-36         | ✅ Reviewed 2026-07-13 — FR-32 rewritten to match real checkboxes; re-open dialog wording reconciled (code)                                                                                                                                                                                                                                                                                      |
+| 9.8 Export                                                   | FR-37 to FR-39         | ✅ Reviewed 2026-07-13 — no findings, confirmed accurate                                                                                                                                                                                                                                                                                                                                         |
+| 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                                                                                                                                      |
+| 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                                                                                                                                 |
+| 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); summary-bullet citations remain not built; human curator confirmation (`P6.5`) is permanently superseded, not pending — see `ADR-DATA-007`'s 2026-07-14 amendment                                                                              |
 
 ---
 
@@ -612,40 +612,63 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ### FR-12A — Should Have (provisional)
 
-**Requirement:** The charity profile shall optionally capture financial and governance facts — total annual expenditure, reserves, whether any trustees are related to each other, the number of authorised bank signatories, and whether any bank signatories are related to each other or to a trustee — to support eligibility checks required by specific funders' guidelines that the original 5-field profile could not capture.
+**Requirement (revised 2026-07-15, twice the same day — moved from `/profile` to Step 4, then made guideline-driven per `PDR-AI-008`):** The application flow shall capture financial and governance facts — total annual expenditure, reserves, whether any trustees are related to each other, the number of authorised bank signatories, and whether any bank signatories are related to each other or to a trustee — **only when a funder's guidelines actually raise the relevant topic**, to support eligibility checks specific funders require.
 
-**Added 2026-07-13 — new entry, not a correction to an existing FR.** Follows the FR-31A precedent: this is a real, shipped feature (P6.1, `ADR-DATA-006` R13, migration `20260705000000`, 2026-07-05) with no acceptance criteria anywhere in this document before now — see the Section 9.2 review finding. `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` Section 4.2.3 ("Financial and governance (P6.1, R13)") already documents these fields; this entry brings `acceptance-criteria.md` in line with that. **Priority marked "Should Have" provisionally** — all five fields are optional in the UI, but this feature has never been given a formal MoSCoW classification in `docs/moscow-feature-register.md` (checked directly: no match for these fields there at all). Worth a decision on whether it should be formally registered there too.
+**Originally added 2026-07-13** as a `/profile`-page feature (P6.1, `ADR-DATA-006` R13, migration `20260705000000`, 2026-07-05). **Re-sited 2026-07-15**: investigation found the five `charity_profiles` columns were never actually consumed anywhere — not by Step 3's summary/eligibility logic, not by P6.5's clone — so the original AC-FR-12A-01's "helps Grant Pathway flag issues before you apply" claim was untrue. WJ chose to represent these facts as `application_items` rows instead (Option C — the item-graph, matching how narrative questions already work), over keeping them at profile level. That first pass was placement only — all 5 always shown, unconditionally.
 
-**Confirmed built** — verified directly in `components/charity-profile-form.tsx` and `actions/charity.ts`.
+**Reworked again 2026-07-15, later the same day (`PDR-AI-008`)**: live testing of the always-on version found it disjointed from the rest of Step 4 (no citation, shown regardless of relevance). Now a fact is extracted and shown only when the funder's guidelines raise the topic at all — a deliberately **lower** bar than ordinary narrative "questions" (a general eligibility/policy statement counts, not just a discrete question) — with an optional citation exactly as narrative questions/sections already have. See `ADR-DATA-006`'s two 2026-07-15 amendments and `data-model.md` §4c for full detail.
+
+**Manual-add fallback built (2026-07-15, same day, fast-follow):** for the residual zero-signal case, a quiet link lets a charity add one of the 5 facts themselves — new AC-FR-12A-04 below. **Priority still marked "Should Have" provisionally** — same unresolved MoSCoW-registration gap as before.
+
+**Confirmed built** — verified directly in `lib/governance-items.ts`, `lib/prompts.ts`, `app/api/generate-summary/route.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, and `components/application-step4-draft.tsx`.
 
 ---
 
-**AC-FR-12A-01 — Governance and reserves fields displayed, all optional**
+**AC-FR-12A-01 — Governance and reserves items shown only when a funder's guidelines raise the topic, no dedicated heading**
 
-- **Given** I am on `/profile`
+- **Given** I am on Step 4 of an application for a funder whose guidelines raise one or more of the 5 facts (total annual expenditure, reserves, trustee-relatedness, bank-signatory count, bank-signatories-relatedness)
 - **When** the page loads
-- **Then** I see a "Governance and reserves" section below the core profile fields
-- **And** I see the note: _"Optional for now. Some funders check these facts as part of eligibility — filling them in helps Grant Pathway flag issues before you apply."_
-- **And** I see five fields: "Total annual expenditure (£)", "Reserves (£)", "Are any of your trustees related to each other by family or business relationship?" (dropdown: Not sure yet / No / Yes), "How many people are authorised as bank signatories?" (number), and "Are any bank signatories related to each other or to a trustee?" (dropdown: Not sure yet / No / Yes)
-- **And** none of these five fields are marked as required
+- **Then** I see only the items the guidelines actually raised — as an ordinary-looking card at its fixed sort position, with no separate "Governance and reserves" heading or grouping
+- **And** each shown item carries a citation badge exactly like any other extracted question, when the AI found one to cite
+- **And** each label's "(optional)" suffix means a shown item never blocks the approval/assembly gate when left blank, via the same mechanism as any other optional question
+- **Given** instead a funder whose guidelines raise none of the 5 facts
+- **When** the page loads
+- **Then** none of the 5 items appear — no gap, no placeholder, no indication anything is missing
 
 ---
 
-**AC-FR-12A-02 — Months of reserve cover calculated live, not stored**
+**AC-FR-12A-02 — Governance items never carried forward between applications, including P6.5 reuse**
 
-- **Given** I am on `/profile`
-- **When** I enter a value in both "Total annual expenditure" and "Reserves"
-- **Then** I see a live calculation: _"Based on the figures above, you hold approximately [N] months of reserves"_, computed as reserves ÷ (total annual expenditure ÷ 12)
-- **And** this calculated figure is not itself persisted — only the two entered figures (expenditure and reserves) are saved to the database
+- **Given** I have previously entered values for these facts on another application (to any funder, including the same one)
+- **When** I start a brand-new application, whether from scratch or via "Start from your last application to [Funder]" (P6.5)
+- **Then** any governance and reserves items shown on the new application start blank
+- **And** this is deliberate, not a bug: these facts must be re-entered and re-attested fresh for every application, unlike this application's own narrative answers (which P6.5 does carry over, marked "Carried over — please review")
 
 ---
 
-**AC-FR-12A-03 — Governance and reserves fields save successfully when left blank**
+**AC-FR-12A-03 — Governance and reserves items save successfully when left blank; orphan cleanup matches ordinary questions**
 
-- **Given** I am on `/profile` completing my profile for the first time, or editing an existing profile
-- **When** I leave all five governance and reserves fields blank and save
-- **Then** my profile saves successfully with no validation error
-- **And** each field is stored as not set (null), distinguished from an explicit "No" answer or a zero value
+- **Given** I am on Step 4 of an application with one or more governance and reserves items shown
+- **When** I leave one or more of them blank and navigate away
+- **Then** the application saves successfully with no validation error
+- **And** returning to Step 4 later, or regenerating the Step 3 summary (with the same facts still detected), does not delete these blank items or any values already entered in them
+- **And** if regenerating the Step 3 summary produces a different extraction that no longer detects a given fact, an unanswered item for that fact is removed (exactly like a dropped narrative question), while an already-answered one is kept
+
+---
+
+**AC-FR-12A-04 — Manual-add fallback for facts the guidelines don't raise (built 2026-07-15, fast-follow)**
+
+- **Given** I am on Step 4 and at least one of the 5 governance facts is not currently shown
+- **When** I look below the question list
+- **Then** I see a quiet link: "Need to add something about your finances or governance that wasn't asked above? Add it."
+- **When** I click it
+- **Then** I see a checkbox for each fact not already shown, each with a short plain-English explanation of why a funder might ask about it (not just a restatement of its name)
+- **When** I select one or more and click "Add selected"
+- **Then** the item(s) are created and appear in the question list with an "Added by you" label instead of a citation badge
+- **Given** instead all 5 governance facts are already shown
+- **When** the page loads
+- **Then** the manual-add link does not appear at all — there is nothing left to add
+- **And** this link is never proactively suggested or highlighted — it is a quiet, low-key affordance, not a prompt
 
 ---
 
@@ -714,7 +737,7 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ### FR-15 — Must Have
 
-**Requirement:** The system shall allow a user to create a new grant application by selecting a funder from the approved directory and entering the grant name. **Revised 2026-06-01 (DR-FD-001):** Funder is selected via searchable picker, not free-text entry.
+**Requirement (revised 2026-07-15, DR-FD-001 v1.4):** The system shall allow a user to create a new grant application by entering the funder's name as free text and entering the grant name. The 2026-06-01 curated directory picker (DR-FD-001 v1.0), and its 2026-07-11 free-text-fallback amendment (v1.3, never actually built), have both been superseded — the picker has been removed entirely rather than merely relaxed, since Step 3/4/5 processing is driven per-application by the uploaded guidelines, not by funder identity, so a curated directory no longer served a purpose. `applications.funder_id` (FK to `funders`) is left in place, unused; only `funder_name` is populated going forward.
 
 ---
 
@@ -722,11 +745,11 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 - **Given** I am a signed-in user with a completed charity profile
 - **When** I click "+ New Application" or "Start your first application" on `/dashboard`
-- **And** I select a funder from the searchable directory picker on Step 1
+- **And** I type the funder's name on Step 1
 - **And** I enter a grant name
 - **And** I click "Continue"
 - **Then** a new application record is created with status `not_started`
-- **And** the record is linked to the selected `funder_id`
+- **And** the record's `funder_name` is saved (no `funder_id` is set — the field is dormant since 2026-07-15)
 - **And** I am advanced to Step 2 (Funder Guidelines)
 
 ---
@@ -734,21 +757,20 @@ _Note: the final set of profile fields was refined during screen requirements. T
 **AC-FR-15-02 — Required fields enforced**
 
 - **Given** I am on Step 1 of the application flow
-- **When** I attempt to click "Continue" without selecting a funder or entering a grant name
+- **When** I attempt to click "Continue" without entering a funder name or grant name
 - **Then** inline error messages are shown:
-  - Funder: _"Please select a funder from the list"_
+  - Funder: _"Please enter the funder's name"_
   - Grant name: _"Please enter the grant name"_
 - **And** no application record is created
 
 ---
 
-**AC-FR-15-05 — Unlisted funder request link present**
+**AC-FR-15-05 — Reuse-match is name-based, not a stable identity** _(rewritten 2026-07-15 — the curated picker and its "unlisted funder" request link this AC previously described were removed; see FR-15's requirement note)_
 
-- **Given** I am on Step 1 of the application flow
-- **When** I look below the funder picker
-- **Then** I see the link _"My funder isn't listed — request it"_
-- **And** clicking the link opens the funder request form
-- **And** I cannot proceed with an unlisted funder name entered as free text
+- **Given** I have a previous application to a funder I've applied to before
+- **When** I start a new application and type that funder's name on Step 1
+- **Then** the app offers "Start from your last application to [Funder]" if, and only if, the typed name matches the previous application's `funder_name` on a case-insensitive, trimmed basis
+- **And** if I type the funder's name even slightly differently between the two applications (e.g. "Henry Smith Charity" vs "The Henry Smith Charity"), the reuse offer is not shown — this is an accepted soft-miss trade-off (WJ, 2026-07-15), not a bug: the app never wrongly matches two different funders as if they were the same one
 
 ---
 
@@ -1420,13 +1442,16 @@ the funder's required output. The old `/api/generate-draft` route is removed. Se
 
 ---
 
-**AC-FR-28-04 — Free-form guidelines show narrative sections instead of numbered questions** _(Corrected 2026-07-10 — see note below)_
+**AC-FR-28-04 — Free-form guidelines show narrative sections, now numbered like structured questions** _(Corrected 2026-07-16 — see note below)_
 
-- **Given** this application's Step 3 AI summary classified the guidelines as free-form (no numbered questions)
+- **Given** this application's Step 3 AI summary classified the guidelines as free-form
 - **When** I view the Q&A interface
 - **Then** I see named narrative sections (e.g., "About your organisation", "Project description")
+- **And** each section is prefixed with a sequential number, matching the treatment of structured questions and of governance items within either funder type
 - **And** each section has a textarea for my own answer
 - **And** each section shows its AI-extracted guidance text (`q.guidance`) where present, rather than a fixed static note
+
+_Note (2026-07-16): this criterion previously read "no numbered questions" for free-form funders, matching the original design that only structured funders' Q&A cards were numbered. WJ live-tested Walton Charity (free-form) and asked for numbering to be extended to free-form sections too, for consistency with the same-day fix that added sequential numbers to governance items on structured funders. That review found the original "free-form is unnumbered narrative" premise pre-dated PDR-AI-008's governance facts (2026-07-15) — a governance item like "Are any of your trustees related to each other...?" reads as a discrete question regardless of the funder's own classification, not a narrative section title, so leaving it unnumbered inside a free-form funder's item list was inconsistent even before this request. `components/application-step4-draft.tsx`'s number span is no longer gated on `funderType === 'structured'` — every item in the ordered list gets a number, both funder types alike. See `AC-FR-31A-04`'s matching correction for the assembled draft._
 
 _Note (2026-07-10): this criterion previously claimed a fixed static note is displayed -- *"This funder requires a flowing narrative document. Write naturally — the assembly step will format your answers into a coherent document."* This message does not exist anywhere in the codebase. The real per-section guidance is dynamic AI-extracted text (`q.guidance` in `components/application-step4-draft.tsx`), shown only when present and the section isn't a budget question -- there is no fixed narrative-document note. Separately, this criterion previously read "the Step 3 summary identified **the funder** as a free-form narrative funder", implying a stable trait of the funder itself. Per `ADR-DATA-006` and `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md` (BD-08 note, confirmed 2026-07-04), the persistent funder-level "Structured"/"Narrative" badge (the `funders.funder_type` column, from `DR-FD-001`) was retired because it does not reflect a stable property of any funder. What actually drives this screen is a **per-application** classification derived dynamically from that application's own Step 3 AI summary (`applications.ai_summary.funder_type`) — corrected above accordingly. Separately, per `ADR-DATA-006` and moscow register FR-45: extraction is narrative-only in practice regardless of this classification — every extracted question defaults to `question_type = narrative`; the only other question-level distinction actually built is the `is_budget_question` flag (see FR-31, FR-45), not a broader structured/free-form question-type split._
 
@@ -1522,12 +1547,53 @@ _Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previ
 
 ---
 
-**AC-FR-29-05 — Optional questions are excluded from the assembly gate** _(Added 2026-06-04, D-LBF-01/03)_
+**AC-FR-29-05 — Optional questions are excluded from the assembly gate** _(Added 2026-06-04, D-LBF-01/03; exception added 2026-07-16, see AC-FR-29-08)_
 
 - **Given** a question is marked as optional — either by containing "(optional)" in its text or by beginning with "This question is optional"
 - **When** I leave that question unanswered and unapproved
 - **Then** the "Ready to assemble" button remains active (not greyed out)
 - **And** the optional question shows an "Approve this answer" button even when empty, allowing the user to explicitly skip it
+- **Unless** the item was added via the manual "Add a financial or governance detail" picker — see AC-FR-29-08, which is not skippable despite carrying the same "(optional)" text
+
+---
+
+**AC-FR-29-06 — Budget/financial questions over their limit get a deterministic trim, not the AI over-limit message** _(Added 2026-07-16, PDR-AI-007)_
+
+- **Given** a question is flagged `is_budget_question` and its answer exceeds the funder's word or character limit
+- **When** I view that question's card
+- **Then** the "Help me improve this" AI-assist block (including AC-FR-29-04's narrative over-limit message, which references "use AI") is not shown for this question at all — it never was, since AI assist is disabled for budget/financial questions
+- **And** instead I see: _"Your answer exceeds the funder's word/character limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving."_ (wording matches the limit type — "word" or "character" — per the funder's `limitType`)
+- **And** a "Trim to limit" button is shown alongside the message
+- **When** I click "Trim to limit"
+- **Then** my answer is mechanically cut to the last complete sentence that still fits within the limit — no AI/LLM call is made, and no figures, dates, or wording are altered by an AI
+- **And** if even the first sentence alone exceeds the limit, the answer is instead hard-cut at the limit, snapped to the nearest word boundary so no word is left truncated mid-way
+- **And** the "Approve this answer" panel and button remain hidden until the trimmed (or further manually edited) answer is within the limit, per AC-FR-29-04's existing gate
+
+_Note (2026-07-16): this closes a gap first found live during Clothworkers Foundation testing (2026-07-04) and decided the same day as `PDR-AI-007`, formalised as a PDR on 2026-07-11 -- but never actually built. WJ re-discovered the exact same gap independently on 2026-07-16 while testing Henry Smith (a budget question, "If you have not raised all the money needed, what are your plans to do so?", 300-word limit, tested with a 503-word sample), not realising it had already been decided six days earlier. Confirmed via a repo-wide search that no trace of the decided message or "Trim to limit" button existed anywhere outside the PDR document itself -- the decision was never turned into a tracked implementation task in `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md`, the same failure mode as `DR-FD-001`'s 2026-07-11 free-text-fallback amendment (also decided, never tracked, never built). Built exactly as `PDR-AI-007` specified: Option C (budget-specific message, no AI reference) + Option E (deterministic sentence-snap trim, no LLM call) -- Option F (AI assist scoped to budget questions) remains explicitly rejected for now._
+
+---
+
+**AC-FR-29-07 — "Trim to limit" also offered on ordinary narrative questions, alongside AI refine** _(Added 2026-07-16, PDR-AI-007 extension)_
+
+- **Given** a non-budget narrative question's answer exceeds its word or character limit
+- **When** I view that question's card
+- **Then** I see the existing AC-FR-29-04 message and "Help me improve this" button, AND a "Trim to limit" button alongside them
+- **When** I click "Trim to limit"
+- **Then** my answer is mechanically cut the same way as AC-FR-29-06 describes for budget questions -- no AI/LLM call, last complete sentence within the limit, hard word-boundary cut as a fallback
+- **And** clicking "Help me improve this" instead still behaves exactly as before (AC-FR-30 family) -- this is an additional option, not a replacement
+
+_Note (2026-07-16): while testing the AC-FR-29-06 fix, WJ separately hit a non-budget narrative question over its limit and found "Help me improve this" declined to help at all -- correct behaviour, since the test answer was deliberately unrelated filler text and the refine prompt is instructed never to invent facts, but it left no way forward. Combined with `PDR-AI-006`'s already-documented finding that AI refine can undershoot and leave an answer still over limit, narrative questions had two known ways to leave a charity stuck, unlike budget questions which by this point always had a fallback. WJ agreed to extend the same deterministic trim as a secondary option here too. No new logic needed -- `trimToLimit()`/`handleTrimToLimit()` were already generic, keyed only on the question's limit type, never on `is_budget_question`._
+
+---
+
+**AC-FR-29-08 — A manually-added governance item is not exempt from the assembly gate** _(Added 2026-07-16)_
+
+- **Given** a financial or governance item was added via the "Add a financial or governance detail" picker (`q.addedManually` true), not detected by the AI from the funder's guidelines
+- **When** I leave it unanswered and unapproved
+- **Then** the "Ready to assemble" button stays disabled, and the "Approve this answer" panel does not appear until an answer is entered — the item's `item_label` still carries the same "(optional)" suffix as the AI-detected form of the same fact, but that suffix is disregarded for the assembly gate once the item was added manually
+- **And** this exception applies only to manually-added items — an AI-detected governance fact (with or without a citation) remains skippable-when-blank exactly as AC-FR-29-05 describes
+
+_Note (2026-07-16): found live during Henry Smith testing — WJ ticked several governance facts via the manual-add picker, left them blank, and found "Ready to assemble" stayed active throughout, right up to reaching the senior-review gate with 5 blank added fields. Traced to `GOVERNANCE_ITEMS`' item_label carrying "(optional)" unconditionally (`lib/governance-items.ts`), written for the AI-auto-detected case per `PDR-AI-008` (a low-signal AI detection should never become a forced question for a novice user) but reused as-is for the manual-add path, where the opposite is true — the charity actively chose to add the item, so leaving it blank afterwards should not silently bypass approval. Fixed in `components/application-step4-draft.tsx`'s `allApproved` computation and its matching "show approve panel when empty" check, both now gated on `!q.addedManually` in addition to the existing "(optional)" text check. No database or `lib/governance-items.ts` change — the fix is entirely in how the existing `addedManually` flag (already used for the "Added by you" badge) is read._
 
 ---
 
@@ -1561,6 +1627,32 @@ _Priority corrected 2026-07-10: this FR was mislabelled "Should Have" in a previ
 - **Then** I see both my original answer and the refined version
 - **And** I can click "Use this improved version" to replace my answer with the refined text
 - **And** I can click "Keep my original" to discard the refined version
+
+---
+
+**AC-FR-30-03A — Refined suggestion still over its limit shows an inline explanation** _(Added 2026-07-16, PDR-AI-006)_
+
+- **Given** the question has a word or character limit
+- **When** the AI's refined suggestion is itself still over that limit (LLMs cannot always hit an exact count when compressing)
+- **Then** a message appears directly under the suggested text, naming the exact shortfall: _"This suggestion is still \[N\] words over the limit — AI can't always hit an exact word count. Check the counter and trim it further, or try again."_ (wording adapts "words"/"word count" to "characters"/"character count" per the funder's `limitType`, and pluralises correctly for a shortfall of exactly 1)
+- **And** this message does not appear when the suggestion is within the limit — it is conditional, not a blanket disclaimer shown on every AI assist use
+- **And** "Use this improved version" and "Keep my original" remain available regardless — the message is informational only, it does not block either action
+
+_Note (2026-07-16): decided as `PDR-AI-006` on 2026-07-04 alongside the user-guide wording fix, but the in-app half of the decision sat unbuilt for 12 days — WJ raised it while testing the adjacent `PDR-AI-007` narrative-question trim extension and asked for it to be closed in the same pass._
+
+---
+
+**AC-FR-30-03B — Refine flags an answer that doesn't address the question, consistently regardless of word limit** _(Added 2026-07-17, PDR-AI-009)_
+
+- **Given** I click "Help me improve this" on an answer that does not genuinely attempt to address the question (e.g. filler/placeholder text, boilerplate unrelated to the question, or content written for a different question)
+- **When** the AI assist call completes
+- **Then** I still see a refined version of my text — the AI never declines outright — but a clearly marked warning line appears at the top of the suggested text: "⚠️ This answer does not appear to address the question above — please check it carefully before approving."
+- **And** this happens the same way whether my answer is over, under, or at the question's word/character limit — the warning's presence never depends on word count
+- **And** a short, thin, or imperfect answer that is still a genuine attempt to address the question does NOT trigger the warning — it is not a quality or completeness check, only a relevance check
+- **And** if I click "Use this improved version," the warning line is stripped before it is saved as my answer — it is never adopted as part of the application text itself
+- **And** the "still over the limit" shortfall message (AC-FR-30-03A) is calculated on the suggestion text with the warning line excluded, so the warning's own length never inflates or falsely triggers that count
+
+_Note (2026-07-17): WJ found "Help me improve this" declined outright on clearly irrelevant filler text when the answer was over its word limit, but passed the same content straight through unchanged when under limit — an emergent inconsistency, since `buildRefinePrompt()` had no relevance-check instruction at all before this fix; `DR-AI-003`'s human review checklist was the only actual safeguard. Two alternatives were considered and rejected: always declining outright (would need a new API/UI shape to represent "declined," not a prompt-only fix) and always polishing silently (removes the model's only existing signal, the opposite of WJ's "make it tighter" request). Built same day as decided; see `PDR-AI-009` for full rationale._
 
 ---
 
@@ -1650,17 +1742,18 @@ _Numbering note (2026-07-10): FR-31A is not present in the canonical FR-01 to FR
 
 ---
 
-**AC-FR-31A-04 — Assembly formats each answered question under its question or section text, verbatim**
+**AC-FR-31A-04 — Assembly formats each answered question under its numbered question or section text, verbatim**
 
 - **Given** the assembly action runs
 - **When** the `assembled_draft` is generated
-- **Then** each answered question appears as its question (or section) text followed by the charity's own answer text, with entries separated by a divider
-- **And** where this application's Step 3 AI summary classified the guidelines as structured (numbered questions), each entry is additionally prefixed with its question number
-- **And** where the summary classified the guidelines as free-form, no number prefix is added — otherwise the format is identical
+- **Then** each answered question or section appears prefixed with its sequential number, followed by its question/section text, then the charity's own answer text, with entries separated by a divider
+- **And** this applies uniformly — structured questions, free-form sections, and governance items alike, regardless of the application's Step 3 funder-type classification
 - **And** unanswered questions are omitted from the assembled draft
 - **And** no AI is used in this step — the charity's own words are reproduced exactly as written
 
-_Note (2026-07-10): this replaces the previous AC-FR-31A-03/04, which claimed free-form assembly produces "a coherent flowing narrative — not a Q&A list", distinct in kind from structured assembly. Per `actions/applications.ts` `assembleAndAdvance()`, both formats produce the same question-then-answer structure joined by the same `---` divider; the only actual difference is whether a number prefix is added. This also corrects the earlier framing of "the funder is a structured/free-form funder" as an inherent funder trait — see the equivalent note on AC-FR-28-04 above; the same per-application, not per-funder, classification applies here._
+_Note (2026-07-16): this criterion previously distinguished structured (numbered) from free-form (unnumbered) assembly. WJ asked for free-form numbering to be extended to match structured, for the same reason as `AC-FR-28-04`'s matching correction. `actions/applications.ts` `assembleAndAdvance()` no longer detects or branches on funder type at all — the entire "Detect funder type for assembly format" step was removed as dead code once both branches produced the same output; every answered item is now simply numbered by its position in the already-ordered list._
+
+_Note (2026-07-10): this replaces the previous AC-FR-31A-03/04, which claimed free-form assembly produces "a coherent flowing narrative — not a Q&A list", distinct in kind from structured assembly. Per `actions/applications.ts` `assembleAndAdvance()`, both formats produce the same question-then-answer structure joined by the same `---` divider; the only actual difference was whether a number prefix is added (itself since removed — see the note above). This also corrects the earlier framing of "the funder is a structured/free-form funder" as an inherent funder trait — see the equivalent note on AC-FR-28-04 above; the same per-application, not per-funder, classification applies here._
 
 ---
 
@@ -1901,6 +1994,17 @@ _Note: The "Regenerate all answers" action no longer exists. Users write their o
   - An AI disclaimer
   - The Q&A body — each question followed by its approved answer
   - A footer: _"Prepared using Grant Pathway v[version number] — grantpathway.org.uk"_, plus a page number ("Page N of NN", added 2026-07-02 — see PDR-DH-003)
+
+---
+
+**AC-FR-37-03A — The date exported is the same across every export, format, and re-download** _(Added 2026-07-17)_
+
+- **Given** an application has been exported at least once, in either format
+- **When** I download the Word document and the plain text file, whether in the same session or on a later visit
+- **Then** both show the identical "Date:" — the timestamp of this application's very first export, not the moment of each individual download
+- **And** this is distinct from the re-export warning's date (AC-FR-37-05), which correctly always shows the most recent export instead
+
+_Note (2026-07-17): WJ found a .txt export and a .docx export of the same application showed dates 2 minutes apart, since `exportDate` was previously computed live via `new Date()` on every request. Fixed with a new `applications.first_exported_at` column, set once and never overwritten. See `PDR-DH-003` revision history._
 
 ---
 
@@ -2380,6 +2484,13 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 
 ---
 
-_Last updated: 2026-07-14_
+_Last updated: 2026-07-17_
+_2026-07-17 second addendum: new AC-FR-37-03A added — export date fixed to one timestamp per application (`applications.first_exported_at`), not one per request._
+_2026-07-17 addendum: new AC-FR-30-03B added — `PDR-AI-009`'s AI-refine relevance-check consistency fix._
+_2026-07-15 addendum: FR-12A (Section 9.2) re-sited from `/profile` to Step 4 — the 5 governance/reserves fields were never actually consumed anywhere as `charity_profiles` columns, so AC-FR-12A-01's "helps flag issues before you apply" claim was untrue. All three ACs rewritten: AC-FR-12A-01 now describes the fixed 5-card group shown first on Step 4; AC-FR-12A-02 replaced (the live reserves-ratio calculation went with the profile-page fields) with a new criterion covering the deliberate no-seeding-between-applications behaviour, including P6.5 reuse; AC-FR-12A-03 updated for the new blank-item/orphan-cleanup mechanics. See `ADR-DATA-006`'s matching 2026-07-15 amendment and `data-model.md` §4c._
+
+_2026-07-15 second addendum, later the same day: FR-12A reworked again per `PDR-AI-008` — live testing of the always-on version found it disjointed from the rest of Step 4. All three ACs rewritten again: AC-FR-12A-01 now describes conditional, citation-backed, no-heading display instead of an unconditional fixed group; AC-FR-12A-02 unchanged in substance (no seeding still applies) but reworded for the conditional case; AC-FR-12A-03 extended to cover orphan-cleanup now matching ordinary narrative questions (no more governance-specific carve-out). See `ADR-DATA-006`'s second 2026-07-15 amendment and `data-model.md` §4c._
+
+_2026-07-15 third addendum, same day (fast-follow): PDR-AI-008's manual-add fallback built for the zero-signal case. New AC-FR-12A-04 added — a quiet link, hidden once all 5 facts are shown, revealing plain-English-explained checkboxes for only the missing ones; a manually-added item shows "Added by you" instead of a citation badge. See `data-model.md` §4c and `PDR-AI-008`'s updated status note._
 _2026-07-14 addendum: `P6.2a` built (guideline extraction now tags PDF/docx/pasted-text structure with `[PAGE N]`/`[SECTION: ...]` markers, and `preprocessText`'s truncation is now marker-aware). Two stale claims fixed as a direct result: Section 9.11's "none of the build-plan tasks... have started" and "`unpdf` still calls `mergePages: true`" (both now false), and AC-FR-24-06's truncation-warning quote (corrected to match the real component text) and mechanism note (the deferred fix flagged 2026-07-13 is now done). **Same-day follow-up:** `P6.3` (first milestone) built — extraction now asks the AI for a citation per question/section, validated against real markers, and writes it into `application_items.guideline_reference`; Section 9.11 updated again to reflect this (citations recorded, still not displayed anywhere). **Further same-day follow-up:** GAP-33 fixed — guideline text is now actually retained (`application_guidelines` table), which FR-22's own acceptance criteria had been assuming was still unbuilt. AC-FR-22-01/02 flipped to confirmed-built; AC-FR-22-04 reworded to distinguish "data is retained" from "nothing shows the user it's retained" (new GAP-34 tracks that latter, UI-copy gap). **Final same-day follow-up:** `P6.4` (first milestone) built — Step 4 now genuinely shows a citation badge and a "view original guidelines" text panel. Section 9.11's FR-48 substantially rewritten: AC-FR-48-02/03 flipped from "target behaviour" to confirmed-built; the old AC-FR-48-05 ("no citation feature exists") retired and replaced with a corrected version scoped to what's still actually missing (summary-bullet citations, curator confirmation). Also live-verified `P6.3`'s citation accuracy against the real MK Community Foundation — Oak Grants PDF (WJ regenerated the summary; two newly-found questions cross-checked against the actual document and confirmed genuine, not hallucinated) — see `CHANGELOG.md`. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14, P6.2a/P6.3/GAP-33/P6.4 entries)._
 _Status: Complete — full section-by-section review (all 11 sections) against live code completed 2026-07-13. Summary of this pass's findings, section by section: **9.1** — FR-08 re-marked "Confirmed built" (was hedged as conditional). **9.2** — FR-10 rewritten (invented pre-fill fields removed, real AI-paraphrase behaviour documented via new AC-FR-10-01b); new **FR-12A** added in full for the previously-undocumented "Governance and reserves" field group (P6.1/R13); FR-09/FR-13 requirement wording corrected to match their own (already-accurate) ACs. **9.3** — AC-FR-15-04's invented dynamic page-title format corrected to the real static per-step title; FR-16/AC-FR-16-03 corrected for the `mismatch` status, which the dashboard summary strip now also counts (code fix, `components/dashboard-populated.tsx`); FR-17's "View" button renamed to "Re-open" (code fix) with three new ACs (05/06/07) documenting its actual (consequential, not read-only) behaviour and the mismatch-status no-action case. **9.4** — no findings. **9.5** — AC-FR-24-06's truncation warning flagged as stale but deliberately not corrected yet (Option 2/`P6.2a` is expected to change the underlying mechanism — see `[[project_large_guideline_truncation_reeval]]`-equivalent note); new AC-FR-27-05 added for the previously-undocumented second-failure state. **9.6** — FR-31's badge text, AI-assist-disabled label, and assembly-gating mechanism all corrected to match the real code (three ACs). **9.7** — FR-32 substantially rewritten (invented per-answer "review prompts" replaced with the real three-checkbox confirmation panel); re-open dialog wording reconciled between two UI entry points (code fix, `components/application-step5-approve.tsx`). **9.8** — no findings. **9.9** — AC-FR-41-02/03 and AC-FR-43-02 corrected to match the real `/account/delete` page content and post-deletion banner text. **9.10** — no new findings (FR-46 already corrected earlier the same day, FR-45/47 confirmed accurate). **9.11** — no findings. Two related code-comment fixes made in the same session, unrelated to any AC content: two stale D-012 comments (`actions/auth.ts`, `app/auth/callback/route.ts`) describing an outdated "explicit button click" version of the email-confirmation fix, corrected to describe the real auto-submit-via-JavaScript behaviour. See `docs/Implementation Plan/CHANGELOG.md`'s 2026-07-13 entries for the full rationale behind the two code changes (dashboard tally + button rename, and the D-012 comments). Earlier changes in this version: Section 9.10 FR-46 updated to reflect its 2026-07-11 withdrawal (`docs/moscow-feature-register.md`, Won't Have (v1)) — re-marked from "Must Have, not confirmed built" to "Won't Have (v1) — Withdrawn", with the rationale (coverage level is not a stable per-funder property — see BD-04/BD-08) replacing the old "open product question" framing, and the dangling `BRD ... Section 3.3` citation (that section was deleted in full during the 2026-07-11 BRD review) replaced with BD-07 (BRD Section 10). AC-FR-46-01 to 03 re-annotated from "target behaviour — not built" to "withdrawn requirement — will not be built"; AC-FR-46-04 re-annotated as permanent, not provisional. Status table row for Section 9.10 updated to match. Previous changes: FR-29 corrected from Should Have to Must Have (matches `docs/moscow-feature-register.md` and `docs/PRD-Grant-Pathway.md`, both of which record the 2026-05-28 promotion). FR-31A's criteria corrected to match the actual built senior-review screen and `assembleAndAdvance()` logic, in place of the previous three-point-checkbox and structured/free-form-narrative description; FR-31A's numbering gap against the canonical FR-01–47 list is flagged, not resolved, in this pass. AC-FR-28-04 and FR-31A's assembly criteria corrected to stop describing "structured"/"free-form" as a property of the funder — it is a per-application classification (see `ADR-DATA-006`, BRD v0.6 BD-08 note). Section 9.10 added in full: real Given/When/Then criteria written for FR-45 (confirmed not built as originally specified — narrative-only extraction plus `is_budget_question` is what is actually built), FR-46 (confirmed not built anywhere in the codebase), and FR-47 (confirmed built). AC-FR-01-01 and AC-FR-05-04 corrected from "10 or more characters" to "12 or more characters containing both letters and digits", matching the actual validation in `components/register-form.tsx` and `components/reset-password-form.tsx` and the already-corrected FR-02. FR-22 and its acceptance criteria reworded from the old "never store" model to the retained-guidelines model per `ADR-DATA-002`'s 2026-07-10 reversal, with an explicit not-yet-built flag and a new AC-FR-22-04 describing actual current (still-discarding) behaviour, verified against `lib/guidelines-session.ts` and the absence of any guideline-storage migration. Section 9.11 added in full: FR-48 (guideline source-reference/citations, "Option 2") formalised in new `PDR-DH-004` and `ADR-DATA-007`, blended into Phase 6 — confirmed not built anywhere in the codebase (`unpdf` still flattens pages, no citation field, no viewer component). New AC-FR-28-09 added: the previously-extracted-but-unused `summary_json.supportingDocuments` field is now surfaced on the Step 4 preparation checklist as a funder-specific document list alongside the standing financial-prep checklist (`PDR-UI-007`). Later addition (2026-07-13, found during `PRD-Grant-Pathway.md` Section 12 review): new AC-FR-06-04 added for the 55-minute inactivity warning dialog ("Are you still there?" -- "I'm still here" / "Sign out now") before the 60-minute auto-logout -- confirmed built in `components/session-timeout-provider.tsx`/`session-timeout-modal.tsx`, previously undocumented in this section, the PRD's own FR-06 row, and the PRD's Section 12.4 Security table; all three corrected in the same pass. Later addition (2026-07-13, found during a full PRD/BRD/acceptance-criteria cross-document sweep): AC-FR-42-01/02/03 corrected -- claimed the delete-account button is disabled until `DELETE` is typed exactly; confirmed against `components/delete-account-form.tsx` that the button is always enabled and clicking it with the wrong text shows an inline error instead (the PRD's own Screen 9 review had already found and corrected this same fact, but this section was missed at the time)._

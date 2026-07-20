@@ -10,6 +10,503 @@
 
 ---
 
+## 2026-07-17 — Session wrap-up: PDR-AI-010 decided and built, live-testing confirmed, one open finding logged
+
+Reviewed a fresh Stony Stratford export (`NEO_stony_first_test_0759_170726_Application.docx`) as an end-of-session sanity check. All 12 items (3 governance facts + 9 narrative sections) are present, correctly sequenced, and persisted — confirming today's Step 4 sync fix holds across a full assemble/export cycle. Footer version matches the latest push. WJ: "Job done, it looks much better."
+
+**PDR-AI-010 decided and built same day.** The "Finances of Your Group" duplication WJ flagged earlier (citing the same quote as a separate governance-fact card) is addressed via a new decision record: `buildSummaryPrompt()`'s "sections" rule now handles a themed financial section whose only content is numeric fields already captured by the 5 governance facts — still creates the section (the guidelines named the theme) but reframes its guidance as an explicit "tell us in your own words" invitation and omits its citation rather than duplicating one a governance fact already owns. Chosen over WJ's initially-proposed unconditional catch-all specifically to avoid repeating the anti-pattern `PDR-AI-008`'s original always-on governance block was corrected away from (an unconditional, guideline-unlinked card). Full detail in `docs/PRD decisions/PDR-AI-010-financial-section-catch-all.md`.
+
+**One new finding, not yet acted on:** the fresh export's item 3 ("Are any of your trustees related to each other...") appears to be a hallucinated governance fact — neither Stony Stratford source document (`Stony Stratford Grant-Application-Form-2026.docx`, `Stony-Stratford-Town-Council-Grant-Scheme-2026-27-adopted-FC0226.docx`) contains any mention of trustee relatedness, even indirectly, contradicting `PDR-AI-008`'s "do NOT extract a field_key the guidelines never raise" rule and `TEST-DASHBOARD.md`'s existing 2-of-5-signal review for this funder. WJ: formal testing (to be recorded) will cover this rather than an ad-hoc dashboard update now — logged here so it isn't lost before that test.
+
+**Temporary debug logging (added earlier today) kept deliberately, not removed.** WJ wants it retained to help diagnose any further citation-reliability issues during ongoing testing, but was explicit it must not reach production — added an explicit checklist item to the Phase 6 → Go-Live Gate (`IMPLEMENTATION-PLAN.md` v3.18) to confirm removal (or environment-gating) before DNS cutover, rather than relying on it being remembered.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged). PDR-AI-010's prompt change is not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — a future guideline upload for a wholly-numeric financial section is the outstanding live-verification step. WJ is finishing the user guide next; test plans across all funders will be revised once that's done, given today's cumulative improvements.
+
+---
+
+## 2026-07-17 — Budget fields now also reflect the approved-state tint (extends the Yes/No dropdown fix)
+
+WJ confirmed the Yes/No dropdown fix, then pointed out the same white-regardless-of-approval problem on every **budget-flagged** field too — the two £ governance inputs (total expenditure, reserves) and any budget-flagged narrative `Textarea` (e.g. "Budget for this Project"). The earlier CHANGELOG entry above had assumed the budget fields' hardcoded `bg-white` was a deliberate choice ("keeps manually-entered figures looking visually distinct") — WJ's ask makes clear that assumption was wrong; he wants every field, budget or not, to behave consistently once approved.
+
+**Fix:** removed the `bg-white` override from the £-prefixed governance `Input` (`h-10 bg-white pl-6 text-[14px]` → `h-10 pl-6 text-[14px]`) and the budget-conditional on the ordinary narrative `Textarea` (`` `text-[14px] ${q.isBudgetQuestion ? 'bg-white' : ''}` `` → `"text-[14px]"`). Both now fall through to the shared `Input`/`Textarea` components' own `bg-transparent` default, same as every non-budget field already did.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged). Not verified visually in this environment (same constraint as the dropdown fix) — WJ's next look at Step 4 is the verification step for all three field types together (dropdown, £ input, budget textarea).
+
+---
+
+## 2026-07-17 — Governance Yes/No dropdown now reflects the approved-state tint like every other field
+
+WJ noticed once-approved cards turn green throughout Step 4 — except the Yes/No dropdown used for two of the five governance facts (trustee-relatedness, bank-signatories-relatedness), which stayed flat white regardless of approval. Compared side by side: Q3 ("Are any of your trustees related...", a `<select>`) stayed white; Q4 ("Description of Project", an ordinary `<Textarea>`) correctly turned green.
+
+Root cause: `components/ui/input.tsx` and `components/ui/textarea.tsx` both default to `bg-transparent`, letting the parent card's tint (white/amber/green depending on approval and budget status) show through underneath — that's how every ordinary answer field already reflects approval. The governance Yes/No field is a plain native `<select>`, not built on either shared component, and was hardcoded to `bg-white` — never transparent, so it could never pick up the parent's colour regardless of approval state. Not a deliberate design choice (unlike the budget fields' deliberate always-white `bg-white`, which keeps manually-entered figures looking visually distinct) — just an oversight from building the dropdown with a plain baseline background rather than matching the transparent pattern every other non-budget field already uses.
+
+**Fix:** changed the select's `bg-white` to `bg-transparent`, matching `Input`/`Textarea`'s existing pattern exactly.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no existing coverage of this component). Not verified visually in this environment — reproducing an approved governance Yes/No item needs real application data this environment doesn't have set up, and the preview tool has been unreliable for this project all session; WJ's next look at Step 4 is the verification step.
+
+---
+
+## 2026-07-17 — Citation badges now truncate long headings
+
+WJ confirmed item 4's citation fix worked ("brilliant") but flagged item 6's as much worse — its badge rendered an entire multi-sentence instructional paragraph verbatim, because Stony Stratford's source document applies a Heading style to "a) Give details of expenditure required for your project e.g. materials, equipment, professional fees..." rather than a short title. That citation is genuinely valid (a real marker, correctly found) — the source document's own styling choice is just unusually verbose, and nothing in `components/application-step4-draft.tsx`'s `citationLabel()` bounded the badge's length at all.
+
+**Fix:** `citationLabel()` now truncates at a word boundary past 90 characters (chosen so item 4's own 86-character citation, which WJ was happy with, renders completely unchanged). The full, untruncated text remains available via the badge button's `title` attribute (hover) and inside the "view original guidelines" panel it opens — nothing is actually lost, only the badge's own display width is bounded. General fix: any funder whose document styles a long paragraph as a heading would hit the same badge-blowout, not just this one.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no existing coverage of this component, consistent with prior fixes to this file). Verified via a standalone script: item 4's 86-character label passes through unchanged; item 6's paragraph-length label truncates cleanly at a word boundary.
+
+---
+
+## 2026-07-17 — Step 4 sync silently broken for any funder with both governance facts and narrative items (regression since 2026-07-15)
+
+WJ regenerated Stony Stratford again and asked to check `vercel logs` per the debug logging added minutes earlier. The pull surfaced something far more serious than the citation gap it was meant to diagnose:
+
+```
+[step4] free_form upsert failed: null value in column "added_manually" of relation "application_items" violates not-null constraint
+```
+
+Root cause: `resolveGovernanceInserts()` (`lib/governance-items.ts`) always sets `added_manually` explicitly on governance-fact rows (added 2026-07-15, PDR-AI-008 fast-follow's manual-add migration). The narrative section/question insert objects in `app/(authenticated)/applications/[id]/step/4/page.tsx` — both the free_form and structured branches — never set it at all. When both get merged into a single `.upsert()` call (any funder with detected governance facts _and_ narrative items — Stony Stratford's exact case, and likely others), PostgREST needs a consistent column set across the whole batch and fills the missing key with `NULL` for the narrative rows rather than falling back to the column's default, tripping the `not null` constraint on every affected row. The entire upsert fails atomically — silently, caught in a try/catch that only logs to the server, never surfaced to the user — so Step 4 keeps showing whatever was already in the database no matter what the AI regenerates.
+
+This has almost certainly been latent since the `added_manually` migration (`20260715001`) landed 2026-07-15 and simply hadn't been re-triggered by a fresh sync of a funder with both governance facts and narrative content until now. **Retroactive implication:** any regeneration of a funder with governance signal, on or after 2026-07-15, may have silently failed to sync — worth keeping in mind if any other funder's test data looks stale despite a reported regenerate.
+
+**Fix:** added `added_manually: false` explicitly to both the free_form section inserts and the structured question inserts, matching the governance insert's explicit pattern.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no existing test coverage of this Step 4 sync code, consistent with prior fixes to this file).
+
+---
+
+## 2026-07-17 — Citation heading_path fix, corrected: assembled from two markers, not one (third attempt, same Stony Stratford gap)
+
+With the sync bug above fixed, `vercel logs` also gave direct visibility into the actual raw citations the AI was returning — something the two earlier same-day citation fixes could only speculate about. Both failing citations (the "Alignment with Council's Overarching Principles" section, and separately "Budget for this Project") turned out to share one real cause, different from either earlier hypothesis: the model was constructing a two-element `heading_path` by joining two separate, consecutive `[SECTION: ...]` marker lines that merely _read_ like parent/child in the prose (e.g. a tick-list heading immediately followed by a narrative-instruction heading) — but running the real extraction pipeline (`mammoth`/`tagSectionsFromHtml`) locally against the actual Stony Stratford `.docx` confirmed every single marker in this document is flat, single-element, with no genuine nesting anywhere at all. A heading_path assembled by combining two flat markers can never match a real one, so `validateCitation()` correctly (if unhelpfully) rejected it every time — the earlier punctuation-tolerance fix was solving a real but different problem, and remains a valid general fix in its own right.
+
+**Fix:** `buildSummaryPrompt()`'s citation rule (`lib/prompts.ts`) now explicitly says heading_path must be copied from a single marker line, split only on a " > " the marker line itself already contains — never assembled from two separate marker lines just because one heading appears to introduce the next. Corrected the prior "Fixed 2026-07-17" doc comment, which had claimed the tick-list/narrative fix resolved this — it didn't, on its own.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged). Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — WJ's next regeneration, now that the sync bug is also fixed, is the outstanding live-verification step for both the citation gap and the underlying Step 4 sync.
+
+---
+
+## 2026-07-17 — Per-citation debug logging added (Stony Stratford gap persists after two fixes)
+
+WJ regenerated Stony Stratford again after the punctuation-tolerance fix (below) and found item 4 still had no citation badge — plus a new gap on item 6 ("Budget for this Project"), which _had_ carried a citation in the very first test round. Item 6's real marker (`5. BUDGET FOR THIS PROJECT.`) contains no apostrophe/dash, so the punctuation fix can't explain its loss — the most likely explanation is ordinary run-to-run variance in the model's citation-reporting (temperature is already 0 for this route, but this project has hit temperature-0 non-determinism before, e.g. the 2026-07-15 Step 3 extraction-determinism fix).
+
+Rather than propose a third speculative fix, `app/api/generate-summary/route.ts`'s citation-reconciliation loop now logs the raw `citation` object whenever one is offered but fails validation — previously only visible in aggregate (a warning if over half of all offered citations are invalid, which a single stray miss never trips). This surfaces the actual heading_path/quote the model returned for a specific miss via `vercel logs`, without needing a reproducible local Bedrock call (`dotenvx` redacts AWS credentials for this agent). Temporary/diagnostic — intended to be removed once citation reliability is no longer under active investigation.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (unchanged — no test coverage of route-level logging). WJ's next regeneration plus a `vercel logs` pull is the next diagnostic step.
+
+---
+
+## 2026-07-17 — Citation validation made punctuation-tolerant for heading paths (second fix for the same Stony Stratford gap)
+
+WJ regenerated the Stony Stratford summary after this morning's tick-list-plus-narrative-follow-up prompt fix and confirmed "Alignment with Council's Overarching Principles" still had no citation badge — the earlier fix alone didn't close the gap.
+
+Investigation ran the actual `mammoth`/`tagSectionsFromHtml` extraction pipeline (`lib/extract-text.ts`) against the real Stony Stratford `.docx` locally — no Bedrock call needed, since extraction is pure local library code — and confirmed a real `[SECTION: ...]` marker does exist for this heading: `SSTC overarching principles > Which of the Council's overarching principles do you believe your project aligns with?`, using the source's real **curly apostrophe** (’) in "Council's". This is the only heading in the entire document containing an apostrophe. `validateCitation()` (`lib/guideline-citations.ts`) compares the AI's reported `heading_path` against real markers with a byte-exact `Set.has()` — no punctuation tolerance at all — while its sibling function `findQuoteRange()` (used for on-screen quote highlighting) already tolerates exactly this curly-vs-straight-apostrophe variation, found live once before (2026-07-15, MK Community Foundation). An AI-reported heading_path using a straight apostrophe (the LLM's routine "verbatim" quoting behaviour, per that same precedent) would fail the exact match and get silently dropped to no citation — a highly plausible explanation for why this specific heading, and only this one, kept failing.
+
+**Fix:** moved `EQUIVALENT_PUNCTUATION_CLASSES` earlier in `lib/guideline-citations.ts` and added `normalizePunctuationForMatch()`, applied to both `extractValidMarkers()`'s stored heading paths and `validateCitation()`'s incoming `heading_path` lookup — the same tolerance `findQuoteRange()` already has for quotes, now applied consistently to marker matching too. New regression test reproduces the exact Stony Stratford heading and apostrophe variant. This is a general fix, not specific to this one form — any funder whose heading text contains an apostrophe, curly quote, or en/em dash was equally exposed.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 76 tests pass (75 existing + 1 new). Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — WJ's next regeneration of this application is the outstanding live-verification step, alongside the earlier tick-list-plus-narrative-follow-up fix (both may have been needed together).
+
+---
+
+## 2026-07-17 — PDR-AI-009 false-positive investigated: compound questions, no change made
+
+Continuing Stony Stratford Town Council live testing, WJ hit the "does not appear to address the question" warning (`PDR-AI-009`, built and live-verified earlier the same day) repeatedly enough to ask whether it needed loosening — on §5 "Application Background" (5 sub-asks bundled into one guidance paragraph: need, how identified, user involvement, headcount, duration) and §8/9 "General Activities of the Group" (3 sub-asks: activities, meeting frequency, accessibility).
+
+Investigation found a confound before concluding the check was miscalibrated: both flagged test answers reused an identical boilerplate opening sentence copy-pasted from a different question's answer, which the prompt's own instruction already names as something that should fail the check ("boilerplate unrelated to the question"). WJ isolated the variable with a clean test — §11 "Publicity and Marketing" (a single, non-compound question) with a fresh, non-reused, on-topic answer — and got no warning at all, confirming the check works correctly for ordinary single-ask questions.
+
+**WJ's call: no prompt change.** A compound question genuinely asks for several distinct things; flagging an answer that only covers some of them is a defensible reading of "does not address the question," not the same failure mode as the original Henry Smith case (wholly irrelevant filler text) this PDR was built to fix. Recorded in `PDR-AI-009`'s revision history rather than left as an unresolved live-test complaint.
+
+---
+
+## 2026-07-17 — Citation extraction fixed for tick-list-plus-narrative-follow-up sections
+
+WJ live-tested Stony Stratford Town Council's guideline form (a "worst case" test document) and found 10 of 11 extracted items carried a citation badge, but "Alignment with Council's Overarching Principles" — the one section built from a tick-list ("3.1 Which of the Council's overarching principles do you believe your project aligns with? [tick table]") plus a separate narrative follow-up on the same topic ("3.2 Please outline how you believe your project aligns with these aims") — had none.
+
+Investigation confirmed this wasn't a display bug: `validateCitation()` (`lib/guideline-citations.ts`) only checks that the AI's reported page/heading marker exists in the source text — it never inspects the quote's content — so a missing badge means the model itself returned `"citation": null`. The most likely cause: `buildSummaryPrompt()`'s citation rule already tells the model never to quote "a nearby word limit, character limit, **formatting instruction**, or other incidental detail" next to a question/section — and a tick-list intro ("tick all that apply") reads exactly like a formatting instruction. Faced with a section synthesised from a tick-list plus a narrative follow-up, the model likely couldn't tell which part counted as the section's "own text" and defaulted to no citation at all rather than guess.
+
+**Fix:** added an explicit rule to the citation instruction in `lib/prompts.ts` — when a question/section combines a selection/tick-list instruction with a narrative follow-up on the same topic, the follow-up instruction's own wording _is_ the item's own text for citation purposes, not an incidental detail to avoid. This targets the general pattern (any funder combining a tick-list with a "please outline/explain how" follow-up), not just this one form.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of prompt string content). Not independently verifiable against a real Bedrock call locally (`dotenvx` redacts AWS credentials for this agent) — WJ's next guideline upload for Stony Stratford is the outstanding live-verification step.
+
+---
+
+## 2026-07-17 — Export date fixed to one timestamp per application
+
+WJ live-tested a real Henry Smith application export and spotted a 2-minute gap between the "Date:" shown in the .txt export ("08:24") and the .docx export ("08:22") of the same application — an inconsistency he'd caught while reviewing the exports as part of confirming the site footer version fix (below) had reached the export document too.
+
+Root cause: `app/api/export/[applicationId]/route.ts` computed `exportDate` as `new Date()` live on every request, so exporting each format separately — or re-downloading either format weeks later — showed a fresh timestamp each time, for what should read as one snapshot of the application. This is distinct from `applications.last_exported_at`, which is intentionally refreshed on every export to drive the separate "you already exported this" re-export warning — that column's behaviour is correct and unaffected.
+
+**Fix:** new nullable `applications.first_exported_at` column (migration `20260717000000`, `grant-pathway-dev` only), set once on an application's very first export in either format and never overwritten again. The export route now reads this column for the displayed date instead of computing it live. `lib/database.types.ts` regenerated via `supabase gen types typescript` — the regeneration also required manually restoring a previously-lost type refinement for the `reserve_ai_slot` RPC's `Returns` shape (the CLI still can't introspect this function's actual return columns, same limitation as when the types file was first generated 2026-06-22).
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged). New `acceptance-criteria.md` AC-FR-37-03A; `PDR-DH-003` revision history updated; `docs/data-model.md` bumped 1.13 → 1.14; `technical-design.md` bumped 1.18 → 1.19.
+
+---
+
+## 2026-07-17 — Site footer now shows the app version
+
+WJ asked live during Henry Smith testing whether the site footer should show a build/version id, given the confusion that same session about which of two similarly-named test applications he was looking at. Agreed to add one, deferred to the next session ("in the morning").
+
+Not a new decision — the underlying versioning scheme (`YYYY.MM.DD-<short SHA>`, sourced from Vercel's build-time git commit metadata) was already proposed, approved, and built on 2026-07-02 (see that date's entries below), via `lib/version.ts`'s `getAppVersion()`. It was previously wired into only the **export document's** footer (`app/api/export/[applicationId]/route.ts`) — the live app's own footer (`components/site-footer.tsx`) had never shown a version at all. **Built:** `components/site-footer.tsx` now calls the same `getAppVersion()` helper and renders `Grant Pathway v<version>` beneath the existing tagline, in muted text consistent with the rest of the footer. No new design decision required — same helper, same format, second call site.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged, no existing coverage of this component).
+
+**Live-verified by WJ the same day:** screenshot confirmed "Grant Pathway v2026.07.17-9d8d30c" rendering correctly beneath the tagline in the deployed footer.
+
+---
+
+## 2026-07-17 — PDR-AI-009 built: AI refine relevance-check consistency
+
+WJ reviewed two live scenarios from Henry Smith Step 4 testing (screenshots supplied 2026-07-16) where "Help me improve this" declined to touch clearly irrelevant/off-topic filler text when the answer was over its word limit, but passed the same kind of content straight through unchanged when the answer was under limit. Investigation found this decline behaviour is not a designed safeguard: `buildRefinePrompt()` (`lib/prompts.ts`) has no relevance-check instruction at all — the sole safety net against irrelevant AI output is `DR-AI-003`'s Option A (mandatory human review checklist before approval), not anything in the prompt itself. The inconsistency WJ found is emergent LLM behaviour, not a bug in any existing logic. WJ: "A human checklist will not be enough, let's refine the prompt to make it consistent and tighter."
+
+Design agreed the same morning, recorded as `PDR-AI-009`: `buildRefinePrompt()` always attempts its structure/clarity pass regardless of word-limit status (removing the limit-dependent inconsistency), but also judges whether the answer plausibly addresses the question at all — if not, it prepends a clearly-flagged warning line (new exported constant `REFINE_IRRELEVANT_WARNING`) to the same `refinedText` output rather than declining outright. Two alternatives were considered and rejected: always declining outright (needs a new API/UI shape to represent "declined," not a prompt-only fix) and always polishing silently (removes the model's only existing signal, the opposite of "tighter"). No API change — the warning rides inside the existing single-string response.
+
+**Built same day.** One risk found and fixed during implementation: the "Suggested improvement" panel already displays `refinedText` correctly (its existing `whitespace-pre-wrap` rendering shows the warning as its own line, no UI change needed there), but "Use this improved version" previously saved that text verbatim — meaning the literal warning sentence could have ended up saved as part of the charity's actual answer if a user clicked through without reading it. Fixed with a `stripRefineWarning()` helper in `components/application-step4-draft.tsx` (matches `REFINE_IRRELEVANT_WARNING` by exact string, duplicated locally rather than importing the server-only `lib/prompts.ts` into this client component) applied both before adopting the suggestion and before computing `PDR-AI-006`'s "still over the limit" word/character count, which would otherwise have been inflated by the warning line itself (verified: 26 words/147 characters raw vs. the correct 8/39 once stripped). `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged, no existing coverage of this component).
+
+**Live-verified by WJ the same day:** retested a real Henry Smith safeguarding question (300-word limit) with the same irrelevant filler text from the original screenshots. Over the limit (503 words), the warning line appeared exactly as designed, followed by a suggestion compressed to within 300 words (no shortfall message shown). WJ confirmed the mid-text compression seen in the suggestion is expected, pre-existing behaviour from `buildRefinePrompt()`'s over-limit instruction (unrelated to this fix, and distinct from `PDR-AI-007`'s deterministic "Trim to limit"). WJ: "we can safely say this has passed testing."
+
+---
+
+## 2026-07-16 — Manually-added governance items no longer skip the assembly gate when blank
+
+While digesting a live Henry Smith test scenario (screenshots: "8 of 8 questions approved", "Ready to assemble" still active), WJ ticked several financial/governance facts via the "Add a financial or governance detail" manual picker, left them all blank, and found "Ready to assemble" remained clickable throughout, right up to the senior-review gate. Not a bug in the mechanism itself — `GOVERNANCE_ITEMS`' `item_label` deliberately ends in "(optional)" so the existing skippable-when-blank gate treats it like any other optional question — but the reasoning behind that skip only fits the AI-auto-detected case: `PDR-AI-008` decided that a low-signal AI detection should never become a forced question for a novice user. A manual add is the opposite — the charity actively chose to answer that fact, so leaving it blank afterwards shouldn't silently bypass approval.
+
+**Fix:** `components/application-step4-draft.tsx`'s `allApproved` computation, and the matching check that shows the "Approve this answer" panel while an answer is empty, are both now also gated on the existing `addedManually` flag (already used for the "Added by you" badge) — `!q.addedManually` is required alongside the "(optional)" text check before an empty item is treated as skippable. AI-detected governance facts (with or without a citation) are unaffected; only manually-added instances of the same 5 facts now require an answer and approval before assembly.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-29-08), `docs/PRD-Grant-Pathway.md` (0.55 → 0.56), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — PDR-AI-006 built: refined suggestions still over the limit now name the exact shortfall
+
+Third and final gap closed in this same-day cluster (see the two entries below). While discussing why AI refine sometimes can't help at all, WJ asked what benefit there was in offering both "Help me improve this" and "Trim to limit" — the answer surfaced `PDR-AI-006`'s own decision, made 2026-07-04 alongside `PDR-AI-007`: LLMs cannot reliably hit an exact word/character count when compressing (a 200-word answer against a 50-word limit was refined to 60, still over). That PDR's user-guide wording fix was built at the time, but its in-app half — a conditional message inside the "Suggested improvement" card, shown only when the suggestion is itself still over the limit — was left "decided-but-not-yet-built," the third such gap found in one session (after `DR-FD-001`'s free-text fallback and `PDR-AI-007` itself).
+
+**Fix:** `components/application-step4-draft.tsx` now computes the refined suggestion's own word/character count against the question's limit, inside the per-question render loop, and shows exactly the wording `PDR-AI-006` decided: _"This suggestion is still \[N\] words over the limit — AI can't always hit an exact word count. Check the counter and trim it further, or try again."_ (adapted to "characters"/"character count" per `limitType`), directly under the suggested text, only when it's actually still over.
+
+**One implementation snag, found and fixed during this task:** the first version computed this inline as an IIFE inside the JSX return (`{condition && (() => {...})()}`) and tripped the `react-hooks/refs` ESLint rule ("Cannot access refs during render"), even though nothing inside the IIFE touched a ref — almost certainly a false positive from the experimental React Compiler's static analysis misattributing an unrelated ref access elsewhere in the same render function to the IIFE's scope. Fixed by hoisting the computation to a plain `const` alongside the component's other per-question values (`isOver`, `isNear`, etc.), matching the file's existing pattern — this resolved the lint error immediately with no behaviour change.
+
+Verified message wording and pluralisation with a standalone script (10 words → "10 words", 1 word → "1 word", 25 characters → "25 characters"). `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-006-word-limit-compression-disclosure.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-30-03A), `docs/PRD-Grant-Pathway.md` (0.54 → 0.55), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — "Trim to limit" extended to ordinary narrative questions, alongside AI refine
+
+Follow-on from PDR-AI-007's budget-only trim button (previous entry below). While live-testing Henry Smith, WJ hit an ordinary (non-budget) narrative question over its word limit, clicked "Help me improve this," and got back: _"The original answer provided does not contain any information about safeguarding processes or procedures for the planned trip. There is no relevant content to refine or improve. Please provide an answer that addresses the question so that it can be reviewed and refined appropriately."_ — correct behaviour (the refine prompt is instructed never to invent facts, and WJ's test answer was deliberately unrelated word-count-testing filler text, not real content), but it left him with no way forward at all: no rewritten answer, and no fallback.
+
+Discussed the tradeoff directly: AI refine tries to genuinely improve the prose while staying in-limit (better result when it works) but has two known failure modes now confirmed in testing — it can undershoot and land the answer still over limit (`PDR-AI-006`), or it can decline to engage at all when there's nothing genuine to refine (found live, above). A deterministic trim guarantees a way forward either way, at effectively zero cost since `trimToLimit()` (built for PDR-AI-007) already exists and is not budget-specific. WJ agreed to add it as a secondary option, not a replacement for AI refine.
+
+**Fix:** the "Trim to limit" button (same `handleTrimToLimit()` handler, same deterministic sentence-snap logic) now also appears under the existing "trim it or use AI" message for ordinary narrative questions over their limit — previously that message pointed at "use AI" with no concrete action available if AI declined or undershot. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-007-budget-over-limit-messaging.md`, `docs/PRD inputs/acceptance-criteria.md`, `docs/PRD-Grant-Pathway.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — PDR-AI-007 built: budget questions over their limit get a deterministic trim, not silence
+
+WJ live-testing Henry Smith hit a budget-flagged narrative question ("If you have not raised all the money needed, what are your plans to do so?", 300-word limit) with a deliberately over-limit 503-word test sample and asked: "I thought we had fixed this scenario... There is no AI, so therefore how do we assist the user to bring down the number of words?"
+
+**Investigation found this had, in fact, already been decided** — `PDR-AI-007-budget-over-limit-messaging.md`, decided 2026-07-04 during Clothworkers Foundation testing and formalised 2026-07-11 — but a repo-wide search turned up no trace of the decided message or "Trim to limit" button anywhere outside the PDR document itself. The decision was never turned into a tracked task in `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md`, so it sat "decided, not yet built" for 12 days and nobody noticed until WJ independently re-discovered the exact same gap. Same failure mode as `DR-FD-001`'s 2026-07-11 free-text-fallback amendment, found stale during the 2026-07-16 Phase 5 audit (see the entry further below) — a decision recorded only in its own document, with no corresponding line in the tracked task list, is invisible to anyone checking "what's left to build."
+
+**Root cause (confirmed live in code):** the entire "Help me improve this" block in `components/application-step4-draft.tsx` — including the red over-limit warning ("...trim it or use AI...") — was wrapped in `{!q.isBudgetQuestion && (...)}`. Budget questions showed no over-limit message at all, just the raw counter turning red, exactly matching what WJ described.
+
+**Built exactly as PDR-AI-007 decided** (Option C + Option E; Option F — AI assist on budget questions — remains explicitly rejected for now):
+
+1. A budget-specific over-limit message, no AI reference, shown only for `q.isBudgetQuestion && !isGovernanceItem && isOver`: _"Your answer exceeds the funder's word/character limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving."_
+2. A new `trimToLimit()` helper plus a "Trim to limit" button, entirely deterministic (no AI/LLM call, preserving the "AI never sees financial figures" guarantee): snaps to the last complete sentence that still fits within the limit, falling back to a hard word/character cut (snapped to a word boundary) if even the first sentence alone exceeds it.
+
+Verified with a standalone reproduction script against WJ's exact 502-word sample: trims to 285 words, cleanly snapped to a sentence boundary, well within the 300-word limit. Also checked a character-limit case and a no-sentence-fits hard-cut case. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — this component has no existing test coverage; verified live is the established precedent, same as prior Step 4 fixes this session).
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD decisions/PDR-AI-007-budget-over-limit-messaging.md`, `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-29-06), `docs/PRD-Grant-Pathway.md` (0.52 → 0.53), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Numbering extended to free-form funders' sections and governance items
+
+Follow-on from the Step 3 count-mismatch fix (next entry below): WJ then asked directly whether Step 4's lack of numbering on Walton Charity (a free-form funder) should also be revisited, since it looked inconsistent next to structured funders' numbered questions. Confirmed this was documented, intentional behaviour (`AC-FR-28-04`) — free-form funders were designed from the start to show unnumbered narrative sections, distinct from structured funders' numbered Q&A cards. WJ asked for it to be extended anyway, since that original premise pre-dates PDR-AI-008's governance facts (2026-07-15): a fact like "Are any of your trustees related to each other...?" reads as a discrete question regardless of the funder's own classification, not a narrative section title, so leaving it unnumbered inside a free-form item list was inconsistent even before this request.
+
+**Fix:** `components/application-step4-draft.tsx`'s number span is no longer gated on `funderType === 'structured'` — every item (narrative question, narrative section, or governance item) is now numbered by its position in the ordered, answered list, matching the pattern already used for governance items on structured funders (2026-07-16, earlier fix this same day). The free-form textarea's `aria-label` now also includes the number (`Content for section N: ...`) rather than only the question text. `actions/applications.ts`'s `assembleAndAdvance()` no longer detects or branches on funder type at all — the entire "Detect funder type for assembly format" step was removed as dead code once both branches would produce the same numbered output; every answered item is simply prefixed with its position.
+
+Reverses part of a formal, documented decision (`AC-FR-28-04`, `AC-FR-31A-04`) — both corrected with revision notes rather than silently rewritten, matching this repo's practice of never editing a past decision's history away. `PRD-Grant-Pathway.md` (0.51 → 0.52) updated to match.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of either file's numbering logic; verified live is the established precedent for both, same as the earlier structured-funder governance-numbering fix). Can't be verified live locally — Step 4 needs a real application with saved item data — next live check is WJ's.
+
+**Files changed:** `components/application-step4-draft.tsx`, `actions/applications.ts`, `docs/PRD inputs/acceptance-criteria.md`, `docs/PRD-Grant-Pathway.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Step 3 summary undercounted items whenever governance facts were detected
+
+WJ live-testing Walton Charity with a fictitious charity saw Step 3 announce "We identified 4 sections to complete", then Step 4 show "0 of 7 sections approved" — a jarring mismatch between two consecutive screens.
+
+**Root cause:** the Step 3 banner (`components/application-step3-summary.tsx`) computed its count from `summary.sections?.length` (free-form) or `summary.questions.length` (structured) only — it never added `summary.governanceFacts?.length`. Step 4 renders governance facts (PDR-AI-008) as ordinary items in the same list as narrative sections/questions, so its count (`questions.length` in that component, which is really "all items") always included them. Walton's guidelines raised 3 of the 5 governance facts (reserves, trustee-relatedness, bank-signatory-relatedness) alongside 4 narrative sections — 4 vs 7. The same undercount would show on any structured funder with detected governance facts too; it just hadn't been hit yet, since Lloyds Bank Foundation earlier in testing happened to have zero governance signal.
+
+**Fix:** both banner strings now add `governanceFacts?.length ?? 0` to their total before rendering, so the number Step 3 promises always matches what Step 4 actually shows.
+
+`tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — no existing coverage of this component's banner text). Can't be verified live locally (needs a real Bedrock call; `dotenvx` redacts AWS credentials for this agent by design) — next live regeneration with governance facts detected is WJ's verification.
+
+**Separately raised, not yet actioned:** WJ also noted no numbering appears on Step 4 for this (free-form) funder. Confirmed this is documented, intentional behaviour (`AC-FR-28-04`: free-form funders show narrative sections, never numbered, in both Step 4 and the assembled draft) — not a bug. Flagged back to WJ as a design question worth revisiting now that governance facts (more question-like than a narrative section) can appear inside a free-form funder's item list too, a case `AC-FR-28-04` pre-dates.
+
+**Files changed:** `components/application-step3-summary.tsx`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Phase 5 audit follow-up: migration-push task added, ToS/Privacy/Vercel Pro/cron status corrected
+
+Second pass on the Phase 5 review begun earlier the same day (see the entry directly below). Three more findings from that review, all approved for fixing by WJ:
+
+**1. P5.4 had no task for pushing Phase 6's migrations to production.** Every Phase 6 migration since P6.1 (2026-07-05) has been deliberately scoped to `grant-pathway-dev` only, with each task's own scoping note promising `grant-pathway-prod` would be "re-entered at P5.4" — but P5.4's actual checklist never contained a line item for that re-entry, and neither did the Phase 6 → Go-Live Gate. By the time Phase 5 starts, roughly 10 migrations (P6.1, P6.2a, P6.2, P6.3, P6.4, P6.5, both PDR-AI-008 migrations, GAP-33, the manual-add fallback) will need applying to prod. Added an explicit task to P5.4 (`supabase db push` against prod, verified via `supabase migration list` matching Local/Remote on both projects) and a matching checklist line to the Phase 6 → Go-Live Gate.
+
+**2. P5.1's Terms of Service / Privacy Policy rows read as not-yet-drafted.** Both are in fact live — `/terms` since 2026-07-10, `/privacy` since 2026-07-02 (confirmed via `app/(public)/terms`, `app/(public)/privacy`, and the `docs/legal/*.md` sources). Updated both rows and the section preamble to reflect this, calling out the two items that genuinely remain open: the `Effective date` placeholder in both documents (currently `[TO BE CONFIRMED]`, confirmed by reading the actual files) and the solicitor review neither has had yet.
+
+**3. P5.4's "Activate Vercel Pro" and cron-confirmation bullets read as pending.** Vercel Pro is active and all three crons in `vercel.json` are confirmed running (`cleanup-guidelines` every 30 min, `inactivity-warning`/`inactivity-deletion` daily) — corroborated independently, not just from memory: a 30-minute cron is not possible on Vercel's Hobby plan (once-daily crons only), so its presence in production confirms Pro is active. Both bullets marked done.
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.16 → v3.17), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Phase 5 factual audit: Funder Directory section superseded, Admin Dashboard query fixed
+
+WJ asked for a review of `IMPLEMENTATION-PLAN.md`'s Phase 5 section while stepping away, given a week of heavy Phase 6 changes — wanted confirmation it was still "intact and factual" ahead of Phase 5 starting next week.
+
+**Finding:** the Funder Directory section (`P5.FD1`–`P5.FD6`) was still marked "✅ Complete (2026-06-01)", describing a searchable funder picker over a `funders` Supabase table with a "Request a Funder" escape hatch. That entire design was reversed on 2026-07-15 (`DR-FD-001` v1.4, already documented at the time but never propagated back into the Phase 5 plan) — Step 1's funder field is plain free text again, with no picker, no directory query, and no escape hatch. Root cause of the drift: `DR-FD-001` is a Tier 3 (stable) decision record, `IMPLEMENTATION-PLAN.md` is Tier 2 — the reversal was correctly logged in the Tier 3 doc on 2026-07-15 but the corresponding Tier 2 task spec was never revisited, since no task was "in progress" against it at the time.
+
+**Fix:** section re-marked `~~Funder Directory (DR-FD-001)~~ — Superseded 2026-07-15`, with a summary of what changed and why; the six `P5.FD*` task descriptions are struck through and retained underneath for audit-trail purposes only, matching the pattern already used for P6.6's retirement.
+
+**Knock-on fix:** P5.5b's Admin Dashboard "Top funders" panel query joined `applications.funder_id → funders.id` — since no application has populated `funder_id` since the picker was removed, that panel would have silently gone empty/stale for every application created from 2026-07-15 onward. Changed to `SELECT funder_name, COUNT(*) FROM applications GROUP BY funder_name ORDER BY COUNT(*) DESC LIMIT 10`. P5.5b is not yet built, so this is a planning-document correction only — no code changed.
+
+No other Phase 5 content was found to be factually broken in the same review — P5.1–P5.5's GAP items, the P5.4 migration-reconciliation history, and the Performance section were all confirmed still accurate (the Performance section describes June's timing work; July's truncation/repeated-line accuracy fixes sit underneath it as later, separately-logged refinements, not contradictions).
+
+**Files changed:** `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` (v3.15 → v3.16), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Citation quote could highlight an incidental detail (e.g. a word limit) instead of the question itself
+
+WJ spotted this live-testing Lloyds Bank Foundation: the "view original guidelines" panel for "Please provide a short summary of your charity's purpose and aims" highlighted "Suggested word count: 300 - 400 words, maximum 500." instead of the question text — technically a verbatim excerpt from the correct page, but not the sentence a user actually wants jumped to.
+
+**Root cause:** the citation instruction in `buildSummaryPrompt()` (`lib/prompts.ts`) told the AI to quote "a short verbatim excerpt copied exactly from within that marker's text block — something a person could search for and find," without requiring the excerpt to come from the question/section's own wording. Any short, findable string on the cited page satisfied the instruction, including an adjacent word-limit line.
+
+**Fix:** tightened the instruction to require the quote come from the question/section's own text (its title/wording or opening words) and explicitly rule out nearby word/character limits, formatting instructions, or other incidental details — stating the purpose directly (a reader clicking the citation should land on the question, not something next to it).
+
+Prompt-only change — no code path to unit test, and the actual output can't be reproduced locally (Bedrock calls need real AWS credentials, which `dotenvx` redacts to empty strings for this agent by design). `tsc --noEmit`, `eslint --max-warnings 0`, all 75 tests pass (unchanged). Live re-verification is WJ's next Step 3 generation.
+
+**Files changed:** `lib/prompts.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Governance items now get a real sequential number, folded in with narrative questions
+
+WJ reviewed a Clothworkers assembled draft (Step 5) showing "Total annual expenditure (£)" with no number at all, immediately followed by "1. Please describe the community/group of people you support..." — the first narrative question. He initially thought I'd misread his concern as being about truncated answer text (a red herring from investigating a different, unrelated question about deliberately-pasted word-count-testing content), then clarified: he expected the governance item to be numbered "1." and the narrative question to follow as "2.", not for governance items to be excluded from numbering entirely.
+
+This reverses part of PDR-AI-008's original rendering design (governance items render as unnumbered "ordinary cards", and the 2026-07-15 Step 5 numbering fix explicitly matched that — see this file's 2026-07-15 entry and `PDR-AI-008`'s Revision History). Confirmed the exact scope with WJ before changing established, documented behaviour: number governance items in both Step 4 (writing) and Step 5 (assembled draft), keeping their existing sort-first position rather than moving them to the end.
+
+**Fix:** both `components/application-step4-draft.tsx` and `actions/applications.ts` (`assembleAndAdvance`) now compute the displayed number from each item's **position in the already-ordered, answered list** (`index + 1`) rather than from the raw `item_order` column, which stays negative for governance items and was never meant to be user-facing. Step 4 previously suppressed the number entirely for governance items (`!isGovernanceItem`); Step 5 previously did the same via a `field_key !== null` check (the fix from 2026-07-15 that stopped it leaking the raw negative order). Both checks are removed — every structured-funder item now gets a number, governance items included, since governance items already sort before narrative questions by design (reserved negative `item_order`, -5 to -1).
+
+Also removed `field_key` from `assembleAndAdvance`'s query — it was only ever read for the now-removed numbering condition.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 75 tests pass (unchanged — neither file has existing unit coverage, same precedent as the original 2026-07-15 fix: tightly coupled to the Supabase client / DOM rendering, verified live instead). **Files changed:** `components/application-step4-draft.tsx`, `actions/applications.ts`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Repeated-line stripping was deleting genuine questions that recur verbatim across a funder's multiple forms
+
+Follow-on from the form-aware truncation fix (next entry below): while verifying that fix against the real Clothworkers PDF, found that "Please describe the difference you expect your capital project to make" was missing from the cleaned text **even with no truncation ceiling applied at all** — a separate, pre-existing bug, not caused by truncation. WJ called it a serious bug and asked to fix it immediately rather than deferring, while he continued testing.
+
+**Root cause:** `detectRepeatedLines()` (`lib/preprocess-text.ts`) treated any line appearing 3+ times identically (under 120 characters) as a PDF running header/footer and stripped it everywhere. Clothworkers repeats this exact question verbatim across all 3 of its forms (Small Grants, Large Grants stages 1 and 2) — a plain "identical 3+ times" rule can't distinguish that from an actual repeated header like "THE CLOTHWORKERS' FOUNDATION: OPEN GRANTS PROGRAMME GUIDANCE" (which legitimately appears near-identically on most pages and should be stripped).
+
+**Fix:** added a marker-adjacency requirement. A genuine running header/footer reliably sits as the very first non-blank line after a `[PAGE N]`/`[SECTION: ...]` boundary, or the very last non-blank line before the next one — `isAdjacentToMarker()` checks this for every occurrence of a repeated line, and a line is only stripped if **all** of its occurrences qualify. Clothworkers' repeated question is embedded mid-page in each of its 3 forms (never adjacent to a page boundary), so it now survives; the genuine running header still strips cleanly since every one of its occurrences sits immediately after a page marker. Deliberately conservative: if even one occurrence isn't marker-adjacent, none of that line's occurrences are stripped — erring toward keeping content, consistent with this file's existing "when in doubt, omit a pattern" philosophy for boilerplate-heading stripping.
+
+Verified against the real Clothworkers PDF (both fixes combined): the whole Small Grants form, including this question and the funding-shortfall question, now survives the 50,000-char production ceiling intact. Also spot-checked the cleaning step (no truncation, isolating this change's effect) against 7 other scheduled-funder guideline PDFs (A B Charitable Trust, Walton Charity, Idlewild, Garfield Weston, Nationwide, Heritage Fund, MK Community Foundation) — reductions stayed modest (0–2%) with no crashes or obviously broken output, per ADR-AI-010's requirement to test any pre-processing change across all scheduled funders. Full end-to-end (live AI extraction) re-verification per funder remains WJ's live-testing responsibility, same as always — this was a text-level sanity check only, not a substitute for it.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 75 tests pass (3 new: a true header still strips correctly; a genuine cross-form repeated question survives; a repeated line with mixed marker-adjacency is kept entirely).
+
+**Files changed:** `lib/preprocess-text.ts`, `__tests__/preprocess-text.test.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — Form-aware truncation: large multi-form guideline PDFs were losing their actual application questions
+
+WJ was live-testing Clothworkers' Foundation (Harry's Rainbow) — a scheduled ADR-AI-010 test funder whose 54-page guidance-plus-sample-forms PDF has always hit the truncation warning ("very large... reviewed the first section") — and asked directly: how many questions should this document actually produce, and can the message/process be improved rather than just accepted? Investigation confirmed the guidance was accurate but the underlying process was actively losing content: production's `PREPROCESS_CHAR_CEILING` (50,000, per this ADR's 2026-06-05 decision) truncated in raw document order, which meant a "keep the first N characters" cut systematically favoured front-loaded eligibility/overview prose over the actual Sample Small Grants Programme Application Form — landing mid-way through the form's most important narrative questions ("describe your project," "how you will raise the shortfall") on the real document.
+
+Presented two fix options with a clear tradeoff (raise the ceiling further vs. detect-and-prioritise the real form section) and asked WJ to choose before changing a production-wide parameter; he chose the form-aware approach. **Built:** `findFormStartIndex()` (`lib/preprocess-text.ts`) scans for a strong "this is the actual sample form" heading (`SAMPLE ... APPLICATION`, falling back to `APPLICATION FORM`) — deliberately skipping numbered table-of-contents entries so an early "4. Sample Small Grants Programme Application Form" listing doesn't get mistaken for the real thing. When a form-start heading is found anywhere in a document that needs truncation, the ceiling budget is split: pre-form content is capped at 40% of the ceiling (`PREAMBLE_MAX_SHARE`) so the form section reliably gets the majority share, rather than letting a long preamble consume the whole budget before the form is ever reached. The existing marker-snap logic (drop a partial page/section entirely rather than leave it half-populated) was extracted into a reusable `snapToLastMarker()` helper and applied to both the preamble and form slices.
+
+**A real implementation bug found and fixed during verification, not shipped as designed:** the first version only triggered the form-aware split when the form heading's offset was _beyond_ the ceiling — reproducing this exactly on the real Clothworkers PDF revealed that header/footer stripping (an earlier pipeline step) shrinks the cleaned document enough that the heading actually lands _before_ the ceiling, so the condition never fired and the plain path still cut the form short. Corrected to trigger whenever a form heading exists anywhere in a truncated document, not only when it's beyond the ceiling. Verified against the real PDF (not a synthetic fixture) both before and after this correction — confirmed broken, confirmed fixed — using a local repro script that reproduces `lib/extract-text.ts`'s exact `unpdf` extraction pipeline (no Bedrock call, so no secrets required; see `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`-adjacent tooling note in project memory about Bedrock calls specifically needing production logs instead).
+
+The client-facing message (`components/application-step3-summary.tsx`) now distinguishes the two cases: when a form section was found and prioritised, the copy says so explicitly rather than the previous blanket "reviewed the first section" wording, which would have been actively misleading once truncation stopped happening in raw document order. The API response (`app/api/generate-summary/route.ts`) carries a new `formSectionPrioritized` boolean alongside the existing `guidelinesTruncated` flag.
+
+**A second, separate bug surfaced during this investigation, not fixed here:** Clothworkers repeats the exact sentence "Please describe the difference you expect your capital project to make" identically across all three of its forms (Small Grants, Large Grants stages 1 and 2). The existing repeated-line header/footer detection (any line appearing 3+ times identically, `detectRepeatedLines`) treats this as page-header noise and strips it everywhere — including from the Small Grants form where it's a genuine, load-bearing question. Confirmed this happens regardless of truncation (reproduced with an artificially huge ceiling, no cut at all). Flagged to WJ as a distinct follow-up requiring its own fix and cross-funder validation (per this ADR's existing Consequences requirement to test any pre-processing change against all scheduled funders) — not bundled into this change.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 72 tests pass (4 new, covering: a SAMPLE-heading form prioritised over an earlier numbered TOC entry; the APPLICATION FORM fallback pattern; no-op when the form already fits the ceiling; plain fallback when no form heading exists at all).
+
+**Files changed:** `lib/preprocess-text.ts`, `app/api/generate-summary/route.ts`, `components/application-step3-summary.tsx`, `__tests__/preprocess-text.test.ts`, `docs/Technical Decision and Design/ADR-AI-010-summary-performance-strategy.md`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-16 — generate-summary fix: free_form sections with no word limit crashed Step 3 deterministically
+
+WJ was live-testing Walton Charity (a `free_form` funder) specifically to exercise the eligibility-mismatch path (Harry's Rainbow — bereavement support in Milton Keynes vs. Walton's Elmbridge-only, poverty-focused criteria) and hit "We couldn't generate your summary right now" on Step 3. He asked whether it was a Claude outage. Anthropic's status page did show a resolved "Claude Sonnet 5 errors" incident earlier that morning (08:39–08:53 UTC), which looked like a plausible match at first, but the real Vercel function logs (retrieved after installing and linking the Vercel CLI — not previously set up in this environment — `vercel logs --status-code 500`) told a different story: `stop_reason: end_turn` on every attempt, ruling out output-token truncation, and the actual failure was `[generate-summary] JSON parse/validation failed after retry`.
+
+**Root cause:** temporary diagnostic logging (added to `route.ts`, then removed once root-caused) surfaced the exact Zod error — 4× `"Invalid input: expected number, received null"`. Claude was returning `wordLimit: null` for each of Walton's narrative sections that has no stated word limit — the same convention already used and accepted for `questions[].wordLimit`. But `aiSummarySectionSchema.wordLimit` was `z.number().optional()` (missing `.nullable()`), so every section without an explicit limit failed validation. Since this route runs at `temperature: 0` (the 2026-07-15 determinism fix), the failure was 100% reproducible on this document, not transient — no amount of "Try again" could ever have worked, and the error copy's "this is usually temporary" was actively misleading for this failure mode.
+
+**Fix:** `aiSummarySectionSchema` (`app/api/generate-summary/route.ts`) and the `AiSummarySection` type (`lib/types.ts`) now accept `wordLimit: number | null`, matching `aiSummaryQuestionSchema`'s existing pattern. Downstream consumers (`actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`) already normalised with `?? null` and needed no change — only the validation boundary was wrong. Confirmed fixed by WJ's live retry: the summary generated successfully and the eligibility-mismatch result rendered exactly as expected. `tsc --noEmit`, `eslint --max-warnings 0`, all 68 tests pass.
+
+**Tooling note:** the Vercel CLI is now installed and linked to this project (`rapidglobes-projects/grant-pathway`), so `vercel logs`/`vercel ls` are available for future investigations — this was the missing piece that made root-causing this fast rather than guesswork.
+
+**Files changed:** `app/api/generate-summary/route.ts`, `lib/types.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-15 — Step 5 assembled-draft numbering fix for governance items
+
+WJ predicted, then live-verified, that MK Community Foundation's Sapling Grants guidelines would trigger the same 3-of-5 governance facts as Oak Grants (Reserves, bank-signatory count, bank-signatories-related) — confirming the extraction logic generalises correctly across a second programme from the same funder. But he then flagged the Step 5 "Review and approve" screen showing these items with their raw internal numbering visible: "-4. Reserves (£)", "-2. How many people are authorised as bank signatories?", "-1. Are any bank signatories related to each other or to a trustee?"
+
+**Root cause:** governance items use a reserved negative `item_order` (-5 to -1) purely so they sort before a funder's own numbered questions — never meant to be shown to a user. Step 4's rendering already excludes this prefix for governance items, built during the PDR-AI-008 work. But `assembleAndAdvance()` (`actions/applications.ts`), which formats the Step 5 "assembled draft" independently by reading `item_order`/`item_label`/`answer_text` straight from the database, had no equivalent exclusion — it prefixes every structured-funder item with its raw `item_order` unconditionally.
+
+**Fix:** the query now also selects `field_key`; a governance item (identified the same way Step 4 does — `field_key !== null`) renders as a plain label with no number, exactly matching Step 4's display. `tsc --noEmit` and `eslint --max-warnings 0` both clean. No test added — `assembleAndAdvance` has no existing unit coverage (heavy Supabase-client coupling, consistent with other server actions in this file) — live re-verification of the Step 5 screen is pending WJ's own testing, per this project's established pattern for AI/UI behaviour that can't be exercised from this environment.
+
+**Files changed:** `actions/applications.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-15 — Citation-highlight fix: typographic punctuation tolerance
+
+WJ asked a direct testable question after the PDR-AI-008 build: "will the MKCF guidelines trigger a governance question?" Read the actual MK Community Foundation Oak Grants PDF and predicted 2-3 of the 5 facts would trigger (reserves policy, bank-signatory relatedness, plausibly signatory count) based on the extraction rules. WJ then live-tested it and got exactly that — 12 narrative questions + 3 governance items — confirming the detection logic works as designed. But he flagged something the prediction didn't cover: the Reserves item's citation badge linked correctly to "Page 3," but clicking it opened the viewer with no highlight and no auto-scroll, landing on Page 1.
+
+**Root-caused with a direct database query**, not guesswork: `supabase db query --linked` against `grant-pathway-dev` to pull the actual stored `guideline_reference.quote` for the 3 governance items and the retained `application_guidelines.guideline_text` for the same application, then ran the real `findQuoteRange` matching logic against both outside the app to reproduce the failure deterministically. Found: the AI's quote read "...six months' free reserves..." (straight apostrophe, U+0027) while the source PDF's actual text reads "...six months' free reserves..." (curly/smart apostrophe, U+2019) — a single-character mismatch that defeats the literal word-for-word regex match. WJ separately confirmed the two bank-signatory items (sharing a different quote with no smart punctuation) highlighted correctly — isolating the bug to typographic punctuation variants specifically, not a broader citation-viewer regression.
+
+**Fix:** `findQuoteRange` (`lib/guideline-citations.ts`) now treats each of three punctuation-equivalence classes as interchangeable when building its match pattern — straight/curly apostrophe (`'` / `'` / `'` / `ʼ`), straight/curly double quote (`"` / `"` / `"`), and hyphen/en-dash/em-dash (`-` / `–` / `—`). Each character in the quote is matched against its whole equivalence class in the source text, not just that literal character — but the _displayed_ highlight still slices from the original text, so the on-screen result always shows the source's real typesetting (e.g. the curly apostrophe), never a normalised version. This is a general fix, not scoped to governance facts — it benefits any funder's guidelines using proper typographic punctuation, which is common in PDFs and Word documents generated by non-technical staff.
+
+Verified against the real retained MKCF text before and after the fix (a standalone script reproducing the exact production logic) — confirmed broken beforehand, confirmed fixed afterward, before touching the actual source file.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 68 tests pass (4 new — the exact live case verbatim, the symmetric curly-in-quote/straight-in-source direction, double quotes, and dashes).
+
+**Files changed:** `lib/guideline-citations.ts`, `__tests__/guideline-citations.test.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-15 — PDR-AI-008's manual-add fallback built (fast-follow)
+
+The auto-detection half of PDR-AI-008 (previous entry) deliberately deferred the zero-signal fallback — a manual-add picker — as a separate follow-up. WJ asked for it to be built while stepping out briefly, and asked what was needed first; answered directly (the design was already agreed in the earlier conversation) and proceeded without a blocking plan-mode approval gate, since he wouldn't be present to approve one. One real judgement call was flagged rather than silently decided: how to distinguish a manually-added item from an AI-detected one with no citation, since both otherwise look identical (`guideline_reference: null`). Resolved with a new boolean column rather than overloading an existing enum.
+
+**The mechanism:** a quiet link below the Step 4 question list — "Need to add something about your finances or governance that wasn't asked above? Add it." — appears only when at least one of the 5 governance facts isn't already shown, and disappears entirely once all 5 are present. Clicking it reveals checkboxes for just the missing facts, each carrying a plain-English explanation (`GOVERNANCE_FIELD_EXPLANATIONS`, `lib/governance-items.ts`) rather than a bare label — a novice user (Persona 1, Margaret) shouldn't have to already know what "bank signatory relatedness" means to decide whether it applies to her.
+
+**Data:** new `application_items.added_manually` boolean column (migration `20260715000001`), `false` by default. A new server action `addManualGovernanceItems` (`actions/applications.ts`) creates the selected rows via `resolveGovernanceInserts()` with `added_manually: true`, scoped to the closed 5-field vocabulary only — any value outside `GOVERNANCE_FIELD_KEYS` is silently rejected server-side, not just hidden client-side.
+
+**A real bug caught before it shipped:** the existing orphan-cleanup logic only treats a governance item's `item_order` as "in the summary" when the AI currently detects it. A manually-added item is never AI-detected by definition, so without a fix, the very next Step 4 sync (e.g. simply reloading the page) would have deleted an unanswered manually-added item as "orphaned." Fixed by folding any existing row's `added_manually` item_order into the same `summaryOrders` set used for narrative orphan-checking — a manually-added item now survives regardless of what any given extraction pass does or doesn't detect, exactly as intended.
+
+**Rendering:** a manually-added item shows a small "Added by you" badge in place of a citation badge — honest about where the question came from, matching the UX design discussed earlier the same day. On successful add, the client does a hard page reload rather than reconciling local state — consistent with this codebase's existing "mutate then hard-refresh" pattern (`setDraftInProgress`'s own caller), and avoids duplicating the server's sort/guidance/citation logic on the client for what is a rare-use feature.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 64 tests pass (4 new — explanation-map coverage and `added_manually` default/override behaviour). Migration applied to `grant-pathway-dev` only (`supabase migration list`, 24/24 matched before and after); `grant-pathway-prod` confirmed still unlinked (`supabase projects list`).
+
+**Files changed:** `supabase/migrations/20260715000001_governance_manual_add.sql` (new), `lib/database.types.ts`, `lib/governance-items.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `__tests__/governance-items.test.ts`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/PRD decisions/PRD-DECISIONS-INDEX.md`, `docs/data-model.md` (v1.13), `docs/PRD-Grant-Pathway.md` (v0.51), `docs/PRD inputs/acceptance-criteria.md` (new AC-FR-12A-04).
+
+---
+
+## 2026-07-15 — PDR-AI-008 built: governance facts now guideline-driven, superseding the always-on block
+
+WJ's live testing of the always-on 5-item "Governance and reserves" block (built earlier the same day, commit `82e11d9`, currency-formatted in `7e68c9a`) found it disjointed from the rest of Step 4 — no citation, no funder-specific rationale, shown regardless of whether the funder cares. Decided (`docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`) and built the same day.
+
+**The mechanism:** a new `"governanceFacts"` array joins `questions`/`sections` in the AI JSON schema (`lib/prompts.ts`), Zod-validated and citation-reconciled in `app/api/generate-summary/route.ts` through the exact same `extractValidMarkers`/`validateCitation` pipeline already used for narrative items — no new citation machinery. The key design choice: this array's extraction bar is deliberately **lower** than "questions" — a general eligibility or policy statement counts, not just a discrete question — and citation stays optional (an entry with `citation: null` is still shown, exactly like narrative questions/sections already behave). This is what delivers WJ's "auto-show on any signal" decision without needing a separate relaxed-citation tier.
+
+**What creates the rows:** `lib/governance-items.ts` gained `resolveGovernanceInserts()` — given whichever facts the AI detected this time, it looks up `item_type`/`item_label`/`item_order`/`is_budget_question` from the fixed `GOVERNANCE_ITEMS` table (still never trusted from the AI — only _whether_ a row exists at all is now guideline-driven) and dedupes by `field_key`. Both sync paths (`setDraftInProgress`, Step 4's fallback sync) now call this conditionally, replacing the unconditional "always upsert all 5" block from this morning.
+
+**Orphan cleanup simplified, not special-cased:** `isOrphanedItem()`'s `field_key` carve-out — needed this morning because governance items were never part of the AI's own numbering — is gone. A detected fact's reserved `item_order` now folds into the same `summaryOrders` set the narrative sync already builds, so a governance item whose fact the extraction no longer raises is cleaned up exactly like a dropped narrative question: deleted if unanswered, kept if already answered. This is a genuine simplification, not just new capability — one fewer special case in the codebase than this morning's build had.
+
+**Rendering:** the dedicated "Governance and reserves" section heading in `components/application-step4-draft.tsx` is removed entirely (confirmed with WJ: blend in, no special framing) — a shown item now renders as an ordinary-looking card at its reserved sort position, picking up the same citation badge every other item gets automatically once `guideline_reference` is populated. The AI's extracted wording is surfaced through the existing `guidance` text slot (previously free_form-sections-only) instead of a removed heading's blurb — loosened that render condition to also cover governance items regardless of funder type or budget-question status.
+
+**Deliberately not built this round:** a manual-add picker for the zero-signal case (WJ confirmed: auto-detection first, manual-add as a separate fast-follow — see `PDR-AI-008` for the full reasoning about why a self-serve relevance picker would ask a novice user, Persona 1 Margaret, to make a judgement call her persona says she can't reliably make).
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 60 tests pass (2 tests removed — they asserted the exact carve-out being retired — 5 new tests added, 3 for `resolveGovernanceInserts`, 2 for the simplified `isOrphanedItem`). No DB migration — `field_key`/`guideline_reference` already existed from this morning's build.
+
+**Files changed:** `lib/types.ts`, `lib/prompts.ts`, `lib/governance-items.ts`, `app/api/generate-summary/route.ts`, `actions/applications.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `__tests__/governance-items.test.ts`, `docs/Technical Decision and Design/ADR-DATA-006-application-item-graph-model.md`, `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`, `docs/PRD decisions/PRD-DECISIONS-INDEX.md`, `docs/data-model.md` (v1.12), `docs/PRD-Grant-Pathway.md` (v0.50), `docs/PRD inputs/acceptance-criteria.md`.
+
+---
+
+## 2026-07-15 — DR-FD-001 v1.4: curated funder picker/directory removed, free-text field restored
+
+WJ questioned whether Step 1's "Who is offering this grant?" searchable picker was still needed, six weeks after it was introduced (DR-FD-001, 2026-06-01). Investigation found the 2026-07-11 amendment relaxing the picker to a free-text fallback had never actually been built — it existed only inside the decision record, with no corresponding task in `IMPLEMENTATION-PLAN.md`'s tracked list.
+
+**Decision: go further than finishing that fallback — remove the picker/directory entirely.** With Step 3/4/5 processing already known (per the same 2026-07-11 amendment) to be driven per-application by the uploaded guidelines rather than by funder identity, a curated directory no longer serves the purpose it was built for. `Who is offering this grant?` is a plain free-text field again.
+
+**Dependency sweep before touching anything** (WJ was explicit he didn't want something else to silently break): grepped every reference to `funder_id`/`funders`/`FunderOption` across the codebase. Contained to three files: `actions/applications.ts` (`getActiveFunders()` deleted; `saveApplicationStep1()` loses its `funderId` param), `components/application-step1-form.tsx` (whole picker/dropdown/keyboard-nav/mailto-link UI replaced with a plain text input), and the Step 1 server page (stops fetching the funder list). No test file referenced any of it.
+
+**The one real compatibility question:** P6.5's "start from your last application to [Funder]" (`getPreviousApplicationForFunder`) matched "same funder" by exact `funder_id` equality. With no stable funder identity left, it now matches a trimmed, case-insensitive `funder_name` comparison instead (Postgres `ILIKE`, with `%`/`_`/`\` escaped so a funder name containing one of those characters literally isn't treated as a wildcard). Agreed with WJ as a deliberate soft-miss trade-off: typing a funder's name slightly differently between two applications means the reuse prompt just won't offer itself — it will never wrongly match two different funders' data together.
+
+**Left alone, on purpose:** the `funders` table and `applications.funder_id` column — same low-priority-cleanup treatment already given to the table's own dormant `funder_type` column, rather than an urgent drop migration. No database migration in this change at all.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 55 tests pass.
+
+**Files changed:** `actions/applications.ts`, `components/application-step1-form.tsx`, `app/(authenticated)/applications/[id]/step/1/page.tsx`, `docs/decisions/DR-FD-001-funder-directory-model.md` (v1.4), `docs/decisions/DECISIONS-INDEX.md`, `docs/PRD-Grant-Pathway.md` (v0.49), `docs/PRD inputs/acceptance-criteria.md` (FR-15), `docs/moscow-feature-register.md` (v1.17), `docs/data-model.md` (v1.11).
+
+---
+
+## 2026-07-15 — PDR-AI-008: governance-facts placement to be reworked via guideline-driven extraction
+
+Following the £-formatting fix (next entry below), WJ's live testing prompted a bigger rethink: the fixed 5-item "Governance and reserves" block (built earlier the same day, previous entry) felt disjointed from the rest of Step 4 — no citation badge, no funder-specific rationale, shown unconditionally regardless of whether a given funder cares about any of it.
+
+**Decision (full record: `docs/PRD decisions/PDR-AI-008-governance-fact-detection-and-fallback.md`):** fold these 5 facts into the same guideline-driven extraction pipeline that already produces ordinary narrative questions with citations — shown only when a funder's guidelines actually raise the topic, not unconditionally on every application.
+
+**The key nuance, worth preserving:** the natural instinct was to require a precise, quotable citation before showing an item, with a self-serve "tick whichever of these applies" picker as the fallback for anything less precise. WJ pushed back once the conversation reached `docs/user-personas-journeys-and-use-cases.md`'s Persona 1, Margaret — no fundraising training, finds funder language confusing, already unsure whether her answers address what the funder asked. A picker that asks her to judge relevance herself just relocates the guesswork, it doesn't remove it. Also explicitly rejected: proactively suggesting a governance fact to a novice user when the AI has no signal at all — WJ's judgement was that this could make things worse for Margaret, not better, by introducing a decision point instead of removing one.
+
+**Landed on instead:** auto-show a governance item whenever the AI has _any_ signal at all, even an imprecise, unlocalised one — so a novice user is never shown a gap she's expected to notice and fill herself. The manual-add picker (plain-English explanations, not jargon labels) stays available to everyone but is designed as a rare shortcut for a more experienced user (Persona 2, David) who might know a funder-specific quirk the guidelines don't spell out — not the primary safety net.
+
+**Status: decided, not built.** This supersedes the "placement only, always show all 5 unconditionally" scope agreed earlier the same day (see the entry below) — that build stands as shipped and working, but its unconditional-display design will be reworked once this is scheduled.
+
+---
+
+## 2026-07-15 — Governance Step 4 items: £ fields reformatted to UK currency style
+
+During his live verification pass of the governance-items redesign (previous entry below), WJ confirmed the 5 items render correctly at the top of Step 4, then asked for the two £ fields (total annual expenditure, reserves) to display in UK currency format — "£ n,nnn,nnn" — rather than a plain unformatted number input.
+
+**Fix:** `components/application-step4-draft.tsx` splits the governance number-input branch in two: the two budget fields (`is_budget_question: true`) now render a text input with a fixed "£" affix and live UK thousands-separator formatting (`toLocaleString('en-GB')`) via a new `formatThousands()` helper; the bank-signatory count field (not a budget question) keeps the original plain number input, unaffected. The underlying stored `answer_text` stays raw digits (formatting is display-only, applied on render and stripped again on input) — no change to what's saved, so `saveAnswer`, Step 5 export, and the DB column are all unaffected.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 55 tests pass. `docs/PRD-Grant-Pathway.md` (v0.48) Step 4 Q&A table row corrected to describe the three number-field input types precisely instead of grouping them all as "plain number input".
+
+**Files changed:** `components/application-step4-draft.tsx`, `docs/PRD-Grant-Pathway.md` (v0.48).
+
+---
+
+## 2026-07-15 — Governance/reserves facts re-sited from `charity_profiles` into `application_items`
+
+WJ asked why the 5 governance/reserves facts (P6.1, 2026-07-05) lived on the charity profile page rather than at Step 3 or Step 4. Investigation found they were never actually consumed anywhere — not by Step 3's summary/eligibility logic, not by P6.5's clone — so `/profile`'s own copy ("helps flag issues before you apply") was untrue.
+
+**Decision: Option C — re-site into the item-graph, not Step 3 or a hybrid.** The schema already had dormant scaffolding that looked purpose-built for exactly this: `item_type` values `data`/`number` and a `source_of_truth = 'charity_profile'` enum value, both defined by P6.2 but never populated. Chosen over keeping them at profile level (never wired up, no reuse of the citation/approval machinery every other item already has) and over building AI-driven per-funder relevance detection immediately (bigger scope, not asked for this round).
+
+**Scope, confirmed with WJ:**
+
+- Placement only, this round — all 5 items always shown, every application, matching today's behaviour. No AI relevance/citation detection yet; deferred.
+- `/profile`'s governance section and the 5 `charity_profiles` columns retired outright. No backfill — this is dev/test data, and the new design has no per-charity "current value" store to backfill into anyway.
+- **No seeding between applications, including P6.5 reuse.** WJ was explicit: carrying forward financial/governance figures silently risks stale data. Every application collects these 5 facts fresh, every time — no exception for the "start from your last application" reuse flow.
+
+**Implementation:** new `application_items.field_key` column (CHECK-constrained to the 5 known values) identifies these rows robustly, independent of `item_label` wording. Reserved negative `item_order` (-5 to -1) sorts them first without touching the existing AI-driven narrative numbering. Created via the same dual sync path every other item already uses (`setDraftInProgress`, Step 4's fallback sync) — a third upsert block runs unconditionally in both, `answer_text` deliberately omitted so a fresh row inserts blank and an already-answered row is never clobbered on repeat syncs. `answer_text` stores the literal display value as plain text (not a coded enum), so `saveAnswer`/`approveAnswer` and the Step 5 export needed zero changes — only the Step 4 input widget is type-aware (a number input, or a Yes/No/Not sure yet select, instead of a textarea). P6.5's clone explicitly filters out `field_key IS NOT NULL` rows so reuse never carries these forward either. Item labels end in "(optional)" deliberately, reusing Step 4's existing optional-question gate with no code change to that logic.
+
+Also fixed in passing: the Step 4 orphan-cleanup filter (deletes unanswered rows the AI summary no longer mentions) was duplicated identically in two branches — extracted into a single tested `isOrphanedItem()` helper, which also had to learn to never treat a governance item as orphaned regardless of the current AI summary's numbering.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 55 tests pass (9 new). Migration applied to `grant-pathway-dev` only (confirmed via `supabase migration list` before/after — 22/22, then 23/23); `grant-pathway-prod` remains unlinked. Live browser verification pending WJ.
+
+**Files changed:** `supabase/migrations/20260715000000_governance_items_move_to_item_graph.sql`, `lib/governance-items.ts` (new), `lib/database.types.ts`, `actions/applications.ts`, `actions/charity.ts`, `app/(authenticated)/applications/[id]/step/4/page.tsx`, `components/application-step4-draft.tsx`, `components/charity-profile-form.tsx`, `__tests__/governance-items.test.ts` (new), `docs/data-model.md` (v1.10), `IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-07-15 — Step 3 extraction pinned to `temperature: 0`; anti-merge rule added
+
+Ad-hoc E2E testing found a regression: MK Community Foundation — Oak Grants extracted 10 questions on a brand-new test run, down from the 12 confirmed correct the day before (2026-07-14 P6.3 live-test). `git log` and a same-code-path check ("Regenerate summary" vs. a first-time upload) ruled out a code change or stale cache — the guideline text and route were identical between runs.
+
+**Root cause:** the Step 3 Bedrock call (`app/api/generate-summary/route.ts`) never set a `temperature`, leaving the model at its non-zero API default — the same input text can legitimately produce different extraction output, including a different question count, on separate calls. This had never been decided or documented anywhere (`ADR-AI-004`, the prompt-construction ADR, said nothing about temperature). Separately, `lib/prompts.ts`'s extraction rules only forbade merging questions _across_ multiple application forms — nothing stopped the model merging two adjacent, related-but-distinct questions _within_ one form, which is the specific pair (existing funding secured / fundraising plans) that went missing.
+
+**Fixed:** `temperature: 0` pinned on the Step 3 summary call only — this is a structured-extraction task (pull out what's literally stated), not creative generation, so determinism is the correct behaviour. `/api/refine-answer` (rewording a user's own answer) is a different, more variation-tolerant task and was deliberately left unchanged. The extraction prompt gained an explicit instruction alongside the existing cross-form rule: never merge two distinct questions into one, even when adjacent or thematically related, even within the same form.
+
+This is a general reliability fix, not specific to one funder — any funder's guidelines could in principle have hit the same non-deterministic merging behaviour.
+
+`tsc --noEmit` and `eslint --max-warnings 0` both clean. No schema change.
+
+**Live-verified by WJ the same day:** re-ran "Regenerate summary" three times on MK Community Foundation — Oak Grants — all three runs consistently returned 12 questions. Separately, a fresh funder (MK Community Foundation — Sapling Grants) was spot-checked: Claude's manual read of the PDF (applying the same extraction rules) predicted 6 narrative questions; the live app returned exactly 6.
+
+**Files changed:** `app/api/generate-summary/route.ts`, `lib/prompts.ts`, `IMPLEMENTATION-STATUS.md`, `ADR-AI-004-prompt-construction.md`.
+
+---
+
 ## 2026-07-14 — P6.6 (Transparency Status) retired, will not be built
 
 P6.6 was designed to show a per-funder trust badge (fully supported / partially supported / guidance-only / unreviewed), keyed to whether a human curator had reviewed and approved a playbook for that funder. P6.5's pivot earlier today to private, per-charity reuse removed that basis entirely — no curator role exists or is planned. Rather than invent a substitute signal (extraction/citation quality, structured-vs-free-text parsing were both considered), WJ confirmed retiring the task: with no curation step anywhere in the product, every funder is in the identical state, so there is nothing left for a "trust tier" to differentiate.

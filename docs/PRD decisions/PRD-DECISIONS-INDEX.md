@@ -10,7 +10,7 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 | Status         | Count |
 | -------------- | ----- |
-| ✅ Decided     | 20    |
+| ✅ Decided     | 23    |
 | 🔄 In Progress | 0     |
 | ⏳ Pending     | 0     |
 | ⏸ Deferred     | 0     |
@@ -42,15 +42,18 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ## AI Integration (AI)
 
-| ID                                                            | Question                                                                                                                                               | Status     |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| [PDR-AI-001](PDR-AI-001-claude-model-selection.md)            | Which Anthropic Claude model will be used for AI summarisation and draft generation in v1?                                                             | ✅ Decided |
-| [PDR-AI-002](PDR-AI-002-prompt-strategy.md)                   | Will AI prompts be hardcoded, stored in the database, or managed through a configuration file?                                                         | ✅ Decided |
-| [PDR-AI-003](PDR-AI-003-streaming-vs-batch.md)                | Should AI-generated content stream to the screen word by word, or appear all at once when complete?                                                    | ✅ Decided |
-| [PDR-AI-004](PDR-AI-004-context-window-management.md)         | How will the application handle funder guidelines that are too long for a single API context window?                                                   | ✅ Decided |
-| [PDR-AI-005](PDR-AI-005-cost-controls.md)                     | Will there be a limit on AI requests per user per day or session, and what happens when the limit is reached?                                          | ✅ Decided |
-| [PDR-AI-006](PDR-AI-006-word-limit-compression-disclosure.md) | When AI assist can't fully compress an over-limit answer to fit, how should Grant Pathway tell the user?                                               | ✅ Decided |
-| [PDR-AI-007](PDR-AI-007-budget-over-limit-messaging.md)       | When a budget/financial question exceeds its limit, what message and trim assistance should be shown, given AI assist is disabled for these questions? | ✅ Decided |
+| ID                                                                 | Question                                                                                                                                                                                      | Status     |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| [PDR-AI-001](PDR-AI-001-claude-model-selection.md)                 | Which Anthropic Claude model will be used for AI summarisation and draft generation in v1?                                                                                                    | ✅ Decided |
+| [PDR-AI-002](PDR-AI-002-prompt-strategy.md)                        | Will AI prompts be hardcoded, stored in the database, or managed through a configuration file?                                                                                                | ✅ Decided |
+| [PDR-AI-003](PDR-AI-003-streaming-vs-batch.md)                     | Should AI-generated content stream to the screen word by word, or appear all at once when complete?                                                                                           | ✅ Decided |
+| [PDR-AI-004](PDR-AI-004-context-window-management.md)              | How will the application handle funder guidelines that are too long for a single API context window?                                                                                          | ✅ Decided |
+| [PDR-AI-005](PDR-AI-005-cost-controls.md)                          | Will there be a limit on AI requests per user per day or session, and what happens when the limit is reached?                                                                                 | ✅ Decided |
+| [PDR-AI-006](PDR-AI-006-word-limit-compression-disclosure.md)      | When AI assist can't fully compress an over-limit answer to fit, how should Grant Pathway tell the user?                                                                                      | ✅ Decided |
+| [PDR-AI-007](PDR-AI-007-budget-over-limit-messaging.md)            | When a budget/financial question exceeds its limit, what message and trim assistance should be shown, given AI assist is disabled for these questions?                                        | ✅ Decided |
+| [PDR-AI-008](PDR-AI-008-governance-fact-detection-and-fallback.md) | When should the 5 governance/reserves facts be asked, and what happens when a funder's guidelines don't clearly raise one — should a novice user ever be asked to judge relevance themselves? | ✅ Decided |
+| [PDR-AI-009](PDR-AI-009-refine-relevance-check-consistency.md)     | When an answer doesn't genuinely address its question, what should "Help me improve this" do — consistently, regardless of word-limit status?                                                 | ✅ Decided |
+| [PDR-AI-010](PDR-AI-010-financial-section-catch-all.md)            | When a free_form funder's themed financial section reduces to pure numbers already covered by the 5 governance facts, should it be dropped, forced unconditionally, or something else?        | ✅ Decided |
 
 ---
 
@@ -81,5 +84,5 @@ These decisions cover: feature scope and prioritisation, user interface and expe
 
 ---
 
-_Last updated: 2026-07-11_
-_Status: 20 of 20 decisions made. PDR-AI-007 added: budget/financial questions over their word/character limit currently show no message at all (confirmed live in `application-step4-draft.tsx`) — decided (2026-07-04, formalised 2026-07-11) to show a budget-specific message without an AI-assist reference, plus a deterministic "Trim to limit" button (no AI/LLM call); not yet built, held pending end of current testing session._
+_Last updated: 2026-07-17_
+_Status: 23 of 23 decisions made. PDR-AI-008: the 5 governance/reserves facts built earlier the same day as an always-on fixed block (commit `82e11d9`) have been folded into guideline-driven extraction — shown automatically whenever the AI has any signal at all (even an imprecise one), never proactively suggested to a novice user (Persona 1, Margaret) who can't be expected to judge relevance herself. The manual-add picker (rare experienced-user shortcut for the zero-signal case) has also now been built, same day — a quiet link, hidden once all 5 facts are shown, revealing plain-English-explained checkboxes for only the missing ones. Both halves of PDR-AI-008 are complete. PDR-AI-009: decided and **built same day (2026-07-17)** — "Help me improve this" always attempts a polish but prepends a flagged warning when the answer doesn't genuinely address the question, regardless of word-limit status; see that PDR for the two rejected alternatives and a UI risk found and fixed during implementation. PDR-AI-010: decided and **built same day (2026-07-17)**, found live-testing Stony Stratford Town Council — a "sections"-mode financial theme reducing entirely to numbers already captured by the governance facts was citing the exact same quote as a separate governance-fact card; the section is still created (the guidelines named the theme) but its guidance now explicitly invites context beyond the figures, and its citation is omitted rather than duplicated — deliberately guideline-driven, not an unconditional catch-all, to avoid repeating the exact anti-pattern PDR-AI-008's original always-on governance block was corrected away from._

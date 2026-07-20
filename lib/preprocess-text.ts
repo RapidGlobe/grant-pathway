@@ -13,6 +13,19 @@
 // leave those markers alone. Pasted text (no file, so no markers yet) gets
 // the same section tagging here instead, via looksLikeHeading's existing
 // numbered/ALL-CAPS heuristic.
+//
+// Form-aware truncation (2026-07-16): a plain "keep the first N characters"
+// ceiling systematically favours front-loaded guidance/eligibility prose over
+// the actual application form, which many funders (Clothworkers, Henry Smith,
+// Lloyds, Idlewild) place well into a combined guidance-plus-sample-forms
+// PDF. Confirmed on Clothworkers' 54-page pack: the plain ceiling cut off
+// mid-way through the real form's most important narrative questions
+// ("describe your project", "the difference you expect it to make") while
+// keeping only front-matter guidance. findFormStartIndex() below looks for a
+// strong "this is the actual sample form" heading; when one is found beyond
+// where the ceiling would otherwise land, the ceiling budget is split between
+// a short preamble (eligibility/overview context) and the form section
+// itself, rather than truncating in raw document order.
 
 // Default character ceiling. Override via PREPROCESS_CHAR_CEILING env var.
 // Applied after all other stripping — a safety net for very large documents.
@@ -75,20 +88,58 @@ function isPageNumber(line: string): boolean {
   )
 }
 
-// Lines appearing 3+ times in identical form and shorter than 120 characters
-// are treated as PDF header/footer artefacts and removed. Structural markers
-// are excluded even if a heading title happens to repeat verbatim elsewhere.
+// Returns true if the line at `index` sits immediately next to a structural
+// marker — i.e. it is the first non-blank line after a [PAGE N]/[SECTION: ...]
+// boundary (a running header) or the last non-blank line before the next one
+// (a running footer). Blank lines in between are skipped, since PDF
+// extraction commonly leaves a blank line before/after a page's header/footer.
+function isAdjacentToMarker(lines: string[], index: number): boolean {
+  let before = index - 1
+  while (before >= 0 && lines[before].trim() === '') before--
+  if (before >= 0 && STRUCTURAL_MARKER.test(lines[before].trim())) return true
+
+  let after = index + 1
+  while (after < lines.length && lines[after].trim() === '') after++
+  if (after < lines.length && STRUCTURAL_MARKER.test(lines[after].trim())) return true
+
+  return false
+}
+
+// Lines appearing 3+ times in identical form, shorter than 120 characters,
+// and — critically — sitting at a page/section boundary on EVERY occurrence
+// are treated as PDF running header/footer artefacts and removed. Structural
+// markers are excluded even if a heading title happens to repeat verbatim
+// elsewhere.
+//
+// The marker-adjacency requirement (2026-07-16) guards against a real bug
+// found on Clothworkers' Foundation guidelines: a genuine, load-bearing
+// question ("Please describe the difference you expect your capital project
+// to make") is repeated verbatim across the funder's 3 separate application
+// forms, embedded mid-page each time — a plain "identical 3+ times" rule
+// stripped it everywhere, including from the one form that actually needed
+// it. A true running header/footer, by contrast, reliably sits as the first
+// or last line of every page it appears on. If even one occurrence of a
+// repeated line is NOT marker-adjacent, none of its occurrences are
+// stripped — erring toward keeping content over losing it.
 function detectRepeatedLines(lines: string[]): Set<string> {
-  const counts = new Map<string, number>()
-  for (const line of lines) {
+  const positions = new Map<string, number[]>()
+  lines.forEach((line, index) => {
     const t = line.trim()
     if (t && t.length < 120 && !STRUCTURAL_MARKER.test(t)) {
-      counts.set(t, (counts.get(t) ?? 0) + 1)
+      const existing = positions.get(t)
+      if (existing) {
+        existing.push(index)
+      } else {
+        positions.set(t, [index])
+      }
     }
-  }
+  })
+
   const repeated = new Set<string>()
-  for (const [text, count] of counts) {
-    if (count >= 3) repeated.add(text)
+  for (const [text, indices] of positions) {
+    if (indices.length >= 3 && indices.every((index) => isAdjacentToMarker(lines, index))) {
+      repeated.add(text)
+    }
   }
   return repeated
 }
@@ -135,11 +186,85 @@ function tagPastedTextSections(text: string): string {
   return out.join('\n')
 }
 
+// Heading patterns that reliably mark the start of an actual, fillable
+// application form — as opposed to a table-of-contents listing (numbered,
+// e.g. "4. Sample Small Grants Programme Application Form") or a guidance
+// section that merely discusses the form in the abstract (e.g. "THE
+// APPLICATION FORM" heading before the real thing). Checked in priority
+// order; the first line in the whole document matching either pattern (and
+// not a numbered heading) wins, so a document with multiple sample forms
+// (e.g. Small Grants, then Large Grants) correctly lands on the first one.
+const FORM_START_PATTERNS: RegExp[] = [
+  /^SAMPLE\b.{0,80}APPLICATION/i,
+  /^(THE\s+)?APPLICATION\s+FORM\b/i,
+]
+
+// Share of the character ceiling reserved for pre-form content (eligibility,
+// overview, what's funded) when a form-start heading is found beyond where a
+// plain ceiling cut would reach. The remainder goes to the form section
+// itself — deliberately biased toward the form, since that's where the
+// concrete narrative questions live.
+const PREAMBLE_MAX_SHARE = 0.4
+
+/**
+ * Finds the character offset of the first heading that marks the start of an
+ * actual sample/fillable application form, or -1 if none is found. Skips
+ * numbered headings (table-of-contents entries) — those list a form's title
+ * without containing the form itself.
+ */
+function findFormStartIndex(text: string): number {
+  const lines = text.split('\n')
+  const offsets: number[] = []
+  let offset = 0
+  for (const line of lines) {
+    offsets.push(offset)
+    offset += line.length + 1 // +1 for the '\n' removed by split
+  }
+
+  for (const pattern of FORM_START_PATTERNS) {
+    for (let i = 0; i < lines.length; i++) {
+      const trimmed = lines[i].trim()
+      if (!trimmed || numberedHeadingDepth(trimmed) !== null) continue
+      if (!looksLikeHeading(trimmed)) continue
+      if (pattern.test(trimmed)) return offsets[i]
+    }
+  }
+  return -1
+}
+
+/**
+ * Truncates `slice` back to the last complete [PAGE N] / [SECTION: ...]
+ * marker it contains, so a page/section that would be cut off mid-way is
+ * dropped in its entirety rather than left half-populated with no citation
+ * to anchor to. Falls back to a last-newline snap (only if it falls in the
+ * final `minKeepRatio` of the slice) when no marker is present at all.
+ */
+function snapToLastMarker(slice: string, minKeepRatio = 0.9): string {
+  const markerPattern = /^\[(?:PAGE \d+|SECTION:.*)\]$/gm
+  let lastMarkerIndex = -1
+  let markerMatch: RegExpExecArray | null
+  while ((markerMatch = markerPattern.exec(slice)) !== null) {
+    lastMarkerIndex = markerMatch.index
+  }
+
+  if (lastMarkerIndex > 0) {
+    return slice.slice(0, lastMarkerIndex).trimEnd()
+  }
+
+  const lastNewline = slice.lastIndexOf('\n')
+  if (lastNewline > slice.length * minKeepRatio) {
+    return slice.slice(0, lastNewline)
+  }
+  return slice
+}
+
 export type PreprocessResult = {
   text: string
   wasTruncated: boolean
   originalLength: number
   processedLength: number
+  /** True if a form-start heading was found and prioritised over blindly keeping the first N characters (2026-07-16). */
+  formSectionPrioritized: boolean
 }
 
 export function preprocessText(raw: string, charCeiling = DEFAULT_CHAR_CEILING): PreprocessResult {
@@ -210,34 +335,38 @@ export function preprocessText(raw: string, charCeiling = DEFAULT_CHAR_CEILING):
     .join('\n')
     .trim()
 
-  // 8. Apply character ceiling — snap back to the last complete [PAGE N] /
-  //    [SECTION: ...] marker before the ceiling (ADR-AI-007, P6.2a), so a
-  //    page/section that would be cut off is dropped in its entirety rather
-  //    than left half-populated with no citation to anchor to. Falls back to
-  //    the previous last-newline snap if no marker is found in range (e.g.
-  //    unmarked plain text, or a single page/section larger than the ceiling).
+  // 8. Apply character ceiling. Plain case: snap back to the last complete
+  //    [PAGE N] / [SECTION: ...] marker before the ceiling (ADR-AI-007,
+  //    P6.2a), so a page/section that would be cut off is dropped in its
+  //    entirety rather than left half-populated with no citation to anchor
+  //    to. Form-aware case (2026-07-16): if an actual application form starts
+  //    beyond where the plain ceiling would land, a plain cut would silently
+  //    drop the form's real questions while keeping only front-matter
+  //    guidance — instead, split the budget between a short preamble and the
+  //    form section itself.
   let wasTruncated = false
+  let formSectionPrioritized = false
   if (text.length > charCeiling) {
     wasTruncated = true
-    const slice = text.slice(0, charCeiling)
-    const markerPattern = /^\[(?:PAGE \d+|SECTION:.*)\]$/gm
-    let lastMarkerIndex = -1
-    let markerMatch: RegExpExecArray | null
-    while ((markerMatch = markerPattern.exec(slice)) !== null) {
-      lastMarkerIndex = markerMatch.index
-    }
+    const formStartIndex = findFormStartIndex(text)
 
-    if (lastMarkerIndex > 0) {
-      text = slice.slice(0, lastMarkerIndex).trimEnd()
+    // Trigger whenever a form section exists at all, not only when it starts
+    // beyond the ceiling — even a form starting well before the ceiling can
+    // still get cut off mid-way if the plain [0, ceiling) window doesn't
+    // leave it enough room (confirmed on Clothworkers: header/footer removal
+    // shrinks the document enough that the form heading lands at ~36k chars
+    // against a 50k ceiling, yet the plain path still lost the form's last
+    // two questions — capping the preamble share frees up real room for it).
+    if (formStartIndex > 0) {
+      formSectionPrioritized = true
+      const preambleBudget = Math.min(formStartIndex, Math.floor(charCeiling * PREAMBLE_MAX_SHARE))
+      const preamble = snapToLastMarker(text.slice(0, preambleBudget))
+      const formBudget = charCeiling - preambleBudget
+      const formSlice = text.slice(formStartIndex, formStartIndex + formBudget)
+      const formPart = snapToLastMarker(formSlice)
+      text = `${preamble}\n\n${formPart}`
     } else {
-      let fallback = slice
-      const lastNewline = fallback.lastIndexOf('\n')
-      // Only snap to last newline if it falls in the final 10% of the slice —
-      // avoids losing large amounts of content on single-line-heavy docs
-      if (lastNewline > charCeiling * 0.9) {
-        fallback = fallback.slice(0, lastNewline)
-      }
-      text = fallback
+      text = snapToLastMarker(text.slice(0, charCeiling))
     }
   }
 
@@ -246,5 +375,6 @@ export function preprocessText(raw: string, charCeiling = DEFAULT_CHAR_CEILING):
     wasTruncated,
     originalLength,
     processedLength: text.length,
+    formSectionPrioritized,
   }
 }

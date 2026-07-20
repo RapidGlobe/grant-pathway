@@ -105,6 +105,7 @@ export type Database = {
       }
       application_items: {
         Row: {
+          added_manually: boolean
           ai_refined_answer: string | null
           answer_source: Database['public']['Enums']['answer_source'] | null
           answer_text: string | null
@@ -113,6 +114,7 @@ export type Database = {
           cloned_from_application_id: string | null
           created_at: string
           decision_maker_visible: boolean
+          field_key: string | null
           guideline_reference: Json | null
           id: string
           is_approved: boolean
@@ -131,6 +133,7 @@ export type Database = {
           word_limit: number | null
         }
         Insert: {
+          added_manually?: boolean
           ai_refined_answer?: string | null
           answer_source?: Database['public']['Enums']['answer_source'] | null
           answer_text?: string | null
@@ -139,6 +142,7 @@ export type Database = {
           cloned_from_application_id?: string | null
           created_at?: string
           decision_maker_visible?: boolean
+          field_key?: string | null
           guideline_reference?: Json | null
           id?: string
           is_approved?: boolean
@@ -157,6 +161,7 @@ export type Database = {
           word_limit?: number | null
         }
         Update: {
+          added_manually?: boolean
           ai_refined_answer?: string | null
           answer_source?: Database['public']['Enums']['answer_source'] | null
           answer_text?: string | null
@@ -165,6 +170,7 @@ export type Database = {
           cloned_from_application_id?: string | null
           created_at?: string
           decision_maker_visible?: boolean
+          field_key?: string | null
           guideline_reference?: Json | null
           id?: string
           is_approved?: boolean
@@ -206,6 +212,7 @@ export type Database = {
           created_at: string
           current_step: number
           draft_status: string
+          first_exported_at: string | null
           funder_id: string | null
           funder_name: string
           grant_name: string
@@ -221,6 +228,7 @@ export type Database = {
           created_at?: string
           current_step?: number
           draft_status?: string
+          first_exported_at?: string | null
           funder_id?: string | null
           funder_name: string
           grant_name: string
@@ -236,6 +244,7 @@ export type Database = {
           created_at?: string
           current_step?: number
           draft_status?: string
+          first_exported_at?: string | null
           funder_id?: string | null
           funder_name?: string
           grant_name?: string
@@ -257,16 +266,11 @@ export type Database = {
       }
       charity_profiles: {
         Row: {
-          bank_signatories_related: boolean | null
-          bank_signatory_count: number | null
           charity_name: string
           created_at: string
           id: string
           lookup_source: string | null
           registration_number: string | null
-          reserves: number | null
-          total_expenditure: number | null
-          trustees_related: boolean | null
           updated_at: string
           user_id: string
           what_charity_does: string
@@ -274,16 +278,11 @@ export type Database = {
           who_charity_helps: string
         }
         Insert: {
-          bank_signatories_related?: boolean | null
-          bank_signatory_count?: number | null
           charity_name: string
           created_at?: string
           id?: string
           lookup_source?: string | null
           registration_number?: string | null
-          reserves?: number | null
-          total_expenditure?: number | null
-          trustees_related?: boolean | null
           updated_at?: string
           user_id: string
           what_charity_does: string
@@ -291,16 +290,11 @@ export type Database = {
           who_charity_helps: string
         }
         Update: {
-          bank_signatories_related?: boolean | null
-          bank_signatory_count?: number | null
           charity_name?: string
           created_at?: string
           id?: string
           lookup_source?: string | null
           registration_number?: string | null
-          reserves?: number | null
-          total_expenditure?: number | null
-          trustees_related?: boolean | null
           updated_at?: string
           user_id?: string
           what_charity_does?: string

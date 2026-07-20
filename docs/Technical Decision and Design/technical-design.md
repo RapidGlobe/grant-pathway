@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.16
+**Version:** 1.19
 **Date:** 2026-04-21
-**Last updated:** 2026-07-14
+**Last updated:** 2026-07-17
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -342,21 +342,22 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 #### `applications`
 
-| Column             | Type          | Constraints                                                                                                                                         |
-| ------------------ | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`               | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                     |
-| `user_id`          | `uuid`        | FK → `auth.users(id)`                                                                                                                               |
-| `funder_id`        | `uuid`        | FK → `funders(id)`, nullable (migration safety)                                                                                                     |
-| `funder_name`      | `text`        | Not null — retained for display/export; populated from `funders.name` on selection                                                                  |
-| `grant_name`       | `text`        | Not null                                                                                                                                            |
-| `status`           | `text`        | `not_started \| in_progress \| approved \| exported \| mismatch`                                                                                    |
-| `current_step`     | `integer`     | 1–5, default 1                                                                                                                                      |
-| `ai_summary`       | `text`        | Nullable — JSON string, populated in Step 3                                                                                                         |
-| `draft_status`     | `text`        | `not_started \| in_progress \| ready_to_assemble \| assembled \| exported`, default `not_started` — tracks progress through the Step 4 Q&A workflow |
-| `assembled_draft`  | `text`        | Nullable — final assembled application text, written by the assemble action once all questions are answered; Step 5 export reads from this column   |
-| `last_exported_at` | `timestamptz` | Nullable — timestamp of most recent Word export                                                                                                     |
-| `created_at`       | `timestamptz` | Default `now()`                                                                                                                                     |
-| `updated_at`       | `timestamptz` | Default `now()`                                                                                                                                     |
+| Column              | Type          | Constraints                                                                                                                                                                                                                                                                                                |
+| ------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                | `uuid`        | PK, default `gen_random_uuid()`                                                                                                                                                                                                                                                                            |
+| `user_id`           | `uuid`        | FK → `auth.users(id)`                                                                                                                                                                                                                                                                                      |
+| `funder_id`         | `uuid`        | FK → `funders(id)`, nullable (migration safety)                                                                                                                                                                                                                                                            |
+| `funder_name`       | `text`        | Not null — retained for display/export; populated from `funders.name` on selection                                                                                                                                                                                                                         |
+| `grant_name`        | `text`        | Not null                                                                                                                                                                                                                                                                                                   |
+| `status`            | `text`        | `not_started \| in_progress \| approved \| exported \| mismatch`                                                                                                                                                                                                                                           |
+| `current_step`      | `integer`     | 1–5, default 1                                                                                                                                                                                                                                                                                             |
+| `ai_summary`        | `text`        | Nullable — JSON string, populated in Step 3                                                                                                                                                                                                                                                                |
+| `draft_status`      | `text`        | `not_started \| in_progress \| ready_to_assemble \| assembled \| exported`, default `not_started` — tracks progress through the Step 4 Q&A workflow                                                                                                                                                        |
+| `assembled_draft`   | `text`        | Nullable — final assembled application text, written by the assemble action once all questions are answered; Step 5 export reads from this column                                                                                                                                                          |
+| `last_exported_at`  | `timestamptz` | Nullable — timestamp of most recent export (any format); drives the re-export warning                                                                                                                                                                                                                      |
+| `first_exported_at` | `timestamptz` | Nullable — timestamp of this application's very first export (any format), added 2026-07-17. Set once, never overwritten — the export document's displayed "Date:" always reads this column, not `new Date()` at request time, so every export (either format, any future re-download) shows the same date |
+| `created_at`        | `timestamptz` | Default `now()`                                                                                                                                                                                                                                                                                            |
+| `updated_at`        | `timestamptz` | Default `now()`                                                                                                                                                                                                                                                                                            |
 
 `mismatch` is a terminal status — no transitions to steps 4 or 5 are permitted from this state (FR-47, DR-EL-001).
 
@@ -691,9 +692,6 @@ export const buildSummaryPrompt = (
 // "citation" (source_type/page_number/heading_path/quote, ADR-DATA-007) —
 // see "Citation recording" below.
 
-// Step 4: generate draft answers for all questions
-export const buildDraftPrompt = (...): string => `...`
-
 // Step 4: improve structure/clarity of a written answer (non-budget only)
 export const buildRefinePrompt = (
   questionText: string,
@@ -701,7 +699,15 @@ export const buildRefinePrompt = (
   wordLimit: number | null,
 ): string => `...`
 // Returns JSON: { "refinedText": "..." }
+// Relevance check (PDR-AI-009, 2026-07-17): always attempts the refine —
+// never declines outright, regardless of word-limit status — but prepends
+// the exported REFINE_IRRELEVANT_WARNING constant to refinedText when the
+// answer doesn't plausibly address the question. Stripped by
+// components/application-step4-draft.tsx before the suggestion is adopted
+// as the saved answer or counted against the word/character limit.
 ```
+
+**Corrected 2026-07-17** — this code block previously still showed `buildDraftPrompt` (Step 4 draft generation), which was deleted from `lib/prompts.ts` on 2026-07-01 (zero callers, superseded by `refine-answer` — see Section 6.6/PRD 0.x history). Removed here; not caught by the 2026-07-01 change at the time.
 
 **Prompt safety:** All prompts use XML-tag fencing to delimit user-supplied content (guidelines text, answer text) from the system instruction. This prevents prompt injection from funder documents. All LLM responses are validated with `safeParse` before use — an invalid JSON response triggers one automatic retry before surfacing as an error.
 
@@ -932,7 +938,7 @@ Vercel automatic Git deployment. (ADR-OPS-002)
 
 ### App versioning
 
-Since this project deploys continuously rather than on a release cadence, the app version (shown in the export document footer, per `PDR-DH-003`) is auto-derived from Vercel's build-time Git metadata rather than manually bumped. Format: `YYYY.MM.DD-<short git SHA>` (e.g. `2026.07.02-a2ca520`). Computed once at build time in `next.config.ts` (`APP_VERSION`), read via `lib/version.ts`'s `getAppVersion()`. Falls back to `"dev"` outside Vercel. Added 2026-07-02 — see `CHANGELOG.md` for the full rationale.
+Since this project deploys continuously rather than on a release cadence, the app version is auto-derived from Vercel's build-time Git metadata rather than manually bumped. Format: `YYYY.MM.DD-<short git SHA>` (e.g. `2026.07.02-a2ca520`). Computed once at build time in `next.config.ts` (`APP_VERSION`), read via `lib/version.ts`'s `getAppVersion()`. Falls back to `"dev"` outside Vercel. Added 2026-07-02 — see `CHANGELOG.md` for the full rationale. Shown in two places: the export document footer (per `PDR-DH-003`) and, since 2026-07-17, the live app's `SiteFooter` component — added so WJ can confirm which deployed build he is testing.
 
 ### Continuous Integration
 
@@ -1128,6 +1134,9 @@ The following one-time tasks must be completed before the first production deplo
 | 1.8     | 2026-07-05 | Rapidglobe Ltd | Added forward-reference notes to the `funders` and `application_answers` schema sections pointing at ADR-DATA-006 (Application Item-Graph Model) — a decided but not-yet-built rearchitecture superseding `funder_type` and the flat `application_answers` structure. No schema change; the tables documented here remain the accurate current-production state                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 | 1.9 | 2026-07-10 | Rapidglobe Ltd | Documented the reversal of ADR-DATA-002 ("never store" funder guidelines): the "commercially sensitive information" premise was checked against the real document corpus in `docs/Grant Org Guidelines/` and found false — these are funders' own publicly published guidance. Added a reversal note under "Data not stored" and a forward-reference note under "Guidelines session storage" explaining that extracted guideline text will be retained in Postgres (application-scoped cascade per ADR-DATA-003, or indefinite for approved playbooks) once the Phase 6 P6.2a/P6.2/P6.3 work ships; also added a forward-reference note under "Data retention" for the two new Phase 6 tables. No code has changed — `sessionStorage` and "never stored" remain the accurate current-production behaviour until that Phase 6 work lands |
+| 1.19 | 2026-07-17 | Rapidglobe Ltd | **Export date fixed to one timestamp per application.** New nullable `applications.first_exported_at` column (migration `20260717000000`, `grant-pathway-dev` only), set once on an application's very first export (any format) and never overwritten — `app/api/export/[applicationId]/route.ts`'s displayed "Date:" now reads this column instead of computing `new Date()` live on every request. Fixes a bug WJ found live-testing: a .txt export and a .docx export of the same application showed dates 2 minutes apart. `last_exported_at` (always refreshed, drives the re-export warning) is unaffected. §6 `applications` schema table updated. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-17) and `docs/data-model.md` v1.14. |
+| 1.18 | 2026-07-17 | Rapidglobe Ltd | **PDR-AI-009 built** — "Prompt architecture" section's `buildRefinePrompt` code sample updated with a relevance-check note: the prompt now always attempts the refine regardless of word-limit status (never declines outright), but prepends the exported `REFINE_IRRELEVANT_WARNING` constant to `refinedText` when the answer doesn't plausibly address the question — stripped by `components/application-step4-draft.tsx` before adoption or limit-counting. Same code block also still showed `buildDraftPrompt`, deleted from `lib/prompts.ts` on 2026-07-01 (zero callers) but missed by that day's own correction pass (v1.7) — removed. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-17) and `PDR-AI-009`. |
+| 1.17 | 2026-07-17 | Rapidglobe Ltd | **App versioning note updated** — the app version (`lib/version.ts`'s `getAppVersion()`) is now shown in two places, not one: the export document footer (`PDR-DH-003`, unchanged) and, newly, the live app's `SiteFooter` component (`components/site-footer.tsx`), added so WJ can distinguish deployed builds while live-testing. No new architectural decision — same helper, second call site. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-17). |
 | 1.16 | 2026-07-14 | Rapidglobe Ltd | **P6.5 built — private per-charity reuse, not a shared playbook.** During the design walkthrough, WJ challenged the premise behind a shared, curator-approved playbook: why shouldn't a charity applicant be their own curator? The simpler feature adopted instead: a charity starting a new application to a funder they've already reached Step 4 with before may choose to carry across their own previous question list, retained guidelines, AI summary, and answers (reset to "needs review"). New nullable `application_items.cloned_from_application_id` (self-referencing FK, `on delete set null`; migration `20260714000002`) — no new table. §6's `rubric_criterion_link` forward-reference corrected (target is `P6.7`, not `P6.5`); the `application_guidelines` cascade note's "Playbook rows... non-user-scoped" sentence corrected to describe the real, fully user-scoped mechanism. `ADR-DATA-006`/`ADR-DATA-007` amended the same day. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14). |
 | 1.15 | 2026-07-14 | Rapidglobe Ltd | **P6.4 built (first milestone)** — new "Citation display and viewer" note: Step 4 shows a clickable citation badge per question, opening a text panel (reusing the existing `Dialog` primitive) that highlights the cited quote in the retained guideline text. `ADR-SEC-004`/`ADR-DATA-007`/`ADR-OPS-006` corrected the same day — all three wrongly assumed canvas-based PDF rendering; the viewer is a plain text panel, no CSP change needed. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14). |
 | 1.14 | 2026-07-14 | Rapidglobe Ltd | **GAP-33 fixed** — new §6 `application_guidelines` table (migration `20260714000001`): retains the marker-tagged guideline text sent to the AI, so `P6.4`'s viewer has something real to render. `ADR-DATA-002`'s 2026-07-10 reversal decided this should exist; no task ever built it until now (a planning gap, not a P6.2 defect — confirmed with WJ). "Data not stored"/"Data retention" sections corrected: guideline text is no longer session-only. RLS table and account-deletion cascade order updated. Full detail in `docs/Implementation Plan/CHANGELOG.md` (2026-07-14) and `docs/data-model.md` v1.8. |

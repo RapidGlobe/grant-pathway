@@ -1,7 +1,9 @@
 import Link from 'next/link'
+import { getAppVersion } from '@/lib/version'
 
 export function SiteFooter() {
   const year = new Date().getFullYear()
+  const appVersion = getAppVersion()
 
   return (
     <footer className="border-t border-[#EDE8E1] bg-[#FDF9F5]">
@@ -11,6 +13,7 @@ export function SiteFooter() {
           <p className="mt-0.5 text-[12px] text-[#64748B]">
             Your free grant writing companion for UK charities
           </p>
+          <p className="mt-0.5 text-[11px] text-[#94A3B8]">Grant Pathway v{appVersion}</p>
         </div>
 
         <nav aria-label="Legal links">

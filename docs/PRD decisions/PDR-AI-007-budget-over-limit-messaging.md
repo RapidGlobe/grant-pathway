@@ -55,13 +55,19 @@ Alongside the message, a **"Trim to limit" button** — mechanically cuts the te
 
 ## Implementation status
 
-**Decided, not yet built — held pending the end of the current testing session (WJ, 2026-07-04).** Build tasks, both in `components/application-step4-draft.tsx` (or equivalent budget-card rendering logic):
+**Built 2026-07-16.** The decision sat unbuilt for 12 days after being formalised — no task was ever added to `IMPLEMENTATION-PLAN.md`/`IMPLEMENTATION-STATUS.md`'s tracked lists, so it fell through without anyone noticing. WJ independently re-discovered the exact same gap live-testing Henry Smith (a 300-word-limit budget question, tested with a 503-word sample), not realising it had already been decided. Built exactly as specified:
 
-1. A budget-specific over-limit message block — parallel to the existing narrative one, but without any AI-assist reference — rendered when `q.isBudgetQuestion && isOver`.
-2. A deterministic "Trim to limit" button alongside it, cutting to the last complete sentence within the limit — no AI/LLM call.
+1. A budget-specific over-limit message block, no AI-assist reference, rendered when `q.isBudgetQuestion && !isGovernanceItem && isOver` (`components/application-step4-draft.tsx`) — wording adapts "word"/"character" per the funder's `limitType`, matching the existing narrative-message pattern.
+2. A deterministic `trimToLimit()` helper plus a "Trim to limit" button: snaps to the last complete sentence within the limit (checked against sentence-end punctuation, walking forward until the next sentence would exceed the limit), falling back to a hard word/character cut (snapped to a word boundary) if even the first sentence alone exceeds it. No AI/LLM call anywhere in this path.
 
-Log as a defect/enhancement note against the Clothworkers Foundation test plan (where it was found) as part of the end-of-testing batch pass.
+Verified with a standalone reproduction script against the exact word-count-testing sample WJ used (502 words → 285 words, snapped cleanly to a sentence boundary, well within the 300-word limit) plus a character-limit case and a no-sentence-fits hard-cut case. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged — this component has no existing test coverage; verified live is the established precedent here, same as prior Step 4 fixes this session). New acceptance criterion: `acceptance-criteria.md` AC-FR-29-06.
+
+## Extension (2026-07-16, same day) — "Trim to limit" also offered on ordinary narrative questions
+
+This PDR's Option E (deterministic trim) was scoped to budget/financial questions specifically because AI assist doesn't exist for them (Option F rejected). While testing the built fix, WJ separately hit an ordinary narrative question over its limit, clicked "Help me improve this," and the AI declined entirely — correctly, since the test answer was deliberately irrelevant filler text and the refine prompt is instructed never to invent facts. That, plus `PDR-AI-006`'s already-documented finding that AI refine can undershoot and leave an answer still over limit, means narrative questions have two known ways to leave a charity stuck with no fallback at all, unlike budget questions which now always have one.
+
+WJ agreed to add the same "Trim to limit" button as a **secondary** option alongside "Help me improve this" for narrative questions too — not a replacement, since AI refine genuinely improves the prose when it works. `handleTrimToLimit()`/`trimToLimit()` were already generic (keyed only on `limitType`/`wordLimit`/`charLimit`, never on `isBudgetQuestion`), so no new logic was needed — only a second render site for the existing button, under the existing over-limit message. `tsc --noEmit`, `eslint --max-warnings 0` clean, all 75 tests pass (unchanged).
 
 ## Date Decided
 
-2026-07-04 (fix approved); formalised as PDR-AI-007 on 2026-07-11.
+2026-07-04 (fix approved); formalised as PDR-AI-007 on 2026-07-11; built 2026-07-16; extended to narrative questions 2026-07-16 (same day).

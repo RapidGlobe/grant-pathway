@@ -77,8 +77,26 @@ const aiSummarySectionSchema = z.object({
   number: z.number(),
   title: z.string(),
   guidance: z.string(),
-  wordLimit: z.number().optional(),
+  wordLimit: z.number().nullable().optional(),
   is_budget_section: z.boolean(),
+  citation: citationSchema,
+})
+
+// PDR-AI-008 (2026-07-15): closed vocabulary of the 5 governance/reserves
+// facts (lib/governance-items.ts) — kept as an inline literal enum, not
+// derived from GOVERNANCE_FIELD_KEYS, since that export is a plain readonly
+// array (not a tuple) and z.enum requires a `[string, ...string[]]` tuple.
+const governanceFieldKeySchema = z.enum([
+  'governance_total_expenditure',
+  'governance_reserves',
+  'governance_trustees_related',
+  'governance_bank_signatory_count',
+  'governance_bank_signatories_related',
+])
+
+const aiSummaryGovernanceFactSchema = z.object({
+  field_key: governanceFieldKeySchema,
+  questionText: z.string(),
   citation: citationSchema,
 })
 
@@ -90,6 +108,7 @@ const aiSummarySchema = z.object({
   lookingFor: z.array(z.string()),
   questions: z.array(aiSummaryQuestionSchema),
   sections: z.array(aiSummarySectionSchema).optional(),
+  governanceFacts: z.array(aiSummaryGovernanceFactSchema).optional(),
   keyRequirements: z.array(z.string()),
   funderAiPolicy: z.string().nullable().optional(),
   supportingDocuments: z.array(z.string()).optional(),
@@ -231,16 +250,23 @@ export async function POST(request: NextRequest) {
 
   let textForPrompt = guidelinesText
   let guidelinesTruncated = false
+  let formSectionPrioritized = false
   if (!skipPreprocessing) {
-    const { text, wasTruncated, originalLength, processedLength } = preprocessText(
-      guidelinesText,
-      charCeiling,
-    )
+    const {
+      text,
+      wasTruncated,
+      originalLength,
+      processedLength,
+      formSectionPrioritized: formPrioritized,
+    } = preprocessText(guidelinesText, charCeiling)
     textForPrompt = text
     guidelinesTruncated = wasTruncated
+    formSectionPrioritized = formPrioritized
     console.log(
       `[generate-summary] pre-processing: ${originalLength} → ${processedLength} chars` +
-        (wasTruncated ? ` (truncated at ${charCeiling})` : ''),
+        (wasTruncated
+          ? ` (truncated at ${charCeiling}${formPrioritized ? ', form section prioritized' : ''})`
+          : ''),
     )
     if (wasTruncated) {
       console.warn(
@@ -266,6 +292,9 @@ export async function POST(request: NextRequest) {
         {
           model: MODEL,
           max_tokens: SUMMARY_MAX_TOKENS,
+          // Extraction, not creative generation — the same guidelines text must
+          // always yield the same questions/sections/citations (2026-07-15 regression).
+          temperature: 0,
           system: AI_SYSTEM_PROMPT,
           messages: [{ role: 'user', content: prompt }],
         },
@@ -375,21 +404,49 @@ export async function POST(request: NextRequest) {
   // nothing renders citations to a user yet) if over half of what the AI
   // offered turns out invalid, as a signal the tagging or the model's
   // behaviour may need attention.
+  //
+  // Per-item logging (added 2026-07-17, live-testing Stony Stratford Town
+  // Council): a citation offered-but-invalid is otherwise invisible — only
+  // caught by the aggregate >50% warning below, which a single stray miss
+  // never trips. Logs the raw citation the AI actually returned so a
+  // specific miss can be diagnosed from `vercel logs` without needing a
+  // Bedrock call reproduced locally (dotenvx redacts AWS credentials for
+  // this agent). Remove once citation reliability is no longer under
+  // active investigation.
   const validMarkers = extractValidMarkers(textForPrompt)
   let citationsOffered = 0
   let citationsValid = 0
 
-  const reconcileCitation = (raw: (typeof rawSummary.questions)[number]['citation']) => {
+  const reconcileCitation = (
+    raw: (typeof rawSummary.questions)[number]['citation'],
+    label: string,
+  ) => {
     const result = validateCitation(raw ?? null, validMarkers)
     if (result.wasOffered) citationsOffered++
     if (result.wasValid) citationsValid++
+    if (result.wasOffered && !result.wasValid) {
+      console.warn(
+        `[generate-summary] citation offered but invalid for "${label}" (applicationId: ${applicationId}):`,
+        JSON.stringify(raw),
+      )
+    }
     return result.citation
   }
 
   const summary: AiSummaryData = {
     ...rawSummary,
-    questions: rawSummary.questions.map((q) => ({ ...q, citation: reconcileCitation(q.citation) })),
-    sections: rawSummary.sections?.map((s) => ({ ...s, citation: reconcileCitation(s.citation) })),
+    questions: rawSummary.questions.map((q) => ({
+      ...q,
+      citation: reconcileCitation(q.citation, `Q${q.number}: ${q.text}`),
+    })),
+    sections: rawSummary.sections?.map((s) => ({
+      ...s,
+      citation: reconcileCitation(s.citation, `S${s.number}: ${s.title}`),
+    })),
+    governanceFacts: rawSummary.governanceFacts?.map((f) => ({
+      ...f,
+      citation: reconcileCitation(f.citation, f.field_key),
+    })),
   }
 
   if (citationsOffered > 0 && citationsValid / citationsOffered < 0.5) {
@@ -451,8 +508,14 @@ export async function POST(request: NextRequest) {
     questionsFound,
     approachingLimit,
     guidelinesTruncated,
+    formSectionPrioritized,
   })
 }
 
 // AiSummaryData, AiSummaryQuestion, AiSummarySection — see lib/types.ts
-export type { AiSummaryData, AiSummaryQuestion, AiSummarySection } from '@/lib/types'
+export type {
+  AiSummaryData,
+  AiSummaryQuestion,
+  AiSummarySection,
+  AiSummaryGovernanceFact,
+} from '@/lib/types'
