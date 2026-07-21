@@ -23,6 +23,19 @@ describe('extractValidMarkers', () => {
     expect(markers.headingPaths.has('Eligibility > Referrals')).toBe(true)
     expect(markers.headingPaths.has('Something else')).toBe(false)
   })
+
+  // [ITEM N] (2026-07-21 amendment, ADR-DATA-007): fallback marker for
+  // guidelines with no page or heading structure at all — confirmed live on
+  // the Wolfson Foundation's Health & Disability docx, whose paragraphs all
+  // use Word's default "Normal" style (no w:pStyle Heading reference
+  // anywhere), so it previously produced zero citations of any kind.
+  it('extracts item numbers from [ITEM N] markers', () => {
+    const text = '[ITEM 1]\nName and address of the organisation\n\n[ITEM 2]\nUK charity number.'
+    const markers = extractValidMarkers(text)
+    expect(markers.items.has(1)).toBe(true)
+    expect(markers.items.has(2)).toBe(true)
+    expect(markers.items.has(3)).toBe(false)
+  })
 })
 
 describe('validateCitation', () => {
@@ -32,7 +45,13 @@ describe('validateCitation', () => {
 
   it('accepts a page citation that matches a real marker', () => {
     const result = validateCitation(
-      { source_type: 'page', page_number: 3, heading_path: null, quote: 'Eligibility text' },
+      {
+        source_type: 'page',
+        page_number: 3,
+        heading_path: null,
+        item_number: null,
+        quote: 'Eligibility text',
+      },
       markers,
     )
     expect(result.wasValid).toBe(true)
@@ -49,6 +68,7 @@ describe('validateCitation', () => {
         source_type: 'heading',
         page_number: null,
         heading_path: ['Eligibility', 'Referrals'],
+        item_number: null,
         quote: 'Referral detail',
       },
       markers,
@@ -63,7 +83,13 @@ describe('validateCitation', () => {
 
   it('rejects a page citation pointing at a page that does not exist (hallucination guard)', () => {
     const result = validateCitation(
-      { source_type: 'page', page_number: 99, heading_path: null, quote: 'made up' },
+      {
+        source_type: 'page',
+        page_number: 99,
+        heading_path: null,
+        item_number: null,
+        quote: 'made up',
+      },
       markers,
     )
     expect(result.wasOffered).toBe(true)
@@ -83,6 +109,7 @@ describe('validateCitation', () => {
           'SSTC overarching principles',
           "Which of the Council's overarching principles do you believe your project aligns with?",
         ],
+        item_number: null,
         quote: 'Please outline how you believe your project aligns with these aims',
       },
       curlyMarkers,
@@ -97,6 +124,7 @@ describe('validateCitation', () => {
         source_type: 'heading',
         page_number: null,
         heading_path: ['Not', 'Real'],
+        item_number: null,
         quote: 'made up',
       },
       markers,
@@ -107,7 +135,7 @@ describe('validateCitation', () => {
 
   it('rejects a citation with an empty quote even if the marker is real', () => {
     const result = validateCitation(
-      { source_type: 'page', page_number: 3, heading_path: null, quote: '   ' },
+      { source_type: 'page', page_number: 3, heading_path: null, item_number: null, quote: '   ' },
       markers,
     )
     expect(result.wasValid).toBe(false)
@@ -119,6 +147,44 @@ describe('validateCitation', () => {
       wasOffered: false,
       wasValid: false,
     })
+  })
+
+  it('accepts an item citation that matches a real [ITEM N] marker', () => {
+    const itemMarkers = extractValidMarkers(
+      '[ITEM 1]\nBackground to the organisation (max 250 words)\n\n[ITEM 2]\nProject timetable.',
+    )
+    const result = validateCitation(
+      {
+        source_type: 'item',
+        page_number: null,
+        heading_path: null,
+        item_number: 1,
+        quote: 'Background to the organisation',
+      },
+      itemMarkers,
+    )
+    expect(result.wasValid).toBe(true)
+    expect(result.citation).toEqual({
+      source_type: 'item',
+      item_number: 1,
+      quote: 'Background to the organisation',
+    })
+  })
+
+  it('rejects an item citation pointing at an item number that does not exist', () => {
+    const itemMarkers = extractValidMarkers('[ITEM 1]\nOnly one item here.')
+    const result = validateCitation(
+      {
+        source_type: 'item',
+        page_number: null,
+        heading_path: null,
+        item_number: 7,
+        quote: 'made up',
+      },
+      itemMarkers,
+    )
+    expect(result.wasValid).toBe(false)
+    expect(result.citation).toBeNull()
   })
 })
 
@@ -148,6 +214,18 @@ describe('toGuidelineReferenceColumn', () => {
     expect(result.source_type).toBe('heading')
     expect(result.heading_path).toEqual(['Eligibility'])
     expect('page_number' in result).toBe(false)
+  })
+
+  it('omits page_number and heading_path entirely for an item citation', () => {
+    const result = toGuidelineReferenceColumn({
+      source_type: 'item',
+      item_number: 4,
+      quote: 'text',
+    }) as Record<string, unknown>
+    expect(result.source_type).toBe('item')
+    expect(result.item_number).toBe(4)
+    expect('page_number' in result).toBe(false)
+    expect('heading_path' in result).toBe(false)
   })
 })
 

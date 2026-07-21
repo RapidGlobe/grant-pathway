@@ -65,6 +65,22 @@ This ADR consolidates technical consequences that were already recorded as forwa
 
 **Amendment (2026-07-14):** step 5 of the Decision above ("Human curation confirms accuracy (`P6.5`)") is superseded, not built. `P6.5` no longer builds a curated, funder-wide playbook or a human-curator role of any kind — see `ADR-DATA-006`'s 2026-07-14 amendment. There is now no additional human-confirmation step for citations at all beyond the automated marker-validation already built in `P6.3` (`validateCitation()`, `lib/guideline-citations.ts`) — a citation is trusted if it points at a real `[PAGE N]`/`[SECTION: ...]` marker in the retained text, same as every other application. `docs/PRD inputs/acceptance-criteria.md` FR-48's curator-confirmation criteria (AC-FR-48-04/05) are corrected accordingly — this is a permanent scope reduction, not a "not yet built" item waiting on a future task.
 
+**Amendment (2026-07-21): third marker type, `[ITEM N]`, a fallback for documents with no page or heading structure at all.** Live-testing found the Wolfson Foundation's Health & Disability guidelines produced zero citations on every attempt. Root cause, confirmed by unzipping the actual docx: every paragraph uses Word's default "Normal" style — there is no `w:pStyle` Heading reference anywhere in the file. "Applicant details", "Project details" etc. are plain paragraphs that merely look like section titles (visually bold), not real Word headings. `tagSectionsFromHtml()` (`lib/extract-text.ts`) only promotes real `<h1>`-`<h6>` tags (as mammoth resolves them from `w:pStyle`) to `[SECTION: ...]` markers, so this document produced zero of those; being a docx, not a PDF, it also never gets `[PAGE N]` markers. The whole guideline therefore carried no structural marker of any kind, so the prompt's own instruction — "if you cannot identify a specific marker, set citation to null" — was working exactly as designed; this was a gap in what the tagging pipeline could anchor to, not a validation bug, and not unique to Wolfson: any short, flat, unheaded guideline (docx or pasted) hits the same wall.
+
+Extends the Decision above with a third `source_type`, `'item'`, anchored to a `[ITEM N]` marker — one per paragraph/bullet/line — inserted **only as a fallback when a document has no heading (or page) structure at all**. Documents with real headings are completely unaffected; this keeps the change scoped to exactly the class of document that was broken, rather than renumbering every docx in the system:
+
+```
+guideline_reference: {
+  source_type: 'page' | 'heading' | 'item',
+  page_number: number | null,     // set only when source_type = 'page'
+  heading_path: string[] | null,  // set only when source_type = 'heading'
+  item_number: number | null,     // set only when source_type = 'item'
+  quote: string
+}
+```
+
+Same discriminated-union guarantee as the original two-member shape — exactly one of `page_number`/`heading_path`/`item_number` is non-null, the CHECK constraint (`application_items_guideline_reference_shape`, extended by migration `20260721000000_citation_item_marker.sql`) enforces the unused keys are entirely absent, and `validateCitation()`/`extractValidMarkers()`/`toGuidelineReferenceColumn()` (`lib/guideline-citations.ts`) gained a third branch alongside the existing two, built the same way. `citationFullLabel()` (`components/application-step4-draft.tsx`) renders it as "Item N of the guidelines"; the "view original guidelines" text panel needed no change at all, since it only ever searches for the `quote` string, never the marker syntax. The marker-recognition regex, previously duplicated across four separate literals in `lib/preprocess-text.ts` and `lib/guideline-citations.ts`, was consolidated into `lib/structural-markers.ts` as part of this fix, so a future fourth marker type only needs to change one place.
+
 ## Source
 
 `PDR-DH-004` (guideline source-reference design decision, "Option 2"), `ADR-DATA-002` (2026-07-10 reversal), `ADR-DATA-006` (item-graph model), `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` Phase 6 section (P6.2a–P6.5 build sequencing).

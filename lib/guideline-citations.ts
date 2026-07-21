@@ -1,8 +1,10 @@
 // Guideline citation validation (P6.3, ADR-DATA-007)
 //
 // The AI extraction prompt (lib/prompts.ts) asks the model to report which
-// [PAGE N] / [SECTION: ...] marker (lib/extract-text.ts / lib/preprocess-
-// text.ts, P6.2a) each question/section was drawn from. A citation is never
+// [PAGE N] / [SECTION: ...] / [ITEM N] marker (lib/extract-text.ts / lib/
+// preprocess-text.ts, P6.2a; [ITEM N] added 2026-07-21 as a fallback for
+// guidelines with no page or heading structure) each question/section was
+// drawn from. A citation is never
 // trusted purely on the AI's word — this module cross-checks every reported
 // citation against the markers actually present in the text the AI was
 // given, so a citation can only ever reference a chunk of guideline text
@@ -15,18 +17,21 @@
 
 import type { Json } from './database.types'
 import type { GuidelineCitation } from './types'
+import { itemMarkerGlobal, pageMarkerGlobal, sectionMarkerGlobal } from './structural-markers'
 
-/** Raw citation shape as the AI returns it — both keys present, one null. */
+/** Raw citation shape as the AI returns it — all three keys present, two null. */
 export type RawCitation = {
-  source_type: 'page' | 'heading'
+  source_type: 'page' | 'heading' | 'item'
   page_number: number | null
   heading_path: string[] | null
+  item_number: number | null
   quote: string
 } | null
 
 export type ValidMarkers = {
   pages: Set<number>
   headingPaths: Set<string>
+  items: Set<number>
 }
 
 // Typographic punctuation variants that are interchangeable for matching
@@ -67,15 +72,23 @@ function normalizePunctuationForMatch(s: string): string {
 export function extractValidMarkers(text: string): ValidMarkers {
   const pages = new Set<number>()
   const headingPaths = new Set<string>()
+  const items = new Set<number>()
 
-  for (const m of text.matchAll(/^\[PAGE (\d+)\]$/gm)) {
+  for (const m of text.matchAll(pageMarkerGlobal())) {
     pages.add(parseInt(m[1], 10))
   }
-  for (const m of text.matchAll(/^\[SECTION: (.+)\]$/gm)) {
+  for (const m of text.matchAll(sectionMarkerGlobal())) {
     headingPaths.add(normalizePunctuationForMatch(m[1].trim()))
   }
+  // [ITEM N] (2026-07-21 amendment, ADR-DATA-007): fallback marker for
+  // guidelines with no page or heading structure at all — see
+  // lib/extract-text.ts's tagSectionsFromHtml and lib/preprocess-text.ts's
+  // tagPastedTextSections.
+  for (const m of text.matchAll(itemMarkerGlobal())) {
+    items.add(parseInt(m[1], 10))
+  }
 
-  return { pages, headingPaths }
+  return { pages, headingPaths, items }
 }
 
 /**
@@ -114,6 +127,14 @@ export function validateCitation(
         wasValid: true,
       }
     }
+  } else if (raw.source_type === 'item' && raw.item_number !== null && quote) {
+    if (markers.items.has(raw.item_number)) {
+      return {
+        citation: { source_type: 'item', item_number: raw.item_number, quote },
+        wasOffered: true,
+        wasValid: true,
+      }
+    }
   }
 
   return { citation: null, wasOffered: true, wasValid: false }
@@ -130,7 +151,10 @@ export function toGuidelineReferenceColumn(citation: GuidelineCitation | null | 
   if (citation.source_type === 'page') {
     return { source_type: 'page', page_number: citation.page_number, quote: citation.quote }
   }
-  return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
+  if (citation.source_type === 'heading') {
+    return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
+  }
+  return { source_type: 'item', item_number: citation.item_number, quote: citation.quote }
 }
 
 /**

@@ -10,6 +10,25 @@
 
 ---
 
+## 2026-07-21 — `[ITEM N]` citation fallback marker built (Wolfson zero-citation defect)
+
+While generating screenshots for the user guide, WJ noticed the Wolfson Foundation's guidelines produced zero citations on Step 4, contradicting the app's own "We identified 6 sections to complete" summary. Investigated via `supabase db query --linked` against `grant-pathway-dev` and a live production log tail (`vercel logs --follow --environment production`) while WJ re-triggered a regeneration: `guideline_reference` was null on all 6 items, both today and on an earlier 2026-06-05 test of the same funder, and — tellingly — no per-citation debug warning fired at all (the logging `363afcc` added on 2026-07-17 only fires when a citation is _offered but invalid_; here nothing was ever offered).
+
+**Root cause, confirmed by unzipping the actual docx:** every paragraph uses Word's default "Normal" style — zero `w:pStyle` Heading references anywhere in the file. "Applicant details", "Project details" etc. are plain paragraphs that only _look_ like section titles (bold), not real Word headings. `tagSectionsFromHtml()` (`lib/extract-text.ts`) only promotes real `<h1>`-`<h6>` tags to `[SECTION: ...]` markers, so this document produced none; being a docx, not a PDF, it also never gets `[PAGE N]` markers. The whole guideline carried no structural marker of any kind — the prompt's own "if you can't identify a marker, set citation to null" instruction was working exactly as designed. This is a genuine gap in what the tagging pipeline can anchor to, not a validation bug — and not Wolfson-specific: any short, flat, unheaded guideline (docx or pasted) hits the same wall.
+
+**Fix (WJ's proposal — "can we not number the bullets and use them as citations?"):** a third citation `source_type`, `'item'`, anchored to a new `[ITEM N]` marker — one per paragraph/bullet/line — inserted only as a fallback when a document has no heading (or page) structure at all. Documents with real headings are completely unaffected, keeping the change scoped to exactly the class of document that was broken:
+
+- `lib/extract-text.ts`'s `tagSectionsFromHtml()` and `lib/preprocess-text.ts`'s `tagPastedTextSections()` both gained the `[ITEM N]` fallback (docx and pasted-text paths respectively)
+- New `lib/structural-markers.ts` consolidates the marker-recognition regex, previously duplicated across four separate hardcoded literals (three in `preprocess-text.ts`, one in `guideline-citations.ts`) — a shape of bug where a future marker type could easily be added to some copies but not others
+- `lib/guideline-citations.ts` (`RawCitation`/`ValidMarkers` types, `extractValidMarkers`, `validateCitation`, `toGuidelineReferenceColumn`), `lib/types.ts`'s `GuidelineCitation`, the `citationSchema` in `app/api/generate-summary/route.ts`, and `lib/prompts.ts`'s citation instructions all gained the `'item'` branch
+- `components/application-step4-draft.tsx`'s `citationFullLabel()` renders it as "Item N of the guidelines"; the "view original guidelines" text panel needed **no change** — it only ever searches for the `quote` string, never marker syntax, so it was already type-agnostic
+- New migration `20260721000000_citation_item_marker.sql` extends the `application_items_guideline_reference_shape` CHECK constraint with a third disjunct; applied to `grant-pathway-dev`, prod push not yet done (flagged, per the existing schema-drift practice, as a separate explicit step)
+- `ADR-DATA-007` amended; `docs/data-model.md`, `technical-design.md`, and `docs/PRD inputs/acceptance-criteria.md` (FR-48/AC-FR-48-02) updated to match
+
+New test coverage: extended `__tests__/guideline-citations.test.ts` and `__tests__/preprocess-text.test.ts` with `item`-branch cases, and added `__tests__/extract-text.test.ts` (`tagSectionsFromHtml` had zero prior unit coverage — closed as part of this fix, by exporting the previously-private function). `tsc --noEmit`, `eslint --max-warnings 0`, and all 90 tests pass. Not yet live-verified against a real Bedrock call for Wolfson specifically (dotenvx redacts AWS credentials for this agent) — next step is for WJ to regenerate the Wolfson application once more and confirm citation badges now appear.
+
+---
+
 ## 2026-07-17 — Session wrap-up: PDR-AI-010 decided and built, live-testing confirmed, one open finding logged
 
 Reviewed a fresh Stony Stratford export (`NEO_stony_first_test_0759_170726_Application.docx`) as an end-of-session sanity check. All 12 items (3 governance facts + 9 narrative sections) are present, correctly sequenced, and persisted — confirming today's Step 4 sync fix holds across a full assemble/export cycle. Footer version matches the latest push. WJ: "Job done, it looks much better."

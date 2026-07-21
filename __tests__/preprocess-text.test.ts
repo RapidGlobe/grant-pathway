@@ -139,6 +139,48 @@ describe('preprocessText — structural marker protection (ADR-DATA-007, P6.2a)'
   })
 })
 
+describe('preprocessText — [ITEM N] fallback marker for headless pasted text (2026-07-21 amendment, ADR-DATA-007)', () => {
+  // Confirmed live on the Wolfson Foundation's Health & Disability guidelines:
+  // a flat, unheaded bullet list with no numbered or ALL-CAPS heading lines
+  // produced zero [SECTION: ...] markers (nothing for looksLikeHeading to
+  // match) and, being pasted text rather than a PDF, zero [PAGE N] markers —
+  // the whole document carried no structural marker at all, so no citation
+  // could ever validate. This fallback numbers every non-blank line instead.
+  it('tags every non-blank line with [ITEM N] when no heading-like line exists anywhere', () => {
+    const text = [
+      'Name and address of the organisation',
+      'UK charity number, if applicable',
+      'Background to the organisation (max 250 words)',
+    ].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain('[ITEM 1]\nName and address of the organisation')
+    expect(out).toContain('[ITEM 2]\nUK charity number, if applicable')
+    expect(out).toContain('[ITEM 3]\nBackground to the organisation (max 250 words)')
+  })
+
+  it('does not apply the [ITEM N] fallback when at least one heading-like line exists', () => {
+    const text = ['1. Eligibility', 'Who can apply.', 'A plain bullet with no heading.'].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain('[SECTION: 1. Eligibility]')
+    expect(out).not.toContain('[ITEM 1]')
+  })
+
+  it('protects [ITEM N] markers from repeated-line/boilerplate stripping and truncation the same way [PAGE N]/[SECTION: ...] are protected', () => {
+    const lines = Array.from({ length: 5 }, (_, i) => `Bullet number ${i + 1} of the guidelines.`)
+    const text = lines.join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    for (let i = 1; i <= 5; i++) {
+      expect(out).toContain(`[ITEM ${i}]`)
+    }
+  })
+})
+
 describe('preprocessText — form-aware truncation (2026-07-16, Clothworkers regression)', () => {
   function buildDoc({
     preambleLines,
