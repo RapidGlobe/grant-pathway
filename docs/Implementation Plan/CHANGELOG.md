@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-23 — Citation-highlight fix: list-bullet glyph tolerance
+
+WJ, continuing a Garfield Weston test application on Step 4, noticed Q1 ("Total annual expenditure")'s citation badge opened the viewer with the quote correctly highlighted and scrolled to, but Q9 ("Your finances")'s badge — same funder, same document — opened the viewer with no highlight, landing on Page 1.
+
+**Root-caused with `supabase db query --linked`** against `grant-pathway-dev`: pulled the actual `guideline_reference` for both items plus the retained `application_guidelines.guideline_text`. Q1's quote ("Please provide a breakdown of how much your organisation plans to spend") is a clean, unbroken sentence in the source. Q9's stored quote reads "We need to understand: that you have a robust plan to fund your work" — but the source PDF's actual text is "We need to understand:\n■ that you have a robust plan to fund your work" (a bulleted list, one bullet per line). The AI, quoting "verbatim," treated the "■" bullet glyph as decorative list formatting and quoted straight through it — reasonable behaviour, but `findQuoteRange`'s word-matching regex only tolerated whitespace between words, and a non-whitespace "■" sitting between "understand:" and "that" broke the match entirely, same shape of bug as the 2026-07-15 punctuation-tolerance fix and the 2026-07-17 heading-path fixes.
+
+**Fix:** `findQuoteRange` (`lib/guideline-citations.ts`) now folds a small set of list-bullet glyphs (`■ • ● ▪ ◦ ‣ ·`) into the same separator it already uses for whitespace between quote words, so a bullet sitting amid the whitespace no longer breaks the match. This is a general fix, not scoped to Garfield Weston or to budget questions — it benefits any funder's guidelines where a bulleted list item gets quoted straight through its own bullet marker (PDF bullets frequently survive extraction as literal characters — see `lib/extract-text.ts`). No stored `guideline_reference` data needed correcting; the existing quote was already fine, only the client-side matching logic was too strict.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, all 27 tests in `guideline-citations.test.ts` pass (1 new — the exact live Garfield Weston case).
+
+**Files changed:** `lib/guideline-citations.ts`, `__tests__/guideline-citations.test.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-21 — `[ITEM N]` citation fallback marker built (Wolfson zero-citation defect)
 
 While generating screenshots for the user guide, WJ noticed the Wolfson Foundation's guidelines produced zero citations on Step 4, contradicting the app's own "We identified 6 sections to complete" summary. Investigated via `supabase db query --linked` against `grant-pathway-dev` and a live production log tail (`vercel logs --follow --environment production`) while WJ re-triggered a regeneration: `guideline_reference` was null on all 6 items, both today and on an earlier 2026-06-05 test of the same funder, and — tellingly — no per-citation debug warning fired at all (the logging `363afcc` added on 2026-07-17 only fires when a citation is _offered but invalid_; here nothing was ever offered).

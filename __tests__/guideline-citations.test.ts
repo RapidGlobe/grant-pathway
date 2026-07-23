@@ -301,4 +301,16 @@ describe('findQuoteRange', () => {
     const range = findQuoteRange(text, quote)
     expect(range).not.toBeNull()
   })
+
+  it('tolerates a list-bullet glyph the quote drops between words (live bug, 2026-07-23 — Garfield Weston "Your finances")', () => {
+    // Real case found live-testing: the PDF's bulleted list renders as
+    // "understand:\n■ that you have..." but the AI's "verbatim" quote treats
+    // the bullet as formatting, not text, and quotes straight through it.
+    const text =
+      'This part of your proposal is extremely important. We need to understand:\n■ that you have a robust plan to fund your work\n■ where your funding comes from'
+    const quote = 'We need to understand: that you have a robust plan to fund your work'
+    const range = findQuoteRange(text, quote)
+    expect(range).not.toBeNull()
+    expect(text.slice(range!.start, range!.end)).toContain('understand:\n■ that')
+  })
 })

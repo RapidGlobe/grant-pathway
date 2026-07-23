@@ -52,6 +52,16 @@ const EQUIVALENT_PUNCTUATION_CLASSES = [
   ['-', '–', '—'], // hyphen, en dash, em dash
 ]
 
+// List-bullet glyphs that PDF extraction (lib/extract-text.ts's unpdf path)
+// carries through as literal characters in the retained guideline text (e.g.
+// "understand:\n■ that you have..."). An AI quoting "verbatim" treats these as
+// decorative list formatting, not text, and drops them — so a quote that spans
+// across a bullet point (found live, 2026-07-23, Garfield Weston "Your
+// finances": "We need to understand: that you have a robust plan..." skips
+// over the "■" between "understand:" and "that") must still match even though
+// the source has a non-whitespace character sitting between the two words.
+const LIST_BULLET_CHARS = ['■', '•', '●', '▪', '◦', '‣', '·']
+
 /** Maps every punctuation-class character to its class's first (canonical) member. */
 function normalizePunctuationForMatch(s: string): string {
   let result = ''
@@ -159,19 +169,23 @@ export function toGuidelineReferenceColumn(citation: GuidelineCitation | null | 
 
 /**
  * Finds where `quote` occurs in `text` (P6.4's "view original guidelines"
- * panel), tolerating two classes of near-miss differences between them:
+ * panel), tolerating three classes of near-miss differences between them:
  *
  * 1. Whitespace — PDF extraction often wraps a line where the AI's quote has
  *    an ordinary space (e.g. "project\nwill address" in the source vs.
  *    "project will address" in the quote). Matches the quote's words in
- *    order, joined by `\s+`, so any run of whitespace in the source (space,
- *    newline, multiple spaces) satisfies a single space in the quote.
+ *    order, joined by a separator, so any run of whitespace in the source
+ *    (space, newline, multiple spaces) satisfies a single space in the quote.
  * 2. Typographic punctuation — the AI frequently normalises curly
  *    quotes/apostrophes and en/em dashes to their plain-ASCII equivalents
  *    even when quoting "verbatim" (see EQUIVALENT_PUNCTUATION_CLASSES
  *    above). Each occurrence of one of these characters in the quote is
  *    matched against its whole equivalence class in the source, not just
  *    that literal character.
+ * 3. List bullets — the same separator also swallows a list-bullet glyph
+ *    (see LIST_BULLET_CHARS above) sitting amid the whitespace, since the AI
+ *    drops these when it quotes across a bullet point (e.g. source
+ *    "understand:\n■ that you have" vs. quote "understand: that you have").
  *
  * Returns null if no match is found — the caller shows the text unhighlighted
  * rather than treating this as an error (quotes are validated against real
@@ -194,7 +208,10 @@ export function findQuoteRange(text: string, quote: string): { start: number; en
     return result
   }
 
-  const pattern = words.map(toPunctuationTolerantPattern).join('\\s+')
+  // Separator tolerates a list-bullet glyph sitting amid the whitespace (see
+  // LIST_BULLET_CHARS above) as well as plain runs of whitespace.
+  const separator = `[\\s${LIST_BULLET_CHARS.map(escapeRegex).join('')}]+`
+  const pattern = words.map(toPunctuationTolerantPattern).join(separator)
 
   let match: RegExpExecArray | null
   try {
