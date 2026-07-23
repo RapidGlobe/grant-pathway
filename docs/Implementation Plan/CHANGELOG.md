@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-23 — Account deletion fixed: `service_role` was missing table grants on the two newest item-graph tables
+
+WJ tried to delete a test account (`grantpathway+lloyds1@gmail.com`, 2 applications) via Step 8.2's "Permanently delete my account" flow and got a generic "Deletion failed. Please try again." His own first hypothesis — that he'd clicked the delete button before typing `DELETE` in the confirmation box — was ruled out: the client-side confirmation check runs before any network call and shows a different message ("Please type DELETE in capitals to confirm"), so reaching the generic server error means the confirmation had already passed.
+
+**Root-caused via `vercel logs --environment production --query "delete-account"`:** the real error was `42501: permission denied for table application_items`, thrown on the very first step of `app/api/account/delete/route.ts`'s cascade (`service` client's `.from('application_items').delete()`). A `select count(*)` re-check on every affected table after the failed attempt confirmed nothing had been deleted at all — the cascade aborted immediately on step 1, before touching `application_guidelines`, `applications`, or anything else.
+
+**Root cause, confirmed by querying `information_schema.role_table_grants`:** `application_items` and `application_guidelines` (both added later, 2026-07-14, in `20260714000000_p6_2_application_item_graph.sql` and `20260714000001_gap33_application_guidelines.sql`) only ever granted `select, insert, update, delete` to `authenticated` — following `20260521000000_grant_table_permissions.sql`'s pattern for that role — never to `service_role`. The four original tables (`user_profiles`, `charity_profiles`, `applications`, `ai_usage_log`) already carry full `service_role` privileges, granted ad hoc at some earlier point outside any tracked migration (their grantor is `postgres`, but no migration file in the repo contains a `service_role` grant) — so this class of gap has existed since the item-graph rearchitecture and was invisible until a `service_role` code path (account deletion is the only one) actually touched these two tables.
+
+**Fix:** new migration `20260723000000_grant_service_role_item_graph_tables.sql` grants `select, insert, update, delete` on both tables to `service_role`. Applied to `grant-pathway-dev` (currently linked project) and verified via `information_schema.role_table_grants` — both tables now show full `service_role` privileges. **Not yet applied to `grant-pathway-prod`** — same outstanding gap as the existing schema-drift tracking (`grant-pathway-prod` remains unlinked/behind per the Phase 6 convention until P5.4).
+
+Purely additive (a `GRANT`, no data or schema change) — no user data was affected by the failed attempt; WJ's account and its 2 applications, 20 items, 1 guidelines row, and 10 `ai_usage_log` rows are all still intact, confirmed by direct count both before and after the failed attempt.
+
+**Files changed:** `supabase/migrations/20260723000000_grant_service_role_item_graph_tables.sql`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-23 — Citation-highlight fix: list-bullet glyph tolerance
 
 WJ, continuing a Garfield Weston test application on Step 4, noticed Q1 ("Total annual expenditure")'s citation badge opened the viewer with the quote correctly highlighted and scrolled to, but Q9 ("Your finances")'s badge — same funder, same document — opened the viewer with no highlight, landing on Page 1.
