@@ -318,6 +318,13 @@ export type ChangePasswordResult = {
  * before calling updateUser — Supabase has no dedicated "verify current
  * password" API, but signInWithPassword validates the credential correctly.
  *
+ * `current_password` is also passed to `updateUser` itself (2026-07-24 fix):
+ * this Supabase project has `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD`
+ * enabled, which makes GoTrue reject any password update that omits it —
+ * regardless of the signInWithPassword re-verification immediately above,
+ * which GoTrue has no way to know happened. Found live: every change-password
+ * attempt failed with `code: 'current_password_required'` until this was added.
+ *
  * Called directly from AccountSettingsForm via useTransition (not FormData).
  */
 export async function changePassword(
@@ -341,7 +348,10 @@ export async function changePassword(
   })
   if (signInError) return { status: 'wrong_password' }
 
-  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+    current_password: currentPassword,
+  })
   if (updateError) {
     // Supabase Auth rejects passwords that don't meet its configured strength
     // requirements with error.code === 'weak_password' (AuthWeakPasswordError).
