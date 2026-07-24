@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { lookupCharity, saveCharityProfile, type CharityProfileData } from '@/actions/charity'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 type LookupState = null | 'match' | 'no-match' | 'unavailable'
 
@@ -27,9 +28,15 @@ interface CharityProfileFormProps {
   initialData?: CharityProfileData | null
   /** Derived from initialData in the page — true when an existing profile was found. */
   isEdit?: boolean
+  /** PDR-UI-008 — has the user already dismissed tt-charity-lookup. */
+  tooltipDismissed?: boolean
 }
 
-export function CharityProfileForm({ initialData, isEdit = false }: CharityProfileFormProps) {
+export function CharityProfileForm({
+  initialData,
+  isEdit = false,
+  tooltipDismissed = false,
+}: CharityProfileFormProps) {
   const router = useRouter()
   const [lookupQuery, setLookupQuery] = useState('')
   const [lookupResult, setLookupResult] = useState<LookupState>(null)
@@ -159,16 +166,24 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
           Find your charity on the Charity Commission register
         </p>
         <div className="flex gap-2">
-          <Input
-            type="search"
-            placeholder="Search by charity name or registration number"
-            value={lookupQuery}
-            onChange={(e) => setLookupQuery(e.target.value)}
-            onKeyDown={handleLookupKeyDown}
-            aria-label="Search by charity name or registration number"
-            className="h-10 flex-1 text-[14px]"
-            disabled={isLookingUp}
-          />
+          <ContextualTooltip
+            tooltipId="tt-charity-lookup"
+            variant="page-load"
+            initiallyDismissed={tooltipDismissed}
+            content="Search by name or registration number — most UK charities are found automatically from the Charity Commission database."
+          >
+            <Input
+              id="charity-lookup"
+              type="search"
+              placeholder="Search by charity name or registration number"
+              value={lookupQuery}
+              onChange={(e) => setLookupQuery(e.target.value)}
+              onKeyDown={handleLookupKeyDown}
+              aria-label="Search by charity name or registration number"
+              className="h-10 flex-1 text-[14px]"
+              disabled={isLookingUp}
+            />
+          </ContextualTooltip>
           <Button
             type="button"
             onClick={handleLookup}

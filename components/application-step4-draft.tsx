@@ -51,6 +51,9 @@ import {
   GOVERNANCE_FIELD_EXPLANATIONS,
   type GovernanceFieldKey,
 } from '@/lib/governance-items'
+import { MONTHLY_CAP } from '@/lib/prompts'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
+import type { TooltipId } from '@/actions/tooltips'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,10 +96,16 @@ interface ApplicationStep4DraftProps {
   grantName: string
   approachingLimit: boolean
   limitReached: boolean
+  /** AI requests used this calendar month (of MONTHLY_CAP). Computed at page
+   * load; kept in sync with each refine response's own currentUsage so the
+   * count is live without a page reload (PDR-UI-008, tt-ai-help-limit). */
+  currentUsage: number
   /** Retained guideline text (P6.4, GAP-33) — null if never retained (older
    * applications, or the summary has never been regenerated since). Text
    * only, never the raw file (ADR-DATA-002). */
   guidelineText: string | null
+  /** PDR-UI-008 — which of this page's 4 tooltips the user has already dismissed. */
+  dismissedTooltips: Set<TooltipId>
 }
 
 /** Badge/dialog-title labels stay readable even when a funder's own document
@@ -215,11 +224,18 @@ export function ApplicationStep4Draft({
   grantName,
   approachingLimit,
   limitReached,
+  currentUsage,
   guidelineText,
+  dismissedTooltips,
 }: ApplicationStep4DraftProps) {
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
     Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
   )
+
+  // PDR-UI-008 (tt-ai-help-limit): live count of AI requests used this month,
+  // seeded from the page-load value and updated from each refine response's
+  // own currentUsage so it stays accurate without a page reload.
+  const [aiUsageCount, setAiUsageCount] = useState(currentUsage)
 
   // P6.4: "view original guidelines" panel — which citation is being viewed,
   // or null if the panel is closed. A single dialog is reused for every
@@ -299,6 +315,14 @@ export function ApplicationStep4Draft({
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
   const itemLabelPlural = funderType === 'free_form' ? 'sections' : 'questions'
 
+  // PDR-UI-008 — tt-ai-help-limit and tt-budget-no-ai each attach to the
+  // first matching card only, not every card of that kind; computed once
+  // here rather than inside the render loop below.
+  const firstRefineButtonIndex = questions.findIndex(
+    (q) => !q.isBudgetQuestion && q.fieldKey == null,
+  )
+  const firstBudgetQuestionIndex = questions.findIndex((q) => q.isBudgetQuestion)
+
   // ── Auto-save ─────────────────────────────────────────────────────────────
 
   async function doSave(
@@ -366,7 +390,12 @@ export function ApplicationStep4Draft({
         }),
       })
 
-      const data = (await res.json()) as { refinedText?: string; error?: string }
+      const data = (await res.json()) as {
+        refinedText?: string
+        error?: string
+        approachingLimit?: boolean
+        currentUsage?: number
+      }
 
       if (!res.ok || data.error) {
         setRefineStates((prev) => ({
@@ -378,6 +407,11 @@ export function ApplicationStep4Draft({
         }))
         return
       }
+
+      // Keep the live AI-usage count in sync with what the server actually
+      // recorded, rather than incrementing client-side (a failed/cancelled
+      // call must not bump the count client never sees the server undo).
+      if (typeof data.currentUsage === 'number') setAiUsageCount(data.currentUsage)
 
       setRefineStates((prev) => ({
         ...prev,
@@ -795,20 +829,42 @@ export function ApplicationStep4Draft({
                   <p className="mb-3 text-[13px] leading-relaxed text-[#64748B]">{q.guidance}</p>
                 )}
 
-              {/* Budget warning */}
-              {q.isBudgetQuestion && (
-                <div className="mb-3 flex items-start gap-2">
-                  <AlertTriangle
-                    className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
-                    aria-hidden="true"
-                  />
-                  <p className="text-[12px] text-[#78350F]">
-                    {funderType === 'free_form'
-                      ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
-                      : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
-                  </p>
-                </div>
-              )}
+              {/* Budget warning — first budget-type card only gets the
+                  tt-budget-no-ai tooltip (PDR-UI-008); every budget card
+                  still shows the plain warning text either way. */}
+              {q.isBudgetQuestion &&
+                (index === firstBudgetQuestionIndex ? (
+                  <ContextualTooltip
+                    tooltipId="tt-budget-no-ai"
+                    variant="page-load"
+                    initiallyDismissed={dismissedTooltips.has('tt-budget-no-ai')}
+                    content="AI assistance isn't available here — financial figures are shown exactly as you enter them."
+                  >
+                    <div className="mb-3 flex items-start gap-2">
+                      <AlertTriangle
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
+                        aria-hidden="true"
+                      />
+                      <p className="text-[12px] text-[#78350F]">
+                        {funderType === 'free_form'
+                          ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
+                          : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
+                      </p>
+                    </div>
+                  </ContextualTooltip>
+                ) : (
+                  <div className="mb-3 flex items-start gap-2">
+                    <AlertTriangle
+                      className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
+                      aria-hidden="true"
+                    />
+                    <p className="text-[12px] text-[#78350F]">
+                      {funderType === 'free_form'
+                        ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
+                        : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
+                    </p>
+                  </div>
+                ))}
 
               {/* Governance item input — currency (£, UK thousands-separated), plain count, or Yes/No/Not sure yet select */}
               {isGovernanceItem && q.itemType === 'number' && q.isBudgetQuestion && (
@@ -900,15 +956,34 @@ export function ApplicationStep4Draft({
                 <div className="mt-3">
                   {refineState.status === 'idle' && (
                     <>
-                      <button
-                        type="button"
-                        onClick={() => void handleRefine(q)}
-                        disabled={isEmpty || limitReached || isApprovedQ}
-                        className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
-                      >
-                        <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                        Help me improve this
-                      </button>
+                      {index === firstRefineButtonIndex ? (
+                        <ContextualTooltip
+                          tooltipId="tt-ai-help-limit"
+                          variant="first-click"
+                          initiallyDismissed={dismissedTooltips.has('tt-ai-help-limit')}
+                          content={`This uses one of your ${MONTHLY_CAP} monthly AI requests. You've used ${aiUsageCount} so far this month.`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => void handleRefine(q)}
+                            disabled={isEmpty || limitReached || isApprovedQ}
+                            className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                          >
+                            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                            Help me improve this
+                          </button>
+                        </ContextualTooltip>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handleRefine(q)}
+                          disabled={isEmpty || limitReached || isApprovedQ}
+                          className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                        >
+                          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                          Help me improve this
+                        </button>
+                      )}
                       {isOver && (
                         <>
                           <p className="mt-1 text-[12px] text-[#DC2626]">
@@ -1078,14 +1153,21 @@ export function ApplicationStep4Draft({
       {missingGovernanceItems.length > 0 && (
         <div className="mb-8">
           {!showManualAddPanel ? (
-            <button
-              type="button"
-              onClick={() => setShowManualAddPanel(true)}
-              className="text-[13px] text-[#64748B] underline-offset-2 hover:text-[#1E293B] hover:underline"
+            <ContextualTooltip
+              tooltipId="tt-governance-add-it"
+              variant="page-load"
+              initiallyDismissed={dismissedTooltips.has('tt-governance-add-it')}
+              content="Some funders expect this even if their guidelines don't ask for it directly."
             >
-              Need to add something about your finances or governance that wasn&apos;t asked above?
-              Add it.
-            </button>
+              <button
+                type="button"
+                onClick={() => setShowManualAddPanel(true)}
+                className="text-[13px] text-[#64748B] underline-offset-2 hover:text-[#1E293B] hover:underline"
+              >
+                Need to add something about your finances or governance that wasn&apos;t asked
+                above? Add it.
+              </button>
+            </ContextualTooltip>
           ) : (
             <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
               <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
@@ -1165,19 +1247,22 @@ export function ApplicationStep4Draft({
         >
           Back
         </Link>
-        <Button
-          type="button"
-          onClick={handleReadyToAssemble}
-          disabled={!allApproved || isAssembling}
-          title={
-            !allApproved
-              ? `Approve all ${questions.length} ${itemLabelPlural} to continue`
-              : undefined
-          }
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+        <ContextualTooltip
+          tooltipId="tt-ready-to-assemble"
+          variant="hover-disabled"
+          active={!allApproved}
+          initiallyDismissed={dismissedTooltips.has('tt-ready-to-assemble')}
+          content={`Approve all ${questions.length} ${itemLabelPlural} before you can assemble your application.`}
         >
-          {isAssembling ? 'Saving…' : 'Ready to assemble'}
-        </Button>
+          <Button
+            type="button"
+            onClick={handleReadyToAssemble}
+            disabled={!allApproved || isAssembling}
+            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+          >
+            {isAssembling ? 'Saving…' : 'Ready to assemble'}
+          </Button>
+        </ContextualTooltip>
       </div>
 
       {/* "View original guidelines" panel (P6.4) — one dialog reused for every

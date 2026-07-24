@@ -40,6 +40,7 @@ import {
   clearGuidelines,
   setGuidelinesFilename,
 } from '@/lib/guidelines-session'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 type UploadState = 'idle' | 'uploading' | 'processing' | 'uploaded'
 type UploadError = 'format' | 'size' | 'scanned' | 'server' | null
@@ -52,6 +53,8 @@ interface ApplicationStep2FormProps {
   currentStep: number
   initialError?: UploadError
   showLargeWarning?: boolean
+  /** PDR-UI-008 — has the user already dismissed tt-guidelines-choice. */
+  tooltipDismissed?: boolean
 }
 
 const ACCEPTED_EXTENSIONS = ['.pdf', '.docx']
@@ -74,6 +77,7 @@ export function ApplicationStep2Form({
   currentStep,
   initialError = null,
   showLargeWarning = false,
+  tooltipDismissed = false,
 }: ApplicationStep2FormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -240,9 +244,16 @@ export function ApplicationStep2Form({
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
         )}
       </p>
-      <p className="mb-6 text-[15px] text-[#64748B]">
-        Upload the funder&apos;s guidelines document, or paste the text directly below.
-      </p>
+      <ContextualTooltip
+        tooltipId="tt-guidelines-choice"
+        variant="page-load"
+        initiallyDismissed={tooltipDismissed}
+        content="For the best results, upload or paste just the section with the application questions — you can skip the funder's background information or T&Cs."
+      >
+        <p className="mb-6 text-[15px] text-[#64748B]">
+          Upload the funder&apos;s guidelines document, or paste the text directly below.
+        </p>
+      </ContextualTooltip>
 
       {/* Re-upload advisory (GAP-19) — shown when returning to Step 2 after
           advancing past it and sessionStorage no longer has an entry */}

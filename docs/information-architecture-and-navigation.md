@@ -4,8 +4,8 @@
 **Volatility:** Medium
 **Update when:** Any change to page structure, navigation, routing, or information hierarchy
 
-**Version:** 1.7
-**Last updated:** 2026-06-30
+**Version:** 1.8
+**Last updated:** 2026-07-24
 
 This document defines the complete information architecture, URL structure, navigation components, access control rules, and page-level navigation for Grant Pathway v1. It is a reference for design, development, and testing.
 
@@ -111,6 +111,7 @@ Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-pass
 | Element                   | Behaviour                                                                                                                                     |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | Grant Pathway logo (left) | Link to `/` -- gives pages reached directly (e.g. `/terms` from a search result) a route back; signed-in users are redirected to `/dashboard` |
+| Help                      | External link to the GitBook help centre (`PDR-UI-008`, 2026-07-24); opens in a new tab                                                       |
 | Register -- it's free     | Link to `/register`; hidden on `/register` (circular) and `/verify-email` (the user has just registered)                                      |
 
 > The standalone "Sign in" nav link was removed 2026-06-09 — every public-facing form already carries a contextual sign-in link (see CHANGELOG).
@@ -121,12 +122,13 @@ Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-pass
 
 Displayed on all authenticated routes.
 
-| Element                                    | Behaviour                 |
-| ------------------------------------------ | ------------------------- |
-| Grant Pathway logo (left)                  | Links to `/dashboard`     |
-| My Applications                            | Links to `/dashboard`     |
-| Charity Profile                            | Links to `/profile`       |
-| Account (right -- shows user's first name) | Dropdown menu (see below) |
+| Element                                    | Behaviour                                                                               |
+| ------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Grant Pathway logo (left)                  | Links to `/dashboard`                                                                   |
+| My Applications                            | Links to `/dashboard`                                                                   |
+| Charity Profile                            | Links to `/profile`                                                                     |
+| Help                                       | External link to the GitBook help centre (`PDR-UI-008`, 2026-07-24); opens in a new tab |
+| Account (right -- shows user's first name) | Dropdown menu (see below)                                                               |
 
 **Account dropdown items:**
 
@@ -144,6 +146,7 @@ Displayed on all routes (public and authenticated).
 | Element          | Detail                                                                                             |
 | ---------------- | -------------------------------------------------------------------------------------------------- |
 | Tagline          | "Your free grant writing companion for UK charities"                                               |
+| Help Centre      | External link to the GitBook help centre (`PDR-UI-008`, 2026-07-24) -- opens in a new tab          |
 | Privacy Policy   | Link to `/privacy` -- opens in a new tab so the user never loses a form or in-progress application |
 | Terms of Service | Link to `/terms` -- opens in a new tab so the user never loses a form or in-progress application   |
 | Copyright        | (c) RapidGlobe Ltd [current year]                                                                  |
@@ -271,6 +274,7 @@ _Status: Complete_
 
 | Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                              |
 | ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.8     | 2026-07-24 | Rapidglobe Ltd | Persistent "Help" link added to the authenticated nav, public nav, and global footer (`PDR-UI-008`) -- external link to the GitBook help centre, opens in a new tab.                                                                                                                            |
 | 1.0     | 2026-04-16 | Rapidglobe Ltd | Initial version                                                                                                                                                                                                                                                                                 |
 | 1.1     | 2026-05-26 | Rapidglobe Ltd | Post-action redirect for charity profile update changed from stay-on-page to redirect to dashboard (2026-05-26 testing decision)                                                                                                                                                                |
 | 1.2     | 2026-05-29 | Rapidglobe Ltd | Step 4 description updated to reflect section-by-section mode for narrative funders and Q&A mode for structured funders. Document history table added.                                                                                                                                          |

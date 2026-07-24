@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Logo } from '@/components/logo'
 import { usePathname } from 'next/navigation'
-import { ChevronDown, Settings, LogOut } from 'lucide-react'
+import { ChevronDown, Settings, LogOut, HelpCircle } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/actions/auth'
+import { HELP_CENTRE_BASE_URL } from '@/lib/help-centre'
 
 interface NavAuthenticatedProps {
   firstName?: string
@@ -84,36 +85,48 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
           </nav>
         </div>
 
-        {/* Right — account dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex items-center gap-2 rounded-md bg-[#E6F4F4] px-3 py-1.5 transition-all hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
-            aria-label="Account menu"
+        {/* Right — help link + account dropdown */}
+        <div className="flex items-center gap-2">
+          <Link
+            href={HELP_CENTRE_BASE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[14px] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
           >
-            <div
-              className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#0D6E6E]"
-              aria-hidden="true"
-            >
-              <span className="text-[11px] font-bold leading-none text-white">{initials}</span>
-            </div>
-            <span className="text-[14px] font-semibold text-[#0D6E6E]">{displayName}</span>
-            <ChevronDown className="h-3.5 w-3.5 text-[#0D6E6E]" aria-hidden="true" />
-          </DropdownMenuTrigger>
+            <HelpCircle className="h-4 w-4" aria-hidden="true" />
+            Help<span className="sr-only"> (opens in a new tab)</span>
+          </Link>
 
-          <DropdownMenuContent align="end" className="w-auto min-w-40">
-            <DropdownMenuItem>
-              <Link href="/account" className="flex w-full items-center gap-2">
-                <Settings className="h-4 w-4 text-[#64748B]" aria-hidden="true" />
-                Account settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              Sign out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className="flex items-center gap-2 rounded-md bg-[#E6F4F4] px-3 py-1.5 transition-all hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+              aria-label="Account menu"
+            >
+              <div
+                className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#0D6E6E]"
+                aria-hidden="true"
+              >
+                <span className="text-[11px] font-bold leading-none text-white">{initials}</span>
+              </div>
+              <span className="text-[14px] font-semibold text-[#0D6E6E]">{displayName}</span>
+              <ChevronDown className="h-3.5 w-3.5 text-[#0D6E6E]" aria-hidden="true" />
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-auto min-w-40">
+              <DropdownMenuItem>
+                <Link href="/account" className="flex w-full items-center gap-2">
+                  <Settings className="h-4 w-4 text-[#64748B]" aria-hidden="true" />
+                  Account settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
     </header>
   )

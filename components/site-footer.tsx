@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { getAppVersion } from '@/lib/version'
+import { HELP_CENTRE_BASE_URL } from '@/lib/help-centre'
 
 export function SiteFooter() {
   const year = new Date().getFullYear()
@@ -18,8 +19,18 @@ export function SiteFooter() {
 
         <nav aria-label="Legal links">
           <ul className="flex items-center gap-4 list-none m-0 p-0">
-            {/* Legal links open in a new tab so users are never pulled out of
-                a form or an in-progress application to read a policy */}
+            {/* Help + legal links open in a new tab so users are never pulled
+                out of a form or an in-progress application */}
+            <li>
+              <Link
+                href={HELP_CENTRE_BASE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B]"
+              >
+                Help centre<span className="sr-only"> (opens in a new tab)</span>
+              </Link>
+            </li>
             <li>
               <Link
                 href="/privacy"

@@ -15,6 +15,7 @@ import {
 import { StepIndicator } from '@/components/step-indicator'
 import { approveApplication, reopenApplication } from '@/actions/applications'
 import type { ApplicationStatus } from '@/lib/application-guard'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -37,6 +38,8 @@ interface ApplicationStep5ApproveProps {
   answers: AnswerRow[]
   assembledDraft: string | null
   lastExportedAt: string | null
+  /** PDR-UI-008 — has the user already dismissed tt-download-docx. */
+  tooltipDismissed?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -109,6 +112,7 @@ export function ApplicationStep5Approve({
   answers,
   assembledDraft,
   lastExportedAt,
+  tooltipDismissed = false,
 }: ApplicationStep5ApproveProps) {
   const router = useRouter()
 
@@ -398,20 +402,27 @@ export function ApplicationStep5Approve({
       {/* ── Action buttons ────────────────────────────────────────────────── */}
       <div className="mb-3 space-y-3">
         {/* Download as Word — clicking this approves + downloads in one step */}
-        <Button
-          type="button"
-          onClick={() => void handleDownloadClick('docx')}
-          disabled={(!isApproved && !allChecked) || isDownloading}
-          variant={isApproved ? 'outline' : 'default'}
-          className={
-            isApproved
-              ? 'h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40'
-              : 'h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40'
-          }
+        <ContextualTooltip
+          tooltipId="tt-download-docx"
+          variant="first-click"
+          initiallyDismissed={tooltipDismissed}
+          content="Save a local copy as soon as you download it — Grant Pathway stores your answers securely, but having a local copy is good practice."
         >
-          <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-          {isDownloadingDocx ? 'Downloading…' : 'Download as Word document (.docx)'}
-        </Button>
+          <Button
+            type="button"
+            onClick={() => void handleDownloadClick('docx')}
+            disabled={(!isApproved && !allChecked) || isDownloading}
+            variant={isApproved ? 'outline' : 'default'}
+            className={
+              isApproved
+                ? 'h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40'
+                : 'h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40'
+            }
+          >
+            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+            {isDownloadingDocx ? 'Downloading…' : 'Download as Word document (.docx)'}
+          </Button>
+        </ContextualTooltip>
 
         {/* Download as plain text */}
         <Button

@@ -6,6 +6,7 @@ import { Upload, Sparkles, FileText, ArrowRight, AlertTriangle } from 'lucide-re
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { createApplication } from '@/actions/applications'
+import { helpCentreUrl } from '@/lib/help-centre'
 
 interface DashboardEmptyProps {
   firstName?: string
@@ -91,6 +92,20 @@ export function DashboardEmpty({
             step="3"
           />
         </div>
+
+        <p className="mt-8 text-[13px] text-[#94A3B8]">
+          Need a hand? Visit our{' '}
+          <a
+            href={helpCentreUrl()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-[#0D6E6E] underline-offset-2 hover:underline"
+          >
+            help centre
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>{' '}
+          for step-by-step guides to every part of Grant Pathway.
+        </p>
       </div>
     </div>
   )

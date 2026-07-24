@@ -18,12 +18,18 @@ import { Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StepIndicator } from '@/components/step-indicator'
 import { assembleAndAdvance, setDraftInProgress } from '@/actions/applications'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 interface ApplicationStep4SeniorReviewProps {
   applicationId: string
+  /** PDR-UI-008 — has the user already dismissed tt-senior-review-confirm. */
+  tooltipDismissed: boolean
 }
 
-export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4SeniorReviewProps) {
+export function ApplicationStep4SeniorReview({
+  applicationId,
+  tooltipDismissed,
+}: ApplicationStep4SeniorReviewProps) {
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [backError, setBackError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
@@ -93,14 +99,21 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
         >
           {isGoingBack ? 'Going back…' : 'Back to editing'}
         </button>
-        <Button
-          type="button"
-          onClick={handleAssemble}
-          disabled={isAssembling || isGoingBack}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
+        <ContextualTooltip
+          tooltipId="tt-senior-review-confirm"
+          variant="page-load"
+          initiallyDismissed={tooltipDismissed}
+          content="Confirm a senior team member has reviewed the financial content before assembling your draft."
         >
-          {isAssembling ? 'Assembling…' : 'Yes — assemble my draft'}
-        </Button>
+          <Button
+            type="button"
+            onClick={handleAssemble}
+            disabled={isAssembling || isGoingBack}
+            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
+          >
+            {isAssembling ? 'Assembling…' : 'Yes — assemble my draft'}
+          </Button>
+        </ContextualTooltip>
       </div>
     </div>
   )

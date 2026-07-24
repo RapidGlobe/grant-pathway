@@ -6,7 +6,7 @@
 // Request body: { applicationId: string, answerId: string, questionText: string, answerText: string }
 //
 // Success response:
-//   { refinedText: string, approachingLimit: boolean }
+//   { refinedText: string, approachingLimit: boolean, currentUsage: number }
 //
 // Error response (same shape as all AI routes — GAP-04):
 //   { error: AiErrorCode, message: string }
@@ -165,6 +165,7 @@ export async function POST(request: NextRequest) {
 
   const logId = slotData.log_id as string
   const approachingLimit = slotData.approaching_limit as boolean
+  const currentUsage = slotData.current_usage as number
 
   // ── 6. Call Bedrock with retry ─────────────────────────────────────────────
   const client = new AnthropicBedrock({
@@ -242,5 +243,5 @@ export async function POST(request: NextRequest) {
   })
 
   // ── 9. Return response ─────────────────────────────────────────────────────
-  return NextResponse.json({ refinedText, approachingLimit })
+  return NextResponse.json({ refinedText, approachingLimit, currentUsage })
 }

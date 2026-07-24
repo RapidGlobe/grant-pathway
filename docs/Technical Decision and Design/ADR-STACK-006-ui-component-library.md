@@ -24,9 +24,11 @@ Grant Pathway requires a set of accessible, composable UI components covering fo
 
 shadcn/ui is the UI component library. Components are initialised into the codebase using the shadcn CLI and customised to match the design system in design-requirements.md. Lucide React is used as the icon library (already a shadcn/ui dependency).
 
+**Amendment (2026-07-24, found while building PDR-UI-008):** the actual primitives underneath `components/ui/` are **Base UI** (`@base-ui/react`), not Radix UI — see `components/ui/tooltip.tsx`, `components/ui/dialog.tsx`. shadcn/ui itself switched its default primitive from Radix to Base UI at some point after this ADR was written (2026-04-17); this ADR's Decision/Rationale text was never updated to match. `ADR-OPS-006`'s own 2026-07-14 revision already correctly references Base UI. No functional impact — shadcn/ui's Tailwind-native, in-codebase model and WCAG-compliant primitive behaviour hold regardless of which underlying library it wraps; only this document's wording was stale.
+
 ## Rationale
 
-- Radix UI provides WCAG-compliant keyboard navigation and ARIA attributes for all interactive components (dialogs, dropdowns, popovers).
+- Base UI (formerly documented here as Radix UI — see the 2026-07-24 amendment above) provides WCAG-compliant keyboard navigation and ARIA attributes for all interactive components (dialogs, dropdowns, popovers, tooltips).
 - shadcn/ui components live in `components/ui/` in the codebase — they are not an external dependency lock-in.
 - Tailwind CSS is used throughout the product; shadcn/ui is Tailwind-native.
 - Lucide icons are included and already used in the design system (DDR-CS-006 references specific Lucide icons).

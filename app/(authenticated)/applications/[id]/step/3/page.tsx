@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ApplicationStep3Summary } from '@/components/application-step3-summary'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
+import { getDismissedTooltipIds } from '@/actions/tooltips'
 
 export const metadata: Metadata = {
   title: 'AI Summary',
@@ -26,6 +27,7 @@ export default async function Step3Page({ params }: Props) {
 
   // Step locking: redirects to current step if current_step < 3
   const { funderName, grantName, aiSummary } = await getApplicationOrRedirect(id, 3)
+  const dismissed = await getDismissedTooltipIds(['tt-summary-review'])
 
   return (
     <ApplicationStep3Summary
@@ -33,6 +35,7 @@ export default async function Step3Page({ params }: Props) {
       funderName={funderName}
       grantName={grantName}
       existingSummary={aiSummary}
+      tooltipDismissed={dismissed.has('tt-summary-review')}
     />
   )
 }

@@ -2,7 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { HelpCircle } from 'lucide-react'
 import { Logo } from '@/components/logo'
+import { HELP_CENTRE_BASE_URL } from '@/lib/help-centre'
 
 export function NavPublic() {
   const pathname = usePathname()
@@ -33,6 +35,17 @@ export function NavPublic() {
             pages where it is out of context. */}
         <nav aria-label="Site navigation">
           <ul className="flex items-center gap-2 list-none m-0 p-0">
+            <li>
+              <Link
+                href={HELP_CENTRE_BASE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-md px-3 py-2 text-[14px] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+              >
+                <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                Help<span className="sr-only"> (opens in a new tab)</span>
+              </Link>
+            </li>
             {pathname !== '/register' &&
               pathname !== '/verify-email' &&
               pathname !== '/privacy' &&

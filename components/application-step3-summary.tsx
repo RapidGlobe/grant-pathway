@@ -35,6 +35,7 @@ import { StepIndicator } from '@/components/step-indicator'
 import { getGuidelines, clearGuidelines, getGuidelinesFilename } from '@/lib/guidelines-session'
 import { advanceToStep4, setApplicationMismatch } from '@/actions/applications'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 type DisplayState =
   'loading' | 'content' | 'mismatch' | 'failure' | 'persistent-failure' | 'no-guidelines'
@@ -45,6 +46,8 @@ interface ApplicationStep3SummaryProps {
   grantName: string
   /** Existing summary JSON string from the database. If non-null, skip generation. */
   existingSummary: string | null
+  /** PDR-UI-008 — has the user already dismissed tt-summary-review. */
+  tooltipDismissed?: boolean
 }
 
 const LOADING_MESSAGES = [
@@ -58,6 +61,7 @@ export function ApplicationStep3Summary({
   funderName,
   grantName,
   existingSummary,
+  tooltipDismissed = false,
 }: ApplicationStep3SummaryProps) {
   // ── State ──────────────────────────────────────────────────────────────────
   const [displayState, setDisplayState] = useState<DisplayState>(() => {
@@ -117,7 +121,6 @@ export function ApplicationStep3Summary({
 
   // Read filename and guidelines availability from sessionStorage on mount
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- reading sessionStorage; can only run client-side in useEffect
     setGuidelinesFilename(getGuidelinesFilename(applicationId))
     setGuidelinesAvailable(getGuidelines(applicationId) !== null)
   }, [applicationId])
@@ -128,7 +131,6 @@ export function ApplicationStep3Summary({
   useEffect(() => {
     if (displayState !== 'loading') return
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting progress state when loading begins
     setProgress(0)
     setLoadingMessage(LOADING_MESSAGES[0].text)
 
@@ -160,7 +162,6 @@ export function ApplicationStep3Summary({
     if (!guidelinesText) {
       // No guidelines in sessionStorage and no DB summary — user must re-upload
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- updating state in response to missing sessionStorage data
       setDisplayState('no-guidelines')
       return
     }
@@ -416,9 +417,16 @@ export function ApplicationStep3Summary({
     <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={3} />
 
-      <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
-        Your funder guidelines — summary
-      </h1>
+      <ContextualTooltip
+        tooltipId="tt-summary-review"
+        variant="page-load"
+        initiallyDismissed={tooltipDismissed}
+        content="If your charity doesn't match this funder's criteria, you'll see a message here explaining why — you can update your profile or pick a different funder."
+      >
+        <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
+          Your funder guidelines — summary
+        </h1>
+      </ContextualTooltip>
       <p className="mb-1 text-[14px] font-medium text-[#0D6E6E]">
         {funderName}
         {grantName && grantName !== funderName && (

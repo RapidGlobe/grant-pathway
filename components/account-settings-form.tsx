@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { changePassword } from '@/actions/auth'
+import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 interface FieldErrors {
   currentPassword?: string
@@ -275,14 +276,19 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
           Deleting your account will permanently remove all your data, including your charity
           profile and saved applications. This cannot be undone.
         </p>
-        <Link href="/account/delete">
-          <Button
-            type="button"
-            className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C]"
-          >
-            Delete my account
-          </Button>
-        </Link>
+        <ContextualTooltip
+          variant="persistent"
+          content="This permanently deletes your charity profile and all saved applications. This can't be undone."
+        >
+          <Link href="/account/delete">
+            <Button
+              type="button"
+              className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C]"
+            >
+              Delete my account
+            </Button>
+          </Link>
+        </ContextualTooltip>
       </section>
     </div>
   )

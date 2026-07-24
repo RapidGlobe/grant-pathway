@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ApplicationStep2Form } from '@/components/application-step2-form'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
+import { getDismissedTooltipIds } from '@/actions/tooltips'
 
 export const metadata: Metadata = {
   title: 'Upload Guidelines',
@@ -36,6 +37,7 @@ export default async function Step2Page({ params, searchParams }: Props) {
   }
   const initialError: UploadError = error && error in errorMap ? errorMap[error] : null
   const showLargeWarning = warning === 'large'
+  const dismissed = await getDismissedTooltipIds(['tt-guidelines-choice'])
 
   return (
     <ApplicationStep2Form
@@ -45,6 +47,7 @@ export default async function Step2Page({ params, searchParams }: Props) {
       currentStep={currentStep}
       initialError={initialError}
       showLargeWarning={showLargeWarning}
+      tooltipDismissed={dismissed.has('tt-guidelines-choice')}
     />
   )
 }

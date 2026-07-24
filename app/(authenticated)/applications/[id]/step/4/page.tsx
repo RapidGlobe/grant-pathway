@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
 import { resolveGovernanceInserts, isOrphanedItem } from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
+import { getDismissedTooltipIds } from '@/actions/tooltips'
 
 export const metadata: Metadata = {
   title: 'Draft Answers',
@@ -68,7 +69,13 @@ export default async function Step4Page({ params }: Props) {
 
   // S6.7 — Show senior review confirmation before assembly
   if (draftStatus === 'ready_to_assemble') {
-    return <ApplicationStep4SeniorReview applicationId={id} />
+    const dismissed = await getDismissedTooltipIds(['tt-senior-review-confirm'])
+    return (
+      <ApplicationStep4SeniorReview
+        applicationId={id}
+        tooltipDismissed={dismissed.has('tt-senior-review-confirm')}
+      />
+    )
   }
 
   // S6.7 — Draft already assembled; send user straight to Step 5
@@ -346,6 +353,15 @@ export default async function Step4Page({ params }: Props) {
   const approachingLimit = currentUsage >= 40
   const limitReached = currentUsage >= 50
 
+  // PDR-UI-008 — dismissed-state for this page's 4 tooltips, fetched once
+  // and passed one hop into ApplicationStep4Draft's props.
+  const dismissedTooltips = await getDismissedTooltipIds([
+    'tt-ai-help-limit',
+    'tt-budget-no-ai',
+    'tt-ready-to-assemble',
+    'tt-governance-add-it',
+  ])
+
   // ── P6.4: fetch retained guideline text for the "view original guidelines"
   // panel (GAP-33, application_guidelines) — text-only, never the raw file
   // (ADR-DATA-002). Absent for applications created before GAP-33 shipped, or
@@ -387,7 +403,9 @@ export default async function Step4Page({ params }: Props) {
       grantName={grantName}
       approachingLimit={approachingLimit}
       limitReached={limitReached}
+      currentUsage={currentUsage}
       guidelineText={guidelinesRow?.guideline_text ?? null}
+      dismissedTooltips={dismissedTooltips}
     />
   )
 }
