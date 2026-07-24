@@ -32,6 +32,12 @@ Found and fixed a stale documentation drift while touching `components/ui/toolti
 
 ---
 
+## 2026-07-24 — Help centre link + tooltips given their own test plan layer
+
+`PDR-UI-008` (above) left verification as a manual to-do with no dedicated place to track it. Added `docs/Test Plans/help-and-tooltips-test-plan.md` under `DR-TEST-001`'s layer structure: 8 cases covering the help-centre link (4 locations), all 5 tooltip trigger variants (`page-load`, `first-click`, `hover-disabled`, `persistent`, and the deliberately-non-`ContextualTooltip` password hint), cross-session persistence (the one property that actually proves server-side storage over `localStorage`), and the `ADR-OPS-006` accessibility pass. Kept separate from the two flagship plans and the capability matrix — this is a horizontal UI concern spanning Profile, Steps 2-5, and Account Settings, not tied to a specific funder or guideline shape. `TEST-DASHBOARD.md` (v2.1) and `AGENTS.md`'s mandatory-coverage section updated to reference it. Not yet executed.
+
+---
+
 ## 2026-07-24 — Test strategy restructured: funder-by-funder plans replaced with a capability/guideline-shape model (`DR-TEST-001`)
 
 A routine review of `AB-Charitable-Trust-test-plan.md` against `grant-pathway-user-guide-v1.19.docx` surfaced that it still tested the funder picker/directory UI (search dropdown, "Structured" badge, "Request a Funder" link) removed entirely by `DR-FD-001` v1.4 on 2026-07-15. Separately, its ABC-04 eligibility-mismatch case assumed a mismatch was a soft, non-blocking observation — wrong since `DR-EL-001` (2026-06-02, predates this plan's v1.0), which made it a hard stop with no path to Step 4. That hard stop structurally conflicts with the same plan's later requirement to reach export in the same run.

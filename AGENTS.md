@@ -145,7 +145,7 @@ No change to AGENTS.md is required — the tier header makes the doc self-govern
 
 ### Test plans — mandatory coverage rule
 
-As of `DR-TEST-001` (2026-07-24), `docs/Test Plans/` is organised in layers rather than one plan per named funder — see `TEST-DASHBOARD.md` for the current structure (mechanical regression, two flagship end-to-end plans, a guideline-shape/capability matrix, and a dedicated eligibility plan). This reflects the product no longer varying its behaviour by funder identity (`DR-FD-001` v1.4) — the axis worth testing is guideline shape and capability, not funder name.
+As of `DR-TEST-001` (2026-07-24), `docs/Test Plans/` is organised in layers rather than one plan per named funder — see `TEST-DASHBOARD.md` for the current structure (mechanical regression, two flagship end-to-end plans, a guideline-shape/capability matrix, a dedicated eligibility plan, and a UI/accessibility plan for cross-cutting concerns like `PDR-UI-008`'s help centre link and contextual tooltips). This reflects the product no longer varying its behaviour by funder identity (`DR-FD-001` v1.4) — the axis worth testing is guideline shape and capability, not funder name. Horizontal UI features that touch many routes at once (tooltips, nav, help links) get their own plan rather than being folded into the flagships, which stay scoped to the funder-flow-specific coverage in the list below.
 
 **Full end-to-end coverage — from login through to export, no step omitted** — remains mandatory for:
 
