@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-24 — Change-password failure: root cause not yet found, error logging added (investigation in progress)
+
+WJ tried to change the password on a test account (`grantpathway+walton1@gmail.com`) via Account Settings and got a generic "Something went wrong. Please try again." The current-password field showed no error, meaning `changePassword` (`actions/auth.ts`) got past `signInWithPassword` (the current password was correct) and failed later, at `supabase.auth.updateUser({ password: newPassword })`, returning a non-`weak_password` error that the client always maps to the same generic message.
+
+**Could not reproduce or root-cause directly this session:** `changePassword` had zero error logging on this path — unlike `app/api/account/delete/route.ts`'s cascade, an `updateError` here was silently converted to `{ status: 'error' }` with nothing written to server logs, so `vercel logs` had nothing to show for the attempt already made. Attempting to reproduce locally via the Supabase Admin/anon APIs directly (set a known password via `auth.admin.updateUserById`, then replay the exact `signInWithPassword` + `updateUser` sequence) was also not possible in this environment — `SUPABASE_SERVICE_ROLE_KEY`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` read as empty strings here (secret redaction), so no authenticated Supabase API call can be made from this session.
+
+**Leading hypothesis, unconfirmed:** Supabase Auth's "Secure password change" project setting (`GoTrue`'s `secure_password_change` / `SECURE_PASSWORD_CHANGE_ENABLED`) may be enabled on `grant-pathway-dev`'s hosted Auth config even though `supabase/config.toml` (the local/intended config) has it `false` — if so, `updateUser({password})` would require a `reauthenticate()` nonce this codebase's `changePassword` never requests, and would fail for every user, not just this account. Not verified — the CLI has no `supabase config pull`/diff command to read the actual remote Auth config, and the Management API needs a token this session doesn't have access to either.
+
+**Fix so far:** added logging only (`console.error('[change-password] Failed to update password:', { code, status, message })`), matching the pattern already used in the account-deletion route. No behaviour change yet. **Next step:** WJ to retry the password change once this deploys; the real error will then be visible via `vercel logs --query "change-password"`, at which point the actual fix (likely either a code change to add the reauthentication step, or a Supabase dashboard settings change) can be identified and applied.
+
+**Files changed:** `actions/auth.ts`, `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-07-23 — Account deletion fixed: `service_role` was missing table grants on the two newest item-graph tables
 
 WJ tried to delete a test account (`grantpathway+lloyds1@gmail.com`, 2 applications) via Step 8.2's "Permanently delete my account" flow and got a generic "Deletion failed. Please try again." His own first hypothesis — that he'd clicked the delete button before typing `DELETE` in the confirmation box — was ruled out: the client-side confirmation check runs before any network call and shows a different message ("Please type DELETE in capitals to confirm"), so reaching the generic server error means the confirmation had already passed.

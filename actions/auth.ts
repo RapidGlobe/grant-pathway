@@ -329,7 +329,10 @@ export async function changePassword(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user?.email) return { status: 'error' }
+  if (!user?.email) {
+    console.error('[change-password] No authenticated user on session')
+    return { status: 'error' }
+  }
 
   // Verify the current password before allowing the change
   const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -345,6 +348,16 @@ export async function changePassword(
     if (updateError.code === 'weak_password') {
       return { status: 'weak_password' }
     }
+    // Logged so the real cause (e.g. a GoTrue-side setting the app doesn't
+    // implement, rate limiting, session/reauth issues) is visible in
+    // `vercel logs` instead of only ever surfacing as a generic client-side
+    // "Something went wrong" — see the account-deletion 42501 fix (2026-07-23)
+    // for why this class of error was previously invisible.
+    console.error('[change-password] Failed to update password:', {
+      code: updateError.code,
+      status: updateError.status,
+      message: updateError.message,
+    })
     return { status: 'error' }
   }
 
