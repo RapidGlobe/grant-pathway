@@ -46,17 +46,20 @@ import { extractValidMarkers, validateCitation } from '@/lib/guideline-citations
 import type { AiSummaryData } from '@/lib/types'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Raw citation shape as the AI actually returns it (P6.3, ADR-DATA-007) —
-// both page_number and heading_path present, one always null, per the
-// prompt's worked examples. reconcileCitations() below (near the parse
-// logic) converts this into the strict omitted-key discriminated union
+// Raw citation shape as the AI actually returns it (P6.3, ADR-DATA-007) — all
+// three of page_number/heading_path/item_number present, two always null,
+// per the prompt's worked examples. item_number/'item' added 2026-07-21 as a
+// fallback for guidelines with no page or heading structure (lib/extract-
+// text.ts, lib/preprocess-text.ts). reconcileCitations() below (near the
+// parse logic) converts this into the strict omitted-key discriminated union
 // application_items expects, after cross-checking it against real markers
 // in the guidelines text (lib/guideline-citations.ts).
 const citationSchema = z
   .object({
-    source_type: z.enum(['page', 'heading']),
+    source_type: z.enum(['page', 'heading', 'item']),
     page_number: z.number().nullable(),
     heading_path: z.array(z.string()).nullable(),
+    item_number: z.number().nullable(),
     quote: z.string(),
   })
   .nullable()
@@ -398,8 +401,8 @@ export async function POST(request: NextRequest) {
 
   // ── 7a. Reconcile citations against real markers (P6.3, ADR-DATA-007) ─────
   // A citation is never trusted purely on the AI's word — cross-check every
-  // reported [PAGE N] / [SECTION: ...] citation against the markers actually
-  // present in the text the AI was given (textForPrompt, post-truncation), and
+  // reported [PAGE N] / [SECTION: ...] / [ITEM N] citation against the markers
+  // actually present in the text the AI was given (textForPrompt, post-truncation), and
   // drop (null out) any that don't check out. Log a warning (not a failure —
   // nothing renders citations to a user yet) if over half of what the AI
   // offered turns out invalid, as a signal the tagging or the model's

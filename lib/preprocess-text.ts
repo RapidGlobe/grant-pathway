@@ -27,6 +27,12 @@
 // a short preamble (eligibility/overview context) and the form section
 // itself, rather than truncating in raw document order.
 
+import {
+  STRUCTURAL_MARKER,
+  hasAnyStructuralMarker,
+  structuralMarkerGlobal,
+} from './structural-markers'
+
 // Default character ceiling. Override via PREPROCESS_CHAR_CEILING env var.
 // Applied after all other stripping — a safety net for very large documents.
 export const DEFAULT_CHAR_CEILING = 20_000
@@ -57,8 +63,9 @@ const BOILERPLATE_HEADINGS: RegExp[] = [
 const MAX_BOILERPLATE_SECTION_LINES = 60
 
 // Structural markers inserted by lib/extract-text.ts (or by
-// tagPastedTextSections below) — must never be stripped as noise.
-const STRUCTURAL_MARKER = /^\[(?:PAGE \d+|SECTION:.*)\]$/
+// tagPastedTextSections below) — must never be stripped as noise. Canonical
+// definition lives in lib/structural-markers.ts (2026-07-21) — this used to
+// be one of four separately-hardcoded copies of the same pattern.
 
 function isBoilerplateHeading(line: string): boolean {
   const t = line.trim()
@@ -158,20 +165,41 @@ function numberedHeadingDepth(line: string): number | null {
  * (unlike PDF/docx, tagged in lib/extract-text.ts). Falls back to the same
  * numbered/ALL-CAPS heading heuristic already used to bound boilerplate
  * sections, inserting `[SECTION: ...]` markers so a citation still has real
- * structure to point at (ADR-DATA-007, P6.2a). This is a heuristic guess, not
- * a guarantee — plain text with no heading-like lines gets no markers, which
- * is an accepted limitation, not a bug.
+ * structure to point at (ADR-DATA-007, P6.2a).
+ *
+ * `[ITEM N]` fallback (2026-07-21 amendment): if NO line anywhere in the
+ * pasted text looks like a heading (a flat, unheaded bullet/paragraph list —
+ * the same shape as the Wolfson Foundation docx that motivated this fix),
+ * the numbered/ALL-CAPS heuristic has nothing to hang a `[SECTION: ...]`
+ * marker off at all. Rather than leave the whole text unmarked, number every
+ * non-blank line `[ITEM N]` instead, so a citation still has something real
+ * to anchor to. Text with at least one detected heading is unaffected —
+ * this only activates when `sawHeading` never becomes true.
  *
  * Skipped entirely if the text already carries markers (it came from
  * extract-text.ts, which tags PDFs/docx itself).
  */
 function tagPastedTextSections(text: string): string {
-  if (/^\[PAGE \d+\]$/m.test(text) || /^\[SECTION:/m.test(text)) return text
+  if (hasAnyStructuralMarker(text)) return text
+
+  const lines = text.split('\n')
+  const sawHeading = lines.some((line) => looksLikeHeading(line.trim()))
+
+  if (!sawHeading) {
+    let itemNumber = 0
+    return lines
+      .map((line) => {
+        if (line.trim() === '') return line
+        itemNumber++
+        return `[ITEM ${itemNumber}]\n${line}`
+      })
+      .join('\n')
+  }
 
   const stack: { depth: number; title: string }[] = []
   const out: string[] = []
 
-  for (const line of text.split('\n')) {
+  for (const line of lines) {
     const trimmed = line.trim()
     if (looksLikeHeading(trimmed)) {
       const depth = numberedHeadingDepth(trimmed) ?? 1
@@ -240,7 +268,7 @@ function findFormStartIndex(text: string): number {
  * final `minKeepRatio` of the slice) when no marker is present at all.
  */
 function snapToLastMarker(slice: string, minKeepRatio = 0.9): string {
-  const markerPattern = /^\[(?:PAGE \d+|SECTION:.*)\]$/gm
+  const markerPattern = structuralMarkerGlobal()
   let lastMarkerIndex = -1
   let markerMatch: RegExpExecArray | null
   while ((markerMatch = markerPattern.exec(slice)) !== null) {

@@ -117,11 +117,13 @@ function truncateLabel(label: string, maxLength: number): string {
 
 /** Untruncated citation text — used for the badge's `title` (hover) attribute
  * so the full heading is still available even when citationLabel() below
- * truncates the visible text. */
+ * truncates the visible text. 'item' (2026-07-21 amendment): fallback marker
+ * for guidelines with no page or heading structure at all — see
+ * lib/extract-text.ts / lib/preprocess-text.ts. */
 function citationFullLabel(citation: GuidelineCitation): string {
-  return citation.source_type === 'page'
-    ? `Page ${citation.page_number} of the guidelines`
-    : citation.heading_path.join(' > ')
+  if (citation.source_type === 'page') return `Page ${citation.page_number} of the guidelines`
+  if (citation.source_type === 'heading') return citation.heading_path.join(' > ')
+  return `Item ${citation.item_number} of the guidelines`
 }
 
 /** A short label for a citation badge, e.g. "Page 5 of the guidelines" or "Eligibility > Referrals". */

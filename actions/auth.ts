@@ -298,6 +298,16 @@ export async function signIn(_prevState: SignInState, formData: FormData): Promi
     }
     // All other errors (wrong password, unknown email, rate limit) surface as
     // the same generic credentials message to prevent email enumeration (AC-FR-04-03).
+    // Logged server-side only (never shown to the user, so this doesn't weaken
+    // the anti-enumeration behaviour) — without it, a genuine rate limit or
+    // other non-credentials failure is indistinguishable from a real wrong
+    // password from the outside, same class of invisible-error problem found
+    // in change-password (2026-07-24).
+    console.error('[sign-in] signInWithPassword failed:', {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+    })
     return { error: 'credentials' }
   }
 
@@ -318,6 +328,13 @@ export type ChangePasswordResult = {
  * before calling updateUser — Supabase has no dedicated "verify current
  * password" API, but signInWithPassword validates the credential correctly.
  *
+ * `current_password` is also passed to `updateUser` itself (2026-07-24 fix):
+ * this Supabase project has `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD`
+ * enabled, which makes GoTrue reject any password update that omits it —
+ * regardless of the signInWithPassword re-verification immediately above,
+ * which GoTrue has no way to know happened. Found live: every change-password
+ * attempt failed with `code: 'current_password_required'` until this was added.
+ *
  * Called directly from AccountSettingsForm via useTransition (not FormData).
  */
 export async function changePassword(
@@ -329,7 +346,10 @@ export async function changePassword(
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  if (!user?.email) return { status: 'error' }
+  if (!user?.email) {
+    console.error('[change-password] No authenticated user on session')
+    return { status: 'error' }
+  }
 
   // Verify the current password before allowing the change
   const { error: signInError } = await supabase.auth.signInWithPassword({
@@ -338,13 +358,26 @@ export async function changePassword(
   })
   if (signInError) return { status: 'wrong_password' }
 
-  const { error: updateError } = await supabase.auth.updateUser({ password: newPassword })
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: newPassword,
+    current_password: currentPassword,
+  })
   if (updateError) {
     // Supabase Auth rejects passwords that don't meet its configured strength
     // requirements with error.code === 'weak_password' (AuthWeakPasswordError).
     if (updateError.code === 'weak_password') {
       return { status: 'weak_password' }
     }
+    // Logged so the real cause (e.g. a GoTrue-side setting the app doesn't
+    // implement, rate limiting, session/reauth issues) is visible in
+    // `vercel logs` instead of only ever surfacing as a generic client-side
+    // "Something went wrong" — see the account-deletion 42501 fix (2026-07-23)
+    // for why this class of error was previously invisible.
+    console.error('[change-password] Failed to update password:', {
+      code: updateError.code,
+      status: updateError.status,
+      message: updateError.message,
+    })
     return { status: 'error' }
   }
 

@@ -1,8 +1,10 @@
 // Guideline citation validation (P6.3, ADR-DATA-007)
 //
 // The AI extraction prompt (lib/prompts.ts) asks the model to report which
-// [PAGE N] / [SECTION: ...] marker (lib/extract-text.ts / lib/preprocess-
-// text.ts, P6.2a) each question/section was drawn from. A citation is never
+// [PAGE N] / [SECTION: ...] / [ITEM N] marker (lib/extract-text.ts / lib/
+// preprocess-text.ts, P6.2a; [ITEM N] added 2026-07-21 as a fallback for
+// guidelines with no page or heading structure) each question/section was
+// drawn from. A citation is never
 // trusted purely on the AI's word — this module cross-checks every reported
 // citation against the markers actually present in the text the AI was
 // given, so a citation can only ever reference a chunk of guideline text
@@ -15,18 +17,21 @@
 
 import type { Json } from './database.types'
 import type { GuidelineCitation } from './types'
+import { itemMarkerGlobal, pageMarkerGlobal, sectionMarkerGlobal } from './structural-markers'
 
-/** Raw citation shape as the AI returns it — both keys present, one null. */
+/** Raw citation shape as the AI returns it — all three keys present, two null. */
 export type RawCitation = {
-  source_type: 'page' | 'heading'
+  source_type: 'page' | 'heading' | 'item'
   page_number: number | null
   heading_path: string[] | null
+  item_number: number | null
   quote: string
 } | null
 
 export type ValidMarkers = {
   pages: Set<number>
   headingPaths: Set<string>
+  items: Set<number>
 }
 
 // Typographic punctuation variants that are interchangeable for matching
@@ -46,6 +51,16 @@ const EQUIVALENT_PUNCTUATION_CLASSES = [
   ['"', '“', '”'], // straight double quote, curly left/right double quote
   ['-', '–', '—'], // hyphen, en dash, em dash
 ]
+
+// List-bullet glyphs that PDF extraction (lib/extract-text.ts's unpdf path)
+// carries through as literal characters in the retained guideline text (e.g.
+// "understand:\n■ that you have..."). An AI quoting "verbatim" treats these as
+// decorative list formatting, not text, and drops them — so a quote that spans
+// across a bullet point (found live, 2026-07-23, Garfield Weston "Your
+// finances": "We need to understand: that you have a robust plan..." skips
+// over the "■" between "understand:" and "that") must still match even though
+// the source has a non-whitespace character sitting between the two words.
+const LIST_BULLET_CHARS = ['■', '•', '●', '▪', '◦', '‣', '·']
 
 /** Maps every punctuation-class character to its class's first (canonical) member. */
 function normalizePunctuationForMatch(s: string): string {
@@ -67,15 +82,23 @@ function normalizePunctuationForMatch(s: string): string {
 export function extractValidMarkers(text: string): ValidMarkers {
   const pages = new Set<number>()
   const headingPaths = new Set<string>()
+  const items = new Set<number>()
 
-  for (const m of text.matchAll(/^\[PAGE (\d+)\]$/gm)) {
+  for (const m of text.matchAll(pageMarkerGlobal())) {
     pages.add(parseInt(m[1], 10))
   }
-  for (const m of text.matchAll(/^\[SECTION: (.+)\]$/gm)) {
+  for (const m of text.matchAll(sectionMarkerGlobal())) {
     headingPaths.add(normalizePunctuationForMatch(m[1].trim()))
   }
+  // [ITEM N] (2026-07-21 amendment, ADR-DATA-007): fallback marker for
+  // guidelines with no page or heading structure at all — see
+  // lib/extract-text.ts's tagSectionsFromHtml and lib/preprocess-text.ts's
+  // tagPastedTextSections.
+  for (const m of text.matchAll(itemMarkerGlobal())) {
+    items.add(parseInt(m[1], 10))
+  }
 
-  return { pages, headingPaths }
+  return { pages, headingPaths, items }
 }
 
 /**
@@ -114,6 +137,14 @@ export function validateCitation(
         wasValid: true,
       }
     }
+  } else if (raw.source_type === 'item' && raw.item_number !== null && quote) {
+    if (markers.items.has(raw.item_number)) {
+      return {
+        citation: { source_type: 'item', item_number: raw.item_number, quote },
+        wasOffered: true,
+        wasValid: true,
+      }
+    }
   }
 
   return { citation: null, wasOffered: true, wasValid: false }
@@ -130,24 +161,31 @@ export function toGuidelineReferenceColumn(citation: GuidelineCitation | null | 
   if (citation.source_type === 'page') {
     return { source_type: 'page', page_number: citation.page_number, quote: citation.quote }
   }
-  return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
+  if (citation.source_type === 'heading') {
+    return { source_type: 'heading', heading_path: citation.heading_path, quote: citation.quote }
+  }
+  return { source_type: 'item', item_number: citation.item_number, quote: citation.quote }
 }
 
 /**
  * Finds where `quote` occurs in `text` (P6.4's "view original guidelines"
- * panel), tolerating two classes of near-miss differences between them:
+ * panel), tolerating three classes of near-miss differences between them:
  *
  * 1. Whitespace — PDF extraction often wraps a line where the AI's quote has
  *    an ordinary space (e.g. "project\nwill address" in the source vs.
  *    "project will address" in the quote). Matches the quote's words in
- *    order, joined by `\s+`, so any run of whitespace in the source (space,
- *    newline, multiple spaces) satisfies a single space in the quote.
+ *    order, joined by a separator, so any run of whitespace in the source
+ *    (space, newline, multiple spaces) satisfies a single space in the quote.
  * 2. Typographic punctuation — the AI frequently normalises curly
  *    quotes/apostrophes and en/em dashes to their plain-ASCII equivalents
  *    even when quoting "verbatim" (see EQUIVALENT_PUNCTUATION_CLASSES
  *    above). Each occurrence of one of these characters in the quote is
  *    matched against its whole equivalence class in the source, not just
  *    that literal character.
+ * 3. List bullets — the same separator also swallows a list-bullet glyph
+ *    (see LIST_BULLET_CHARS above) sitting amid the whitespace, since the AI
+ *    drops these when it quotes across a bullet point (e.g. source
+ *    "understand:\n■ that you have" vs. quote "understand: that you have").
  *
  * Returns null if no match is found — the caller shows the text unhighlighted
  * rather than treating this as an error (quotes are validated against real
@@ -170,7 +208,10 @@ export function findQuoteRange(text: string, quote: string): { start: number; en
     return result
   }
 
-  const pattern = words.map(toPunctuationTolerantPattern).join('\\s+')
+  // Separator tolerates a list-bullet glyph sitting amid the whitespace (see
+  // LIST_BULLET_CHARS above) as well as plain runs of whitespace.
+  const separator = `[\\s${LIST_BULLET_CHARS.map(escapeRegex).join('')}]+`
+  const pattern = words.map(toPunctuationTolerantPattern).join(separator)
 
   let match: RegExpExecArray | null
   try {

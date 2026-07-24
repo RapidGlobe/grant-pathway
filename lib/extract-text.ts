@@ -20,7 +20,9 @@
 // > B]` — so a later citation can only ever point at a chunk of text that
 // structurally exists in the source, rather than a free-typed guess. Nothing
 // downstream consumes these markers yet (that's P6.3); lib/preprocess-text.ts
-// is responsible for not stripping them.
+// is responsible for not stripping them. A docx with no real heading styles
+// gets a per-paragraph `[ITEM N]` fallback marker instead (2026-07-21
+// amendment) — see tagSectionsFromHtml below.
 
 import mammoth from 'mammoth'
 import { extractText as unpdfExtractText, getDocumentProxy } from 'unpdf'
@@ -124,18 +126,42 @@ function stripTags(html: string): string {
  * nesting (ADR-DATA-007) rather than extractRawText's flat, headingless
  * string. Not a full HTML parser: walks top-level block tags only, which is
  * all mammoth's default style map produces for headings/paragraphs/lists.
+ *
+ * `[ITEM N]` fallback (2026-07-21 amendment, ADR-DATA-007): mammoth only
+ * promotes real Word Heading styles to `<h1>`-`<h6>` — a document whose
+ * "section titles" are just bold Normal-style paragraphs (confirmed on the
+ * Wolfson Foundation guidelines: zero `w:pStyle` Heading references anywhere
+ * in the file) produces zero `<h*>` tags, so the loop below never pushes to
+ * `stack` and every line falls into the unmarked `else` branch — a docx has
+ * no page structure either, so the result is a completely untagged blob with
+ * nothing for a citation to point at. When no heading exists anywhere in the
+ * document, number every block `[ITEM N]` instead, so a citation always has
+ * a real, verifiable marker to anchor to. Documents with real headings are
+ * completely unaffected — this only activates when `sawHeading` never
+ * becomes true, keeping the already-working `[SECTION: ...]` path untouched.
  */
-function tagSectionsFromHtml(html: string): string {
+export function tagSectionsFromHtml(html: string): string {
   const blockPattern = /<(h[1-6]|p|li|td|th)[^>]*>([\s\S]*?)<\/\1>/gi
-  const stack: { level: number; title: string }[] = []
-  const lines: string[] = []
+  const blocks: { tag: string; content: string }[] = []
   let match: RegExpExecArray | null
 
   while ((match = blockPattern.exec(html)) !== null) {
     const tag = match[1].toLowerCase()
     const content = stripTags(match[2])
     if (!content) continue
+    blocks.push({ tag, content })
+  }
 
+  const sawHeading = blocks.some((b) => /^h[1-6]$/.test(b.tag))
+
+  if (!sawHeading) {
+    return blocks.map((b, i) => `[ITEM ${i + 1}]\n${b.content}`).join('\n\n')
+  }
+
+  const stack: { level: number; title: string }[] = []
+  const lines: string[] = []
+
+  for (const { tag, content } of blocks) {
     const headingLevel = /^h[1-6]$/.test(tag) ? parseInt(tag[1], 10) : null
     if (headingLevel !== null) {
       while (stack.length && stack[stack.length - 1].level >= headingLevel) stack.pop()

@@ -2,12 +2,16 @@ import type { GovernanceFieldKey } from './governance-items'
 
 // Guideline source-reference (ADR-DATA-007, P6.3): a discriminated union so a
 // citation is never both- or neither-populated. Matches the `application_items
-// .guideline_reference` JSONB shape/CHECK constraint exactly (P6.2 migration)
-// — `page_number`/`heading_path` must be entirely OMITTED (not just null) for
-// the unused variant when writing to the database, per that constraint.
+// .guideline_reference` JSONB shape/CHECK constraint exactly (P6.2 migration,
+// extended 2026-07-21 for the 'item' variant) — the fields belonging to the
+// other variants must be entirely OMITTED (not just null) per that constraint.
+// 'item' (2026-07-21 amendment): fallback marker for guidelines with no page
+// structure (docx/pasted) AND no real heading structure — a flat, unheaded
+// bullet list would otherwise carry no structural marker at all to cite.
 export type GuidelineCitation =
   | { source_type: 'page'; page_number: number; quote: string }
   | { source_type: 'heading'; heading_path: string[]; quote: string }
+  | { source_type: 'item'; item_number: number; quote: string }
 
 export type AiSummaryQuestion = {
   number: number
