@@ -117,7 +117,7 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 **Steps:**
 
-1. At Step 4, hover or tab to the **first** "Help me improve this" button — confirm the tooltip appears, showing the current AI-usage count (e.g. "12 of 20 uses this month")
+1. At Step 4, hover or tab to the **first** "Help me improve this" button — confirm the tooltip appears, showing the current AI-usage count against the 50-request monthly cap (e.g. "You've used 12 so far this month")
 2. Click the button — confirm both (a) the AI refine action actually runs (the answer is refined, not just the tooltip closing) and (b) the tooltip does not reappear on a second hover
 3. Reload Step 4 — confirm `tt-ai-help-limit` stays dismissed
 4. At Step 5, hover or tab to "Download as Word document (.docx)" — confirm the tooltip appears

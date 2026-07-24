@@ -7,7 +7,7 @@
 // (e.g. linking Step 2's upload screen straight to the relevant help page)
 // a one-line call site rather than a redesign.
 
-const DEFAULT_HELP_CENTRE_BASE_URL = 'https://grantpathway.gitbook.io'
+const DEFAULT_HELP_CENTRE_BASE_URL = 'https://rapidglobe.gitbook.io/grant-pathway'
 
 export const HELP_CENTRE_BASE_URL =
   process.env.NEXT_PUBLIC_HELP_CENTRE_BASE_URL || DEFAULT_HELP_CENTRE_BASE_URL

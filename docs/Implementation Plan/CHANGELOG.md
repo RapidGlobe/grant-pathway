@@ -10,6 +10,12 @@
 
 ---
 
+## 2026-07-24 — Help centre base URL corrected to the real GitBook address
+
+WJ supplied an updated handoff spec (`grant-pathway-help-integration-spec_1.md`) confirming the actual GitBook help centre address: `https://rapidglobe.gitbook.io/grant-pathway`, not the placeholder `https://grantpathway.gitbook.io` used when `PDR-UI-008` was first built. Fixed the single source of truth, `lib/help-centre.ts`'s `DEFAULT_HELP_CENTRE_BASE_URL` — every help link (nav, footer, dashboard empty state) reads from this one constant, so no other file needed a change. Confirmed no test or doc hardcodes the old literal URL. Deep-linking (the spec's Part A table of per-page GitBook URLs) remains unbuilt, as already decided in `PDR-UI-008` — `helpCentreUrl(path)` already supports it as a one-line addition whenever that's wanted. `npm run type-check`, `lint`, and `test` (97 tests) all pass.
+
+---
+
 ## 2026-07-24 — Help centre link + contextual tooltips built (`PDR-UI-008`)
 
 WJ asked for a review of an externally-written spec (`grant-pathway-help-integration-spec.md`) proposing a persistent help-centre link and 11 in-app contextual tooltips (the spec's own P0/P1/P2 tables sum to 3+5+3=11 — an early effort estimate mislabelled this as "13," corrected in `PDR-UI-008` and here). After an effort estimate and a full technical plan (checked against Next.js's own Server Function docs, `ADR-SEC-002`, and `ADR-OPS-006`), WJ approved full scope.
