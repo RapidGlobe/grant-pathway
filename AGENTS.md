@@ -145,22 +145,28 @@ No change to AGENTS.md is required — the tier header makes the doc self-govern
 
 ### Test plans — mandatory coverage rule
 
-Every funder test plan in `docs/Test Plans/` must cover the **complete end-to-end flow** — from login through to export. No step may be omitted on the assumption that it was tested previously or is not specific to that funder.
+As of `DR-TEST-001` (2026-07-24), `docs/Test Plans/` is organised in layers rather than one plan per named funder — see `TEST-DASHBOARD.md` for the current structure (mechanical regression, two flagship end-to-end plans, a guideline-shape/capability matrix, and a dedicated eligibility plan). This reflects the product no longer varying its behaviour by funder identity (`DR-FD-001` v1.4) — the axis worth testing is guideline shape and capability, not funder name.
 
-Minimum required steps for every funder test plan:
+**Full end-to-end coverage — from login through to export, no step omitted** — remains mandatory for:
+
+- The two flagship plans (`AB-Charitable-Trust-test-plan.md`, `MK-Community-Foundation-test-plan.md`)
+- At least one path through `guideline-capability-matrix-test-plan.md`
+
+Minimum required steps for a full end-to-end run:
 
 1. Account registration (or login for returning test user)
 2. Charity profile setup or verification
-3. Funder selection from the picker (Step 1)
-4. Grant name entry (Step 1)
-5. Guidelines upload or paste (Step 2)
-6. AI summary generation — including recording the time taken (Step 3)
-7. "Before you begin writing" preparation checklist confirmation (Step 4 gate)
-8. Q&A writing interface — at least one narrative answer written, AI-assisted, and approved (Step 4)
-9. Export as Word document (Step 5)
-10. Any funder-specific tests relevant to that organisation's question set, format, or eligibility criteria
+3. Application details — funder and grant name entry (Step 1, free text)
+4. Guidelines upload or paste (Step 2)
+5. AI summary generation — including recording the time taken (Step 3)
+6. "Before you begin writing" preparation checklist confirmation (Step 4 gate)
+7. Q&A writing interface — at least one narrative answer written, AI-assisted, and approved (Step 4)
+8. Export as Word document (Step 5)
+9. Any capability- or shape-specific checks relevant to that plan (word/character limit type, non-narrative filtering, citation coverage, etc.)
 
-**Why:** Steps that appear generic may behave differently for different funders due to funder type, question count, or character/word limit handling. Testing them in context catches issues that a generic test would not.
+**Individual capability-matrix or eligibility-plan cases may share a pre-seeded account** rather than re-registering each time, matching the pattern `regression-test-plan.md` already uses (RT-01a is the only case that exercises fresh registration; the rest reuse the seeded account). These cases exist to test a specific extraction/eligibility behaviour, not to re-prove account/profile mechanics that the flagships and `regression-test-plan.md` already cover.
+
+**Why:** Steps that appear generic may still behave differently depending on guideline shape, extraction path, or limit-handling — testing them in context catches issues a generic test would not. Full coverage is concentrated in the two flagships (and at least one matrix path) rather than repeated across many near-identical funder plans, because the previous funder-by-funder structure caused real, repeated drift (the funder-picker removal and the eligibility hard-stop's structural conflict with full-flow coverage — see `DR-TEST-001` — both went undetected across multiple plans before being caught).
 
 ---
 

@@ -1,8 +1,8 @@
-# A B Charitable Trust Test Plan
+# A B Charitable Trust Test Plan — Flagship
 
-**Version:** 1.2
-**Date:** 2026-07-04
-**Status:** Ready for a full clean execution. Corrected against the current service and `grant-pathway-user-guide-v1_15.docx` (2026-07-04) — see Document History for the full list of corrections. ABC-01 and ABC-02 were already confirmed live against the corrected flow (2026-07-04) and their Pass results retained; ABC-03 onward cleared for a clean re-run.
+**Version:** 2.0
+**Date:** 2026-07-24
+**Status:** Rewritten as one of two flagship end-to-end plans under `DR-TEST-001` (capability-based test strategy). Ready for a full clean execution against the current service. Superseded results from v1.2 not carried forward — see Document History.
 **Tester:** WJ
 **Test account:** grantpathway+ABC@gmail.com
 
@@ -10,67 +10,34 @@
 
 ## Overview
 
-This test plan covers an end-to-end test of Grant Pathway using A B Charitable Trust as the target funder. A B Charitable Trust is a **Structured** funder that publishes a numbered list of application questions as a PDF in advance of their online portal opening — making them a primary test case for the numbered-list PDF extraction path.
+This is one of two **flagship** end-to-end plans (with `MK-Community-Foundation-test-plan.md`) that exercise the complete Grant Pathway flow — registration through export — against a real funder's guidelines. Per `DR-TEST-001` (2026-07-24), most named-funder plans have been retired in favour of a capability/guideline-shape matrix (`guideline-capability-matrix-test-plan.md`) and a dedicated eligibility plan (`eligibility-check-test-plan.md`); this plan and MK Community Foundation's are kept specifically because, between them, they cover both extraction paths' user experience, both limit types, and the governance/financial path with minimal overlap.
 
-**Key differences from the Idlewild Trust test:**
+A B Charitable Trust publishes a numbered list of application questions as a PDF in advance of their online portal opening (`docs/Grant Org Guidelines/AB Trust Online-Application-Form-Guidance-July-2024-b.pdf`), making it a clean numbered-list PDF fixture. Only 2–3 of its questions require narrative prose; the rest are data-entry, financial, dropdown, or file-upload fields — a good test of non-narrative filtering. B4's 15-word limit is the tightest word limit tested anywhere in this suite.
 
-| Factor                   | Idlewild Trust                                  | A B Charitable Trust                                                                    |
-| ------------------------ | ----------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Question document format | Multi-column table (caused D-IT-01)             | Numbered list (A1–D8) — expected to extract cleanly                                     |
-| Charity eligibility      | Arts sector only — Harry's Rainbow not eligible | Social justice / human rights focus — Harry's Rainbow likely NOT eligible               |
-| Narrative questions      | 9 (all character-limited)                       | 2–3 only (B3, B4, C11) — rest are data-entry, financial, or file uploads                |
-| Key unique limit         | Character limits (GAP-27)                       | B4: **15-word limit** — very tight and specific                                         |
-| D5 — proposal document   | N/A                                             | File upload (Word/PDF 2–2½ pages) — NOT a text field; must not appear as a writing card |
-| Previous test result     | D-IT-01 open                                    | First live test of fixed extraction prompt                                              |
+**This document was previously tested under a deliberate eligibility mismatch** (Harry's Rainbow, a children's bereavement charity, against AB's actual social-justice/human-rights/refugees/penal-reform focus) to exercise `DR-EL-001`'s hard stop. That design conflicted with this plan's own mandate to reach export in the same run — if the mismatch fires as intended, the application dead-ends at Step 3 and none of the writing/export steps can run. `DR-TEST-001` resolves this: the negative case is retested once, properly, in `eligibility-check-test-plan.md` (reusing this exact Harry's Rainbow / AB Charitable Trust pairing — see EL-02 there). This plan now uses a charity description with plausible alignment to AB's categories, so the same application can be carried through to export.
 
 **Application window:** Next deadline **31 July 2026** — decisions expected October 2026. Applications are currently open.
 
-**Coverage principle:** Every test covers the complete end-to-end flow. No step is omitted on the assumption it was tested previously. See AGENTS.md — mandatory test plan coverage rule.
+**Coverage principle:** As one of the two flagship plans, every test here covers the complete end-to-end flow. No step is omitted on the assumption it was tested previously. See `AGENTS.md` — mandatory test plan coverage rule.
 
 ---
 
 ## Test Data
 
-| Item                        | Value                                                                             |
-| --------------------------- | --------------------------------------------------------------------------------- |
-| Test user email             | grantpathway+ABC@gmail.com                                                        |
-| Test user password          | (set by tester at registration)                                                   |
-| Charity name                | Harry's Rainbow                                                                   |
-| Charity registration number | 1194917                                                                           |
-| Charity type                | UK Registered Charity                                                             |
-| Charity focus               | Children's bereavement support, Milton Keynes                                     |
-| Funder                      | A B Charitable Trust                                                              |
-| Grant range                 | £10k–£40k/yr                                                                      |
-| Application type            | Single stage                                                                      |
-| Application deadline        | 31 July 2026                                                                      |
-| Guidelines file             | AB Charitable Trust application questions PDF (from `docs/Grant Org Guidelines/`) |
-| Guidelines input method     | PDF upload (primary); paste text (fallback if extraction fails)                   |
-
----
-
-## Lessons Applied from Idlewild Trust Testing
-
-| Lesson                                               | Applied in this plan                                                            |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Complete end-to-end flow mandatory                   | All steps 1–5 covered including prep checklist                                  |
-| Record AI summary timing                             | Stopwatch step included in ABC-03                                               |
-| Prep checklist must be explicitly confirmed          | Step included in ABC-06                                                         |
-| PDF table format causes extraction failure (D-IT-01) | AB format is numbered list — expect clean extraction; paste fallback documented |
-| No indication of which file was loaded               | Known limitation — noted in ABC-03 expected result                              |
-| Eligibility mismatch should be surfaced              | ABC-04 tests for POSITIVE eligibility match (Harry's Rainbow IS eligible)       |
-| Non-narrative questions should not appear in Step 4  | ABC-07 explicitly verifies only narrative questions shown                       |
-
----
-
-## Known Expected Behaviours
-
-| Ref               | Description                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Prior test        | AB Charitable Trust was previously processed by Grant Pathway (D-011 in the main test log). Document has sections A–D. Only 2–3 questions require narrative prose (B3, B4, possibly C11). D5 is a file upload instruction (Word/PDF proposal, 2–2½ pages) — must NOT appear as a text writing card.                                                                                                                               |
-| B4 word limit     | B4 asks for a summary in "no more than 15 words" — the tightest word limit of any funder tested. Counter should show "X / 15 words".                                                                                                                                                                                                                                                                                              |
-| Grant amount      | AB does not ask applicants to specify a grant amount. Open Programme range is £10,000–£30,000 pa.                                                                                                                                                                                                                                                                                                                                 |
-| No file indicator | The Step 3 summary page does not currently show which guidelines file was uploaded. This is a known limitation logged as a product improvement.                                                                                                                                                                                                                                                                                   |
-| Test order        | ABC-04 (eligibility mismatch) and ABC-05 (content accuracy) must run **before** ABC-06 (preparation checklist/start writing) — clicking "start writing" navigates past Step 3, so the AI summary is no longer available to review afterwards. Same defect found and fixed in the MKCF plan (2026-07-03); fixed here by splitting the Step 4 navigation out of ABC-03 into its own ABC-06, renumbering old ABC-06–10 to ABC-07–11. |
+| Item                         | Value                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Test user email              | grantpathway+ABC@gmail.com                                                                                                                                                                                                                                                                                                                                                                              |
+| Test user password           | (set by tester at registration — 12+ characters, letters and numbers)                                                                                                                                                                                                                                                                                                                                   |
+| Charity name                 | Harry's Rainbow                                                                                                                                                                                                                                                                                                                                                                                         |
+| Charity registration number  | 1194917                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Charity type                 | UK Registered Charity                                                                                                                                                                                                                                                                                                                                                                                   |
+| Charity focus (for this run) | Advocacy and access-to-justice support for bereaved children and families navigating the family courts and welfare system, Milton Keynes and surrounding areas — chosen to plausibly align with AB's Access to Justice / Human Rights categories rather than read purely as bereavement support (see EL-02 in `eligibility-check-test-plan.md` for the deliberately-mismatched version of this charity) |
+| Funder                       | A B Charitable Trust                                                                                                                                                                                                                                                                                                                                                                                    |
+| Grant range                  | £10k–£40k/yr                                                                                                                                                                                                                                                                                                                                                                                            |
+| Application type             | Single stage                                                                                                                                                                                                                                                                                                                                                                                            |
+| Application deadline         | 31 July 2026                                                                                                                                                                                                                                                                                                                                                                                            |
+| Guidelines file              | AB Charitable Trust application questions PDF (from `docs/Grant Org Guidelines/`)                                                                                                                                                                                                                                                                                                                       |
+| Guidelines input method      | PDF upload (primary); paste text (fallback if extraction fails)                                                                                                                                                                                                                                                                                                                                         |
 
 ---
 
@@ -78,19 +45,18 @@ This test plan covers an end-to-end test of Grant Pathway using A B Charitable T
 
 Complete after running all tests.
 
-| Test ID | Test Name                                                        | Idlewild Lesson Applied                           | AI Summary Time | Result | Notes                                                                              |
-| ------- | ---------------------------------------------------------------- | ------------------------------------------------- | --------------- | ------ | ---------------------------------------------------------------------------------- |
-| ABC-01  | Account registration and charity profile                         | No                                                | N/A             | Pass   | Confirmed live 2026-07-04 against the corrected D-012 verification flow.           |
-| ABC-02  | A B Charitable Trust funder picker                               | No                                                | N/A             | Pass   | Confirmed live 2026-07-04; empty-state "Start your first application" button used. |
-| ABC-03  | PDF upload and AI summary                                        | Yes — timing                                      |                 |        |                                                                                    |
-| ABC-04  | AI eligibility mismatch — Harry's Rainbow NOT eligible           | Yes — social justice focus vs bereavement charity | N/A             |        |                                                                                    |
-| ABC-05  | AI summary content accuracy                                      | No                                                | N/A             |        |                                                                                    |
-| ABC-06  | Preparation checklist and start writing                          | Yes — prep checklist                              | N/A             |        |                                                                                    |
-| ABC-07  | Narrative question extraction — 2–3 expected; D5 must NOT appear | Yes — non-narrative filtering                     | N/A             |        |                                                                                    |
-| ABC-08  | Word limit extraction — B4 is 15 words (tightest limit tested)   | Yes — limit type correct                          | N/A             |        |                                                                                    |
-| ABC-09  | Narrative answer writing and AI assist                           | No                                                | N/A             |        |                                                                                    |
-| ABC-10  | Answer approval and assembly                                     | No                                                | N/A             |        |                                                                                    |
-| ABC-11  | Word document export; Word document verified; re-export warning  | No                                                | N/A             |        |                                                                                    |
+| Test ID | Test Name                                                        | AI Summary Time | Result | Notes |
+| ------- | ---------------------------------------------------------------- | --------------- | ------ | ----- |
+| ABC-01  | Account registration and charity profile                         | N/A             |        |       |
+| ABC-02  | Application details — funder and grant name (free text)          | N/A             |        |       |
+| ABC-03  | PDF upload and AI summary                                        |                 |        |       |
+| ABC-04  | AI summary accuracy and eligibility (positive check)             | N/A             |        |       |
+| ABC-05  | Preparation checklist and start writing                          | N/A             |        |       |
+| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | N/A             |        |       |
+| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | N/A             |        |       |
+| ABC-08  | Narrative answer writing, AI assist, and citation check          | N/A             |        |       |
+| ABC-09  | Answer approval and assembly                                     | N/A             |        |       |
+| ABC-10  | Word document export; Word document verified; re-export warning  | N/A             |        |       |
 
 ---
 
@@ -108,95 +74,92 @@ Complete after running all tests.
 
 ### ABC-01 — Account Registration and Charity Profile
 
-**Idlewild lesson applied:** No — standard setup
 **Prerequisite:** None
 
 **Steps:**
 
 1. Go to [grant-pathway-three.vercel.app](https://grant-pathway-three.vercel.app)
-2. Click **Register**
-3. Enter first name, last name, email `grantpathway+ABC@gmail.com`, password (12+ characters, must include letters and digits), accept Terms and Privacy Policy
-4. Click **Create account**
-5. Open the verification email and click the verification link — this auto-confirms on page load (no button click required) and expires after 1 hour (D-012, 2026-07-02)
-6. On the "Email verified" screen, click **Sign in** and enter the registered email and password (the verification flow signs the session out — this is a normal credentials sign-in, not an automatic redirect to the dashboard)
-7. Click **Charity Profile** in the navigation
-8. Enter charity registration number **1194917** and trigger the Charity Commission lookup
-9. Confirm or complete pre-filled fields:
-   - Charity name: Harry's Rainbow
-   - What does your charity do: children's bereavement support, therapeutic groups, activities and trips for children aged 0–25 bereaved of a parent or sibling, Milton Keynes and surrounding areas
-   - Who does your charity help: children, young people and young adults aged 0–25 bereaved of a parent or sibling
-   - Where do you work: Milton Keynes and surrounding areas
-10. Complete any remaining required fields and click **Save**
+2. Click **Register — it's free**
+3. Enter first name, last name, email `grantpathway+ABC@gmail.com`, password (**12+ characters, must include letters and numbers** — confirmed against `register-form.tsx`; the user guide's "at least 10 characters" is a guide error, not what the app enforces), confirm password
+4. Tick **Terms of Service and Privacy Policy** (required). Optionally tick **I'm happy to be contacted occasionally to share feedback about Grant Pathway**
+5. Click **Create account**
+6. Open the verification email and click the verification link — this auto-confirms on page load (no button click required) and expires after 1 hour (D-012, 2026-07-02)
+7. On the "Email verified" screen, click **Sign in** and enter the registered email and password (the verification flow signs the session out — this is a normal credentials sign-in, not an automatic redirect to the dashboard)
+8. A banner prompts you to complete your charity profile. Click **Complete your profile**
+9. Enter charity registration number **1194917** in the search box and click **Look up charity**
+10. Confirm or complete pre-filled fields:
+    - Charity name: Harry's Rainbow
+    - What does your charity do: (see Test Data — charity focus above)
+    - Who does your charity help: children, young people and families navigating bereavement-related legal, welfare, and access-to-justice processes, Milton Keynes and surrounding areas
+    - Where do you work: Milton Keynes and surrounding areas
+11. Click **Save profile**
+12. On the "Profile saved" confirmation screen, click **Go to my dashboard**
+13. Click **Start your first application**
 
 **Expected result:**
 
 - Account created and email verified without errors
 - Sign-in with credentials succeeds
 - Charity Commission lookup returns Harry's Rainbow details and pre-fills name and registration number
-- Profile saves successfully
+- Profile saves successfully; "Profile saved" confirmation screen shown with **Go to my dashboard** button
+- Dashboard shows the empty-state **Start your first application** button (zero applications on this fresh account)
 
-**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:** Registration, corrected verification flow (auto-confirm + separate sign-in), and Charity Commission lookup/profile save all completed successfully.
+**Notes:**
 
 ---
 
-### ABC-02 — A B Charitable Trust Funder Picker
+### ABC-02 — Application Details — Funder and Grant Name (Free Text)
 
-**Idlewild lesson applied:** No — this test passed cleanly in Idlewild; confirms the picker works consistently
 **Prerequisite:** ABC-01 complete
+
+**Background:** Step 1 (`Who is offering this grant?`) is a plain free-text field, not a picker — the searchable directory with a "Structured" badge and "Can't find your funder? Request it to be added" link was removed entirely on 2026-07-15 (`DR-FD-001` v1.4). There is no autocomplete, dropdown, or funder-type badge to confirm here.
 
 **Steps:**
 
-1. From the dashboard, click **Start your first application** — this is a freshly registered account with zero applications, so the dashboard shows this empty-state button rather than the **+ New Application** button that appears once at least one application already exists
-2. On Step 1, click into the funder picker search field
-3. Type **"A B"**
-4. Confirm **A B Charitable Trust** appears in the dropdown with a **Structured** badge
-5. Select **A B Charitable Trust**
-6. Enter grant name: **"General Grant 2026"**
-7. Click **Continue**
+1. In the **Who is offering this grant?** field, type **"A B Charitable Trust"**
+2. In the **grant name** field, type **"General Grant 2026"**
+3. Click **Continue**
 
 **Expected result:**
 
-- "A B" search returns A B Charitable Trust in the dropdown
-- **Structured** badge displayed alongside the name
-- "Can't find your funder? Request it to be added" link visible below the picker
-- Application created and Step 2 (Uploaded Guidelines) displayed
+- Both fields accept free text with no dropdown or autocomplete behaviour
+- No "reuse a previous application" prompt appears (this is a fresh account's first application — that prompt only appears when a prior application to a name-matching funder already exists, per P6.5)
+- Application created and Step 2 (Upload the Funder's Guidelines) displayed
 
-**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:** Confirmed the empty-state button and that Continue lands directly on Step 2 (Uploaded Guidelines), not the dashboard.
+**Notes:**
 
 ---
 
 ### ABC-03 — PDF Upload and AI Summary
 
-**Idlewild lesson applied:** Yes — timing recorded; paste fallback documented
 **Prerequisite:** ABC-02 complete
 
 **Steps:**
 
-1. On Step 2, upload the A B Charitable Trust application questions PDF from `docs/Grant Org Guidelines/`
+1. On Step 2, click **Choose file** (or drag and drop) and upload the A B Charitable Trust application questions PDF from `docs/Grant Org Guidelines/`
 2. Confirm the file is accepted (filename displayed, no error)
 3. Click **Continue**
 4. On Step 3, start a stopwatch — AI summary auto-generates on page load
-5. Stop when summary cards appear — record the time in the results table above
-6. Review the generated AI summary
+5. Stop when summary cards appear — record the time in the results table above (guide states this usually takes up to 45 seconds)
 
-**Do not click Continue yet** — the eligibility mismatch review (ABC-04) and content-accuracy review (ABC-05) both need the AI summary visible on Step 3. Continuing to Step 4 happens in ABC-06, after both reviews are complete.
+**Do not click Continue yet** — ABC-04's content/eligibility review needs the AI summary visible on Step 3. Continuing to Step 4 happens in ABC-05.
 
-**If PDF extraction fails (no questions shown after continuing in ABC-06):**
+**If PDF extraction fails (no questions shown after continuing in ABC-05):**
 
 - Return to Step 2 using the **Back** button
-- Paste the narrative questions directly from the AB Charitable Trust document into the paste box instead
+- Click the **Paste text** tab and paste the narrative questions directly from the AB Charitable Trust document instead
 - Regenerate the summary and proceed
 
 **Expected result:**
 
-- PDF uploads successfully (no format or size error — AB document is .pdf)
-- AI summary generates without error within 30 seconds
+- PDF uploads successfully (no format or size error)
+- AI summary generates without error, typically within 45 seconds
 - Summary content covers AB Charitable Trust's focus areas, eligibility, and requirements
-- _(Known limitation: no filename indicator shown on Step 3 — this is expected)_
+- _(Known limitation: no filename indicator shown on Step 3 confirming which file was loaded — this is expected, not a defect)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -204,61 +167,32 @@ Complete after running all tests.
 
 ---
 
-### ABC-04 — AI Eligibility Mismatch — Harry's Rainbow Likely NOT Eligible
+### ABC-04 — AI Summary Accuracy and Eligibility (Positive Check)
 
-**Idlewild lesson applied:** Yes — same pattern as IT-04. AB Charitable Trust funds specific social justice causes; Harry's Rainbow does not operate in these areas
-**Prerequisite:** ABC-03 complete (AI summary generated). Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see ABC-06).
+**Prerequisite:** ABC-03 complete (AI summary generated). Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 (see ABC-05).
 
-**Background:** AB Charitable Trust funds organisations working in: Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform (these are the categories in the B1 dropdown). Harry's Rainbow provides bereavement support to children — this does not fall within these categories.
-
-**Steps:**
-
-1. Review the AI summary generated in ABC-03
-2. Check the "Who can apply" and "What the funder is looking for" sections
-3. Confirm the summary correctly identifies AB Charitable Trust's social justice / human rights focus:
-   - Access to Justice
-   - Human Rights
-   - Migrants and Refugees
-   - The Justice System and Penal Reform
-4. Assess whether the summary flags a potential mismatch with Harry's Rainbow's bereavement focus
-5. Note whether the AI surfaces the category restriction (B1) as an eligibility consideration
-
-**Expected result:**
-
-- Summary clearly identifies the social justice / human rights funding focus
-- A user reading the summary would immediately recognise that Harry's Rainbow's bereavement work does not align with AB's categories
-- Ideally the AI flags the mismatch explicitly — this is an observation, not a mandatory pass criterion
-- Grant Pathway does not block the user from proceeding (eligibility is the charity's responsibility)
-
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
-
-**Notes:**
-
----
-
-### ABC-05 — AI Summary Content Accuracy
-
-**Idlewild lesson applied:** No
-**Prerequisite:** ABC-03 complete. Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 and start writing (see ABC-06).
+**Background:** AB Charitable Trust funds organisations working in Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform. This run uses a charity profile worded to plausibly align with that focus (see Test Data), so the expected outcome is a **pass**, not a mismatch. The eligibility hard-stop mechanism itself, and a genuine mismatch case using this same charity/funder pairing, are covered once in `eligibility-check-test-plan.md` (EL-01/EL-02) rather than repeated here — see `DR-TEST-001`.
 
 **Steps:**
 
-1. Review the full AI summary
-2. Check each section is present and plausible:
+1. Confirm no red eligibility-mismatch warning card appears at the top of Step 3
+2. Review each summary section is present and plausible:
    - **About this grant** — describes AB Charitable Trust and its focus areas
    - **Grant amount** — references the £10k–£40k/yr range or similar
    - **Who can apply** — UK registered charities, eligibility criteria
    - **What the funder is looking for** — funding priorities and themes
    - **Key requirements** — restrictions, deadlines, exclusions
+   - _(Application sections is expected to be absent — that card only renders for `free_form`-classified funders; AB's numbered-list PDF is expected to classify as structured)_
 3. Check whether the application deadline (31 July 2026) is mentioned
-4. Check whether the single-stage nature of the application is noted
 
 **Expected result:**
 
-- All five summary sections are present and populated
-- Grant amount or range is referenced correctly
-- At least one of: deadline, exclusions, or key priorities is accurately captured
+- No eligibility mismatch triggered; **Continue** button available (not replaced by an acknowledge-only button)
+- All applicable summary sections present and populated
+- Grant amount or range referenced correctly
+- At least one of deadline, exclusions, or key priorities accurately captured
 - Summary is in plain English and comprehensible to a non-specialist user
+- _(As established in prior sessions — see `DR-AI-003` — "no hallucinated conditions" is a spot-check here, not exhaustive verification; this plan does not attempt to re-litigate that limitation)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -266,10 +200,9 @@ Complete after running all tests.
 
 ---
 
-### ABC-06 — Preparation Checklist and Start Writing
+### ABC-05 — Preparation Checklist and Start Writing
 
-**Idlewild lesson applied:** Yes — prep checklist explicitly confirmed
-**Prerequisite:** ABC-05 complete (AI summary content and eligibility reviewed while still on Step 3)
+**Prerequisite:** ABC-04 complete (AI summary content reviewed while still on Step 3)
 
 **Steps:**
 
@@ -288,12 +221,11 @@ Complete after running all tests.
 
 ---
 
-### ABC-07 — Narrative Question Extraction — Only 2–3 Expected
+### ABC-06 — Narrative Question Extraction — Only 2–3 Expected
 
-**Idlewild lesson applied:** Yes — directly tests non-narrative question filtering
-**Prerequisite:** ABC-06 complete (Q&A interface entered)
+**Prerequisite:** ABC-05 complete (Q&A interface entered)
 
-**Background:** The A B Charitable Trust document has questions across four sections (A, B, C, D). The vast majority are data-entry, financial, dropdown, or file upload fields. Only 2–3 require a narrative prose answer:
+**Background:** The A B Charitable Trust document has questions across four sections (A–D). Only 2–3 require a narrative prose answer:
 
 | Question | Text                                                                         | Expected                                                                                       |
 | -------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -304,18 +236,18 @@ Complete after running all tests.
 
 **Steps:**
 
-1. In the Step 4 Q&A interface, count the number of questions displayed
+1. In the Step 4 Q&A interface, count the number of question cards displayed
 2. Confirm B3 and B4 are both present
-3. Confirm D5 ("Please provide an overview of your work/funding proposal") does **NOT** appear as a text writing card — it is a document upload instruction
+3. Confirm D5 ("Please provide an overview of your work/funding proposal") does **NOT** appear as a text writing card — it is a document-upload instruction
 4. Confirm none of the following appear as writing cards: A1–A10 (org details), B1–B2 (dropdowns), C1–C10 (financial figures), D1–D4 (file uploads), D6–D8 (further file uploads)
 5. Record the exact number and text of all questions shown
 
 **Expected result:**
 
 - 2–3 questions displayed (B3, B4, and possibly C11)
-- B4 shows a **15-word limit** badge — the tightest limit in any funder tested so far
+- B4 shows a **15-word limit** badge — the tightest limit in this suite
 - D5 does not appear as a text writing card
-- No data-entry, financial, dropdown, or standard file upload questions shown
+- No data-entry, financial, dropdown, or standard file-upload questions shown
 - _(If more than 5 questions shown, investigate — log as defect if non-narrative fields included)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -324,10 +256,9 @@ Complete after running all tests.
 
 ---
 
-### ABC-08 — Word Limit Extraction and Counter Display
+### ABC-07 — Word Limit Extraction and Counter Display
 
-**Idlewild lesson applied:** Yes — Idlewild used character limits; AB uses word limits. Also tests B4's unique 15-word limit — the tightest tested so far
-**Prerequisite:** ABC-07 complete
+**Prerequisite:** ABC-06 complete
 
 **Steps:**
 
@@ -345,7 +276,7 @@ Complete after running all tests.
 - B4 shows **"15 words"** badge and **"X / 15 words"** counter
 - Counter highlights or changes colour when the 15-word limit is exceeded on B4
 - B3 may or may not show a limit (guidance text only — acceptable either way)
-- All counters show "words" not "characters" — confirming limit type extraction is correct for this funder
+- All counters show "words" not "characters"
 - _(If B4 shows "15 characters" instead of "15 words" — log as a defect)_
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
@@ -354,10 +285,9 @@ Complete after running all tests.
 
 ---
 
-### ABC-09 — Narrative Answer Writing and AI Assist
+### ABC-08 — Narrative Answer Writing, AI Assist, and Citation Check
 
-**Idlewild lesson applied:** No — core writing interface test
-**Prerequisite:** ABC-08 complete
+**Prerequisite:** ABC-07 complete
 
 **Steps:**
 
@@ -368,18 +298,20 @@ Complete after running all tests.
 5. Confirm the refined answer:
    - Does not add facts not in the original answer
    - Maintains first-person plural voice ("we", "our", "us")
-   - Stays within the word or character limit
-6. Review the three mandatory prompts:
+   - Stays within the word or character limit (or is closer to it — AI can't always hit an exact count)
+6. If a citation badge is shown alongside the suggestion, click it and confirm the guidelines viewer opens with the relevant passage highlighted and scrolled to
+7. Review the three mandatory prompts:
    - Does this accurately describe your charity and project?
    - Are all figures, dates, and facts correct?
    - Does this answer the question that was asked?
-7. Edit one sentence directly in the text field
-8. Click **Approve**
+8. Edit one sentence directly in the text field
+9. Click **Approve**
 
 **Expected result:**
 
 - Answer text area accepts input without errors
 - AI assist returns a refined answer within 15 seconds
+- If present, a citation click opens the guidelines viewer with the passage highlighted (not just landing on page 1 with no highlight)
 - Mandatory review prompts displayed before approval is possible
 - Answer is visually marked as approved after clicking Approve
 - No data loss when navigating to the next question
@@ -390,10 +322,9 @@ Complete after running all tests.
 
 ---
 
-### ABC-10 — Answer Approval and Assembly
+### ABC-09 — Answer Approval and Assembly
 
-**Idlewild lesson applied:** No
-**Prerequisite:** ABC-09 complete (at least one answer approved)
+**Prerequisite:** ABC-08 complete (at least one answer approved)
 
 **Steps:**
 
@@ -419,15 +350,14 @@ Complete after running all tests.
 
 ---
 
-### ABC-11 — Word Document Export; Word Document Verified; Re-export Warning
+### ABC-10 — Word Document Export; Word Document Verified; Re-export Warning
 
-**Idlewild lesson applied:** No — blocked in Idlewild due to D-IT-01; this is the first successful export test
-**Prerequisite:** ABC-10 complete
+**Prerequisite:** ABC-09 complete
 
 **Steps:**
 
 1. Tick all three review checkboxes on Step 5
-2. Click **Download as Word document (.docx)** — this both approves and downloads in one action (no separate Approve button/modal since 2026-06-12); confirm a persistent "Application approved" banner replaces the checklist
+2. Click **Download as Word document (.docx)** — this both approves and downloads in one action; confirm a persistent "Application approved" banner replaces the checklist
 3. Open the downloaded .docx file and verify:
    - Title: **"General Grant 2026"**
    - Funder: **"A B Charitable Trust"** (or similar)
@@ -438,14 +368,14 @@ Complete after running all tests.
 4. Click **Download as Word document (.docx)** again
 5. Verify the re-export warning dialog appears with the prior export timestamp
 6. Cancel — do not re-export
-7. Click **Download as plain text (.txt)** — because the application was already exported as Word in step 2, the re-export confirmation dialog will appear again here too (D-WF-04, expected, not a defect); confirm through it
-8. Verify a .txt file is downloaded, with the same footer line but no page numbers (plain text has no concept of pages)
+7. Click **Download as plain text (.txt)** — the re-export confirmation dialog appears again here too (D-WF-04, expected, not a defect); confirm through it
+8. Verify a .txt file is downloaded, with the same footer line but no page numbers
 
 **Expected result:**
 
 - Word export opens correctly in Microsoft Word
 - Export date includes a timestamp
-- Only approved answers are included (unapproved questions are absent); word limits are not shown in the exported document
+- Only approved answers are included; word limits are not shown in the exported document
 - Re-export warning shows the prior export timestamp on both the second Word download and the plain-text download
 - Plain text download works
 - Document is clean, readable, and free of formatting artefacts
@@ -458,8 +388,9 @@ Complete after running all tests.
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| 1.1     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect (same as MKCF plan, 2026-07-03): ABC-03 previously bundled AI summary generation with clicking past Step 3 into Step 4 and starting the checklist/writing flow, so ABC-04/ABC-05's content review nominally ran after the summary was no longer visible. Split the Step 4 navigation out of ABC-03 into a new ABC-06 ("Preparation Checklist and Start Writing"), which now runs after ABC-04/ABC-05. Old ABC-06–10 renumbered to ABC-07–11; now 11 test cases total.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 1.2     | 2026-07-04 | Rapidglobe Ltd | Corrected against the current service and `grant-pathway-user-guide-v1_15.docx`, following live execution of ABC-01/ABC-02 and cross-checking in parallel with Clothworkers. Fixed a formatting error from a prior edit that had accidentally deleted the "### ABC-02" heading and section divider. ABC-01: updated verification flow for D-012 (2026-07-02) — auto-confirm + **Sign in**, not "Go to my dashboard"; corrected "Who do you help" to the actual field label "Who does your charity help?" (`grant-pathway-user-guide-v1_15.docx` p.19); removed the unsourced "Dashboard shows profile complete — Start button enabled" bullet. ABC-02: empty-state dashboard button is **Start your first application**, not **+ New Application**, for this freshly registered account; removed the "Application created and dashboard updated" bullet (Continue lands on Step 2, not the dashboard, at this point); corrected the "My funder isn't listed" bullet to the actual copy ("Can't find your funder? Request it to be added..."). ABC-03: removed a stray "Open the application from the dashboard" step that didn't follow from ABC-02; removed "select Upload a file" / "click Generate summary" wording — no such toggle or button exists, and the AI summary auto-generates on page load. ABC-10/ABC-11 rewritten to match the current merged approve+download flow (2026-06-12, D-WF-04) and the "Before we put it together" senior review screen; ABC-11 now also covers the re-export warning dialog and the plain-text export, matching IT-MKCF-13's current template. ABC-01/ABC-02 results retained as Pass (confirmed live against the corrected flow, 2026-07-04); ABC-03 onward cleared for a clean re-run. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 1.1     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect: split Step 4 navigation out of ABC-03 into a new ABC-06, run after the AI-summary content/eligibility review. Old ABC-06–10 renumbered to ABC-07–11.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 1.2     | 2026-07-04 | Rapidglobe Ltd | Corrected against the service and `grant-pathway-user-guide-v1_15.docx` following live execution of ABC-01/ABC-02. ABC-10/ABC-11 rewritten to match the merged approve+download flow and senior review screen.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 2.0     | 2026-07-24 | Rapidglobe Ltd | **Rewritten as a flagship plan under `DR-TEST-001`.** Corrected against `grant-pathway-user-guide-v1.19.docx` and current code. Major changes: (1) Step 1 rewritten from the removed funder picker (search dropdown, "Structured" badge, "Request a Funder" link — removed `DR-FD-001` v1.4, 2026-07-15) to the current free-text fields. (2) ABC-01 gained the missing "Profile saved" confirmation screen step and the optional feedback-consent checkbox; password requirement corrected to 12+ characters with letters and numbers (the app's actual rule, per `register-form.tsx` — the user guide's "at least 10 characters" is a guide defect, not reflected here). (3) The old ABC-04 (eligibility mismatch) assumed mismatch was a soft, non-blocking observation — this was wrong since `DR-EL-001` (2026-06-02, predates this plan's v1.0), which made it a hard stop with no path to Step 4. That hard stop structurally conflicted with this plan's later export steps. Resolved per `DR-TEST-001`: this plan now uses a charity description with plausible eligibility alignment (positive case only); the genuine Harry's Rainbow/AB mismatch is retested properly in `eligibility-check-test-plan.md` (EL-02). (4) Retired the "Known Expected Behaviours" section — every row duplicated content already stated in the Overview, Test Data, or the relevant test case's own Background/Prerequisite; the one non-duplicated fact (prior processing history, formerly logged as D-011) is no longer load-bearing enough to keep. (5) Added a citation-check step to ABC-08 (new "Guidelines Citations" feature in the v1.19 guide, not covered in any prior version of this plan). Net: 11 test cases reduced to 10 (eligibility deep-dive moved out; old ABC-04/ABC-05 merged into one lighter positive check). |
