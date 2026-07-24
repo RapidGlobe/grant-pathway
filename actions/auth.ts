@@ -298,6 +298,16 @@ export async function signIn(_prevState: SignInState, formData: FormData): Promi
     }
     // All other errors (wrong password, unknown email, rate limit) surface as
     // the same generic credentials message to prevent email enumeration (AC-FR-04-03).
+    // Logged server-side only (never shown to the user, so this doesn't weaken
+    // the anti-enumeration behaviour) — without it, a genuine rate limit or
+    // other non-credentials failure is indistinguishable from a real wrong
+    // password from the outside, same class of invisible-error problem found
+    // in change-password (2026-07-24).
+    console.error('[sign-in] signInWithPassword failed:', {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+    })
     return { error: 'credentials' }
   }
 
