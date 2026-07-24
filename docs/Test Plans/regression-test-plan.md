@@ -1,9 +1,9 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.4
+**Version:** 2.5
 **Date:** 2026-06-15
-**Last updated:** 2026-07-04 (added RT-15 — session timeout, confirmed live)
-**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-15 confirmed live 2026-07-04; RT-01–14 results are still blank as of this update
+**Last updated:** 2026-07-24 (added RT-01b — Charity Commission lookup, per `DR-TEST-001`)
+**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-15 confirmed live 2026-07-04; RT-01b new, not yet run; RT-01–14 results are still blank as of this update
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
@@ -72,25 +72,26 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 
 ## Test Results Summary
 
-| Test ID | Test Name                                 | Tier  | Result | Date       | Notes                                                                            |
-| ------- | ----------------------------------------- | ----- | ------ | ---------- | -------------------------------------------------------------------------------- |
-| RT-00   | Environment and schema verification       | Env   | Pass   | 2026-07-03 | Confirmed pointing at `grant-pathway-dev`. Run ahead of MKCF Oak Grants testing. |
-| RT-01a  | Account registration (fresh account only) | Smoke |        |            |                                                                                  |
-| RT-01   | Sign-in and session persistence           | Smoke |        |            |                                                                                  |
-| RT-02   | Unauthenticated redirect                  | Smoke |        |            |                                                                                  |
-| RT-03   | Dashboard renders with data               | Smoke |        |            |                                                                                  |
-| RT-04   | Step 4 Q&A interface loads                | Smoke |        |            |                                                                                  |
-| RT-05   | AI refine-answer endpoint                 | Smoke |        |            |                                                                                  |
-| RT-06   | Answer approval and progress bar          | Full  |        |            |                                                                                  |
-| RT-07   | Preparation checklist gate                | Full  |        |            |                                                                                  |
-| RT-08   | Senior review screen                      | Full  |        |            |                                                                                  |
-| RT-09   | Final review, approval, and Word export   | Full  |        |            |                                                                                  |
-| RT-10   | Plain text export                         | Full  |        |            |                                                                                  |
-| RT-11   | Dashboard reopen application              | Full  |        |            |                                                                                  |
-| RT-12   | Change password                           | Full  |        |            |                                                                                  |
-| RT-13   | Sign out                                  | Full  |        |            |                                                                                  |
-| RT-14   | Delete account                            | Full  |        |            |                                                                                  |
-| RT-15   | Session timeout (inactivity)              | Full  | Pass   | 2026-07-04 | Confirmed live during Clothworkers testing — see RT-15 notes.                    |
+| Test ID | Test Name                                             | Tier  | Result | Date       | Notes                                                                            |
+| ------- | ----------------------------------------------------- | ----- | ------ | ---------- | -------------------------------------------------------------------------------- |
+| RT-00   | Environment and schema verification                   | Env   | Pass   | 2026-07-03 | Confirmed pointing at `grant-pathway-dev`. Run ahead of MKCF Oak Grants testing. |
+| RT-01a  | Account registration (fresh account only)             | Smoke |        |            |                                                                                  |
+| RT-01b  | Charity Commission lookup — found and not-found paths | Smoke |        |            |                                                                                  |
+| RT-01   | Sign-in and session persistence                       | Smoke |        |            |                                                                                  |
+| RT-02   | Unauthenticated redirect                              | Smoke |        |            |                                                                                  |
+| RT-03   | Dashboard renders with data                           | Smoke |        |            |                                                                                  |
+| RT-04   | Step 4 Q&A interface loads                            | Smoke |        |            |                                                                                  |
+| RT-05   | AI refine-answer endpoint                             | Smoke |        |            |                                                                                  |
+| RT-06   | Answer approval and progress bar                      | Full  |        |            |                                                                                  |
+| RT-07   | Preparation checklist gate                            | Full  |        |            |                                                                                  |
+| RT-08   | Senior review screen                                  | Full  |        |            |                                                                                  |
+| RT-09   | Final review, approval, and Word export               | Full  |        |            |                                                                                  |
+| RT-10   | Plain text export                                     | Full  |        |            |                                                                                  |
+| RT-11   | Dashboard reopen application                          | Full  |        |            |                                                                                  |
+| RT-12   | Change password                                       | Full  |        |            |                                                                                  |
+| RT-13   | Sign out                                              | Full  |        |            |                                                                                  |
+| RT-14   | Delete account                                        | Full  |        |            |                                                                                  |
+| RT-15   | Session timeout (inactivity)                          | Full  | Pass   | 2026-07-04 | Confirmed live during Clothworkers testing — see RT-15 notes.                    |
 
 ---
 
@@ -164,6 +165,32 @@ Run this before every session, every time, no exceptions. It exists because on 2
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes (record the test email used, and the feedback-consent choice made in step 3):**
+
+---
+
+### RT-01b — Charity Commission Lookup — Found and Not-Found Paths [SMOKE]
+
+**Prerequisite:** A signed-in account with no completed charity profile yet (or use the Charity Profile page's edit/re-lookup entry point on an existing account).
+
+**What this tests:** The Charity Commission registration-number lookup used in charity profile setup — both the found path (pre-fills fields) and the not-found path (falls back to manual entry). Neither path has had a dedicated regression case before; RT-01a exercises the found path only incidentally, as one option among two ("look up... or enter manually") without confirming the not-found path actually works.
+
+**Steps:**
+
+1. On the Charity Profile page, enter a real, currently-registered charity number (e.g. **1194917**, Harry's Rainbow — used throughout this suite's flagship plans) and click **Look up charity**
+2. Confirm **What does the charity do** and **Who does your charity help** populate automatically from the Charity Commission record
+3. Clear the form (or start a fresh profile) and enter an invalid/non-existent registration number (e.g. **0000001**) and click **Look up charity**
+4. Confirm the app handles the not-found case gracefully — no crash, a clear message that the charity wasn't found, and the manual-entry fields remain available and enterable
+5. Complete the manual fields and click **Save profile**
+
+**Expected result:**
+
+- Found path: fields pre-fill correctly from the Charity Commission record
+- Not-found path: a clear, non-alarming message is shown; no error page or unhandled exception; manual entry remains fully usable
+- Both paths result in a profile that saves successfully
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes:**
 
 ---
 
@@ -676,3 +703,4 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 | 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 2.3     | 2026-07-04 | Rapidglobe Ltd | Added RT-12 (Change Password), RT-13 (Sign Out), and RT-14 (Delete Account) — account housekeeping had no regression coverage at all (guide Section 15, "Managing Your Account"). RT-12 mutates the shared regression account's password and includes an explicit revert step. RT-14 requires a disposable throwaway account, never the shared regression account or an in-use funder test account, since deletion is permanent. 14 test cases across 3 tiers.                                                                                                                                                                                                                                                              |
 | 2.4     | 2026-07-04 | Rapidglobe Ltd | Added RT-15 (Session Timeout — Inactivity), covering the documented 60-minute inactivity timeout (ADR-SEC-003, NFR, FR-06) that had no test coverage. Recorded as Pass based on a genuine live occurrence during Clothworkers testing — WJ was away over an hour, was signed out as expected, and on signing back in the in-progress application was exactly as left. The 55-minute warning modal itself was not directly observed this time (WJ was away from the screen) — flagged as unconfirmed in RT-15's notes, only the 60-minute sign-out and state preservation are confirmed. Also noted the user guide has no session-timeout section — a documentation gap, not a product defect. 15 test cases across 3 tiers. |
+| 2.5     | 2026-07-24 | Rapidglobe Ltd | Added RT-01b (Charity Commission lookup — found and not-found paths), per `DR-TEST-001`'s capability-based restructuring — this account/profile mechanic had no dedicated coverage anywhere in the suite; RT-01a only exercised the found path incidentally. 16 test cases across 3 tiers.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
