@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-25 — `tt-charity-lookup` flash bug (`GAP-36`): root-caused and fixed
+
+Four hypotheses tested live and ruled out in earlier sessions today: browser-extension interference, `type="search"`'s native decoration, Base UI's `InputPrimitive` specifically, and a `side="top"` viewport-edge collision. WJ then tested a _second_ diagnostic tooltip on the same page (Charity name field) — it flashed too, ruling out "specific to the lookup input" and narrowing the cause to something page/component-wide.
+
+With WJ's permission, drove his own already-authenticated Chrome session directly (no credentials entered or handled) to debug live rather than keep guessing blind. Used a `MutationObserver` plus dispatched pointer/focus events to watch `#charity-lookup` during the exact hover window: its `type` and `name` attributes were being toggled repeatedly. A controlled A/B on the same live page — an identical Base UI `Input` elsewhere with no tooltip attached — showed zero attribute churn under the same event sequence, isolating the cause to the tooltip wrapping specifically, not the input component itself.
+
+**Root cause:** Base UI's `Tooltip.Trigger`, when composing its own props onto a polymorphic `render` target, applies button-oriented default props (`type`, `name`) — a sensible default for a `<button>` trigger, but setting `type` on a genuine `<input>` forces Chromium to reinitialise the native widget, blurring it instantly and closing the tooltip.
+
+**Fix:** added a `wrapInStableSpan` option (plus a `spanClassName` passthrough for layout) to `components/contextual-tooltip.tsx`, reusing the existing focusable-span-wrapper mechanism that was previously only used for the hover-disabled case (`tt-ready-to-assemble`) — Base UI now composes its props onto a stable `<span>` instead of directly onto the input. Applied to `tt-charity-lookup`. The earlier disproven `type`/`side` experiments and the temporary diagnostic tooltip on Charity name were reverted/removed. Buttons, links, and plain text elements are unaffected (no `type`-dependent native behaviour) and don't need this — this is the only tooltip in the app wrapping a genuine `<input>`. `npm run type-check`, `lint`, and `test` (95 tests) all pass. Live re-confirmation by WJ still pending.
+
+---
+
 ## 2026-07-25 — `tt-charity-lookup` flash bug (`GAP-36`): two more theories ruled out, third in progress
 
 Both of the previous entry's candidate fixes turned out not to be it. WJ re-tested `type="text"` (previous entry) — still flashed, identically. Then, to isolate whether the styled `Input` component's underlying Base UI `InputPrimitive` was the cause, temporarily swapped it for a plain native `<input>` with matching styling — still flashed. So the cause is not the input's `type`, not the `Input` wrapper, and (from the previous entry) not a browser extension either.
