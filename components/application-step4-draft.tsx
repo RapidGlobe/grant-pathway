@@ -53,7 +53,6 @@ import {
 } from '@/lib/governance-items'
 import { MONTHLY_CAP } from '@/lib/prompts'
 import { ContextualTooltip } from '@/components/contextual-tooltip'
-import type { TooltipId } from '@/actions/tooltips'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -104,8 +103,6 @@ interface ApplicationStep4DraftProps {
    * applications, or the summary has never been regenerated since). Text
    * only, never the raw file (ADR-DATA-002). */
   guidelineText: string | null
-  /** PDR-UI-008 — which of this page's 4 tooltips the user has already dismissed. */
-  dismissedTooltips: Set<TooltipId>
 }
 
 /** Badge/dialog-title labels stay readable even when a funder's own document
@@ -226,7 +223,6 @@ export function ApplicationStep4Draft({
   limitReached,
   currentUsage,
   guidelineText,
-  dismissedTooltips,
 }: ApplicationStep4DraftProps) {
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
     Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
@@ -834,12 +830,7 @@ export function ApplicationStep4Draft({
                   still shows the plain warning text either way. */}
               {q.isBudgetQuestion &&
                 (index === firstBudgetQuestionIndex ? (
-                  <ContextualTooltip
-                    tooltipId="tt-budget-no-ai"
-                    variant="page-load"
-                    initiallyDismissed={dismissedTooltips.has('tt-budget-no-ai')}
-                    content="AI assistance isn't available here — financial figures are shown exactly as you enter them."
-                  >
+                  <ContextualTooltip content="AI assistance isn't available here — financial figures are shown exactly as you enter them.">
                     <div className="mb-3 flex items-start gap-2">
                       <AlertTriangle
                         className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
@@ -958,9 +949,6 @@ export function ApplicationStep4Draft({
                     <>
                       {index === firstRefineButtonIndex ? (
                         <ContextualTooltip
-                          tooltipId="tt-ai-help-limit"
-                          variant="first-click"
-                          initiallyDismissed={dismissedTooltips.has('tt-ai-help-limit')}
                           content={`This uses one of your ${MONTHLY_CAP} monthly AI requests. You've used ${aiUsageCount} so far this month.`}
                         >
                           <button
@@ -1153,12 +1141,7 @@ export function ApplicationStep4Draft({
       {missingGovernanceItems.length > 0 && (
         <div className="mb-8">
           {!showManualAddPanel ? (
-            <ContextualTooltip
-              tooltipId="tt-governance-add-it"
-              variant="page-load"
-              initiallyDismissed={dismissedTooltips.has('tt-governance-add-it')}
-              content="Some funders expect this even if their guidelines don't ask for it directly."
-            >
+            <ContextualTooltip content="Some funders expect this even if their guidelines don't ask for it directly.">
               <button
                 type="button"
                 onClick={() => setShowManualAddPanel(true)}
@@ -1248,10 +1231,7 @@ export function ApplicationStep4Draft({
           Back
         </Link>
         <ContextualTooltip
-          tooltipId="tt-ready-to-assemble"
-          variant="hover-disabled"
           active={!allApproved}
-          initiallyDismissed={dismissedTooltips.has('tt-ready-to-assemble')}
           content={`Approve all ${questions.length} ${itemLabelPlural} before you can assemble your application.`}
         >
           <Button

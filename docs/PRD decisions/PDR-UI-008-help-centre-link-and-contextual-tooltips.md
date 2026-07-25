@@ -1,7 +1,7 @@
 # PDR-UI-008 — Help Centre Link and Contextual Tooltips
 
-**Date:** 2026-07-24
-**Status:** Decided ✓ — built and verified (type-check/lint/tests green); live browser/accessibility verification still outstanding (see Document History v2.0)
+**Date:** 2026-07-24 (persistence mechanism reversed and simplified 2026-07-25 — see v3.0)
+**Status:** Decided ✓ — built and verified (type-check/lint/tests green); live browser/accessibility verification still outstanding (see Document History v2.0). Tooltips no longer persist dismissed-state (v3.0).
 **Author:** Rapidglobe Ltd
 
 ---
@@ -94,9 +94,32 @@ Both "Help me improve this" and "Ready to assemble" render at ambiguous instance
 
 ---
 
+## Reversal — Persistence Removed (2026-07-25)
+
+Live-testing this feature (`docs/Test Plans/help-and-tooltips-test-plan.md`) surfaced two problems the same session: HT-02 first failed because migration `20260724000000` had been committed but never pushed to `grant-pathway-dev`, and once fixed, WJ found there was no way for a user to bring a dismissed tooltip back (`GAP-35`) — the natural fix, a "Reset tooltips" control, was built first, then reconsidered within hours.
+
+Standing back, WJ concluded the persistence mechanism itself — a new table, RLS policies, grants to two roles, 5 trigger variants, a dismiss action, a reset action, and a reset control — was disproportionate to the value it added for a pre-launch product with no real users yet to have earned that complexity, versus a plain hover/focus tooltip with no memory at all (the same pattern `tt-delete-account` already used). Agreed: keep every tooltip's content and placement, drop all persistence.
+
+**What changed:**
+
+- `components/contextual-tooltip.tsx` rewritten: no `variant` prop, no dismiss button, no `tooltipId`/`initiallyDismissed`. Every tooltip is now a plain hover/focus hint. The `active` prop is kept only for `tt-ready-to-assemble` (hides the hint once the target control is no longer disabled).
+- `actions/tooltips.ts` deleted (`getDismissedTooltipIds`, `dismissTooltip`, `resetAllTooltips` all removed) — nothing calls them anymore.
+- The "Reset tooltips" control added earlier the same day for `GAP-35` is removed from `account-settings-form.tsx` — there is nothing left to reset.
+- Migration `20260725000000_drop_user_tooltip_dismissals.sql` drops the table (RLS/grants go with it); pushed to `grant-pathway-dev`.
+- All 5 Server Component pages (`profile/page.tsx`, `step/2` through `step/5`) no longer fetch or thread dismissed-state.
+- `__tests__/contextual-tooltip.test.tsx` rewritten for the simplified component (4 tests, down from 6).
+- `docs/Test Plans/help-and-tooltips-test-plan.md` needs its own rewrite pass (HT-02/03/07 assumed persistence) — tracked separately, not part of this PDR.
+
+**Not reversed:** the help centre link (Part A) is unaffected — it was never part of the persistence mechanism.
+
+`npm run type-check`, `lint`, and `test` (95 tests) all pass.
+
+---
+
 ## Document History
 
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1.0     | 2026-07-24 | Rapidglobe Ltd | Initial decision — full scope (help link + all 13 tooltips) approved by WJ; implementation approach corrected against the actual codebase (no new tour dependency, server-side state, real route/counter/selector facts) rather than the source spec's untested assumptions.                                                                                                                                                                                                                                                                                                                                                   |
 | 2.0     | 2026-07-24 | Rapidglobe Ltd | Built. Corrected the "13" tooltip count to 11 (own arithmetic error); corrected 4 tooltips' variant assignment against the spec's actual trigger column (v1.0 had mis-assigned them); found the senior-review "checkbox" doesn't exist; `tt-register-password` deliberately not built (already redundant with a permanent visible hint, and structurally can't persist pre-auth). Added dev-only component-testing infrastructure (none existed before). Type-check/lint/tests all green; live browser and accessibility verification still outstanding, blocked by this environment's known dev-server credential limitation. |
+| 3.0     | 2026-07-25 | Rapidglobe Ltd | **Persistence reversed.** Live-testing found the missed migration (`GAP-35`'s root cause) and the "how do I bring a tooltip back" gap; WJ concluded the whole server-side dismiss/persist/reset mechanism was over-engineered for a pre-launch product and asked to simplify to a plain hover/focus tooltip with no memory. `user_tooltip_dismissals` table dropped, `actions/tooltips.ts` deleted, `contextual-tooltip.tsx` simplified, Reset tooltips control removed, all 5 pages' dismissed-state fetching removed. See "Reversal" section above. Type-check/lint/95 tests all green.                                      |

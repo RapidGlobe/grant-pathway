@@ -38,8 +38,6 @@ interface ApplicationStep5ApproveProps {
   answers: AnswerRow[]
   assembledDraft: string | null
   lastExportedAt: string | null
-  /** PDR-UI-008 — has the user already dismissed tt-download-docx. */
-  tooltipDismissed?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -112,7 +110,6 @@ export function ApplicationStep5Approve({
   answers,
   assembledDraft,
   lastExportedAt,
-  tooltipDismissed = false,
 }: ApplicationStep5ApproveProps) {
   const router = useRouter()
 
@@ -402,12 +399,7 @@ export function ApplicationStep5Approve({
       {/* ── Action buttons ────────────────────────────────────────────────── */}
       <div className="mb-3 space-y-3">
         {/* Download as Word — clicking this approves + downloads in one step */}
-        <ContextualTooltip
-          tooltipId="tt-download-docx"
-          variant="first-click"
-          initiallyDismissed={tooltipDismissed}
-          content="Save a local copy as soon as you download it — Grant Pathway stores your answers securely, but having a local copy is good practice."
-        >
+        <ContextualTooltip content="Save a local copy as soon as you download it — Grant Pathway stores your answers securely, but having a local copy is good practice.">
           <Button
             type="button"
             onClick={() => void handleDownloadClick('docx')}

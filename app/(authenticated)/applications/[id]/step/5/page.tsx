@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { ApplicationStep5Approve, type AnswerRow } from '@/components/application-step5-approve'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
-import { getDismissedTooltipIds } from '@/actions/tooltips'
 
 export const metadata: Metadata = {
   title: 'Approve & Export',
@@ -63,8 +62,6 @@ export default async function Step5Page({ params }: Props) {
     answerSource: (row.answer_source as AnswerRow['answerSource']) ?? null,
   }))
 
-  const dismissed = await getDismissedTooltipIds(['tt-download-docx'])
-
   return (
     <ApplicationStep5Approve
       applicationId={id}
@@ -74,7 +71,6 @@ export default async function Step5Page({ params }: Props) {
       answers={answers}
       assembledDraft={assembledDraft}
       lastExportedAt={lastExportedAt}
-      tooltipDismissed={dismissed.has('tt-download-docx')}
     />
   )
 }

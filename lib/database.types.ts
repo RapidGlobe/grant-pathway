@@ -360,24 +360,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_tooltip_dismissals: {
-        Row: {
-          dismissed_at: string
-          tooltip_id: string
-          user_id: string
-        }
-        Insert: {
-          dismissed_at?: string
-          tooltip_id: string
-          user_id: string
-        }
-        Update: {
-          dismissed_at?: string
-          tooltip_id?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
     }
     Views: {
       [_ in never]: never

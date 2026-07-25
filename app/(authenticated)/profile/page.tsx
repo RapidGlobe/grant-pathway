@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { CharityProfileForm } from '@/components/charity-profile-form'
 import { getCharityProfile } from '@/actions/charity'
-import { getDismissedTooltipIds } from '@/actions/tooltips'
 
 /**
  * Extend the Vercel serverless timeout to 60 seconds for this route.
@@ -25,12 +24,5 @@ export const metadata: Metadata = {
 export default async function ProfilePage() {
   const profile = await getCharityProfile()
   const isEdit = !!profile
-  const dismissed = await getDismissedTooltipIds(['tt-charity-lookup'])
-  return (
-    <CharityProfileForm
-      initialData={profile}
-      isEdit={isEdit}
-      tooltipDismissed={dismissed.has('tt-charity-lookup')}
-    />
-  )
+  return <CharityProfileForm initialData={profile} isEdit={isEdit} />
 }

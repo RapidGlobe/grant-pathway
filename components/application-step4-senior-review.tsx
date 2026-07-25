@@ -22,14 +22,9 @@ import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 interface ApplicationStep4SeniorReviewProps {
   applicationId: string
-  /** PDR-UI-008 — has the user already dismissed tt-senior-review-confirm. */
-  tooltipDismissed: boolean
 }
 
-export function ApplicationStep4SeniorReview({
-  applicationId,
-  tooltipDismissed,
-}: ApplicationStep4SeniorReviewProps) {
+export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4SeniorReviewProps) {
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [backError, setBackError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
@@ -99,12 +94,7 @@ export function ApplicationStep4SeniorReview({
         >
           {isGoingBack ? 'Going back…' : 'Back to editing'}
         </button>
-        <ContextualTooltip
-          tooltipId="tt-senior-review-confirm"
-          variant="page-load"
-          initiallyDismissed={tooltipDismissed}
-          content="Confirm a senior team member has reviewed the financial content before assembling your draft."
-        >
+        <ContextualTooltip content="Confirm a senior team member has reviewed the financial content before assembling your draft.">
           <Button
             type="button"
             onClick={handleAssemble}

@@ -28,7 +28,7 @@
 
 import { useState, useRef, useEffect, useTransition } from 'react'
 import Link from 'next/link'
-import { Upload, FileText, X, AlertTriangle, AlertCircle, Info } from 'lucide-react'
+import { Upload, FileText, X, AlertTriangle, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -49,12 +49,8 @@ interface ApplicationStep2FormProps {
   applicationId: string
   funderName: string
   grantName: string
-  /** Current step from the database — used to show re-upload advisory (GAP-19) */
-  currentStep: number
   initialError?: UploadError
   showLargeWarning?: boolean
-  /** PDR-UI-008 — has the user already dismissed tt-guidelines-choice. */
-  tooltipDismissed?: boolean
 }
 
 const ACCEPTED_EXTENSIONS = ['.pdf', '.docx']
@@ -74,10 +70,8 @@ export function ApplicationStep2Form({
   applicationId,
   funderName,
   grantName,
-  currentStep,
   initialError = null,
   showLargeWarning = false,
-  tooltipDismissed = false,
 }: ApplicationStep2FormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -244,31 +238,11 @@ export function ApplicationStep2Form({
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
         )}
       </p>
-      <ContextualTooltip
-        tooltipId="tt-guidelines-choice"
-        variant="page-load"
-        initiallyDismissed={tooltipDismissed}
-        content="For the best results, upload or paste just the section with the application questions — you can skip the funder's background information or T&Cs."
-      >
+      <ContextualTooltip content="For the best results, upload or paste just the section with the application questions — you can skip the funder's background information or T&Cs.">
         <p className="mb-6 text-[15px] text-[#64748B]">
           Upload the funder&apos;s guidelines document, or paste the text directly below.
         </p>
       </ContextualTooltip>
-
-      {/* Re-upload advisory (GAP-19) — shown when returning to Step 2 after
-          advancing past it and sessionStorage no longer has an entry */}
-      {currentStep >= 3 && !guidelinesRestored && uploadState === 'idle' && !uploadError && (
-        <div
-          role="note"
-          className="mb-4 flex items-start gap-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4"
-        >
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#2563EB]" aria-hidden="true" />
-          <p className="text-[13px] text-[#1E40AF]">
-            Your guidelines are not saved between sessions — please upload or paste them again to
-            continue.
-          </p>
-        </div>
-      )}
 
       {/* ── File upload area ── */}
       <div className="mb-4">

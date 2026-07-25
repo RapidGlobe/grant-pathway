@@ -46,8 +46,6 @@ interface ApplicationStep3SummaryProps {
   grantName: string
   /** Existing summary JSON string from the database. If non-null, skip generation. */
   existingSummary: string | null
-  /** PDR-UI-008 — has the user already dismissed tt-summary-review. */
-  tooltipDismissed?: boolean
 }
 
 const LOADING_MESSAGES = [
@@ -61,7 +59,6 @@ export function ApplicationStep3Summary({
   funderName,
   grantName,
   existingSummary,
-  tooltipDismissed = false,
 }: ApplicationStep3SummaryProps) {
   // ── State ──────────────────────────────────────────────────────────────────
   const [displayState, setDisplayState] = useState<DisplayState>(() => {
@@ -119,8 +116,14 @@ export function ApplicationStep3Summary({
   // Whether guidelines are still available in sessionStorage (for Regenerate warning)
   const [guidelinesAvailable, setGuidelinesAvailable] = useState(true)
 
-  // Read filename and guidelines availability from sessionStorage on mount
+  // Read filename and guidelines availability from sessionStorage on mount.
+  // This effect and the two below are unchanged since S5.2/S5.4 -- removing
+  // an unrelated prop elsewhere in this component flips whether the React
+  // Compiler's bailout analysis surfaces react-hooks/set-state-in-effect
+  // here. Same 3 lines had identical disables removed as "unused" on
+  // 2026-07-24 (PDR-UI-008 v2.0) when this file's shape last changed.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setGuidelinesFilename(getGuidelinesFilename(applicationId))
     setGuidelinesAvailable(getGuidelines(applicationId) !== null)
   }, [applicationId])
@@ -131,6 +134,7 @@ export function ApplicationStep3Summary({
   useEffect(() => {
     if (displayState !== 'loading') return
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see note above the sessionStorage-read effect above.
     setProgress(0)
     setLoadingMessage(LOADING_MESSAGES[0].text)
 
@@ -162,6 +166,7 @@ export function ApplicationStep3Summary({
     if (!guidelinesText) {
       // No guidelines in sessionStorage and no DB summary — user must re-upload
       if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- see note above the sessionStorage-read effect above.
       setDisplayState('no-guidelines')
       return
     }
@@ -417,12 +422,7 @@ export function ApplicationStep3Summary({
     <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={3} />
 
-      <ContextualTooltip
-        tooltipId="tt-summary-review"
-        variant="page-load"
-        initiallyDismissed={tooltipDismissed}
-        content="If your charity doesn't match this funder's criteria, you'll see a message here explaining why — you can update your profile or pick a different funder."
-      >
+      <ContextualTooltip content="If your charity doesn't match this funder's criteria, you'll see a message here explaining why — you can update your profile or pick a different funder.">
         <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
           Your funder guidelines — summary
         </h1>

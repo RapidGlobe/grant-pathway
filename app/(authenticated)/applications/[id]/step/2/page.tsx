@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { ApplicationStep2Form } from '@/components/application-step2-form'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
-import { getDismissedTooltipIds } from '@/actions/tooltips'
 
 export const metadata: Metadata = {
   title: 'Upload Guidelines',
@@ -26,9 +25,7 @@ export default async function Step2Page({ params, searchParams }: Props) {
   const { error, warning } = await searchParams
 
   // Step locking: redirects to Step 1 if current_step < 2
-  // currentStep tells the form whether the user has been past Step 2 before
-  // so it can show the re-upload advisory when no sessionStorage entry exists (GAP-19).
-  const { funderName, grantName, currentStep } = await getApplicationOrRedirect(id, 2)
+  const { funderName, grantName } = await getApplicationOrRedirect(id, 2)
 
   const errorMap: Record<string, UploadError> = {
     format: 'format',
@@ -37,17 +34,14 @@ export default async function Step2Page({ params, searchParams }: Props) {
   }
   const initialError: UploadError = error && error in errorMap ? errorMap[error] : null
   const showLargeWarning = warning === 'large'
-  const dismissed = await getDismissedTooltipIds(['tt-guidelines-choice'])
 
   return (
     <ApplicationStep2Form
       applicationId={id}
       funderName={funderName}
       grantName={grantName}
-      currentStep={currentStep}
       initialError={initialError}
       showLargeWarning={showLargeWarning}
-      tooltipDismissed={dismissed.has('tt-guidelines-choice')}
     />
   )
 }
