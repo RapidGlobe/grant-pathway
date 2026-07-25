@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { changePassword } from '@/actions/auth'
+import { resetAllTooltips } from '@/actions/tooltips'
 import { ContextualTooltip } from '@/components/contextual-tooltip'
 
 interface FieldErrors {
@@ -31,6 +32,22 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
   const [passwordUpdated, setPasswordUpdated] = useState(false)
   const [serverError, setServerError] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [tooltipsReset, setTooltipsReset] = useState(false)
+  const [tooltipResetError, setTooltipResetError] = useState('')
+  const [isResettingTooltips, startTooltipReset] = useTransition()
+
+  function handleResetTooltips() {
+    setTooltipsReset(false)
+    setTooltipResetError('')
+    startTooltipReset(async () => {
+      const result = await resetAllTooltips()
+      if (result.ok) {
+        setTooltipsReset(true)
+      } else {
+        setTooltipResetError(result.error)
+      }
+    })
+  }
 
   function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -263,6 +280,49 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
             {isPending ? 'Updating…' : 'Update password'}
           </Button>
         </form>
+      </section>
+
+      <hr className="mb-8 border-[#E2E8F0]" />
+
+      {/* ── Reset help tips ────────────────────────────────────────────────── */}
+      <section aria-labelledby="tooltips-heading" className="mb-8">
+        <h2 id="tooltips-heading" className="mb-2 text-[16px] font-semibold text-[#1E293B]">
+          Help tips
+        </h2>
+        <p className="mb-5 text-[14px] text-[#374151]">
+          Bring back the contextual help tips you&apos;ve previously dismissed across the app.
+        </p>
+
+        {tooltipsReset && (
+          <div
+            role="alert"
+            className="mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] px-4 py-3"
+          >
+            <CheckCircle className="h-4 w-4 shrink-0 text-[#16A34A]" aria-hidden="true" />
+            <p className="text-[14px] text-[#166534]">
+              Your help tips have been reset and will show again as you use the app.
+            </p>
+          </div>
+        )}
+
+        {tooltipResetError && (
+          <div
+            role="alert"
+            className="mb-5 flex items-center gap-2 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3"
+          >
+            <AlertCircle className="h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
+            <p className="text-[14px] text-[#991B1B]">{tooltipResetError}</p>
+          </div>
+        )}
+
+        <Button
+          type="button"
+          onClick={handleResetTooltips}
+          disabled={isResettingTooltips}
+          className="h-10 bg-[#0D6E6E] px-5 text-[14px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+        >
+          {isResettingTooltips ? 'Resetting…' : 'Reset tooltips'}
+        </Button>
       </section>
 
       <hr className="mb-8 border-[#E2E8F0]" />

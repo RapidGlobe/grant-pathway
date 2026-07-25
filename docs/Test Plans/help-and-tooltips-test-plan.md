@@ -43,16 +43,16 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 ## Test Results Summary
 
-| Test ID | Test Name                                                       | Result | Notes |
-| ------- | --------------------------------------------------------------- | ------ | ----- |
-| HT-01   | Help centre links — presence, target, new-tab behaviour         |        |       |
-| HT-02   | Page-load tooltips — dismiss via X persists across reload       |        |       |
-| HT-03   | First-click tooltips — auto-dismiss without blocking the action |        |       |
-| HT-04   | Hover-disabled tooltip — shows only while disabled              |        |       |
-| HT-05   | Persistent tooltip — delete-account warning never dismisses     |        |       |
-| HT-06   | Non-persisted password hint — always shown, not a dismiss bug   |        |       |
-| HT-07   | Cross-device/cross-session persistence                          |        |       |
-| HT-08   | Accessibility pass — axe-core, keyboard-only, screen reader     |        |       |
+| Test ID | Test Name                                                       | Result | Notes                                                            |
+| ------- | --------------------------------------------------------------- | ------ | ---------------------------------------------------------------- |
+| HT-01   | Help centre links — presence, target, new-tab behaviour         | Pass   |                                                                  |
+| HT-02   | Page-load tooltips — dismiss via X persists across reload       | Pass   | Migration `20260724000000` was missing on dev, pushed 2026-07-25 |
+| HT-03   | First-click tooltips — auto-dismiss without blocking the action |        |                                                                  |
+| HT-04   | Hover-disabled tooltip — shows only while disabled              |        |                                                                  |
+| HT-05   | Persistent tooltip — delete-account warning never dismisses     |        |                                                                  |
+| HT-06   | Non-persisted password hint — always shown, not a dismiss bug   |        |                                                                  |
+| HT-07   | Cross-device/cross-session persistence                          |        |                                                                  |
+| HT-08   | Accessibility pass — axe-core, keyboard-only, screen reader     |        |                                                                  |
 
 ---
 
@@ -77,9 +77,9 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - All four link locations present and pointing at the same help centre base URL
 - Every link opens in a new tab, never navigating the app away
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Tested in Google Chrome; a GitBook editor toolbar appeared over the help centre page (visible only because that Chrome profile is signed into the GitBook account used to set up the space — not present in Edge/Comet as a signed-out visitor). Not a Grant Pathway defect, no action needed.
 
 ---
 
@@ -103,9 +103,9 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - Each disappears on X-click and stays gone after a reload
 - Dismissing one tooltip does not affect any other tooltip's shown/dismissed state
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record which of the 6 were tested and any that failed to persist):**
+**Notes (record which of the 6 were tested and any that failed to persist):** First attempt (2026-07-25) failed to persist for `tt-charity-lookup` — traced to migration `20260724000000` (`user_tooltip_dismissals` table) never having been pushed to `grant-pathway-dev`; pushed same day, then re-tested and confirmed dismiss now persists across reload. Separately, WJ raised that once dismissed there is no self-service way to bring a page-load tooltip back — logged as `GAP-35`, not a defect in this test's pass result.
 
 ---
 

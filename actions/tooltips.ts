@@ -74,3 +74,25 @@ export async function dismissTooltip(
   }
   return { ok: true }
 }
+
+/**
+ * Clears every dismissed-tooltip row for the current user, so all
+ * `page-load`/`first-click`/`hover-disabled` tooltips show again (GAP-35).
+ * `tt-delete-account` (persistent) and `tt-register-password` (not a row in
+ * this table at all) are unaffected -- one always shows, the other never
+ * persists here regardless.
+ */
+export async function resetAllTooltips(): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { ok: false, error: 'You must be signed in.' }
+
+  const { error } = await supabase.from('user_tooltip_dismissals').delete().eq('user_id', user.id)
+
+  if (error) {
+    return { ok: false, error: 'Could not reset your tooltips. Please try again.' }
+  }
+  return { ok: true }
+}
