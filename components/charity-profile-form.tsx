@@ -248,16 +248,21 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
               *
             </span>
           </Label>
-          <Input
-            id="charityName"
-            type="text"
-            autoComplete="organization"
-            value={charityName}
-            onChange={(e) => setCharityName(e.target.value)}
-            aria-invalid={!!fieldErrors.charityName || undefined}
-            aria-describedby={fieldErrors.charityName ? 'charityName-error' : undefined}
-            className="h-10 text-[14px]"
-          />
+          {/* TEMPORARY DIAGNOSTIC (GAP-36) -- second tooltip on this same page,
+              a different field, to test whether the flash is page-wide or
+              specific to the lookup input. Remove once GAP-36 is resolved. */}
+          <ContextualTooltip content="DIAGNOSTIC — does this one flash too?">
+            <Input
+              id="charityName"
+              type="text"
+              autoComplete="organization"
+              value={charityName}
+              onChange={(e) => setCharityName(e.target.value)}
+              aria-invalid={!!fieldErrors.charityName || undefined}
+              aria-describedby={fieldErrors.charityName ? 'charityName-error' : undefined}
+              className="h-10 text-[14px]"
+            />
+          </ContextualTooltip>
           {fieldErrors.charityName && (
             <p id="charityName-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
               {fieldErrors.charityName}
