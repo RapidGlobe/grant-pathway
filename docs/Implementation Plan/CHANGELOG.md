@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-25 — `tt-charity-lookup` flash bug (`GAP-36`): two more theories ruled out, third in progress
+
+Both of the previous entry's candidate fixes turned out not to be it. WJ re-tested `type="text"` (previous entry) — still flashed, identically. Then, to isolate whether the styled `Input` component's underlying Base UI `InputPrimitive` was the cause, temporarily swapped it for a plain native `<input>` with matching styling — still flashed. So the cause is not the input's `type`, not the `Input` wrapper, and (from the previous entry) not a browser extension either.
+
+Reverted both disproven diagnostic changes back to the original code (`Input` component, `type="search"` restored — that was intentional for the mobile "search" keyboard label, no reason to lose it now it's cleared). New hypothesis: the field sits close to the top of the page — only a heading, one padding block, and one line of label text above it — so a `side="top"` tooltip (every `ContextualTooltip` defaults to `side="top"`) may have too little vertical clearance and collide with the viewport edge. Some floating-position libraries hide the popup entirely rather than cleanly flipping side when this happens, which would look exactly like an instant open-then-vanish. Added `side="bottom"` to this one tooltip instance as a test. `npm run type-check`, `lint`, and `test` (95 tests) all pass. WJ stepped away mid-session; not yet confirmed either way.
+
+---
+
 ## 2026-07-25 — `tt-charity-lookup` flash bug (`GAP-36`): fix attempted, pending confirmation
 
 Live-debugging with WJ ruled out two leading theories one at a time: browser-extension interference (reproduced in Incognito across Chrome, Perplexity Comet, and Edge — all extensions off) and a mouse-only cause (also flashes when the field is reached via Tab, not just hover). This left `type="search"` as the standout difference — it's the only one of the 9 tooltips built on a native search input; the other 3 tooltips wrapping Base UI's own `Button` component (also `@base-ui/react/button` under the hood) are unaffected, so "wraps a Base UI primitive" isn't the differentiator, but "is a search input specifically" still is.
