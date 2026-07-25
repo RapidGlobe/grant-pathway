@@ -45,13 +45,13 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 ## Test Results Summary
 
-| Test ID | Test Name                                                             | Result        | Notes                                                                                                                                            |
-| ------- | --------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| HT-01   | Help centre links — presence, target, new-tab behaviour               | Pass          |                                                                                                                                                  |
-| HT-02   | All tooltips — show on hover/focus, no dismiss control, never persist | Pass (caveat) | Core behaviour confirmed on all 9; `GAP-36` (`tt-charity-lookup` flash) still open, `GAP-37` (`tt-summary-review` wrong copy) fixed same day     |
-| HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass          |                                                                                                                                                  |
-| HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass          |                                                                                                                                                  |
-| HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Blocked       | Step 1 (axe-core) blocked — needs local `npm run dev`, not the deployed build. Step 2 (keyboard) found and fixed `GAP-38`. Steps 3-4 not yet run |
+| Test ID | Test Name                                                             | Result  | Notes                                                                                                                                            |
+| ------- | --------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| HT-01   | Help centre links — presence, target, new-tab behaviour               | Pass    |                                                                                                                                                  |
+| HT-02   | All tooltips — show on hover/focus, no dismiss control, never persist | Pass    | Core behaviour confirmed on all 9; `GAP-36` (`tt-charity-lookup` flash) and `GAP-37` (`tt-summary-review` wrong copy) both fixed same day        |
+| HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass    |                                                                                                                                                  |
+| HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass    |                                                                                                                                                  |
+| HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Blocked | Step 1 (axe-core) blocked — needs local `npm run dev`, not the deployed build. Step 2 (keyboard) found and fixed `GAP-38`. Steps 3-4 not yet run |
 
 ---
 
@@ -104,7 +104,7 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 **Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:** Core behaviour (hover/focus show, no dismiss control, no persistence) confirmed across all 9 tooltips; marked pass with two open findings rather than fail, per WJ. `tt-charity-lookup` flashes open for ~2ms on first hover of the Charity Commission search input, then disappears, rather than staying open — logged as `GAP-36`, still open (needs live browser debugging). `tt-summary-review`'s copy ("if your charity doesn't match this funder's criteria, you'll see a message here explaining why") was factually wrong — logged as `GAP-37`, fixed same day alongside `GAP-38` below; copy now reads "This is an AI-generated summary of the funder's guidelines — check it looks right before continuing. You can regenerate it if anything looks off."
+**Notes:** Core behaviour (hover/focus show, no dismiss control, no persistence) confirmed across all 9 tooltips. `tt-charity-lookup` flashed open for ~2ms on first hover of the Charity Commission search input, then disappeared, rather than staying open — logged as `GAP-36`; root-caused (Base UI's `Tooltip.Trigger` was setting `type`/`name` attributes directly on the input, forcing Chromium to reinitialise the native widget and blur it) and fixed same day via a stable-span wrapper — confirmed live on the deployed build, no longer flashes. `tt-summary-review`'s copy ("if your charity doesn't match this funder's criteria, you'll see a message here explaining why") was factually wrong — logged as `GAP-37`, fixed same day alongside `GAP-38` below; copy now reads "This is an AI-generated summary of the funder's guidelines — check it looks right before continuing. You can regenerate it if anything looks off."
 
 ---
 
