@@ -9,11 +9,11 @@
 | Field              | Detail                                            |
 | ------------------ | ------------------------------------------------- |
 | **Document title** | Product Requirements Document -- Grant Pathway v1 |
-| **Version**        | 0.59 Draft                                        |
+| **Version**        | 0.60 Draft                                        |
 | **Status**         | Draft                                             |
 | **Author**         | Rapidglobe Ltd                                    |
 | **Date created**   | 2026-04-16                                        |
-| **Last updated**   | 2026-07-24                                        |
+| **Last updated**   | 2026-07-25                                        |
 | **Review date**    | Prior to development start                        |
 
 ### Revision History
@@ -82,6 +82,7 @@
 | 0.57 | 2026-07-17 | Rapidglobe Ltd | Section 5.6 (Global Footer) gained a new "App version" row: the site footer (`components/site-footer.tsx`) now shows "Grant Pathway v[version number]", reusing the same `getAppVersion()` helper and format already shown in the export document footer (Section 5.5) -- added so WJ can confirm which deployed build he is testing, after losing track of which of two similarly-named test applications he was viewing during live Henry Smith testing. No new design decision -- same helper, second call site. |
 | 0.56 | 2026-07-16 | Rapidglobe Ltd | A manually-added governance/finance item (via the "Add a financial or governance detail" picker, PDR-AI-008) is no longer exempt from the "Ready to assemble" gate. WJ live-tested Henry Smith, ticked several governance facts via the manual picker, left them blank, and found the button stayed active throughout -- traced to the shared `item_label`'s "(optional)" suffix, written for the AI-auto-detected case (a low-signal detection should never become a forced question) but reused as-is for manual adds, where the charity actively chose to answer the fact. `components/application-step4-draft.tsx`'s `allApproved` gate and its "show approve panel when empty" check are now both keyed on the existing `addedManually` flag in addition to the "(optional)" text check -- AI-detected items are unaffected. Section 7 Screen 7 Step 4 table ("Optional questions" and "Governance and reserves items" rows) updated. New `acceptance-criteria.md` AC-FR-29-08; `PDR-AI-008` revision history updated. |
 | 0.59 | 2026-07-24 | Rapidglobe Ltd | Section 6.9's note about the deletion-confirmation email's code comment mislabelling itself "Email 2" was itself stale: `git log` shows the comment was corrected to "Email 5" the same day this doc flagged it (commit `6c42c63`, 2026-07-10), but the doc note was never updated to say so and kept describing it as an open follow-up for two weeks. Found while WJ investigated the "Create a new account" button in that email (confirmed live -- `grantpathway.org.uk` is genuinely wired as the project's production domain in Vercel, not a placeholder). Section 6.9's note corrected to reflect the fix is already done; no code change needed. |
+| 0.60 | 2026-07-25 | Rapidglobe Ltd | `PDR-UI-008` (help centre link + contextual tooltips, built 2026-07-24, persistence reversed 2026-07-25) had no PRD entry -- deliberately held until WJ's own live testing completed (`docs/Test Plans/help-and-tooltips-test-plan.md` v2.0, HT-01 to HT-04 Pass, HT-05 Pass on axe-core/keyboard/focus-order with NVDA/VoiceOver deferred). Added: a "Help" row to Sections 5.4 and 5.5's nav tables and 5.6's footer table; a new Section 5.6a documenting the dashboard empty-state help link; a new "Cross-Cutting -- Contextual Tooltips" subsection after Screen 11 in Section 7 listing all 10 built tooltips (screen, trigger element, behaviour), referencing `PDR-UI-008` for full implementation detail. Matching FR-49 acceptance criteria added to `acceptance-criteria.md` Section 9.12 in the same pass. |
 
 ### Related Documents
 
@@ -276,6 +277,7 @@ Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-pass
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | Grant Pathway logo (left) | Links to `/` -- gives pages reached directly (e.g. `/terms` from a search result) a route back; signed-in users redirected to `/dashboard` |
 | Register -- it's free     | Links to `/register`; hidden on `/register` (circular), `/verify-email` (user has just registered), and the legal pages (out of context)   |
+| Help (added 2026-07-24)   | Links to the external help centre (`PDR-UI-008`); opens in a new tab                                                                       |
 
 **No standalone "Sign in" nav link exists** -- it was removed 2026-06-09; every public-facing form already carries a contextual sign-in link.
 
@@ -283,24 +285,26 @@ Displayed on all public routes (`/`, `/register`, `/verify-email`, `/forgot-pass
 
 Displayed on all authenticated routes.
 
-| Element                                  | Behaviour                                          |
-| ---------------------------------------- | -------------------------------------------------- |
-| Grant Pathway logo (left)                | Links to `/dashboard`                              |
-| My Applications                          | Links to `/dashboard`                              |
-| Charity Profile                          | Links to `/profile`                                |
-| Account (right, shows user's first name) | Dropdown: Account Settings (`/account`) / Sign Out |
+| Element                                  | Behaviour                                                            |
+| ---------------------------------------- | -------------------------------------------------------------------- |
+| Grant Pathway logo (left)                | Links to `/dashboard`                                                |
+| My Applications                          | Links to `/dashboard`                                                |
+| Charity Profile                          | Links to `/profile`                                                  |
+| Help (added 2026-07-24)                  | Links to the external help centre (`PDR-UI-008`); opens in a new tab |
+| Account (right, shows user's first name) | Dropdown: Account Settings (`/account`) / Sign Out                   |
 
 ### 5.6 Global Footer
 
 Displayed on all routes.
 
-| Element          | Detail                                                                                                                                                                                    |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tagline          | "Your free grant writing companion for UK charities"                                                                                                                                      |
-| Privacy Policy   | Links to `/privacy` -- opens in a new tab so the user never loses a form or in-progress application (added 2026-06-10)                                                                    |
-| Terms of Service | Links to `/terms` -- opens in a new tab, same reason (added 2026-06-10)                                                                                                                   |
-| Copyright        | (c) RapidGlobe Ltd [current year]                                                                                                                                                         |
-| App version      | "Grant Pathway v[version number]" -- same `getAppVersion()` value and format as the export document footer (5.5), so WJ can confirm which deployed build he is testing (added 2026-07-17) |
+| Element                        | Detail                                                                                                                                                                                    |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tagline                        | "Your free grant writing companion for UK charities"                                                                                                                                      |
+| Help centre (added 2026-07-24) | Links to the external help centre (`PDR-UI-008`) -- opens in a new tab                                                                                                                    |
+| Privacy Policy                 | Links to `/privacy` -- opens in a new tab so the user never loses a form or in-progress application (added 2026-06-10)                                                                    |
+| Terms of Service               | Links to `/terms` -- opens in a new tab, same reason (added 2026-06-10)                                                                                                                   |
+| Copyright                      | (c) RapidGlobe Ltd [current year]                                                                                                                                                         |
+| App version                    | "Grant Pathway v[version number]" -- same `getAppVersion()` value and format as the export document footer (5.5), so WJ can confirm which deployed build he is testing (added 2026-07-17) |
 
 ### 5.7 Page Titles
 
@@ -1053,6 +1057,29 @@ Full Terms of Service, statically rendered at build time from `docs/legal/terms-
 **URL:** `/privacy` | **Auth:** Any auth state -- no authentication required, authenticated users are not redirected away
 
 Full Privacy Policy, statically rendered at build time from `docs/legal/privacy-policy.md` (corrected 2026-07-13 -- same stale path already fixed in Section 5.2 and Screen 10, missed here), including accessible HTML tables for company details, legal bases, data processors, and retention periods. Standard public navigation bar and global footer. Linked from the global footer and the Register screen's consent checkbox, both opening in a new tab. Page title: "Privacy Policy -- Grant Pathway." The effective date in the source document is `[TO BE CONFIRMED]` and must be set before go-live (P5.1).
+
+---
+
+### Cross-Cutting -- Contextual Tooltips (added 2026-07-25, `PDR-UI-008`)
+
+Not a screen of its own -- these 9 tooltips, plus one hover-disabled variant, appear across several of the screens above. Full implementation and testing detail: `PDR-UI-008` and `docs/Test Plans/help-and-tooltips-test-plan.md`.
+
+Every tooltip below is a plain hover/focus hint -- shows on mouse hover or keyboard focus, no dismiss (X) control, no persisted "seen" state, appears identically every time for every user.
+
+| Tooltip                    | Screen                              | Trigger element                                                                             |
+| -------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------- |
+| `tt-charity-lookup`        | Screen 6 -- Charity Profile         | Charity Commission search input                                                             |
+| `tt-guidelines-choice`     | Screen 7 Step 2                     | Intro paragraph above the upload/paste choice                                               |
+| `tt-summary-review`        | Screen 7 Step 3                     | "Your funder guidelines -- summary" heading                                                 |
+| `tt-budget-no-ai`          | Screen 7 Step 4                     | First budget question's warning block                                                       |
+| `tt-governance-add-it`     | Screen 7 Step 4                     | Governance "Add it" manual-fallback prompt button                                           |
+| `tt-senior-review-confirm` | Screen 7 Step 4, senior-review view | "Yes -- assemble my draft" button                                                           |
+| `tt-ai-help-limit`         | Screen 7 Step 4                     | First "Help me improve this" button (shows current AI-usage count)                          |
+| `tt-ready-to-assemble`     | Screen 7 Step 4                     | "Ready to assemble" button -- shown only while genuinely disabled; bare button once enabled |
+| `tt-download-docx`         | Screen 7 Step 5                     | "Download as Word document (.docx)" button                                                  |
+| `tt-delete-account`        | Screen 8 -- Account Settings        | "Delete my account" button                                                                  |
+
+`tt-register-password` (Screen 2 -- Register) was scoped but deliberately **not built** as a tooltip -- the password field already carries a permanent, always-visible hint ("At least 12 characters, including letters and numbers"); a hover/focus tooltip repeating the same text would be pure duplication.
 
 ---
 

@@ -25,6 +25,7 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 | 9.9 Account Deletion                                         | FR-40 to FR-44         | ✅ Reviewed 2026-07-13 — AC-FR-41-02/03 and AC-FR-43-02 corrected to match live page content; AC-FR-42-01/02/03 corrected (disabled-until-match button behaviour was wrong, found during a PRD/BRD/AC cross-document sweep)                                                                                                                                                                                                                                                                                                                        |
 | 9.10 Question Typing, Funder Coverage & Eligibility Mismatch | FR-45 to FR-47         | ✅ Reviewed 2026-07-13 — FR-45 confirmed not built as specified (own citations); FR-46 withdrawn (Won't Have, 2026-07-11); FR-47 confirmed built                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 9.11 Guideline Source-Reference (Citations)                  | FR-48                  | ✅ Reviewed 2026-07-13, updated 2026-07-14, updated 2026-07-21 — `P6.2a`/`P6.3`/GAP-33/`P6.4` (first milestone) now built and confirmed visible on Step 4 (AC-02/03); a third citation type (`[ITEM N]`, a numbered-item fallback for guidelines with no page or heading structure) built 2026-07-21 after live-testing found the Wolfson Foundation's guidelines produced zero citations; summary-bullet citations remain not built; human curator confirmation (`P6.5`) is permanently superseded, not pending — see `ADR-DATA-007`'s amendments |
+| 9.12 Help Centre Link & Contextual Tooltips                  | FR-49                  | ✅ Added 2026-07-25 — `PDR-UI-008` built 2026-07-24 (persistence mechanism reversed 2026-07-25); live-tested against `docs/Test Plans/help-and-tooltips-test-plan.md` v2.0 (HT-01 to HT-04 Pass, HT-05 Pass on axe-core/keyboard/focus-order, NVDA/VoiceOver pass deferred by WJ)                                                                                                                                                                                                                                                                  |
 
 ---
 
@@ -2484,6 +2485,66 @@ _Added 2026-07-10. FR-48 was introduced the same day this section was added — 
 
 ---
 
+## 9.12 Help Centre Link & Contextual Tooltips
+
+_Added 2026-07-25. `PDR-UI-008` (help centre link + contextual tooltips) was built 2026-07-24 without corresponding acceptance criteria being written at the time; live testing was deliberately completed first (`docs/Test Plans/help-and-tooltips-test-plan.md`) since it surfaced a design reversal (dismissed-state persistence removed, see PDR v3.0) that would otherwise have required rewriting these criteria a second time._
+
+### FR-49 — Should Have
+
+**Requirement:** The system shall provide a persistent link to an external help centre, and contextual in-app tooltips at known points of friction.
+
+**Confirmed built (2026-07-24, `PDR-UI-008`; simplified 2026-07-25, v3.0).** 10 of 11 spec'd tooltips built (`tt-register-password` skipped as redundant with an existing permanent hint on the Register page). No dismissed-state persistence — every tooltip is a plain hover/focus hint shown identically every time, for every user, with no memory and no dismiss control.
+
+---
+
+**AC-FR-49-01 — Help centre link present in all four locations, opens in a new tab**
+
+- **Given** I am on any page of the application, signed in or signed out
+- **When** I look for a way to get help
+- **Then** I find a "Help" link in the relevant navigation (public nav when signed out, authenticated nav when signed in), in the global footer, and — when signed in with zero applications — in the dashboard empty-state copy
+- **And** clicking any of these links opens the help centre in a **new browser tab**, leaving the Grant Pathway tab untouched
+
+---
+
+**AC-FR-49-02 — Contextual tooltips show on hover/focus, every time, with no dismiss control**
+
+- **Given** I hover my mouse over, or move keyboard focus to, any of the 9 tooltip-wrapped elements (`tt-charity-lookup`, `tt-guidelines-choice`, `tt-summary-review`, `tt-budget-no-ai`, `tt-governance-add-it`, `tt-senior-review-confirm`, `tt-ai-help-limit`, `tt-download-docx`, `tt-delete-account`)
+- **When** the tooltip appears
+- **Then** it shows relevant, accurate guidance for that specific field or action, with no X or other dismiss control anywhere on it
+- **And** reloading the page, or signing out and back in, never changes whether the tooltip appears — there is no per-user "already seen" state to persist
+- **And** for `tt-ai-help-limit` and `tt-download-docx` specifically, clicking the wrapped button while its tooltip is showing still performs the button's real action (the AI refine request fires; the download starts)
+
+---
+
+**AC-FR-49-03 — "Ready to assemble" tooltip shows only while the button is genuinely disabled**
+
+- **Given** I am on Step 4 with at least one question not yet approved, so the "Ready to assemble" button is disabled
+- **When** I hover or tab to that button
+- **Then** a tooltip explains what is still required before I can proceed, and inspecting the element confirms there is no native `title` attribute duplicating the same message
+- **And** once every question is approved and the button becomes enabled, the tooltip no longer appears on hover or focus
+
+---
+
+**AC-FR-49-04 — Register page password hint is a permanent static hint, not a tooltip**
+
+- **Given** I am on the Register page
+- **When** I view the password field
+- **Then** I see the requirements hint ("At least 12 characters, including letters and numbers") displayed permanently below the field, with no hover or focus needed to reveal it
+- **And** there is no separate hover/focus-triggered tooltip duplicating the same text — this was a deliberate scope exclusion (`tt-register-password` was never built), not an oversight
+
+---
+
+**AC-FR-49-05 — Every tooltip trigger is reachable and operable by keyboard alone**
+
+- **Given** I navigate the application using only Tab/Shift+Tab, no mouse
+- **When** I tab through any page carrying a contextual tooltip
+- **Then** every trigger element receives visible focus and its tooltip content appears, including triggers wrapping non-interactive elements (`tt-budget-no-ai`, `tt-guidelines-choice`, `tt-summary-review`) which gained an explicit `tabIndex` and focus-visible ring for this reason (`GAP-38`, fixed 2026-07-25 — found via live keyboard-only testing; WCAG 2.1.1)
+
+---
+
+---
+
+_Last updated: 2026-07-25 — added Section 9.12 in full (FR-49, `PDR-UI-008`), five new acceptance criteria (AC-FR-49-01 to 05) covering the help centre link and all 9 built contextual tooltips, written after live testing completed (`help-and-tooltips-test-plan.md` v2.0) rather than at build time, so the criteria reflect the final simplified (no-persistence) behaviour rather than the reversed v1 design._
 _Last updated: 2026-07-17_
 _2026-07-17 second addendum: new AC-FR-37-03A added — export date fixed to one timestamp per application (`applications.first_exported_at`), not one per request._
 _2026-07-17 addendum: new AC-FR-30-03B added — `PDR-AI-009`'s AI-refine relevance-check consistency fix._
