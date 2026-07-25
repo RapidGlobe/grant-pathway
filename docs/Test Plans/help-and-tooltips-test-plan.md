@@ -45,13 +45,13 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 ## Test Results Summary
 
-| Test ID | Test Name                                                             | Result | Notes                                                                           |
-| ------- | --------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
-| HT-01   | Help centre links — presence, target, new-tab behaviour               | Pass   |                                                                                 |
-| HT-02   | All tooltips — show on hover/focus, no dismiss control, never persist |        | Rewritten 2026-07-25 for the simplified (no-persistence) design; not yet re-run |
-| HT-03   | Hover-disabled tooltip — shows only while disabled                    |        |                                                                                 |
-| HT-04   | Non-persisted password hint — always shown, not a dismiss bug         |        |                                                                                 |
-| HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           |        |                                                                                 |
+| Test ID | Test Name                                                             | Result        | Notes                                                                                                                                            |
+| ------- | --------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| HT-01   | Help centre links — presence, target, new-tab behaviour               | Pass          |                                                                                                                                                  |
+| HT-02   | All tooltips — show on hover/focus, no dismiss control, never persist | Pass (caveat) | Core behaviour confirmed on all 9; `GAP-36` (`tt-charity-lookup` flash) and `GAP-37` (`tt-summary-review` wrong copy) found, not yet fixed       |
+| HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass          |                                                                                                                                                  |
+| HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass          |                                                                                                                                                  |
+| HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Blocked       | Step 1 (axe-core) blocked — needs local `npm run dev`, not the deployed build. Step 2 (keyboard) found and fixed `GAP-38`. Steps 3-4 not yet run |
 
 ---
 
@@ -102,9 +102,9 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - Clicking `tt-ai-help-limit`'s or `tt-download-docx`'s wrapped button still performs the button's real action
 - Reloading, signing out/in, or using a different session never changes whether a tooltip shows
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Core behaviour (hover/focus show, no dismiss control, no persistence) confirmed across all 9 tooltips; marked pass with two open findings rather than fail, per WJ. `tt-charity-lookup` flashes open for ~2ms on first hover of the Charity Commission search input, then disappears, rather than staying open — logged as `GAP-36`, still open (needs live browser debugging). `tt-summary-review`'s copy ("if your charity doesn't match this funder's criteria, you'll see a message here explaining why") was factually wrong — logged as `GAP-37`, fixed same day alongside `GAP-38` below; copy now reads "This is an AI-generated summary of the funder's guidelines — check it looks right before continuing. You can regenerate it if anything looks off."
 
 ---
 
@@ -128,9 +128,9 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - No native `title` duplicate present
 - Tooltip stops appearing once the button is enabled
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Confirmed via dev tools — no `title` attribute on the tooltip-trigger span or the button itself.
 
 ---
 
@@ -150,7 +150,7 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 - Exactly one always-visible password-requirements hint, no duplicate tooltip layered on top, no dismiss control
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -175,9 +175,9 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - Every trigger fully reachable and its tooltip legible by keyboard alone
 - Screen reader announces tooltip content correctly
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☒ Blocked
 
-**Notes (record which screen reader was used and which tooltip(s) were sampled):**
+**Notes (record which screen reader was used and which tooltip(s) were sampled):** Step 1 (axe-core) blocked — WJ was testing against the deployed Vercel build, and `@axe-core/react` only runs when `NODE_ENV === 'development'` (stripped from production/preview builds entirely); needs a local `npm run dev` session to actually check, not yet done. Step 2 (keyboard-only) found a real bug: only `tt-ai-help-limit` (wraps a real `<button>`) was reachable via Tab on Step 4 — `tt-budget-no-ai`, `tt-guidelines-choice`, and `tt-summary-review` wrap plain non-interactive elements (`div`/`p`/`h1`) with no `tabIndex`, so keyboard users could never reach them at all (WCAG 2.1.1). Logged as `GAP-38`, fixed same day (`tabIndex={0}` + focus-visible ring added to all three). Steps 3-4 (focus order, screen reader pass) not yet run.
 
 ---
 

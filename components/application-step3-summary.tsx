@@ -422,8 +422,11 @@ export function ApplicationStep3Summary({
     <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
       <StepIndicator currentStep={3} />
 
-      <ContextualTooltip content="If your charity doesn't match this funder's criteria, you'll see a message here explaining why — you can update your profile or pick a different funder.">
-        <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
+      <ContextualTooltip content="This is an AI-generated summary of the funder's guidelines — check it looks right before continuing. You can regenerate it if anything looks off.">
+        <h1
+          tabIndex={0}
+          className="mb-1 rounded text-[24px] font-bold text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+        >
           Your funder guidelines — summary
         </h1>
       </ContextualTooltip>

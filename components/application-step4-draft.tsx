@@ -831,7 +831,10 @@ export function ApplicationStep4Draft({
               {q.isBudgetQuestion &&
                 (index === firstBudgetQuestionIndex ? (
                   <ContextualTooltip content="AI assistance isn't available here — financial figures are shown exactly as you enter them.">
-                    <div className="mb-3 flex items-start gap-2">
+                    <div
+                      tabIndex={0}
+                      className="mb-3 flex items-start gap-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                    >
                       <AlertTriangle
                         className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
                         aria-hidden="true"

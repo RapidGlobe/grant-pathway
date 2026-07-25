@@ -239,7 +239,10 @@ export function ApplicationStep2Form({
         )}
       </p>
       <ContextualTooltip content="For the best results, upload or paste just the section with the application questions — you can skip the funder's background information or T&Cs.">
-        <p className="mb-6 text-[15px] text-[#64748B]">
+        <p
+          tabIndex={0}
+          className="mb-6 rounded text-[15px] text-[#64748B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+        >
           Upload the funder&apos;s guidelines document, or paste the text directly below.
         </p>
       </ContextualTooltip>

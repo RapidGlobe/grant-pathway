@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-25 — Three tooltips unreachable by keyboard, fixed (`GAP-38`); wrong copy fixed (`GAP-37`)
+
+Live-testing HT-05's keyboard-only pass, WJ found only `tt-ai-help-limit` reachable via Tab/Shift+Tab on Step 4. Root cause: `tt-budget-no-ai` (Step 4 budget warning), `tt-guidelines-choice` (Step 2 intro), and `tt-summary-review` (Step 3 heading) each wrap a plain `<div>`/`<p>`/`<h1>` with no `tabIndex` — `ContextualTooltip`'s default path (`active` prop omitted) renders the child directly as the trigger with no focusable wrapper, so Base UI's hover/focus handling never gets a keyboard-reachable target for these three. A real WCAG 2.1.1 (Keyboard) failure, not test-data-dependent — the other 6 tooltips all wrap a real button/link/input and were unaffected. Fixed by adding `tabIndex={0}` plus the same `focus-visible` ring styling already used elsewhere in this codebase for non-button focusable elements (e.g. Step 2's upload dropzone).
+
+Bundled in the same pass: `tt-summary-review`'s copy (`GAP-37`, found earlier the same session) was rewritten while this exact line was already being touched — from a caveat that can never actually apply to what's on screen, to a description of what the screen is for: "This is an AI-generated summary of the funder's guidelines — check it looks right before continuing. You can regenerate it if anything looks off."
+
+`GAP-36` (`tt-charity-lookup`'s ~2ms open-then-close flash on hover) remains open — needs live browser debugging to root-cause, not fixable from a code read alone. `npm run type-check`, `lint`, and `test` (95 tests) all pass.
+
+---
+
 ## 2026-07-25 — Tooltip persistence reversed and simplified (`PDR-UI-008` v3.0)
 
 Continuing the same live-testing session that found the missing migration and built the "Reset tooltips" control (below), WJ stepped back and asked whether the whole persistence mechanism was actually adding value. Agreed: a missed migration, then needing a self-service reset control just to bring a dismissed tooltip back, was a lot of engineering and testing surface — a new table, RLS policies, grants to two roles, 5 trigger variants, dismiss/reset Server Actions — for a pre-launch product with no real users yet to have earned that complexity, versus a plain hover/focus tooltip with no memory (the pattern `tt-delete-account` already used).
