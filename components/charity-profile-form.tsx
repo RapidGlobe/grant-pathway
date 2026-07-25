@@ -161,7 +161,11 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         </p>
         <div className="flex gap-2">
           <ContextualTooltip content="Search by name or registration number — most UK charities are found automatically from the Charity Commission database.">
-            <Input
+            {/* TEMPORARY DIAGNOSTIC (GAP-36) -- plain native <input>, not the
+                Input component, to test whether Base UI's InputPrimitive
+                specifically is what breaks this tooltip. Revert to <Input>
+                once this is confirmed either way. */}
+            <input
               id="charity-lookup"
               type="text"
               placeholder="Search by charity name or registration number"
@@ -169,7 +173,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
               onChange={(e) => setLookupQuery(e.target.value)}
               onKeyDown={handleLookupKeyDown}
               aria-label="Search by charity name or registration number"
-              className="h-10 flex-1 text-[14px]"
+              className="h-10 w-full min-w-0 flex-1 rounded-lg border border-input bg-transparent px-2.5 py-1 text-[14px] outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50"
               disabled={isLookingUp}
             />
           </ContextualTooltip>
