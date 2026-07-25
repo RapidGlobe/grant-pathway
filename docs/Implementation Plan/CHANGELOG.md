@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-25 — `tt-charity-lookup` flash bug (`GAP-36`): fix attempted, pending confirmation
+
+Live-debugging with WJ ruled out two leading theories one at a time: browser-extension interference (reproduced in Incognito across Chrome, Perplexity Comet, and Edge — all extensions off) and a mouse-only cause (also flashes when the field is reached via Tab, not just hover). This left `type="search"` as the standout difference — it's the only one of the 9 tooltips built on a native search input; the other 3 tooltips wrapping Base UI's own `Button` component (also `@base-ui/react/button` under the hood) are unaffected, so "wraps a Base UI primitive" isn't the differentiator, but "is a search input specifically" still is.
+
+Changed `type="search"` to `type="text"` on the Charity Commission lookup field (`charity-profile-form.tsx`) — the field never used any native search behaviour (Enter is handled manually via `handleLookupKeyDown`, no `<form>` submit binding), so this is a safe, functionally-equivalent change either way. Not yet confirmed as the actual fix — logged in `ADR-TRACEABILITY.md`'s `GAP-36` row as "fix attempted, not yet confirmed" pending WJ's live re-test. `npm run type-check`, `lint`, and `test` (95 tests) all pass.
+
+---
+
 ## 2026-07-25 — Three tooltips unreachable by keyboard, fixed (`GAP-38`); wrong copy fixed (`GAP-37`)
 
 Live-testing HT-05's keyboard-only pass, WJ found only `tt-ai-help-limit` reachable via Tab/Shift+Tab on Step 4. Root cause: `tt-budget-no-ai` (Step 4 budget warning), `tt-guidelines-choice` (Step 2 intro), and `tt-summary-review` (Step 3 heading) each wrap a plain `<div>`/`<p>`/`<h1>` with no `tabIndex` — `ContextualTooltip`'s default path (`active` prop omitted) renders the child directly as the trigger with no focusable wrapper, so Base UI's hover/focus handling never gets a keyboard-reachable target for these three. A real WCAG 2.1.1 (Keyboard) failure, not test-data-dependent — the other 6 tooltips all wrap a real button/link/input and were unaffected. Fixed by adding `tabIndex={0}` plus the same `focus-visible` ring styling already used elsewhere in this codebase for non-button focusable elements (e.g. Step 2's upload dropzone).

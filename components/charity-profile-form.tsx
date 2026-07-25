@@ -163,7 +163,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
           <ContextualTooltip content="Search by name or registration number — most UK charities are found automatically from the Charity Commission database.">
             <Input
               id="charity-lookup"
-              type="search"
+              type="text"
               placeholder="Search by charity name or registration number"
               value={lookupQuery}
               onChange={(e) => setLookupQuery(e.target.value)}
