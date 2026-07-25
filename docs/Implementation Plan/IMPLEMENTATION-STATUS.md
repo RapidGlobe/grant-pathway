@@ -6,7 +6,9 @@
 
 **Phases 0–5 and Phase 6 task P6.1 are complete and archived in [IMPLEMENTATION-STATUS-ARCHIVE.md](IMPLEMENTATION-STATUS-ARCHIVE.md). This file tracks Phase 6 (P6.2a onward) and all future work.**
 
-**Last updated:** 2026-07-24 (Help centre base URL corrected — an updated handoff spec confirmed the real GitBook address, `https://rapidglobe.gitbook.io/grant-pathway`, replacing the placeholder used when `PDR-UI-008` was first built. Single-constant fix in `lib/help-centre.ts`; no other file changed. Type-check/lint/97 tests all pass. See `CHANGELOG.md` (2026-07-24) for full detail.)
+**Last updated:** 2026-07-25 (Dependabot PR #80's react-dom bump was failing every check — react-dom@19.2.8 needs peer react@^19.2.8, which the PR left at 19.2.7. Fixed directly on master by bumping both together, matching this repo's existing practice of fixing dependency issues via a direct commit rather than pushing onto a Dependabot branch. Also patched a newly-disclosed postcss advisory found mid-verification (override floor raised 8.5.10→8.5.18); a second newly-disclosed brace-expansion advisory was left as-is — it's dev-tooling-only and part of the same already-deferred ESLint 10 chain as PR #70. Type-check/lint/97 tests/build all pass. See `CHANGELOG.md` (2026-07-25) for full detail.)
+
+**Previously (2026-07-24):** Help centre base URL corrected — an updated handoff spec confirmed the real GitBook address, `https://rapidglobe.gitbook.io/grant-pathway`, replacing the placeholder used when `PDR-UI-008` was first built. Single-constant fix in `lib/help-centre.ts`; no other file changed. Type-check/lint/97 tests all pass. See `CHANGELOG.md` (2026-07-24) for full detail.
 
 **Previously (2026-07-24):** Help centre link + tooltips given their own test plan layer — `docs/Test Plans/help-and-tooltips-test-plan.md` new, 8 cases covering the help-centre link, all 5 tooltip trigger variants, cross-session persistence, and the `ADR-OPS-006` accessibility pass. Kept separate from the flagship/capability-matrix plans as a horizontal UI concern. `TEST-DASHBOARD.md` bumped to v2.1. Not yet executed. See `CHANGELOG.md` (2026-07-24) for full detail.
 

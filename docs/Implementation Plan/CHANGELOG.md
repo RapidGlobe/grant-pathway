@@ -10,6 +10,19 @@
 
 ---
 
+## 2026-07-25 — react/react-dom peer-dependency conflict fixed; new postcss advisory patched
+
+Dependabot PR #80 (`chore(deps): bump react-dom from 19.2.7 to 19.2.8`) failed every check — `react-dom@19.2.8` requires peer `react@^19.2.8`, but the PR only bumped `react-dom`, leaving `react` at `19.2.7`. `npm ci` failed immediately with an `ERESOLVE` conflict, taking `audit`, `lint-and-typecheck`, `test`, and the Vercel preview deployment down with it. `master` itself was never affected — confirmed via its own CI runs, all green. Fixed directly on `master` (not by pushing onto Dependabot's branch, which risks a force-push wiping any manual commit) by bumping both `react` and `react-dom` to `19.2.8` together; Dependabot is expected to auto-close #80 once it sees the target version already satisfied, as it has for prior PRs this week.
+
+While verifying, `npm install` surfaced 12 new high-severity findings absent from this morning's clean `audit` CI run on this same commit (`found 0 vulnerabilities` at 15:33 UTC) — confirming these are freshly-disclosed advisories, not caused by the react bump (the lockfile diff touched only `react`/`react-dom`). Investigated each:
+
+- **`postcss <=8.5.17`** (`GHSA-r28c-9q8g-f849`, path traversal via source-map auto-loading) — a same-major-version patch fix exists at `8.5.18`+. Raised the existing `postcss` override floor from `>=8.5.10` to `>=8.5.18`. Low risk, same playbook as the earlier `sharp`/`@hono/node-server` override fixes.
+- **`brace-expansion <=5.0.7`** (`GHSA-mh99-v99m-4gvg`, DoS via unbounded expansion) — reached only via `eslint`'s own dependency tree (`@eslint/config-array`, `@eslint/eslintrc`, `eslint-config-next`'s `eslint-plugin-import`). No patched release exists in the installed `1.1.x` line (`1.1.16` is the last one ever published) — the fix requires `brace-expansion` 2.x+, which requires `minimatch`'s own major bump, which requires `eslint` 10. This is the exact same chain already blocking PR #70 (`eslint-config-next` incompatibility) — WJ already confirmed waiting it out rather than forcing a workaround. Left as-is: dev-tooling only (build-time lint), never shipped to users, and forcing an override here risks actually breaking `eslint` (an ESM-only rewrite under a CJS `minimatch@3.1.5`'s `require`), unlike the safe same-major-version `postcss` bump above.
+
+`npm run type-check`, `lint`, `test` (97 tests), and `npm run build` all pass.
+
+---
+
 ## 2026-07-24 — Help centre base URL corrected to the real GitBook address
 
 WJ supplied an updated handoff spec (`grant-pathway-help-integration-spec_1.md`) confirming the actual GitBook help centre address: `https://rapidglobe.gitbook.io/grant-pathway`, not the placeholder `https://grantpathway.gitbook.io` used when `PDR-UI-008` was first built. Fixed the single source of truth, `lib/help-centre.ts`'s `DEFAULT_HELP_CENTRE_BASE_URL` — every help link (nav, footer, dashboard empty state) reads from this one constant, so no other file needed a change. Confirmed no test or doc hardcodes the old literal URL. Deep-linking (the spec's Part A table of per-page GitBook URLs) remains unbuilt, as already decided in `PDR-UI-008` — `helpCentreUrl(path)` already supports it as a one-line addition whenever that's wanted. `npm run type-check`, `lint`, and `test` (97 tests) all pass.
