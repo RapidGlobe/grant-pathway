@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Any change to the eligibility-mismatch prompt, the Step 3 mismatch UI, or `DR-EL-001`'s behaviour
 
-**Version:** 1.0
-**Date:** 2026-07-24
-**Status:** New plan under `DR-TEST-001` (capability-based test strategy). EL-01 and its corroborating precedents are already-passed reuse; EL-02 and EL-03 need live execution.
+**Version:** 1.1
+**Date:** 2026-07-27
+**Status:** New plan under `DR-TEST-001` (capability-based test strategy). EL-01 and its corroborating precedents are already-passed reuse; EL-02 completed (caveat — see Notes); EL-03 still needs live execution.
 **Tester:** WJ
 
 ---
@@ -54,11 +54,11 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 
 ## Test Results Summary
 
-| Test ID | Test Name                                               | Result | Notes                                                                       |
-| ------- | ------------------------------------------------------- | ------ | --------------------------------------------------------------------------- |
-| EL-01   | Positive match — no false mismatch on a genuine fit     |        | Reuses MKCF flagship's MKCF-04 result if run same session, or a fresh check |
-| EL-02   | Clear negative — hard stop on an unambiguous mismatch   |        |                                                                             |
-| EL-03   | Borderline — no over-trigger on a partial, adjacent fit |        |                                                                             |
+| Test ID | Test Name                                               | Result        | Notes                                                                                                |
+| ------- | ------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------- |
+| EL-01   | Positive match — no false mismatch on a genuine fit     |               | Reuses MKCF flagship's MKCF-04 result if run same session, or a fresh check                          |
+| EL-02   | Clear negative — hard stop on an unambiguous mismatch   | Pass (caveat) | Completed as a byproduct of AB Charitable Trust flagship testing, 2026-07-27 — see EL-02 Notes below |
+| EL-03   | Borderline — no over-trigger on a partial, adjacent fit |               |                                                                                                      |
 
 ---
 
@@ -112,9 +112,9 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 - Continue button hidden; only the acknowledge button available
 - Application status set to `mismatch`; dashboard shows the red "Ineligible" badge; no path to Step 4
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Completed 2026-07-27 as a byproduct, not a deliberate run of this test case: while live-testing the AB Charitable Trust flagship (v2.0, before its 2026-07-27 charity swap — see that plan's Document History), `grantpathway+ABC@gmail.com`'s Harry's Rainbow profile against A B Charitable Trust guidelines (grant name "General Grant 2026", not "Eligibility Check Test" — same funder/charity pairing, functionally equivalent) produced exactly this case's expected mismatch: a red card citing AB's actual four focus areas and describing Harry's Rainbow's real bereavement-support work, with an acknowledge-only button in place of Continue. Steps 1-5 confirmed. **Step 6 (dashboard "Ineligible" badge) not independently checked in that session** — worth a quick look next time the dashboard is viewed, otherwise treat as outstanding.
 
 ---
 
@@ -145,4 +145,5 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026-07-27 | Rapidglobe Ltd | EL-02 logged as completed (caveat): occurred as a byproduct of AB Charitable Trust flagship testing (its Harry's Rainbow charity, before that plan's charity swap to Asylum Justice the same day) rather than a deliberate run of this test case. Steps 1–5 confirmed; step 6 (dashboard "Ineligible" badge) not independently checked. `grantpathway+ABC@gmail.com` is now a dedicated fixture for this case, no longer incidentally shared with the flagship plan (which moved to a new account).             |
 | 1.0     | 2026-07-24 | Rapidglobe Ltd | New plan created under `DR-TEST-001`, replacing the per-funder manufactured-mismatch pattern. EL-01 reuses the MK Community Foundation flagship's positive result; EL-02 and EL-03 are new, not yet executed. Prior corroborating hard-stop passes (Idlewild IT-04, Lloyds IT-LBF-03, MKCF's former Elmbridge case) catalogued for reference rather than re-run. Escape-hatch verification (profile correction → successful reapplication) flagged as an open follow-on — never completed in any prior session. |
