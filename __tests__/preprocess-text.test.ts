@@ -181,6 +181,55 @@ describe('preprocessText — [ITEM N] fallback marker for headless pasted text (
   })
 })
 
+describe('preprocessText — soft line-wrap rejoining for pasted numbered questions (2026-07-27, MK Community Foundation regression)', () => {
+  // Word sometimes preserves visual line wraps as literal newlines when its
+  // text is copied to the clipboard. A long numbered application question
+  // wrapped this way used to be tagged as a [SECTION: ...] heading using
+  // only its first physical line, splitting the sentence mid-way and
+  // breaking citation-quote matching for the rest of it.
+  it('rejoins a numbered question that was soft-wrapped across two lines into one heading', () => {
+    const text = [
+      '4. How will you measure and record the impact of your project? (Reach & Impact)',
+      '5. How will you promote the project and ensure the project reaches the intended',
+      'beneficiaries? (Reach & Impact)',
+      '6. How will you continue to fund the project beyond this grant?',
+    ].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain(
+      '[SECTION: 5. How will you promote the project and ensure the project reaches the intended beneficiaries? (Reach & Impact)]',
+    )
+    expect(out).not.toMatch(/reaches the intended\]/)
+  })
+
+  it('does not merge a genuine new sentence following a short heading', () => {
+    const text = ['1. Eligibility', 'Who can apply.', '1.1 Referrals', 'Referral detail.'].join(
+      '\n',
+    )
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain('[SECTION: 1. Eligibility]')
+    expect(out).toContain('Who can apply.')
+    expect(out).not.toContain('Eligibility Who can apply')
+  })
+
+  it('does not merge a lowercase-starting bullet into the preceding line', () => {
+    const text = [
+      '1. Eligibility',
+      '• eligible organisations only',
+      '• registered charities preferred',
+    ].join('\n')
+
+    const { text: out } = preprocessText(text)
+
+    expect(out).toContain('• eligible organisations only')
+    expect(out).toContain('• registered charities preferred')
+    expect(out).not.toContain('eligible organisations only • registered charities preferred')
+  })
+})
+
 describe('preprocessText — form-aware truncation (2026-07-16, Clothworkers regression)', () => {
   function buildDoc({
     preambleLines,

@@ -79,10 +79,58 @@ function isBoilerplateHeading(line: string): boolean {
 function looksLikeHeading(line: string): boolean {
   const t = line.trim()
   if (STRUCTURAL_MARKER.test(t)) return true
-  if (!t || t.length > 100) return false
-  if (/^\d+(\.\d+)*\.?\s+\S/.test(t)) return true // "1. Title", "2.3 Section"
+  if (!t) return false
+  // Numbered headings get a longer cap than ALL CAPS ones below. A numbered
+  // application question is often a full sentence, not a short title — e.g.
+  // "9. How does the project ensure it is inclusive and reaches diverse
+  // communities in Milton Keynes?" (96 characters), or longer once
+  // dewrapSoftLineBreaks (below) has rejoined a soft-wrapped one. The
+  // numbered prefix itself is already a strong, low-false-positive signal,
+  // so a generous cap here doesn't risk misclassifying ordinary prose.
+  if (/^\d+(\.\d+)*\.?\s+\S/.test(t)) return t.length <= 300
+  if (t.length > 100) return false
   if (t === t.toUpperCase() && /[A-Z]/.test(t) && t.length > 3) return true // ALL CAPS
   return false
+}
+
+// Rejoins a sentence that was split across two physical lines by a soft
+// (visual) line wrap preserved as a literal newline when pasted — e.g. from
+// Word, which sometimes exports copied plain text one visual line at a time
+// rather than one paragraph at a time. Undetected, this splits a numbered
+// application question's own "heading" line mid-sentence: the closing `]`
+// of the resulting [SECTION: ...] marker lands inside the sentence, and any
+// citation "quote" spanning across it can never match the guidelines text
+// (found live-testing MK Community Foundation's pasted Oak Grants
+// questions, 2026-07-27 — longer numbered questions that happened to wrap
+// onto a second line lost their citation highlight, while shorter
+// single-line ones worked fine).
+//
+// Heuristic: merge a non-blank line into the previous non-blank line only
+// when it starts with a lowercase letter and isn't itself a new bullet. A
+// genuine new sentence, heading, or bullet reliably starts with a capital
+// letter or a bullet marker, so a lowercase start is strong evidence of a
+// sentence continuing mid-wrap rather than a new one beginning.
+// Deliberately conservative: a continuation that happens to start with a
+// capitalised word or acronym is left unmerged (no worse than the
+// pre-existing behaviour) rather than risk merging two genuinely separate
+// lines — e.g. this must not merge "Who can apply." into a preceding
+// "1. Eligibility" heading, since that's a real, separate sentence, not a
+// wrapped continuation of the heading itself.
+function dewrapSoftLineBreaks(lines: string[]): string[] {
+  const result: string[] = []
+  for (const raw of lines) {
+    const trimmed = raw.trim()
+    const prev = result.length > 0 ? result[result.length - 1] : null
+    const prevTrimmed = prev !== null ? prev.trim() : ''
+    const looksLikeContinuation = /^[a-z]/.test(trimmed) && !/^[•\-*o]\s/.test(trimmed)
+
+    if (trimmed !== '' && prev !== null && prevTrimmed !== '' && looksLikeContinuation) {
+      result[result.length - 1] = `${prev} ${trimmed}`
+    } else {
+      result.push(raw)
+    }
+  }
+  return result
 }
 
 function isPageNumber(line: string): boolean {
@@ -182,7 +230,7 @@ function numberedHeadingDepth(line: string): number | null {
 function tagPastedTextSections(text: string): string {
   if (hasAnyStructuralMarker(text)) return text
 
-  const lines = text.split('\n')
+  const lines = dewrapSoftLineBreaks(text.split('\n'))
   const sawHeading = lines.some((line) => looksLikeHeading(line.trim()))
 
   if (!sawHeading) {
