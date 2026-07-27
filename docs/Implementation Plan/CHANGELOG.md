@@ -10,6 +10,17 @@
 
 ---
 
+## 2026-07-27 — Guideline capability/shape matrix fully executed: GCM-01–05 all Pass
+
+WJ completed a full run of `guideline-capability-matrix-test-plan.md` (GCM-01 through GCM-05) in one session, closing out the last untested layer of `DR-TEST-001`'s restructured suite. The table-format budget-question fix (previous entry) was found and fixed mid-run, then live-verified. Two further findings were logged as observations rather than fixed tonight, per WJ's call:
+
+- **Non-deterministic eligibility verdict:** National Opera Studio against Idlewild Trust Arts failed the eligibility hard-stop on one run, then passed on an immediate retry with no profile changes. Not yet root-caused — worth investigating given `DR-EL-001`'s eligibility check is meant to be a reliable gate, not a coin flip on borderline cases.
+- **No aggregate word-limit indicator across split sections:** CPF Trust's guidance caps the whole application at 500 words, but the AI (correctly) split the single email into 3 topic sections rather than one undifferentiated block — reasonable, since the source lists 5 named required pieces of information rather than genuinely free-flowing prose. However none of the 3 resulting cards shows any word-limit badge, so nothing stops the applicant exceeding 500 words in total. Agreed fix: a live combined word counter shown across the linked cards (soft nudge, not a hard block) — deferred to a future session, not built tonight.
+
+GCM-04 (Clothworkers, large-document truncation) needed a different charity than the other three cases — National Opera Studio doesn't genuinely fit any of Clothworkers' 10 disadvantage/marginalisation programme areas (capital-projects-only funder) — so the archived `Clothworkers-Foundation-test-plan.md`'s Bridge Support MK fixture (young people facing economic disadvantage/homelessness, Milton Keynes) was reused on a fresh account, avoiding another one-per-account profile-overwrite mix-up. All 13 extracted questions were cross-checked directly against the source PDF's pages 21–24 — every citation, quote, and word limit matched exactly, doubling as a clean GCM-05 citation spot-check. `TEST-DASHBOARD.md` bumped to v2.7, this plan now 🟢.
+
+---
+
 ## 2026-07-27 — Project funding-amount question silently dropped on table-shaped guidelines (GCM-01), fixed
 
 Starting the guideline-capability-matrix-test-plan.md (GCM-01, multi-column table PDF shape), WJ tested Idlewild Trust's Arts application questions PDF against **National Opera Studio** — a genuine, unforced eligibility match for Idlewild's early-career-professional-development programme (Harry's Rainbow, used for this case in earlier sessions, was never a real match and has already failed AB Charitable Trust for the same underlying reason). Extraction otherwise looked clean (12 questions, correct character-limit typing), but Q24 — "State the total amount of funding you are requesting towards this project from Idlewild Trust" — was missing entirely from Step 4.

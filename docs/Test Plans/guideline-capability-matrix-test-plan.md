@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** A new guideline shape is encountered that isn't represented below, or the extraction/citation pipeline changes
 
-**Version:** 1.0
-**Date:** 2026-07-24
-**Status:** New plan under `DR-TEST-001` (capability-based test strategy). Not yet executed.
+**Version:** 1.1
+**Date:** 2026-07-27
+**Status:** Fully executed 2026-07-27 — GCM-01 through GCM-05 all Pass. One real defect found and fixed same session (GCM-01, table-format budget-question skip-list); two observations logged, not actioned tonight (GCM-03 aggregate word limit; a non-deterministic eligibility verdict found alongside GCM-01) — see Defect Log.
 **Tester:** WJ
 
 ---
@@ -40,13 +40,23 @@ Individual cases here may reuse a pre-seeded account rather than registering fre
 
 ## Test Results Summary
 
-| Test ID | Test Name                                      | Result | Notes |
-| ------- | ---------------------------------------------- | ------ | ----- |
-| GCM-01  | Multi-column table PDF — extraction robustness |        |       |
-| GCM-02  | Freeform narrative — no discrete questions     |        |       |
-| GCM-03  | Pasted-text-only as a first-class path         |        |       |
-| GCM-04  | Large document — truncation behaviour          |        |       |
-| GCM-05  | Citation coverage spot-check                   |        |       |
+| Test ID | Test Name                                      | Result        | Notes                                                                                                    |
+| ------- | ---------------------------------------------- | ------------- | -------------------------------------------------------------------------------------------------------- |
+| GCM-01  | Multi-column table PDF — extraction robustness | Pass (caveat) | Real defect found and fixed same session — see Defect Log #1. Charity: National Opera Studio             |
+| GCM-02  | Freeform narrative — no discrete questions     | Pass          | Charity: National Opera Studio (same account)                                                            |
+| GCM-03  | Pasted-text-only as a first-class path         | Pass (caveat) | Section-count expectation outdated (see case Notes); aggregate word-limit gap logged — see Defect Log #3 |
+| GCM-04  | Large document — truncation behaviour          | Pass          | New charity used (Bridge Support MK, per archived Clothworkers plan)                                     |
+| GCM-05  | Citation coverage spot-check                   | Pass          | Sampled from GCM-04 (5 citations, all correct)                                                           |
+
+---
+
+## Defect Log
+
+| ID  | Test   | Description                                                                                                                                                                                                                                                                                                                                                                                                                   | Severity | Status                                                 |
+| --- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------ |
+| 1   | GCM-01 | A project funding-amount question ("State the total amount of funding you are requesting...") was silently missing from Step 4. Root cause: `lib/prompts.ts`'s TABLE FORMAT rule (used for table-structured guidelines) had its own numeric-type skip-list with no budget-question exception, distinct from the general exclusion rule fixed earlier the same day for MK Community Foundation. See `CHANGELOG.md` 2026-07-27. | Medium   | Fixed and live-verified same session (12→13 questions) |
+| 2   | GCM-01 | Eligibility verdict was non-deterministic on identical input: National Opera Studio against Idlewild Trust Arts failed the eligibility check on one run, then passed on an immediate retry with no profile changes made. Not yet root-caused.                                                                                                                                                                                 | Medium   | Observation — not investigated tonight                 |
+| 3   | GCM-03 | CPF Trust's guidance states a 500-word limit across the whole application, but the AI split the application into 3 sections, none of which show a word-limit badge — the app has no way to represent or enforce a limit shared across multiple extracted sections. Option agreed: a live combined-word counter across the linked cards (soft nudge, no hard block).                                                           | Low      | Observation — fix agreed, deferred to a future session |
 
 ---
 
@@ -73,9 +83,9 @@ Individual cases here may reuse a pre-seeded account rather than registering fre
 - Question text is coherent and not merged across table columns
 - Character limits correctly typed as "characters," not "words"
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Tested against **National Opera Studio** — Harry's Rainbow (used for this case in earlier sessions) was never a genuine match for Idlewild Arts' early-career-professional-development remit and has already failed elsewhere (AB Charitable Trust) for the same reason. Character limits correctly typed throughout (e.g. 1600 characters on the project-description question). Found a real defect: Q24 ("State the total amount of funding you are requesting...") was missing entirely — root-caused to a table-format-specific skip-list gap, fixed and confirmed live (12→13 questions, Q24 present and budget-flagged). See Defect Log #1. Separately, the eligibility check gave a different verdict (fail, then pass) across two runs with an unchanged profile — see Defect Log #2, not investigated tonight.
 
 ---
 
@@ -98,9 +108,9 @@ Individual cases here may reuse a pre-seeded account rather than registering fre
 - Step 4 sections map sensibly onto the guidelines' actual headings
 - No fabricated section headings not present in the source document
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Same account/charity (National Opera Studio) as GCM-01. 10 sections identified, mapping sensibly onto Garfield Weston's published headings — no fabricated structure. Clean result.
 
 ---
 
@@ -118,15 +128,15 @@ Individual cases here may reuse a pre-seeded account rather than registering fre
 4. Continue to Step 4 and confirm the writing interface presents a **single narrative card** (matching CPF Trust's actual single-block email format), not multiple discrete question cards
 5. Confirm a 500-word limit badge is shown and the counter tracks correctly
 
-**Expected result:**
+**Expected result — superseded 2026-07-27, see Notes:**
 
 - Paste-only input produces a working AI summary with no file present at any point
-- Step 4 shows one narrative card, correctly reflecting the single-block email format
-- 500-word limit correctly extracted and displayed
+- ~~Step 4 shows one narrative card, correctly reflecting the single-block email format~~ — this assumption came from the archived plan's oversimplified characterisation, not the funder's actual guidance text; see Notes
+- 500-word limit correctly extracted and displayed — **gap found, see Defect Log #3**
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** CPF Trust's real guidance lists 5 named pieces of information the email must include, not a single free-flowing prompt — the AI correctly produced 3 sections reflecting that structure (merging charity name+description, keeping the core "how the grant would be used" narrative, and splitting out "grant amount requested" as its own budget-flagged section), correctly excluding contact details and the two attachment requirements. This is a better representation of the source than one undifferentiated card would be — the "single card" expectation above is now known to be based on an inaccurate assumption, not a real requirement, and is left struck through rather than deleted. However, none of the 3 cards shows the guidance's stated 500-word **total** limit — see Defect Log #3, fix agreed (a live combined counter) but deferred to a future session.
 
 ---
 
@@ -149,9 +159,9 @@ Individual cases here may reuse a pre-seeded account rather than registering fre
 - No question or section silently missing in a way consistent with mid-content truncation
 - If truncation does occur, it happens at a sensible boundary (not mid-sentence or mid-question), per the marker-aware truncation fix (P6.2a, 2026-07-14)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** National Opera Studio doesn't genuinely fit Clothworkers' 10 disadvantage/marginalisation programme areas (capital projects only), so a different charity was needed — used **Bridge Support MK** (young people facing economic disadvantage/homelessness risk, Milton Keynes) per the archived `Clothworkers-Foundation-test-plan.md`, matching Clothworkers' Young People Facing Disadvantage / Homelessness / Economic Disadvantage categories. The truncation warning appeared as expected (document is the largest in the corpus) and was marker-aware, per `ADR-AI-007`/P6.2a — it correctly located and prioritised the actual application form (pages 21–24) rather than cutting off mid-content. All 13 extracted questions cross-checked directly against the source PDF (pages 21–24): every citation, quote, and stated word limit matches exactly, no hallucinations found.
 
 ---
 
@@ -174,14 +184,15 @@ Individual cases here may reuse a pre-seeded account rather than registering fre
 - Highlighted passages plausibly support their attached claim
 - Any failure is logged as a defect with the exact question, funder document, and citation text
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record which citations were sampled and from which case):**
+**Notes (record which citations were sampled and from which case):** Sampled from GCM-04 (Clothworkers): 5 citations checked directly against the source PDF's pages 21–24 (annual expenditure, community description, org summary, lived-experience leadership, project description). All 5 opened with a correct highlight, on the correct page, supporting their attached question — no defects found.
 
 ---
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                               |
-| ------- | ---------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-07-24 | Rapidglobe Ltd | New plan created under `DR-TEST-001`, replacing per-funder full walkthroughs for shapes not already covered by the two flagship plans. Covers multi-column table PDF (Idlewild), freeform narrative (Garfield Weston), pasted-text-only (CPF Trust), large-document truncation (Clothworkers), and a citation-coverage spot-check. Not yet executed. |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026-07-27 | Rapidglobe Ltd | Full execution completed: GCM-01–05 all Pass. One real defect found and fixed same session (GCM-01 — a project funding-amount question dropped by a table-format-specific skip-list gap in `lib/prompts.ts`, distinct from the same-day MKCF fix). Two observations logged, not actioned tonight: a non-deterministic eligibility verdict on identical input (GCM-01), and a missing aggregate word-limit indicator when one funder limit spans multiple extracted sections (GCM-03) — fix agreed (live combined counter) but deferred. GCM-03's "single narrative card" expectation struck through as based on an inaccurate assumption from the archived plan, not the funder's real guidance text. See Defect Log and `CHANGELOG.md` 2026-07-27. |
+| 1.0     | 2026-07-24 | Rapidglobe Ltd | New plan created under `DR-TEST-001`, replacing per-funder full walkthroughs for shapes not already covered by the two flagship plans. Covers multi-column table PDF (Idlewild), freeform narrative (Garfield Weston), pasted-text-only (CPF Trust), large-document truncation (Clothworkers), and a citation-coverage spot-check. Not yet executed.                                                                                                                                                                                                                                                                                                                                                                                                |
