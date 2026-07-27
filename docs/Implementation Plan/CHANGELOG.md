@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-27 — Question-extraction gap found live-testing MKCF-06: project-budget questions and compound label+question lines were being dropped
+
+Live-testing the MK Community Foundation Oak Grants flagship (MKCF-06), WJ found the AI-extracted 15 questions but was missing "What is the total cost of your project?" and "Description of your project" (from a compound "Project Name & Description of your project:" line), even though the criteria PDF asks both.
+
+**Root cause:** `lib/prompts.ts`'s `buildSummaryPrompt()` question-extraction exclusion list read "number fields (income, expenditure, employee count, salary, grant amount)" with no distinction between the charity's own organisational figures (correctly excluded — captured by `governanceFacts` instead) and a project-specific budget/cost question, which the separate `is_budget_question` rule says should still be extracted as a narrative question. The model followed the exclusion list literally and dropped the project-cost question entirely instead of flagging it. The compound line was dropped in full because its leading "Project Name" label matched the data-entry exclusion pattern, taking the genuinely narrative "Description of your project" half down with it.
+
+**Fix:** scoped the exclusion to organisational income/expenditure/employee count/salary figures only, added an explicit rule that project budget/cost questions are never excluded (extract with `is_budget_question=true` even when short/numeric-looking), and added a rule to extract only the narrative portion of a compound label+question line rather than dropping the whole line. `npm run type-check` passes. Not yet independently verified against a live Bedrock call — WJ's retest of MKCF-06 is the outstanding verification step.
+
+Also found in the same session: the AB Charitable Trust flagship's Test Data charity ("Harry's Rainbow") doesn't actually align with any of AB's four eligible themes (access to justice/human rights/migrants/refugees/penal reform) despite the test data's framing — ABC-04 (intended as the positive/match case) triggered a genuine eligibility mismatch instead. The run was retained as a de facto completion of `EL-02` (the deliberately-mismatched case in `eligibility-check-test-plan.md`). `AB-Charitable-Trust-test-plan.md`'s Test Data needs a different charity before ABC-03/04 can be re-run as a true positive case — not yet actioned.
+
+**Why:** the exclusion list conflated two different concepts (organisational financial data-entry vs. project budget/cost questions) that the rest of the prompt and `acceptance-criteria.md` (AC-FR-45-03) already treat differently — budget questions are meant to still surface as narrative cards with disabled AI assist, not be silently discarded like true data-entry fields.
+
+---
+
 ## 2026-07-25 — `tt-charity-lookup` flash bug (`GAP-36`): root-caused and fixed
 
 Four hypotheses tested live and ruled out in earlier sessions today: browser-extension interference, `type="search"`'s native decoration, Base UI's `InputPrimitive` specifically, and a `side="top"` viewport-edge collision. WJ then tested a _second_ diagnostic tooltip on the same page (Charity name field) — it flashed too, ruling out "specific to the lookup input" and narrowing the cause to something page/component-wide.
