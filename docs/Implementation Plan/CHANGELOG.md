@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-27 — Project funding-amount question silently dropped on table-shaped guidelines (GCM-01), fixed
+
+Starting the guideline-capability-matrix-test-plan.md (GCM-01, multi-column table PDF shape), WJ tested Idlewild Trust's Arts application questions PDF against **National Opera Studio** — a genuine, unforced eligibility match for Idlewild's early-career-professional-development programme (Harry's Rainbow, used for this case in earlier sessions, was never a real match and has already failed AB Charitable Trust for the same underlying reason). Extraction otherwise looked clean (12 questions, correct character-limit typing), but Q24 — "State the total amount of funding you are requesting towards this project from Idlewild Trust" — was missing entirely from Step 4.
+
+**Root cause:** the earlier same-day fix for MK Community Foundation's dropped budget questions only touched `lib/prompts.ts`'s general prose-based exclusion wording. Table-structured guideline documents (like this one) are matched by a separate TABLE FORMAT rule with its own independent skip-list keyed on the source table's "Type of question" column ("Short numerical field", "Drop-down list", etc.) — it had no budget-question exception at all, so Q24 (typed "Short numerical field" in the source table) was skipped outright regardless of the general carve-out. A different code path than the MKCF bug, same underlying failure mode, only surfacing on a table-shaped document — exactly the gap `guideline-capability-matrix-test-plan.md`'s GCM-01 case exists to catch.
+
+**Fix:** added the same budget-question exception directly to the TABLE FORMAT skip-list in `lib/prompts.ts`. `tsc --noEmit`, `npm test` (98/98), and lint all pass. Not yet independently verified against a live Bedrock call — WJ's retest of GCM-01 is the outstanding step.
+
+---
+
 ## 2026-07-27 — AB Charitable Trust flagship: full clean execution completed, two factual test-plan errors corrected
 
 WJ ran the AB Charitable Trust flagship (v2.1/v2.2, Asylum Justice) end to end — ABC-01 through ABC-10 all Pass, one real defect found along the way (governance dropdown fix, previous entry).
