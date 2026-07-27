@@ -1,8 +1,8 @@
 # MK Community Foundation — Oak Grants Test Plan — Flagship
 
-**Version:** 2.0
-**Date:** 2026-07-24
-**Status:** Rewritten as one of two flagship end-to-end plans under `DR-TEST-001` (capability-based test strategy). Ready for a full clean execution against the current service. Superseded results from v1.5 not carried forward — see Document History.
+**Version:** 2.1
+**Date:** 2026-07-27
+**Status:** Fully executed 2026-07-27, both extraction paths. MKCF-01–09 Pass on upload path (19 questions after the question-extraction fix) and on paste path (16 questions; citation-highlight fix live-verified). See Document History for defects found and fixed during this run.
 **Tester:** WJ
 **Test account:** grantpathway+mkcf1@gmail.com
 
@@ -80,30 +80,32 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 | Q9  | How does the project ensure it is inclusive and reaches diverse communities in Milton Keynes?                                                                                          | None displayed (word counter only) | Yes      |
 | Q10 | Please expand on the steps taken to actively reach and engage with underserved and marginalised communities to ensure the project is accessible to all intended beneficiaries?         | None displayed (word counter only) | Yes      |
 
-**Re-confirm this table's accuracy during MKCF-06** — the question set has previously drifted (10→12 questions observed by WJ, refresh not yet run against this plan; treat the table above as last-known, not guaranteed current).
+**Superseded 2026-07-27:** the 10-question set above predates a real extraction bug (project-budget questions and compound label+question lines were silently dropped) fixed the same day — see Defect Log. Actual counts confirmed live post-fix: **19 questions on the upload path**, **16 questions on the paste path** (both include the extra project-budget and compound-line questions this table was missing; the two paths differ because the pasted document is a narrower source than the uploaded PDF, not a bug — see MKCF-03 notes). This table is retained as historical baseline only and is no longer being kept current question-by-question.
 
 ---
 
 ## Test Results Summary
 
-| Test ID | Test Name                                                               | AI Summary Time | Result | Notes |
-| ------- | ----------------------------------------------------------------------- | --------------- | ------ | ----- |
-| MKCF-01 | Account registration and charity profile                                | N/A             |        |       |
-| MKCF-02 | Application details — funder and grant name (free text)                 | N/A             |        |       |
-| MKCF-03 | Guidelines upload/paste and AI summary                                  |                 |        |       |
-| MKCF-04 | AI summary content accuracy — 20% match requirement, no mismatch        | N/A             |        |       |
-| MKCF-05 | Preparation checklist and start writing                                 | N/A             |        |       |
-| MKCF-06 | Narrative question extraction, word limits, and non-narrative filtering | N/A             |        |       |
-| MKCF-07 | Narrative answer writing, AI assist, and citation check                 | N/A             |        |       |
-| MKCF-08 | Answer approval and assembly                                            | N/A             |        |       |
-| MKCF-09 | Export; Word document verified; re-export warning                       | N/A             |        |       |
+| Test ID | Test Name                                                               | AI Summary Time | Result        | Notes                                                                                                                                                  |
+| ------- | ----------------------------------------------------------------------- | --------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MKCF-01 | Account registration and charity profile                                | N/A             | Pass          | Run on both upload and paste passes, same account                                                                                                      |
+| MKCF-02 | Application details — funder and grant name (free text)                 | N/A             | Pass          |                                                                                                                                                        |
+| MKCF-03 | Guidelines upload/paste and AI summary                                  | Not timed       | Pass          | Upload path: 15 questions, then 19 after the question-extraction fix. Paste-path retest: 16 questions                                                  |
+| MKCF-04 | AI summary content accuracy — 20% match requirement, no mismatch        | N/A             | Pass          |                                                                                                                                                        |
+| MKCF-05 | Preparation checklist and start writing                                 | N/A             | Pass          | Checklist item count tracked question count (9 items after fix, upload path; shorter on paste path — narrower source document)                         |
+| MKCF-06 | Narrative question extraction, word limits, and non-narrative filtering | N/A             | Pass (caveat) | See Defect Log — question-extraction bug and citation-highlight bug both found and fixed same session; citation fix live-verified on paste-path retest |
+| MKCF-07 | Narrative answer writing, AI assist, and citation check                 | N/A             | Pass          | Citations confirmed correct on both paths, incl. governance-fact citation and the previously-broken Q12/Q14/Q16/Q17 (paste path)                       |
+| MKCF-08 | Answer approval and assembly                                            | N/A             | Pass          |                                                                                                                                                        |
+| MKCF-09 | Export; Word document verified; re-export warning                       | N/A             | Pass          |                                                                                                                                                        |
 
 ---
 
 ## Defect Log
 
-| ID  | Test | Description | Severity | Status |
-| --- | ---- | ----------- | -------- | ------ |
+| ID  | Test    | Description                                                                                                                                                                                                                                                                                    | Severity | Status                                                 |
+| --- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------ |
+| 1   | MKCF-06 | Question extraction silently dropped project-budget questions and the narrative half of compound label+question lines — `lib/prompts.ts` exclusion list conflated organisational financial fields with project budget/cost questions. See `CHANGELOG.md` 2026-07-27.                           | Medium   | Fixed and live-verified (15→19 questions, upload path) |
+| 2   | MKCF-07 | Citation badge on 4 numbered narrative questions (Q12/Q14/Q16/Q17, paste path) navigated to the right heading but highlighted nothing — soft line-wrap from Word's clipboard export broke the `[SECTION: ...]` marker mid-sentence in `lib/preprocess-text.ts`. See `CHANGELOG.md` 2026-07-27. | Medium   | Fixed and live-verified (paste-path retest)            |
 
 ---
 
@@ -135,9 +137,9 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - Charity profile saves successfully; "Profile saved" confirmation screen shown
 - Dashboard shows the empty-state **Start your first application** button (fresh account, zero applications)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Same account reused for a second, fresh application to retest the paste path; registration/profile itself only exercised once.
 
 ---
 
@@ -159,7 +161,7 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - No "reuse a previous application" prompt (fresh account, no prior applications)
 - Application created and Step 2 displayed
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -182,9 +184,9 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - Summary reflects Milton Keynes geographic focus, grant range, and 20% match requirement
 - MK Minds Matter passes eligibility (no mismatch warning)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record input method used — PDF or paste):**
+**Notes (record input method used — PDF or paste):** Both methods run: PDF upload first (15 questions, then 19 after the same-day question-extraction fix), then paste (`MKCF Oak copy and paste Application Questions.docx` content pasted directly) on a fresh application — 16 questions. MK Minds Matter passed eligibility on both.
 
 ---
 
@@ -208,9 +210,9 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - 20% match requirement present and clearly stated
 - _(Spot-check only for hallucinated conditions, per `DR-AI-003` — not exhaustive verification, consistent with this suite's established testing limitation)_
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record where the 20% match requirement appeared in the summary):**
+**Notes (record where the 20% match requirement appeared in the summary):** Confirmed present in the Step 3 summary cards on both paths; no hallucinated conditions spotted in the spot-check.
 
 ---
 
@@ -229,9 +231,9 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - Preparation checklist displays correctly
 - Step 4 loads with writing cards
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Checklist item count tracks question count — 9 items after the extraction fix on the upload path; shorter on the paste path since the pasted document is a narrower source (no supporting-documents content), not a defect.
 
 ---
 
@@ -252,9 +254,9 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - No dedicated match-funding question (expected absent — folded into Q6 instead, tested in MKCF-07)
 - No data-entry, dropdown, or administrative fields appearing as writing cards
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (update Expected Narrative Questions table with actual observed values; flag if the count has moved from 10):**
+**Notes (update Expected Narrative Questions table with actual observed values; flag if the count has moved from 10):** Count had moved well past 10 — see Defect Log #1. Root cause was a real extraction bug (project-budget questions and compound label+question lines silently dropped), not further drift; fixed same session, confirmed 19 questions on the upload path and 16 on the paste path, both genuine against source. Expected Narrative Questions table above marked superseded rather than rewritten line-by-line, since it's no longer being kept current per-question.
 
 ---
 
@@ -279,9 +281,9 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - If present, a citation click opens the guidelines viewer with the passage highlighted
 - Q6 answer covers both sustainability and the 20% match reference; AI assist available (not flagged as budget)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Citation checking went well beyond one question — WJ checked citations question-by-question through the full paste-path set. Found citation highlight missing on 4 numbered questions (Q12/Q14/Q16/Q17) — see Defect Log #2; fixed same session and confirmed working via a fresh Step 3 regeneration and re-check. A governance-fact (Reserves) citation was independently confirmed correct on both paths. AI assist confirmed to correct spelling/grammar without inventing facts.
 
 ---
 
@@ -303,7 +305,7 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - Assembly completes correctly
 - Step 5 displays correct funder and grant name
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -328,7 +330,7 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 - Re-export warning shows the prior timestamp on both subsequent downloads
 - Plain text download works
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -339,4 +341,5 @@ Obtain the MKCF Oak Grants criteria and portal questions and save to `docs/Grant
 | Version | Date                     | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ------- | ------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 1.0–1.5 | 2026-06-17 to 2026-07-04 | Rapidglobe Ltd | Full history archived — see prior version in git history. Summary: initial two-account plan (Elmbridge Families Together mismatch + MK Minds Matter happy path), 13 test cases; corrections for auto-confirming email verification (D-012), merged approve+download export flow (D-WF-04), empty-state dashboard button; clean full retest 2026-07-04, all 13 cases passed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 2.1     | 2026-07-27               | Rapidglobe Ltd | Full clean execution completed, both extraction paths: MKCF-01–09 all Pass. MKCF-06 surfaced a real question-extraction bug (project-budget questions and compound label+question lines silently dropped) and MKCF-07 surfaced a real citation-highlight bug (soft-wrapped numbered questions in pasted guidelines) — both root-caused, fixed, and live-verified same session; see Defect Log and `CHANGELOG.md` 2026-07-27. Question counts confirmed: 19 (upload path), 16 (paste path) — the old 10-question Expected Narrative Questions table marked superseded rather than rewritten line-by-line.                                                                                                                                                                                                                                                                                                                                                                               |
 | 2.0     | 2026-07-24               | Rapidglobe Ltd | **Rewritten as a flagship plan under `DR-TEST-001`.** Removed the Elmbridge Families Together account and its three test cases (IT-MKCF-01–03) — the geographic-mismatch case now lives in `eligibility-check-test-plan.md` (EL-02), reusing the already-passed 2026-07-04 result rather than re-running it here. Step 1 rewritten from the removed funder picker to the current free-text fields (`DR-FD-001` v1.4). Registration step gained the missing "Profile saved" confirmation screen and feedback-consent checkbox; password requirement corrected to 12+ characters with letters and numbers. Merged old IT-MKCF-10 (non-narrative handling) into IT-MKCF-09, resolving the open "not actioned" TODO logged in v1.4. Added a citation-check step to the writing/AI-assist case. Renumbered IT-MKCF-04–13 to MKCF-01–09 (13 cases reduced to 9). Flagged the previously-noted 10→12 question drift as unconfirmed against this rewritten plan, to be re-verified at MKCF-06. |

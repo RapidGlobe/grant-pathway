@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-27 — MK Community Foundation flagship: paste-path retest completed, citation fix live-verified
+
+WJ ran a full fresh paste-path pass of the MK Community Foundation Oak Grants flagship (`MKCF Oak copy and paste Application Questions.docx` pasted directly rather than uploaded), to confirm the same-day question-extraction fix and citation fix both hold under the paste path specifically. Result: 16 application questions extracted (15 narrative + 1 governance fact), Step 3 summary content confirmed accurate against the source, and — the specific point of this retest — the previously-broken citations on the numbered questions corresponding to Q12/Q14/Q16/Q17 now open the guidelines viewer **with the correct passage highlighted**, resolving the `dewrapSoftLineBreaks()` fix's outstanding live-verification step from earlier the same day. MKCF-01 through MKCF-09 all passed on this run with no other issues reported.
+
+One observation, not a defect: a criteria-section bullet ("There is a need for this project to be supported by grant funding...") that was cited as the source for a governance fact on the earlier upload-path run wasn't the quote chosen this time — expected run-to-run variance in which applicable passage the model selects to cite, not a regression, since that bullet sits under an eligibility/criteria heading rather than being a numbered application question.
+
+This closes out live verification for both defects fixed earlier today (question-extraction gap, citation highlight loss) — see the two entries immediately below for root cause and fix detail.
+
+---
+
 ## 2026-07-27 — Citation highlight missing on soft-wrapped numbered questions in pasted guidelines, root-caused and fixed
 
 Continuing the same MK Community Foundation retest (paste path this time, `MKCF Oak copy and paste Application Questions.docx`), WJ found citation badges on several numbered narrative questions (Q5, Q7, Q9, Q10 in the source document — items 12, 14, 16, 17 on Step 4) correctly navigated to the right heading in the "view original guidelines" panel but highlighted nothing. Shorter numbered questions and a governance fact citation on the same document worked correctly, ruling out a general citation regression.
