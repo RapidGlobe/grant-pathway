@@ -459,10 +459,21 @@ export function ApplicationStep4Draft({
   // ── Approve answer (FR-33) ────────────────────────────────────────────────
 
   async function handleApprove(answerId: string) {
+    // A governance dropdown can be approved without ever firing onChange (its
+    // default is now shown, and approvable, as "Not sure yet" — see isEmpty
+    // above) — so an untouched one has no dirty text to flush. Persist the
+    // real value it's displaying rather than leaving answer_text null while
+    // is_approved flips true.
+    const question = questions.find((q) => q.id === answerId)
+    const rawText = latestAnswers.current[answerId] ?? ''
+    const textToSave =
+      question?.itemType === 'data' && rawText.trim() === '' ? 'Not sure yet' : rawText
+
     // Flush any unsaved text first so the approved answer matches what's stored
-    if (dirtyRef.current.has(answerId)) {
+    if (dirtyRef.current.has(answerId) || textToSave !== rawText) {
       dirtyRef.current.delete(answerId)
-      await doSave(answerId, latestAnswers.current[answerId] ?? '')
+      if (textToSave !== rawText) setAnswers((prev) => ({ ...prev, [answerId]: textToSave }))
+      await doSave(answerId, textToSave)
     }
     setApprovingId(answerId)
     setApproveErrors((prev) => ({ ...prev, [answerId]: '' }))
@@ -738,7 +749,14 @@ export function ApplicationStep4Draft({
           const isOver = limit != null && count > limit
           const isNear = limit != null && !isOver && count > limit * 0.9
           const refineState = refineStates[q.id] ?? ({ status: 'idle' } as RefineState)
-          const isEmpty = text.trim() === ''
+          // A governance "data" item is a Yes/No/Not sure yet select — it
+          // always has an effectively selected option (there is no blank
+          // placeholder), so "Not sure yet" is a real, always-present answer,
+          // not an unanswered state. Treating it as isEmpty hid the approve
+          // panel entirely for a manually-added item left at its default,
+          // with no way to remove the item to escape it (found live-testing
+          // AB Charitable Trust, 2026-07-27).
+          const isEmpty = q.itemType === 'data' ? false : text.trim() === ''
 
           // PDR-AI-006: LLMs can't reliably hit an exact word/character count
           // when compressing — surface this only when the AI's own suggestion
@@ -897,13 +915,20 @@ export function ApplicationStep4Draft({
               {isGovernanceItem && q.itemType === 'data' && (
                 <select
                   id={`answer-${q.id}`}
-                  value={text}
+                  // "Not sure yet" is given its own real value (not "") so it's
+                  // distinguishable from a genuinely untouched field — an empty
+                  // string collapsed both cases together, hiding the approve
+                  // panel for a manually-added item until the user picked a
+                  // *different* option (found live-testing AB Charitable
+                  // Trust, 2026-07-27). The fallback below only covers display
+                  // for an item that's never been interacted with yet.
+                  value={text === '' ? 'Not sure yet' : text}
                   onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                   onBlur={() => handleAnswerBlur(q.id)}
                   aria-label={q.questionText}
                   className="h-10 w-full rounded-md border border-[#D1D5DB] bg-transparent px-3 text-[14px] sm:w-60"
                 >
-                  <option value="">Not sure yet</option>
+                  <option value="Not sure yet">Not sure yet</option>
                   <option value="No">No</option>
                   <option value="Yes">Yes</option>
                 </select>
