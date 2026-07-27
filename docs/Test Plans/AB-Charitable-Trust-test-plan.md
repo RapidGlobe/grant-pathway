@@ -1,8 +1,8 @@
 # A B Charitable Trust Test Plan — Flagship
 
-**Version:** 2.1
+**Version:** 2.2
 **Date:** 2026-07-27
-**Status:** Charity swapped to a genuine positive match (see Document History) — needs a full clean execution under the new Test Data; no results carried forward from v2.0.
+**Status:** Fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
 **Tester:** WJ
 **Test account:** grantpathway+ABC2@gmail.com
 
@@ -18,7 +18,7 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 **Charity swapped again, 2026-07-27:** v2.0's replacement charity ("plausible alignment" wording layered onto Harry's Rainbow) was live-tested and still triggered a genuine eligibility mismatch — the AI's rejection reasoning centred on "emotional support, mentoring, and recreational activities for bereaved children," ignoring the added access-to-justice framing, because the charity's real underlying nature was still bereavement support. Rather than attempt a third wording tweak on the same charity, this plan now uses **Asylum Justice** (real charity, number 1112026) — its actual, genuine charitable objects are to provide legal advice, assistance, and representation to asylum seekers and refugees, which is an unambiguous, unforced match against two of AB's four funded categories (Access to Justice; Migrants and Refugees). No invented "plausible alignment" narrative is needed — the profile fields below use the charity's real stated purpose. Since a charity profile is one-per-account (`docs/data-model.md` §2), this required a new test account (`grantpathway+ABC2@gmail.com`) rather than reusing `grantpathway+ABC@gmail.com`, which stays reserved for EL-02's Harry's Rainbow fixture.
 
-**Application window:** Next deadline **31 July 2026** — decisions expected October 2026. Applications are currently open.
+**Application window:** the guidelines document states no fixed deadline or decision date at all — applications appear to be accepted on a rolling basis. Do not expect the AI summary to mention a specific date; there isn't one to extract. (An earlier version of this plan incorrectly asserted a "31 July 2026" deadline that doesn't appear anywhere in the source guidelines — corrected 2026-07-27, see Document History.)
 
 **Coverage principle:** As one of the two flagship plans, every test here covers the complete end-to-end flow. No step is omitted on the assumption it was tested previously. See `AGENTS.md` — mandatory test plan coverage rule.
 
@@ -37,9 +37,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 | Who does your charity help   | Asylum seekers and refugees navigating the UK asylum and immigration system who cannot access legal advice through mainstream routes                                                                                                                                                                                                                                                                                                |
 | Where do you work            | Cardiff, Swansea, and Newport, with a national remit                                                                                                                                                                                                                                                                                                                                                                                |
 | Funder                       | A B Charitable Trust                                                                                                                                                                                                                                                                                                                                                                                                                |
-| Grant range                  | £10k–£40k/yr                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Grant range                  | £10k–£30k/yr (Open Programme, per the guidelines document — corrected 2026-07-27, was previously wrongly recorded as £10k–£40k/yr)                                                                                                                                                                                                                                                                                                  |
 | Application type             | Single stage                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Application deadline         | 31 July 2026                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Guidelines file              | AB Charitable Trust application questions PDF (from `docs/Grant Org Guidelines/`)                                                                                                                                                                                                                                                                                                                                                   |
 | Guidelines input method      | PDF upload (primary); paste text (fallback if extraction fails)                                                                                                                                                                                                                                                                                                                                                                     |
 
@@ -47,28 +46,26 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 ## Test Results Summary
 
-Complete after running all tests.
-
-| Test ID | Test Name                                                        | AI Summary Time | Result | Notes |
-| ------- | ---------------------------------------------------------------- | --------------- | ------ | ----- |
-| ABC-01  | Account registration and charity profile                         | N/A             |        |       |
-| ABC-02  | Application details — funder and grant name (free text)          | N/A             |        |       |
-| ABC-03  | PDF upload and AI summary                                        |                 |        |       |
-| ABC-04  | AI summary accuracy and eligibility (positive check)             | N/A             |        |       |
-| ABC-05  | Preparation checklist and start writing                          | N/A             |        |       |
-| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | N/A             |        |       |
-| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | N/A             |        |       |
-| ABC-08  | Narrative answer writing, AI assist, and citation check          | N/A             |        |       |
-| ABC-09  | Answer approval and assembly                                     | N/A             |        |       |
-| ABC-10  | Word document export; Word document verified; re-export warning  | N/A             |        |       |
+| Test ID | Test Name                                                        | AI Summary Time | Result        | Notes                                                                                                                                |
+| ------- | ---------------------------------------------------------------- | --------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ABC-01  | Account registration and charity profile                         | N/A             | Pass          | Redone on `grantpathway+ABC2@gmail.com` after an initial run mistakenly reused `+ABC1@gmail.com` (EL-02's reserved fixture account)  |
+| ABC-02  | Application details — funder and grant name (free text)          | N/A             | Pass          |                                                                                                                                      |
+| ABC-03  | PDF upload and AI summary                                        | Not timed       | Pass          |                                                                                                                                      |
+| ABC-04  | AI summary content accuracy                                      | N/A             | Pass          | Grant range and deadline claims in this plan corrected 2026-07-27 (see Document History)                                             |
+| ABC-05  | Preparation checklist and start writing                          | N/A             | Pass          |                                                                                                                                      |
+| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | N/A             | Pass          | 4 items total (governance fact + B3 + B4 + C11) — B3 briefly thought missing, confirmed present on inspection of the guidelines text |
+| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | N/A             | Pass          |                                                                                                                                      |
+| ABC-08  | Narrative answer writing, AI assist, and citation check          | N/A             | Pass (caveat) | See Defect Log — manually-added governance dropdown stuck at "Not sure yet"; found, fixed, and retested same session                 |
+| ABC-09  | Answer approval and assembly                                     | N/A             | Pass          |                                                                                                                                      |
+| ABC-10  | Word document export; Word document verified; re-export warning  | N/A             | Pass          |                                                                                                                                      |
 
 ---
 
 ## Defect Log
 
-| ID  | Test | Description | Severity | Status |
-| --- | ---- | ----------- | -------- | ------ |
-|     |      |             |          |        |
+| ID  | Test   | Description                                                                                                                                                                                                                                                                                                                                                      | Severity | Status                                          |
+| --- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| 1   | ABC-08 | Manually-added governance dropdown ("Are any bank signatories related...") showed no approve panel at all when left at its default "Not sure yet" — stored as an empty string, indistinguishable from untouched, with no way to remove the item. Switching to Yes/No worked around it but "Not sure yet" itself was unapprovable. See `CHANGELOG.md` 2026-07-27. | Medium   | Fixed and live-verified (retested same session) |
 
 ---
 
@@ -108,9 +105,9 @@ Complete after running all tests.
 - Profile saves successfully; "Profile saved" confirmation screen shown with **Go to my dashboard** button
 - Dashboard shows the empty-state **Start your first application** button (zero applications on this fresh account)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Initial run mistakenly reused `grantpathway+ABC1@gmail.com` (reserved for `eligibility-check-test-plan.md` EL-02) and reset its charity profile — caught before proceeding past ABC-02, redone cleanly on `+ABC2@gmail.com`.
 
 ---
 
@@ -132,7 +129,7 @@ Complete after running all tests.
 - No "reuse a previous application" prompt appears (this is a fresh account's first application — that prompt only appears when a prior application to a name-matching funder already exists, per P6.5)
 - Application created and Step 2 (Upload the Funder's Guidelines) displayed
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -150,14 +147,6 @@ Complete after running all tests.
 4. On Step 3, start a stopwatch — AI summary auto-generates on page load
 5. Stop when summary cards appear — record the time in the results table above (guide states this usually takes up to 45 seconds)
 
-**Do not click Continue yet** — ABC-04's content/eligibility review needs the AI summary visible on Step 3. Continuing to Step 4 happens in ABC-05.
-
-**If PDF extraction fails (no questions shown after continuing in ABC-05):**
-
-- Return to Step 2 using the **Back** button
-- Click the **Paste text** tab and paste the narrative questions directly from the AB Charitable Trust document instead
-- Regenerate the summary and proceed
-
 **Expected result:**
 
 - PDF uploads successfully (no format or size error)
@@ -165,42 +154,40 @@ Complete after running all tests.
 - Summary content covers AB Charitable Trust's focus areas, eligibility, and requirements
 - _(Known limitation: no filename indicator shown on Step 3 confirming which file was loaded — this is expected, not a defect)_
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
 ---
 
-### ABC-04 — AI Summary Accuracy and Eligibility (Positive Check)
+### ABC-04 — AI Summary Content Accuracy
 
 **Prerequisite:** ABC-03 complete (AI summary generated). Review this **before** continuing past Step 3 — the summary is no longer easily visible once you proceed to Step 4 (see ABC-05).
 
-**Background:** AB Charitable Trust funds organisations working in Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform. Asylum Justice's real, genuine charitable objects — legal advice, assistance, and representation for asylum seekers and refugees — fall squarely within Access to Justice and Migrants and Refugees, with no invented framing required, so the expected outcome is a **pass**, not a mismatch. The eligibility hard-stop mechanism itself, and a genuine mismatch case (Harry's Rainbow against this same funder), are covered once in `eligibility-check-test-plan.md` (EL-01/EL-02) rather than repeated here — see `DR-TEST-001`.
+**Background:** AB Charitable Trust funds organisations working in Access to Justice, Human Rights, Migrants and Refugees, and The Justice System and Penal Reform. Asylum Justice's real, genuine charitable objects — legal advice, assistance, and representation for asylum seekers and refugees — fall squarely within Access to Justice and Migrants and Refugees, with no invented framing required. This case is purely a content-accuracy check; eligibility matching itself (including a genuine mismatch case) is covered once in `eligibility-check-test-plan.md` rather than repeated here — see `DR-TEST-001`.
 
 **Steps:**
 
-1. Confirm no red eligibility-mismatch warning card appears at the top of Step 3
-2. Review each summary section is present and plausible:
+1. Review each summary section is present and plausible:
    - **About this grant** — describes AB Charitable Trust and its focus areas
-   - **Grant amount** — references the £10k–£40k/yr range or similar
+   - **Grant amount** — references the £10k–£30k/yr range or similar
    - **Who can apply** — UK registered charities, eligibility criteria
    - **What the funder is looking for** — funding priorities and themes
    - **Key requirements** — restrictions, deadlines, exclusions
    - _(Application sections is expected to be absent — that card only renders for `free_form`-classified funders; AB's numbered-list PDF is expected to classify as structured)_
-3. Check whether the application deadline (31 July 2026) is mentioned
+2. Confirm no fixed deadline is invented — the guidelines document doesn't state one, so none should appear in the summary
 
 **Expected result:**
 
-- No eligibility mismatch triggered; **Continue** button available (not replaced by an acknowledge-only button)
 - All applicable summary sections present and populated
-- Grant amount or range referenced correctly
-- At least one of deadline, exclusions, or key priorities accurately captured
+- Grant amount or range referenced correctly (£10k–£30k/yr)
+- No deadline is fabricated; exclusions and key priorities accurately captured
 - Summary is in plain English and comprehensible to a non-specialist user
 - _(As established in prior sessions — see `DR-AI-003` — "no hallucinated conditions" is a spot-check here, not exhaustive verification; this plan does not attempt to re-litigate that limitation)_
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Grant range confirmed as £10k–£30k/yr; no fabricated deadline appeared, consistent with the guidelines stating none.
 
 ---
 
@@ -219,7 +206,7 @@ Complete after running all tests.
 - Prep checklist screen confirmed before Q&A interface
 - Step 4 loads with writing cards
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -254,9 +241,9 @@ Complete after running all tests.
 - No data-entry, financial, dropdown, or standard file-upload questions shown
 - _(If more than 5 questions shown, investigate — log as defect if non-narrative fields included)_
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record exact questions shown):**
+**Notes (record exact questions shown):** 4 items shown: 1 governance fact (total annual expenditure, mapped from C3) plus B3, B4, and C11 — matches this table's expectation exactly. B3 was briefly thought missing since the app doesn't label cards with their original letter/number code, only running numbers; confirmed present by checking its question text against the source PDF. D5 correctly absent.
 
 ---
 
@@ -283,9 +270,9 @@ Complete after running all tests.
 - All counters show "words" not "characters"
 - _(If B4 shows "15 characters" instead of "15 words" — log as a defect)_
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record limit type and values seen):**
+**Notes (record limit type and values seen):** B4 showed "15 words" badge and counted in words throughout. A manual test of the AI-refine step on B3 showed a 2-word difference (56→58) between the written and AI-refined answer — expected per this case's own "AI can't always hit an exact count" allowance, not a defect (B3 has no stated limit to breach either way).
 
 ---
 
@@ -320,9 +307,9 @@ Complete after running all tests.
 - Answer is visually marked as approved after clicking Approve
 - No data loss when navigating to the next question
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Found a real defect — see Defect Log #1: a manually-added governance dropdown left at its default "Not sure yet" showed no approve panel at all, with no way to remove the item. Root-caused, fixed, and retested same session; confirmed working (both an explicit "Not sure yet" selection and an untouched-then-approved item now save and approve correctly). All other narrative citation checks passed.
 
 ---
 
@@ -348,7 +335,7 @@ Complete after running all tests.
 - Assembly completes correctly
 - Step 5 displays correct funder and grant name
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -384,7 +371,7 @@ Complete after running all tests.
 - Plain text download works
 - Document is clean, readable, and free of formatting artefacts
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
 
@@ -397,5 +384,6 @@ Complete after running all tests.
 | 1.0     | 2026-06-01 | Rapidglobe Ltd | Initial test plan — A B Charitable Trust, Harry's Rainbow test charity, 10 tests incorporating Idlewild lessons                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | 1.1     | 2026-07-04 | Rapidglobe Ltd | Fixed step-ordering defect: split Step 4 navigation out of ABC-03 into a new ABC-06, run after the AI-summary content/eligibility review. Old ABC-06–10 renumbered to ABC-07–11.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 1.2     | 2026-07-04 | Rapidglobe Ltd | Corrected against the service and `grant-pathway-user-guide-v1_15.docx` following live execution of ABC-01/ABC-02. ABC-10/ABC-11 rewritten to match the merged approve+download flow and senior review screen.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 2.2     | 2026-07-27 | Rapidglobe Ltd | Full clean execution completed under Asylum Justice: ABC-01–10 all Pass. Corrected two factual errors found live: grant range was wrongly recorded as £10k–£40k/yr (the guidelines document actually states £10,000–£30,000 pa for the Open Programme), and a fabricated "31 July 2026" deadline was removed from the Overview and Test Data — the guidelines state no fixed deadline at all, so ABC-04's Step 3 summary correctly didn't mention one. ABC-04 renamed from "AI Summary Accuracy and Eligibility (Positive Check)" to "AI Summary Content Accuracy" and all eligibility-specific steps/wording removed — eligibility matching is `eligibility-check-test-plan.md`'s concern, not this flagship's, per `DR-TEST-001`. ABC-03's redundant "do not click Continue yet" / PDF-extraction-fallback guidance removed (no longer needed). One real defect found and fixed same session: a manually-added governance dropdown left at its default "Not sure yet" showed no approve panel and had no way to be removed — see Defect Log and `CHANGELOG.md` 2026-07-27.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 2.1     | 2026-07-27 | Rapidglobe Ltd | **Charity swapped from Harry's Rainbow to Asylum Justice — genuine positive match, no invented framing.** Live-testing v2.0's "plausibly aligned" Harry's Rainbow wording against ABC-04 found it still triggered a real eligibility mismatch (the AI's reasoning centred on bereavement support, ignoring the added justice framing) — the accidental run was retained as a de facto `EL-02` completion in `eligibility-check-test-plan.md` rather than wasted. Replaced with Asylum Justice (real charity, number 1112026), whose actual charitable objects — legal advice/assistance/representation for asylum seekers and refugees — are an unambiguous, unforced match against AB's Access to Justice and Migrants and Refugees categories. Since `charity_profiles` is one-per-account (`docs/data-model.md` §2), this needed a new test account (`grantpathway+ABC2@gmail.com`); `grantpathway+ABC@gmail.com` stays reserved as `eligibility-check-test-plan.md` EL-02's Harry's Rainbow fixture, unaffected by this change. Test Data, ABC-01, ABC-04, and ABC-08 updated accordingly. No results carried forward — full re-execution needed under the new charity.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 2.0     | 2026-07-24 | Rapidglobe Ltd | **Rewritten as a flagship plan under `DR-TEST-001`.** Corrected against `grant-pathway-user-guide-v1.19.docx` and current code. Major changes: (1) Step 1 rewritten from the removed funder picker (search dropdown, "Structured" badge, "Request a Funder" link — removed `DR-FD-001` v1.4, 2026-07-15) to the current free-text fields. (2) ABC-01 gained the missing "Profile saved" confirmation screen step and the optional feedback-consent checkbox; password requirement corrected to 12+ characters with letters and numbers (the app's actual rule, per `register-form.tsx` — the user guide's "at least 10 characters" is a guide defect, not reflected here). (3) The old ABC-04 (eligibility mismatch) assumed mismatch was a soft, non-blocking observation — this was wrong since `DR-EL-001` (2026-06-02, predates this plan's v1.0), which made it a hard stop with no path to Step 4. That hard stop structurally conflicted with this plan's later export steps. Resolved per `DR-TEST-001`: this plan now uses a charity description with plausible eligibility alignment (positive case only); the genuine Harry's Rainbow/AB mismatch is retested properly in `eligibility-check-test-plan.md` (EL-02). (4) Retired the "Known Expected Behaviours" section — every row duplicated content already stated in the Overview, Test Data, or the relevant test case's own Background/Prerequisite; the one non-duplicated fact (prior processing history, formerly logged as D-011) is no longer load-bearing enough to keep. (5) Added a citation-check step to ABC-08 (new "Guidelines Citations" feature in the v1.19 guide, not covered in any prior version of this plan). Net: 11 test cases reduced to 10 (eligibility deep-dive moved out; old ABC-04/ABC-05 merged into one lighter positive check). |

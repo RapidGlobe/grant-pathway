@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-27 — AB Charitable Trust flagship: full clean execution completed, two factual test-plan errors corrected
+
+WJ ran the AB Charitable Trust flagship (v2.1/v2.2, Asylum Justice) end to end — ABC-01 through ABC-10 all Pass, one real defect found along the way (governance dropdown fix, previous entry).
+
+Two errors in the test plan itself were also found and corrected, unrelated to the app: the Test Data table recorded the Open Programme's grant range as £10k–£40k/yr, but the actual guidelines document (`AB Trust Online-Application-Form-Guidance-July-2024-b.pdf`) states £10,000–£30,000 pa — confirmed by extracting the PDF text directly. Separately, the plan's Overview and ABC-04 asserted a "31 July 2026" application deadline that doesn't appear anywhere in the guidelines document at all (no deadline, closing date, or year is mentioned) — the AI summary correctly didn't surface a deadline because there isn't one to extract; the test plan's expectation was wrong, not the extraction. Both corrected in `AB-Charitable-Trust-test-plan.md` v2.2. ABC-04 was also renamed and stripped of eligibility-specific wording (now purely a content-accuracy check; eligibility matching is `eligibility-check-test-plan.md`'s job), and ABC-03's redundant navigation/PDF-fallback guidance was removed at WJ's request.
+
+Also actioned: mid-session, WJ's first ABC-01 attempt mistakenly reused `grantpathway+ABC@gmail.com` (reserved as `eligibility-check-test-plan.md` EL-02's fixture account) and reset its charity profile before switching to the correct new account (`+ABC2@gmail.com`). The profile reset happened before the mix-up was caught, so EL-02's fixture is now gone — its recorded pass stands as historical evidence but that account can no longer reproduce the result. Flagged in `eligibility-check-test-plan.md` v1.2. `TEST-DASHBOARD.md` bumped to v2.6, AB Charitable Trust flagship now 🟢.
+
+---
+
 ## 2026-07-27 — Manually-added governance dropdown could get permanently stuck at "Not sure yet", fixed
 
 Live-testing the AB Charitable Trust flagship (ABC-08), WJ manually added the "Are any bank signatories related to each other or to a trustee?" governance item (via the "Need to add something about your finances or governance..." link) and left it at its default "Not sure yet" — no "Approve this answer" panel appeared at all. Switching the dropdown to "Yes" or "No" made the panel appear immediately.
