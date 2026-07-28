@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-28 — RT-15 diagnostic surfaces and fixes two real session-timeout defects
+
+With the diagnostic shortened timer in place (see previous entry below), the warning modal appeared as expected — but WJ found two real, previously-hidden defects while trying to interact with it.
+
+**D-013 (Blocking): the modal dismissed itself the instant the mouse moved toward its buttons.** Root cause: the document-level activity listener in `components/session-timeout-provider.tsx` (`mousemove`/`keydown`/`click`/`touchstart`) called `resetTimers()` — which closes the modal and reschedules both timers — on any matching event anywhere on the page, with no check for whether the warning modal was already open. Moving the mouse toward "I'm still here" or "Sign out now" triggered this before the click ever landed, so the modal reappeared a full warning-window later without ever being clickable. This has likely been broken since the modal was first built — the only reason it wasn't caught sooner is that nobody had previously managed to keep the modal on screen long enough to try clicking it. Fixed by tracking modal-open state in a `modalOpenRef` and having the activity listener ignore ambient events while the modal is showing; only its own two buttons can end the warning state once triggered.
+
+**D-014 (Cosmetic): warning text rendered "You'll be signed out in 1 minutedue to inactivity" — no space before "due".** Root cause: a JSX line-wrap whitespace-trimming gotcha in `components/session-timeout-modal.tsx`, not a plain typo — the sentence was written as JSX text wrapped across two source lines starting immediately after `{minuteLabel}`; Babel's JSX transform trims the leading space of each line before rejoining them, silently eating the one space that mattered. The space between `{minutesRemaining}` and `{minuteLabel}` survived because that pair sits on a single unwrapped line. Fixed by rewriting the sentence as one JS template literal, which is immune to this class of bug regardless of future reformatting.
+
+Both fixes are pushed. The diagnostic shortened timer (1/2 minutes) remains in place pending a clean re-test that confirms both fixes hold and the original point of this re-test — the underlying sign-out logic — is sound; see `docs/Test Plans/regression-test-plan.md` v2.9, RT-15 and Defect Log D-013/D-014.
+
+---
+
 ## 2026-07-28 — RT-15 session-timeout re-run failed to reproduce; timer temporarily shortened to diagnose
 
 WJ ran a fresh scripted re-run of RT-15 (session timeout) in Google Chrome and saw neither the 55-minute warning modal nor the 60-minute automatic sign-out — the session simply stayed active throughout. The 2026-07-04 Pass on record was a genuine live occurrence (WJ away from the session over an hour during Clothworkers testing), not a scripted run, so this is the first deliberate attempt to reproduce the behaviour on demand.
