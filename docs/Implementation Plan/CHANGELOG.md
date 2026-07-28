@@ -10,6 +10,12 @@
 
 ---
 
+## 2026-07-28 — RT-01b (Charity Commission lookup) confirmed live, closed
+
+`regression-test-plan.md`'s RT-01b (added 2026-07-24, never run) confirmed as a byproduct of the same day's eligibility testing rather than a dedicated run — both the found path (valid registration number pre-fills the charity profile) and the not-found path (invalid number falls back to manual entry with no crash) exercised while setting up EL-01/EL-03's charity profiles. No issues found. `regression-test-plan.md` bumped to v2.6, `TEST-DASHBOARD.md` to v2.11.
+
+---
+
 ## 2026-07-28 — Both matrix fixes live-verified; EL-01/EL-03 completed; combined counter made more prominent
 
 WJ live-tested both fixes built earlier the same day:

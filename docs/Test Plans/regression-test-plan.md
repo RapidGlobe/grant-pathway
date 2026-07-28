@@ -1,9 +1,9 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.5
+**Version:** 2.6
 **Date:** 2026-06-15
-**Last updated:** 2026-07-24 (added RT-01b — Charity Commission lookup, per `DR-TEST-001`)
-**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-15 confirmed live 2026-07-04; RT-01b new, not yet run; RT-01–14 results are still blank as of this update
+**Last updated:** 2026-07-28 (RT-01b executed and passed)
+**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-15 confirmed live 2026-07-04; RT-01b confirmed live 2026-07-28; RT-01–14 results are still blank as of this update
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
@@ -76,7 +76,7 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 | ------- | ----------------------------------------------------- | ----- | ------ | ---------- | -------------------------------------------------------------------------------- |
 | RT-00   | Environment and schema verification                   | Env   | Pass   | 2026-07-03 | Confirmed pointing at `grant-pathway-dev`. Run ahead of MKCF Oak Grants testing. |
 | RT-01a  | Account registration (fresh account only)             | Smoke |        |            |                                                                                  |
-| RT-01b  | Charity Commission lookup — found and not-found paths | Smoke |        |            |                                                                                  |
+| RT-01b  | Charity Commission lookup — found and not-found paths | Smoke | Pass   | 2026-07-28 | Confirmed live as a byproduct of eligibility testing — see RT-01b notes.         |
 | RT-01   | Sign-in and session persistence                       | Smoke |        |            |                                                                                  |
 | RT-02   | Unauthenticated redirect                              | Smoke |        |            |                                                                                  |
 | RT-03   | Dashboard renders with data                           | Smoke |        |            |                                                                                  |
@@ -188,9 +188,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - Not-found path: a clear, non-alarming message is shown; no error page or unhandled exception; manual entry remains fully usable
 - Both paths result in a profile that saves successfully
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Confirmed live 2026-07-28 as a byproduct of `eligibility-check-test-plan.md`'s EL-01/EL-03 charity-profile setup, rather than a dedicated standalone run. Both paths exercised: a valid registration number pre-filled the charity profile fields correctly, and an invalid/non-existent number fell back gracefully to manual entry with no crash. No issues found.
 
 ---
 
@@ -698,6 +698,7 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.6     | 2026-07-28 | Rapidglobe Ltd | RT-01b executed and passed — confirmed as a byproduct of `eligibility-check-test-plan.md`'s EL-01/EL-03 testing rather than a dedicated run. Both the found path (valid registration number pre-fills) and not-found path (invalid number falls back to manual entry, no crash) confirmed working.                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers.                         |
 | 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
