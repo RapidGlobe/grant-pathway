@@ -285,8 +285,11 @@ export type SignInState = {
  * Client-side validation (email format, non-empty password) runs first.
  */
 export async function signIn(_prevState: SignInState, formData: FormData): Promise<SignInState> {
-  const email = (formData.get('email') as string | null) ?? ''
-  const password = (formData.get('password') as string | null) ?? ''
+  // Trimmed defensively: a trailing space or newline picked up from a copy-paste
+  // (mobile clipboards in particular) otherwise turns a correct password into
+  // a silent invalid_credentials failure. Found live, 2026-07-28.
+  const email = ((formData.get('email') as string | null) ?? '').trim()
+  const password = ((formData.get('password') as string | null) ?? '').trim()
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })

@@ -28,10 +28,12 @@ export function SignInForm({ accountDeleted = false }: SignInFormProps) {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     const errors: FieldErrors = {}
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // Trimmed before validation so a trailing space/newline from a copy-paste
+    // doesn't fail the email format check or reach the server untrimmed.
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       errors.email = 'Please enter a valid email address'
     }
-    if (!password) {
+    if (!password.trim()) {
       errors.password = 'Please enter your password'
     }
 

@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-28 — Sign-in: email/password now trimmed before authentication (D-015)
+
+WJ tried to log in on an iPhone ahead of an external demo and got `invalid_credentials` despite copy-pasting both fields correctly — traced via `vercel logs` to a trailing space at the end of the pasted password. Neither `components/sign-in-form.tsx` nor `signIn()` in `actions/auth.ts` trimmed the email or password before use: the client-side email regex would already reject a trailing-space email, but a trailing-space password passed client validation untouched and was sent to Supabase's `signInWithPassword()` as-is, which does an exact match and silently fails.
+
+Fixed in both places: `signIn()` now trims both fields server-side before calling Supabase (the actual fix — copy-paste whitespace is not mobile-specific and can come from a password manager or document on any device); `SignInForm`'s client-side validation now trims before checking, so a trailing-space email no longer shows a spurious "invalid email" error before the request even reaches the server. Verified live in the dev server: a trailing-space password now passes client validation, reaches the server action, and is correctly rejected as wrong credentials rather than being silently mismatched by whitespace.
+
+Registration, password reset, and change-password were not touched — out of scope for this fix, flagged as the same latent risk if it resurfaces there.
+
+---
+
 ## 2026-07-28 — Documentation freshness audit: six gaps found and fixed across five Tier 1 docs
 
 WJ asked whether all documentation referenced in `AGENTS.md` was up to date. Ran a targeted audit against the Tier 1 (always-check) docs plus the Tier 2 docs most likely to have drifted, cross-checking each against this changelog and the live code/schema. Six concrete gaps found, all fixed same day — no wrong facts anywhere, only missing updates:
