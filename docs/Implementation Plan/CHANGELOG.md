@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-28 — External tester brief drafted; Dependabot status confirmed unchanged
+
+WJ decided to open the (already-live) `grant-pathway-dev`-backed site to external testers for a few weeks ahead of launch, rather than cutting over to `grant-pathway-prod` early. No infrastructure change needed — the live `grantpathway.org.uk` deployment already points at `grant-pathway-dev`.
+
+New `docs/legal/external-tester-brief.md`: a plain-English note for testers covering the pre-launch caveats (build may change under them, test data may not be kept long-term), the two behaviours most likely to surprise someone hitting them for the first time (the 50/month AI usage limit and `DR-EL-001`'s no-override eligibility hard-stop), a link to the real Terms/Privacy, and a feedback contact. Not wired into the app — intended for WJ to send directly to testers.
+
+Also checked GitHub Dependabot status while reviewing readiness: no change since the 2026-07-25 `brace-expansion`/ESLint-10-block finding. 5 open PRs, 4 of which fail CI only on the same known transitive `brace-expansion` audit finding (bundled inside ESLint 9's own dependency tree); the ESLint 9→10 PR itself still fails outright on the same `eslint-plugin-react`/ESLint 10 incompatibility recorded previously. Left untouched per WJ's standing instruction to leave this parked until prod-push week.
+
+---
+
 ## 2026-07-28 — Legal pages split into internal (with changelog) and external (clean) copies
 
 WJ noticed the live `/terms` and `/privacy` pages were rendering their "Change from vX.X" changelog blockquotes directly — internal-facing content (cross-references to `DR-BM-003`, `ADR-STACK-005`, `DR-DP-002`, `ADR-DATA-005`) with no meaning to an external reader (a charity user, a funder, a regulator).
