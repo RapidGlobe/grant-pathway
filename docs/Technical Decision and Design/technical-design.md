@@ -752,7 +752,7 @@ export type AiSummaryData = {
 - `structured` funders → Step 4 Q&A interview (numbered questions, one textarea per question)
 - `free_form` funders → Step 4 section-by-section writing (section title + guidance, one textarea per section)
 
-**Eligibility mismatch:** If the AI determines the charity is ineligible for the grant, `eligibilityMismatch: true` is returned and `applications.status` is set to `mismatch` — a terminal state that blocks steps 4 and 5.
+**Eligibility mismatch:** If the AI determines the charity is ineligible for the grant, `eligibilityMismatch: true` is returned and `applications.status` is set to `mismatch` — a terminal state that blocks steps 4 and 5. Because this hard stop has no override (`DR-EL-001`) and Bedrock does not guarantee identical output across calls even at `temperature: 0`, a `true` verdict from the first call is confirmed with a second, identical call before being trusted — the route only returns `eligibilityMismatch: true` if both calls agree (`PDR-AI-011`, found via GCM-01 live testing, 2026-07-28).
 
 Prompts use explicit JSON output format. (ADR-AI-004)
 

@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-28 — Non-deterministic eligibility verdict (Defect Log #2) root-caused and fixed (`PDR-AI-011`)
+
+Investigated the GCM-01 observation from the previous session's capability/shape matrix run: National Opera Studio against Idlewild Trust Arts guidelines failed the `DR-EL-001` eligibility hard-stop on one run, then passed on an immediate retry with no profile changes.
+
+Root cause: `temperature: 0` is already set on the `generate-summary` Bedrock call (added 2026-07-15, for a different, already-fixed determinism issue) — this was not a missing-setting bug. Bedrock-hosted Claude does not guarantee bit-identical output across separate calls even at temperature 0 (batched-inference floating-point non-determinism — a hosted-LLM-wide limitation, not something fixable in this codebase). This matters here specifically because `eligibilityMismatch` gates a hard stop with **no override** (`DR-EL-001`): one wrong `true` permanently dead-ends an application. The GCM-01 case wasn't even a genuine borderline call — National Opera Studio does fit Idlewild's early-career remit — so the "fail" run was a real false positive.
+
+Fix (`PDR-AI-011`, `app/api/generate-summary/route.ts`): when the first call returns `eligibilityMismatch: true`, a second identical call now confirms it before anything is shown to the user. Both calls must agree to proceed to the hard stop; if the second call disagrees, times out, or fails to parse, the route falls back to trusting the first verdict _unless_ the second call cleanly disagreed, in which case the mismatch is dropped — deliberately asymmetric, since a false "not blocked" costs nothing but a false "blocked" costs the user a deleted-and-restarted application. Both calls' tokens are logged against the same AI-usage row; no second monthly-cap slot is consumed.
+
+`tsc --noEmit`, `eslint --max-warnings 0`, and all 98 `vitest` tests pass unchanged (no existing coverage of this route — Bedrock calls can't be exercised locally, `dotenvx` redacts AWS credentials for this agent). Not yet live-verified — WJ's next regeneration of the National Opera Studio / Idlewild Trust pairing is the outstanding step.
+
+---
+
 ## 2026-07-27 — Guideline capability/shape matrix fully executed: GCM-01–05 all Pass
 
 WJ completed a full run of `guideline-capability-matrix-test-plan.md` (GCM-01 through GCM-05) in one session, closing out the last untested layer of `DR-TEST-001`'s restructured suite. The table-format budget-question fix (previous entry) was found and fixed mid-run, then live-verified. Two further findings were logged as observations rather than fixed tonight, per WJ's call:

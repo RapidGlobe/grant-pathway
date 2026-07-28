@@ -319,7 +319,7 @@ export async function POST(request: NextRequest) {
   // ── 7. Extract and parse JSON response ────────────────────────────────────
   const rawText = bedrockResponse.content[0]?.type === 'text' ? bedrockResponse.content[0].text : ''
 
-  const tokenCount =
+  let tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
 
   console.log(
@@ -396,6 +396,75 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(aiErrorBody('parse_error'), {
         status: httpStatusForError('parse_error'),
       })
+    }
+  }
+
+  // ── 7b. Confirm an eligibility-mismatch verdict with a second call ───────
+  // (DR-EL-001's hard stop has no override — a false positive here dead-ends
+  // the application permanently. Root-caused 2026-07-27/28, guideline-
+  // capability-matrix-test-plan.md GCM-01 Defect Log #2: temperature:0 does
+  // NOT guarantee bit-identical Bedrock output across separate calls
+  // (batched-inference floating-point non-determinism — not fixable in this
+  // codebase); National Opera Studio flipped fail→pass against Idlewild
+  // Trust with an unchanged profile, and the "fail" run was a genuine false
+  // positive (the Studio does fit Idlewild's early-career remit). A verdict
+  // that flips on an identical retry is, by definition, not the "clear,
+  // unambiguous" mismatch DR-EL-001 requires — so before hard-stopping, ask
+  // once more and only proceed if both calls agree. Any failure to get a
+  // clean second opinion (network error, unparseable response) falls back to
+  // trusting the first verdict rather than risking a wrongly-lifted stop.)
+  if (rawSummary.eligibilityMismatch === true) {
+    try {
+      const confirmResponse = await withRetry(() =>
+        client.messages.create(
+          {
+            model: MODEL,
+            max_tokens: SUMMARY_MAX_TOKENS,
+            temperature: 0,
+            system: AI_SYSTEM_PROMPT,
+            messages: [{ role: 'user', content: prompt }],
+          },
+          { signal: AbortSignal.timeout(60_000) },
+        ),
+      )
+
+      tokenCount +=
+        (confirmResponse.usage?.input_tokens ?? 0) + (confirmResponse.usage?.output_tokens ?? 0)
+
+      const confirmText =
+        confirmResponse.content[0]?.type === 'text' ? confirmResponse.content[0].text : ''
+      const confirmCleaned = confirmText
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```\s*$/, '')
+        .trim()
+
+      let confirmParsed: unknown
+      try {
+        confirmParsed = JSON.parse(confirmCleaned)
+      } catch {
+        confirmParsed = null
+      }
+      const confirmResult = aiSummarySchema.safeParse(confirmParsed)
+
+      if (confirmResult.success && confirmResult.data.eligibilityMismatch !== true) {
+        console.warn(
+          `[generate-summary] eligibility mismatch NOT confirmed on second call (applicationId: ${applicationId}) — treating as not a mismatch`,
+        )
+        rawSummary = { ...rawSummary, eligibilityMismatch: false, mismatchReason: null }
+      } else if (confirmResult.success) {
+        console.log(
+          `[generate-summary] eligibility mismatch confirmed on second call (applicationId: ${applicationId})`,
+        )
+      } else {
+        console.warn(
+          `[generate-summary] eligibility confirmation call returned an unparseable response (applicationId: ${applicationId}) — trusting first verdict`,
+        )
+      }
+    } catch (confirmErr) {
+      console.warn(
+        `[generate-summary] eligibility confirmation call failed (applicationId: ${applicationId}) — trusting first verdict`,
+        confirmErr,
+      )
     }
   }
 

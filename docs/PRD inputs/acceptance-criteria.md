@@ -2426,6 +2426,16 @@ _Added 2026-07-10. FR-45 to FR-47 were introduced into `docs/moscow-feature-regi
 
 ---
 
+**AC-FR-47-05 — A mismatch verdict is confirmed before the hard stop is shown (`PDR-AI-011`)**
+
+- **Given** the first AI summary call returns `eligibilityMismatch: true`
+- **When** the system issues a second, identical confirmation call
+- **Then** the red warning card and hard stop are only shown if the second call also reports a mismatch
+- **And** if the second call disagrees, the warning is not shown and I proceed to Step 4 as if no mismatch had been detected
+- **And** if the second call fails outright (error or unparseable response), the first call's verdict is trusted unchanged
+
+---
+
 ---
 
 ## 9.11 Guideline Source-Reference (Citations)
