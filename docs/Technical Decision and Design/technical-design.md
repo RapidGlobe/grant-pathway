@@ -744,6 +744,7 @@ export type AiSummaryData = {
   supportingDocuments?: string[]
   eligibilityMismatch?: boolean
   mismatchReason?: string | null
+  overallWordLimit?: number | null
 }
 ```
 
@@ -753,6 +754,8 @@ export type AiSummaryData = {
 - `free_form` funders → Step 4 section-by-section writing (section title + guidance, one textarea per section)
 
 **Eligibility mismatch:** If the AI determines the charity is ineligible for the grant, `eligibilityMismatch: true` is returned and `applications.status` is set to `mismatch` — a terminal state that blocks steps 4 and 5. Because this hard stop has no override (`DR-EL-001`) and Bedrock does not guarantee identical output across calls even at `temperature: 0`, a `true` verdict from the first call is confirmed with a second, identical call before being trusted — the route only returns `eligibilityMismatch: true` if both calls agree (`PDR-AI-011`, found via GCM-01 live testing, 2026-07-28).
+
+**Aggregate word limit across sections:** `overallWordLimit` (`PDR-AI-012`) is set only for free_form funders whose guidelines state a single word limit spanning multiple sections as a group rather than any one individually — e.g. a 500-word cap on the whole application. Sections covered by it carry no individual `wordLimit`. Step 4 sums the live word count of every such section and shows it as a combined counter (soft nudge, never a hard block), read directly from the parsed `ai_summary` — no database column.
 
 Prompts use explicit JSON output format. (ADR-AI-004)
 

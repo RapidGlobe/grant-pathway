@@ -1598,6 +1598,17 @@ _Note (2026-07-16): found live during Henry Smith testing — WJ ticked several 
 
 ---
 
+**AC-FR-29-09 — A combined counter is shown when several free_form sections share one aggregate word limit** _(Added 2026-07-28, `PDR-AI-012`)_
+
+- **Given** the funder's guidelines state a single word limit governing several extracted sections together (e.g. "keep your total response to 500 words"), rather than a limit on any one section individually
+- **When** I view Step 4 for a free_form application
+- **Then** none of the sections covered by that shared limit shows its own word-limit badge — instead, each shows a "Counts toward N-word total" badge
+- **And** a combined counter is shown near the top of the page (alongside the approval progress bar), reading "Combined across `<count>` linked sections: `<live total>` / N words", updating live as I type in any of those sections
+- **And** the combined counter turns amber near the limit and red once exceeded, but never disables "Approve this answer" or "Ready to assemble" — this is a soft nudge, not a hard block, matching how individual per-section/per-question limits already behave (AC-FR-29-04 only gates on a section's own stated limit, never on this aggregate one)
+- **And** a section that carries its own separate stated word limit is excluded from the combined count and keeps its own individual badge and counter as before, unaffected by this feature
+
+---
+
 ### FR-30 — Must Have
 
 **Requirement:** The AI assist feature ("Help me improve this") shall improve the structure and clarity of the user's written answer without adding facts or changing the meaning.

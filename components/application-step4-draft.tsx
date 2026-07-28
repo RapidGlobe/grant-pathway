@@ -103,6 +103,11 @@ interface ApplicationStep4DraftProps {
    * applications, or the summary has never been regenerated since). Text
    * only, never the raw file (ADR-DATA-002). */
   guidelineText: string | null
+  /** free_form only (PDR-AI-012) — a single word limit governing several
+   * sections together rather than any one of them individually. null when
+   * the guidelines state no such aggregate limit (the common case), or for
+   * structured funders. */
+  overallWordLimit: number | null
 }
 
 /** Badge/dialog-title labels stay readable even when a funder's own document
@@ -223,6 +228,7 @@ export function ApplicationStep4Draft({
   limitReached,
   currentUsage,
   guidelineText,
+  overallWordLimit,
 }: ApplicationStep4DraftProps) {
   const [answers, setAnswers] = useState<Record<string, string>>(() =>
     Object.fromEntries(questions.map((q) => [q.id, q.answerText ?? ''])),
@@ -310,6 +316,25 @@ export function ApplicationStep4Draft({
 
   const itemLabel = funderType === 'free_form' ? 'section' : 'question'
   const itemLabelPlural = funderType === 'free_form' ? 'sections' : 'questions'
+
+  // PDR-AI-012 — combined word counter across sections sharing one aggregate
+  // limit (e.g. "keep your total response to 500 words" spanning several
+  // AI-extracted sections, none of which carries its own wordLimit). Only
+  // narrative sections with no limit of their own count towards it — a
+  // section that DOES carry its own wordLimit/charLimit is already covered
+  // by its own per-card counter and must not be double-counted here.
+  const combinedLimitQuestions =
+    overallWordLimit != null
+      ? questions.filter((q) => q.fieldKey == null && q.wordLimit == null && q.charLimit == null)
+      : []
+  const combinedWordCount = combinedLimitQuestions.reduce(
+    (sum, q) => sum + countWords(answers[q.id] ?? ''),
+    0,
+  )
+  const combinedLimitQuestionIds = new Set(combinedLimitQuestions.map((q) => q.id))
+  const combinedIsOver = overallWordLimit != null && combinedWordCount > overallWordLimit
+  const combinedIsNear =
+    overallWordLimit != null && !combinedIsOver && combinedWordCount > overallWordLimit * 0.9
 
   // PDR-UI-008 — tt-ai-help-limit and tt-budget-no-ai each attach to the
   // first matching card only, not every card of that kind; computed once
@@ -692,6 +717,22 @@ export function ApplicationStep4Draft({
               aria-label={funderType === 'free_form' ? 'Sections approved' : 'Questions approved'}
             />
           </div>
+          {overallWordLimit != null && (
+            <p
+              className={`mt-1.5 text-[12px] ${
+                combinedIsOver
+                  ? 'text-[#DC2626]'
+                  : combinedIsNear
+                    ? 'text-[#D97706]'
+                    : 'text-[#64748B]'
+              }`}
+              aria-live="polite"
+            >
+              Combined across {combinedLimitQuestions.length} linked{' '}
+              {combinedLimitQuestions.length === 1 ? 'section' : 'sections'}: {combinedWordCount} /{' '}
+              {overallWordLimit} words
+            </p>
+          )}
         </div>
       </div>
 
@@ -800,6 +841,14 @@ export function ApplicationStep4Draft({
                   {limit && (
                     <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]">
                       {limit}&nbsp;{useChars ? 'characters' : 'words'}
+                    </span>
+                  )}
+                  {!limit && combinedLimitQuestionIds.has(q.id) && (
+                    <span
+                      title={`This section shares the funder's overall ${overallWordLimit}-word limit with other sections — see the combined count near the top of the page.`}
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]"
+                    >
+                      Counts toward {overallWordLimit}-word total
                     </span>
                   )}
                   {q.isBudgetQuestion && (

@@ -117,6 +117,7 @@ const aiSummarySchema = z.object({
   supportingDocuments: z.array(z.string()).optional(),
   eligibilityMismatch: z.boolean().optional(),
   mismatchReason: z.string().nullable().optional(),
+  overallWordLimit: z.number().nullable().optional(),
 })
 
 export const maxDuration = 90

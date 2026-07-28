@@ -389,6 +389,9 @@ export default async function Step4Page({ params }: Props) {
       limitReached={limitReached}
       currentUsage={currentUsage}
       guidelineText={guidelinesRow?.guideline_text ?? null}
+      overallWordLimit={
+        funderType === 'free_form' ? (parsedSummary?.overallWordLimit ?? null) : null
+      }
     />
   )
 }

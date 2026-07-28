@@ -250,7 +250,8 @@ Where they work: ${charity.whereCharityWorks}`
     "Document category 2"
   ],
   "eligibilityMismatch": false,
-  "mismatchReason": null
+  "mismatchReason": null,
+  "overallWordLimit": null
 }
 
 Rules:
@@ -267,6 +268,7 @@ Rules:
 - "supportingDocuments": list all supporting document categories the funder requires or recommends submitting alongside the application (e.g. "Most recent annual accounts", "Governing document / constitution"); return an empty array [] if none are mentioned
 - "eligibilityMismatch": set to true ONLY if a charity profile was provided AND there is a clear, unambiguous mismatch between the charity's stated work and the funder's eligibility criteria — for example, a funder that exclusively funds arts organisations but the charity has no arts remit whatsoever, or a funder that only funds environmental projects but the charity works in healthcare. Do NOT set to true for borderline cases, partial alignment, or where the charity might plausibly qualify. If no charity profile was provided, always set to false
 - "mismatchReason": if eligibilityMismatch is true, write a short paragraph in plain English explaining why the charity is unlikely to be eligible. Structure it as: (1) what the funder is specifically designed to support, (2) what the charity does and why it falls outside that focus, (3) a conclusion that the work does not sufficiently align with the programme's objectives. Use professional, measured language — acknowledge the charity's work positively before explaining the mismatch. This text is shown directly to the user. Example style: "The [Funder] [Grant] is specifically designed to support projects that [funder purpose]. While [Charity] delivers valuable [charity work], these activities fall outside the funder's clear focus on [funder focus]. As a result, the charity's work does not sufficiently align with the programme's core objectives, making it highly unlikely to meet the eligibility criteria." If eligibilityMismatch is false, set to null
+- "overallWordLimit" (PDR-AI-012): ONLY for free_form funders — always null for structured funders. Set to a number ONLY when the guidelines state a SINGLE word limit that governs the whole application/response as a unit (e.g. "please keep your total submission to no more than 500 words", "the whole application must not exceed 500 words") rather than giving each section/theme its own separate limit. When this applies, do NOT also set an individual "wordLimit" on the "sections" that fall under this shared cap — leave each of those sections' own "wordLimit" as null, since the limit belongs to the group as a whole, not any one section (a section may still carry its own "wordLimit" instead of contributing to this field, if the guidelines genuinely state a distinct limit for that specific section rather than the shared total). Set to null whenever no single aggregate limit is stated, even if individual sections each have their own separate stated limits — do not sum or invent an aggregate that the guidelines never state
 - Use UK English spelling throughout
 - All arrays must have at least one item except "questions", "sections", "governanceFacts", and "supportingDocuments" which may be empty
 

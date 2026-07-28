@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-28 — Combined word-limit counter across split sections built (Defect Log #3, `PDR-AI-012`)
+
+Built the fix agreed the previous session for the GCM-03 observation (CPF Trust): a funder's single 500-word limit covering the whole application had no home once `buildSummaryPrompt()` (correctly) split it into 3 topic sections, none of which showed any limit badge.
+
+`AiSummaryData` gains an optional `overallWordLimit` field, populated only when the guidelines state one limit spanning multiple sections as a group (never invented, never summed from separately-stated per-section limits). No database migration — it lives in the existing `applications.ai_summary` JSONB column, read the same way `sections`/`governanceFacts` already are.
+
+Step 4 (`components/application-step4-draft.tsx`) sums the live word count of every narrative section carrying no individual limit of its own, and shows it as a combined counter pinned inside the existing sticky progress-bar region — `Combined across N linked sections: X / <limit> words`, turning amber near the limit and red once exceeded, same visual escalation as any per-section counter. Never disables Approve or Ready to assemble — a soft nudge, consistent with how every other limit in the product already behaves. Each contributing section shows a small "Counts toward `<limit>`-word total" badge so its lack of an individual limit reads as intentional.
+
+New automated coverage: `__tests__/step4-combined-word-limit.test.tsx` (3 tests, all passing) — verifies the combined sum excludes sections with their own separate limit, updates live as text is typed, and turns red once exceeded. `tsc --noEmit`, `eslint --max-warnings 0`, and the full `vitest` suite (101 tests) pass. Extraction itself (whether the AI correctly recognises an aggregate limit as such, rather than missing it or forcing a per-section split) is not yet live-verified — WJ's next CPF Trust regeneration is the outstanding step. See `PDR-AI-012` for full rationale.
+
+---
+
 ## 2026-07-28 — Non-deterministic eligibility verdict (Defect Log #2) root-caused and fixed (`PDR-AI-011`)
 
 Investigated the GCM-01 observation from the previous session's capability/shape matrix run: National Opera Studio against Idlewild Trust Arts guidelines failed the `DR-EL-001` eligibility hard-stop on one run, then passed on an immediate retry with no profile changes.

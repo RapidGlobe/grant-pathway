@@ -59,4 +59,11 @@ export type AiSummaryData = {
   supportingDocuments?: string[]
   eligibilityMismatch?: boolean
   mismatchReason?: string | null
+  /** free_form only (PDR-AI-012): set when the guidelines state a single word
+   * limit governing the whole application/response rather than any one
+   * section individually — e.g. "keep your total response to 500 words".
+   * Sections covered by this limit carry no wordLimit of their own; Step 4
+   * shows a live combined counter across them instead of a per-card limit.
+   * null when no such aggregate limit is stated, or for structured funders. */
+  overallWordLimit?: number | null
 }

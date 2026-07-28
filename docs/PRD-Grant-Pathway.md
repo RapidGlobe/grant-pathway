@@ -489,6 +489,8 @@ Full testable acceptance criteria for all requirements are in `docs/PRD inputs/a
 | FR-30 | A per-question "Help me improve this" AI assist action shall be available on request, using the charity's own written answer as its only input; it shall correct spelling and grammar and improve structure and clarity, and shall not add facts or change claims | Must Have |
 | FR-31 | Budget questions and sections shall be visually flagged (amber) and the AI assist action shall be disabled on them; the user must enter their own figures                                                                                                         | Must Have |
 
+**Combined word-limit counter across split sections (added 2026-07-28, `PDR-AI-012`):** for a free_form funder whose guidelines state a single word limit covering the whole application rather than any one AI-extracted section individually (e.g. "keep your total response to 500 words"), the sections that share that limit show no individual limit badge — instead, each shows a "Counts toward N-word total" badge, and a live combined counter (summed across those sections only) is pinned near the approval progress bar. It escalates amber-then-red exactly like an individual limit, but never blocks approval or assembly — a soft nudge, consistent with FR-29's own limits.
+
 **The preparation checklist (shown once, on first arrival at Step 4):**
 
 Heading: _"Before you begin writing."_ Message: _"The financial sections of this application cannot be completed by AI. Before you start, gather:"_ followed by a checklist:
