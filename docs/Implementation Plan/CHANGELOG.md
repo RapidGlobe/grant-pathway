@@ -10,6 +10,21 @@
 
 ---
 
+## 2026-07-28 — Documentation freshness audit: six gaps found and fixed across five Tier 1 docs
+
+WJ asked whether all documentation referenced in `AGENTS.md` was up to date. Ran a targeted audit against the Tier 1 (always-check) docs plus the Tier 2 docs most likely to have drifted, cross-checking each against this changelog and the live code/schema. Six concrete gaps found, all fixed same day — no wrong facts anywhere, only missing updates:
+
+1. **`IMPLEMENTATION-STATUS.md`** — was stale by a full day (Last-updated still said 2026-07-27); added a full narrative entry for 2026-07-28's work (eligibility confirmation, combined word-limit counter, EL-01/EL-03, RT-01b through RT-15, legal doc split, external tester brief, AWS spend-cap correction) and fixed stale version pointers.
+2. **`data-model.md`** — `charity_profiles.lookup_source` documented `oscr`/`ccni` as valid values, but the live CHECK constraint only allows `charity_commission`/`manual` (corrected); added missing `service_role` grants documentation (and the 2026-07-23 incident/fix) to `application_items`/`application_guidelines`, previously undocumented anywhere; added the missing `added_manually` column to the formal field table (only existed in prose before). Bumped to v1.17.
+3. **`PRD-Grant-Pathway.md`** — Section 7's Step 4 screen spec didn't mention the combined word-limit counter (already described in Section 6.6, never propagated); Section 12.4's session-timeout row said "any activity resets the timer," now qualified with the D-013 exception. Also fixed the trailing document-status line, drifted two versions behind (0.58 vs 0.60) — the same recurring class of bug flagged twice before in this doc's own history. Bumped to v0.61.
+4. **`acceptance-criteria.md`** — no AC covered "ambient activity while the warning modal is open must not dismiss it." New AC-FR-06-05 added for D-013; AC-FR-06-02 cross-referenced to note the exception.
+5. **`technical-design.md`** — session-timeout section didn't mention the D-013 exception, was missing `touchstart` from the tracked activity events, and described an invented "Stay signed in" button label instead of the real "I'm still here"/"Sign out now." All corrected. Bumped to v1.23.
+6. **`moscow-feature-register.md`** — FR-29 and FR-47's notes didn't mention `PDR-AI-012` (combined counter) and `PDR-AI-011` (confirmation call) respectively, both built several days before this register was last touched. Bumped to v1.20.
+
+Confirmed fully current, no action needed: `CHANGELOG.md` itself, `TEST-DASHBOARD.md`, `PRD-DECISIONS-INDEX.md`, `non-functional-requirements.md`, and all of `docs/legal/` (the internal/external split is byte-consistent, and the tester brief's stated 50/month AI limit and no-override eligibility claim both verified against the live code).
+
+---
+
 ## 2026-07-28 — AWS Bedrock spend-cap backstop confirmed already built, PDR-AI-005 corrected
 
 While reviewing external-tester readiness, flagged `PDR-AI-005`'s AWS Bedrock spend-cap backstop as apparently still just "planned" — the PDR's Backstop section used future tense ("will also be configured") with no confirmation it existed. WJ checked the AWS console and found it was already built: `grant-pathway-bedrock-cap`, a $127/month (≈£100, matching the C1 budget) AWS Budget with two alert thresholds ($70/55%, $127/100%) emailing the correct recipient. No cost-dimension filter is applied (tracks the whole account rather than `Service: Amazon Bedrock` specifically), confirmed not to matter in practice since the AWS account is Bedrock-only. No Budget Action is attached, so it is alert-only, not an automatic hard stop.
