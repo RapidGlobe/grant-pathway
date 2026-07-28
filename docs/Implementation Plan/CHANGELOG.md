@@ -10,6 +10,19 @@
 
 ---
 
+## 2026-07-28 — RT-01 through RT-14 all executed and passed; two stale plan-text issues corrected
+
+WJ ran the full regression suite (`regression-test-plan.md`) end to end for the first time since RT-01b's addition — RT-01 through RT-14 all Pass. Two of those runs surfaced plan text that had drifted from the current app rather than any product defect:
+
+- **RT-03** (dashboard renders with data): step 1's element list never mentioned the "Ineligible" application-count badge that `DR-EL-001`'s eligibility hard-stop added to the dashboard summary bar. Corrected.
+- **RT-11** (dashboard reopen application): step 2 said "Click View", but the card's button for an approved/exported application now reads "Re-open" — consistent with the rename already recorded elsewhere (`FR-17`), just never updated in this specific test step. Corrected.
+
+**RT-14** (delete account) is the first fresh confirmation since the 2026-07-23 `service_role` grant fix (`application_items`/`application_guidelines` were missing `service_role` table grants, causing every deletion to fail on the very first cascade step with `42501: permission denied`) — passed cleanly against `grant-pathway-dev`, confirming that fix holds. Migration `20260723000000_grant_service_role_item_graph_tables.sql` is **still not applied to `grant-pathway-prod`** — the same outstanding gap tracked since 2026-07-23, due at P5.4.
+
+Only RT-15 (session timeout) remains — a fresh re-run was in progress at the time of this update; its existing 2026-07-04 Pass stands independently since it needs no re-verification. `regression-test-plan.md` bumped to v2.7, `TEST-DASHBOARD.md` to v2.13.
+
+---
+
 ## 2026-07-28 — RT-01b (Charity Commission lookup) confirmed live, closed
 
 `regression-test-plan.md`'s RT-01b (added 2026-07-24, never run) confirmed as a byproduct of the same day's eligibility testing rather than a dedicated run — both the found path (valid registration number pre-fills the charity profile) and the not-found path (invalid number falls back to manual entry with no crash) exercised while setting up EL-01/EL-03's charity profiles. No issues found. `regression-test-plan.md` bumped to v2.6, `TEST-DASHBOARD.md` to v2.11.

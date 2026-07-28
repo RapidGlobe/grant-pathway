@@ -1,9 +1,9 @@
 # Grant Pathway — Regression Test Plan
 
-**Version:** 2.6
+**Version:** 2.7
 **Date:** 2026-06-15
-**Last updated:** 2026-07-28 (RT-01b executed and passed)
-**Status:** Ready for execution — RT-00 passed 2026-07-03; RT-15 confirmed live 2026-07-04; RT-01b confirmed live 2026-07-28; RT-01–14 results are still blank as of this update
+**Last updated:** 2026-07-28 (RT-01 through RT-14 all executed and passed)
+**Status:** RT-00 through RT-14 all Pass (RT-03 and RT-11 with a caveat — plan text was stale, corrected; RT-14 confirms the 2026-07-23 `service_role` grant fix holds on `grant-pathway-dev`, `grant-pathway-prod` still unpatched). Only RT-15's 2026-07-28 fresh re-run remains in progress (its 2026-07-04 Pass stands independently).
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
@@ -72,26 +72,26 @@ This plan uses a pre-seeded test account with an existing in-progress applicatio
 
 ## Test Results Summary
 
-| Test ID | Test Name                                             | Tier  | Result | Date       | Notes                                                                            |
-| ------- | ----------------------------------------------------- | ----- | ------ | ---------- | -------------------------------------------------------------------------------- |
-| RT-00   | Environment and schema verification                   | Env   | Pass   | 2026-07-03 | Confirmed pointing at `grant-pathway-dev`. Run ahead of MKCF Oak Grants testing. |
-| RT-01a  | Account registration (fresh account only)             | Smoke |        |            |                                                                                  |
-| RT-01b  | Charity Commission lookup — found and not-found paths | Smoke | Pass   | 2026-07-28 | Confirmed live as a byproduct of eligibility testing — see RT-01b notes.         |
-| RT-01   | Sign-in and session persistence                       | Smoke |        |            |                                                                                  |
-| RT-02   | Unauthenticated redirect                              | Smoke |        |            |                                                                                  |
-| RT-03   | Dashboard renders with data                           | Smoke |        |            |                                                                                  |
-| RT-04   | Step 4 Q&A interface loads                            | Smoke |        |            |                                                                                  |
-| RT-05   | AI refine-answer endpoint                             | Smoke |        |            |                                                                                  |
-| RT-06   | Answer approval and progress bar                      | Full  |        |            |                                                                                  |
-| RT-07   | Preparation checklist gate                            | Full  |        |            |                                                                                  |
-| RT-08   | Senior review screen                                  | Full  |        |            |                                                                                  |
-| RT-09   | Final review, approval, and Word export               | Full  |        |            |                                                                                  |
-| RT-10   | Plain text export                                     | Full  |        |            |                                                                                  |
-| RT-11   | Dashboard reopen application                          | Full  |        |            |                                                                                  |
-| RT-12   | Change password                                       | Full  |        |            |                                                                                  |
-| RT-13   | Sign out                                              | Full  |        |            |                                                                                  |
-| RT-14   | Delete account                                        | Full  |        |            |                                                                                  |
-| RT-15   | Session timeout (inactivity)                          | Full  | Pass   | 2026-07-04 | Confirmed live during Clothworkers testing — see RT-15 notes.                    |
+| Test ID | Test Name                                             | Tier  | Result        | Date       | Notes                                                                                              |
+| ------- | ----------------------------------------------------- | ----- | ------------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| RT-00   | Environment and schema verification                   | Env   | Pass          | 2026-07-03 | Confirmed pointing at `grant-pathway-dev`. Run ahead of MKCF Oak Grants testing.                   |
+| RT-01a  | Account registration (fresh account only)             | Smoke |               |            |                                                                                                    |
+| RT-01b  | Charity Commission lookup — found and not-found paths | Smoke | Pass          | 2026-07-28 | Confirmed live as a byproduct of eligibility testing — see RT-01b notes.                           |
+| RT-01   | Sign-in and session persistence                       | Smoke | Pass          | 2026-07-28 |                                                                                                    |
+| RT-02   | Unauthenticated redirect                              | Smoke | Pass          | 2026-07-28 |                                                                                                    |
+| RT-03   | Dashboard renders with data                           | Smoke | Pass (caveat) | 2026-07-28 | Plan text was stale (missing Ineligible counter) — see RT-03 notes.                                |
+| RT-04   | Step 4 Q&A interface loads                            | Smoke | Pass          | 2026-07-28 |                                                                                                    |
+| RT-05   | AI refine-answer endpoint                             | Smoke | Pass          | 2026-07-28 |                                                                                                    |
+| RT-06   | Answer approval and progress bar                      | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-07   | Preparation checklist gate                            | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-08   | Senior review screen                                  | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-09   | Final review, approval, and Word export               | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-10   | Plain text export                                     | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-11   | Dashboard reopen application                          | Full  | Pass (caveat) | 2026-07-28 | Plan text was stale (said "View", app shows "Re-open") — see RT-11 notes.                          |
+| RT-12   | Change password                                       | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-13   | Sign out                                              | Full  | Pass          | 2026-07-28 |                                                                                                    |
+| RT-14   | Delete account                                        | Full  | Pass          | 2026-07-28 | See RT-14 notes (2026-07-23 `service_role` grant fix).                                             |
+| RT-15   | Session timeout (inactivity)                          | Full  | Pass          | 2026-07-04 | Confirmed live during Clothworkers testing — see RT-15 notes. Fresh re-run in progress 2026-07-28. |
 
 ---
 
@@ -188,7 +188,7 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - Not-found path: a clear, non-alarming message is shown; no error page or unhandled exception; manual entry remains fully usable
 - Both paths result in a profile that saves successfully
 
-**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:** Confirmed live 2026-07-28 as a byproduct of `eligibility-check-test-plan.md`'s EL-01/EL-03 charity-profile setup, rather than a dedicated standalone run. Both paths exercised: a valid registration number pre-filled the charity profile fields correctly, and an invalid/non-existent number fell back gracefully to manual entry with no crash. No issues found.
 
@@ -213,9 +213,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - Dashboard shows "My Applications" heading and the user's name ("Testname") in the nav bar
 - No error message displayed
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -235,9 +235,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - Dashboard content is not shown
 - No error page displayed
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -251,7 +251,7 @@ Run this before every session, every time, no exceptions. It exists because on 2
 **Steps:**
 
 1. On the dashboard, verify the following elements are present:
-   - Summary bar showing application counts (Not started / In progress / Approved / Exported)
+   - Summary bar showing application counts (Not started / In progress / Approved / Exported / Ineligible — the Ineligible count was added with `DR-EL-001`'s eligibility hard-stop and is missing from this step's original wording, corrected 2026-07-28)
    - AI requests counter ("X of 50 AI requests used this month")
    - At least one application card showing funder name, grant name, status, and last updated date
    - "+ New Application" button
@@ -264,9 +264,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - Application data loaded from database (not empty/loading state)
 - Status labels match Section 16 of the user guide (Not started / In progress / Approved / Exported)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record button label — "Continue" or "View"):**
+**Notes:** Live-tested 2026-07-28 — dashboard rendered correctly, all real data. Plan text was out of date: the summary bar now also shows an "Ineligible" count (`DR-EL-001`), not listed in step 1's original wording — corrected above. Button label was "Continue" as expected.
 
 ---
 
@@ -299,9 +299,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - No "Page not found" or error state
 - No console errors
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record number of question cards shown):**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -328,9 +328,9 @@ Run this before every session, every time, no exceptions. It exists because on 2
 - Two options are shown: **Use this improved version** and **Keep my original**
 - No error toast or console error
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record approximate response time):**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -364,9 +364,9 @@ Run these after all Tier 1 tests pass.
 - Editing an approved answer removes the approval (as per user guide: "If you edit an approved answer, the approval is removed")
 - **Ready to assemble** button remains inactive while any answer is unapproved
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -392,9 +392,9 @@ Run these after all Tier 1 tests pass.
 - Clicking the button transitions to the Q&A interface
 - Q&A interface loads correctly on first visit with no "No questions found" fallback
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -419,9 +419,9 @@ Run these after all Tier 1 tests pass.
 - Screen matches Section 8 description in user guide
 - Clicking "Yes — assemble my draft" proceeds to the final review (Step 5 / Section 9)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -465,9 +465,9 @@ Run these after all Tier 1 tests pass.
 - Application status on dashboard updates to **Exported**
 - Document opens cleanly in Word or equivalent; content matches the approved answers entered in Step 4
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes (record the exact banner text shown):**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -501,9 +501,9 @@ Run these after all Tier 1 tests pass.
 - Content matches the approved answers entered in Step 4
 - Content matches the Word export's content (same answers, same order), just without Word formatting
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -517,7 +517,7 @@ Run these after all Tier 1 tests pass.
 **Steps:**
 
 1. From the dashboard, locate the application approved in RT-09
-2. Click **View** on that application's card — for an approved/exported application, this button directly opens the re-open confirmation modal (there is no separate "Reopen" button on the card itself, and no intermediate navigation into the application first)
+2. Click **Re-open** on that application's card (corrected 2026-07-28 — this button read "View" when this step was originally written; the app has since renamed it to "Re-open" for an approved/exported application) — it directly opens the re-open confirmation modal, with no intermediate navigation into the application first
 3. Confirm the modal reads "Re-open application" with the warning that re-opening removes approval and answers will need re-reviewing
 4. Click **Re-open** in the modal
 5. Confirm the application returns to Step 4 with status **In progress**
@@ -531,9 +531,9 @@ Run these after all Tier 1 tests pass.
 - All answer approvals are reset
 - Step 4 Q&A interface loads correctly on return
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28 — reopen mechanism itself worked correctly, no issues. Plan text was out of date: step 2 said "Click View", but the card's button now reads "Re-open" for an approved/exported application (matches the already-documented `FR-17` rename) — corrected above.
 
 ---
 
@@ -560,9 +560,9 @@ Run these after all Tier 1 tests pass.
 - Signing in with the new password succeeds
 - Password is successfully reverted at the end, leaving the shared test account in its documented state
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues. Password reverted per step 5.
 
 ---
 
@@ -586,9 +586,9 @@ Run these after all Tier 1 tests pass.
 - Sign out redirects to the sign-in page
 - The session is genuinely cleared — direct navigation to a protected route redirects again, the same as RT-02's unauthenticated check, but exercised via the actual sign-out action rather than a fresh incognito window
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no issues.
 
 ---
 
@@ -619,9 +619,9 @@ Run these after all Tier 1 tests pass.
 - Signing back in with the deleted account's credentials fails
 - Clicking **Cancel** on the confirmation screen (if tested instead) returns to Account settings without deleting anything
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☑ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28 against `grant-pathway-dev`, no issues — deletion completed cleanly. This is the first fresh confirmation since the 2026-07-23 `service_role` grant fix (see `CHANGELOG.md` 2026-07-23): `application_items`/`application_guidelines` were missing `service_role` table grants, causing every deletion to fail with `42501: permission denied` on the very first cascade step. Migration `20260723000000_grant_service_role_item_graph_tables.sql` fixed this on `grant-pathway-dev` (this plan's test environment) — today's clean pass confirms it holds. That migration is **still not applied to `grant-pathway-prod`** as of this test — same outstanding gap tracked since 2026-07-23, due at P5.4.
 
 ---
 
@@ -696,12 +696,13 @@ For RT-08/RT-09/RT-10, approve all answers in Step 4 before running those tests.
 
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.6     | 2026-07-28 | Rapidglobe Ltd | RT-01b executed and passed — confirmed as a byproduct of `eligibility-check-test-plan.md`'s EL-01/EL-03 testing rather than a dedicated run. Both the found path (valid registration number pre-fills) and not-found path (invalid number falls back to manual entry, no crash) confirmed working.                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers.                         |
-| 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| 2.3     | 2026-07-04 | Rapidglobe Ltd | Added RT-12 (Change Password), RT-13 (Sign Out), and RT-14 (Delete Account) — account housekeeping had no regression coverage at all (guide Section 15, "Managing Your Account"). RT-12 mutates the shared regression account's password and includes an explicit revert step. RT-14 requires a disposable throwaway account, never the shared regression account or an in-use funder test account, since deletion is permanent. 14 test cases across 3 tiers.                                                                                                                                                                                                                                                              |
-| 2.4     | 2026-07-04 | Rapidglobe Ltd | Added RT-15 (Session Timeout — Inactivity), covering the documented 60-minute inactivity timeout (ADR-SEC-003, NFR, FR-06) that had no test coverage. Recorded as Pass based on a genuine live occurrence during Clothworkers testing — WJ was away over an hour, was signed out as expected, and on signing back in the in-progress application was exactly as left. The 55-minute warning modal itself was not directly observed this time (WJ was away from the screen) — flagged as unconfirmed in RT-15's notes, only the 60-minute sign-out and state preservation are confirmed. Also noted the user guide has no session-timeout section — a documentation gap, not a product defect. 15 test cases across 3 tiers. |
-| 2.5     | 2026-07-24 | Rapidglobe Ltd | Added RT-01b (Charity Commission lookup — found and not-found paths), per `DR-TEST-001`'s capability-based restructuring — this account/profile mechanic had no dedicated coverage anywhere in the suite; RT-01a only exercised the found path incidentally. 16 test cases across 3 tiers.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.7     | 2026-07-28 | Rapidglobe Ltd | RT-01 through RT-14 all executed and passed in one full session. Two plan-text staleness issues found and corrected: RT-03's step 1 element list was missing the "Ineligible" dashboard counter (added with `DR-EL-001`); RT-11's step 2 said "Click View" but the app now shows "Re-open" for an approved/exported application (matches the already-documented `FR-17` rename). RT-14 (delete account) is the first fresh confirmation since the 2026-07-23 `service_role` grant fix — passed cleanly on `grant-pathway-dev`; `grant-pathway-prod` remains unpatched, same outstanding gap. Only RT-15 (session timeout) remains — a fresh re-run was in progress at the time of this update; its existing 2026-07-04 Pass stands independently. |
+| 2.6     | 2026-07-28 | Rapidglobe Ltd | RT-01b executed and passed — confirmed as a byproduct of `eligibility-check-test-plan.md`'s EL-01/EL-03 testing rather than a dedicated run. Both the found path (valid registration number pre-fills) and not-found path (invalid number falls back to manual entry, no crash) confirmed working.                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 1.0     | 2026-06-15 | Rapidglobe Ltd | Initial regression test plan. 10 test cases across 2 tiers. Derived from Alan Knox Automated Testing audit and cross-referenced with user guide v1.14.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 1.1     | 2026-07-01 | Rapidglobe Ltd | Added Tier 0 (RT-00 environment/schema verification) after discovering `grant-pathway-dev` and `grant-pathway-prod` were both missing the AI-cap RPC schema (and prod was also missing the approve/reopen RPC) for weeks — invisible from inside the app, only found by querying the database directly. Added RT-11 (dashboard reopen), the only test covering `reopen_application`. Annotated RT-05 and RT-09 with their RPC dependencies. Noted that this plan has zero recorded executions and that every historical funder test result predates the 2026-06-22/06-29 RPC introductions, so none of them are valid evidence the current codebase works end-to-end. 11 test cases across 3 tiers.                                               |
+| 2.2     | 2026-07-03 | Rapidglobe Ltd | RT-00 executed for the first time — Pass, confirmed against `grant-pathway-dev`, run ahead of MKCF Oak Grants testing. Updated Status line and zero-executions note accordingly; RT-01–11 remain unrun.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 2.3     | 2026-07-04 | Rapidglobe Ltd | Added RT-12 (Change Password), RT-13 (Sign Out), and RT-14 (Delete Account) — account housekeeping had no regression coverage at all (guide Section 15, "Managing Your Account"). RT-12 mutates the shared regression account's password and includes an explicit revert step. RT-14 requires a disposable throwaway account, never the shared regression account or an in-use funder test account, since deletion is permanent. 14 test cases across 3 tiers.                                                                                                                                                                                                                                                                                    |
+| 2.4     | 2026-07-04 | Rapidglobe Ltd | Added RT-15 (Session Timeout — Inactivity), covering the documented 60-minute inactivity timeout (ADR-SEC-003, NFR, FR-06) that had no test coverage. Recorded as Pass based on a genuine live occurrence during Clothworkers testing — WJ was away over an hour, was signed out as expected, and on signing back in the in-progress application was exactly as left. The 55-minute warning modal itself was not directly observed this time (WJ was away from the screen) — flagged as unconfirmed in RT-15's notes, only the 60-minute sign-out and state preservation are confirmed. Also noted the user guide has no session-timeout section — a documentation gap, not a product defect. 15 test cases across 3 tiers.                       |
+| 2.5     | 2026-07-24 | Rapidglobe Ltd | Added RT-01b (Charity Commission lookup — found and not-found paths), per `DR-TEST-001`'s capability-based restructuring — this account/profile mechanic had no dedicated coverage anywhere in the suite; RT-01a only exercised the found path incidentally. 16 test cases across 3 tiers.                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
