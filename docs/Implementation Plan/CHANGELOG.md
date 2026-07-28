@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-28 — external-tester-brief.md relocated to docs/Test Plans, GitBook help link added
+
+WJ asked to move `docs/legal/external-tester-brief.md` (drafted the same day, see the AWS Bedrock entry below) to `docs/Test Plans/` — it's a testing-programme document (a briefing note for external testers), not a legal one, so `docs/legal` was never really its home. Moved with `git mv` (history preserved), not duplicated. While there, added a short "Need a hand while you're testing?" section pointing testers at the real help centre (`https://rapidglobe.gitbook.io/grant-pathway`) before they email in a question.
+
+No change to `TEST-DASHBOARD.md` — this document isn't one of the tracked test-plan layers (`DR-TEST-001`), it's tester onboarding material, so it doesn't get a dashboard row.
+
+---
+
 ## 2026-07-28 — Sign-in: email/password now trimmed before authentication (D-015)
 
 WJ tried to log in on an iPhone ahead of an external demo and got `invalid_credentials` despite copy-pasting both fields correctly — traced via `vercel logs` to a trailing space at the end of the pasted password. Neither `components/sign-in-form.tsx` nor `signIn()` in `actions/auth.ts` trimmed the email or password before use: the client-side email regex would already reject a trailing-space email, but a trailing-space password passed client validation untouched and was sent to Supabase's `signInWithPassword()` as-is, which does an exact match and silently fails.

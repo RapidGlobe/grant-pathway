@@ -26,6 +26,10 @@ You're using our working build ahead of public launch, not a finished product. A
 
 The full Terms of Service and Privacy Policy apply to your use of the test build, same as they will at launch — you can read them at `/terms` and `/privacy` on the site. In short: you own your content, we don't use it to train AI models, and you can delete your account (and everything in it) at any time from within the service.
 
+## Need a hand while you're testing?
+
+The in-app "Help" link (in the site's nav and footer) takes you straight to our help centre: **https://rapidglobe.gitbook.io/grant-pathway**. It's worth a look before you email us with a question — it may already be answered there.
+
 ## Giving feedback
 
 Whatever you notice — confusing wording, something that felt slow, a mismatch that shouldn't have fired, or just a "this was great" — please email **wjokhia@rapidglobe.com**. There's no formal bug-report process; a plain email describing what you did and what you expected is exactly right.
