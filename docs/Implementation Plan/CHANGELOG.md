@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-28 — AWS Bedrock spend-cap backstop confirmed already built, PDR-AI-005 corrected
+
+While reviewing external-tester readiness, flagged `PDR-AI-005`'s AWS Bedrock spend-cap backstop as apparently still just "planned" — the PDR's Backstop section used future tense ("will also be configured") with no confirmation it existed. WJ checked the AWS console and found it was already built: `grant-pathway-bedrock-cap`, a $127/month (≈£100, matching the C1 budget) AWS Budget with two alert thresholds ($70/55%, $127/100%) emailing the correct recipient. No cost-dimension filter is applied (tracks the whole account rather than `Service: Amazon Bedrock` specifically), confirmed not to matter in practice since the AWS account is Bedrock-only. No Budget Action is attached, so it is alert-only, not an automatic hard stop.
+
+Corrected `PDR-AI-005` to describe this as confirmed and built rather than planned, and fixed the Rationale's inaccurate "hard backstop" wording to "alert-based backstop" to match the real configuration. No code or infrastructure change — documentation correction only.
+
+---
+
 ## 2026-07-28 — RT-15 closed: session-timeout fixes confirmed, diagnostic timer reverted
 
 WJ re-tested with the shortened diagnostic timer (see the two entries below) and confirmed both defects are fixed: the warning modal now stays on screen and is clickable even as the mouse moves toward its buttons, and the warning text reads correctly ("You'll be signed out in 1 minute due to inactivity.").
