@@ -32,8 +32,7 @@ export function SessionTimeoutModal({
             Are you still there?
           </DialogTitle>
           <DialogDescription className="mt-2 text-[14px] leading-relaxed text-[#64748B]">
-            You&apos;ll be signed out in {minutesRemaining} {minuteLabel} due to inactivity. Make
-            sure you&apos;ve saved any work before your session ends.
+            {`You'll be signed out in ${minutesRemaining} ${minuteLabel} due to inactivity. Make sure you've saved any work before your session ends.`}
           </DialogDescription>
         </DialogHeader>
 
