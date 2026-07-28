@@ -719,12 +719,12 @@ export function ApplicationStep4Draft({
           </div>
           {overallWordLimit != null && (
             <p
-              className={`mt-1.5 text-[12px] ${
+              className={`mt-1.5 text-[14px] font-bold ${
                 combinedIsOver
                   ? 'text-[#DC2626]'
                   : combinedIsNear
                     ? 'text-[#D97706]'
-                    : 'text-[#64748B]'
+                    : 'text-[#334155]'
               }`}
               aria-live="polite"
             >
