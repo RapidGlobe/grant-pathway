@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-28 — RT-15 session-timeout re-run failed to reproduce; timer temporarily shortened to diagnose
+
+WJ ran a fresh scripted re-run of RT-15 (session timeout) in Google Chrome and saw neither the 55-minute warning modal nor the 60-minute automatic sign-out — the session simply stayed active throughout. The 2026-07-04 Pass on record was a genuine live occurrence (WJ away from the session over an hour during Clothworkers testing), not a scripted run, so this is the first deliberate attempt to reproduce the behaviour on demand.
+
+Leading theory, unconfirmed: Chrome throttles (and, with Memory Saver enabled, can fully discard) JavaScript timers in backgrounded/inactive tabs, which is exactly the `setTimeout`/`setInterval` mechanism `components/session-timeout-provider.tsx` relies on. That would explain a real occurrence surfacing once under uncontrolled conditions but not reproducing reliably in a deliberate background-tab wait.
+
+To isolate whether the sign-out logic itself is sound — independent of any Chrome background-tab behaviour — `WARNING_MS`/`TIMEOUT_MS` in `session-timeout-provider.tsx` have been temporarily shortened from 55/60 minutes to 1/2 minutes, so the full behaviour can be observed within a few minutes instead of an hour. The modal's countdown display was changed from a hardcoded 5-minute assumption to a value derived from the actual `WARNING_MS`/`TIMEOUT_MS` gap (`COUNTDOWN_MINUTES`), so it stays accurate whether the real or shortened thresholds are in effect. **This is a diagnostic-only change** — no product behaviour is intended to change; the thresholds will be reverted to 55/60 minutes once the underlying logic is confirmed working (or a real defect is found and fixed). See `docs/Test Plans/regression-test-plan.md` v2.8 for the re-test steps.
+
+---
+
 ## 2026-07-28 — External tester brief drafted; Dependabot status confirmed unchanged
 
 WJ decided to open the (already-live) `grant-pathway-dev`-backed site to external testers for a few weeks ahead of launch, rather than cutting over to `grant-pathway-prod` early. No infrastructure change needed — the live `grantpathway.org.uk` deployment already points at `grant-pathway-dev`.
