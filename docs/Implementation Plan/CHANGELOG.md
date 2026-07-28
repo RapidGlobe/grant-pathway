@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-28 — Legal pages split into internal (with changelog) and external (clean) copies
+
+WJ noticed the live `/terms` and `/privacy` pages were rendering their "Change from vX.X" changelog blockquotes directly — internal-facing content (cross-references to `DR-BM-003`, `ADR-STACK-005`, `DR-DP-002`, `ADR-DATA-005`) with no meaning to an external reader (a charity user, a funder, a regulator).
+
+`docs/legal/terms-of-service.md` and `privacy-policy.md` remain the internal working copies — unchanged, full changelog history preserved for audit trail. Two new files, `terms-of-service-external.md` and `privacy-policy-external.md`, hold the same body text with only the changelog blockquotes removed; the Version/Effective date/Last updated line stays on both, since both documents' own body text (ToS §12, Privacy §10) tells the reader that line is what shows them when the document last changed. `app/(public)/terms/page.tsx` and `app/(public)/privacy/page.tsx` now read from the `-external` files instead.
+
+A maintenance note was added to both internal files: since the external copies carry no changelog of their own, any future section edit must be manually mirrored into the matching `-external` file — nothing else will prompt this.
+
+Verified: `tsc --noEmit`, `eslint --max-warnings 0`, all 101 tests pass. Both live pages checked in a local dev server — render correctly, no changelog blocks visible, all section numbering and cross-references intact.
+
+---
+
 ## 2026-07-28 — RT-01 through RT-14 all executed and passed; two stale plan-text issues corrected
 
 WJ ran the full regression suite (`regression-test-plan.md`) end to end for the first time since RT-01b's addition — RT-01 through RT-14 all Pass. Two of those runs surfaced plan text that had drifted from the current app rather than any product defect:

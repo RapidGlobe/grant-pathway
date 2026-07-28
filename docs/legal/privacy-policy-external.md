@@ -4,16 +4,6 @@
 **Effective date: [TO BE CONFIRMED]**
 **Last updated: 2 July 2026**
 
-> **Change from v1.3 (29 June 2026):** Sections 2, 3, and 5 corrected to describe the actual AI model — the charity writes every answer; AI refines and improves on request only, and does not generate answers from scratch. This corrects a stale claim left over from an earlier product model abandoned on 2026-05-28.
-
-> **Change from v1.2 (17 June 2026):** Data protection contact email (Section 1), rights contact email (Section 8), and general contact email (Section 11) updated from wjokhia@rapidglobe.com to admin@rapidglobe.com.
-
-> **Change from v1.1 (26 May 2026):** Section 1 updated to confirm ICO registration number ZC168720.
-
-> **Change from v1.0 (22 May 2026):** Section 5 updated to reflect Amazon Bedrock (eu-west-2, London) as the AI processing provider, replacing the previous Anthropic direct API reference; Sentry data region corrected to European Union. Section 6 updated to reflect that AI processing no longer involves a US data transfer. Section 7 updated to accurately disclose the 7-day automated backup retention window that applies after account deletion (ADR-DATA-005).
-
-**Internal maintenance note (added 2026-07-28):** This file is the internal working copy — full changelog with cross-references to internal decision records, kept here for audit trail. The live `/privacy` page renders `privacy-policy-external.md` instead, a clean copy of the same body text with the "Change from vX.X" blockquotes above removed (they cite internal doc IDs like `ADR-DATA-005` that mean nothing to an external reader). **Whenever the numbered sections below change, mirror the same section change into `privacy-policy-external.md` — that file has no changelog of its own, so there is nothing else to prompt this.**
-
 ---
 
 ## 1. Who We Are

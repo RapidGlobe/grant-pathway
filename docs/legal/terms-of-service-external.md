@@ -4,14 +4,6 @@
 **Effective date: [TO BE CONFIRMED]**
 **Last updated: 10 July 2026**
 
-> **Change from v1.2 (2 July 2026):** Section 8 (Intellectual Property) corrected — Grant Pathway's source code is closed and proprietary, not open source. This was a stale claim carried over from `DR-BM-003`'s original 2026-04-09 position, which was reversed on 2026-07-10 (see `DR-BM-003`, `ADR-STACK-005`); the live GitHub repository has in fact been private with no open-source licence throughout.
-
-> **Change from v1.1 (26 May 2026):** Section 5 corrected to describe the actual AI model — the charity writes every answer; AI refines and improves on request only, and does not generate answers from scratch. This corrects a stale claim left over from an earlier product model abandoned on 2026-05-28.
-
-> **Change from v1.0 (22 May 2026):** Section 5 updated to reference Amazon Bedrock as the AI processing layer, consistent with the privacy policy and DR-DP-002. Section 9 updated to acknowledge that operational backup infrastructure is maintained for disaster recovery purposes; this does not constitute a guarantee of data recovery and does not change the limitation of liability in Section 10.
-
-**Internal maintenance note (added 2026-07-28):** This file is the internal working copy — full changelog with cross-references to internal decision records, kept here for audit trail. The live `/terms` page renders `terms-of-service-external.md` instead, a clean copy of the same body text with the "Change from vX.X" blockquotes above removed (they cite internal doc IDs like `DR-BM-003` that mean nothing to an external reader). **Whenever the numbered sections below change, mirror the same section change into `terms-of-service-external.md` — that file has no changelog of its own, so there is nothing else to prompt this.**
-
 ---
 
 ## 1. Introduction

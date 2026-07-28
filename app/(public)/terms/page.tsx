@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default async function TermsPage() {
   const markdown = await readFile(
-    path.join(process.cwd(), 'docs', 'legal', 'terms-of-service.md'),
+    path.join(process.cwd(), 'docs', 'legal', 'terms-of-service-external.md'),
     'utf-8',
   )
 
