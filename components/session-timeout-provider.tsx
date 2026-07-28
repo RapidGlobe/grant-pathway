@@ -37,12 +37,16 @@ export function SessionTimeoutProvider() {
   const warningTimerId = useRef<ReturnType<typeof setTimeout> | null>(null)
   const signoutTimerId = useRef<ReturnType<typeof setTimeout> | null>(null)
   const countdownId = useRef<ReturnType<typeof setInterval> | null>(null)
+  // Tracks whether the modal is open without waiting for a re-render, so the
+  // activity listener below can check it synchronously on every event.
+  const modalOpenRef = useRef(false)
 
   const doSignOut = useCallback(async () => {
     // Clear all timers before navigating — prevents a second sign-out call
     if (warningTimerId.current) clearTimeout(warningTimerId.current)
     if (signoutTimerId.current) clearTimeout(signoutTimerId.current)
     if (countdownId.current) clearInterval(countdownId.current)
+    modalOpenRef.current = false
     setShowModal(false)
     await signOut()
     router.push('/')
@@ -54,11 +58,13 @@ export function SessionTimeoutProvider() {
     if (signoutTimerId.current) clearTimeout(signoutTimerId.current)
     if (countdownId.current) clearInterval(countdownId.current)
 
+    modalOpenRef.current = false
     setShowModal(false)
     setMinutesLeft(COUNTDOWN_MINUTES)
 
     // Warning modal fires once WARNING_MS of inactivity has elapsed
     warningTimerId.current = setTimeout(() => {
+      modalOpenRef.current = true
       setShowModal(true)
       let mins = COUNTDOWN_MINUTES
       countdownId.current = setInterval(() => {
@@ -81,7 +87,14 @@ export function SessionTimeoutProvider() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initialising timers on mount via stable callback
     resetTimers()
 
-    const onActivity = () => resetTimers()
+    // While the warning modal is open, ignore ambient activity (moving the
+    // mouse toward its buttons would otherwise dismiss it before it can be
+    // clicked) — only the modal's own "I'm still here" / "Sign out now"
+    // actions should end the warning state at that point.
+    const onActivity = () => {
+      if (modalOpenRef.current) return
+      resetTimers()
+    }
     ACTIVITY_EVENTS.forEach((ev) => document.addEventListener(ev, onActivity, { passive: true }))
 
     return () => {
