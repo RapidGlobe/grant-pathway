@@ -6,13 +6,11 @@ import { SessionTimeoutModal } from '@/components/session-timeout-modal'
 import { signOut } from '@/actions/auth'
 
 // Inactivity thresholds (FR-06 / AC-FR-06-01)
-// TEMPORARY — shortened for RT-15 diagnostic re-test (2026-07-28). Revert to
-// 55 * 60 * 1000 / 60 * 60 * 1000 once the sign-out logic is confirmed working.
-const WARNING_MS = 1 * 60 * 1000 // Show modal at 1 minute
-const TIMEOUT_MS = 2 * 60 * 1000 // Sign out at 2 minutes
+const WARNING_MS = 55 * 60 * 1000 // Show modal at 55 minutes
+const TIMEOUT_MS = 60 * 60 * 1000 // Sign out at 60 minutes
 
-// Countdown length is derived from the gap above, so it stays accurate whether
-// the real 5-minute gap or this shortened test gap is in effect.
+// Countdown length is derived from the gap above rather than hardcoded, so it
+// stays accurate if the thresholds above are ever changed.
 const COUNTDOWN_MINUTES = Math.max(1, Math.round((TIMEOUT_MS - WARNING_MS) / 60_000))
 
 // Events that count as user activity (AC-FR-06-02)
@@ -20,14 +18,15 @@ const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'touchstart'] as const
 
 /**
  * Mounts invisibly inside the authenticated layout and manages the
- * inactivity session timeout (FR-06). Thresholds are currently shortened for
- * diagnostic testing — see WARNING_MS/TIMEOUT_MS above.
+ * 60-minute inactivity session timeout (FR-06).
  *
  * - Any user activity (mouse, keyboard, touch) resets the timer.
- * - At WARNING_MS of inactivity the warning modal opens with a countdown.
- * - At TIMEOUT_MS signOut() is called and the user is sent to /.
+ * - At 55 minutes of inactivity the warning modal opens with a countdown.
+ * - At 60 minutes signOut() is called and the user is sent to /.
  * - "I'm still here" resets the timer and closes the modal.
  * - "Sign out now" signs out immediately.
+ * - While the modal is open, ambient activity is ignored — only its own
+ *   buttons can end the warning state (see modalOpenRef below).
  */
 export function SessionTimeoutProvider() {
   const router = useRouter()

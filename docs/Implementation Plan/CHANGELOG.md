@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-07-28 — RT-15 closed: session-timeout fixes confirmed, diagnostic timer reverted
+
+WJ re-tested with the shortened diagnostic timer (see the two entries below) and confirmed both defects are fixed: the warning modal now stays on screen and is clickable even as the mouse moves toward its buttons, and the warning text reads correctly ("You'll be signed out in 1 minute due to inactivity.").
+
+`WARNING_MS`/`TIMEOUT_MS` in `components/session-timeout-provider.tsx` have been reverted to the real 55/60 minutes — no diagnostic-only code remains in the file. RT-15 is closed as Pass; see `docs/Test Plans/regression-test-plan.md` v2.10. All 15 test cases in the regression plan now Pass.
+
+---
+
 ## 2026-07-28 — RT-15 diagnostic surfaces and fixes two real session-timeout defects
 
 With the diagnostic shortened timer in place (see previous entry below), the warning modal appeared as expected — but WJ found two real, previously-hidden defects while trying to interact with it.
