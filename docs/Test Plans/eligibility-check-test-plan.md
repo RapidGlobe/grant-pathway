@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Any change to the eligibility-mismatch prompt, the Step 3 mismatch UI, or `DR-EL-001`'s behaviour
 
-**Version:** 1.2
-**Date:** 2026-07-27
-**Status:** New plan under `DR-TEST-001` (capability-based test strategy). EL-01 and its corroborating precedents are already-passed reuse; EL-02 completed (caveat — see Notes) but its fixture account's profile has since been overwritten and can no longer reproduce the result (see EL-02 Notes); EL-03 still needs live execution.
+**Version:** 1.3
+**Date:** 2026-07-28
+**Status:** All three cases now executed. EL-01 Pass; EL-02 completed (caveat — see Notes) but its fixture account's profile has since been overwritten and can no longer reproduce the result (see EL-02 Notes); EL-03 Pass — no mismatch warning, correctly defaulting to `false` on a partial/adjacent fit, as `DR-EL-001` requires.
 **Tester:** WJ
 
 ---
@@ -56,9 +56,9 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 
 | Test ID | Test Name                                               | Result        | Notes                                                                                                |
 | ------- | ------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------- |
-| EL-01   | Positive match — no false mismatch on a genuine fit     |               | Reuses MKCF flagship's MKCF-04 result if run same session, or a fresh check                          |
+| EL-01   | Positive match — no false mismatch on a genuine fit     | Pass          | Live-tested 2026-07-28, no eligibility issues to report                                              |
 | EL-02   | Clear negative — hard stop on an unambiguous mismatch   | Pass (caveat) | Completed as a byproduct of AB Charitable Trust flagship testing, 2026-07-27 — see EL-02 Notes below |
-| EL-03   | Borderline — no over-trigger on a partial, adjacent fit |               |                                                                                                      |
+| EL-03   | Borderline — no over-trigger on a partial, adjacent fit | Pass          | Live-tested 2026-07-28, Harry's Rainbow vs Wolfson Foundation — no mismatch warning, as expected     |
 
 ---
 
@@ -80,9 +80,9 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 
 - No mismatch triggered for a charity that is a genuine, unambiguous fit for the funder's stated criteria (same Milton Keynes geography, broad remit)
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28, no eligibility issues to report.
 
 ---
 
@@ -137,9 +137,9 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 - No mismatch warning — the AI should default to `false` on this partial fit and allow the user to continue and make their own eligibility judgement
 - If a mismatch **does** appear, this is not automatically a defect — record the exact reason given and assess whether Wolfson's guidelines contain a genuine exclusion this test's Background didn't anticipate, versus the AI over-triggering on a surface-level theme mismatch. Either finding is useful: it either corrects this test's assumption or surfaces a real calibration issue worth its own defect.
 
-**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:**
+**Notes:** Live-tested 2026-07-28 with Harry's Rainbow (children's bereavement support, Milton Keynes) against Wolfson Foundation's Health & Disability guidelines. No eligibility-mismatch warning appeared. Initially logged as a possible failure since no warning showed, but this is the case's actual expected result (see Expected result above) — the AI correctly defaulted to `false` on a partial/adjacent fit rather than over-triggering, exactly as `DR-EL-001` requires for borderline cases. Not a defect; test passes.
 
 ---
 
@@ -147,6 +147,7 @@ These three, plus EL-01/EL-02/EL-03 below, mean the hard-stop mechanism has now 
 
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.3     | 2026-07-28 | Rapidglobe Ltd | EL-01 and EL-03 both live-tested and passed. EL-01: MK Minds Matter vs MK Community Foundation, no eligibility issues. EL-03: Harry's Rainbow vs Wolfson Foundation Health & Disability — no mismatch warning appeared, which is the case's expected (passing) result, not a failure — the AI correctly defaulted to `false` on a partial/adjacent fit per `DR-EL-001`.                                                                                                                                         |
 | 1.2     | 2026-07-27 | Rapidglobe Ltd | `grantpathway+ABC@gmail.com`'s charity profile was reset to Asylum Justice while starting the AB Charitable Trust flagship's v2.1 re-run, before the mix-up was caught and that run correctly moved to a new account. The EL-02 pass recorded below (v1.1) still stands as historical evidence, but this account no longer holds the Harry's Rainbow profile it depended on and can't reproduce the result — flagged in EL-02's Notes and the header Status line.                                               |
 | 1.1     | 2026-07-27 | Rapidglobe Ltd | EL-02 logged as completed (caveat): occurred as a byproduct of AB Charitable Trust flagship testing (its Harry's Rainbow charity, before that plan's charity swap to Asylum Justice the same day) rather than a deliberate run of this test case. Steps 1–5 confirmed; step 6 (dashboard "Ineligible" badge) not independently checked. `grantpathway+ABC@gmail.com` is now a dedicated fixture for this case, no longer incidentally shared with the flagship plan (which moved to a new account).             |
 | 1.0     | 2026-07-24 | Rapidglobe Ltd | New plan created under `DR-TEST-001`, replacing the per-funder manufactured-mismatch pattern. EL-01 reuses the MK Community Foundation flagship's positive result; EL-02 and EL-03 are new, not yet executed. Prior corroborating hard-stop passes (Idlewild IT-04, Lloyds IT-LBF-03, MKCF's former Elmbridge case) catalogued for reference rather than re-run. Escape-hatch verification (profile correction → successful reapplication) flagged as an open follow-on — never completed in any prior session. |

@@ -44,7 +44,7 @@ Both calls' token usage are summed into the same AI-usage log row — the confir
 
 **Built 2026-07-28.** `app/api/generate-summary/route.ts` — confirmation call added between the primary JSON-parse step and citation reconciliation. `tsc --noEmit`, `eslint --max-warnings 0`, and the full `vitest` suite (98 tests) all pass unchanged (no existing test coverage of this route — Bedrock calls cannot be exercised locally, `dotenvx` redacts AWS credentials for this agent, per established precedent).
 
-Not yet independently verified against a live Bedrock call. WJ's next live regeneration of the National Opera Studio / Idlewild Trust pairing (ideally repeated a few times, matching the conditions that originally surfaced the flip) is the outstanding verification step.
+**Live-verified by WJ, 2026-07-28:** retested the original National Opera Studio vs Idlewild Trust Arts pairing directly — no false eligibility mismatch, no repeat of the original fail-then-pass flip. `eligibility-check-test-plan.md`'s EL-01 was also run the same session as a second, independent positive-match check — Pass, no eligibility issues reported.
 
 ## Date Decided
 

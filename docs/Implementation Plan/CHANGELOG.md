@@ -10,6 +10,19 @@
 
 ---
 
+## 2026-07-28 — Both matrix fixes live-verified; EL-01/EL-03 completed; combined counter made more prominent
+
+WJ live-tested both fixes built earlier the same day:
+
+- **`PDR-AI-011` (eligibility confirmation):** retested National Opera Studio vs Idlewild Trust Arts directly — no false mismatch, no repeat of the original flip. `eligibility-check-test-plan.md` EL-01 (positive-match check) also run — Pass, no eligibility issues.
+- **`PDR-AI-012` (combined word-limit counter):** retested CPF Trust — `overallWordLimit` correctly extracted, combined counter displayed and updated live (confirmed at "600 / 500 words" in red once over). WJ found the counter easy to miss against the sticky progress bar; bumped from 12px to 14px bold (resting colour darkened from `#64748B` to `#334155` for contrast), confirmed as an improvement on retest.
+
+Also completed: `eligibility-check-test-plan.md`'s EL-03 (Harry's Rainbow vs Wolfson Foundation Health & Disability). No mismatch warning appeared — WJ initially read this as a failure, but the test plan's own Background/Expected result confirms this **is** the passing outcome: `DR-EL-001` requires the AI to default borderline/partial fits to `false`, and a bereavement-support charity against a Health & Disability funder that doesn't explicitly exclude it is exactly that case. Corrected and logged as Pass, not a defect. All three eligibility cases (EL-01/02/03) and both `guideline-capability-matrix-test-plan.md` observations from the 2026-07-27 session are now closed.
+
+`guideline-capability-matrix-test-plan.md` bumped to v1.4, `eligibility-check-test-plan.md` to v1.3 (now 🟢 on `TEST-DASHBOARD.md`, v2.10).
+
+---
+
 ## 2026-07-28 — Combined word-limit counter across split sections built (Defect Log #3, `PDR-AI-012`)
 
 Built the fix agreed the previous session for the GCM-03 observation (CPF Trust): a funder's single 500-word limit covering the whole application had no home once `buildSummaryPrompt()` (correctly) split it into 3 topic sections, none of which showed any limit badge.

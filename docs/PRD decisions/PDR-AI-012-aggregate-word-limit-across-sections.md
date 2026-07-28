@@ -42,7 +42,9 @@ Step 4 (`components/application-step4-draft.tsx`) sums the live word count of ev
 
 Automated coverage added: `__tests__/step4-combined-word-limit.test.tsx` (3 tests) — verifies the combined count only sums sections with no individual limit of their own, updates live as text is typed in any contributing section, is unaffected by typing in a section that has its own separate limit, turns red once the aggregate is exceeded, and renders nothing at all when `overallWordLimit` is null. `tsc --noEmit`, `eslint --max-warnings 0`, and the full `vitest` suite (101 tests, including the 3 new ones) all pass.
 
-Not yet independently verified against a live Bedrock call — `overallWordLimit` extraction itself (does the AI correctly recognise CPF Trust's 500-word cap as an aggregate rather than inventing a per-section split of it, or missing it entirely) can only be confirmed against a real regeneration. WJ's next live retest of CPF Trust is the outstanding verification step.
+**Live-verified by WJ, 2026-07-28:** retested CPF Trust — `overallWordLimit` correctly extracted (500), the combined counter displayed and updated live across the 3 linked sections (confirmed showing "600 / 500 words" in red once over), and the badge/soft-nudge behaviour worked as designed.
+
+**Follow-up, same day:** WJ found the counter easy to miss against the sticky progress bar and asked for more visual weight. Bumped from `text-[12px]` to `text-[14px] font-bold`, with the resting-state colour darkened from `#64748B` to `#334155` for better contrast now that the text is bold. Confirmed by WJ as an improvement on retest.
 
 ## Date Decided
 
