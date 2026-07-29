@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-29 — Feature-flag rule replaced with a recovery-path rule, `AI_ENABLED` documented, prompt-regression check added (Opus audit M3)
+
+`DEPLOYMENT-CHECKLIST.md` §"Feature flag convention" stated that any change to AI prompt logic, funder eligibility rules or export behaviour **must be wrapped in an environment variable flag before it ships**. It was not being followed. Only two flags have ever existed, both about preprocessing (`DISABLE_TEXT_PREPROCESSING`, `PREPROCESS_CHAR_CEILING`), while at least four `lib/prompts.ts` changes shipped without one: the Step 3 extraction determinism fix (2026-07-15), the table-format budget-question rule (2026-07-27), the `[ITEM N]` fallback citation marker (2026-07-21), and governance-fact detection plus its manual-add fallback (`PDR-AI-008`).
+
+WJ asked for the option that adds value rather than the option that merely restores compliance, and chose all three changes below.
+
+**1. The rule was replaced, not reinstated — because it guarded the wrong risk.** Every one of those four unflagged changes was itself a _fix_ for a defect found during live testing. In each case the problem was not that a bad change could not be undone — Vercel instant rollback handles that in about a minute — but that the defect went undetected until a human tested manually. A per-change feature flag would not have helped with that at all, which is exactly why the rule was ignored in practice. It is now a **recovery-path convention**: every change in those three categories must have a named way to back it out, recorded in the commit or changelog entry, and Vercel rollback, `AI_ENABLED=false`, or a dedicated flag all qualify. A dedicated flag is still the right answer when a change must be switchable off _without_ reverting everything deployed alongside it. A mandatory rule that is routinely broken is worse than an honest one, because it teaches everyone that the checklist is optional.
+
+**2. `AI_ENABLED` is now documented in the feature-flag table**, listed first. It is the master kill-switch — checked in `/api/generate-summary`, `/api/refine-answer` and the charity-objects paraphrase in `actions/charity.ts` — yet it was absent from the one table an operator would consult during an incident, despite being present in `.env.example` and in both routes. Documented with what users actually experience: the two AI routes return `503` and show the "AI service busy" message, while the charity paraphrase degrades silently so profile setup still completes. Also recorded is the sharp edge that it must be exactly the string `false`; any other value, including `FALSE` or `0`, leaves AI enabled.
+
+**3. New pre-deploy item — the prompt-change regression check.** Any change to `lib/prompts.ts` now requires re-running one known guideline end to end and confirming the extracted question count is unchanged, or changed only as the fix intended, with before/after counts recorded in the changelog. This is the control that would have caught the 12→10 question regression, and it addresses the actual failure mode: silent extraction regressions are the most common defect class in this codebase and are invisible to CI, type-checking and the unit suite (see audit observation **O7** — there are no route-handler or Server Action tests).
+
+**Also fixed in passing:** the pre-deploy item "Any affected funder test plan has been re-run" predated `DR-TEST-001`, which retired per-funder plans in favour of capability layers. It now points at `TEST-DASHBOARD.md` for the current structure. That closes the first half of audit finding **L4**; the missing `**Tier:**` header on this document is the other half and remains open for the documentation sweep.
+
+`DEPLOYMENT-CHECKLIST.md` bumped to v1.3.
+
+---
+
 ## 2026-07-29 — Legal-reviewer options researched and filed (Opus audit S2b); branch protection required-checks corrected
 
 **New document: `docs/legal/legal-review-options-2026-07-29.md`.** Audit finding **S2** — both live legal pages publish `Effective date: [TO BE CONFIRMED]` — was accepted as Severe and is blocking external-tester verification. It splits into **S2a** (set the two dates; not blocked, needs no solicitor) and **S2b** (obtain an independent review), where the real blocker was that WJ had been unable to find a suitable, reasonably priced reviewer. Researched at his request and capped at 10 providers on his instruction.
