@@ -12,17 +12,17 @@ Provided free of charge by **RapidGlobe Ltd** (company no. 05615649). Source cod
 
 ## Tech stack
 
-| Concern                   | Technology                                                 |
-| ------------------------- | ---------------------------------------------------------- |
-| Framework                 | Next.js (App Router), TypeScript                           |
-| Database + Auth + Storage | Supabase (PostgreSQL, London region)                       |
-| AI                        | Anthropic Claude Sonnet 4.6 via Amazon Bedrock (eu-west-2) |
-| Hosting                   | Vercel (function region: London, eu-west-2)                |
-| Email                     | Resend                                                     |
-| Error tracking            | Sentry EU                                                  |
-| Rate limiting             | Upstash Redis                                              |
-| Charity register          | Charity Commission for England and Wales API               |
-| Domain                    | grantpathway.org.uk                                        |
+| Concern                   | Technology                                                            |
+| ------------------------- | --------------------------------------------------------------------- |
+| Framework                 | Next.js (App Router), TypeScript                                      |
+| Database + Auth + Storage | Supabase (PostgreSQL, London region)                                  |
+| AI                        | Anthropic Claude (latest Sonnet model) via Amazon Bedrock (eu-west-2) |
+| Hosting                   | Vercel (function region: London, eu-west-2)                           |
+| Email                     | Resend                                                                |
+| Error tracking            | Sentry EU                                                             |
+| Rate limiting             | Upstash Redis                                                         |
+| Charity register          | Charity Commission for England and Wales API                          |
+| Domain                    | grantpathway.org.uk                                                   |
 
 All data is stored and processed within the UK/EEA. No data is used to train AI models.
 
@@ -34,7 +34,7 @@ All data is stored and processed within the UK/EEA. No data is used to train AI 
 
 - Node.js 18+
 - A Supabase project (London region recommended)
-- AWS credentials with Amazon Bedrock access (Claude Sonnet 4.6, eu-west-2)
+- AWS credentials with Amazon Bedrock access (latest Claude Sonnet model, eu-west-2 — see `lib/prompts.ts`'s `MODEL` constant for the exact deployed value)
 - Upstash Redis instance
 - Resend API key
 - Sentry DSN (optional for local dev)
@@ -85,6 +85,8 @@ Every commit runs Prettier and ESLint via Husky pre-commit hooks. GitHub Actions
 
 See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
 
+A separate scheduled workflow, `schema-drift-check.yml`, runs daily against the real hosted dev and prod Supabase databases (not just a local instance) to catch a tracked migration or RPC function that's missing from either — `validate-migrations` above only proves the migrations apply cleanly to an empty database, not that they've actually been run against the live environments.
+
 ---
 
 ## Documentation
@@ -97,12 +99,14 @@ All project documentation lives in `docs/`. Start here:
 | `docs/Implementation Plan/CHANGELOG.md`                  | Every significant design decision and why it was made                                                 |
 | `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md`       | Pre-deploy gates, rollback steps, feature flags                                                       |
 | `docs/Implementation Plan/ADR-TRACEABILITY.md`           | All ADR consequences mapped to tasks; known gaps (GAP-xx)                                             |
-| `docs/Technical Decision and Design/`                    | Architectural Decision Records (ADRs) — 46 decisions covering every major technical choice            |
+| `docs/Technical Decision and Design/`                    | Architectural Decision Records (ADRs) — see `ADR-INDEX.md` for the current full list of decisions     |
 | `docs/decisions/`                                        | Business and product decision records (DRs)                                                           |
-| `docs/PRD inputs/`                                       | Acceptance criteria and screen requirements                                                           |
+| `docs/PRD-Grant-Pathway.md`                              | Product requirements, including screen-by-screen content and validation rules (Section 7)             |
+| `docs/PRD inputs/acceptance-criteria.md`                 | Functional acceptance criteria                                                                        |
 | `docs/data-model.md`                                     | Full database schema and entity relationships                                                         |
 | `docs/Technical Decision and Design/technology-stack.md` | Tech stack decisions and rationale                                                                    |
 | `docs/non-functional-requirements.md`                    | Performance, accessibility, security, and availability targets                                        |
+| `docs/Test Plans/TEST-DASHBOARD.md`                      | Current test coverage and pass/fail status across the whole test suite                                |
 | `docs/Alan Knox Audits/`                                 | Engineering practice audits against Alan Knox's vibe-coding series                                    |
 | `AGENTS.md`                                              | Rules for AI coding sessions — mandatory pre-task checks, documentation requirements, commit protocol |
 
