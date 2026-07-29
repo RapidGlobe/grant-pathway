@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-29 — Opus audit amended: S4's Sentry claim was wrong, and M8 (Server Action version skew) added
+
+Two amendments to `docs/Opus Audit 290726.md`, both arising from the finding-by-finding walkthrough with WJ.
+
+**S4's Sentry row was wrong and has been withdrawn.** The audit claimed the production Vercel Sentry DSN was empty and that production therefore had no error visibility. It is not empty. `vercel env ls` shows both `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` present in Production (set 71 days ago), and the deployed production JavaScript bundle carries a live DSN on `o4511417358745600.ingest.de.sentry.io` — correct EU region, matching the org ID in `IMPLEMENTATION-PLAN.md:1587`, and the only Sentry host the CSP permits. WJ then confirmed from the Sentry dashboard that `production` events are arriving. The false claim was inherited from `IMPLEMENTATION-STATUS-ARCHIVE.md:830`, a P3.7-era note reading "production Vercel DSN is empty — to be set at P5.4" which was never updated after the DSN was set. **That archive line is still stale and should be corrected** — logged, not yet actioned. One part of the same P5.4 item does remain genuinely unverified: no Sentry alert rule appears to be configured (seven issues accumulated unnoticed), and PII scrubbing has not been confirmed active.
+
+**New finding M8 — deploying over an open tab breaks Server Actions, and the failure is silent.** Investigating Sentry issue `GRANT-PATHWAY-6` ("An unexpected response was received from the server", 8 events over three weeks) produced an unambiguous diagnosis. On 2026-07-25 a tab loaded release `5895146` at 16:41, sat for 2h02m, then posted a Server Action at 18:43 — which returned HTTP `200` but a body React could not parse, throwing via `onunhandledrejection` 17 ms later. Commit `40453bf` had deployed at 17:30, in between, invalidating the older build's Server Action IDs. This is Vercel version skew: **Skew Protection is disabled** (confirmed — production sets no `__vdpl` cookie), and 14 commits were pushed to `master` that single day, each a production deploy invalidating every open tab. A second mechanism compounds it: the 2h02m gap exceeded the 60-minute session timeout, and `D-013` (fixed 2026-07-28) meant the client never signed the user out.
+
+The more serious half is the handling rather than the cause: **88% of the 8 events occurred on `.../step/4`**, the answer-writing screen, not `/profile`. The rejection reaches the global handler with nothing surfaced in the UI, so a tester writing grant answers gets no error, no retry prompt, and no indication the submit failed. Fix is two-part — enable Skew Protection (Pro-plan settings toggle, no code change), then catch Server Action failures and surface a recoverable message, Step 4 first. Not yet distinguished: whether the ~7 early-July events (all release `efd0136c63f8`, all on `step/4`) are also skew or a since-fixed Step 4 fault; the discriminator is whether they show the same long gap before the failing POST.
+
+No service code changed in this entry — audit report amendments plus this record only. Medium findings now number 8.
+
+---
+
 ## 2026-07-29 — `app/mockup/` deleted: publicly reachable internal design mock-up removed (Opus audit S3)
 
 The independent Opus audit (`docs/Opus Audit 290726.md`, finding **S3**) found `app/mockup/page.tsx` — a throwaway design mock-up for the Step 4 Draft Answers redesign, built 2026-06-05 — still shipping to production and reachable with no authentication. It sat outside both the `(public)` and `(authenticated)` route groups; `middleware.ts` gates by allow-list (`PROTECTED`), so a route absent from that list is open by default, and `app/robots.ts` disallows only `/api/`, `/account/` and `/dashboard/`, leaving `/mockup` indexable too.

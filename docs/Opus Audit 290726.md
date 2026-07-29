@@ -17,6 +17,8 @@
 | Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-07-29 | **M6 rewritten** after querying the GitHub API directly. The original said branch protection did not exist; it does — classic protection is live on `master` with all four CI checks required, but `enforce_admins` is `false`, so the only contributor is exempt. Cause differs, practical exposure is the same. A dependency on M2 was identified (admin enforcement cannot be enabled while `audit` is red) and recorded in M2, M6 and §7. |
+| 2026-07-29 | **S4's Sentry row corrected — the original finding was wrong.** It claimed the production Sentry DSN was empty and that production had no error visibility. Verified directly: the production bundle carries a live, correctly-regioned EU DSN and Sentry is receiving events. The false claim was inherited from a stale note in `IMPLEMENTATION-STATUS-ARCHIVE.md`. Corrected in S4 and recorded in §2.                                     |
+| 2026-07-29 | **M8 added** — Server Action version skew. Found by investigating a real production Sentry issue while reviewing S4, so it is evidence-led rather than inspection-led: Vercel Skew Protection is off, and Server Action failures surface as unhandled promise rejections with no user-visible error. Added to §4 and §7.                                                                                                                      |
 
 ---
 
@@ -55,22 +57,23 @@
 
 Everything in this table passes. It is recorded so the findings below are read in proportion.
 
-| Check                                             | Result                                                                                        |
-| ------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `npm run type-check`                              | Pass — 0 errors                                                                               |
-| `npm run lint` (ESLint, `--max-warnings 0`)       | Pass — clean                                                                                  |
-| `npm test` (Vitest)                               | Pass — 10 files, 101 tests, 0 failures                                                        |
-| CI `lint-and-typecheck` job                       | Pass on latest `master`                                                                       |
-| CI `test` job                                     | Pass on latest `master`                                                                       |
-| CI `validate-migrations` job                      | Pass on latest `master`                                                                       |
-| `ADR-INDEX.md` vs 49 ADR files                    | Complete — no orphans, no phantom entries                                                     |
-| `DECISIONS-INDEX.md` vs 31 DR files               | Complete                                                                                      |
-| `PRD-DECISIONS-INDEX.md` vs 26 PDR files          | Complete                                                                                      |
-| `DESIGN-DECISIONS-INDEX.md` vs 14 DDR files       | Complete                                                                                      |
-| Broken relative links in live (non-archived) docs | None                                                                                          |
-| Bedrock model ID format                           | Correct — `anthropic.` prefix, no date suffix                                                 |
-| Dormant schema documented rather than hidden      | Yes — `funders` / `funder_id` marked dormant in `data-model.md` with the deciding DR and date |
-| Internal vs external legal copies in sync         | Yes — identical section headings, delta is exactly the internal changelog blockquotes         |
+| Check                                             | Result                                                                                                                                                          |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run type-check`                              | Pass — 0 errors                                                                                                                                                 |
+| `npm run lint` (ESLint, `--max-warnings 0`)       | Pass — clean                                                                                                                                                    |
+| `npm test` (Vitest)                               | Pass — 10 files, 101 tests, 0 failures                                                                                                                          |
+| CI `lint-and-typecheck` job                       | Pass on latest `master`                                                                                                                                         |
+| CI `test` job                                     | Pass on latest `master`                                                                                                                                         |
+| CI `validate-migrations` job                      | Pass on latest `master`                                                                                                                                         |
+| `ADR-INDEX.md` vs 49 ADR files                    | Complete — no orphans, no phantom entries                                                                                                                       |
+| `DECISIONS-INDEX.md` vs 31 DR files               | Complete                                                                                                                                                        |
+| `PRD-DECISIONS-INDEX.md` vs 26 PDR files          | Complete                                                                                                                                                        |
+| `DESIGN-DECISIONS-INDEX.md` vs 14 DDR files       | Complete                                                                                                                                                        |
+| Broken relative links in live (non-archived) docs | None                                                                                                                                                            |
+| Bedrock model ID format                           | Correct — `anthropic.` prefix, no date suffix                                                                                                                   |
+| Dormant schema documented rather than hidden      | Yes — `funders` / `funder_id` marked dormant in `data-model.md` with the deciding DR and date                                                                   |
+| Internal vs external legal copies in sync         | Yes — identical section headings, delta is exactly the internal changelog blockquotes                                                                           |
+| Production error reporting (added 2026-07-29)     | **Working** — live EU-region DSN in the production bundle, Sentry receiving `production` events. Corrects the original S4 claim; see the correction note in S4. |
 
 ---
 
@@ -118,9 +121,12 @@ The file's own header says _"Not connected to real data. Safe to delete after de
 
 | Gap                                        | Consequence today                                                                          |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| Production Vercel Sentry DSN is empty      | **No error visibility in production.** Errors hit by beta testers are invisible.           |
 | UptimeRobot monitor not configured         | No uptime measurement at all, against a documented 99.5% target (NFR-02)                   |
 | Production Supabase still on the free tier | No automated backups, contrary to `ADR-DATA-005`, which makes Pro a pre-launch requirement |
+
+**Correction, 2026-07-29 — this table originally listed a fourth gap, "Production Vercel Sentry DSN is empty / no error visibility in production." That was wrong and has been removed.** Verified directly: `vercel env ls` shows both `SENTRY_DSN` and `NEXT_PUBLIC_SENTRY_DSN` present in the Production environment, and the deployed production JavaScript bundle carries a live DSN on `o4511417358745600.ingest.de.sentry.io` — the correct EU region, matching the org ID recorded in `IMPLEMENTATION-PLAN.md:1587` and the only Sentry host the CSP permits. Sentry is receiving production events. The false claim was inherited from `IMPLEMENTATION-STATUS-ARCHIVE.md:830`, a P3.7-era note reading _"production Vercel DSN is empty — to be set at P5.4"_ that was never updated after the DSN was set. **That stale line should be corrected** so it does not mislead again. §1 flagged that Vercel Sensitive values could not be read back and that such findings rested on the repository's own records; this is the case where the record was wrong and the finding should have been pressed further before being written.
+
+One genuinely unverified part of the same P5.4 item remains: `IMPLEMENTATION-PLAN.md:1587` also requires PII scrubbing confirmed active and **email alerts configured for new error types**. Seven issues have accumulated in Sentry without being noticed, which suggests no alert rule exists. Errors that arrive but are never read provide little more protection than errors that never arrive.
 
 Also inside P5.4 and easy to lose: the production Supabase redirect-URL allowlist has never been populated. The dev equivalent had to be added manually before email verification worked at all — the same omission in production would break registration for every user on day one.
 
@@ -249,6 +255,36 @@ Separately, the local install has drifted: `npm ls react` reports `react@19.2.7 
 
 **Fix:** run `npm ci` locally to resync, close the superseded PRs, and consider grouping Dependabot updates so the queue stays readable. ESLint 10 / PR #70 stays deferred as already decided.
 
+### M8 — Deploying over an open tab breaks Server Actions, and the failure is silent
+
+_Added 2026-07-29. Found by investigating a real production Sentry issue while verifying S4, so this is evidence-led rather than inspection-led — it has already happened eight times in production._
+
+Sentry issue `GRANT-PATHWAY-6` — "An unexpected response was received from the server", unhandled, 8 events over three weeks, most recently 2026-07-25. The breadcrumb trail is unambiguous:
+
+| Time (BST)   | Event                                                              |
+| ------------ | ------------------------------------------------------------------ |
+| 16:41:27–28  | Three navigation fetches — dashboard, terms, dashboard — all `200` |
+| _~2h02m gap_ | nothing                                                            |
+| 18:43:36.620 | `POST /profile` → **`200`**                                        |
+| 18:43:36.637 | Unhandled promise rejection, 17 ms later                           |
+
+The request **succeeded** at HTTP level and then React failed to parse the body, via `auto.browser.global_handlers.onunhandledrejection` with `handled: false`. That is the signature of a **Server Action** whose response was not a valid flight payload.
+
+**Cause.** The event's release tag is `5895146465b3` — commit `5895146`, 16:39:22 that day. The tab loaded two minutes later, so it was running that build. But commit `40453bf` deployed at **17:30:42**, an hour before the failed submit. The browser was still executing the older build's JavaScript and posting a Server Action ID the new deployment no longer recognised. This is **version skew**, and it is expected behaviour when Vercel's Skew Protection is disabled — which it is. Confirmed by response inspection: production sets no `__vdpl` deployment cookie.
+
+The exposure scales with deploy frequency, and the frequency is high: **14 commits were pushed to `master` on 2026-07-25 alone**, each one a production deploy, each invalidating Server Actions for every tab already open.
+
+A second mechanism compounds it. The 2h02m gap is well past the 60-minute session timeout, and on 2026-07-25 the `D-013` defect meant the client never actually signed the user out — so the tab sat looking authenticated. `D-013` was fixed on 2026-07-28, reducing but not removing this path: an expired session hitting a Server Action produces the same unhandled rejection.
+
+**The more serious half is the handling, not the cause.** The `url` tag shows **88% of the 8 events occurred on `.../step/4`** — the answer-writing screen — not on `/profile`. A tester writing grant answers who hits this gets no error message, no retry prompt, and no indication the submit failed; the rejection goes to the global handler and nothing surfaces in the UI. Silent failure on the one screen where losing work costs the user most.
+
+**Fix, in two parts:**
+
+1. **Enable Vercel Skew Protection** (available on the project's Pro plan, a settings toggle, no code change). Suggested maximum age 1 day. Applies to deployments made after enabling.
+2. **Handle Server Action failures visibly.** Catch the rejection and surface a recoverable message — "your session expired, please sign in again" or "something went wrong, please try again" — rather than letting it reach the global handler. Step 4 is the priority.
+
+**Not yet distinguished.** The 8 events split into roughly 7 in early July (all release `efd0136c63f8`, all on `step/4`) plus the single 2026-07-25 event analysed above. Either all are skew from a heavy-deploy period, or the early cluster is a genuine Step 4 fault in that release that has since been fixed. The discriminator: check whether the early events also show a long gap between the last successful navigation fetch and the failing POST. A long gap means skew or session expiry; adjacent timestamps mean a real code fault.
+
 ---
 
 ## 5. Low — nice to resolve before go-live
@@ -296,20 +332,22 @@ The trap is in the upgrade path, and it is worth recording _now_ while the reaso
 
 Grouped by dependency rather than severity, since several items share a single work session.
 
-| Order | Work                                                                                                                                                                                 | Covers                                                           |
-| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
-| 1     | Delete `app/mockup/`; add `disallow: '/'` to `robots.ts`                                                                                                                             | S3, part of M5 — minutes, and closes a live public exposure      |
-| 2     | Fix AGENTS.md §1's five documentation paths                                                                                                                                          | M1 — five lines, and every subsequent AI session benefits        |
-| 3     | Get the `audit` job green (or move it out of `ci.yml`); reconcile the checklist's CI section with the four real jobs                                                                 | M2 — restores a working CI signal before the riskiest work below |
-| 4     | Move CI to Node 22/24, add `engines`, correct the README prerequisite                                                                                                                | M4                                                               |
-| 5     | Make the base URL environment-driven                                                                                                                                                 | M5                                                               |
-| 6     | **P5.4 production infrastructure** — apply all migrations to prod, repoint env vars, prod Sentry DSN, Supabase Pro, redirect-URL allowlist, UptimeRobot, DNS cutover, `git tag v1.0` | S1, S4, remainder of M5                                          |
-| 7     | **P5.1 compliance** — legal effective dates, solicitor review, dependency licence review                                                                                             | S2, L8                                                           |
-| 8     | Documentation staleness sweep in one pass                                                                                                                                            | L1–L7, L9                                                        |
-| 9     | Decide the feature-flag question: honour the convention or amend it; document `AI_ENABLED` either way                                                                                | M3                                                               |
-| 10    | Set `enforce_admins: true` on `master` (**only after step 3** — unsatisfiable while `audit` is red); delete the disabled "Protect Master" ruleset; rewrite GAP-11 to match reality   | M6                                                               |
-| 11    | `npm ci`; close superseded Dependabot PRs; delete stale local branches                                                                                                               | M7, O8                                                           |
-| 12    | Record the `temperature`/Sonnet 5 upgrade trap in `PDR-AI-001` or `ADR-AI-002`                                                                                                       | O3                                                               |
+| Order | Work                                                                                                                                                                                 | Covers                                                                            |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| 1     | Delete `app/mockup/`; add `disallow: '/'` to `robots.ts`                                                                                                                             | S3, part of M5 — minutes, and closes a live public exposure                       |
+| 1b    | **Enable Vercel Skew Protection** (settings toggle, Pro plan, suggested max age 1 day) and redeploy; then handle Server Action failures visibly, Step 4 first                        | M8 — the toggle takes minutes and should precede the next external tester session |
+| 1c    | Configure a Sentry alert rule for new issues, and confirm PII scrubbing is active                                                                                                    | The one part of S4's Sentry item that is genuinely unverified                     |
+| 2     | Fix AGENTS.md §1's five documentation paths                                                                                                                                          | M1 — five lines, and every subsequent AI session benefits                         |
+| 3     | Get the `audit` job green (or move it out of `ci.yml`); reconcile the checklist's CI section with the four real jobs                                                                 | M2 — restores a working CI signal before the riskiest work below                  |
+| 4     | Move CI to Node 22/24, add `engines`, correct the README prerequisite                                                                                                                | M4                                                                                |
+| 5     | Make the base URL environment-driven                                                                                                                                                 | M5                                                                                |
+| 6     | **P5.4 production infrastructure** — apply all migrations to prod, repoint env vars, prod Sentry DSN, Supabase Pro, redirect-URL allowlist, UptimeRobot, DNS cutover, `git tag v1.0` | S1, S4, remainder of M5                                                           |
+| 7     | **P5.1 compliance** — legal effective dates, solicitor review, dependency licence review                                                                                             | S2, L8                                                                            |
+| 8     | Documentation staleness sweep in one pass                                                                                                                                            | L1–L7, L9                                                                         |
+| 9     | Decide the feature-flag question: honour the convention or amend it; document `AI_ENABLED` either way                                                                                | M3                                                                                |
+| 10    | Set `enforce_admins: true` on `master` (**only after step 3** — unsatisfiable while `audit` is red); delete the disabled "Protect Master" ruleset; rewrite GAP-11 to match reality   | M6                                                                                |
+| 11    | `npm ci`; close superseded Dependabot PRs; delete stale local branches                                                                                                               | M7, O8                                                                            |
+| 12    | Record the `temperature`/Sonnet 5 upgrade trap in `PDR-AI-001` or `ADR-AI-002`                                                                                                       | O3                                                                                |
 
 ---
 
