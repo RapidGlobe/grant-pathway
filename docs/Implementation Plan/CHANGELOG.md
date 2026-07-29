@@ -10,6 +10,42 @@
 
 ---
 
+## 2026-07-29 — Phase 5 reviewed and found not to hang together; restructure proposed, not yet applied
+
+WJ asked for a review of Phase 5 "given your knowledge of the service", and specifically whether the plan should contain a comparison of the built service against the BRD, PRD, technical design and acceptance criteria. It should, and does not. Full findings and the proposed structure: **`docs/Implementation Plan/phase-5-restructure-proposal-2026-07-29.md`** (awaiting WJ's approval — **no change has been made to `IMPLEMENTATION-PLAN.md` or either status document**).
+
+The three structural problems, each verified against code, schema or documents rather than inferred:
+
+1. **The status accounting misstates the position.** `IMPLEMENTATION-STATUS.md` says Phase 0–5 is "all complete, 97 tasks"; the archive says Phase 5 is 13 tasks / 7 done with P5.1–P5.6 each "Not started". Six of those seven "done" are the funder-directory tasks reversed on 2026-07-15 (`DR-FD-001` v1.4). Phase 5's real progress is one task — `P5.PERF1`.
+2. **`P5.3` is headed "Accessibility" but seven of its bullets are not accessibility work** — GAP-05/21/22/23/24/25/31 are code changes derived from ADRs and PDRs, and **none of the seven is built**. The most consequential is **GAP-24**: every Word export still tells the funder "All content has been checked for accuracy before submission", a claim the app cannot make in the user's name. `PDR-DH-003` specifies different wording. One line in `app/api/export/[applicationId]/route.ts`.
+3. **`P5.5` "Final Testing" predates Phase 6** — no coverage of citations, governance facts, the item graph, reuse-previous-application or the eligibility hard-stop, and it competes with the layer structure `DR-TEST-001` put in `TEST-DASHBOARD.md`.
+
+**A related defect in how gaps are recorded, worth its own note.** `ADR-TRACEABILITY.md` marks GAP-21 to GAP-25 `✅ … step added to P5.3 in IMPLEMENTATION-PLAN.md` — meaning **a task was written**. Two rows away, GAP-26's `✅ Resolved (commit 372d95b)` means **the code exists**. One symbol, one column, two meanings. The consequence is not hypothetical: the **Phase 4 → Phase 5 gate sign-off** (2026-06-17) reads "GAP-05/12/17/21/22/23/24/25/26 resolved", and six of those nine are unbuilt. The proposal recommends splitting the column rather than rewriting a signed sign-off.
+
+The proposal's headline addition is a new blocking **`P5.0` — requirements reconciliation**: one pass per requirement document against the built service, output to a dated register with every divergence dispositioned fix / amend-doc / accept, sequenced **before** `P5.5` so final testing tests the agreed specification. The justification is empirical — five instances of doc-vs-build drift were found this month (Stony Stratford, `DR-FD-001`, `DR-TEST-001`, GAP-33, the Opus audit) and every one was found by accident while doing something else.
+
+---
+
+## 2026-07-29 — Dependency updates merged; TypeScript 7 and ESLint 10 deliberately deferred
+
+First output of the morning's `dependabot.yml` grouping rewrite, and it behaved as designed — minors and patches batched, majors left standalone so breakage stays isolated.
+
+**Merged** (both squashed, all four required checks plus the Vercel preview green):
+
+- **#86** `production-minor-patch`, 8 updates — Next 16.2.10 → 16.2.12, `@anthropic-ai/sdk` 0.109 → 0.115, `@sentry/nextjs` 10.68 → 10.69, `@supabase/ssr` 0.12.1 → 0.12.4, plus `lucide-react`, `shadcn`, `unpdf`
+- **#87** `development-minor-patch`, 4 updates — `eslint-config-next` 16.2.10 → 16.2.12, `prettier` 3.9.2 → 3.9.6, `vitest` 4.1.9 → 4.1.10
+
+**Deferred, both blocked upstream by `eslint-config-next` / Next itself, not by our code:**
+
+- **#88 `typescript` 6.0.3 → 7.0.2.** CI fails with `typescript-eslint does not support TS 7.0` (`eslint-config-next@16.2.x` pins `typescript-eslint@^8`, peer range `>=4.8.4 <6.1.0`). The Vercel preview fails separately and more tellingly: Turbopack compiles fine, then **Next 16.2.11's own TypeScript step cannot load TS 7** and reports it as not installed.
+- **#79 `eslint` 9.39.4 → 10.8.0.** Unchanged since 2026-07-20 — `eslint-plugin-react` inside `eslint-config-next` throws under ESLint 10's new API.
+
+Consistent with WJ's 2026-07-20 decision on the ESLint major: wait for upstream rather than pin or override transitive dependencies. **A red Vercel preview on either of these two PRs is expected and is not a production signal.**
+
+**Two process notes worth keeping.** Branch protection refused the first merge attempt — `strict: true` requires the head branch be current with `master`, which had moved. The branch was rebased and re-checked rather than forced through with `--admin`; this was the first live exercise of the protection configured earlier the same day. Separately, #87 then hit a `package-lock.json` rebase conflict against the newly-merged #86, resolved by asking Dependabot to regenerate the lockfile rather than hand-merging it — a hand-merged lockfile can yield a dependency tree that nothing has tested.
+
+---
+
 ## 2026-07-29 — Step 4 now tells the user when a save or action could not reach the server (Opus audit M8, second half)
 
 M8's first half (enabling Vercel Skew Protection) was closed earlier today. This is the second and more important half: **the failure was silent.**
