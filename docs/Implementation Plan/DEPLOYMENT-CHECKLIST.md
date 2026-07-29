@@ -1,7 +1,9 @@
 # Grant Pathway — Deployment Checklist
 
-**Version:** 1.1
-**Last updated:** 15 June 2026
+**Version:** 1.2
+**Last updated:** 29 July 2026
+
+**Changes in 1.2 (Opus audit M2):** the pre-deploy CI item now names the three real gating jobs instead of three invented labels, and the "Standard deploy" step no longer claims deploys wait for CI — they never have. Whether to make that gate real is an open decision.
 
 This checklist must be completed before deploying any change that touches an API route, database migration, authentication flow, AI prompt, or environment variable. For minor documentation-only changes it may be skipped.
 
