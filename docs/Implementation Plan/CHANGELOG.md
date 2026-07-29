@@ -22,6 +22,8 @@ This project still uses `middleware.ts` — which carries the route allow-list, 
 
 `AGENTS.md` §1 also gained a standing instruction: if a listed path is missing, find the current location and correct the table rather than skipping the check, since Next.js reorganises its docs between versions. That is what stops this recurring.
 
+**Logged as audit observation O10 at WJ's request**, with the recommendation to migrate after go-live rather than before — a rename touching authentication and CSP is not worth disturbing while production infrastructure work is outstanding. O10 also records how it went unnoticed: Next 16 arrived on 2026-05-20 inside commit `b369a95` ("fix: update dependencies to resolve security vulnerabilities"), so a major framework upgrade landed within a security patch and the release notes were never read; the deprecation produces no build, lint or CI signal; and the `AGENTS.md` check written to catch exactly this was unenforceable. Added to §6 and as row 12 of the report's suggested order of work.
+
 ---
 
 ## 2026-07-29 — Opus audit amended: S4's Sentry claim was wrong, and M8 (Server Action version skew) added

@@ -18,6 +18,7 @@
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-07-29 | **M6 rewritten** after querying the GitHub API directly. The original said branch protection did not exist; it does — classic protection is live on `master` with all four CI checks required, but `enforce_admins` is `false`, so the only contributor is exempt. Cause differs, practical exposure is the same. A dependency on M2 was identified (admin enforcement cannot be enabled while `audit` is red) and recorded in M2, M6 and §7. |
 | 2026-07-29 | **S4's Sentry row corrected — the original finding was wrong.** It claimed the production Sentry DSN was empty and that production had no error visibility. Verified directly: the production bundle carries a live, correctly-regioned EU DSN and Sentry is receiving events. The false claim was inherited from a stale note in `IMPLEMENTATION-STATUS-ARCHIVE.md`. Corrected in S4 and recorded in §2.                                     |
+| 2026-07-29 | **O10 added** — `middleware.ts` is deprecated in Next 16 (renamed to Proxy). Found while correcting M1's documentation paths, and traced to the same root cause: the unenforceable check in `AGENTS.md` §1 meant no session ever read the deprecation notice. Recorded as an observation rather than a Low finding because the recommendation is explicitly to migrate _after_ go-live. Added to §6 and §7.                                   |
 | 2026-07-29 | **M8 added** — Server Action version skew. Found by investigating a real production Sentry issue while reviewing S4, so it is evidence-led rather than inspection-led: Vercel Skew Protection is off, and Server Action failures surface as unhandled promise rejections with no user-visible error. Added to §4 and §7.                                                                                                                      |
 
 ---
@@ -326,6 +327,20 @@ The trap is in the upgrade path, and it is worth recording _now_ while the reaso
 
 **O9 — On the placement of this file.** I put it at `docs/Opus Audit 290726.md`. There is no existing `reports/` directory, and `docs/Alan Knox Audits/` belongs to a different audit series with its own tracker, so I did not want to file it there. Move it if you would rather it lived elsewhere. Note that if you commit it, AGENTS.md §5 requires `npx prettier --write "docs/Opus Audit 290726.md"` first — it was written from outside the normal edit workflow, so the pre-commit hook will not format it and CI `format:check` would catch it.
 
+**O10 — `middleware.ts` is deprecated in Next 16; migrate after go-live, not before.** _Added 2026-07-29, found while correcting M1's documentation paths._
+
+There is no middleware documentation left in the installed Next 16.2.11 tree — searching it for "middleware" returns no file. The reason is a rename: **as of Next.js 16, Middleware is called Proxy**, and `01-app/03-api-reference/03-file-conventions/proxy.md` states that "the `middleware` file convention is deprecated and has been renamed to `proxy`." Functionality is unchanged. Next ships a codemod that renames both the file and the exported function:
+
+```bash
+npx @next/codemod@canary middleware-to-proxy .
+```
+
+This project still uses `middleware.ts`, which carries the route allow-list, the per-request CSP nonce, and session handling. It works today and Next will not remove the old convention before v17, so **nothing is broken and nothing is urgent.**
+
+**Recommendation: do not migrate before go-live.** It is a rename with tooling, but it touches authentication and security headers — the two things least worth disturbing while production infrastructure work is outstanding. Best done after launch, or folded into the eventual Next 17 upgrade when it becomes mandatory.
+
+**How it went unnoticed is the more useful part of this finding.** Three things aligned: (1) Next 16 entered the project on 2026-05-20 via commit `b369a95`, titled "fix: update dependencies to resolve security vulnerabilities" — a major framework upgrade arriving inside a security patch, so the release notes announcing the rename were never read; (2) the deprecation is silent, producing no build warning, no lint error and no CI signal; (3) `AGENTS.md` §1, the check written specifically to catch this class of change, was pointing at paths that did not exist (**M1**), so no session ever opened the Proxy page. M1 and O10 are the same root failure surfacing two months apart. With M1 fixed, the next session working in that file will see the deprecation notice.
+
 ---
 
 ## 7. Suggested order of work
@@ -347,7 +362,8 @@ Grouped by dependency rather than severity, since several items share a single w
 | 9     | Decide the feature-flag question: honour the convention or amend it; document `AI_ENABLED` either way                                                                                | M3                                                                                |
 | 10    | Set `enforce_admins: true` on `master` (**only after step 3** — unsatisfiable while `audit` is red); delete the disabled "Protect Master" ruleset; rewrite GAP-11 to match reality   | M6                                                                                |
 | 11    | `npm ci`; close superseded Dependabot PRs; delete stale local branches                                                                                                               | M7, O8                                                                            |
-| 12    | Record the `temperature`/Sonnet 5 upgrade trap in `PDR-AI-001` or `ADR-AI-002`                                                                                                       | O3                                                                                |
+| 12    | **Post-launch:** migrate `middleware.ts` → `proxy.ts` via `npx @next/codemod@canary middleware-to-proxy .`, with auth and CSP retested                                               | O10 — deliberately _not_ pre-go-live                                              |
+| 13    | Record the `temperature`/Sonnet 5 upgrade trap in `PDR-AI-001` or `ADR-AI-002`                                                                                                       | O3                                                                                |
 
 ---
 
