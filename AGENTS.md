@@ -28,15 +28,23 @@ This file governs how all contributors — human and AI — work on this codebas
 
 Before writing any Next.js code, identify the area you are working in and read the corresponding guide in `node_modules/next/dist/docs/` before touching any code:
 
-| Area                                 | Where to look                                                    |
-| ------------------------------------ | ---------------------------------------------------------------- |
-| Routing, layouts, pages              | `app-router/building-your-application/routing/`                  |
-| Server Components and Server Actions | `app-router/building-your-application/data-fetching/`            |
-| Middleware                           | `app-router/building-your-application/routing/middleware.md`     |
-| API routes (Route Handlers)          | `app-router/building-your-application/routing/route-handlers.md` |
-| Configuration (`next.config.ts`)     | `app-router/api-reference/next-config-js/`                       |
+| Area                                 | Where to look                                                                                        |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Routing, layouts, pages              | `01-app/01-getting-started/03-layouts-and-pages.md`, `01-app/03-api-reference/03-file-conventions/`  |
+| Server Components and Server Actions | `01-app/01-getting-started/05-server-and-client-components.md`, `01-app/02-guides/server-actions.md` |
+| Data fetching and mutations          | `01-app/01-getting-started/06-fetching-data.md`, `01-app/01-getting-started/07-mutating-data.md`     |
+| Caching and revalidation             | `01-app/01-getting-started/08-caching.md`, `01-app/01-getting-started/09-revalidating.md`            |
+| **Proxy** (formerly Middleware)      | `01-app/01-getting-started/16-proxy.md`, `01-app/03-api-reference/03-file-conventions/proxy.md`      |
+| API routes (Route Handlers)          | `01-app/01-getting-started/15-route-handlers.md`                                                     |
+| Configuration (`next.config.ts`)     | `01-app/03-api-reference/05-config/01-next-config-js/`                                               |
+
+Paths are relative to `node_modules/next/dist/docs/`. The two top-level directories that matter are `01-app/` (App Router — this project) and `02-pages/` (Pages Router — **not** used here; do not read from it).
+
+**As of Next.js 16, Middleware is renamed to Proxy.** The `middleware` file convention is deprecated. This codebase still uses `middleware.ts`, which has not yet been migrated — see the note in `docs/Implementation Plan/CHANGELOG.md` (2026-07-29). Read the Proxy docs, not your training data's Middleware docs, when working in that file.
 
 Heed all deprecation notices. If the guide contradicts your training data, the guide wins.
+
+**If a path above does not exist,** list the directory and find the current location rather than skipping this check — Next.js reorganises its documentation tree between versions. Then correct the table here so the next session does not repeat the search. These paths were wrong from the project's start until 2026-07-29 (they pointed at a non-existent `app-router/` tree), which made this check unenforceable for months; the whole point of the rule is that it actually runs.
 
 **Why:** Next.js App Router introduced breaking changes from the Pages Router. Code written from training data alone has repeatedly introduced subtle bugs and deprecated patterns into this codebase.
 

@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-29 — AGENTS.md §1 Next.js documentation paths corrected (Opus audit M1) — and Middleware is deprecated in Next 16
+
+`AGENTS.md` §1 is the first mandatory pre-task check and the most strongly worded rule in the file: identify the area you are working in and read the corresponding Next.js guide before touching any code, because "this is NOT the Next.js you know." The Opus audit (finding **M1**) found that **all five paths it listed did not exist** — they pointed under `node_modules/next/dist/docs/app-router/…`, and there is no `app-router` directory in the installed package at all. The rule has therefore been structurally unenforceable since the project began: every session following it literally found nothing and either skipped the check or improvised from training data, which is precisely what it exists to prevent. It also undermined `DR-BM-002` (succession plan), which assumes `AGENTS.md` is followable by a future maintainer.
+
+Corrected against the installed Next 16.2.11 tree, with every path verified to exist. The real root is `node_modules/next/dist/docs/`, with `01-app/` for the App Router and `02-pages/` for the Pages Router (explicitly marked not-for-use here). The table was expanded slightly from five rows to seven — data fetching/mutations and caching/revalidation now have their own rows, since those were previously collapsed into a single "data-fetching" path that no longer reflects how the docs are organised.
+
+**Found while verifying those paths — a real deprecation this codebase has not acted on.** There is no middleware documentation in Next 16 at all; searching the installed docs tree for "middleware" returns no file. The reason: **as of Next.js 16, Middleware is renamed to Proxy**, and `01-app/03-api-reference/03-file-conventions/proxy.md` states plainly that "the `middleware` file convention is deprecated and has been renamed to `proxy`." Functionality is unchanged; the rename reflects Next's intent to discourage the pattern and avoid confusion with Express-style middleware. Next ships a codemod for the migration: `npx @next/codemod@canary middleware-to-proxy .`, which renames both the file and the exported function.
+
+This project still uses `middleware.ts` — which carries the route allow-list, the per-request CSP nonce, and session handling. **Not migrated in this entry**, deliberately: `middleware.ts` is load-bearing for authentication and security headers, so a rename belongs in its own change with its own testing, not bundled into a documentation fix. Logged here and noted in `AGENTS.md` §1 so no session mistakes the deprecated name for current practice. This is a good illustration of M1's cost: the check that would have surfaced this months ago was pointing at paths that did not exist.
+
+`AGENTS.md` §1 also gained a standing instruction: if a listed path is missing, find the current location and correct the table rather than skipping the check, since Next.js reorganises its docs between versions. That is what stops this recurring.
+
+---
+
 ## 2026-07-29 — Opus audit amended: S4's Sentry claim was wrong, and M8 (Server Action version skew) added
 
 Two amendments to `docs/Opus Audit 290726.md`, both arising from the finding-by-finding walkthrough with WJ.
