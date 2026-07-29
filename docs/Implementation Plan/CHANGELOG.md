@@ -10,6 +10,29 @@
 
 ---
 
+## 2026-07-29 — M5 verified live; Skew Protection confirmed active; production accidentally rolled back and restored
+
+**Deployment incident, worth recording because the cause is a trap.** While setting `NEXT_PUBLIC_SITE_URL` on production, `vercel redeploy <old-deployment-url>` was used to pick up the new variable. That command **re-deploys the source of the deployment you name** — and the URL taken from the top of `vercel ls --prod` was an older deployment. The result aliased production back to commit `6de08b6` (2026-07-28), **16 commits behind `master`**, silently undoing every change made earlier the same day in production — including the `app/mockup/` deletion, so the publicly reachable mock-up briefly returned.
+
+Caught within minutes by checking the live `APP_VERSION`, which read `2026.07.29-6de08b6` instead of the expected `11feffc`. Fixed with `vercel deploy --prod` from a clean tree at `11feffc`. **The lesson for next time: to pick up an environment-variable change, deploy the current commit — do not `vercel redeploy` an arbitrary URL from `vercel ls`, which is a rollback dressed as a refresh.** Note also that `robots.ts` and `sitemap.ts` are statically prerendered, so an environment-variable change only takes effect on a **new build**; redeploying an existing build would not have applied it regardless.
+
+**M5 then verified live** against `grant-pathway-three.vercel.app`:
+
+| Check          | Result                                                               |
+| -------------- | -------------------------------------------------------------------- |
+| `APP_VERSION`  | `2026.07.29-11feffc` — current `master`                              |
+| `/robots.txt`  | `User-Agent: *` / `Disallow: /` — indexing correctly blocked         |
+| `/sitemap.xml` | URLs now `https://grant-pathway-three.vercel.app/…` from the env var |
+| `/mockup`      | **404** — S3 confirmed gone from production                          |
+
+`NEXT_PUBLIC_SITE_URL` was added via the CLI as **non-sensitive** (`--no-sensitive`). It was created as Sensitive by default, which is wrong for a `NEXT_PUBLIC_` value — that content is inlined into the client bundle and is public by definition — and marking it Sensitive blocks `vercel env pull`, worsening the existing local-development problem where none of the eight required secrets can be retrieved. Removed and re-added.
+
+**Skew Protection (audit M8) confirmed active.** WJ enabled it at a 12-hour maximum age. Verified in production: every asset URL carries a deployment-pinning parameter, e.g. `?dpl=dpl_FGoKRGXkqQzQ4CkdN4KJCmysDHQc`. **The verification method matters** — an earlier check looked for a `__vdpl` cookie and found none, and that was the wrong signal: Next.js on Vercel pins the deployment ID into asset requests rather than setting that cookie, so the cookie's absence proves nothing. The audit report's M8 has been corrected accordingly. Twelve hours is sufficient because the exposure window is bounded by the 60-minute session timeout, not by tab lifetime — an idle tab becomes a signed-out tab, and signing back in loads the current build. That reasoning depends on `D-013` (fixed 2026-07-28) having restored the sign-out.
+
+M8's second half — surfacing Server Action failures to the user instead of letting them reach the global unhandled-rejection handler — remains open.
+
+---
+
 ## 2026-07-29 — Public base URL made environment-driven; indexing now opt-in (Opus audit M5)
 
 `https://grantpathway.org.uk` was hardcoded in nine places while the domain did not serve the app. Checked directly today, and the position is worse than "DNS not pointed yet":
