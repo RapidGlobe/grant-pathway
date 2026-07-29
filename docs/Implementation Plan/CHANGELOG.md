@@ -10,6 +10,31 @@
 
 ---
 
+## 2026-07-29 — Step 4 now tells the user when a save or action could not reach the server (Opus audit M8, second half)
+
+M8's first half (enabling Vercel Skew Protection) was closed earlier today. This is the second and more important half: **the failure was silent.**
+
+The Server Actions in `actions/` already return `{ ok, error }` result objects for expected errors, and Step 4 surfaces those correctly. The gap was the other category — the action call failing _before any result comes back_, where the HTTP request succeeds but the response is not a parseable Server Action payload, so the promise rejects with "An unexpected response was received from the server." Two causes, both observed: version skew (a deployment landing while the page is open) and session expiry (the 60-minute timeout, where the request is redirected to sign-in and React receives HTML).
+
+None of Step 4's handlers caught that. `handleApprove`, `handleAddManualGovernanceItems`, `handleReadyToAssemble` and `handleManualContinue` all awaited their action with no `try`/`catch`, so the rejection escaped to `window.onunhandledrejection` — Sentry recorded it (`GRANT-PATHWAY-6`, 8 events over three weeks, **88% of them on Step 4**) but the user saw nothing: the button simply stopped, with no error, no retry prompt, and no indication anything had failed.
+
+**Worst of all was `doSave`.** It _did_ have a `try`/`catch`, but the catch was empty, commented `// silent — blur will retry on next edit`. The reasoning was sound for a transient failure — and wrong for these two causes, where every retry fails too. A user could keep writing for a long stretch, watching "Saving…" appear and disappear, believing their work was safe while nothing was persisting.
+
+**What changed:**
+
+- **New `lib/action-error.ts`** holding the two user-facing messages, with the reasoning and the Sentry evidence recorded alongside them. The two causes are not reliably distinguishable from the client, so the copy covers both and leads with the recovery action.
+- **`doSave` now surfaces failure** via a sticky `role="alert"` banner in the progress bar: "**Not saved.** This answer could not be saved. The app may have been updated, or your session may have timed out. Your text is still on screen — copy it if you want to be safe, then reload the page and sign in again if asked." with a **Reload now** button. It sits in the sticky bar deliberately — that is where the user already looks for save state, and being sticky it cannot be scrolled past while they carry on typing. It clears automatically when any later save succeeds.
+- **The other four handlers now catch** and route to their existing inline error slots with the shorter "We could not reach the server… your answers are safe" message. No new UI was needed for these; the slots already existed for result-object errors.
+- Telling the user the text is still on screen is deliberate: the answer is not lost, and they can copy it before reloading.
+
+**Documentation, per the Tier 1 checklist:** `PRD-Grant-Pathway.md` Section 7 Screen 7 Step 4 gains an error-state row (v0.62), kept distinct from the existing "API failure" row, which covers the AI routes returning an error rather than an action failing to return at all. `acceptance-criteria.md` gains **AC-FR-18-04**, which also records why this is a deliberate exception to AC-FR-18-02's "background saves are silent, with no visible indicator" rule: silence remains correct for saves that _succeed_, since there is nothing to act on, but it should never have extended to failures.
+
+`npm run type-check`, `npm run lint` and all 101 tests pass. **Not yet verified in the browser** — reproducing it needs an authenticated Step 4 session plus a forced transport failure. Quickest live check: open Step 4, type into an answer, set the browser's network to offline in devtools, click away to trigger the blur save, and confirm the banner appears; then go back online and confirm the next successful save clears it.
+
+Scope note: only Step 4 was changed, matching the audit's recommendation and where 88% of the observed events occurred. The same pattern exists in other components that call Server Actions without a `try`/`catch`, and is worth a sweep post-launch.
+
+---
+
 ## 2026-07-29 — Dependabot switched to weekly grouped updates; lockfile drift resolved; audit's PR count corrected (Opus audit M7, O8)
 
 **First, a correction to the audit itself.** M7 claimed "twenty Dependabot PRs are open on `origin`, several already superseded," citing duplicate `next` and `lucide-react` bumps. That count was wrong. Five are open (#79, #81, #82, #84, #85), none superseded — each is a distinct package at its latest version. `.github/dependabot.yml` sets `open-pull-requests-limit: 5` per ecosystem, so a twenty-PR npm backlog was never possible. The superseded PRs the finding described were real, but had already been closed on 24–27 July, before the audit ran: #83 (`eslint-config-next` 16.2.11), #80 (`react-dom`), #72 (`eslint-config-next` 16.2.10), and #70 (`eslint` 10.7.0, itself superseded by #79 at 10.8.0). Dependabot closes its own PRs when it opens a newer bump for the same package, so the backlog had largely cleared itself. The audit report's M7 has been corrected in place.

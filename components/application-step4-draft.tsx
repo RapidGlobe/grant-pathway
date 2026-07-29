@@ -25,6 +25,7 @@ import {
   FileText,
   History,
 } from 'lucide-react'
+import { SAVE_FAILED_MESSAGE, ACTION_FAILED_MESSAGE } from '@/lib/action-error'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -257,6 +258,9 @@ export function ApplicationStep4Draft({
   )
 
   const [isSaving, setIsSaving] = useState(false)
+  // Set when a save fails at transport level rather than returning a result —
+  // version skew or an expired session. Opus audit M8.
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
 
@@ -355,8 +359,15 @@ export function ApplicationStep4Draft({
     setIsSaving(true)
     try {
       await saveAnswer(answerId, text, source)
+      // A save getting through clears any earlier failure notice — the user has
+      // recovered (usually by reloading) and the banner would now be misleading.
+      setSaveError(null)
     } catch {
-      // silent — blur will retry on next edit
+      // Previously silent, on the reasoning that blur would retry on the next
+      // edit. It does — but if the cause is version skew or an expired session
+      // every retry fails too, and the user was told nothing while believing
+      // their work was saved. Opus audit M8.
+      setSaveError(SAVE_FAILED_MESSAGE)
     } finally {
       pendingSaves.current--
       if (pendingSaves.current === 0) setIsSaving(false)
@@ -502,12 +513,20 @@ export function ApplicationStep4Draft({
     }
     setApprovingId(answerId)
     setApproveErrors((prev) => ({ ...prev, [answerId]: '' }))
-    const result = await approveAnswer(answerId)
-    setApprovingId(null)
-    if (!result.ok) {
-      setApproveErrors((prev) => ({ ...prev, [answerId]: result.error }))
-    } else {
-      setApproved((prev) => ({ ...prev, [answerId]: true }))
+    try {
+      const result = await approveAnswer(answerId)
+      if (!result.ok) {
+        setApproveErrors((prev) => ({ ...prev, [answerId]: result.error }))
+      } else {
+        setApproved((prev) => ({ ...prev, [answerId]: true }))
+      }
+    } catch {
+      // Transport-level failure — the action never returned a result. Without
+      // this the rejection reached the global unhandled handler and the user saw
+      // the approve button simply stop, with no explanation. Opus audit M8.
+      setApproveErrors((prev) => ({ ...prev, [answerId]: ACTION_FAILED_MESSAGE }))
+    } finally {
+      setApprovingId(null)
     }
   }
 
@@ -529,7 +548,15 @@ export function ApplicationStep4Draft({
     }
     setManualAddError(null)
     setIsSavingManualAdd(true)
-    const result = await addManualGovernanceItems(applicationId, [...selectedManualFieldKeys])
+    let result: Awaited<ReturnType<typeof addManualGovernanceItems>>
+    try {
+      result = await addManualGovernanceItems(applicationId, [...selectedManualFieldKeys])
+    } catch {
+      // Transport-level failure — see lib/action-error.ts. Opus audit M8.
+      setManualAddError(ACTION_FAILED_MESSAGE)
+      setIsSavingManualAdd(false)
+      return
+    }
     setIsSavingManualAdd(false)
     if (!result.ok) {
       setManualAddError(result.error)
@@ -547,8 +574,15 @@ export function ApplicationStep4Draft({
   function handleReadyToAssemble() {
     setAssembleError(null)
     startAssembleTransition(async () => {
-      const result = await setDraftReadyToAssemble(applicationId)
-      if (result && !result.ok) setAssembleError(result.error)
+      try {
+        const result = await setDraftReadyToAssemble(applicationId)
+        if (result && !result.ok) setAssembleError(result.error)
+      } catch {
+        // Transport-level failure — see lib/action-error.ts. Without this the
+        // rejection escaped the transition unhandled and the button reverted to
+        // its idle label with nothing explaining why. Opus audit M8.
+        setAssembleError(ACTION_FAILED_MESSAGE)
+      }
     })
   }
 
@@ -562,7 +596,15 @@ export function ApplicationStep4Draft({
     setManualError(null)
     setIsSavingManual(true)
 
-    const saveResult = await saveManualAnswer(applicationId, manualQuestion, manualAnswer)
+    let saveResult: Awaited<ReturnType<typeof saveManualAnswer>>
+    try {
+      saveResult = await saveManualAnswer(applicationId, manualQuestion, manualAnswer)
+    } catch {
+      // Transport-level failure — see lib/action-error.ts. Opus audit M8.
+      setManualError(SAVE_FAILED_MESSAGE)
+      setIsSavingManual(false)
+      return
+    }
     if (!saveResult.ok) {
       setManualError(saveResult.error)
       setIsSavingManual(false)
@@ -570,9 +612,14 @@ export function ApplicationStep4Draft({
     }
 
     startManualContinueTransition(async () => {
-      const result = await setDraftReadyToAssemble(applicationId)
-      if (result && !result.ok) {
-        setManualContinueError(result.error)
+      try {
+        const result = await setDraftReadyToAssemble(applicationId)
+        if (result && !result.ok) {
+          setManualContinueError(result.error)
+          setIsSavingManual(false)
+        }
+      } catch {
+        setManualContinueError(ACTION_FAILED_MESSAGE)
         setIsSavingManual(false)
       }
     })
@@ -706,6 +753,26 @@ export function ApplicationStep4Draft({
               </span>
             )}
           </div>
+          {/* Save-failure notice (Opus audit M8). Lives in the sticky bar
+              alongside "Saving…" because that is where the user already looks
+              for save state, and being sticky means it cannot be scrolled past
+              while they carry on typing into an answer that is not persisting.
+              role="alert" so it is announced immediately rather than politely. */}
+          {saveError && (
+            <div
+              role="alert"
+              className="mb-1.5 rounded-md border border-[#DC2626] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#991B1B]"
+            >
+              <span className="font-semibold">Not saved.</span> {saveError}{' '}
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:outline-none"
+              >
+                Reload now
+              </button>
+            </div>
+          )}
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
             <div
               className="h-full rounded-full bg-[#0D6E6E] transition-all duration-300"

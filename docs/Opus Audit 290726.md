@@ -284,10 +284,10 @@ A second mechanism compounds it. The 2h02m gap is well past the 60-minute sessio
 
 **The more serious half is the handling, not the cause.** The `url` tag shows **88% of the 8 events occurred on `.../step/4`** — the answer-writing screen — not on `/profile`. A tester writing grant answers who hits this gets no error message, no retry prompt, and no indication the submit failed; the rejection goes to the global handler and nothing surfaces in the UI. Silent failure on the one screen where losing work costs the user most.
 
-**Fix, in two parts:**
+**Fix, in two parts — both now done (2026-07-29):**
 
-1. **Enable Vercel Skew Protection** (available on the project's Pro plan, a settings toggle, no code change). Suggested maximum age 1 day. Applies to deployments made after enabling.
-2. **Handle Server Action failures visibly.** Catch the rejection and surface a recoverable message — "your session expired, please sign in again" or "something went wrong, please try again" — rather than letting it reach the global handler. Step 4 is the priority.
+1. **Enable Vercel Skew Protection** (available on the project's Pro plan, a settings toggle, no code change). ✅ Enabled at a 12-hour maximum age and verified active — see the note above.
+2. **Handle Server Action failures visibly.** ✅ Done for Step 4. New `lib/action-error.ts` holds the user-facing copy; `doSave` now raises a sticky `role="alert"` "**Not saved.**" banner in the progress bar with a **Reload now** button instead of swallowing the error, and the approve, add-item, ready-to-assemble and manual-continue handlers all catch and route to their existing inline error slots. `PRD-Grant-Pathway.md` v0.62 and new `AC-FR-18-04` record the behaviour. **Not browser-verified** — reproducing it needs an authenticated Step 4 session plus a forced transport failure. **Remaining scope:** Step 4 only, matching where 88% of events occurred; other components calling Server Actions without a `try`/`catch` share the pattern and are worth a post-launch sweep.
 
 **Not yet distinguished.** The 8 events split into roughly 7 in early July (all release `efd0136c63f8`, all on `step/4`) plus the single 2026-07-25 event analysed above. Either all are skew from a heavy-deploy period, or the early cluster is a genuine Step 4 fault in that release that has since been fixed. The discriminator: check whether the early events also show a long gap between the last successful navigation fetch and the failing POST. A long gap means skew or session expiry; adjacent timestamps mean a real code fault.
 

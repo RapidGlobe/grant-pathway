@@ -972,6 +972,22 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
+**AC-FR-18-04 — A save that cannot reach the server is reported, not swallowed** _(added 2026-07-29, Opus audit M8)_
+
+- **Given** I am writing answers on Step 4
+- **And** the page has become stale — a new version has been deployed since I loaded it, or my session has timed out
+- **When** an auto-save is attempted on blur or by the 60-second background sweep
+- **And** the save fails at transport level, returning no result at all
+- **Then** a visible alert appears in the sticky progress bar reading "**Not saved.**" followed by an explanation that the app may have been updated or the session timed out
+- **And** I am told my text is still on screen and can be copied
+- **And** a "Reload now" action is offered
+- **And** the alert cannot be scrolled out of view while I continue typing
+- **And** the alert clears automatically if a later save succeeds
+
+**Note on the deliberate exception to AC-FR-18-02.** AC-FR-18-02 requires background saves to be **silent** with no visible indicator. That still holds for saves that _succeed_ — silence is correct when there is nothing for the user to act on. It does not extend to failures: prior to this change a failed save was also silent, so a user could continue writing for a long period believing their work was saved when nothing was persisting. This was found in production (Sentry `GRANT-PATHWAY-6`, 8 events over three weeks, 88% on Step 4), where the rejection reached the browser's global unhandled-rejection handler and nothing surfaced in the UI.
+
+---
+
 ### FR-19 — Must Have
 
 **Requirement:** The system shall allow a user to delete a saved application.
