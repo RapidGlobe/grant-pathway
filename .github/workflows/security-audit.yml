@@ -1,0 +1,34 @@
+name: Security Audit
+
+# Dependency-vulnerability scan, split out of ci.yml on 2026-07-29 (Opus audit M2).
+#
+# Why this is a separate workflow rather than a job in ci.yml: a high-severity
+# advisory in a devDependency with no available fix (brace-expansion, via
+# eslint/eslint-config-next — see PR #70, ESLint 10 upgrade deferred) held the
+# `audit` job red continuously. Because a workflow's overall status is the worst
+# of its jobs, ci.yml went red on every push, so a real failure in
+# lint-and-typecheck, test or validate-migrations produced exactly the same red
+# as the known, accepted advisory. The signal stopped carrying information.
+#
+# Splitting it out keeps the scan running and reporting, while letting ci.yml
+# reflect only checks that should block. This workflow is deliberately NOT a
+# required status check on master.
+
+on:
+  schedule:
+    # Mondays 08:00 UTC — weekly is enough for advisory drift, and a weekday
+    # morning means it is seen rather than lost in a weekend backlog.
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm audit --audit-level=high

@@ -74,18 +74,20 @@ Open `http://localhost:3000` in your browser.
 
 ### Code quality
 
-Every commit runs Prettier and ESLint via Husky pre-commit hooks. GitHub Actions CI runs four jobs on every push to `master` and every PR:
+Every commit runs Prettier and ESLint via Husky pre-commit hooks. GitHub Actions CI (`ci.yml`) runs three jobs on every push to `master` and every PR:
 
-| CI job     | What it checks                                                        |
-| ---------- | --------------------------------------------------------------------- |
-| Quality    | `type-check`, `lint`, `format:check`                                  |
-| Tests      | Vitest test suite (`npm test`)                                        |
-| Security   | `npm audit --audit-level=high`                                        |
-| Migrations | Applies all migrations from scratch against a local Supabase instance |
+| CI job                | What it checks                                                        |
+| --------------------- | --------------------------------------------------------------------- |
+| `lint-and-typecheck`  | `type-check`, `lint`, `format:check`                                  |
+| `test`                | Vitest test suite (`npm test`)                                        |
+| `validate-migrations` | Applies all migrations from scratch against a local Supabase instance |
 
 See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`.
 
-A separate scheduled workflow, `schema-drift-check.yml`, runs daily against the real hosted dev and prod Supabase databases (not just a local instance) to catch a tracked migration or RPC function that's missing from either — `validate-migrations` above only proves the migrations apply cleanly to an empty database, not that they've actually been run against the live environments.
+Two further workflows run outside `ci.yml` and do not gate:
+
+- **`security-audit.yml`** — `npm audit --audit-level=high`, weekly on Mondays plus manual runs. Split out of `ci.yml` on 2026-07-29 because an unfixable devDependency advisory kept it red on every push, which made a real failure in the three gating jobs look identical to known noise.
+- **`schema-drift-check.yml`** — runs daily against the real hosted dev and prod Supabase databases (not just a local instance) to catch a tracked migration or RPC function that's missing from either. `validate-migrations` above only proves the migrations apply cleanly to an empty database, not that they've actually been run against the live environments.
 
 ---
 

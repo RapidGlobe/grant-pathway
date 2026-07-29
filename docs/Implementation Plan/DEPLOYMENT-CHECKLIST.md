@@ -11,7 +11,7 @@ This checklist must be completed before deploying any change that touches an API
 
 ### Code quality gates
 
-- [ ] GitHub Actions CI is passing (type-check, lint, format:check all green)
+- [ ] GitHub Actions `ci.yml` is passing — all three gating jobs green: `lint-and-typecheck` (type-check, lint, format:check), `test` (Vitest), `validate-migrations`. **This must be checked manually** — see the note under "Standard deploy" below.
 - [ ] Vercel preview deployment has been reviewed and behaves as expected
 - [ ] Any affected funder test plan has been re-run if AI prompt logic changed
 - [ ] No `console.error` or unhandled promise rejections visible in Vercel function logs during preview testing
@@ -40,7 +40,7 @@ This checklist must be completed before deploying any change that touches an API
 ### Standard deploy (push to master)
 
 1. Merge to `master` — GitHub Actions CI runs automatically
-2. On CI pass, Vercel builds and deploys to production automatically
+2. Vercel builds and deploys to production automatically. **Note: this is not gated on CI.** Vercel deploys on push regardless of whether `ci.yml` passes or fails — the two run independently and in parallel. This document previously stated "on CI pass, Vercel builds and deploys," which was never true in practice (corrected 2026-07-29, Opus audit **M2**). **So CI must be checked manually before and after deploying** — a red run does not stop the code reaching production. Whether to make the gate real (via Vercel's Ignored Build Step) is an open decision.
 3. Monitor Vercel function logs for the first 5 minutes after deploy
 4. Check Sentry for any new errors in the first 10 minutes
 

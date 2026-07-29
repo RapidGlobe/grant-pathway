@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-29 — Dependency scan split out of ci.yml so a real CI failure is visible again (Opus audit M2)
+
+The `audit` job (`npm audit --audit-level=high`) has been moved out of `ci.yml` into a new dedicated workflow, `.github/workflows/security-audit.yml`. WJ chose this option over the alternative of allowing the known advisory.
+
+**Why.** A high-severity `brace-expansion` advisory reaching the tree via `eslint`/`eslint-config-next` (both devDependencies) has no fix available short of the ESLint 10 upgrade deferred in PR #70, so the `audit` job had been red continuously since roughly 2026-07-25. Because a workflow's overall status is the worst of its jobs, `ci.yml` was red on **11 of its last 12 runs** on `master` — which meant a genuine failure in `lint-and-typecheck`, `test` or `validate-migrations` would have produced exactly the same red as the known, accepted noise. All three were confirmed passing at audit time, but nothing would have signalled it if they had not been. The scan still runs and still reports; it simply no longer determines whether `ci.yml` is green.
+
+`security-audit.yml` runs weekly (Mondays 08:00 UTC) plus on manual dispatch, rather than on every push — weekly is sufficient for advisory drift, and it is deliberately **not** a required status check. The removed job's place in `ci.yml` carries a comment explaining where it went and why, so the split does not read as an accidental deletion.
+
+**Also corrected, same finding.** `DEPLOYMENT-CHECKLIST.md` stated under "Standard deploy" that "on CI pass, Vercel builds and deploys to production automatically." That was never true — Vercel deploys on push, independently of and in parallel with CI, so a red run has never stopped code reaching production. Corrected to say so plainly, with an explicit instruction that CI must be checked manually. Whether to make the gate real (via Vercel's Ignored Build Step) is recorded as an open decision, not silently resolved. The pre-deploy checklist item was also corrected: it listed three checks under the old invented names, and now names the three real gating jobs.
+
+**Job naming reconciled across three documents.** `README.md`, `technology-stack.md` TS-08 and `DEPLOYMENT-CHECKLIST.md` all described CI using the labels Quality / Tests / Security / Migrations, which match no actual job name — so a red check in GitHub could not be traced to the document describing it. All three now use the real names (`lint-and-typecheck`, `test`, `validate-migrations`) and list `security-audit.yml` and `schema-drift-check.yml` separately as non-gating workflows.
+
+**Outstanding consequence, not yet actioned:** `master`'s branch protection still lists `audit` among its four required status checks. That job no longer exists in `ci.yml`, so the check will never report and the requirement can never be met. This needs the protection rule updated to the three remaining contexts — flagged to WJ, awaiting his go-ahead since it is a repository settings change. Until then the position is unchanged in practice, because `enforce_admins` is `false` (audit finding **M6**).
+
+---
+
 ## 2026-07-29 — AGENTS.md §1 Next.js documentation paths corrected (Opus audit M1) — and Middleware is deprecated in Next 16
 
 `AGENTS.md` §1 is the first mandatory pre-task check and the most strongly worded rule in the file: identify the area you are working in and read the corresponding Next.js guide before touching any code, because "this is NOT the Next.js you know." The Opus audit (finding **M1**) found that **all five paths it listed did not exist** — they pointed under `node_modules/next/dist/docs/app-router/…`, and there is no `app-router` directory in the installed package at all. The rule has therefore been structurally unenforceable since the project began: every session following it literally found nothing and either skipped the check or improvised from training data, which is precisely what it exists to prevent. It also undermined `DR-BM-002` (succession plan), which assumes `AGENTS.md` is followable by a future maintainer.

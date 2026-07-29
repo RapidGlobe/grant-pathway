@@ -138,14 +138,22 @@ Upstash provides a serverless Redis instance used for per-user rate limiting on 
 | Provider | GitHub Actions |
 
 **Rationale:**
-GitHub Actions runs automatically on every push to `master` and every pull request. Four jobs run in CI:
+GitHub Actions runs automatically on every push to `master` and every pull request. Three gating jobs run in `ci.yml` — job names below are the real workflow job names, so they match what GitHub reports and what branch protection requires:
 
-| Job        | What it checks                                                        |
-| ---------- | --------------------------------------------------------------------- |
-| Quality    | `type-check`, `lint` (ESLint, max-warnings 0), `format:check`         |
-| Tests      | Vitest test suite (`npm test`)                                        |
-| Security   | `npm audit --audit-level=high`                                        |
-| Migrations | Applies all migrations from scratch against a local Supabase instance |
+| Job                   | What it checks                                                        |
+| --------------------- | --------------------------------------------------------------------- |
+| `lint-and-typecheck`  | `type-check`, `lint` (ESLint, max-warnings 0), `format:check`         |
+| `test`                | Vitest test suite (`npm test`)                                        |
+| `validate-migrations` | Applies all migrations from scratch against a local Supabase instance |
+
+Two further workflows run outside `ci.yml` and deliberately do **not** gate:
+
+| Workflow                 | What it checks                                                                      | When                      |
+| ------------------------ | ----------------------------------------------------------------------------------- | ------------------------- |
+| `security-audit.yml`     | `npm audit --audit-level=high`                                                      | Weekly (Mondays) + manual |
+| `schema-drift-check.yml` | Tracked migrations and RPC functions against the real hosted dev and prod databases | Daily                     |
+
+The dependency scan was a fourth job inside `ci.yml` until 2026-07-29. It was separated out because a high-severity advisory in a devDependency with no available fix (see `PR #70`, ESLint 10 upgrade deferred) held it red continuously — and since a workflow's status is the worst of its jobs, `ci.yml` went red on every push. A genuine failure in the three gating jobs became indistinguishable from known, accepted noise. The scan still runs and still reports; it just no longer determines whether `ci.yml` is green.
 
 See `ADR-OPS-008-linting-and-code-quality.md`.
 

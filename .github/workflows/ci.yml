@@ -31,16 +31,12 @@ jobs:
       - run: npm ci
       - run: npm test
 
-  audit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm audit --audit-level=high
+  # The dependency-vulnerability scan formerly lived here as an `audit` job.
+  # Moved to security-audit.yml on 2026-07-29 (Opus audit M2): it was red
+  # continuously from ~2026-07-25 on a devDependency advisory with no available
+  # fix, which turned this whole workflow red on every push and made a genuine
+  # failure in the jobs below indistinguishable from known, accepted noise.
+  # It still runs and still reports — it just no longer gates.
 
   validate-migrations:
     runs-on: ubuntu-latest
