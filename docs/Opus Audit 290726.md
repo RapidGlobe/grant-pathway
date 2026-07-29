@@ -12,6 +12,12 @@
 
 **No changes were made to the service or to any existing documentation.** This file is the only artefact added.
 
+**Amendment history**
+
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-29 | **M6 rewritten** after querying the GitHub API directly. The original said branch protection did not exist; it does — classic protection is live on `master` with all four CI checks required, but `enforce_admins` is `false`, so the only contributor is exempt. Cause differs, practical exposure is the same. A dependency on M2 was identified (admin enforcement cannot be enabled while `audit` is red) and recorded in M2, M6 and §7. |
+
 ---
 
 ## Contents
@@ -162,6 +168,8 @@ Two sub-problems:
 - **The `audit` job being permanently red desensitises the whole CI signal.** I understand the red is known and accepted (`brace-expansion` via `eslint`/`eslint-config-next`, both devDependencies, unfixable short of the deferred ESLint 10 upgrade in PR #70) and I am not reopening that decision. The issue is different: while `audit` is red, the run-level status is red, so a genuine failure in `test`, `lint-and-typecheck` or `validate-migrations` produces the same red you have learned to ignore. I confirmed the other three jobs currently pass — but nothing would have told you if they did not.
 - **The checklist lists three checks; CI runs four jobs.** It omits `test`, `audit` and `validate-migrations` entirely, and uses names (`Quality`/`Tests`/`Security`/`Migrations`, also used in `README.md` and `technology-stack.md` TS-08) that match no actual job name.
 
+**A third consequence, found while pushing this report (see M6):** `master` has branch protection requiring all four checks, so while `audit` is red the requirement is **unsatisfiable** — no push can ever legitimately satisfy it, and every push proceeds only because admins are exempt. The red job is therefore not merely noise; it has made the branch-protection rule structurally impossible to meet, which is very likely why admin enforcement was left off in the first place. Fixing `audit` unblocks M6.
+
 **Fix (either is enough for the desensitisation):** allow the known advisory so `audit` goes green and a real failure is visible again, or split `audit` into a separate non-blocking workflow so `ci.yml` reflects only gating checks. Then either configure Vercel's Ignored Build Step to gate on CI, or amend the checklist to say plainly that deploys are not CI-gated and CI must be checked manually.
 
 ### M3 — The mandatory feature-flag convention is not being followed
@@ -204,13 +212,34 @@ The DNS cutover is a P5.4 step, so this largely self-resolves at launch — but 
 
 **Fix:** derive the base URL from an environment variable with the domain as the default, and add `disallow: '/'` to `robots.ts` until the domain is live.
 
-### M6 — The stated compensating control for branch protection does not exist
+### M6 — Branch protection is configured but exempts the only person who pushes, and GAP-11's status is out of date
 
-`ADR-TRACEABILITY.md` GAP-11 is the only entry still marked 🔴 BLOCKED: branch protection on `master` cannot be configured because it requires GitHub Pro for private repos. The recorded workaround is _"team enforces PR review manually."_
+_Amended 2026-07-29 after querying the GitHub API directly. The original wording said branch protection did not exist. It does — the finding is narrower and more specific than first written._
 
-There is no team, and there are no PRs. Every recent commit went straight to `master`, and every push to `master` deploys to production automatically. So the sole control between an unreviewed commit and production is that the commit happens to be correct. For a solo-plus-AI project that is a reasonable _risk acceptance_, but it should be recorded as one — the current wording describes a review process that is not happening, which is the kind of thing that reads as assurance in a later review.
+`ADR-TRACEABILITY.md` GAP-11 is marked 🔴 BLOCKED, stating that branch protection on `master` "requires GitHub Pro for private repos" and that the workaround is _"team enforces PR review manually."_ Both halves are now inaccurate:
 
-**Fix:** either take the GitHub Pro upgrade and enable the rule before launch, or rewrite GAP-11's status to state the accepted risk honestly.
+**Classic branch protection is live on `master`** (`GET /repos/RapidGlobe/grant-pathway/branches/master/protection`):
+
+| Setting                                  | Value                                                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| `required_status_checks.contexts`        | `lint-and-typecheck`, `test`, `audit`, `validate-migrations` — all four |
+| `required_status_checks.strict`          | `true` (branch must be up to date before merging)                       |
+| `allow_force_pushes` / `allow_deletions` | `false` / `false`                                                       |
+| **`enforce_admins`**                     | **`false`**                                                             |
+| `required_pull_request_reviews`          | **absent — PR review is not required at all**                           |
+
+So the protection exists and is correctly specified, but `enforce_admins: false` exempts repository admins — which in a solo project is the only person who ever pushes. Every push therefore bypasses it. This was demonstrated while committing this very report; the remote responded:
+
+```
+remote: Bypassed rule violations for refs/heads/master:
+remote: - 4 of 4 required status checks are expected.
+```
+
+That push was documentation-only and harmless, but the mechanism is identical for a code change. The practical position is unchanged from the original finding — nothing stands between an unreviewed commit and an automatic production deploy — but the cause is different: not an absent rule, an unenforced one. There is also no PR-review requirement, so GAP-11's "team enforces PR review manually" workaround describes a process that neither happens nor is required.
+
+**Separately, there is dead configuration:** a repository _ruleset_ named "Protect Master" (id `16804175`, created 2026-05-24) exists with `enforcement: "disabled"`. It has no effect. It appears to be the abandoned first attempt that GAP-11 records as blocked — worth deleting so it isn't mistaken for live protection later.
+
+**Fix — and note the ordering dependency, which matters:** setting `enforce_admins: true` is the real fix, but **it must come after M2**. While the `audit` job stays red, the four-check requirement is unsatisfiable, so enabling admin enforcement today would block every push to `master` — including the P5.4 production work. Fix the red `audit` job first, then enable enforcement, then delete the disabled ruleset and rewrite GAP-11 to describe the actual configuration. If admin enforcement is judged too rigid for a solo developer, that is a legitimate call — but record it as an explicit risk acceptance rather than leaving GAP-11 asserting a blocker that no longer exists and a review process that does not happen.
 
 ### M7 — Dependency backlog is stale, and `node_modules` no longer matches the lockfile
 
@@ -278,7 +307,7 @@ Grouped by dependency rather than severity, since several items share a single w
 | 7     | **P5.1 compliance** — legal effective dates, solicitor review, dependency licence review                                                                                             | S2, L8                                                           |
 | 8     | Documentation staleness sweep in one pass                                                                                                                                            | L1–L7, L9                                                        |
 | 9     | Decide the feature-flag question: honour the convention or amend it; document `AI_ENABLED` either way                                                                                | M3                                                               |
-| 10    | Resolve GAP-11 — GitHub Pro, or an honest risk acceptance                                                                                                                            | M6                                                               |
+| 10    | Set `enforce_admins: true` on `master` (**only after step 3** — unsatisfiable while `audit` is red); delete the disabled "Protect Master" ruleset; rewrite GAP-11 to match reality   | M6                                                               |
 | 11    | `npm ci`; close superseded Dependabot PRs; delete stale local branches                                                                                                               | M7, O8                                                           |
 | 12    | Record the `temperature`/Sonnet 5 upgrade trap in `PDR-AI-001` or `ADR-AI-002`                                                                                                       | O3                                                               |
 
