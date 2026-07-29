@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-29 — Legal-reviewer options researched and filed (Opus audit S2b); branch protection required-checks corrected
+
+**New document: `docs/legal/legal-review-options-2026-07-29.md`.** Audit finding **S2** — both live legal pages publish `Effective date: [TO BE CONFIRMED]` — was accepted as Severe and is blocking external-tester verification. It splits into **S2a** (set the two dates; not blocked, needs no solicitor) and **S2b** (obtain an independent review), where the real blocker was that WJ had been unable to find a suitable, reasonably priced reviewer. Researched at his request and capped at 10 providers on his instruction.
+
+Headline options, all with sourced published prices: **qLegal (QMUL) at £0** — the only free scheme found whose criteria admit a _for-profit_ company (turnover under £100k), reopening for enquiries July/August 2026; **Singleton Solicitors at £480 + VAT** — the only published fixed fee covering _both_ documents in one price, SRA-regulated with a commercial/IT specialism; and **Lawhive at roughly £200–£400** for both, the cheapest genuinely regulated route. Recommended path: use the free ICO tools (Privacy Notice Generator, self-assessment toolkit, SME helpline 0303 123 1113 option 4) to clean the drafts first, apply to qLegal in parallel, then pay for the review — realistic total around £576 inc. VAT, plausibly £0.
+
+Ruled out honestly rather than padded: **LawWorks is a hard no** — its criteria require the applicant to _be_ a not-for-profit, so a company supplying charities is excluded regardless of what it provides for free. TrustLaw's >50%-profit-reinvestment test makes eligibility doubtful. The Chancery Lane Project (climate clause library) and Advocate (individuals, barristers, disputes) are not applicable. The main trap flagged is **DPO-as-a-service at £695–£5,000/month** — RapidGlobe almost certainly has no statutory DPO duty, so a monthly retainer to solve a one-off review would be the worst-value option available. Two prices could not be verified against the provider's own site on the day (Singleton and LawBite both failed to resolve) and are flagged in place.
+
+The document is research into providers and their costs — explicitly **not** legal advice, and it makes no recommendation on the content of either legal document.
+
+**Separately, branch protection on `master` corrected.** The previous entry moved the `audit` job out of `ci.yml`, but the protection rule still listed `audit` among its four required status checks — a context that no longer exists and could therefore never report, making the rule permanently unsatisfiable in a new way. Reduced to the three real contexts (`lint-and-typecheck`, `test`, `validate-migrations`) with WJ's authorisation. Everything else deliberately unchanged and verified after the change: `strict` still true, force-pushes and deletions still blocked, no PR-review requirement, and **`enforce_admins` still `false`** — that last one is audit finding **M6** and remains an open decision, not something to change as a side effect of this fix.
+
+---
+
 ## 2026-07-29 — Dependency scan split out of ci.yml so a real CI failure is visible again (Opus audit M2)
 
 The `audit` job (`npm audit --audit-level=high`) has been moved out of `ci.yml` into a new dedicated workflow, `.github/workflows/security-audit.yml`. WJ chose this option over the alternative of allowing the known advisory.
