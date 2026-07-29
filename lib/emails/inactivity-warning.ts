@@ -2,6 +2,8 @@
 // Subject: "Your Grant Pathway account will be deleted in 30 days"
 // Sent at 23 months of inactivity by the inactivity-warning cron job.
 
+import { SITE_URL } from '@/lib/site-url'
+
 export function buildInactivityWarningEmail(firstName: string, deletionDate: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -40,7 +42,7 @@ export function buildInactivityWarningEmail(firstName: string, deletionDate: str
                 <strong>Your account will be permanently deleted on ${deletionDate}.</strong>
                 If you'd like to keep it, simply sign in before that date.
               </p>
-              <a href="https://grantpathway.org.uk/"
+              <a href="${SITE_URL}/"
                  style="display:inline-block;background-color:#0D6E6E;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 24px;border-radius:6px;">
                 Sign in to keep my account
               </a>

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { headers } from 'next/headers'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AxeProvider from '@/components/axe-provider'
+import { SITE_URL } from '@/lib/site-url'
 import './globals.css'
 
 const inter = Inter({
@@ -11,7 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://grantpathway.org.uk'),
+  metadataBase: new URL(SITE_URL),
   title: {
     template: '%s — Grant Pathway',
     default: 'Grant Pathway',
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
     siteName: 'Grant Pathway',
     title: 'Grant Pathway',
     description: 'Your free grant writing companion for UK charities',
-    url: 'https://grantpathway.org.uk',
+    url: SITE_URL,
   },
   twitter: {
     card: 'summary',

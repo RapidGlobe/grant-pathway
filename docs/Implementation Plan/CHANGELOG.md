@@ -10,6 +10,29 @@
 
 ---
 
+## 2026-07-29 — Public base URL made environment-driven; indexing now opt-in (Opus audit M5)
+
+`https://grantpathway.org.uk` was hardcoded in nine places while the domain did not serve the app. Checked directly today, and the position is worse than "DNS not pointed yet":
+
+- The domain **is** attached to the `grant-pathway` Vercel project (both apex and `www`), but its nameservers are still the registrar's (`ns39`/`ns40.domaincontrol.com`). Vercel reports the domain as **not configured properly** and asks for `A grantpathway.org.uk 76.76.21.21`, or the nameservers moved to `ns1`/`ns2.vercel-dns.com`.
+- `https://grantpathway.org.uk` returns HTTP `200` — but from `76.223.67.189`, serving a **registrar parking page**, not the app. It contains no `APP_VERSION`, whereas `grant-pathway-three.vercel.app` correctly serves `2026.07.29-0b8bdf9`. A `200` here is misleading: it looks alive and is not the product.
+- `www.grantpathway.org.uk` does not resolve at all.
+
+So the live consequence was real rather than theoretical: the three transactional emails that link to the domain — inactivity warning, and both account-deletion confirmations — have been sending users to a parking page, and `sitemap.xml` advertised five URLs that do not reach the app. (A note in this changelog dated 2026-07-28 said the domain "already points at `grant-pathway-dev`"; that is not correct, and the DNS check above supersedes it.)
+
+**Fix — one new module, `lib/site-url.ts`, exporting two values:**
+
+- **`SITE_URL`** — the public origin, from `NEXT_PUBLIC_SITE_URL`, defaulting to `https://grantpathway.org.uk` and stripped of any trailing slash. Now used by `app/sitemap.ts`, `app/robots.ts`, `app/layout.tsx` (`metadataBase` and the OpenGraph `url`) and all three emails. The cutover is now one environment variable instead of edits in nine files. The truthiness check is deliberate rather than `??`: `vercel env pull` writes an _empty string_ for an unset variable, which `??` would not catch — the same trap already documented in `next.config.ts` for `VERCEL_GIT_COMMIT_SHA`.
+- **`ALLOW_INDEXING`** — from `NEXT_PUBLIC_ALLOW_INDEXING`, and **opt-in**: unless it is exactly `'true'`, `robots.ts` returns `disallow: '/'` for all user agents. Previously `robots.ts` had `allow: '/'` unconditionally, so the pre-launch `vercel.app` host and every preview deployment were indexable. Safe-by-default was chosen over "disallow until launch, then remember to change it" precisely because the second form relies on remembering.
+
+Both variables documented in `.env.example`. `README.md` gains a short domain-status note so the `vercel.app`-only reality is visible to anyone starting from the readme, and its tech-stack Domain row is qualified.
+
+**Two things deliberately left hardcoded.** The Resend sender address `noreply@grantpathway.org.uk` in `lib/emails/send.ts` — that is a verified sending identity tied to DKIM records at the registrar, not a link, and it works today. And the Word-export footer "Prepared using Grant Pathway v… — grantpathway.org.uk" — a printed brand line, where substituting a `localhost` or `vercel.app` origin during development would make exports look wrong for no gain.
+
+`npm run type-check`, `npm run lint` and all 101 tests pass. **Still requires WJ:** the DNS change at the registrar, then `NEXT_PUBLIC_ALLOW_INDEXING=true` on production at launch. Until then, consider setting `NEXT_PUBLIC_SITE_URL=https://grant-pathway-three.vercel.app` in Vercel so email links reach the running app.
+
+---
+
 ## 2026-07-29 — CI moved to Node 24 to match production; `engines` field added (Opus audit M4)
 
 `ci.yml` pinned `node-version: '20'`. **Node 20 reached end-of-life on 30 April 2026**, so it receives no further security patches — but the more consequential problem was a mismatch nobody had checked. `vercel project inspect` shows the production project runs **Node 24.x**, and local development is on **v24.14.1**. CI was therefore the only place in the whole setup running Node 20 — the one place whose entire job is catching mistakes before they reach users. A regression that manifests only on 24 would have passed CI and broken production; a syntax feature working locally and in production but not on 20 would have failed CI spuriously. Either way a green tick meant "works on an obsolete version," not "works on the version users hit."

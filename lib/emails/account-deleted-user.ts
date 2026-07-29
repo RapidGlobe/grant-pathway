@@ -2,6 +2,8 @@
 // Subject: "Your Grant Pathway account has been deleted"
 // Sent immediately after a user deletes their own account.
 
+import { SITE_URL } from '@/lib/site-url'
+
 export function buildAccountDeletedByUserEmail(firstName: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -39,7 +41,7 @@ export function buildAccountDeletedByUserEmail(firstName: string): string {
               <p style="margin:0 0 24px;font-size:15px;color:#374151;line-height:1.6;">
                 If you change your mind, you can create a new account at any time — it's free.
               </p>
-              <a href="https://grantpathway.org.uk/register"
+              <a href="${SITE_URL}/register"
                  style="display:inline-block;background-color:#0D6E6E;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 24px;border-radius:6px;">
                 Create a new account
               </a>

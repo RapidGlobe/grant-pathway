@@ -22,9 +22,11 @@ Provided free of charge by **RapidGlobe Ltd** (company no. 05615649). Source cod
 | Error tracking            | Sentry EU                                                             |
 | Rate limiting             | Upstash Redis                                                         |
 | Charity register          | Charity Commission for England and Wales API                          |
-| Domain                    | grantpathway.org.uk                                                   |
+| Domain                    | grantpathway.org.uk (DNS not yet pointed at Vercel — see below)       |
 
 All data is stored and processed within the UK/EEA. No data is used to train AI models.
+
+**Domain status (as at 2026-07-29).** `grantpathway.org.uk` is registered and attached to the Vercel project, but its DNS still points at the registrar — the apex serves a parking page and `www` does not resolve at all. The app is reachable only at the `vercel.app` URL above until the A record is changed (Vercel expects `76.76.21.21`, or the nameservers moved to `ns1`/`ns2.vercel-dns.com`). The cutover is a P5.4 step. Nothing in the code hardcodes the domain — `lib/site-url.ts` reads `NEXT_PUBLIC_SITE_URL`, so pointing the app at a different origin is an environment-variable change.
 
 ---
 

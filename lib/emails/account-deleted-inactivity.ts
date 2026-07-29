@@ -2,6 +2,8 @@
 // Subject: "Your Grant Pathway account has been deleted"
 // Sent immediately after automated deletion at 24 months.
 
+import { SITE_URL } from '@/lib/site-url'
+
 export function buildAccountDeletedInactivityEmail(firstName: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
@@ -41,7 +43,7 @@ export function buildAccountDeletedInactivityEmail(firstName: string): string {
                 removed. If you'd like to use Grant Pathway again, you're welcome to create a
                 new free account.
               </p>
-              <a href="https://grantpathway.org.uk/register"
+              <a href="${SITE_URL}/register"
                  style="display:inline-block;background-color:#0D6E6E;color:#FFFFFF;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 24px;border-radius:6px;">
                 Create a new account
               </a>

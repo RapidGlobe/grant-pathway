@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next'
-
-const BASE_URL = 'https://grantpathway.org.uk'
+import { SITE_URL as BASE_URL } from '@/lib/site-url'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
