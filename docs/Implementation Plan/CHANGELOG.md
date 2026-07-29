@@ -35,12 +35,18 @@ First output of the morning's `dependabot.yml` grouping rewrite, and it behaved 
 - **#86** `production-minor-patch`, 8 updates — Next 16.2.10 → 16.2.12, `@anthropic-ai/sdk` 0.109 → 0.115, `@sentry/nextjs` 10.68 → 10.69, `@supabase/ssr` 0.12.1 → 0.12.4, plus `lucide-react`, `shadcn`, `unpdf`
 - **#87** `development-minor-patch`, 4 updates — `eslint-config-next` 16.2.10 → 16.2.12, `prettier` 3.9.2 → 3.9.6, `vitest` 4.1.9 → 4.1.10
 
-**Deferred, both blocked upstream by `eslint-config-next` / Next itself, not by our code:**
+**Deferred and then closed, both blocked upstream by `eslint-config-next` / Next itself, not by our code.** They were first left open, then closed later the same evening — see the note below on why the position changed.
 
 - **#88 `typescript` 6.0.3 → 7.0.2.** CI fails with `typescript-eslint does not support TS 7.0` (`eslint-config-next@16.2.x` pins `typescript-eslint@^8`, peer range `>=4.8.4 <6.1.0`). The Vercel preview fails separately and more tellingly: Turbopack compiles fine, then **Next 16.2.11's own TypeScript step cannot load TS 7** and reports it as not installed.
 - **#79 `eslint` 9.39.4 → 10.8.0.** Unchanged since 2026-07-20 — `eslint-plugin-react` inside `eslint-config-next` throws under ESLint 10's new API.
 
-Consistent with WJ's 2026-07-20 decision on the ESLint major: wait for upstream rather than pin or override transitive dependencies. **A red Vercel preview on either of these two PRs is expected and is not a production signal.**
+Consistent with WJ's 2026-07-20 decision on the ESLint major: wait for upstream rather than pin or override transitive dependencies.
+
+**Both PRs were then closed the same evening, and the reason is worth recording.** They were initially left open. WJ then spotted two further red deployment rows and asked about them — they turned out to be **the same PR (#88) rebuilt twice**, because Dependabot re-bases and rebuilds an open PR on every merge to `master`. Left open, these two would have generated a red row on every future merge indefinitely. That is precisely the desensitisation failure **M2** (a permanently-red CI job masking real failures) and **M7** (a permanently-full PR queue that stopped carrying information) were both about, so leaving them open would have re-created the problem the day it was fixed. Closing costs nothing: Dependabot does not re-raise a PR for a version it has already had closed, but does raise a fresh one for the next release — by which time upstream should have caught up. Rationale is recorded on both closed PRs as well as here.
+
+**A trap found while checking, worth keeping.** The Vercel preview on the **ESLint 10** branch is **green**, which reads as "the incompatibility is fixed". It is not: `next build` does not run ESLint, so a passing Vercel deployment says nothing about the upgrade. Only CI's `lint-and-typecheck` exercises it, and that is still red on the original `contextOrFilename.getFilename is not a function` error. Do not treat a green preview badge on a lint-related dependency PR as evidence.
+
+**A red Vercel preview on a deferred major-version PR is expected and is not a production signal.**
 
 **Two process notes worth keeping.** Branch protection refused the first merge attempt — `strict: true` requires the head branch be current with `master`, which had moved. The branch was rebased and re-checked rather than forced through with `--admin`; this was the first live exercise of the protection configured earlier the same day. Separately, #87 then hit a `package-lock.json` rebase conflict against the newly-merged #86, resolved by asking Dependabot to regenerate the lockfile rather than hand-merging it — a hand-merged lockfile can yield a dependency tree that nothing has tested.
 
