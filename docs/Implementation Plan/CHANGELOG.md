@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-29 — `app/mockup/` deleted: publicly reachable internal design mock-up removed (Opus audit S3)
+
+The independent Opus audit (`docs/Opus Audit 290726.md`, finding **S3**) found `app/mockup/page.tsx` — a throwaway design mock-up for the Step 4 Draft Answers redesign, built 2026-06-05 — still shipping to production and reachable with no authentication. It sat outside both the `(public)` and `(authenticated)` route groups; `middleware.ts` gates by allow-list (`PROTECTED`), so a route absent from that list is open by default, and `app/robots.ts` disallows only `/api/`, `/account/` and `/dashboard/`, leaving `/mockup` indexable too.
+
+No data exposure — the page was never connected to real data. The problem was that it published internal product-strategy notes on a public URL during an external tester beta, and some of those notes are now factually wrong: it stated "Does not handle narrative funders (Garfield Weston, City Bridge)" and recommended implementing "Option B", both of which were superseded when Option B was built. A public page telling a charity (or a named funder) that Grant Pathway does not handle their applications is actively misleading, quite apart from the roadmap and target-funder-coverage detail it disclosed.
+
+Deleted rather than relocated. The file's own header already authorised this — _"Not connected to real data. Safe to delete after design sign-off"_ — and sign-off happened when Option B shipped. The equivalent static design artefact already lives at `docs/Business Design/mockup.html`, so nothing is lost by removing the live route. Verified before deletion that nothing references `app/mockup` or the `/mockup` route anywhere in the codebase (the other `/mockup` matches in `CHANGELOG.md` and `PRD-Grant-Pathway.md` are the tail of the `Business Design/mockup.html` path, unrelated).
+
+WJ authorised this fix during a finding-by-finding walkthrough of the audit report. Note that the second half of the audit's suggested step 1 — adding `disallow: '/'` to `robots.ts` while `grantpathway.org.uk` is still pre-launch (finding **M5**) — is **not** included here; it remains open pending that finding's review.
+
+---
+
 ## 2026-07-28 — external-tester-brief.md relocated to docs/Test Plans, GitBook help link added
 
 WJ asked to move `docs/legal/external-tester-brief.md` (drafted the same day, see the AWS Bedrock entry below) to `docs/Test Plans/` — it's a testing-programme document (a briefing note for external testers), not a legal one, so `docs/legal` was never really its home. Moved with `git mv` (history preserved), not duplicated. While there, added a short "Need a hand while you're testing?" section pointing testers at the real help centre (`https://rapidglobe.gitbook.io/grant-pathway`) before they email in a question.
