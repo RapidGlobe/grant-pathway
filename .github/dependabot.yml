@@ -2,17 +2,49 @@
 # package ecosystems to update and where the package manifests are located.
 # Please see the documentation for all configuration options:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Revised 2026-07-29 (Opus audit M7): daily updates with no grouping kept the
+# queue permanently full at its five-PR limit, each PR a single package bump, so
+# the queue stopped functioning as a signal — the same desensitisation problem as
+# the permanently-red `audit` job in M2. Now weekly and grouped: routine
+# minor/patch bumps arrive as two PRs a week instead of a rolling stream, while
+# major bumps stay separate because those are the ones that need reading.
 
 version: 2
 updates:
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
-      interval: 'daily' # every weekday, Mon–Fri
+      interval: 'weekly'
+      day: 'monday'
     open-pull-requests-limit: 5
+    groups:
+      # Routine production minor/patch bumps — one PR, reviewed as a batch.
+      production-minor-patch:
+        dependency-type: 'production'
+        update-types:
+          - 'minor'
+          - 'patch'
+      # Routine tooling minor/patch bumps — one PR. Lower risk than the above,
+      # since devDependencies do not ship to users.
+      development-minor-patch:
+        dependency-type: 'development'
+        update-types:
+          - 'minor'
+          - 'patch'
+    # Major bumps are deliberately left ungrouped, so each arrives as its own PR
+    # with its own changelog to read. The ESLint 10 upgrade is the standing
+    # example — blocked on eslint-config-next compatibility and deliberately
+    # deferred — and it should stay visible as one identifiable PR rather than
+    # being buried inside a batch.
 
   - package-ecosystem: 'github-actions'
     directory: '/.github/workflows'
     schedule:
-      interval: 'daily'
+      interval: 'weekly'
+      day: 'monday'
     open-pull-requests-limit: 5
+    groups:
+      github-actions:
+        patterns:
+          - '*'

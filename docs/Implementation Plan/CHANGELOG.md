@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-29 — Dependabot switched to weekly grouped updates; lockfile drift resolved; audit's PR count corrected (Opus audit M7, O8)
+
+**First, a correction to the audit itself.** M7 claimed "twenty Dependabot PRs are open on `origin`, several already superseded," citing duplicate `next` and `lucide-react` bumps. That count was wrong. Five are open (#79, #81, #82, #84, #85), none superseded — each is a distinct package at its latest version. `.github/dependabot.yml` sets `open-pull-requests-limit: 5` per ecosystem, so a twenty-PR npm backlog was never possible. The superseded PRs the finding described were real, but had already been closed on 24–27 July, before the audit ran: #83 (`eslint-config-next` 16.2.11), #80 (`react-dom`), #72 (`eslint-config-next` 16.2.10), and #70 (`eslint` 10.7.0, itself superseded by #79 at 10.8.0). Dependabot closes its own PRs when it opens a newer bump for the same package, so the backlog had largely cleared itself. The audit report's M7 has been corrected in place.
+
+**The queue did have a real problem, just not the one described.** `interval: 'daily'` with **no grouping** kept it pinned at the five-PR limit with one package per PR — so the queue stopped carrying information, the same desensitisation pattern as the permanently-red `audit` job in M2. Revised to `weekly` (Mondays) with grouping: routine production minor/patch bumps arrive as one PR, routine devDependency minor/patch bumps as another, so ordinary maintenance is two PRs a week instead of a rolling stream. **Major bumps are deliberately left ungrouped** so each arrives with its own changelog to read — the deferred ESLint 10 upgrade is the standing example, and it should stay visible as one identifiable PR rather than being buried in a batch. GitHub Actions updates also moved to weekly and grouped.
+
+**Lockfile drift resolved.** `npm ls react` reported `react@19.2.7 deduped invalid: "19.2.8" from the root project` — the lockfile correctly pinned 19.2.8 while the installed tree had 19.2.7, so local runs were not testing the pinned versions (CI was unaffected, since it runs `npm ci`). Fixed by running `npm ci`; `react@19.2.8` now resolves consistently throughout the tree.
+
+**Stale local branches deleted (audit observation O8).** `dependabot/npm_and_yarn/prettier-3.8.4` and `dependabot/npm_and_yarn/typescript-6.0.3` existed locally, both superseded by what `package.json` already declares (`prettier ^3.9.2`, `typescript ^6`). Removed; `master` is now the only local branch.
+
+The five open PRs were left open — none is superseded, so there is nothing to close. ESLint 10 (#79) remains deferred as previously decided.
+
+---
+
 ## 2026-07-29 — GAP-11 closed as an accepted deviation; dead ruleset deleted (Opus audit M6)
 
 **Admin enforcement was considered and deliberately rejected, on a mechanical ground rather than a preference.** With the M2 fix in place the required checks are the three real jobs and they are green, so `enforce_admins: true` had become technically possible for the first time. It is still the wrong choice here: **required status checks are evaluated against the commit being pushed, but the checks only run after the push.** A direct push can therefore never satisfy them — which is exactly what the bypass message on earlier pushes was reporting (`4 of 4 required status checks are expected`, i.e. not yet reported). Turning on admin enforcement would not have tightened direct pushes; it would have **blocked them outright**, forcing a pull-request workflow in which the sole developer approves their own PRs. That adds process without adding a reviewer, and it contradicts `AGENTS.md` §5's instruction to push to `origin master` immediately after committing. WJ's decision: accept the exemption and document it.
