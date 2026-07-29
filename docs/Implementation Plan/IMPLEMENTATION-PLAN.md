@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** Approach for a future task changes — update the task spec to reflect current intent
 
-**Version:** 3.20
+**Version:** 3.21
 **Date:** 2026-05-07
-**Last updated:** 2026-07-24
+**Last updated:** 2026-07-29
 **Status:** Ready for development
 **Owner:** Rapidglobe Ltd
 
@@ -108,7 +108,7 @@ Before writing any code, confirm all external accounts are ready:
 | -------------- | ------------------------------------------------------------------ |
 | GitHub         | Create account; create private repository `grant-pathway`          |
 | Vercel         | Create account; link to GitHub repository                          |
-| Node.js 20+    | Verify installed (`node --version`)                                |
+| Node.js 24+    | Verify installed (`node --version`)                                |
 | Docker Desktop | Install with WSL2 backend (required for local Supabase in Phase 3) |
 | Supabase CLI   | Install globally (`npm install -g supabase`)                       |
 

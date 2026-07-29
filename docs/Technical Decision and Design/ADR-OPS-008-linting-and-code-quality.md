@@ -159,7 +159,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - run: npm run type-check
@@ -167,7 +167,9 @@ jobs:
       - run: npm run format:check
 ```
 
-**Result:** Every push to `master` and every PR shows a green ✅ or red ❌ on GitHub before Vercel begins its build.
+**Result:** Every push to `master` and every PR shows a green ✅ or red ❌ on GitHub.
+
+> **Correction (2026-07-29, Opus audit M2/M4).** Two things above describe the plan rather than what was built. First, the snippet shows one job; `ci.yml` as built has **three** gating jobs — `lint-and-typecheck`, `test` and `validate-migrations` — plus a non-gating `security-audit.yml` (the dependency scan, split out because an unfixable devDependency advisory held it permanently red and masked genuine failures) and a scheduled `schema-drift-check.yml`. See `technology-stack.md` TS-08 for the current picture. Second, "before Vercel begins its build" was never true: Vercel deploys on push independently of and in parallel with CI, so a red run has never blocked a deployment. Whether to make that gate real is an open decision recorded in `DEPLOYMENT-CHECKLIST.md`. The `node-version` in the snippet was also updated from `'20'` to `'24'` to match the live workflows — Node 20 reached end-of-life on 30 April 2026, and Vercel runs 24.x. The decision this ADR records is unchanged; only these factual details were stale.
 
 ---
 

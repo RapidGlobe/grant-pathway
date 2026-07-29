@@ -10,6 +10,24 @@
 
 ---
 
+## 2026-07-29 — CI moved to Node 24 to match production; `engines` field added (Opus audit M4)
+
+`ci.yml` pinned `node-version: '20'`. **Node 20 reached end-of-life on 30 April 2026**, so it receives no further security patches — but the more consequential problem was a mismatch nobody had checked. `vercel project inspect` shows the production project runs **Node 24.x**, and local development is on **v24.14.1**. CI was therefore the only place in the whole setup running Node 20 — the one place whose entire job is catching mistakes before they reach users. A regression that manifests only on 24 would have passed CI and broken production; a syntax feature working locally and in production but not on 20 would have failed CI spuriously. Either way a green tick meant "works on an obsolete version," not "works on the version users hit."
+
+The audit's original recommendation was Node 22 or 24. Once the Vercel setting was confirmed as 24.x, **24 became the only sensible choice** — picking 22 would have left a smaller version of the same mismatch.
+
+Changes:
+
+- `node-version: '20'` → `'24'` in `ci.yml` (both Node jobs) and `security-audit.yml`
+- **`"engines": { "node": ">=24" }` added to `package.json`.** There was no `engines` field at all, so nothing anywhere declared a Node requirement and each environment simply chose for itself — which is how three different answers arose. This also has a practical effect beyond documentation: Vercel reads `engines.node` when selecting a runtime, so the production Node version is now pinned in version-controlled code rather than existing only as a dashboard setting nobody had looked at.
+- `README.md` prerequisite corrected from **"Node.js 18+"** — which was below the installed Next 16.2.11's own declared `>=20.9.0`, so anyone following the README with Node 18 would have produced a build that could not run. This mattered more than it looks: `DR-BM-002` (succession plan) assumes a future maintainer can follow the documentation.
+- Same correction applied to `IMPLEMENTATION-PLAN.md` ("Node.js 20+" prerequisite) and `technical-design.md` ("Node.js 20+").
+- `ADR-OPS-008`'s illustrative `ci.yml` snippet updated to `'24'`, with a correction note recording two further ways it had drifted from reality: it shows one job where three now gate, and its "before Vercel begins its build" claim was never true (see M2). The decision the ADR records is unchanged — only stale factual detail.
+
+`npm run type-check`, `npm run lint` and all 101 tests pass after the change.
+
+---
+
 ## 2026-07-29 — Feature-flag rule replaced with a recovery-path rule, `AI_ENABLED` documented, prompt-regression check added (Opus audit M3)
 
 `DEPLOYMENT-CHECKLIST.md` §"Feature flag convention" stated that any change to AI prompt logic, funder eligibility rules or export behaviour **must be wrapped in an environment variable flag before it ships**. It was not being followed. Only two flags have ever existed, both about preprocessing (`DISABLE_TEXT_PREPROCESSING`, `PREPROCESS_CHAR_CEILING`), while at least four `lib/prompts.ts` changes shipped without one: the Step 3 extraction determinism fix (2026-07-15), the table-format budget-question rule (2026-07-27), the `[ITEM N]` fallback citation marker (2026-07-21), and governance-fact detection plus its manual-add fallback (`PDR-AI-008`).

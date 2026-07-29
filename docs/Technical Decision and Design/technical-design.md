@@ -4,9 +4,9 @@
 **Volatility:** High
 **Update when:** Any change to system architecture, data model, API contracts, or component design
 
-**Version:** 1.23
+**Version:** 1.24
 **Date:** 2026-04-21
-**Last updated:** 2026-07-28
+**Last updated:** 2026-07-29
 **Status:** Approved — all architectural decisions decided
 **Owner:** Rapidglobe Ltd
 
@@ -1034,7 +1034,7 @@ WCAG 2.2 Level AA is required from day one. (DDR-AC-001, ADR-OPS-006)
 
 ### Prerequisites
 
-- Node.js 20+
+- Node.js 24+ (declared in `package.json` `engines`; CI and Vercel both run 24.x — Node 20 reached end-of-life 30 April 2026)
 - Docker Desktop (with WSL2 backend on Windows)
 - Supabase CLI (`npm install -g supabase`)
 - Git

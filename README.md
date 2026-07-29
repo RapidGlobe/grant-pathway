@@ -32,7 +32,7 @@ All data is stored and processed within the UK/EEA. No data is used to train AI 
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 24 or newer (declared in `package.json`'s `engines` field, and the version CI and Vercel both run — Node 20 reached end-of-life on 30 April 2026)
 - A Supabase project (London region recommended)
 - AWS credentials with Amazon Bedrock access (latest Claude Sonnet model, eu-west-2 — see `lib/prompts.ts`'s `MODEL` constant for the exact deployed value)
 - Upstash Redis instance
