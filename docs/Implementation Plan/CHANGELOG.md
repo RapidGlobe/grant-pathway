@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-07-29 — GAP-11 closed as an accepted deviation; dead ruleset deleted (Opus audit M6)
+
+**Admin enforcement was considered and deliberately rejected, on a mechanical ground rather than a preference.** With the M2 fix in place the required checks are the three real jobs and they are green, so `enforce_admins: true` had become technically possible for the first time. It is still the wrong choice here: **required status checks are evaluated against the commit being pushed, but the checks only run after the push.** A direct push can therefore never satisfy them — which is exactly what the bypass message on earlier pushes was reporting (`4 of 4 required status checks are expected`, i.e. not yet reported). Turning on admin enforcement would not have tightened direct pushes; it would have **blocked them outright**, forcing a pull-request workflow in which the sole developer approves their own PRs. That adds process without adding a reviewer, and it contradicts `AGENTS.md` §5's instruction to push to `origin master` immediately after committing. WJ's decision: accept the exemption and document it.
+
+**GAP-11's recorded status was wrong on both counts and has been rewritten.** It claimed branch protection "requires GitHub Pro for private repos" — untrue; classic protection is live on `master` with the three CI contexts required, `strict` mode on, and force-pushes and branch deletion blocked. And its workaround, "team enforces PR review manually," described a process that neither happens nor is required: there is no team, and no PR-review requirement exists. All three GAP-11 rows also referred to branch `main`; the branch is `master`. Status changed from 🔴 BLOCKED to ➖ accepted deviation, matching the register's existing convention for GAP-15/GAP-16, with the residual risk stated plainly — nothing prevents an unreviewed commit reaching production, and Vercel deploys independently of CI — alongside the mitigations actually relied on: the pre-deploy checklist, Vercel instant rollback, `AI_ENABLED`, and CI now being genuinely green so a real failure is visible. Flagged to revisit if a second contributor joins, at which point enforcement plus review stops being ceremonial.
+
+**Dead configuration deleted.** The repository ruleset "Protect Master" (id `16804175`, created 2026-05-24, `enforcement: "disabled"`) had no effect and appeared to be the abandoned first attempt GAP-11 recorded as blocked. Deleted via the API so it cannot later be mistaken for live protection. The repository now has no rulesets; classic branch protection is the only mechanism, which removes the ambiguity of having both.
+
+`ADR-OPS-002` and `ADR-STACK-005` consequence rows updated to ✅ with their stale wording corrected. `ADR-TRACEABILITY.md` bumped to v2.13.
+
+---
+
 ## 2026-07-29 — M5 verified live; Skew Protection confirmed active; production accidentally rolled back and restored
 
 **Deployment incident, worth recording because the cause is a trap.** While setting `NEXT_PUBLIC_SITE_URL` on production, `vercel redeploy <old-deployment-url>` was used to pick up the new variable. That command **re-deploys the source of the deployment you name** — and the URL taken from the top of `vercel ls --prod` was an older deployment. The result aliased production back to commit `6de08b6` (2026-07-28), **16 commits behind `master`**, silently undoing every change made earlier the same day in production — including the `app/mockup/` deletion, so the publicly reachable mock-up briefly returned.
