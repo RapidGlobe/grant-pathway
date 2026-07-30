@@ -35,6 +35,40 @@ All six corrected. **Three remaining references are correct and were deliberatel
 
 **2. `user-personas-journeys-and-use-cases.md` still describes the removed funder picker — flagged, not fixed.** Its v1.3 entry (2026-06-01) recorded UC-05 being updated _to_ the funder-directory model, and `DR-FD-001` v1.4 reversed that model on 2026-07-15: the picker was removed and Step 1 is free text again. Four places still describe a "searchable approved directory" and the "My funder isn't listed — request it" link — Journey 1 step 6, Journey 2 step 3, and UC-05 points 1 and 3. Raised with WJ and **carried into `P5.0`'s scope** rather than fixed inside a retitling change; the v1.3 history row is marked superseded so the drift is not invisible meanwhile. A good illustration of why P5.0 exists: the picker removal was propagated into the plan, the BRD and the test plans at the time, but not into this Tier 3 document.
 
+### Follow-on: WJ asked whether `user-personas-journeys-and-use-cases.md` adds any value at all
+
+A fair question, asked directly, and worth answering with evidence rather than an opinion. The answer differed by part.
+
+**Parts 1 and 3 (personas, use cases) — yes, kept.** The personas are load-bearing and recently so: **`PDR-AI-008` (2026-07-15, two weeks before this review) cites Persona 1's lack of formal fundraising training as the reason the governance-fact fallback behaves as it does**, and `tone-and-voice-guide.md` uses both personas as the source for the product's writing voice — its §1 is written directly about Margaret and David. Neither reference is decorative. The overlap with BRD §2 is also smaller than it looks: the BRD covers target users demographically (income band, team size, technical literacy), the personas cover motivation and behaviour, and it is the second kind that informs product decisions.
+
+**Part 2 (user journeys) — no, deleted.** 52 lines describing the five-step flow, which the product itself now defines and `PRD-Grant-Pathway.md` §7 specifies exactly. **A journey map is a pre-build instrument: it exists to decide what to build. Once the thing is built, it becomes a competing description that nobody updates.** Demonstrated precisely here — `DR-FD-001` v1.4 removed the funder picker on 2026-07-15, the change reached the plan, the BRD and the test plans, and did not reach this document, so two journeys went on describing a picker for six weeks. A pointer block now sits where Part 2 was, naming PRD §7, `acceptance-criteria.md` and the flagship test plans as the authorities on the flow, so anyone looking for journeys finds an answer at the place they look rather than nothing.
+
+Deleting Part 2 removed two of the four stale picker references. The other two were in **UC-05** and were corrected in place, including its "Alternative Flows" entry — _"Funder not in directory → … **cannot proceed with an unlisted funder**"_. That gate no longer exists in any form: with free-text entry there is no such thing as an unlisted funder. Removing it was the substantive point of `DR-FD-001` v1.4, and it reflects the founding position that any funder's guidelines should be handled rather than a curated subset.
+
+H1 retitled to "User Personas & Use Cases". **The filename deliberately keeps "journeys"** — nine documents reference this path, including `AGENTS.md`, and renaming a file for a section removal is more churn than value. A note at the top of the document says so.
+
+Document → v1.5, 540 lines → 510.
+
+### A systemic finding this exposed: 36 stale `business/…` paths across five live documents
+
+`tone-and-voice-guide.md`'s Related Documents table pointed at three paths that **do not resolve** — `business/app-name-and-branding.md`, `business/user-personas-journeys-and-use-cases.md`, `business/PRD inputs/email-notifications.md`. All three live under `docs/`. There is no `business/` directory inside the repository at all. Corrected.
+
+Sweeping for the same pattern found **36 further stale `business/…` references across five more live documents**:
+
+| Document                                          | Count | Note                |
+| ------------------------------------------------- | ----- | ------------------- |
+| `docs/Business Design/DESIGN-DECISIONS-INDEX.md`  | 9     |                     |
+| `docs/Business Design/design-requirements.md`     | 8     |                     |
+| `docs/PRD inputs/PRD-INPUTS-INDEX.md`             | 6     |                     |
+| `docs/data-model.md`                              | 5     | **Tier 1 document** |
+| `docs/information-architecture-and-navigation.md` | 2     |                     |
+
+**This exact class of error was found and fixed once before, in one document, and never swept.** `PRD-Grant-Pathway.md:1502` carries the note _"Paths corrected 2026-07-10. All entries below used a stale `business/...` prefix"_ — so on 2026-07-10 someone hit it, fixed that document, and stopped. The same shape as every other finding this week: corrected locally, never propagated.
+
+**Why the audit's link scan missed all of it:** the scan checked markdown links and reported none broken in live documents, which was true. These are backticked paths inside tables — text, not links. Worth noting as a real limitation of that check rather than a gap in the finding.
+
+Raised with WJ; scope beyond the L1 fix, so logged here and carried into `P5.0` rather than fixed inside a retitling change.
+
 ## 2026-07-30 — Phase 5 restructured: approved with amendments and applied
 
 `phase-5-restructure-proposal-2026-07-29.md` walked section by section with WJ and **approved with amendments**. Applied in full: `IMPLEMENTATION-PLAN.md` → **v3.22**, `ADR-TRACEABILITY.md` → **v2.15**, both status documents corrected, proposal → v0.2 (now a record of the review, not the specification).

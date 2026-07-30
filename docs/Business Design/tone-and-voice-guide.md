@@ -8,10 +8,10 @@ This guide defines how Grant Pathway communicates with its users across every sc
 
 | Document                              | Location                                                                                           |
 | ------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| App Name & Branding (colours, fonts)  | `business/app-name-and-branding.md`                                                                |
+| App Name & Branding (colours, fonts)  | `docs/app-name-and-branding.md`                                                                    |
 | Screen Specifications (copy examples) | `docs/PRD-Grant-Pathway.md` (Section 7 -- previously `screen-requirements.md`, retired 2026-07-13) |
-| User Personas                         | `business/user-personas-journeys-and-use-cases.md`                                                 |
-| Email Notifications                   | `business/PRD inputs/email-notifications.md`                                                       |
+| User Personas                         | `docs/user-personas-journeys-and-use-cases.md` (Parts 1 and 3 — journeys removed 2026-07-30)       |
+| Email Notifications                   | `docs/PRD inputs/email-notifications.md`                                                           |
 
 ---
 
@@ -313,6 +313,6 @@ Grant Pathway sounds like a knowledgeable friend who works in the sector -- warm
 
 ---
 
-_Last updated: 2026-04-17_
+_Last updated: 2026-07-30 — the three paths in Related Documents above were corrected from a stale `business/…` prefix to `docs/…`; none of the three had resolved. Found while assessing whether `user-personas-journeys-and-use-cases.md` still earns its place (Opus audit L1 follow-on). The same stale prefix survives in 36 further references across five other live documents — logged, not fixed here._
 _Status: Complete_
 _Sources: app-name-and-branding.md (BR-04), PRD-Grant-Pathway.md Section 7 (previously screen-requirements.md, retired 2026-07-13), user-personas-journeys-and-use-cases.md, PDR-UI-006, design decision records DDR-CS-005, DDR-IP-001, DDR-IP-002_
