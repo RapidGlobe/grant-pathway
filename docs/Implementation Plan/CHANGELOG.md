@@ -10,6 +10,46 @@
 
 ---
 
+## 2026-07-30 — Legal documents prepared for external review: 3 privacy gaps closed, 2 Terms errors fixed, PDFs produced
+
+WJ ran the **ICO's own Privacy Notice Generator** (recommended as step one in `docs/legal/legal-review-options-2026-07-29.md`) and asked for a comparison against `privacy-policy.md` before sending anything to a solicitor.
+
+**The comparison's headline: our policy is substantially better and more complete than the ICO output**, which is a thin skeleton and, as generated, an unfinished one — it carried `[Your additional purpose]` placeholders, three orange instruction boxes, a red "delete these boxes" box, the company **number** typed into the **registered name** field, the wrong brand and domain ("Rapidglobe.com customer privacy notice"), the personal `Wjokhia@` address we deliberately moved away from at v1.3, a retention section pointing circularly at the temporary `grant-pathway-three.vercel.app/privacy` host, and only **one** processing purpose ("to allow the end user to logon"). It also proposed Legitimate interests for account creation where **Contract** is the better analysis. None of that was carried over. It remains useful as a **checklist**, and as evidence to a reviewer that the free ICO tools were used first.
+
+### Three genuine gaps it exposed in our policy — all now closed (privacy policy → v1.5)
+
+1. **First and last name were never disclosed.** Registration has always collected `first_name` and `last_name` (both required, used in email greetings and the nav bar); Section 2 listed only the email address. Now discloses both, plus how the password is treated (one-way hash, never recoverable).
+2. **Consent was missing as a legal basis — the most substantive of the three.** The optional "happy to be contacted" checkbox at registration (`feedback_consent`, FR-08) is textbook consent-based processing and appeared **nowhere** in the policy: not in Section 2, not in the Section 4 basis table. Consequently Section 8 omitted the **right to withdraw consent**, which UK GDPR requires wherever consent is relied on. Now recorded as a basis, with the right added and an explicit statement that withdrawing has no effect on the account or on the lawfulness of prior processing.
+3. **The Charity Commission lookup was undisclosed.** `actions/charity.ts` queries the public register to pre-fill organisation details. A new **"Where we get your information from"** subsection states that almost everything comes directly from the user and discloses this one exception, noting it is optional and returns public register data about the organisation. Flagged for the reviewer rather than asserted as settled: a small charity's registered address is often a trustee's home address.
+
+Also added a short legitimate-interests balancing statement to Section 4, a note in Section 8 that which rights apply depends on the basis, and a retention row for the new fields.
+
+### Two errors found in the Terms of Service while preparing it — one serious (terms → v1.4)
+
+1. **⚠️ Section 6 stated a fair-use limit of 20 AI-assisted requests per month. The real limit is 50.** This is a **binding contractual term**, it was published, and it understated what the service provides by 60%. The cap was raised 20 → 50 on 2026-06-17 (`PDR-AI-005`) and `lib/prompts.ts` has enforced `MONTHLY_CAP = 50` ever since; the Terms were never updated. Six weeks live. **This is the single most consequential thing found today**, and it would have gone to a solicitor uncorrected.
+2. **The contact email was `wjokhia@rapidglobe.com` in four places** (Sections 2, 3, 6, 14). The Privacy Policy moved to `admin@rapidglobe.com` at its v1.3 on 2026-06-17; the Terms did not, so **the two live legal documents gave different contact addresses for the same company.**
+3. Section 5's AWS paragraph still said "when you request a summary or draft answer" — a leftover from the abandoned draft-generation model that the rest of that same section had already been corrected to disprove at v1.1.
+
+**Swept for the stale cap elsewhere, and found two more instances:** `ADR-TRACEABILITY.md`'s `ADR-AI-008` consequence row (_"n of 20 AI requests used this month"_) and two comments in `lib/ai-error-handler.ts` describing a "20/month app-level cap". Both corrected. The 2026-07-10 pass that fixed this figure in `PDR-AI-005`, `ADR-AI-002` and `ADR-AI-008` missed the Terms, the traceability register and the code comments — the same partial-sweep pattern recorded throughout today.
+
+### External copies regenerated rather than hand-mirrored
+
+`privacy-policy-external.md` and `terms-of-service-external.md` were **regenerated from the internal files** by stripping the changelog blockquotes and the internal maintenance note, rather than being edited by hand. The diff was checked line by line to confirm the only changes were the intended ones. This removes the drift risk the internal maintenance note warns about — those files have no changelog of their own, so nothing else prompts the mirror.
+
+### `docs/legal/archive/` created
+
+Only the two genuinely superseded documents moved (`git mv`, history preserved): `grant-pathway-privacy-policy-v1.0.docx` and `grant-pathway-terms-of-service-v1.0.docx` — Word exports of the 22 May 2026 text, now five and four versions behind respectively. The ToS export predates the fair-use correction, so it states the wrong limit too.
+
+**Everything else was deliberately left live** after checking: `AWS-DPA-reference.md`, `AWS-navigating-gdpr-compliance.pdf` (referenced from three documents), `ICO-registration-certificate-ZC168720.pdf`, `sar-procedure.md`, `legal-review-options-2026-07-29.md`, `dependency-licences-2026-07-30.md`, and the four current policy/terms files. References were checked **before** moving (today's L9 lesson): the only mention of either `.docx` is in an archived session note, correctly left as a historical record. `archive/README.md` states plainly that nothing in there is current and must not be sent to a reviewer, names the live authoritative files, and carries the re-base-your-links warning.
+
+### PDFs for the solicitor
+
+`docs/legal/pdf/` — `Grant-Pathway-Privacy-Policy-v1.5.pdf` (8 pages) and `Grant-Pathway-Terms-of-Service-v1.4.pdf` (7 pages), both with a table of contents and page numbers, both generated from the **external** copies since those are the legally operative published text. **`.docx` versions are committed alongside**, because a solicitor will usually want to mark up in Word with tracked changes.
+
+**Method note for whoever regenerates these.** pandoc is installed and pdflatex/xelatex are present, but both LaTeX engines stalled for minutes on first run (MiKTeX installing packages on demand). The reliable route on this machine is **pandoc → `.docx`** (under a second) then **Word via PowerShell COM → PDF**, refreshing the table of contents before saving so page numbers are correct. Both PDFs were visually verified page by page, not assumed — a crude text-extraction check produced false negatives because Word subsets fonts.
+
+**⚠️ Both documents still show `Effective date: [TO BE CONFIRMED]`.** That is audit finding **S2a**, owned by WJ, and it needs no solicitor — but it is the first thing a reviewer will ask about, so it should be set before these PDFs are sent.
+
 ## 2026-07-30 — L9, L10, and a CI cost fix found by a GitHub usage alert
 
 ### L9 — 24 broken relative links, and the cause worth naming

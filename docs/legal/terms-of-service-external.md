@@ -1,8 +1,8 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.3
+**Version:** 1.4
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 10 July 2026**
+**Last updated: 30 July 2026**
 
 ---
 
@@ -26,7 +26,7 @@ Grant Pathway is intended for charitable organisations based in or operating in 
 
 Grant Pathway is not for personal use. It is not intended for commercial fundraising. It is not for use by organisations that are not charitable in nature.
 
-If you are unsure whether your organisation is eligible, please contact us at **wjokhia@rapidglobe.com** before registering.
+If you are unsure whether your organisation is eligible, please contact us at **admin@rapidglobe.com** before registering.
 
 ---
 
@@ -38,7 +38,7 @@ When you register, you create a personal account linked to your email address. Y
 - All activity that takes place under your account
 - Ensuring that the information in your organisation profile is accurate and kept up to date
 
-If you believe your account has been accessed without your authorisation, contact us immediately at **wjokhia@rapidglobe.com**.
+If you believe your account has been accessed without your authorisation, contact us immediately at **admin@rapidglobe.com**.
 
 You may only hold one account per person. You may not share your account with other individuals. You may not create multiple accounts to circumvent the fair-use limit or any other restriction.
 
@@ -75,17 +75,17 @@ Before any AI-generated content is saved to your application, you are asked to c
 
 We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder.
 
-The AI features are powered by the Anthropic Claude model, accessed via Amazon Web Services' Bedrock service (eu-west-2, London). When you request a summary or draft answer, the relevant content from your funder guidelines and organisation profile is processed within UK and European Economic Area infrastructure. Please see our **Privacy Policy** for full details of how your data is handled in this process.
+The AI features are powered by the Anthropic Claude model, accessed via Amazon Web Services' Bedrock service (eu-west-2, London). When you request a summary, or ask for help improving an answer you have written, the relevant content from your funder guidelines and organisation profile is processed within UK and European Economic Area infrastructure. Please see our **Privacy Policy** for full details of how your data is handled in this process.
 
 ---
 
 ## 6. Fair Use
 
-Grant Pathway is free to use. To manage the running costs of the AI features and ensure fair access for all users, each account is subject to a **fair-use limit of 20 AI-assisted requests per calendar month**.
+Grant Pathway is free to use. To manage the running costs of the AI features and ensure fair access for all users, each account is subject to a **fair-use limit of 50 AI-assisted requests per calendar month**.
 
 This limit is intended to accommodate the realistic needs of a small charity writing grant applications throughout the year. The limit resets at the start of each calendar month.
 
-If you believe the limit is preventing you from using the service reasonably, please contact us at **wjokhia@rapidglobe.com**.
+If you believe the limit is preventing you from using the service reasonably, please contact us at **admin@rapidglobe.com**.
 
 ---
 
@@ -182,7 +182,7 @@ These Terms of Service are governed by the laws of England and Wales. Any disput
 
 For any questions about these terms, please contact us:
 
-**Email:** wjokhia@rapidglobe.com
+**Email:** admin@rapidglobe.com
 
 **Post:** RapidGlobe Ltd, Ground Floor Suite, Crown House, 40 North Street, Hornchurch, Essex RM11 1EW
 
@@ -190,6 +190,6 @@ For any questions about these terms, please contact us:
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.3_
+_Version: 1.4_
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 10 July 2026_
+_Last updated: 30 July 2026_

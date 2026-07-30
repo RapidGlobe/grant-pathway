@@ -8,7 +8,7 @@
 //
 // Consistent HTTP status codes and error body shape (GAP-04):
 //
-//   429  usage_limit    — user's 20/month app-level cap reached
+//   429  usage_limit    — user's 50/month app-level cap reached
 //   429  rate_limited   — per-minute Upstash burst limit hit
 //   503  overloaded     — Bedrock returned 529 (service overloaded)
 //   503  timeout        — request timed out waiting for Bedrock
@@ -28,7 +28,7 @@
 // ---------------------------------------------------------------------------
 
 export type AiErrorCode =
-  | 'usage_limit' // App-level 20/month cap
+  | 'usage_limit' // App-level 50/month cap (MONTHLY_CAP in lib/prompts.ts)
   | 'rate_limited' // Per-minute burst limit
   | 'overloaded' // Bedrock 529
   | 'timeout' // Request timed out

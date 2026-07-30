@@ -1,8 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.4
+**Version:** 1.5
 **Effective date: [TO BE CONFIRMED]**
-**Last updated: 2 July 2026**
+**Last updated: 30 July 2026**
+
+> **Change from v1.4 (2 July 2026):** Three disclosure gaps closed, all found by comparing this policy against the notice produced by the ICO's own Privacy Notice Generator (see `docs/legal/legal-review-options-2026-07-29.md`, which recommends using the free ICO tools first). **(1) Section 2 now discloses your first and last name and your password's treatment.** Registration has always collected `first_name` and `last_name` (both required, used in email greetings and the nav bar) but the policy listed only the email address. **(2) Consent is now recorded as a legal basis, and the right to withdraw consent has been added to Section 8.** The optional "happy to be contacted" checkbox at registration (`feedback_consent`, FR-08) is consent-based processing; it appeared nowhere in this policy, and as a result the right to withdraw consent — which UK GDPR requires wherever consent is a basis — was missing. **(3) A new "Where we get your information from" subsection** in Section 2 states that almost everything comes directly from you, and discloses the one exception: the optional Charity Commission register lookup used to pre-fill organisation details. Also added a short legitimate-interests balancing statement to Section 4 and a note in Section 8 that which rights apply depends on the legal basis.
 
 > **Change from v1.3 (29 June 2026):** Sections 2, 3, and 5 corrected to describe the actual AI model — the charity writes every answer; AI refines and improves on request only, and does not generate answers from scratch. This corrects a stale claim left over from an earlier product model abandoned on 2026-05-28.
 
@@ -38,16 +40,27 @@ RapidGlobe Ltd is the **data controller** for the personal information you provi
 
 When you register and use Grant Pathway, you provide:
 
+- **Your name** — your first and last name, collected when you register. We use them to address you by name in emails and in the service
 - **Your email address** — used to create and identify your account
+- **Your password** — stored only as a secure one-way hash. We never see, store, or have any way to recover your actual password
 - **Your organisation's details** — the name, description, who you help, and where you work, as entered in your organisation profile
 - **Grant application content** — funder guidelines you upload or paste in, and the answers you write and refine within the tool
 - **Any AI-suggested improvements** you choose to accept, and any further edits you make, before saving your answer
+- **Your feedback preference** — whether you tick the optional box at registration saying you are happy to be contacted about your experience of using the service. This is entirely optional, ticking it is not a condition of using Grant Pathway, and you can change your mind at any time (see Section 8)
 
 ### Information we collect automatically
 
 - **Usage data** — a count of AI-assisted requests made per account each month, used to manage the fair-use limit
 - **Session data** — a secure token stored in your browser that keeps you signed in while you use the service
 - **Error reports** — if something goes wrong, limited technical information about the error may be collected to help us diagnose and fix the problem
+
+### Where we get your information from
+
+Almost everything we hold comes **directly from you** — you type it in when you register, complete your organisation profile, or work on an application.
+
+There is one exception. If you enter your charity's registration number, Grant Pathway can look that number up in the **public register maintained by the Charity Commission for England and Wales** and pre-fill some of your organisation's details, to save you typing them again. This is optional — you can leave the registration number blank and enter everything yourself. The information returned is public register data about the organisation, not about you personally, and we only use it to populate your organisation profile.
+
+We do not buy personal information, receive it from data brokers, or obtain it from any other third-party source.
 
 We do not collect payment information. We do not use advertising trackers. We do not build profiles for marketing purposes.
 
@@ -70,13 +83,16 @@ We do not use your information for marketing. We do not sell your data. We do no
 
 Under the UK General Data Protection Regulation (UK GDPR), we must have a legal basis for processing your personal data. We rely on the following:
 
-| Processing activity                                      | Legal basis                                                                                            |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Creating and managing your account                       | **Contract** — necessary to provide the service you have signed up for                                 |
-| Saving your organisation profile and application content | **Contract** — necessary to deliver the core features of the service                                   |
-| Sending service emails (welcome, inactivity warning)     | **Contract / Legitimate interests** — necessary to operate the account lifecycle and keep you informed |
-| Managing the fair-use limit                              | **Legitimate interests** — necessary to manage running costs and ensure fair access for all users      |
-| Error monitoring and security                            | **Legitimate interests** — necessary to keep the service reliable and protect against abuse            |
+| Processing activity                                                                          | Legal basis                                                                                                                                                                                            |
+| -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Creating and managing your account                                                           | **Contract** — necessary to provide the service you have signed up for                                                                                                                                 |
+| Saving your organisation profile and application content                                     | **Contract** — necessary to deliver the core features of the service                                                                                                                                   |
+| Sending service emails (welcome, inactivity warning)                                         | **Contract / Legitimate interests** — necessary to operate the account lifecycle and keep you informed                                                                                                 |
+| Managing the fair-use limit                                                                  | **Legitimate interests** — necessary to manage running costs and ensure fair access for all users                                                                                                      |
+| Error monitoring and security                                                                | **Legitimate interests** — necessary to keep the service reliable and protect against abuse                                                                                                            |
+| Recording your feedback preference, and contacting you about your experience if you opted in | **Consent** — we only do this if you ticked the optional box at registration. You may withdraw your consent at any time, and doing so has no effect on your ability to use the service (see Section 8) |
+
+**Where we rely on legitimate interests**, we have considered whether the processing is necessary, whether it could reasonably be achieved another way, and whether it would override your interests or rights. In each case above the processing is limited to what is needed to run the service safely and within cost, and we are satisfied it does not.
 
 ---
 
@@ -115,6 +131,7 @@ Error reports processed by Sentry are stored in the European Union, which is cov
 | Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below)             |
 | Application content                      | Deleted when your account is deleted                                                                   |
 | AI usage log                             | Deleted when your account is deleted                                                                   |
+| Your name and feedback preference        | Deleted when your account is deleted                                                                   |
 | Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below) |
 | Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                      |
 | Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                        |
@@ -135,7 +152,10 @@ Under UK GDPR, you have the following rights in relation to your personal data:
 - **Right to restriction** — you can ask us to limit how we process your data while a concern is being resolved
 - **Right to data portability** — you can ask for your data in a structured, commonly used, machine-readable format
 - **Right to object** — you can object to processing based on legitimate interests
+- **Right to withdraw consent** — where we rely on your consent, you can withdraw it at any time. The only processing we base on consent is contacting you about your experience of the service, if you opted in at registration. You can withdraw that consent by emailing us, and it will not affect your account or your ability to use Grant Pathway in any way
 - **Rights related to automated decision-making** — Grant Pathway does not make automated decisions that have a legal or similarly significant effect on you
+
+Which of these rights apply depends on the legal basis we rely on for the processing in question — Section 4 sets out the basis for each activity. Withdrawing consent does not affect the lawfulness of anything we did before you withdrew it.
 
 To exercise any of these rights, please contact us at **admin@rapidglobe.com**. We will respond within one month of receiving your request. We may need to verify your identity before we can process it.
 
@@ -187,6 +207,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.4_
+_Version: 1.5_
 _Effective date: [TO BE CONFIRMED]_
-_Last updated: 2 July 2026_
+_Last updated: 30 July 2026_
