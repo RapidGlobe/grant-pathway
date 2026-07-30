@@ -10,6 +10,27 @@
 
 ---
 
+## 2026-07-30 — L4 and L5: the two documents that actually needed a Tier header
+
+Done as one change, because L4's remainder and L5's actionable subset are the same fix on the same two files.
+
+**L4 was already two-thirds resolved — by accident.** Of its three parts, the stale _"any affected **funder test plan** has been re-run"_ pre-deploy item (retired by `DR-TEST-001`) and the "still v1.1 / 15 June 2026" complaint were both cleared by the 2026-07-29 M2/M3 work, which took the checklist to v1.3. Only the missing `**Tier:**` header remained, exactly as that day's status note predicted.
+
+**L5 said 147 of 174 live documents lack the header. It reads as 156 of 186 today** — not because anything regressed, but because the figure moves with every document added, which makes it a poor thing to track and worth not recording. The substance of L5 was always the small actionable subset, and the audit was right about that: the great majority of the 156 are correctly governed **by folder**, under `AGENTS.md`'s tier rules for DR/ADR/PDR/DDR records.
+
+**The subset, verified rather than assumed:**
+
+| Document                                           | Finding                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/PRD-Grant-Pathway.md`                        | Now **Tier 1**. `AGENTS.md` §3 has always listed it in the Tier 1 table — review after every task — but the document carried no header, so a reader coming to it directly had no way to know. Checked repo-wide: **it was the only document named in either of `AGENTS.md`'s tier tables that lacked one.** Every other Tier 1 and Tier 2 entry already had its header. |
+| `docs/Implementation Plan/DEPLOYMENT-CHECKLIST.md` | Now **Tier 2**.                                                                                                                                                                                                                                                                                                                                                         |
+
+**The audit was wrong about the second one, and the truth is worse.** L5 described both as "docs `AGENTS.md` names individually by tier that still have no header". `DEPLOYMENT-CHECKLIST.md` is **not named in `AGENTS.md` at all** — zero references, checked directly. So it was not a document whose header had merely been forgotten; it was governed by **nothing**: absent from every tier table and carrying no self-governing header, so no end-of-task checklist has ever pointed at it. That is the document an operator reads immediately before deploying to production, sitting outside the documentation discipline that governs everything else in the repository.
+
+`AGENTS.md` was deliberately **not** modified. Its own §3 "Adding a new document" rule says _"No change to `AGENTS.md` is required — the tier header makes the doc self-governing"_, so the header is the complete fix, and using the project's existing mechanism is better than growing the governing file. Tier 2 rather than 1 because the document describes process rather than product state; **Volatility Medium rather than Low on the evidence** — it went v1.1 → v1.3 in five days. Also switched its `Last updated` to ISO format, which every other document uses.
+
+`PRD-Grant-Pathway.md` → v0.64, `DEPLOYMENT-CHECKLIST.md` → v1.4.
+
 ## 2026-07-30 — L3: NFR-01's pre-launch recommendation resolved, and the real gap named
 
 Audit finding **L3**: `non-functional-requirements.md` still carried _"**Pre-launch recommendation:** … Investigate document pre-processing or streaming responses before go-live"_, seven weeks after pre-processing shipped. Confirmed — `lib/preprocess-text.ts` exists (19KB), is wired into `/api/generate-summary`, and `GAP-30` was closed on 2026-06-07.

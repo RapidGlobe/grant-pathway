@@ -1,7 +1,15 @@
 # Grant Pathway — Deployment Checklist
 
-**Version:** 1.3
-**Last updated:** 29 July 2026
+**Tier:** 2 — Check if relevant to the task
+**Volatility:** Medium
+**Update when:** The deployment process, the CI gating jobs, the recovery-path convention, or the set of pre-deploy checks changes
+
+_Tier header added 2026-07-30 (audit findings L4/L5), and it closes a governance gap rather than merely a formatting one. **This document is not named anywhere in `AGENTS.md`'s tier tables** — the audit stated it was named there individually by tier, which is not the case (checked: `AGENTS.md` contains no reference to it at all). So until now it was governed by nothing: no tier table listed it, and it had no self-governing header, meaning no end-of-task checklist ever pointed at it. That is a live operational document — the one an operator reads before deploying — sitting outside the documentation discipline that governs everything else. Per `AGENTS.md` §3 "Adding a new document" ("No change to `AGENTS.md` is required — the tier header makes the doc self-governing"), adding the header here is the complete fix; `AGENTS.md` deliberately not modified. Tier 2 rather than 1 because it describes process rather than product state, but Volatility is Medium not Low on the evidence: it went from v1.1 to v1.3 in five days._
+
+**Version:** 1.4
+**Last updated:** 2026-07-30
+
+**Changes in 1.4 (Opus audit L4/L5):** `**Tier:**` header added — see the note above; this document was governed by nothing until now. The other two parts of finding **L4** were already resolved by the v1.2/v1.3 work of 2026-07-29: the stale "any affected funder test plan has been re-run" item (retired by `DR-TEST-001`) was removed, and the document is no longer at v1.1 / 15 June 2026. `Last updated` also switched to ISO format for consistency with every other document.
 
 **Changes in 1.3 (Opus audit M3):** `AI_ENABLED` documented in the feature-flag table — it is the master kill-switch and was previously absent from the one place an operator would look during an incident. The "feature flag convention," which mandated a per-change flag and was not being followed, is replaced by a **recovery-path convention** requiring a named way to back the change out. New pre-deploy item: a **prompt-change regression check** on any `lib/prompts.ts` change, since the real failure mode has been undetected extraction regressions rather than un-revertable changes. The stale "any affected funder test plan" item was also corrected — `DR-TEST-001` retired per-funder plans.
 
