@@ -1,4 +1,4 @@
-# Constraints & Assumptions — AI Grant Accelerator v1
+# Constraints & Assumptions — Grant Pathway v1
 
 **Tier:** 2 — Check if relevant to the task
 **Volatility:** Medium

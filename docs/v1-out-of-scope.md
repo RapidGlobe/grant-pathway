@@ -4,7 +4,7 @@
 **Volatility:** Medium
 **Update when:** Any item is confirmed out of scope or scope boundary changes
 
-The following are explicitly **not in scope** for version 1 of the AI Grant Accelerator. Each item is either deferred to a future phase or excluded permanently. Where a future phase is planned, the relevant decision record is referenced.
+The following are explicitly **not in scope** for version 1 of Grant Pathway. Each item is either deferred to a future phase or excluded permanently. Where a future phase is planned, the relevant decision record is referenced.
 
 ---
 

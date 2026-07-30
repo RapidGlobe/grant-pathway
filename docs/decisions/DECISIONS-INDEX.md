@@ -1,4 +1,4 @@
-# Decision Records Index — AI Grant Accelerator
+# Decision Records Index — Grant Pathway
 
 This index lists all business and idea-level decisions that must be made before building the Business Requirements Document (BRD). Each record contains exactly one question to be answered.
 

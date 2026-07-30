@@ -1,4 +1,4 @@
-# Vision Statement — AI Grant Accelerator
+# Vision Statement — Grant Pathway
 
 **Tier:** 3 — Stable; only update if a formal decision changed
 **Volatility:** Low

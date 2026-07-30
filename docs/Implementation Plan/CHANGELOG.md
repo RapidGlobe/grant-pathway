@@ -10,6 +10,31 @@
 
 ---
 
+## 2026-07-30 — L1: retired working title removed from six documents, not one
+
+Audit finding **L1** said `technology-stack.md` was still titled _"Technology Stack — AI Grant Accelerator v1"_, and that its Document History was out of version order. Both confirmed. WJ's context: **"AI Grant Accelerator" was the project's internal working title before the rename to Grant Pathway**, and he was unable to rename the local working folder afterwards — which is exactly why the old name kept resurfacing in documents written against that folder.
+
+WJ asked for a sweep for other references. **Six live documents carried the retired name, not one:**
+
+| Document                                                 | Where                                          |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| `docs/Technical Decision and Design/technology-stack.md` | Title (the one L1 found)                       |
+| `docs/constraints-and-assumptions.md`                    | Title                                          |
+| `docs/decisions/DECISIONS-INDEX.md`                      | Title                                          |
+| `docs/user-personas-journeys-and-use-cases.md`           | Title                                          |
+| `docs/vision-statement.md`                               | Title                                          |
+| `docs/v1-out-of-scope.md`                                | Body — "version 1 of the AI Grant Accelerator" |
+
+All six corrected. **Three remaining references are correct and were deliberately left:** `app-name-and-branding.md`'s "Working title (retired)" row (the record of the rename itself), the audit's own finding text, and the history entries describing this change. Archived copies under `docs/Old/` were not touched.
+
+**Version-order fix.** `technology-stack.md`'s history listed 1.8 and 1.9 above 1.0 and then ran 1.0→1.7 ascending — new entries had been added to the top of an ascending table. Now descending, newest first. **Worth noting the repo has both conventions:** `IMPLEMENTATION-PLAN.md`, `ADR-TRACEABILITY.md` and the PDR/ADR records are descending, while `user-personas-journeys-and-use-cases.md` is ascending and internally consistent. Descending was chosen for `technology-stack.md` to match the high-traffic documents; the personas table was left ascending rather than reordered, because a document that is consistent with itself is not broken.
+
+### Two further findings, both surfaced by the sweep rather than by the audit
+
+**1. A live test plan hardcoded the author's full local OneDrive path.** `regression-test-plan.md` RT-14 step 4 instructed the tester to `cd` into the full `C:\Users\WJ\OneDrive - Rapidglobe Ltd\...` path. It surfaced here only because that path contains the old folder name. This violates `AGENTS.md` §4, which forbids exposing the full OneDrive path in documentation precisely because it is machine-specific — any other contributor following the step literally would `cd` into a directory that does not exist on their machine, and `DR-BM-002`'s succession assumption depends on these plans being followable by someone who is not WJ. Replaced with "the repository root — the directory containing `supabase/` and `package.json`". Plan → v2.11. No change to what the test actually does.
+
+**2. `user-personas-journeys-and-use-cases.md` still describes the removed funder picker — flagged, not fixed.** Its v1.3 entry (2026-06-01) recorded UC-05 being updated _to_ the funder-directory model, and `DR-FD-001` v1.4 reversed that model on 2026-07-15: the picker was removed and Step 1 is free text again. Four places still describe a "searchable approved directory" and the "My funder isn't listed — request it" link — Journey 1 step 6, Journey 2 step 3, and UC-05 points 1 and 3. Raised with WJ and **carried into `P5.0`'s scope** rather than fixed inside a retitling change; the v1.3 history row is marked superseded so the drift is not invisible meanwhile. A good illustration of why P5.0 exists: the picker removal was propagated into the plan, the BRD and the test plans at the time, but not into this Tier 3 document.
+
 ## 2026-07-30 — Phase 5 restructured: approved with amendments and applied
 
 `phase-5-restructure-proposal-2026-07-29.md` walked section by section with WJ and **approved with amendments**. Applied in full: `IMPLEMENTATION-PLAN.md` → **v3.22**, `ADR-TRACEABILITY.md` → **v2.15**, both status documents corrected, proposal → v0.2 (now a record of the review, not the specification).
