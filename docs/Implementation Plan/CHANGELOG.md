@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-07-30 — L7: `ADR-FILE-003` contradicted itself, in the section that is binding
+
+The Consequences list required **two** extraction utilities — `lib/extract-pdf-text.ts` and `lib/extract-docx-text.ts`. The Decision section immediately above it has always specified a **single** wrapper, and the codebase has only ever contained `lib/extract-text.ts`. So the Decision and the implementation agreed; the Consequences list was wrong from the day it was written.
+
+**Why this is not an ordinary inconsistency.** `AGENTS.md` §2 makes the Consequences section of every ADR mandatory pre-task reading and states plainly: _"These are binding requirements, not suggestions."_ A future session doing extraction work would therefore have been instructed to create two files that should not exist, and would have read the correct single-utility implementation as an unfinished gap — possibly "fixing" working code to match a wrong specification. Precisely the failure mode as `GAP-21` directing work at `/api/generate-draft` a month after it was deleted (finding **L2** above): the register or the ADR says one thing, the code says another, and the document is the one a session is told to trust.
+
+Now a single bullet naming `lib/extract-text.ts` and marked built, with the correction and its reasoning recorded in place and in the ADR's Revision History.
+
+**Sweep:** the two-utility claim appeared nowhere else in the repository — no other document, no stale import, no test. One instance only.
+
 ## 2026-07-30 — L6: MKCF flagship cited a guidelines file that has never existed
 
 `MK-Community-Foundation-test-plan.md` cited `docs/Grant Org Guidelines/mkcf-oak-grants-criteria.pdf` in **two** places — the Overview and the "Guidelines — access before testing" section. No such file has ever existed. The real one is **`MK Comm oak-grants-criteria-final-nov-2025.pdf`**.
