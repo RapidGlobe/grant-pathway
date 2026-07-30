@@ -10,6 +10,25 @@
 
 ---
 
+## 2026-07-30 — L3: NFR-01's pre-launch recommendation resolved, and the real gap named
+
+Audit finding **L3**: `non-functional-requirements.md` still carried _"**Pre-launch recommendation:** … Investigate document pre-processing or streaming responses before go-live"_, seven weeks after pre-processing shipped. Confirmed — `lib/preprocess-text.ts` exists (19KB), is wired into `/api/generate-summary`, and `GAP-30` was closed on 2026-06-07.
+
+**The recommendation named two options and both are settled**, which is why "mark it done" would have been the wrong fix:
+
+| Option                  | Status                                                                   |
+| ----------------------- | ------------------------------------------------------------------------ |
+| Document pre-processing | ✅ Built 2026-06-05 (`P5.PERF1`, `GAP-30` closed)                        |
+| Streaming responses     | ➖ Deliberately deferred post-v1 as `FP-10` per `ADR-AI-010` — not a gap |
+
+**The more useful half of this fix is what it exposes.** The performance evidence in NFR-01 — Clothworkers at 40–47s, Garfield Weston at 33–37s — was measured on **2026-06-04, the day before pre-processing existed.** Pre-processing was added specifically to create headroom against those numbers, and no timing run has happened since. So the document asserted a 45-second target on evidence gathered before the mitigation, while simultaneously implying the mitigation was still unbuilt — misleading in two directions at once.
+
+The section now states the status of both options, carries a warning that the figures are a pre-mitigation baseline, and points at the `P5.5` measured-pass step that closes audit observation **O6**. The 2026-06-04 figures are explicitly reframed as a floor on performance rather than a description of it.
+
+**Checked and deliberately not "corrected":** the character ceiling appears as **20,000** in `ADR-AI-010` and the traceability register, and as **50,000** in `IMPLEMENTATION-PLAN.md`'s `P5.PERF1`. Both are right — `DEFAULT_CHAR_CEILING = 20_000` is the code default and production overrides it to 50,000 via `PREPROCESS_CHAR_CEILING`, confirmed present in the Vercel Production environment. This looked like a discrepancy and is not one; a clarifying line now records why, so the next reader does not "fix" it.
+
+**Sweep:** the stale recommendation existed in one live location only. Nothing else to correct.
+
 ## 2026-07-30 — L2: "all three AI routes" corrected in six places, and P5.0 told to sweep
 
 **There are two AI routes:** `/api/generate-summary` and `/api/refine-answer`. `/api/generate-draft` was deleted on 2026-07-01 and is gone from the codebase entirely — `grep generate-draft` across `app/`, `lib/` and `actions/` returns nothing.
