@@ -62,7 +62,7 @@ Each user has their own per-minute rate limit (5 AI calls / 60 seconds via Upsta
 | At scale (~100 users) | Up to 100 simultaneous Bedrock calls | Bedrock handles this comfortably; transient 429s handled by `withRetry()`; Supabase connection pool (pgbouncer) absorbs the read/write load              |
 | Stress scenario       | >100 simultaneous Bedrock calls      | Bedrock may throttle individual users (429); `withRetry()` handles with 1s/3s backoff; Vercel auto-scales function instances; no single point of failure |
 
-The main risk before the first marketing push is unmeasured AI route latency under concurrent load. Structured latency logging added to all three AI routes (2026-06-08, GAP-27 partial) will provide baseline data. Sentry performance monitoring to be configured at P5.4 once production traffic baseline is established.
+The main risk before the first marketing push is unmeasured AI route latency under concurrent load. Structured latency logging added to the AI routes (2026-06-08, GAP-27 partial) will provide baseline data — **two routes today**, `generate-summary` and `refine-answer`. (Corrected 2026-07-30, audit finding **L2**: this read "all three AI routes", which was true when the logging was added but has not been since `/api/generate-draft` was deleted on 2026-07-01.) Sentry performance monitoring to be configured at P5.4 once production traffic baseline is established.
 
 ---
 

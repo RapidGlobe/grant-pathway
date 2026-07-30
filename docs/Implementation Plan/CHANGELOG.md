@@ -10,6 +10,47 @@
 
 ---
 
+## 2026-07-30 — L2: "all three AI routes" corrected in six places, and P5.0 told to sweep
+
+**There are two AI routes:** `/api/generate-summary` and `/api/refine-answer`. `/api/generate-draft` was deleted on 2026-07-01 and is gone from the codebase entirely — `grep generate-draft` across `app/`, `lib/` and `actions/` returns nothing.
+
+Audit finding **L2** flagged four locations still asserting three. Verified: **six** were stale, and one of the audit's four was already fixed.
+
+| Location                                                  | What it said                                                                                            |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `technology-stack.md` TS-07                               | Upstash rate-limits "all three AI API routes… and the draft generation route"                           |
+| **`ADR-TRACEABILITY.md`** — `ADR-OPS-005` consequence row | route tag in "`generate-summary` and `generate-draft`"                                                  |
+| **`ADR-TRACEABILITY.md`** — `GAP-21` description          | "not implemented in `generate-summary` or `generate-draft`"                                             |
+| `ADR-TRACEABILITY.md` — `GAP-27` note                     | "latency logging added to all three AI routes (2026-06-08)" — dated, so annotated rather than rewritten |
+| `IMPLEMENTATION-PLAN.md` — Axiom log drains               | "log storage for all three AI routes"                                                                   |
+| `PRD-Grant-Pathway.md` §10                                | "50 AI requests… across all three AI routes"                                                            |
+| `non-functional-requirements.md`                          | "latency logging added to all three AI routes"                                                          |
+
+**The two bolded rows are the ones that mattered.** They are ADR consequence entries — precisely what a session reads when performing the mandatory `AGENTS.md` §2 check before starting work. Whoever eventually builds `GAP-21` would have been instructed to add `Sentry.withScope` route tagging to a route that does not exist, and could reasonably have concluded the task was half-impossible or the register untrustworthy. The other four were cosmetic. `ADR-OPS-005`'s Task column was also moved to `P5.3b` to match the Phase 5 restructure.
+
+**Already fixed, so removed from the finding:** the audit cited `DEPLOYMENT-CHECKLIST.md:82` ("draft prompt"). It is gone — yesterday's **M3** work replaced the feature-flag convention wholesale with the recovery-path convention and took that reference with it. Fixed as a side effect, not by intent.
+
+**Deliberately left alone: dated statements that were true when written.** `ADR-SEC-005`'s history row recording the 20 → 50 cap raise "across all three AI routes (2026-06-17)", the `docs/Alan Knox Audits/` records, `ADR-AI-010`'s passage explicitly marked _"(Historical, pre-2026-05-28)"_, and every `CHANGELOG` and archive entry. Rewriting dated history to match today's code would be the wrong fix — it destroys the audit trail to tidy a sentence. Where such a statement sits in a live register (`GAP-27`), it is annotated with what is true now rather than altered.
+
+**Why this survived a sweep that did happen.** The 2026-07-01 deletion was not careless — `CHANGELOG.md` that day records _"Documentation swept for every current (non-archived) reference to `/api/generate-draft`"_ and lists `future-phases.md`, `IMPLEMENTATION-PLAN.md` and six ADR files as corrected. It missed six places anyway, because it searched for the route **path** and these six describe the route by **count** ("three AI routes") or by **description** ("the draft generation route") without naming it. A sweep is only as good as the phrasings it looks for.
+
+### `P5.0` amended: run it as a sweep, not a read-through
+
+WJ's suggestion, and the evidence for it is now six instances deep. `P5.0` now carries an explicit method requirement: when a divergence is found, **grep the whole live documentation set for the same fact, path or claim, fix every instance in one pass, and record the sweep rather than only the fix.** A table in the task lists the six precedents:
+
+| Instance                         | What happened                                                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Stale `business/…` paths         | Fixed locally 2026-07-10, again 2026-07-13, and **31 more survived in six documents** until today                     |
+| Funder picker removal            | Reached the plan, BRD and test plans; never reached the personas document, which described a picker for six weeks     |
+| "Production Sentry DSN is empty" | Corrected in reality, never in the archive — and the stale line then produced a **false Severe finding** in the audit |
+| `✅` = tasked vs built           | Noticed for GAP-24; fifteen identical rows sat unexamined, six in the tables `AGENTS.md` §2 depends on                |
+| `/api/generate-draft` deleted    | This finding — swept by path, missed by count                                                                         |
+| "AI Grant Accelerator" retired   | Audit found one document; a sweep found six                                                                           |
+
+In every case the first fix was correct and the sweep never happened. The task now states that **a finding is closed when the class is fixed, not the instance**, and that a deliberately bounded sweep must say so explicitly, because a silently partial fix reads as a complete one.
+
+Documents: `technology-stack.md` → v1.11, `ADR-TRACEABILITY.md` → v2.16, `IMPLEMENTATION-PLAN.md` → v3.23, `PRD-Grant-Pathway.md` → v0.63, plus `non-functional-requirements.md` (no version field).
+
 ## 2026-07-30 — 31 stale documentation paths fixed across six documents
 
 Follow-on from the L1 sweep below, done immediately at WJ's request ("otherwise it will get forgotten") rather than deferred to `P5.0`.
