@@ -10,6 +10,35 @@
 
 ---
 
+## 2026-07-30 — GAP-24 built: the export disclaimer no longer claims accuracy has been checked
+
+Pulled forward out of `P5.3` and fixed immediately, ahead of the rest of the Phase 5 walkthrough, because it is user-facing, it goes to a third party, and it is one line.
+
+**What was wrong.** Every Word and plain-text export ended:
+
+> _"Disclaimer: This application was prepared with AI assistance and reviewed by {name}. All content has been checked for accuracy before submission."_
+
+Nothing in Grant Pathway checks accuracy. The service was therefore asserting a completed accuracy check **in the user's name, on the deliverable, to the funder**. `PDR-DH-003` had always specified the correct alternative — _"Please review carefully before submitting to the funder."_ — which states the user's responsibility rather than claiming a check that never happened.
+
+**What changed, and in which direction.** The two sentences moved opposite ways, which is the part worth recording:
+
+| Sentence                                                                                                            | Direction                  | Reason                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Second — "All content has been checked for accuracy…"                                                               | **Code moved to the spec** | This was the defect. Now reads `PDR-DH-003`'s "Please review carefully before submitting to the funder."                                                                                                                                                |
+| First — "This **application** was **prepared** with AI assistance…" (spec said "This **draft** was **generated**…") | **Spec moved to the code** | Not a defect, only a difference. The built wording was a deliberate 2026-06-01 change made to match the Step 5 confirmation checkbox the user actually ticks. Reverting it would have undone a consistency fix to close a gap that was not the problem. |
+
+Final wording, both formats: _"Disclaimer: This application was prepared with AI assistance and reviewed by {name}. Please review carefully before submitting to the funder."_
+
+**Scope.** A single `disclaimer` constant in `app/api/export/[applicationId]/route.ts` feeds both the `.docx` and `.txt` exports, so one edit covered both. The Step 5 confirmation checkbox ("I understand that this application was prepared with AI assistance and accept full responsibility for all information submitted") is untouched and was never the problem — there the **user** makes the statement about themselves, which is exactly right. No document pinned the exact disclaimer string except `PDR-DH-003`; the PRD and `acceptance-criteria.md` describe it generically ("an AI disclaimer"), and both flagship test plans say only "AI disclaimer present and correctly worded", so no test plan needed amending.
+
+**The wider point this exposed — `✅` in the GAP register means two different things.** GAP-24's status read `✅ 2026-06-16 — disclaimer wording fix step added to P5.3`. That tick meant _a task was written_. Two rows away, GAP-26's `✅ Resolved 2026-06-15 (commit 372d95b)` means _the code exists_. Same column, same symbol, opposite claims. **Verified 2026-07-30: GAP-21, GAP-22, GAP-23, GAP-25 and GAP-31 all still carry the "tasked" form of ✅ and are all still unbuilt** — no `setTag('route'` in `app/`, no `timeout=true` anywhere, no `loading.tsx` files, Zod imported only by `actions/charity.ts`, and `last_inactivity_warned_at` absent from `supabase/`. The **Phase 4 → Phase 5 gate sign-off** (2026-05-22, signed WJ 2026-06-17) lists nine gaps as resolved, six of which are these unbuilt code changes: the gate was signed on a statement that was true as written and false as read. This is finding §2.2 of `phase-5-restructure-proposal-2026-07-29.md`; its item **C2** (separate "tasked" from "built" in the register) is **not yet approved**, so the column structure is unchanged and GAP-24's row now simply says **BUILT** in words.
+
+**Verification:** `npm run type-check`, `npm run lint` and `npm test` (101 tests) all pass. **Not browser-verified** — confirming the rendered text needs an authenticated session with an application through to Step 5 and an actual export; worth eyeballing on the next flagship test run, where both plans already have a "disclaimer present and correctly worded" step.
+
+**Documents updated:** `PDR-DH-003` (spec row + revision history), `ADR-TRACEABILITY.md` v2.14 (GAP-24 row → BUILT, with the tick-ambiguity note), `IMPLEMENTATION-PLAN.md` (P5.3 bullet struck through as done).
+
+---
+
 ## 2026-07-29 — Phase 5 reviewed and found not to hang together; restructure proposed, not yet applied
 
 WJ asked for a review of Phase 5 "given your knowledge of the service", and specifically whether the plan should contain a comparison of the built service against the BRD, PRD, technical design and acceptance criteria. It should, and does not. Full findings and the proposed structure: **`docs/Implementation Plan/phase-5-restructure-proposal-2026-07-29.md`** (awaiting WJ's approval — **no change has been made to `IMPLEMENTATION-PLAN.md` or either status document**).
