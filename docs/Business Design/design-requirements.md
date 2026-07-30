@@ -10,14 +10,14 @@ All requirements in this document reflect the selected design direction (**Warm 
 
 | Document                                  | Location                                                                                           |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| App Name & Branding                       | `business/app-name-and-branding.md`                                                                |
-| Information Architecture & Navigation     | `business/information-architecture-and-navigation.md`                                              |
+| App Name & Branding                       | `docs/app-name-and-branding.md`                                                                    |
+| Information Architecture & Navigation     | `docs/information-architecture-and-navigation.md`                                                  |
 | Screen Specifications (all 11 screens)    | `docs/PRD-Grant-Pathway.md` (Section 7 -- previously `screen-requirements.md`, retired 2026-07-13) |
-| UI Inventory & Data Contracts             | `business/Business Design/ui-inventory-and-data-contracts.md`                                      |
-| Tone & Voice Guide                        | `business/Business Design/tone-and-voice-guide.md`                                                 |
-| Non-Functional Requirements               | `business/non-functional-requirements.md`                                                          |
-| UI Component Library Decision (shadcn/ui) | `business/PRD decisions/PDR-UI-001-ui-component-library.md`                                        |
-| Design Decisions Index                    | `business/Business Design/DESIGN-DECISIONS-INDEX.md`                                               |
+| UI Inventory & Data Contracts             | `docs/Business Design/ui-inventory-and-data-contracts.md`                                          |
+| Tone & Voice Guide                        | `docs/Business Design/tone-and-voice-guide.md`                                                     |
+| Non-Functional Requirements               | `docs/non-functional-requirements.md`                                                              |
+| UI Component Library Decision (shadcn/ui) | `docs/PRD decisions/PDR-UI-001-ui-component-library.md`                                            |
+| Design Decisions Index                    | `docs/Business Design/DESIGN-DECISIONS-INDEX.md`                                                   |
 
 ---
 
@@ -1028,7 +1028,7 @@ Amber `#D97706` outline ring applied on `:focus-visible` only. Contrast: 4.58:1 
 
 ## 10. Tone & Voice Summary
 
-The full reference is in `business/Business Design/tone-and-voice-guide.md`. The key principles for implementation are summarised below.
+The full reference is in `docs/Business Design/tone-and-voice-guide.md`. The key principles for implementation are summarised below.
 
 ### 10.1 Voice Pillars
 

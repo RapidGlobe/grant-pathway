@@ -930,7 +930,7 @@ Checklist:
 **Accessibility — definition of done for every slice (ADR-OPS-006, GAP-16):**
 Before marking any slice complete, run `@axe-core/react` in development mode and resolve all console violations. Keyboard navigation through the slice's interactive elements must be fully operable (Tab, Shift+Tab, Enter, Space, Arrow keys where applicable).
 
-For each slice: replace the static mock page with real data fetching, add Server Actions and API routes, and validate against the acceptance criteria in `business/PRD inputs/acceptance-criteria.md`.
+For each slice: replace the static mock page with real data fetching, add Server Actions and API routes, and validate against the acceptance criteria in `docs/PRD inputs/acceptance-criteria.md` (path corrected 2026-07-30 — was a non-existent `business/` prefix).
 
 ---
 

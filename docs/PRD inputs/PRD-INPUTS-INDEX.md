@@ -40,14 +40,14 @@ This folder contains the five specification documents required to complete the P
 
 ## Related Documents
 
-| Document                            | Location                                           |
-| ----------------------------------- | -------------------------------------------------- |
-| PRD Decisions Index                 | `business/PRD decisions/PRD-DECISIONS-INDEX.md`    |
-| Business Requirements Document      | `business/BRD-Grant-Pathway-v1.md`                 |
-| Non-Functional Requirements         | `business/non-functional-requirements.md`          |
-| User Personas, Journeys & Use Cases | `business/user-personas-journeys-and-use-cases.md` |
-| Technology Stack                    | `business/technology-stack.md`                     |
-| App Name & Branding                 | `business/app-name-and-branding.md`                |
+| Document                            | Location                                                 |
+| ----------------------------------- | -------------------------------------------------------- |
+| PRD Decisions Index                 | `docs/PRD decisions/PRD-DECISIONS-INDEX.md`              |
+| Business Requirements Document      | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md`  |
+| Non-Functional Requirements         | `docs/non-functional-requirements.md`                    |
+| User Personas, Journeys & Use Cases | `docs/user-personas-journeys-and-use-cases.md`           |
+| Technology Stack                    | `docs/Technical Decision and Design/technology-stack.md` |
+| App Name & Branding                 | `docs/app-name-and-branding.md`                          |
 
 ---
 

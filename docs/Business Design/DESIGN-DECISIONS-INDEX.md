@@ -84,16 +84,16 @@ Decisions are grouped by category and should be worked through in the order show
 
 | Document                                            | Location                                                                                           |
 | --------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| App Name & Branding (colours, fonts, tone of voice) | `business/app-name-and-branding.md`                                                                |
-| Information Architecture & Navigation               | `business/information-architecture-and-navigation.md`                                              |
+| App Name & Branding (colours, fonts, tone of voice) | `docs/app-name-and-branding.md`                                                                    |
+| Information Architecture & Navigation               | `docs/information-architecture-and-navigation.md`                                                  |
 | Screen Specifications (all 11 screens)              | `docs/PRD-Grant-Pathway.md` (Section 7 -- previously `screen-requirements.md`, retired 2026-07-13) |
-| UI Component Library Decision (shadcn/ui)           | `business/PRD decisions/PDR-UI-001-ui-component-library.md`                                        |
-| Design-First Approach Decision                      | `business/PRD decisions/PDR-UI-002-design-first-or-code-first.md`                                  |
-| Desktop-Primary Decision                            | `business/PRD decisions/PDR-UI-003-mobile-first-or-desktop-first.md`                               |
-| Navigation Structure Decision                       | `business/PRD decisions/PDR-UI-004-navigation-structure.md`                                        |
-| Dashboard Design Decision                           | `business/PRD decisions/PDR-UI-005-dashboard-design.md`                                            |
-| API Failure UX Decision                             | `business/PRD decisions/PDR-UI-006-api-failure-user-experience.md`                                 |
-| Non-Functional Requirements (WCAG 2.2 AA)           | `business/non-functional-requirements.md`                                                          |
+| UI Component Library Decision (shadcn/ui)           | `docs/PRD decisions/PDR-UI-001-ui-component-library.md`                                            |
+| Design-First Approach Decision                      | `docs/PRD decisions/PDR-UI-002-design-first-or-code-first.md`                                      |
+| Desktop-Primary Decision                            | `docs/PRD decisions/PDR-UI-003-mobile-first-or-desktop-first.md`                                   |
+| Navigation Structure Decision                       | `docs/PRD decisions/PDR-UI-004-navigation-structure.md`                                            |
+| Dashboard Design Decision                           | `docs/PRD decisions/PDR-UI-005-dashboard-design.md`                                                |
+| API Failure UX Decision                             | `docs/PRD decisions/PDR-UI-006-api-failure-user-experience.md`                                     |
+| Non-Functional Requirements (WCAG 2.2 AA)           | `docs/non-functional-requirements.md`                                                              |
 
 ---
 

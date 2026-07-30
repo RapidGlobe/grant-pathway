@@ -10,6 +10,46 @@
 
 ---
 
+## 2026-07-30 — 31 stale documentation paths fixed across six documents
+
+Follow-on from the L1 sweep below, done immediately at WJ's request ("otherwise it will get forgotten") rather than deferred to `P5.0`.
+
+**What was wrong.** 31 backticked file paths across six live documents used a `business/…` prefix. **There is no `business/` directory inside the repository** — every one of them was dead. They are Related-Documents tables and cross-references, so the effect was that following any of them led nowhere.
+
+| Document                                          | Paths fixed    |
+| ------------------------------------------------- | -------------- |
+| `docs/Business Design/DESIGN-DECISIONS-INDEX.md`  | 9              |
+| `docs/Business Design/design-requirements.md`     | 8              |
+| `docs/PRD inputs/PRD-INPUTS-INDEX.md`             | 6              |
+| `docs/data-model.md`                              | 5 — **Tier 1** |
+| `docs/information-architecture-and-navigation.md` | 2              |
+| `docs/Implementation Plan/IMPLEMENTATION-PLAN.md` | 1              |
+
+(Plus three already fixed in `tone-and-voice-guide.md`, which is where the pattern was first noticed — 34 in total.)
+
+**Why this was not a find-and-replace, and why it was done by hand.** WJ asked whether to delegate it. Three of the targets needed more than a prefix change, and a blind `business/` → `docs/` swap would have produced two brand-new broken paths and mangled two pieces of prose:
+
+| Path as written                             | Correct target                                           | Why                                                                                 |
+| ------------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `business/BRD-Grant-Pathway-v1.md`          | `docs/BRD plus decisions Mark Two/BRD-Grant-Pathway.md`  | File was **renamed** (2026-07-11) _and_ moved                                       |
+| `business/technology-stack.md`              | `docs/Technical Decision and Design/technology-stack.md` | File **moved** into a subdirectory                                                  |
+| `` `business/...` `` and `` `business/…` `` | left untouched                                           | Prose ellipses in changelog entries describing this very class of error — not paths |
+
+Every rewritten target was then verified to exist on disk. All 31 resolve.
+
+**A second stale-path pair found in the same sweep.** `information-architecture-and-navigation.md`'s legal-route rows cited `docs/terms-of-service.md` and `docs/privacy-policy.md` as "the authoritative source". Those root-level files were **deleted on 2026-06-22**. The routes actually read `docs/legal/terms-of-service-external.md` and `docs/legal/privacy-policy-external.md` — verified in `app/(public)/terms/page.tsx` and `app/(public)/privacy/page.tsx`, and true since the internal/external split of 2026-07-28. Both rows now name the file the page renders and explain its relationship to the authoritative `docs/legal/` source. Document → v1.9.
+
+**The pattern worth naming, because it is now the third recorded instance.** This same class of error has been found and fixed locally twice before, and swept neither time:
+
+- `PRD-Grant-Pathway.md:1502` — _"Paths corrected 2026-07-10. All entries below used a stale `business/...` prefix"_
+- `IMPLEMENTATION-PLAN.md` v3.5 (2026-07-13) — _"Key References table paths corrected (all used a non-existent `business/` prefix)"_
+
+Twice someone hit the wall, fixed the document in front of them, and stopped. That is the same failure mode as the funder-picker drift, the stale Sentry DSN note, and the tasked-vs-built tick: **a correction applied where it was noticed rather than where it applies.** `P5.0` exists for exactly this, and this is a good argument for it running as a sweep rather than a read-through.
+
+**Why the audit's link scan did not catch any of it.** The scan checked markdown links and correctly reported none broken in live documents. These are backticked paths inside tables — text, not links. Worth recording as a genuine limitation of that check rather than treating the earlier "no broken links" result as wrong.
+
+**Also noted, not fixed:** `data-model.md`'s Document History has the same ordering defect `technology-stack.md` had — 1.17 and 1.18 sit above an otherwise ascending 1.1→1.16 list — and the file carries no `**Version:**` header field at all, so its current version can only be read off the top of that table. Recorded in its v1.18 row for a future pass. `DESIGN-DECISIONS-INDEX.md`, `design-requirements.md` and `PRD-INPUTS-INDEX.md` have neither version fields nor history tables, so their changes are recorded here only.
+
 ## 2026-07-30 — L1: retired working title removed from six documents, not one
 
 Audit finding **L1** said `technology-stack.md` was still titled _"Technology Stack — AI Grant Accelerator v1"_, and that its Document History was out of version order. Both confirmed. WJ's context: **"AI Grant Accelerator" was the project's internal working title before the rename to Grant Pathway**, and he was unable to rename the local working folder afterwards — which is exactly why the old name kept resurfacing in documents written against that folder.
