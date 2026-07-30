@@ -38,16 +38,67 @@ jobs:
   # failure in the jobs below indistinguishable from known, accepted noise.
   # It still runs and still reports — it just no longer gates.
 
+  # Added 2026-07-30: this job now skips its expensive work when nothing under
+  # supabase/ changed, but the JOB STILL RUNS AND STILL REPORTS SUCCESS.
+  #
+  # Why it is done this way rather than with `paths-ignore` or a job-level `if:`.
+  # `validate-migrations` is one of the three required status checks on `master`.
+  # A required check that is *skipped* never reports success, so it blocks merging
+  # forever — which is exactly the unsatisfiable-gate problem that findings M2 and
+  # M6 were about (the required `audit` context outliving the job that produced
+  # it, and admin enforcement being impossible to enable as a result). Making the
+  # steps conditional keeps the contract intact: the check always reports, it just
+  # does nothing when there is nothing to validate.
+  #
+  # Why it is worth doing at all. Starting Supabase and replaying every migration
+  # took 2.3, 4.3 and 9.1 minutes on three consecutive runs measured 2026-07-30 —
+  # it is by far the most expensive and most variable job here, and it was running
+  # in full on documentation-only pushes, of which this project makes a great many
+  # (nine in one day on 2026-07-30 alone). GitHub bills the sum of parallel job
+  # durations, so a docs-only push was costing roughly 4-11 billed minutes to
+  # verify migrations that had not changed. Discovered when the account hit 90% of
+  # its 3,000 included Actions minutes.
+  #
+  # `lint-and-typecheck` is deliberately NOT made conditional: `format:check` runs
+  # `prettier --check .`, which covers Markdown, so it is the one job that genuinely
+  # does apply to a documentation-only change — and it has caught real failures here
+  # before (see AGENTS.md §5).
   validate-migrations:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Check whether migrations or Supabase config changed
+        id: changed
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="origin/${{ github.base_ref }}"
+            git fetch --no-tags --depth=1 origin "${{ github.base_ref }}" || true
+          else
+            BASE="${{ github.event.before }}"
+          fi
+          # First push to a branch, a force-push, or an unknown base: validate anyway.
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "result=true" >> "$GITHUB_OUTPUT"
+            echo "Base commit unavailable — validating migrations to be safe."
+            exit 0
+          fi
+          if git diff --name-only "$BASE" HEAD | grep -qE '^supabase/'; then
+            echo "result=true" >> "$GITHUB_OUTPUT"
+            echo "supabase/ changed — validating migrations."
+          else
+            echo "result=false" >> "$GITHUB_OUTPUT"
+            echo "No changes under supabase/ — skipping migration validation."
+          fi
       - uses: supabase/setup-cli@v3
+        if: steps.changed.outputs.result == 'true'
         with:
           version: latest
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Apply migrations from scratch
+        if: steps.changed.outputs.result == 'true'
         run: supabase db start && supabase db reset --local
       - name: Stop Supabase
-        if: always()
+        if: always() && steps.changed.outputs.result == 'true'
         run: supabase stop

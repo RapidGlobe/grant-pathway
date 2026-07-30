@@ -62,7 +62,7 @@ Log any failures that are NOT in the known expected failures list below.
 
 ## Test Fixtures
 
-The canonical list of 12 target funders (10 structured, 2 narrative) is in [`docs/target-funder-list.md`](../target-funder-list.md). Guidelines for all 12 funders should be sourced from the URLs in that document before running a full test cycle.
+The canonical list of 12 target funders (10 structured, 2 narrative) is in [`docs/target-funder-list.md`](../../target-funder-list.md). Guidelines for all 12 funders should be sourced from the URLs in that document before running a full test cycle.
 
 The following real funder guideline files are currently available in `docs/test-fixtures/`:
 

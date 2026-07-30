@@ -543,7 +543,7 @@ Custom prompt text was written during Phase 1 implementation instead of reading 
 
 **What changed:**
 
-- [DDR-IP-001](Business%20Design/DDR-IP-001-confirmation-pattern.md) revised: approve application confirmation changed from **Option B (inline expansion)** to **Option A (modal dialog)**.
+- [DDR-IP-001](../Business%20Design/DDR-IP-001-confirmation-pattern.md) revised: approve application confirmation changed from **Option B (inline expansion)** to **Option A (modal dialog)**.
 - Confirm button text set to **"Approve my application"** (was "Yes, approve" in original spec; matches what was built in Phase 1).
 - No code changes required — `components/application-step5-approve.tsx` was already built with a modal dialog.
 
@@ -558,7 +558,7 @@ PDR-UI-006 discourages modals for unexpected interruptions (errors). A user-init
 
 **What changed:**
 
-- [DDR-CS-004](Business%20Design/DDR-CS-004-step-indicator.md) updated: Step 2 label changed from "Funder Guidelines" to "Uploaded Guidelines".
+- [DDR-CS-004](../Business%20Design/DDR-CS-004-step-indicator.md) updated: Step 2 label changed from "Funder Guidelines" to "Uploaded Guidelines".
 - `components/step-indicator.tsx` updated to match.
 
 **Why:**
@@ -570,9 +570,9 @@ During Phase 1 Static UI Shell review, the built label ("Upload Guidelines") was
 
 **What changed:**
 
-- New [ADR-OPS-007](Technical%20Decision%20and%20Design/ADR-OPS-007-uptime-monitoring.md) created: uptime monitoring via UptimeRobot (free tier) + a `/api/health` endpoint.
-- [ADR-OPS-005](Technical%20Decision%20and%20Design/ADR-OPS-005-error-tracking.md) updated: added cross-reference to ADR-OPS-007 for the complete observability picture.
-- [ADR-INDEX](Technical%20Decision%20and%20Design/ADR-INDEX.md) updated: Operations group 6 → 7 ADRs, total 42 → 43.
+- New [ADR-OPS-007](../Technical%20Decision%20and%20Design/ADR-OPS-007-uptime-monitoring.md) created: uptime monitoring via UptimeRobot (free tier) + a `/api/health` endpoint.
+- [ADR-OPS-005](../Technical%20Decision%20and%20Design/ADR-OPS-005-error-tracking.md) updated: added cross-reference to ADR-OPS-007 for the complete observability picture.
+- [ADR-INDEX](../Technical%20Decision%20and%20Design/ADR-INDEX.md) updated: Operations group 6 → 7 ADRs, total 42 → 43.
 
 **Why:**
 Sentry (ADR-OPS-005) only captures errors when requests reach the application. A complete Vercel outage or failed deployment produces no Sentry events — the app would be down and silent. Without an external uptime monitor, there is no way to detect a total outage proactively, and no way to measure performance against the documented 99.5% uptime target (NFR-02).
@@ -626,7 +626,7 @@ UK data residency is a trust and compliance requirement for charities. The Anthr
 
 The model capability and pricing are unchanged. Claude Sonnet 4.6 is the direct successor to Claude 3.5 Sonnet. Bedrock identifiers: `anthropic.claude-sonnet-4-6` (In-Region) / `eu.anthropic.claude-sonnet-4-6` (Geo EU fallback, 10% surcharge).
 
-**References:** [DR-AI-002](decisions/DR-AI-002-ai-provider.md), [DR-DP-002](decisions/DR-DP-002-data-hosting.md), [ADR-AI-001](Technical%20Decision%20and%20Design/ADR-AI-001-ai-provider.md), [ADR-AI-002](Technical%20Decision%20and%20Design/ADR-AI-002-model-selection.md)
+**References:** [DR-AI-002](../decisions/DR-AI-002-ai-provider.md), [DR-DP-002](../decisions/DR-DP-002-data-hosting.md), [ADR-AI-001](../Technical%20Decision%20and%20Design/ADR-AI-001-ai-provider.md), [ADR-AI-002](../Technical%20Decision%20and%20Design/ADR-AI-002-model-selection.md)
 
 ---
 
@@ -639,7 +639,7 @@ The model capability and pricing are unchanged. Claude Sonnet 4.6 is the direct 
 **Why it changed:**
 The 200k window was a real engineering constraint with Claude 3.5 Sonnet — very long funder guidelines could not fit. Claude Sonnet 4.6's 1M token window makes this a non-issue. The soft warning is retained as guidance to focus on the most relevant sections of guidelines, not as a technical limit. The character threshold in ADR-AI-007 (150,000 characters) is superseded by the PRD token-based threshold (100,000 tokens).
 
-**References:** [PDR-AI-004](PRD%20decisions/), [ADR-AI-007](Technical%20Decision%20and%20Design/ADR-AI-007-context-window-management.md)
+**References:** [PDR-AI-004](../PRD%20decisions/), [ADR-AI-007](../Technical%20Decision%20and%20Design/ADR-AI-007-context-window-management.md)
 
 ---
 
@@ -652,7 +652,7 @@ The 200k window was a real engineering constraint with Claude 3.5 Sonnet — ver
 **Why it changed:**
 The shift to Bedrock changed the legal chain, not the promise. The user-facing commitment (no training, user owns data) is identical.
 
-**References:** [DR-DP-003](decisions/DR-DP-003-data-ownership.md)
+**References:** [DR-DP-003](../decisions/DR-DP-003-data-ownership.md)
 
 ---
 
@@ -690,7 +690,7 @@ During implementation planning, 30 conflicts between the BRD, PRD, ADRs, screen 
 | Re-open approved application    | Status reverts only                                 | Status reverts + all `is_approved` reset to false | Acceptance criteria               |
 | Protected routes list           | Singular paths in ADR-SEC-001                       | Plural paths matching resolved routes             | Implementation plan               |
 
-**References:** [Implementation Plan](Implementation%20Plan/IMPLEMENTATION-PLAN.md)
+**References:** [Implementation Plan](IMPLEMENTATION-PLAN.md)
 
 ---
 
@@ -715,7 +715,7 @@ Key decisions in the original baseline:
 | AI retry logic | Exponential backoff: 2 retries, 1s then 3s delays, for 429/500/529  |
 | Uptime target  | 99.5% (NFR-02)                                                      |
 
-**References:** [ADR-INDEX](Technical%20Decision%20and%20Design/ADR-INDEX.md) — all 43 ADRs listed with status.
+**References:** [ADR-INDEX](../Technical%20Decision%20and%20Design/ADR-INDEX.md) — all 43 ADRs listed with status.
 
 ---
 
@@ -734,7 +734,7 @@ Key product decisions that are unchanged from the original:
 - **Accessibility:** WCAG 2.2 AA.
 - **UK-only scope:** UK grants, UK charities, UK data residency (achieved via Bedrock revision above).
 
-**References:** [decisions/](decisions/DECISIONS-INDEX.md), [PRD decisions](PRD%20decisions/)
+**References:** [decisions/](../decisions/DECISIONS-INDEX.md), [PRD decisions](../PRD%20decisions/)
 
 ---
 

@@ -15,7 +15,7 @@ implications for Grant Pathway's Step 4 (draft generation).
 
 ### Test fixture findings
 
-> **Note (2026-05-29):** The 3-funder table below was the original test fixture used to trigger the redesign. It has been superseded by the consolidated 12-funder target list, which is now the canonical reference. See [`docs/target-funder-list.md`](../target-funder-list.md).
+> **Note (2026-05-29):** The 3-funder table below was the original test fixture used to trigger the redesign. It has been superseded by the consolidated 12-funder target list, which is now the canonical reference. See [`docs/target-funder-list.md`](../../target-funder-list.md).
 
 | Funder                         | Document                                                                                                                     | Key finding                                                                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

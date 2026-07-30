@@ -1,0 +1,45 @@
+# Line endings — added 2026-07-30 (Opus audit finding L10)
+#
+# Why this file exists. The development machine has `core.autocrlf=true`, and until now
+# there was no `.gitattributes`, so git checked every text file out with CRLF line endings.
+# Prettier's default `endOfLine: "lf"` then reported those files as misformatted. The result
+# was that `npm run format:check` failed on 23 files locally while passing in CI — CI runs
+# on Linux and checks out LF — so the local check could not be trusted and `npm run format`
+# would have rewritten 23 files as pure line-ending churn.
+#
+# The repository content was never the problem: git has always stored LF (verified
+# 2026-07-30 — zero CR bytes in the stored blobs). Only the working-tree checkout differed.
+#
+# `eol=lf` makes the checkout match what is stored, on every platform and for every
+# contributor, so the local and CI results agree. This also matters for `DR-BM-002`'s
+# succession assumption: a future maintainer on Windows would have hit the same false
+# failures with nothing to explain them.
+
+# Normalise all text files to LF in the working tree as well as in the repository.
+* text=auto eol=lf
+
+# Files that must keep CRLF to work on Windows.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files — never touch these. Listed explicitly rather than relying on git's
+# auto-detection, because a corrupted .docx or .pdf caused by line-ending conversion is
+# both easy to cause and hard to notice: this repository stores funder guideline PDFs and
+# exported Word documents that are test inputs and deliverables.
+*.pdf binary
+*.docx binary
+*.doc binary
+*.xlsx binary
+*.pptx binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.zip binary

@@ -10,6 +10,53 @@
 
 ---
 
+## 2026-07-30 — L9, L10, and a CI cost fix found by a GitHub usage alert
+
+### L9 — 24 broken relative links, and the cause worth naming
+
+Independently re-scanned: exactly 24 broken relative markdown links across 5 files, **none in a live document**. The audit's count was right.
+
+**They did not rot — archiving broke them.** Moving a document into an `archive/` subfolder invalidates every relative path inside it, and **22 of the 24 targets still existed**, unchanged, just at a different depth: eight ADRs and `ADR-INDEX.md`, four DRs and `DECISIONS-INDEX.md`, two DDRs, three test plans, `IMPLEMENTATION-PLAN.md`, `target-funder-list.md`. The remaining two were directory links to `PRD decisions/`. All 24 re-based programmatically against the real locations, then re-verified: **zero broken relative links repository-wide.**
+
+**The durable point, which nothing currently says: archiving a document must include re-basing its relative links.** That is the actual root cause here, and it will recur at the next archiving pass — including the deferred Implementation Plan folder tidy-up, which is likely to move these very files again. Fixed now rather than deferred to that tidy-up, on the grounds that the tidy-up has already been deferred for some time and leaving 24 known-broken links in place against a possible future move is the worse bet. `CHANGELOG-ARCHIVE.md` held 16 of them and is not a dead document — it is the designated history for Phases 0–4 and is actively cited, so a reader tracing a Phase 3 decision was hitting dead ends.
+
+### L10 — 23 format failures that were never real
+
+`npm run format:check` reported 23 files as misformatted locally while CI passed. Confirmed the cause precisely rather than assuming it:
+
+- `core.autocrlf=true` on the development machine, and **no `.gitattributes`**, so git checked every text file out with CRLF.
+- Prettier's default `endOfLine: "lf"` then flagged all of them.
+- **git has always stored LF** — verified by counting CR bytes in the stored blobs: zero. The repository content was never wrong; only the local checkout was.
+- CI runs on Linux, checks out LF, and therefore never saw the problem.
+
+So `npm run format:check` could not be trusted locally, and `npm run format` would have rewritten 23 files as pure line-ending churn. Worse than noise: it makes the local signal useless for the one check that genuinely applies to a documentation change.
+
+**Fix.** New `.gitattributes` with `* text=auto eol=lf`, so the checkout matches what is stored on every platform, plus explicit `eol=crlf` for `.bat`/`.cmd`/`.ps1` and an explicit `binary` list for `.pdf`/`.docx`/`.xlsx`/images/fonts. The binary list is deliberate rather than trusting git's auto-detection: this repository stores funder guideline PDFs and exported Word documents as test inputs and deliverables, and a file corrupted by line-ending conversion is easy to cause and hard to notice. Working tree converted to LF in the same pass — which produced **no diff at all**, exactly as predicted, because git already stored LF.
+
+`supabase/.temp/` added to `.prettierignore`. That was the one **genuine** failure of the 23: local Supabase CLI state (`linked-project.json`) that the CLI rewrites as a side effect of `supabase link` and `supabase db query`, and that Prettier has no business reformatting.
+
+**`prettier --check .` now passes cleanly across the whole repository** — 23 failures to zero. Also relevant to `DR-BM-002`: a future maintainer on Windows would have hit the same false failures with nothing to explain them.
+
+### A CI cost fix, prompted by a GitHub usage alert mid-session
+
+WJ received a GitHub Actions alert: **2,702 of 3,000 included minutes used, 90%, resetting 2026-08-01.** Measured rather than estimated:
+
+|                                   |                                                                                                                                                       |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Billed cost per push              | **~4 minutes typical** — `lint-and-typecheck` 1.0 + `test` 0.7 + `validate-migrations` 2.3. GitHub bills the **sum** of parallel jobs, not wall-clock |
+| `validate-migrations` variability | **2.3, 4.3 and 9.1 minutes** on three consecutive runs — by far the most expensive and least predictable job                                          |
+| Today's cost                      | 12 CI runs, ~40 minutes wall-clock, roughly **60–85 billed minutes**                                                                                  |
+
+**The waste:** `ci.yml` had no path filters, so it ran in full on every push — and nine of today's pushes were documentation-only. The project was starting a Supabase instance and replaying every migration to validate migrations that had not changed.
+
+**The fix, and the trap avoided.** `validate-migrations` now checks whether anything under `supabase/` changed and skips its expensive steps if not — but **the job still runs and still reports success.** It was implemented as conditional _steps_ rather than `paths-ignore` or a job-level `if:` for a specific reason: `validate-migrations` is one of the three **required status checks** on `master`, and a required check that is _skipped_ never reports success, so it would block merging forever. That is precisely the unsatisfiable-gate failure that findings **M2** and **M6** were about — the required `audit` context outliving the job that produced it, and admin enforcement being impossible to enable as a consequence. Conditional steps keep the contract intact.
+
+It also falls back to validating anyway when the base commit is unavailable — first push to a branch, a force-push, or an unrecognised base — so the safe default is to run, not to skip.
+
+**`lint-and-typecheck` was deliberately left unconditional.** `format:check` runs `prettier --check .`, which covers Markdown, so it is the one job that genuinely does apply to a documentation-only change — and it has caught real failures in this repository before (`AGENTS.md` §5 records two). Skipping CI on docs would have removed the only check that mattered for the commits being made most often.
+
+**Expected effect:** a documentation-only push drops from ~4 billed minutes to ~1, a saving of roughly 75% on the most frequent commit type, with no loss of coverage.
+
 ## 2026-07-30 — L8: the dependency licence review now exists; GAP-20 closed after ten weeks
 
 `GAP-20` (`ADR-STACK-005` — "dependency licences reviewed for proprietary product compatibility") was the only row in the traceability register whose status cell had ever been **completely empty**, from 2026-05-20 to earlier today. Its P5.1 task existed the whole time. That emptiness is exactly how a task nobody had started stayed invisible for ten weeks while every other row carried something. The bookkeeping half was fixed earlier today under C2; **this entry is the review itself.**

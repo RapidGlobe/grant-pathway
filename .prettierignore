@@ -4,3 +4,11 @@ build/
 node_modules/
 public/
 *.lock
+
+# Supabase CLI local state — added 2026-07-30 (Opus audit finding L10).
+# `supabase/.temp/` holds files the CLI writes and rewrites as a side effect of commands
+# like `supabase link` and `supabase db query` (e.g. `linked-project.json`). It is local
+# machine state, not project source, it is untracked, and Prettier has no business
+# reformatting it. This was the one *genuine* format:check failure among the 23 reported —
+# every other one was a CRLF-versus-LF false failure, now fixed by `.gitattributes`.
+supabase/.temp/
