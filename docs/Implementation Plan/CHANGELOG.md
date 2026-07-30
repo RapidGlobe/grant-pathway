@@ -10,6 +10,45 @@
 
 ---
 
+## 2026-07-30 — L8: the dependency licence review now exists; GAP-20 closed after ten weeks
+
+`GAP-20` (`ADR-STACK-005` — "dependency licences reviewed for proprietary product compatibility") was the only row in the traceability register whose status cell had ever been **completely empty**, from 2026-05-20 to earlier today. Its P5.1 task existed the whole time. That emptiness is exactly how a task nobody had started stayed invisible for ten weeks while every other row carried something. The bookkeeping half was fixed earlier today under C2; **this entry is the review itself.**
+
+**Artefact: `docs/legal/dependency-licences-2026-07-30.md`.**
+
+### Conclusion
+
+**No licence in the dependency tree prevents Grant Pathway from being a closed-source, proprietary, hosted service.** Nothing needs removing or replacing before launch. Three findings carry that:
+
+1. **All 25 direct production dependencies are permissive** — MIT, Apache-2.0, ISC, BSD-2-Clause. No copyleft, no source-available restriction among the packages the product deliberately chose.
+2. **No AGPL, SSPL or BUSL anywhere across 889 installed packages.** This is the finding that matters most for a hosted service: AGPL-3.0 treats network use as distribution and would otherwise oblige us to offer source to every user. Its absence is what makes the answer clean rather than qualified.
+3. **No unlicensed or licence-unspecified packages** — usually the hardest category to clear, and there was nothing to clear.
+
+### The four production-reachable packages that carry real conditions
+
+| Package                           | Licence                              | Assessment                                                                                                                                                                                                                                                                                            |
+| --------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@sentry/cli` (+ platform binary) | FSL-1.1-MIT                          | Not OSI open source — permits any use **except** competing with the licensor, converting to MIT after two years. Build-time CLI for source-map upload; never bundled, never distributed; a grant-writing tool competes with nothing Sentry sells. Dormant restriction.                                |
+| `sharp`'s native binaries         | Apache-2.0 **AND LGPL-3.0-or-later** | Via `next`. LGPL obligations attach on **distribution** and require the component remain replaceable, not that the caller be opened. Separately invoked native modules; nothing distributed. **The one item a solicitor would most want named**, and first to re-check if the delivery model changes. |
+| `jszip`                           | `(MIT OR GPL-3.0-or-later)`          | Dual-licensed; **MIT elected**, now recorded. Not academic — `jszip` genuinely ships, underpinning Word export (`docx`) and `.docx` extraction (`mammoth`).                                                                                                                                           |
+| `caniuse-lite`                    | CC-BY-4.0                            | Browser-support **data**, not code. Build-time only. Ubiquitous.                                                                                                                                                                                                                                      |
+
+Everything else with conditions is dev-only and confirmed unreachable in the production tree: `axe-core`/`@axe-core/react`, `lightningcss`, `@vercel/og`, all MPL-2.0 (file-level copyleft — we modify none of those files and none ships).
+
+### What the conclusion depends on
+
+**Grant Pathway being a hosted service does most of the work here**, because GPL and LGPL obligations attach to distributing software and nothing is distributed. The review names the triggers for re-running it: a change of delivery model (desktop, on-premise, a Docker image for third parties, publishing to npm), a move into a market that competes with Sentry, `jszip` dropping its MIT option, or any new AGPL/SSPL dependency. It also recommends treating an AGPL or SSPL package as a **decision** rather than a routine install, and records that `security-audit.yml` covers vulnerabilities, **not** licences — so nothing automated will catch a licence change. That gap is stated as accepted rather than left invisible.
+
+### Two method points worth keeping
+
+**`npm ci` was run first, and it mattered.** Ten packages were installed at versions not matching `package.json` — `next@16.2.11` against `^16.2.12`, `@sentry/nextjs@10.68.0` against `^10.69.0`, `@anthropic-ai/sdk@0.109.0` against `^0.115.0`, and seven more. This is **audit finding M7's lockfile drift, recurred**: it was cleared with `npm ci` on 2026-07-29 and drifted again, almost certainly on merging the grouped Dependabot PRs (#86/#87) afterwards. CI was unaffected (it runs `npm ci`), but local runs — including every check run earlier today — were not testing the pinned versions. **A licence review run before the resync would have described a dependency tree that neither CI nor production uses.** Worth noting that this drift is now a repeating condition rather than a one-off, and that merging a Dependabot PR leaves the local tree stale by design.
+
+**No licence-checking tool was installed, deliberately.** Adding a dependency to `package.json` in order to audit `package.json` adds a supply-chain surface to answer a question the existing package metadata already answers. The method — read every installed package's declared `license`, then trace each non-permissive one with `npm ls <pkg> --omit=dev` to establish production reachability — is recorded in the artefact so it can be re-run identically.
+
+**Limits stated in the artefact rather than glossed:** licence _texts_ were not read in full (the review trusts declared SPDX identifiers, the industry norm but occasionally wrong); no check that a package's declared licence matches its own `LICENSE` file; not a patent or trademark review; and not a review of the hosted **services** (Bedrock, Supabase, Vercel, Sentry, Upstash, Resend), which are governed by their own terms and tracked separately. **It is explicitly a technical review, not legal advice**, and does not substitute for the independent legal review still tracked in P5.1.
+
+`ADR-TRACEABILITY.md` → v2.17 (GAP-20 and `ADR-STACK-005` both ✅), `IMPLEMENTATION-PLAN.md` P5.1 row marked done.
+
 ## 2026-07-30 — L7: `ADR-FILE-003` contradicted itself, in the section that is binding
 
 The Consequences list required **two** extraction utilities — `lib/extract-pdf-text.ts` and `lib/extract-docx-text.ts`. The Decision section immediately above it has always specified a **single** wrapper, and the codebase has only ever contained `lib/extract-text.ts`. So the Decision and the implementation agreed; the Consequences list was wrong from the day it was written.
