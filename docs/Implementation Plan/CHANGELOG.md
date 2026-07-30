@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-07-30 — L6: MKCF flagship cited a guidelines file that has never existed
+
+`MK-Community-Foundation-test-plan.md` cited `docs/Grant Org Guidelines/mkcf-oak-grants-criteria.pdf` in **two** places — the Overview and the "Guidelines — access before testing" section. No such file has ever existed. The real one is **`MK Comm oak-grants-criteria-final-nov-2025.pdf`**.
+
+**The risk was the opposite of how the audit framed it, and worse.** The audit said a tester "cannot find the input document". But the access section read _"Obtain the MKCF Oak Grants criteria … and save to `…/mkcf-oak-grants-criteria.pdf` **if not already present**"_. A tester would not have been blocked — they would have concluded the file was absent, downloaded the **current** edition from MKCF, and saved a second copy under a different name. The repository copy is explicitly the **November 2025** edition, and every recorded MKCF result is measured against it, including the extracted question count, which has moved repeatedly across runs (10 → 12 → 16 on the paste path, 19 on the upload path). Testing against a silently newer edition would have invalidated every historical comparison with nothing visible to show it had happened — and on a flagship plan whose whole purpose is repeatable end-to-end coverage.
+
+Both citations now name the existing file. The access section additionally forbids a fresh download and states what to do if the guidelines genuinely need refreshing: add the new edition alongside the old under a dated name, update the plan and its expected results, and record it in the Document History — never overwrite or substitute. Plan → v2.2.
+
+**Sweep:** every guideline-file citation across all live test plans was checked. The other four resolve (`AB Trust Online-Application-Form-Guidance-July-2024-b.pdf`, `clothworkers-open-grants-guidance-and-sample-forms.pdf`, `garfield-weston-foundation-application-guidelines-2026.pdf`, `idlewild-arts-application-questions-dec2025.pdf`). This was the only broken one.
+
+**`TEST-DASHBOARD.md` had it right all along** — its funder table cites the correct filename. So the right answer was sitting two documents away from the plan that got it wrong, which is the same propagation failure as the rest of this week's findings, just in the reverse direction: the correction never travelled _from_ the dashboard _to_ the plan. No dashboard change was needed and its status is unaffected.
+
+**Incident during this fix, recorded because it is a real risk with the tooling and not a documentation point.** While amending the Document History, a Python one-liner of the form `open(path, "w").write(text)` raised a `UnicodeEncodeError` on an emoji escape sequence **after** the `"w"` mode had already truncated the file — leaving `MK-Community-Foundation-test-plan.md` at zero bytes. It was recovered immediately and completely with `git checkout --` on the uncommitted file, and the edits were redone through the normal editing tool. No committed content was ever at risk and nothing else was touched. The lesson is specific and worth keeping: **never write a file by chaining `.write()` onto `open(…, "w")` when the payload could raise** — build the full string first and write it in a separate statement, or use the editing tool, which never truncates on failure.
+
 ## 2026-07-30 — L4 and L5: the two documents that actually needed a Tier header
 
 Done as one change, because L4's remainder and L5's actionable subset are the same fix on the same two files.
