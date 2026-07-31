@@ -38,11 +38,13 @@ Grant Pathway is a writing companion. It does not find grants for charities. It 
 
 Here is how a typical session works.
 
-A charity worker registers for a free account and sets up a profile for their organisation. They describe who they are, what they do, who they help, and where they work. They only do this once. From that point on, Grant Pathway remembers their story.
+A charity worker registers for a free account and sets up a profile for their organisation. They describe who they are, what they do, who they help, and where they work. If they have a charity registration number, Grant Pathway can look it up on the public register of charities for England and Wales and fill in some of those details for them, to save re-typing what is already a matter of public record. They only do this once. From that point on, Grant Pathway remembers their story.
 
-When they are ready to work on an application, they create a new entry — just the name of the grant and the funder. They then paste in or upload the funder's guidelines: the document that explains what the funder is looking for, what the application questions are, and what kind of evidence is expected.
+When they are ready to work on an application, they create a new entry — just the name of the grant and the funder. If they have used Grant Pathway before, they can start from one of their own earlier applications rather than from a blank page (P6.5). They then paste in or upload the funder's guidelines: the document that explains what the funder is looking for, what the application questions are, and what kind of evidence is expected.
 
 Grant Pathway reads those guidelines and produces a plain-English summary. Not a copy of the document — a clear, straightforward explanation of what the funder actually cares about, what each question is really asking, and what a good answer might look like. For someone who finds funder language intimidating, this alone can be transformative.
+
+The summary also covers who the funder will and will not fund. If the guidelines make it clear that the charity is not eligible for this particular grant, Grant Pathway says so at that point and does not take the application any further (FR-47 eligibility hard stop — terminal, no override path). Knowing in five minutes is worth a great deal more than finding out after a weekend of writing.
 
 Then, for each question or section in the application, the charity worker writes their own answer. Grant Pathway provides a guided writing card with the word or character limit displayed, the funder's question clearly presented, and any context extracted from the guidelines. If the charity worker wants help improving what they have written — tightening the structure, clarifying the language, making it more funder-appropriate — they can ask Grant Pathway to assist. The AI refines what the charity has already written; it does not generate answers from scratch. The content reflects the charity's authentic voice and real experience. That is what funders are looking for.
 
@@ -96,9 +98,13 @@ The AI-powered features operate within a fair-use limit per account each month. 
 
 Charities trust us with information about their organisation, their work, and their communities. That trust is taken seriously.
 
-All data is stored in UK-based infrastructure. The charity's information is used only to provide the service — to personalise the AI outputs and save time on future applications. It is never used to train artificial intelligence models. It is never shared with third parties for commercial purposes. Users can delete their account and all associated data at any time, completely and permanently. Accounts that have not been used for two years are automatically deleted, with a warning email sent 30 days in advance. This is a deliberate data minimisation commitment — the service does not retain information beyond what is needed, and users are given fair notice before anything is removed.
+The charity's own content — their organisation profile, the funder guidelines they upload, and the answers they write — is held in UK-based infrastructure in London (Supabase). The AI processing that produces the funder summary and suggests improvements also takes place in the UK, and never outside the European Economic Area under any circumstances (AWS Bedrock, `eu-west-2`). A small number of supporting services sit outside the UK — website hosting (Vercel, US), transactional email (Resend, US), and error monitoring (Sentry, EU) — each covered by the safeguards UK data protection law requires. `docs/legal/privacy-policy.md` Section 5 is the authoritative list; do not restate a blanket "all data is stored in the UK" claim here or in any external copy.
 
-The Privacy Policy and Terms of Service will set all of this out clearly, in plain English, before anyone is asked to register.
+The charity's information is used only to provide the service — to personalise the AI outputs and save time on future applications. It is never used to train artificial intelligence models. It is never shared with third parties for commercial purposes.
+
+Users can delete their account and all associated data at any time. Deletion is immediate and permanent in the live service; routine backup copies are removed within seven days as part of the standard backup cycle, and are never accessible to users or used to restore deleted content. Accounts that have not been used for two years are automatically deleted, with a warning email sent approximately 30 days in advance. This is a deliberate data minimisation commitment — the service does not retain information beyond what is needed, and users are given fair notice before anything is removed.
+
+The Privacy Policy and Terms of Service set all of this out in full, in plain English, and can be read before anyone is asked to register.
 
 ---
 
@@ -114,7 +120,7 @@ The intention is to donate the tool to the charity sector through a Community In
 
 Version 1 of Grant Pathway focuses entirely on writing. It is deliberately focused — doing one thing well, for the people who need it most.
 
-Future development will be shaped by the people who use the tool. Ideas already being considered include helping charities find grants that match their work, tracking applications and deadlines, and supporting post-award reporting. None of that is promised. All of it will be considered in conversation with the charities Grant Pathway is built to serve.
+Future development will be shaped by the people who use the tool. Ideas already being considered include tracking applications and deadlines, and supporting post-award reporting. Helping charities find grants in the first place is not among them — Grant Pathway is, and will remain, a writing tool. Grant discovery is being taken forward as a **separate, chargeable RapidGlobe service**, deliberately not folded into Grant Pathway (`BRD-Grant-Pathway.md` Section 8; decided 2026-07-11). `FP-01` in `future-phases.md` still frames discovery as a possible Grant Pathway phase and needs reconciling with that decision. None of this is promised. All of it will be considered in conversation with the charities Grant Pathway is built to serve.
 
 The ambition is simple: to make the grant application process a little less daunting, a little less time-consuming, and a little more fair — for every charity in the UK that is doing good work and deserves the chance to fund it.
 
@@ -124,6 +130,8 @@ _Grant Pathway — grantpathway.org.uk_
 _Free for UK charities. Always._
 
 ---
+
+_Last updated: 2026-07-31 — Reviewed alongside the external overview (now `docs/overview/Grant-Pathway-Business-Overview-v1_17.md`) ahead of distribution. Four corrections: the "all data is stored in UK-based infrastructure" claim replaced with the actual per-provider position from `privacy-policy.md` v1.5 (Vercel and Resend are US-based, Sentry EU); the Charity Commission register lookup, the P6.5 "start from an earlier application" path, and the FR-47 eligibility hard stop added to "What Grant Pathway Does", none of which were described; grant discovery removed from the future-ideas list, since it is now a separate chargeable service rather than a Grant Pathway phase._
 
 _Last updated: 2026-07-02 — Fixed a residual stale line in "What Grant Pathway Does Not Do" that still described the AI as generating a draft; missed in the 2026-05-29 pass._
 

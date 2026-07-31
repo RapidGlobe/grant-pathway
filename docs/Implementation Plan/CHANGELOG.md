@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-07-31 — Business Overview reviewed before distribution and reissued as v1.17
+
+WJ asked for the external Business Overview in `docs/overview/` to be reviewed ahead of distributing it, given the gaps found over the previous week. It was last issued on **20 July** as v1.16, before the legal-document work, and had drifted.
+
+**Reissued as v1.17** (`docs/overview/Grant-Pathway-Business-Overview-v1_17.md` and `.docx`). v1.16 and the older v1.4 Word export are now in `docs/overview/archive/` behind a new `README.md` that states plainly nothing there is current and names the live files — the same pattern as `docs/legal/archive/`, created the day before for the same reason.
+
+### Four substantive findings
+
+1. **The data-residency claim was an overclaim, in a document about to be sent to charities and funders.** It read "All data is stored in UK-based infrastructure" with no qualification, while `docs/legal/privacy-policy.md` v1.5 Section 5 names **Vercel (US)**, **Resend (US)** and **Sentry (EU)** among the processors. The charity's own content genuinely is UK-only — Supabase London, and Bedrock `eu-west-2` which never leaves the EEA — so the fix states that precisely and then names the three supporting services that sit outside the UK under IDTA-equivalent safeguards, rather than softening a claim that is true of the part a charity cares about. The internal `docs/business-overview.md` carried the same sentence and has been corrected too, with a standing note not to restate the blanket version anywhere.
+2. **Grant discovery was still listed as a future Grant Pathway idea.** "Helping charities find grants that match their work" survived in the future-ideas list six weeks after the **2026-07-11** decision that discovery becomes a **separate, chargeable RapidGlobe service** and explicitly not a Grant Pathway feature (`BRD-Grant-Pathway.md` Section 8). Distributing it would have advertised, for free, a feature that is now a paid separate product. Removed and replaced with an explicit statement that Grant Pathway is and will remain a writing tool. **Not reconciled: `FP-01` in `future-phases.md`** still frames discovery as a possible Grant Pathway phase, with `FP-02` (360Giving) hanging off it — flagged in `business-overview.md` for WJ to decide, not rewritten unasked.
+3. **Three built, user-visible behaviours were described nowhere in the overview:** the Charity Commission register lookup that pre-fills the organisation profile (disclosed in the Privacy Policy on 2026-07-30, but never in the product description); the **P6.5** "start from one of your own earlier applications" path; and **FR-47's eligibility hard stop**. The last is the one that matters most to a reader deciding whether to use the service — the tool can tell a charity it is not eligible and refuse to take the application further, with no override — and a business overview that omits it undersells the honest, time-saving behaviour and surprises the user later. All three added.
+4. **The review-and-approve paragraph appeared twice**, near-verbatim, one copy carrying a stray comma ("figures, dates, and facts, correct?"). Both were visible on page 3 of the distributable. Merged into one, and the surrounding mega-paragraph split so the writing interface and the review gate are described separately.
+
+### Smaller corrections
+
+- The fair-use paragraph now points at the Terms of Service for the current figure rather than leaving it unquantified — deliberately not restating "50 per month" in a static distributable, since that figure was itself wrong in the Terms until 2026-07-30.
+- Deletion wording gained the seven-day backup-rotation qualifier, so "completely and permanently" is not read against `privacy-policy.md` Section 7, which is more precise.
+- "The Privacy Policy and Terms of Service **will** set all of this out" moved to the present tense — both have existed and been published since 2026-06-10.
+
+### Method note: the .docx was edited, not regenerated
+
+v1.16's Word file was **hand-finished by WJ in Word** — Grant Pathway logo, RapidGlobe title page, running header and page footer, none of which exist in the `.md`. Regenerating from Markdown via pandoc would have silently dropped all of it, so the `.docx` was instead unzipped and `word/document.xml` edited paragraph by paragraph, preserving every style, image, header and footer. Schema-validated against the original (`validate.py --original`, paragraph count 72 → 75 as expected), converted to PDF via Word COM, and checked page by page. An **orphaned 1.2 MB PNG** that Word had left in the package with no relationship to it was dropped in passing: 3.1 MB → 1.9 MB. Note for future sessions: the docx skill's `soffice.py` shim is Unix-only and fails on Windows with `socket.AF_UNIX`; Word COM via PowerShell is the working route, consistent with the 2026-07-30 legal-PDF note.
+
+### Two items left for WJ, neither actioned
+
+- **The process diagram asserts the same broad claim the text has just been made careful about.** `assets/grant-pathway-process-overview.png` lists "TRUST: DATA STORED IN UK, NEVER SOLD OR USED FOR TRAINING" as a key principle. It is defensible for charity content, which is why it was not treated as a defect — but it is an image, so changing it means redrawing rather than editing, and it sits on the same page as the corrected text.
+- **The overview reads throughout as though the service is live**, which it is not until `P5.4`/`P5.6`. Fine if WJ is distributing it as a "what we are building" document; worth a status line if recipients might try to register.
+
+---
+
 ## 2026-07-30 — Legal documents prepared for external review: 3 privacy gaps closed, 2 Terms errors fixed, PDFs produced
 
 WJ ran the **ICO's own Privacy Notice Generator** (recommended as step one in `docs/legal/legal-review-options-2026-07-29.md`) and asked for a comparison against `privacy-policy.md` before sending anything to a solicitor.
