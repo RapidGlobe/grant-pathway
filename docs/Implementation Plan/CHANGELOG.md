@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-07-31 (fifth pass) — New diagram swapped into the overview (v1.19)
+
+The rebuilt SVG's PNG export replaces the AI-generated diagram in both the `.md` and the `.docx`. **v1.19** is now the live pair.
+
+The `.docx` was again edited in place rather than regenerated, to preserve WJ's hand-finished title page, header and footer. `word/media/image4.png` swapped for the 3200 × 1660 export, and — the step it would be easy to miss — **both the `wp:extent` and the `a:ext` height values were recalculated**, since the new diagram has a different aspect ratio (1.93 against the old 2.36). Width held at the original 6.3 in (5760720 EMU), so the height moved 2443941 → 2988374 EMU (2.67 in → 3.27 in). Leaving those alone would have stretched the image vertically. Schema-validated against v1.18 (77 paragraphs, unchanged), exported via Word COM and checked page by page.
+
+**Consequences worth recording:** the diagram no longer fits at the foot of page 3 and now heads **page 4**, which reads better than being squeezed under the body text. Document still 6 pages. File size dropped 1.9 MB → 1.1 MB, because the replaced image is smaller than the AI-generated original despite being twice the pixel dimensions.
+
+**v1.18 was not archived**, on the same basis as v1.17 earlier the same day: it existed for a few hours, went to nobody, and `docs/overview/archive/` is for versions that actually reached an external audience. Superseded in place; wording preserved in `d455186`. The archive README now states this for both.
+
+**Left deliberately undone: the old `grant-pathway-process-overview.png` has not been deleted.** The live overview no longer references it, but a repository-wide check for other uses was still running — a `.docx` embeds its own copy of an image, so a file can depend on the diagram without naming it anywhere, and `docs/overview/archive/Grant-Pathway-Business-Overview-v1_16.docx` is known to contain one. Deleting on the assumption that "nothing else uses it" is exactly the partial-sweep pattern the 2026-07-30 audit kept finding. Both READMEs record the file as retained pending that check.
+
+**One cosmetic point for WJ, not actioned:** the diagram carries the Grant Pathway logo in its own top-left corner, and the document puts the same logo in the page header — so on page 4 it appears twice, a few centimetres apart. The logos are right for the SVG used standalone (a website, a deck) and only collide inside this document. A one-line change to the SVG would drop them if he prefers.
+
+---
+
 ## 2026-07-31 (fourth pass) — `public/images` tidied: three unused logo files removed, the live one cut 98%
 
 Follow-on from the correction above. Once it was established that `components/logo.tsx` already renders the real asset, the question became what was actually left in `public/images` — and the answer was three unused files and an oversized live one.

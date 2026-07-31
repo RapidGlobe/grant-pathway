@@ -3,7 +3,7 @@
 _The service provided by RapidGlobe Ltd_
 
 **31 July 2026**
-_Version 1.18_
+_Version 1.19_
 
 ---
 
@@ -53,7 +53,7 @@ Before any answer becomes part of the application, the person using the tool mus
 
 When the application is complete, the charity worker can export everything as a clean Word document, ready to copy into a funder's application form or online portal.
 
-![Grant Pathway: High-Level Process Overview](assets/grant-pathway-process-overview.png)
+![Grant Pathway: High-Level Process Overview](assets/grant-pathway-process-overview-v2.png)
 
 ## What Grant Pathway Does Not Do
 
