@@ -11,8 +11,19 @@
 | `grant-pathway-process-overview.svg`    | **Source of truth for the process diagram.** Hand-authored, editable text, logos embedded as base64 so the file stands alone. Edit this, then re-export the PNG below.   |
 | `grant-pathway-process-overview-v2.png` | 3200 × 1660 export of the SVG at 2×, ready to drop into the next version of the Word overview. **Not yet used by any document.**                                         |
 | `grant-pathway-process-overview.png`    | The **old** AI-generated diagram, superseded 2026-07-31 but **still referenced by the live overview** (v1.18) — do not delete until the Word file is rebuilt. See below. |
-| `grant-pathway-logo.png`                | Grant Pathway logo, 1562 × 560, **transparent background**                                                                                                               |
+| `grant-pathway-logo.png`                | Grant Pathway logo, 1562 × 560, transparent background — **the full-resolution master.** See below.                                                                      |
 | `rapidglobe-logo.png`                   | RapidGlobe Ltd logo, 1600 × 896, opaque navy plate                                                                                                                       |
+
+## The two Grant Pathway logo files, and why both exist
+
+There are two copies of the same artwork in the repository, and the distinction matters:
+
+| File                                          | Size       | For                                                                                                                           |
+| --------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `docs/overview/assets/grant-pathway-logo.png` | 1562 × 560 | **Master.** Documents and print — the overview's `.docx` title page renders it about 900 px wide, so the resolution is needed |
+| `public/images/logo.png`                      | 625 × 224  | **Web derivative.** The app nav, which renders it at 156 × 56 (`components/logo.tsx`)                                         |
+
+They were briefly identical, and on 2026-07-31 deleting the docs copy as a duplicate was considered. It was kept instead, because the web copy was optimised down to 625 × 224 / 12 KB in the same pass — after which the docs copy is the only full-resolution logo in the repository outside binary `.docx` files. **If the brand artwork is ever replaced, update both**, and re-embed it in `grant-pathway-process-overview.svg` (which carries its own base64 copy so the SVG stands alone).
 
 ## Why the old PNG is still here
 

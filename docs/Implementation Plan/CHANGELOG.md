@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-07-31 (fourth pass) — `public/images` tidied: three unused logo files removed, the live one cut 98%
+
+Follow-on from the correction above. Once it was established that `components/logo.tsx` already renders the real asset, the question became what was actually left in `public/images` — and the answer was three unused files and an oversized live one.
+
+**Removed, all confirmed unreferenced by any code, config, template or route:**
+
+| File                                          | Size   | What it was                                                                                              |
+| --------------------------------------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| `Grant Pathway PNG Logo.png`                  | 376 KB | The original Canva export, 1920 × 1080, **no alpha channel at all** — superseded before it was ever used |
+| `logo-white-wordmark.png`                     | 190 KB | White-wordmark variant, added 2026-06-12 and "retained for dark/teal background contexts (emails etc.)"  |
+| `Grant_Pathway_PNG_Logo-removebg-preview.png` | 49 KB  | A background-removal intermediate — the filename says "preview"                                          |
+
+The white wordmark was the only judgement call, so it was checked rather than assumed: **both navs are `bg-white`** (`nav-public.tsx`, `nav-authenticated.tsx`), the teal `#0D6E6E` appears only on buttons and tints and never behind a logo, and the transactional emails contain **no images whatsoever** — so the dark logo is correct in every place it is actually used, and the variant sat unused for seven weeks against a context that never arrived. Recoverable from git history, or regenerable from the master, if a dark surface ever appears.
+
+Worth noting these were in `public/`, so all three were **publicly served at guessable URLs** — the same shape as the `app/mockup` deletion (audit S3), though far less consequential: they are logos, not internal strategy notes.
+
+**`public/images/logo.png`: 655 KB → 12 KB, a 98% cut.** It was the full 1562 × 560 master being served for a 156 × 56 nav render. Next/Image resizes on delivery so no user ever downloaded 655 KB, but the source was ~40× larger than needed. Now 625 × 224 (4× the display size, covering every device pixel ratio Next requests) and palette-reduced to 58 colours, which suits artwork that is two flat brand colours plus antialiasing. **Quality was verified, not assumed:** 16/32/64-colour variants were compared by RMSE against the original (0.0149 / 0.0133 / 0.0119 — all confined to edge antialiasing) and 64 was chosen; rendered side by side at 2× display size it is indistinguishable. Transparency confirmed intact (corner pixel `srgba(0,0,0,0)`, mean alpha 0.3204 → 0.3198).
+
+**The docs copy was kept rather than deleted, reversing what was offered.** `docs/overview/assets/grant-pathway-logo.png` and `public/images/logo.png` were briefly identical, and deleting the docs one as a duplicate was the plan — but optimising the web copy makes them no longer duplicates, and the docs copy then becomes **the only full-resolution logo in the repository outside binary `.docx` files**. The overview's title page renders it around 900 px wide, so that resolution is genuinely needed. Both files and the split are now documented in `docs/overview/assets/README.md`, including the instruction to update both plus the SVG's embedded base64 copy if the brand artwork ever changes.
+
+**Verification:** `npm run type-check` clean, `npm run lint` clean, **all 101 tests pass**, and a grep confirms nothing anywhere references the three deleted filenames. The logo asset itself was rendered at 156 × 56, on white and on the brand teal, and at 2× — sharp, correctly transparent, no halo. **Not verified in the running app**: that needs the dev server, and this environment cannot supply the eight required secrets (see the 2026-07-28 note on Vercel Sensitive variables). The asset is a drop-in replacement at the same path with the same aspect ratio and no code change, so the risk is low, but the nav has not been seen live.
+
+---
+
 ## 2026-07-31 (third pass) — Process diagram rebuilt as an editable SVG; the old one had gibberish on it
 
 WJ asked whether the infographic in the overview needed updating. It did, and for a worse reason than the "DATA STORED IN UK" line already flagged: **the artwork contained garbled text**. Stage 4 read _"(User confirms accuracy, the funder funders accuracy..)"_ — not a wording problem, actual gibberish, sitting on page 3 of a document prepared for external distribution and present through several versions.
