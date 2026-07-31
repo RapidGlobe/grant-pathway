@@ -10,6 +10,53 @@
 
 ---
 
+## 2026-07-31 (second pass) — Two day-one claims in the Business Overview tested and both failed; replaced with a sourced statistic (v1.18)
+
+WJ read the "Problem We Are Solving" section of the freshly-issued v1.17 and asked directly whether one paragraph was authentic and accurate — the one naming "theory of change", "additionality" and "outcomes framework" as the jargon that confuses a volunteer, ending "Two to three days of her life, every time." It had been in the document, unchanged, since the first version. **Neither claim survived checking.**
+
+### The jargon examples were wrong, and we could prove it from our own files
+
+`docs/Grant Org Guidelines` holds **23 real funder documents** (11 PDFs plus docx and sample forms, from AB Charitable Trust, Garfield Weston, Clothworkers, Heritage Fund, Henry Smith, Idlewild, Lloyds Bank Foundation, MK Community Foundation, Nationwide/Norfolk, Walton and Wolfson). All 23 were extracted to text — every extraction verified non-empty, so a zero is a real zero — whitespace-normalised so line-wrapped phrases could not hide, and searched:
+
+| Term                 | Appears in |
+| -------------------- | ---------- |
+| "theory of change"   | **0 / 23** |
+| "additionality"      | **0 / 23** |
+| "outcomes framework" | **0 / 23** |
+| impact               | 13 / 23    |
+| safeguarding         | 13 / 23    |
+| outcomes             | 9 / 23     |
+| core costs           | 8 / 23     |
+| beneficiaries        | 6 / 23     |
+| unrestricted         | 6 / 23     |
+| sustainability       | 6 / 23     |
+
+All three named terms are genuine sector jargon — they trace back to `BRD-Grant-Pathway-v0.2.md` and Persona 1's pain points — but they are **not the jargon the funders our users actually face put in front of them**. Replaced with "core costs", "unrestricted funding", "outcomes" and "sustainability": all four verified present in the corpus, and all four still genuinely opaque to someone with no fundraising training ("impact" and "safeguarding" are commoner still but are largely self-explanatory, so they were not used). A do-not-reintroduce note with the counts is now in `business-overview.md` beside the paragraph.
+
+### "Two to three days" had no source and contradicted two other documents
+
+It traces to Persona 1 (Margaret) in `user-personas-journeys-and-use-cases.md`, a composite with **no documented research basis** — no interviews, survey or citation anywhere in the repository. `DR-PS-001`'s rationale likewise asserts that small charities "consistently find the writing burden" the primary obstacle with nothing behind it. The figure also drifted: `tone-and-voice-guide.md` says "a full weekend", `PRD-Grant-Pathway.md` says "2-3 days", and the sentence immediately before it in the overview has her clearing her diary **for the weekend**. Now "A whole weekend of her life, every time", matching Margaret's own pull-quote in the personas document.
+
+This mattered more than a normal wording slip because of who the document is for: the funding model (`DR-OD-002`) depends on approaching technology funders and digital inclusion programmes, who fund on evidence, and "two to three days" is exactly the sentence one of them asks about.
+
+### A sourced statistic added in its place
+
+The narrative framing ("Picture a volunteer at a small community charity…") is honest and was deliberately kept — an illustration needs no citation. What the document lacked was any evidenced claim at all, so one was added as a separate, attributed paragraph:
+
+> Applying for grants costs UK charities **at least £900 million every year**, and the burden falls hardest on the smallest: for charities with an income under £100,000 it comes to **at least 17.5% of the money they raise from foundations**, against around 4% for charities above £1 million.
+
+**Source:** Caroline Fiennes, Gemma Bull and Sarah Sandford, _Understanding and Reducing the System Costs of Foundations' Application Processes_, Giving Evidence, 2022, funded by the **Law Family Commission on Civil Society** — [authors' own summary](https://giving-evidence.com/2022/10/12/applicationcosts/) and [full report](https://giving-evidence.com/wp-content/uploads/2022/09/understanding-and-reducing-the-system-costs-of-foundations-application-processes.pdf). It says what Grant Pathway exists to fix, from an independent source a funder will respect, and every figure in it is a conservative minimum. Cited in a footnote in the `.md` and an italic source note on the last page of the `.docx`.
+
+**Two candidate figures were rejected, and the reasons are recorded in `business-overview.md` so this is not re-litigated.** (1) The Law Family Commission's **own** briefing (`Giving pains: The cost of grant-making`, July 2022) states that small and medium charities spend "more than a third" of their resources on applying — irreconcilable with the underlying report's 17.5% (small) and 15% (medium), and it looks like the two brackets added together. The authors' figures were used, not the publisher's press framing. (2) **Brevio's 2020 survey** — 1,002 organisations, 1 in 8 spending three or more working days a week on applications, £442m sector-wide — is widely cited and is the low end of the range the Commission quotes, but it is a pandemic-period snapshot ("since March" 2020) from a commercial funding platform with an interest in the answer.
+
+### Version handling
+
+Reissued as **v1.18** (`.md` and `.docx`). **v1.17 was not archived**: it existed for about an hour, was never sent to anyone, and this project's `docs/overview/archive/` is for versions that actually reached an external audience — listing an undistributed one would imply somebody holds a copy. Superseded in place; the wording remains in commit `987c8fb`. The archive README now says so explicitly. Same in-place `.docx` XML editing method as the first pass, schema-validated (75 → 77 paragraphs) and checked page by page.
+
+Also checked and deliberately left alone: **"a twenty-page PDF of funder guidelines"**. The real corpus runs 4 to 54 pages, median 10 — above typical but well within range, and clearly illustrative rather than asserted.
+
+---
+
 ## 2026-07-31 — Business Overview reviewed before distribution and reissued as v1.17
 
 WJ asked for the external Business Overview in `docs/overview/` to be reviewed ahead of distributing it, given the gaps found over the previous week. It was last issued on **20 July** as v1.16, before the legal-document work, and had drifted.

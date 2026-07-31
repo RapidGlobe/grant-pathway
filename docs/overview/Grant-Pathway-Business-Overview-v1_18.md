@@ -3,7 +3,7 @@
 _The service provided by RapidGlobe Ltd_
 
 **31 July 2026**
-_Version 1.17_
+_Version 1.18_
 
 ---
 
@@ -19,11 +19,15 @@ Grant Pathway is a free online tool that helps charities write better grant appl
 
 Picture a volunteer at a small community charity. She gives two days a week of her time, coordinating other volunteers, running a weekly social group for isolated older adults, managing the charity's social media — and writing grant applications. She has no fundraising training. When a grant deadline arrives, she clears her diary for the weekend, downloads a twenty-page PDF of funder guidelines, and starts writing from scratch.
 
-She finds the language confusing. Terms like "theory of change", "additionality", and "outcomes framework" were not designed for someone who simply wants to help people in her community. She refers to old applications, copies what she can, rewrites the rest, and submits something she is never quite sure about. Two to three days of her life, every time.
+She finds the language confusing. Guidelines ask about "core costs", "unrestricted funding", "outcomes", and "sustainability" — terms that were not written for someone who simply wants to help people in her community. She refers to old applications, copies what she can, rewrites the rest, and submits something she is never quite sure about. A whole weekend of her life, every time.
 
 Now picture a charity manager at a youth services organisation. He writes ten or twelve applications a year — always in the evenings or at weekends, because there is no one else to do it and the charity cannot afford a professional fundraiser. He knows his applications could be stronger. He simply does not have the time to make them so.
 
 These are not unusual situations. They are the everyday reality for the majority of UK charities. Smaller organisations — the ones doing vital work in communities across the country — are competing for funding against charities with dedicated fundraising teams and polished professional applications. The playing field is not level.
+
+Nor is the cost of applying evenly shared. Research by Giving Evidence, funded by the Law Family Commission on Civil Society, estimated that applying for grants costs UK charities **at least £900 million every year** — and that the burden falls hardest on the smallest. For charities with an income under £100,000, the cost of raising grant funding comes to **at least 17.5% of the money they raise from foundations**, against around 4% for charities with incomes above £1 million.[^1] Roughly four in five UK charities sit in that smallest bracket.
+
+[^1]: Caroline Fiennes, Gemma Bull and Sarah Sandford, _Understanding and Reducing the System Costs of Foundations' Application Processes_, Giving Evidence, 2022, funded by the Law Family Commission on Civil Society. Every figure in the report is stated as a conservative minimum. Available at [giving-evidence.com](https://giving-evidence.com/2022/10/12/applicationcosts/).
 
 There is no shortage of goodwill, capability, or impact in the small charity sector. What is in short supply is time, confidence, and access to the kind of writing support that larger organisations take for granted.
 

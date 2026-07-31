@@ -10,9 +10,11 @@ The current version is in `docs/overview/`:
 
 | Live file                                    | What it is                                                         |
 | -------------------------------------------- | ------------------------------------------------------------------ |
-| `Grant-Pathway-Business-Overview-v1_17.md`   | **Authoritative** source text for the external overview            |
-| `Grant-Pathway-Business-Overview-v1_17.docx` | The distributable Word version, generated from the `.md` above     |
+| `Grant-Pathway-Business-Overview-v1_18.md`   | **Authoritative** source text for the external overview            |
+| `Grant-Pathway-Business-Overview-v1_18.docx` | The distributable Word version, kept in step with the `.md` above  |
 | `assets/`                                    | Images referenced by the overview (the high-level process diagram) |
+
+**v1.17 is not in this folder, deliberately.** It existed for about an hour on 2026-07-31 and was never sent to anyone, so it was superseded in place rather than archived — this folder is for versions that actually reached an external audience, and listing an undistributed one would imply somebody out there holds a copy. It remains in git history (commit `987c8fb`) if the wording is ever needed.
 
 The internal, tier-governed equivalent is `docs/business-overview.md` — that is the one AGENTS.md's Tier 2 checklist refers to. It carries decision references and pointers the external copy deliberately leaves out. **Both must be updated together**; the 2026-07-31 review found the internal copy had drifted three versions behind on data residency alone.
 
