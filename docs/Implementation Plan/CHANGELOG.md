@@ -10,6 +10,31 @@
 
 ---
 
+## 2026-07-31 (seventh pass) — "Bypassed rule violations" on every push explained; audit M6 confirmed closed
+
+Every push to `master` prints `remote: Bypassed rule violations for refs/heads/master: - 3 of 3 required status checks are expected`. Investigated because it reads like a failure. **It is not, and it cannot be made to go away without changing how we work.**
+
+**Why it happens.** `master` carries classic branch protection requiring the three real CI jobs (`lint-and-typecheck`, `test`, `validate-migrations`), with `strict: true` and `enforce_admins: false`. The word that matters is **"expected"** — meaning not yet reported, not failed. A direct push can never satisfy a required status check, because checks only run once the commit exists. The push is therefore always in violation, and because admins are exempt it always proceeds. CI then runs on the push and reports afterwards. **It passed for both of today's commits, and across the last 40 CI runs on `master` there are zero non-successes.**
+
+**Audit finding M6 is now closed.** The 2026-07-29 entry records, as an outstanding consequence, that protection still required a fourth context — `audit` — after that job moved to `security-audit.yml`, so the check could never report; it was "flagged to WJ, awaiting his go-ahead". Verified today: the required contexts are exactly the three real jobs and `audit` is gone from both the protection rule and `ci.yml` (only explanatory comments remain). That earlier note is superseded.
+
+**What the bypass actually costs, and what it does not.** Protection on `master` is an alarm, not a gate — but it is a real gate on pull requests, which is where the changes we did not write ourselves arrive (Dependabot #84–#88). The genuine exposure is elsewhere and already recorded: production is not gated on CI at all, because Vercel deploys on push in parallel with it (`DEPLOYMENT-CHECKLIST.md`, audit **M2**). A red commit ships.
+
+**On the permanent resolution.** Two distinct fixes, for two distinct problems, and only one is worth taking:
+
+| Problem                           | Fix                                                                                                                                                                                    | Verdict                                                                                                                                                                                    |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| The "Bypassed" message itself     | Stop pushing directly: branch + PR + auto-merge, `enforce_admins: true`                                                                                                                | **Not recommended.** A real gate, but it taxes every commit, and most of ours are documentation-only. It also contradicts `AGENTS.md` §5, which mandates commit-and-push after every task. |
+| A red commit can reach production | Invert the deploy trigger — disable Vercel's Git auto-deploy for `master`, add a `deploy-production` job to `ci.yml` gated on `needs: [lint-and-typecheck, test, validate-migrations]` | **The one with teeth.** Leaves §5 untouched and makes the bypass harmless in fact rather than in practice.                                                                                 |
+
+`DEPLOYMENT-CHECKLIST.md` step 2 has been updated to record this assessment, including **why Vercel's Ignored Build Step — the mechanism it originally named — is the weaker option**: `ignoreCommand` runs when Vercel starts the build, which is the same moment CI starts, so there is no conclusion to read. It can skip a build, not wait for one. Left as an open decision, not actioned: it needs Vercel project settings and three repository secrets, which is WJ's call.
+
+**Separately, and worth not misreading: `Schema Drift Check` has failed daily since at least 2026-07-27, and that is expected.** The failure is `prod migration count mismatch: 29 tracked locally, 18 recorded as applied on the remote`; `check-schema (dev)` passes. Eleven migrations are not on production because production is not provisioned yet — which is exactly **P5.4**, still open, whose exit test (added 2026-07-30) is "the `Schema Drift Check` workflow green and staying green". The red is the tracking mechanism working.
+
+**But it carries the same risk the `audit` job did, and that is a new observation.** A check expected to be red until P5.4 lands cannot signal anything else in the meantime — a genuine, unrelated drift on `prod` would look identical to the known failure. This is precisely the pattern the 2026-07-29 entry describes for `ci.yml`, where accepted noise had made it red on 11 of its last 12 runs and would have masked a real failure. Worth deciding before launch whether the prod job should be temporarily skipped (so dev drift stays a live signal) rather than left permanently red.
+
+---
+
 ## 2026-07-31 (sixth pass) — Working copy moved out of OneDrive; §4 reworded to stop naming a location
 
 The local clone now lives outside OneDrive. Per §4 the path is not recorded here — what matters is that it is no longer inside a synced folder.

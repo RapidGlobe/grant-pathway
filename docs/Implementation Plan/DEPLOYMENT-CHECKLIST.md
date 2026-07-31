@@ -6,8 +6,10 @@
 
 _Tier header added 2026-07-30 (audit findings L4/L5), and it closes a governance gap rather than merely a formatting one. **This document is not named anywhere in `AGENTS.md`'s tier tables** — the audit stated it was named there individually by tier, which is not the case (checked: `AGENTS.md` contains no reference to it at all). So until now it was governed by nothing: no tier table listed it, and it had no self-governing header, meaning no end-of-task checklist ever pointed at it. That is a live operational document — the one an operator reads before deploying — sitting outside the documentation discipline that governs everything else. Per `AGENTS.md` §3 "Adding a new document" ("No change to `AGENTS.md` is required — the tier header makes the doc self-governing"), adding the header here is the complete fix; `AGENTS.md` deliberately not modified. Tier 2 rather than 1 because it describes process rather than product state, but Volatility is Medium not Low on the evidence: it went from v1.1 to v1.3 in five days._
 
-**Version:** 1.4
-**Last updated:** 2026-07-30
+**Version:** 1.5
+**Last updated:** 2026-07-31
+
+**Changes in 1.5:** the open decision under "Standard deploy" is now specified rather than merely named. It previously pointed only at Vercel's Ignored Build Step, which cannot actually wait for CI — `ignoreCommand` runs as the build starts, so there is no conclusion to read. Both candidate mechanisms are now set out with the reasoning and the costs, so the decision can be taken without re-deriving it. Still open, not actioned. Raised while investigating why every push to `master` reports `Bypassed rule violations` — see `CHANGELOG.md` 2026-07-31 (seventh pass), which also confirms audit finding **M6** closed.
 
 **Changes in 1.4 (Opus audit L4/L5):** `**Tier:**` header added — see the note above; this document was governed by nothing until now. The other two parts of finding **L4** were already resolved by the v1.2/v1.3 work of 2026-07-29: the stale "any affected funder test plan has been re-run" item (retired by `DR-TEST-001`) was removed, and the document is no longer at v1.1 / 15 June 2026. `Last updated` also switched to ISO format for consistency with every other document.
 
@@ -53,7 +55,13 @@ This checklist must be completed before deploying any change that touches an API
 ### Standard deploy (push to master)
 
 1. Merge to `master` — GitHub Actions CI runs automatically
-2. Vercel builds and deploys to production automatically. **Note: this is not gated on CI.** Vercel deploys on push regardless of whether `ci.yml` passes or fails — the two run independently and in parallel. This document previously stated "on CI pass, Vercel builds and deploys," which was never true in practice (corrected 2026-07-29, Opus audit **M2**). **So CI must be checked manually before and after deploying** — a red run does not stop the code reaching production. Whether to make the gate real (via Vercel's Ignored Build Step) is an open decision.
+2. Vercel builds and deploys to production automatically. **Note: this is not gated on CI.** Vercel deploys on push regardless of whether `ci.yml` passes or fails — the two run independently and in parallel. This document previously stated "on CI pass, Vercel builds and deploys," which was never true in practice (corrected 2026-07-29, Opus audit **M2**). **So CI must be checked manually before and after deploying** — a red run does not stop the code reaching production. Whether to make the gate real is an open decision; the two candidate mechanisms are **not** equivalent, and the one originally named here is the weaker of them (assessment added 2026-07-31):
+
+   - **Vercel's Ignored Build Step is a poor fit.** `ignoreCommand` runs when Vercel _starts_ the build — the same moment CI starts — so there is no CI conclusion to read yet. It can skip a build, not wait for one. Using it as a gate means polling GitHub from inside the build step and paying build minutes for a race.
+   - **Inverting the trigger is the mechanism that works.** Disable Vercel's automatic production deploy (`vercel.json` → `"git": { "deploymentEnabled": { "master": false } }`) and add a `deploy-production` job to `ci.yml` with `needs: [lint-and-typecheck, test, validate-migrations]` that runs `vercel deploy --prod`. CI then becomes a true gate on what reaches production, and `AGENTS.md` §5's push-straight-to-`master` workflow is unaffected. Costs: three repository secrets (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`) to hold and rotate, no deploys during a CI outage, and preview deployments should be left on the Git integration so PR previews keep working.
+
+   Still an open decision, not a recommendation acted on — it requires changes to the Vercel project and repository secrets, which is WJ's call.
+
 3. Monitor Vercel function logs for the first 5 minutes after deploy
 4. Check Sentry for any new errors in the first 10 minutes
 
