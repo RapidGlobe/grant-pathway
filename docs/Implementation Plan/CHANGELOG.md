@@ -10,6 +10,34 @@
 
 ---
 
+## 2026-07-31 (sixth pass) — Working copy moved out of OneDrive; §4 reworded to stop naming a location
+
+The local clone now lives outside OneDrive. Per §4 the path is not recorded here — what matters is that it is no longer inside a synced folder.
+
+**Why it mattered.** The clone was 1.47 GB across 4,210 files, the bulk of it `node_modules/` and `.next/`, every build churning through sync. It also produced real failures, not just noise: the `.vercel/output/builds.json` left behind by the last build in that location recorded `EPERM: operation not permitted, symlink 'account\delete.func'` — OneDrive cannot create the symlinks a Vercel build emits. That stale output has been cleared; the next `vercel build` regenerates it. `.vercel/project.json` (the project link) was left intact.
+
+**The old clone was deleted, after verification rather than on assumption.** It had no commits absent from `origin/master`, a clean tree, and one branch. It did hold two leftover `lint-staged` automatic backup stashes (10 and 13 July) — the kind of thing easily waved away as "just backups". One of them contained 45 lines in `app/(authenticated)/applications/[id]/step/4/page.tsx` that do not exist in `master`, which looked at first like lost work. It was not: those lines are the pre-rename form of the sync logic, `application_answers` / `question_order`, superseded by `application_items` / `item_order` in `82e11d9`, with the orphan predicate extracted to `lib/governance-items.ts` and covered by tests. Nothing was lost. **The parent folder was deliberately kept** — it holds material that is not in the repository and exists nowhere else, including the AWS/Supabase keys note, the logo originals and the archived overview PDFs.
+
+Migration verified by `npm run type-check` passing from the new location, and by confirming `.env.local` (a `vercel env pull` output) is complete: the four keys it lacks against `.env.example` are all safe-by-design absences — `AI_ENABLED` unset means AI **enabled** (the guards test `!== 'false'`), `NEXT_PUBLIC_ALLOW_INDEXING` unset means no indexing (deliberately opt-in), `NEXT_PUBLIC_SITE_URL` falls back to the canonical domain, and `SUPABASE_DB_PASSWORD` is read by no code at all.
+
+**§4 no longer names OneDrive.** All three points and the Why said "the OneDrive path", which made the rule read as _avoid OneDrive_ when it always meant _avoid absolute local paths_. Reworded to describe the working copy generically, with a note recording why, so the next relocation does not invalidate it again. The five historical mentions elsewhere — `CHANGELOG.md` (2026-07-30), `IMPLEMENTATION-STATUS.md`, and three in `regression-test-plan.md` — were **left untouched on purpose**: they record the RT-14 incident where a live test plan hardcoded the author's path, and rewriting them would destroy the audit trail that §3 exists to protect.
+
+**Also fixed, found while in there:** `.claude/settings.json` allowed `Bash(npm run typecheck)`, but the script is `type-check` — the permission could never match, so the command prompted every time.
+
+**Left for when the desktop app is closed:** two stale OneDrive project entries in the user-level `~/.claude.json` (both empty, so pruning is safe, but the app owns that file and rewrites it on exit), and some stale OneDrive permission entries in the gitignored `.claude/settings.local.json`, which are cosmetic — they simply match nothing now.
+
+**Unrelated, noted for follow-up:** the push at the end of this work reported a high-severity Dependabot alert on the default branch, and that the push bypassed 3 required status checks.
+
+---
+
+## 2026-07-31 (fifth pass, later) — Overview v1.19: the Giving Evidence source attached to its citation as a footnote
+
+The source note for the £900m / 17.5% figures sat as a loose paragraph at the very end of the `.docx`, four pages after the claim it supported, with no marker connecting them. It is now a real Word footnote anchored at the end of the citation paragraph, rendering at the foot of **page 2** where the figures are. Wording and styling unchanged (italic, 9pt); the stranded paragraph is gone, so the last page no longer carries a single orphaned line. Verified through Word itself rather than the XML alone — one footnote, reference on page 2, text intact including the `’` in "Foundations’".
+
+Two consequences worth recording. **Content reflows:** still 6 pages, but "What Grant Pathway Does" moves from the foot of page 2 to the top of page 3, and page 6 — which previously held nothing but the orphaned source line — now carries the closing sections. **The `.md` and `.docx` are knowingly out of sync on this point:** at WJ's instruction the `.md` was left alone (it was needed urgently as an email attachment), so it still carries the note as a trailing paragraph. Markdown has no footnote form that survives a round-trip to `.docx`, so aligning them needs a deliberate decision rather than a copy-paste.
+
+---
+
 ## 2026-07-31 (fifth pass) — New diagram swapped into the overview (v1.19)
 
 The rebuilt SVG's PNG export replaces the AI-generated diagram in both the `.md` and the `.docx`. **v1.19** is now the live pair.

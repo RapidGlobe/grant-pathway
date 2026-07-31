@@ -7,7 +7,7 @@ This file governs how all contributors — human and AI — work on this codebas
 | When                     | What                                                              |
 | ------------------------ | ----------------------------------------------------------------- |
 | Before starting any task | Check Next.js docs for the relevant area → check ADR consequences |
-| While working            | Use relative file paths; reference GitHub, not OneDrive           |
+| While working            | Use relative file paths; reference GitHub, not the local copy     |
 | After every task         | Run the documentation tier checklist → commit and push            |
 
 ---
@@ -185,11 +185,13 @@ The canonical source for all project files is the GitHub repository:
 
 When searching for or referencing project files:
 
-1. **Use the GitHub repository as the default location for information search** — browse or fetch files from `https://github.com/RapidGlobe/grant-pathway` rather than navigating the local OneDrive file structure.
-2. **Use relative paths in all file references** — always reference files relative to the repository root (e.g. `docs/Technical Decision and Design/ADR-AI-001-ai-provider.md`), never absolute Windows/OneDrive paths.
-3. **Never expose the full OneDrive path** in responses, commit messages, or documentation. The local working directory is an implementation detail of the developer's machine, not a project reference.
+1. **Use the GitHub repository as the default location for information search** — browse or fetch files from `https://github.com/RapidGlobe/grant-pathway` rather than navigating the local working copy's directory structure.
+2. **Use relative paths in all file references** — always reference files relative to the repository root (e.g. `docs/Technical Decision and Design/ADR-AI-001-ai-provider.md`), never absolute Windows paths.
+3. **Never expose the full local path** of the working copy in responses, commit messages, or documentation. Where the clone happens to sit is an implementation detail of the developer's machine, not a project reference.
 
-**Why:** The local OneDrive path is machine-specific and will differ between contributors. GitHub paths are stable, version-controlled, and work for all team members and future sessions.
+**Why:** The local path is machine-specific and will differ between contributors. GitHub paths are stable, version-controlled, and work for all team members and future sessions.
+
+This rule is deliberately worded without naming any particular location. Until 2026-07-31 the working copy lived inside OneDrive and these three points said so, which made the rule read as "avoid OneDrive" rather than "avoid absolute local paths" — the clone has since moved out of OneDrive, and the rule applies unchanged wherever it sits next.
 
 ---
 
