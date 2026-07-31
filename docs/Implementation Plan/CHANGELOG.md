@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-07-31 (third pass) — Process diagram rebuilt as an editable SVG; the old one had gibberish on it
+
+WJ asked whether the infographic in the overview needed updating. It did, and for a worse reason than the "DATA STORED IN UK" line already flagged: **the artwork contained garbled text**. Stage 4 read _"(User confirms accuracy, the funder funders accuracy..)"_ — not a wording problem, actual gibberish, sitting on page 3 of a document prepared for external distribution and present through several versions.
+
+### What was wrong
+
+**Broken text:** the "funder funders" phrase; a sentence in stage 3 ending in a dangling "AI"; two unfinished ellipses ("AI improves structure…", "accuracy.."); and a stage-4 bracket that merely repeated its own heading ("Export Completed Application (Export completed application upload to form or portal)").
+
+**Inaccurate or missing content:** "TRUST: DATA STORED IN UK" contradicted the text corrected earlier the same day, in the same document, two pages apart. "FREE FOR SMALL UK CHARITIES" contradicted the document's own audience definition (small **and mid-size**, up to ~£1m). The flow was drawn as a straight line 1→2→3→4 with **no exit**, when `FR-47` can terminate an application at Step 3 — the diagram showed a path that cannot always be walked. The Charity Commission lookup and `P6.5` reuse were absent. And its four stages contradicted the app's own five numbered steps, so a user holding the diagram beside the screen would count differently.
+
+**Other:** the stage-4 icon was an imitation of the Microsoft Word logo (rendered as "w/") — unnecessary trademark exposure on external material. The RapidGlobe wordmark was placed so small it read as "RapidGiobe"; **that turned out to be a scaling artefact, not a typo** — cropping the supplied logo to its content and re-rendering shows "RapidGlobe Ltd" correctly, which is worth recording since the opposite was suspected.
+
+**Root cause, and the durable lesson:** it was AI-generated raster artwork. Its text is pixels, so it could not be proof-read by any tool, could not be edited, and any one-line fix meant regenerating the whole image. **Do not use generated raster artwork for anything containing text that has to be correct.**
+
+### What replaced it
+
+`docs/overview/assets/grant-pathway-process-overview.svg` — hand-authored SVG, now the source of truth. Plain commented XML on the `BR-02` palette from `app-name-and-branding.md`, with the two real logos WJ supplied embedded as base64 so the file stands alone. Structure: **set up once**, then **five step cards matching the app's own Step 1–5 numbering**, an **amber exit off Step 3** for the eligibility hard stop, and four key principles. Icons are simple geometric paths — no imitation of anyone's trademark. Text is accurate to the built product: the register lookup, starting from an earlier application, per-answer approval, and Word export are all described as they actually behave.
+
+**One overclaim was caught in the new diagram before it shipped:** a first draft said each summary point is linked back to the guidelines with "every point linked back". Citations are optional per `ADR-DATA-007` — the Wolfson case produced none until the `[ITEM N]` fallback was built — so "every" would have been a fresh overclaim of exactly the kind removed from the text earlier the same day. Now reads "with links back to the funder's own wording."
+
+### Files, and why the old PNG is still present
+
+`grant-pathway-process-overview-v2.png` (3200 × 1660) is the 2× export, **ready but not yet used** — WJ asked explicitly for no new version of the overview in this pass, having spotted further changes he wants. The old `grant-pathway-process-overview.png` is therefore **deliberately left in place**, because the live v1.18 still references it; it goes when the Word file is rebuilt. `assets/README.md` records which file is which so the next session does not guess.
+
+Also saved as reusable assets: `grant-pathway-logo.png` (1562 × 560, **transparent background**) and `rapidglobe-logo.png`, both extracted from the overview's own `.docx` media and confirmed by WJ as the real artwork. **The Grant Pathway one is what `project_logo_replacement` has been waiting for** — `components/logo.tsx` still carries a placeholder SVG, and a real transparent-background PNG is now in the repository.
+
+**Tooling note for future sessions.** No `rsvg-convert` or Inkscape on this machine, and ImageMagick's SVG delegate renders text badly. Headless Chrome is the working route, with two traps: it refuses to write a screenshot from a `file://` URL (serve the folder over `python -m http.server` instead), and **without `--user-data-dir` it fails silently with exit code 0 and writes nothing**. The Browser pane cannot help here — `computer{action:"screenshot"}` needs the pane displayed and times out otherwise. Full commands are in `assets/README.md`.
+
+---
+
 ## 2026-07-31 (second pass) — Two day-one claims in the Business Overview tested and both failed; replaced with a sourced statistic (v1.18)
 
 WJ read the "Problem We Are Solving" section of the freshly-issued v1.17 and asked directly whether one paragraph was authentic and accurate — the one naming "theory of change", "additionality" and "outcomes framework" as the jargon that confuses a volunteer, ending "Two to three days of her life, every time." It had been in the document, unchanged, since the first version. **Neither claim survived checking.**
