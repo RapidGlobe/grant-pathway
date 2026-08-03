@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-08-03 (second pass) — `Schema Drift Check` skips prod until P5.4, so dev drift is a live signal again
+
+**Decision: WJ.** The open question raised in the 2026-07-31 seventh-pass entry — whether the prod job should be temporarily skipped rather than left permanently red — is now settled in favour of skipping.
+
+**The problem was masking, not the failure itself.** The prod leg failed every scheduled run from at least 2026-07-24 to 2026-08-02 — ten consecutive days, verified via `gh run list` rather than taken from the earlier note — and it failed _correctly_: `prod migration count mismatch: 29 tracked locally, 18 recorded as applied on the remote`, because Phase 6's migrations exist only on `grant-pathway-dev`. But a check expected to be red cannot report anything else. `check-schema (dev)` passes, and a workflow's status is the worst of its jobs, so the whole workflow read red daily and a genuine, unrelated drift on **dev** would have been invisible inside the known prod failure. This is the audit's **M2** pattern exactly, one layer down: accepted noise swallowing a real signal.
+
+**Why skipping was available here and was not for `ci.yml`.** M2 and M6 both turned on the fact that a _skipped required status check never reports success_, which is what made the dead `audit` context an unsatisfiable gate. `Schema Drift Check` is **not** a required context — confirmed against the branch protection API, which lists exactly `lint-and-typecheck`, `test` and `validate-migrations`. It runs on a schedule, not on push, and gates nothing. So narrowing it leaves no gate waiting on a check that never reports.
+
+**What changed.** `.github/workflows/schema-drift-check.yml`'s matrix is now driven by a `workflow_dispatch` choice input defaulting to `'["dev"]'`; scheduled runs supply no inputs and fall through to that default. Prod did not become unreachable — the dropdown offers `["dev"]`, `["dev","prod"]` and `["prod"]`, so it can be checked on demand from the Actions tab with no commit, which is what P5.4 will want while applying migrations one at a time. Implemented as a matrix default rather than a job-level `if:` because job-level conditions cannot read the `env` context, and rather than a repository variable because the state then lives outside version control, where a future session reading the workflow file could not see it.
+
+**The real hazard this creates, and what was done about it.** The workflow goes green from now on while production stays exactly as unprovisioned as it was — a green badge that no longer says anything about prod. P5.4's exit test was, verbatim, "the `Schema Drift Check` workflow green and staying green", which this change would have satisfied **vacuously**. That is the hollow-gate failure this project keeps finding in its own records (the `audit` context, GAP-11's phantom PR review, the nine gaps signed off at the Phase 4 → 5 gate on the strength of a task having been _written_). So the exit test was tightened in the same pass to require the prod leg switched back on, with an explicit note not to read the green tick alone as the gate being passed, and **re-enabling the leg is now its own tasked P5.4 checklist item** — placed last, after the migrations, and naming the one-line edit. Skipping the check does not make prod safer and is not a claim that it is; it removes a false alarm.
+
+Also updated: `README.md` and `technology-stack.md` (→ v1.12), both of which described the workflow as covering dev _and_ prod daily.
+
+---
+
 ## 2026-08-03 — Post-move verification: the old working copy is confirmed gone, and the two deferred cleanups are closed
 
 First session from the relocated clone. Verified rather than assumed, because the 2026-07-31 (sixth pass) entry left two items open "for when the desktop app is closed".

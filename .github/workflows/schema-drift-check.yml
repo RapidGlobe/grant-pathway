@@ -10,11 +10,40 @@ name: Schema Drift Check
 # found to have been silently missing this exact schema for weeks -- the
 # gap was invisible from inside the app and from CI. See CHANGELOG.md,
 # 2026-07-01, for the full story.
+#
+# SCHEDULED RUNS CHECK dev ONLY, UNTIL P5.4 PROVISIONS PRODUCTION.
+# Decision: WJ, 2026-08-03. grant-pathway-prod does not have Phase 6's
+# migrations, so the prod leg failed every scheduled run from at least
+# 2026-07-24 -- and a check that is expected to be red cannot signal
+# anything else, so a genuine unrelated drift on prod would have looked
+# identical to the known failure. The same masking that took the audit's
+# M2 finding to split security-audit.yml out of ci.yml. Skipping the prod
+# leg restores dev drift as a live signal; it does not make prod safer,
+# and it is safe to skip only because this workflow is NOT a required
+# status check on master (those are lint-and-typecheck, test and
+# validate-migrations) -- so nothing is left waiting on a check that
+# never reports.
+#
+# TO RE-ENABLE PROD: change the `environments` default below to
+# '["dev","prod"]'. That is an explicit, tasked step in P5.4, and P5.4's
+# exit test requires it -- a green dev-only run does not discharge it.
+# Meanwhile prod can be checked on demand from the Actions tab without
+# editing this file, which is what P5.4 will want while applying
+# migrations.
 
 on:
   schedule:
     - cron: '0 7 * * *' # daily, 07:00 UTC
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      environments:
+        description: 'Databases to check (scheduled runs always use the default)'
+        type: choice
+        default: '["dev"]'
+        options:
+          - '["dev"]'
+          - '["dev","prod"]'
+          - '["prod"]'
 
 jobs:
   check-schema:
@@ -22,7 +51,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        environment: [dev, prod]
+        # Scheduled runs supply no inputs, so they fall through to ["dev"].
+        environment: ${{ fromJSON(github.event.inputs.environments || '["dev"]') }}
     steps:
       - uses: actions/checkout@v7
 

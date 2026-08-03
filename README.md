@@ -89,7 +89,7 @@ See `docs/Technical Decision and Design/ADR-OPS-008-linting-and-code-quality.md`
 Two further workflows run outside `ci.yml` and do not gate:
 
 - **`security-audit.yml`** — `npm audit --audit-level=high`, weekly on Mondays plus manual runs. Split out of `ci.yml` on 2026-07-29 because an unfixable devDependency advisory kept it red on every push, which made a real failure in the three gating jobs look identical to known noise.
-- **`schema-drift-check.yml`** — runs daily against the real hosted dev and prod Supabase databases (not just a local instance) to catch a tracked migration or RPC function that's missing from either. `validate-migrations` above only proves the migrations apply cleanly to an empty database, not that they've actually been run against the live environments.
+- **`schema-drift-check.yml`** — runs daily against the real hosted Supabase databases (not just a local instance) to catch a tracked migration or RPC function that's missing. `validate-migrations` above only proves the migrations apply cleanly to an empty database, not that they've actually been run against the live environments. **Scheduled runs check `dev` only until P5.4 provisions production** (decision: WJ, 2026-08-03) — the prod leg failed every run because Phase 6's migrations are dev-only, and a permanently-red check cannot signal a real, unrelated drift. Prod can still be checked on demand: Actions → Schema Drift Check → Run workflow, and pick `["prod"]` or `["dev","prod"]`. Re-enabling the scheduled prod leg is a tasked P5.4 step and part of its exit test.
 
 ---
 
