@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-08-03 (third pass) — `accessibility-test-plan.md` created: the seventh test layer, and the first plan that tests the product flow for accessibility at all
+
+Agreed 2026-07-30 as P5.3's output artefact and its definition of done; written today at WJ's request. **v1.0, 15 cases (AC-01–15), not yet executed.**
+
+**Why it exists.** `ADR-OPS-006` mandates a manual keyboard / focus / screen-reader / contrast pass **before every release**, and no test plan executed that for the product flow. The only accessibility case anywhere was `help-and-tooltips-test-plan.md` HT-05, scoped to tooltips — and that one narrow keyboard step found `GAP-38`: three of nine tooltips completely unreachable by keyboard, a WCAG 2.1.1 failure that had already shipped. One feature-scoped plan found a real defect on its first run; nothing had looked at the other twenty-odd routes.
+
+**The NVDA section is the part that makes it usable, and it is deliberately not about Grant Pathway.** The screen-reader step was Blocked on 2026-07-25 and attempted again unsuccessfully on 2026-07-30, both times because NVDA was hard to operate — not because the testing was hard. So the plan opens with install guidance, the browse-mode/focus-mode distinction that makes NVDA feel broken to a first-time user, quick-navigation keys, the five keystrokes that matter (starting with `Ctrl` to stop speech), and a symptom-to-cause table. The single highest-value item is the **Speech Viewer** (NVDA menu → Tools): it renders everything NVDA says as text, so announcements can be screenshotted as evidence, read back slowly, and captured with the audio off entirely. Two setup choices are called out because getting them wrong disables about half the documented shortcuts: the Desktop/Laptop keyboard layout, and enabling CapsLock as the NVDA modifier on a machine with no numeric keypad.
+
+**HT-05 step 4 was absorbed rather than left deferred in two places.** It becomes **AC-08**, which also samples the three `GAP-38` tooltips — the ones that are focusable only because `tabIndex={0}` was added by hand, so confirming they _announce_ as well as _receive focus_ is worth doing. `help-and-tooltips-test-plan.md` now points at AC-08 in both its step list and its notes, and its 🟡 clears when AC-08 does. One screen-reader session closes both plans.
+
+**What the plan covers beyond the ADR's own list.** All five of `ADR-OPS-006`'s manual items, plus the two guideline-viewer items in its Consequences, plus the five WCAG 2.2-specific criteria flagged on 2026-07-30 as landing on built-but-untested features — **Consistent Help** (AC-12), **Accessible Authentication** (AC-13, including the paste-into-password requirement that touches `D-015` and the 2026-07-24 change-password rework), **Redundant Entry** (AC-14, P6.5's reuse path), **Focus Appearance** (AC-06) and **Target Size** (AC-11). AC-11 deliberately separates a WCAG failure (under 24×24) from a house-standard deviation (`ADR-OPS-006`'s stricter 44×44), because conflating them would either overstate a breach or hide one.
+
+**Two findings the writing itself produced, before a single case has been run.**
+
+**(1) The register's only 🔵 ADR-OPS-006 row now has a test.** The P6.4 guideline-viewer consequence has read "Built 2026-07-14, not yet manually tested" for three weeks, and no plan existed that would ever test it — so it could have stayed 🔵 indefinitely with nobody doing anything wrong. **AC-05** is now named as its test in `ADR-TRACEABILITY.md` (→ v2.18). Its status was deliberately **left 🔵**: per the v2.15 symbol key, a test being written is not a consequence being discharged, and this is precisely the distinction C2 was introduced to protect.
+
+**(2) A likely real failure, recorded but not fixed.** `design-requirements.md` §8.6 states "text does not use `px` for sizing — use `rem`… to respect user browser font size preferences". The components use hardcoded pixel sizes throughout — `text-[14px]`, `text-[13px]`, `text-[12px]`, `text-[18px]` across `application-step4-draft.tsx`, `session-timeout-modal.tsx` and both nav components. Text in `px` scales with page zoom but not with a user's browser font-size preference, so AC-15 step 1 may well pass while step 4 fails. Written into AC-15 as an expected finding with its reasoning, deliberately **not** fixed inside a test-plan task: it is plausibly a large mechanical change and needs its own decision, including the legitimate option of amending §8.6 if `px`-plus-zoom is judged sufficient for AA.
+
+**And a correction to this session's own work, recorded because it is the exact failure mode the project keeps finding in itself.** The first draft asserted that `ADR-OPS-006`'s Lighthouse CI consequence was undischarged and that a task should be added to P5.3. **It is not undischarged.** `GAP-15` closed it as an accepted deviation on 2026-06-16 — manual audit in place of CI automation for v1, on the grounds that this is a single-developer project and `@axe-core/react` catches regressions during development, with WJ's decision recorded on both the ADR consequence row and the gaps register. The claim came from checking the codebase (no `lighthouserc*`, no CI step — both true) without then checking the register that records why. **Absence in the code is not evidence of an unmade decision.** AC-02 is now written as the discharge of that consequence as amended, which is a reason to actually run it rather than a shortfall to log.
+
+**Not marked 🟢, and it cannot be yet:** the plan's small-viewport cases depend on `GAP-05`'s mobile viewport banner, which is unbuilt and is P5.3's own development work. Build GAP-05, then execute. `TEST-DASHBOARD.md` → v2.17 (6 plans → 7; 🟢 count unchanged at 5).
+
+---
+
 ## 2026-08-03 (second pass) — `Schema Drift Check` skips prod until P5.4, so dev drift is a live signal again
 
 **Decision: WJ.** The open question raised in the 2026-07-31 seventh-pass entry — whether the prod job should be temporarily skipped rather than left permanently red — is now settled in favour of skipping.
