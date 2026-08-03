@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-03 — Post-move verification: the old working copy is confirmed gone, and the two deferred cleanups are closed
+
+First session from the relocated clone. Verified rather than assumed, because the 2026-07-31 (sixth pass) entry left two items open "for when the desktop app is closed".
+
+**Both are now closed.** The user-level `~/.claude.json` no longer carries either stale OneDrive project entry for this repo. The gitignored `.claude/settings.local.json` has one OneDrive path left — `Read(//c/Users/WJ/OneDrive - Rapidglobe Ltd/Downloads/**)` — and it is **not** stale: it resolves to the parent folder that entry deliberately kept, so it still grants what it was written to grant. Two harmless residues remain and are recorded so a future session does not re-investigate them: `~/.claude.json` lists this repo twice under slash-direction variants of the same path, and it still lists a separate, earlier project under OneDrive that has nothing to do with Grant Pathway.
+
+**No clone remains outside the new location.** A recursive sweep of the user profile and of both OneDrive roots finds no `grant-pathway` directory. The one surviving OneDrive folder is the kept parent — it holds no `.git`, `node_modules`, `.next` or `.vercel`, so it is source material, not a repository remnant.
+
+**The move broke nothing.** Tree clean and level with `origin/master`; remote correct; Husky still wired via `core.hooksPath = .husky/_`, which a relocation can silently sever. All four CI gates pass locally — `type-check`, `lint` at `--max-warnings 0`, 101 tests across 10 files, and `format:check`. `.vercel/` now holds only `project.json`, `README.txt` and `.env.preview.local`; the `output/` directory that carried the OneDrive symlink `EPERM` is gone, as that entry intended. The clone is 0.85 GB against the 1.47 GB it occupied under sync.
+
+---
+
 ## 2026-07-31 (seventh pass) — "Bypassed rule violations" on every push explained; audit M6 confirmed closed
 
 Every push to `master` prints `remote: Bypassed rule violations for refs/heads/master: - 3 of 3 required status checks are expected`. Investigated because it reads like a failure. **It is not, and it cannot be made to go away without changing how we work.**
