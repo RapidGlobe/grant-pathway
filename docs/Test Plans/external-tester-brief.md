@@ -8,6 +8,12 @@ Thank you for agreeing to try Grant Pathway. This short note covers what to expe
 
 Grant Pathway is a free tool that helps UK charities write grant applications. It uses AI to summarise a funder's guidelines in plain English, and — on request — to help you improve the structure and clarity of answers you've already written. You write every answer yourself; the AI never generates one from scratch.
 
+## Where to find it
+
+The test build is at **https://grant-pathway-three.vercel.app** — worth bookmarking, as everything below happens there.
+
+One note to save you a wasted search: our own domain, `grantpathway.org.uk`, is registered but not switched on yet, and searching the web for "Grant Pathway" turns up an unrelated product of the same name aimed at Canadian businesses. The link above is the only place to find what you're testing.
+
 ## This is a pre-launch test build
 
 You're using our working build ahead of public launch, not a finished product. A few things follow from that:
