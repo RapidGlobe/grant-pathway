@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** A new route, modal, or interactive component is added; `ADR-OPS-006`'s manual list changes; or a WCAG success criterion in scope is re-targeted
 
-**Version:** 1.1
+**Version:** 1.2
 **Date:** 2026-08-04
-**Status:** Created, not yet executed. This is P5.3's output artefact and its definition of done. **AC-01 carries two known failures and a broken harness — read its Step 0 first.**
+**Status:** Created, not yet executed. This is P5.3's output artefact and its definition of done. **AC-01 carries two known failures and a broken harness — read it from the top; it assumes no prior experience of browser developer tools.**
 **Tester:** WJ
 
 ---
@@ -57,7 +57,7 @@ This is the seventh test layer under `DR-TEST-001` (WJ's decision, 2026-07-30). 
 
 `@axe-core/react` mounts only when `NODE_ENV === 'development'` — it is stripped from production and preview builds entirely, so **no deployed Vercel URL can ever be used for AC-01**, regardless of which Supabase project it points at. This was found live on 2026-07-25 when HT-05's axe step was attempted against the deployed site and blocked.
 
-Separately, and confirmed 2026-08-04: the local dev build loads axe-core but its **auto-reporting does not work**, so AC-01 drives axe explicitly rather than watching the console. See **AC-01 Step 0** — do not start that case without reading it.
+Separately, and confirmed 2026-08-04: the local dev build loads axe-core but its **auto-reporting does not work**, so AC-01 drives axe explicitly rather than watching the console. **Read AC-01 from its first line** — it is written step by step for someone who has never opened browser developer tools, and starting partway in will not work.
 
 ```bash
 npm run dev
@@ -190,126 +190,284 @@ Tick **"Show Speech Viewer on startup"** inside that window so it comes back eac
 
 ## AC-01 — axe-core clean sweep, all routes
 
-**Prerequisite:** local `npm run dev`, signed in on the pre-seeded account, Chrome DevTools open. See Prerequisites 1 and 3.
+**This case is written for someone who has never used browser developer tools.** No prior knowledge is assumed. If a step tells you to press a key, press that key; if it tells you what you should see, and you see something else, stop and write down what you saw — that is a result, not a mistake on your part.
 
-> **⚠️ Read Step 0 before anything else. Do not run this case by watching the console for axe output — that is what the case said until 2026-08-04, and it returns a false Pass.** `@axe-core/react`'s auto-reporting does not work: `components/axe-provider.tsx` wraps its initialisation in a **silent** `catch` for a React 19 incompatibility, so a clean console is indistinguishable from axe never having run. Proven on 2026-08-04 — `/` produced no console output while carrying two genuine AA violations. The steps below therefore run axe **explicitly**, which works today and produces evidence you can paste.
+**Roughly how long:** two to three hours for all 24 pages, once set up. It is repetitive rather than difficult. You can stop and resume — just record which rows you have done.
 
-### Step 0 — Confirm axe is actually available
+### What this case is actually doing
 
-In the DevTools console on any route, run:
+"axe" is a tool that reads a web page and reports things that would make it unusable for someone with a disability — text too faint to read, a button too small to hit, an image with no description. It is built into this app when it runs on your own machine.
+
+You are going to visit every page of Grant Pathway, run axe on each one, and write down what it says.
+
+> **⚠️ Why the steps below are more involved than they should be.** axe is supposed to report problems into the browser automatically, and it does not — this was found on 2026-08-04. The part of the app that starts it up (`components/axe-provider.tsx`) hides its own failure, so it looks like it is working and finding nothing. It is not working at all. **A blank result means nothing until you have done Step 0.** Instead of waiting for axe to report, you will ask it directly. That works today.
+
+---
+
+### Step 0 — Open the app and the developer tools
+
+**Do this first, once.**
+
+1. Make sure the app is running on your machine. In your terminal, in the project folder, run:
+
+```bash
+npm run dev
+```
+
+Leave that window open and running. If it says something like `Ready in 2.7s`, you are fine.
+
+2. **Open Chrome.**
+
+3. In the address bar, type `localhost:3000` and press Enter. You should see the Grant Pathway sign-in page.
+
+4. **Sign in** with the test account (Prerequisites 3). Most of the pages you need are only visible once signed in.
+
+5. **Open the developer tools.** Press **`F12`**.
+
+   A panel opens, usually on the right-hand side or along the bottom. This is Chrome's built-in toolkit for inspecting a page. It has a row of tabs along its top: `Elements`, `Console`, `Sources`, `Network`, and others.
+
+   If `F12` does nothing, use **`Ctrl` + `Shift` + `I`** instead.
+
+6. **Click the `Console` tab.** You will see a mostly-empty area with a `>` prompt at the bottom. This is where you can type instructions to the page. Some grey messages about React or HMR may already be there — ignore them, they are normal.
+
+**Leave the developer tools open for the whole of this case.** Closing and reopening is fine, but you will need them on every page.
+
+---
+
+### Step 1 — Check that axe is actually there
+
+Click into the console (next to the `>` prompt), **type** the following, and press Enter:
 
 ```
-window.axe && window.axe.version
+window.axe.version
 ```
 
-- **Returns a version string** (`4.12.1` at time of writing) → proceed. axe-core is loaded and callable even though the React integration is broken.
-- **Returns `undefined`** → the dynamic import in `axe-provider.tsx` failed outright, not just its React wiring. **Stop and record AC-01 as Blocked** with that fact; the whole case depends on it and this is a bigger finding than any individual violation.
+**Type it rather than pasting it.** The first time you paste anything into Chrome's console it refuses, and asks you to type the words `allow pasting` first — a safety feature. Typing this short line avoids the whole detour.
 
-Also record, once, that the auto-reporting path is broken — it is a defect in its own right (it is an `ADR-OPS-006` Decision item: axe "runs on every development build to surface violations"). Log it in the Defect Log below, separately from any violation it hid.
+**What you should see:**
 
-### Step 1 — Save the sweep snippet once
+- **A version number in quotes, like `'4.12.1'`** → good. axe is loaded. Go to Step 2.
+- **A red error saying `Cannot read properties of undefined`** → axe is not loaded at all. **Stop.** Record AC-01 as **Blocked**, and write down exactly that error. This is a worse problem than any individual finding, because it means the accessibility tooling is entirely absent rather than merely quiet. Nothing else in this case can run.
 
-**DevTools → Sources → Snippets → New snippet**, name it `axe-sweep`, paste the code below, `Ctrl+S` to save. Thereafter run it on any page with **`Ctrl+Enter`** — it survives navigation and full reloads, which a pasted console one-liner does not.
+**Either way, record one thing now:** that axe's automatic reporting is broken. It is a defect in its own right — `ADR-OPS-006` requires axe to report violations during development, and it does not. Put it in the Defect Log at the bottom of this plan as its own row, separate from anything you find on a page.
+
+---
+
+### Step 2 — Set up the sweep tool (once only)
+
+Rather than retyping a long instruction on every page, you will save it once and then run it with two keys.
+
+1. In the developer tools, click the **`Sources`** tab.
+
+   If you cannot see `Sources`, the panel is too narrow — click the **`»`** symbol at the end of the tab row and pick it from the list.
+
+2. Along the left of the Sources panel is a second, smaller row of tabs: `Page`, `Filesystem`, `Overrides`, **`Snippets`**. Click **`Snippets`**.
+
+   Again, if you cannot see it, it will be behind a **`»`**.
+
+3. Click **`+ New snippet`**. A file appears in the list, named something like `Script snippet #1`.
+
+4. **Right-click its name → Rename.** Call it `axe-sweep` and press Enter.
+
+5. Click into the large empty editor area on the right, and **paste in the whole block below.** (Pasting is allowed here — the restriction only applies to the Console.)
 
 ```
-(async () => {
+;(async () => {
+  if (!window.axe) {
+    console.error('AXE IS NOT LOADED — see AC-01 Step 1. Stop and record Blocked.')
+    return
+  }
   const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
-  if (!window.axe) return console.error('AXE NOT LOADED — see AC-01 Step 0')
   const r = await window.axe.run(document, { runOnly: { type: 'tag', values: tags } })
-  const rows = r.violations.flatMap((v) =>
-    v.nodes.map((n) => ({
-      rule: v.id,
-      impact: v.impact,
-      wcag: v.tags.filter((t) => /^wcag\d/.test(t)).join(' '),
-      target: n.target.join(' '),
-      detail: (n.failureSummary || '').split('\n').slice(1).join(' ').trim(),
-    }))
+  const count = r.violations.reduce((n, v) => n + v.nodes.length, 0)
+  const lines = []
+  lines.push('PAGE:   ' + location.pathname)
+  lines.push('RESULT: ' + count + ' problem(s), ' + r.incomplete.length + ' needing a human check')
+  r.violations.forEach((v) =>
+    v.nodes.forEach((n) => {
+      lines.push('')
+      lines.push('  PROBLEM: ' + v.id + '  (severity: ' + v.impact + ')')
+      lines.push('  MEANS:   ' + v.help)
+      lines.push('  ON:      ' + n.target.join(' '))
+      lines.push(
+        '  DETAIL:  ' +
+          (n.failureSummary || '')
+            .split('\n')
+            .slice(1)
+            .join(' ')
+            .trim()
+      )
+    })
   )
-  console.log(
-    `AXE ${location.pathname} — ${rows.length} violation node(s), ${r.passes.length} passes, ${r.incomplete.length} needs-review`
-  )
-  if (rows.length) console.table(rows)
-  if (r.incomplete.length) console.log('needs review:', r.incomplete.map((i) => i.id).join(', '))
+  if (r.incomplete.length) {
+    lines.push('')
+    lines.push('  NEEDS A HUMAN CHECK: ' + r.incomplete.map((i) => i.id).join(', '))
+  }
+  const text = lines.join('\n')
+  console.log(text)
+  if (typeof copy === 'function') {
+    copy(text)
+    console.log('%c^ copied to your clipboard — paste it straight into your notes', 'color:green;font-weight:bold')
+  }
 })()
 ```
 
-Two notes on what it does. It scopes to the five WCAG tags that map to **AA and below**, so axe's "best-practice" rules — which are not WCAG failures — do not inflate the result; delete the `runOnly` option entirely if you want the wider sweep as well. And it reports **violation nodes, not rules**: one rule failing on three elements is three rows, which is what you want when recording.
+6. Press **`Ctrl` + `S`** to save it. The filename stops showing an asterisk when saved.
 
-### Step 2 — Sweep every route
+**That is the setup done.** From now on, on any page, pressing **`Ctrl` + `Enter`** runs this and prints the result into the Console. It also copies the result to your clipboard, so you can paste it straight into your notes without retyping anything.
 
-Run the snippet on each row below **after** rendering the conditional UI named in the third column — axe only sees what is in the DOM at the moment it runs, so a passively-visited route reports clean on UI that never appeared. That is the single biggest way this case can produce a false Pass.
+The snippet stays saved in Chrome. It survives page changes, reloads, and closing the browser.
 
-| #   | Route                           | Render this first, then run the snippet                                                                                                                                                                                                                       |
-| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `/` (signed out)                | Submit the empty form → validation errors. Click "Show password" → toggled state.                                                                                                                                                                             |
-| 2   | `/register`                     | Submit empty → all validation errors. The always-visible password-requirements hint.                                                                                                                                                                          |
-| 3   | `/forgot-password`              | Submit empty → error. Then submit a valid address → success state.                                                                                                                                                                                            |
-| 4   | `/verify-email`                 | Reachable directly. Render the resend form, then submit it → "sent" state.                                                                                                                                                                                    |
-| 5   | `/verify-email/confirm`         | Visit without a token → error state. **The success state needs a real registration** — either register a throwaway account or record which state you tested. Do not leave this row blank without saying which.                                                |
-| 6   | `/privacy`                      | Full page — long headings and lists. Scroll to bottom before running.                                                                                                                                                                                         |
-| 7   | `/terms`                        | Same.                                                                                                                                                                                                                                                         |
-| 8   | 404 (`/no-such-page`)           | `app/not-found.tsx`.                                                                                                                                                                                                                                          |
-| 9   | `/dashboard` (populated)        | Signed in, with at least one application. Open any per-application menu or action row.                                                                                                                                                                        |
-| 10  | `/dashboard` (empty)            | `dashboard-empty.tsx` — the three-column explainer. Needs an account with no applications; **if the seeded account has applications, record this row as not covered** rather than assuming it matches row 9.                                                  |
-| 11  | `/profile`                      | Clear a required field and submit → validation error naming the field. Then use the **Charity Commission lookup**: type a search, get the results list, select a result, let it pre-fill. Run the snippet with the results list open, and again after select. |
-| 12  | `/account`                      | Submit the change-password form empty → errors. Render the tooltip(s) on this page.                                                                                                                                                                           |
-| 13  | `/account/delete`               | ⚠️ **Render the confirmation page and run the snippet. Do not confirm.** This deletes the account and everything in it.                                                                                                                                       |
-| 14  | `/applications/new`             | Submit empty → validation errors.                                                                                                                                                                                                                             |
-| 15  | `/applications/[id]`            | The application shell. Note if it redirects to a step rather than rendering.                                                                                                                                                                                  |
-| 16  | Step 1                          | Funder and grant name. Submit empty → errors.                                                                                                                                                                                                                 |
-| 17  | Step 2                          | Both input paths: the upload control **and** the paste textarea. Trigger a rejected-file-type error if you can do so quickly.                                                                                                                                 |
-| 18  | Step 3                          | The generated summary. Run once **during** generation (staged loading messages) and once after. Reach a citation link and **open the guideline viewer dialog** — run the snippet with it open. Note: regenerating costs one AI action against the 50/month.   |
-| 19  | Step 4 gate                     | The "Before you begin writing" checklist, **before** ticking anything.                                                                                                                                                                                        |
-| 20  | Step 4 (main)                   | The heaviest route — see the sub-list below.                                                                                                                                                                                                                  |
-| 21  | Step 5                          | Review checkbox unticked, then ticked. Approve. Trigger the Word export.                                                                                                                                                                                      |
-| 22  | Session-timeout modal           | See the method below. Run the snippet with the modal open.                                                                                                                                                                                                    |
-| 23  | `app/(authenticated)/error.tsx` | Force a render error in an authenticated page (temporarily `throw new Error('axe test')` in a Server Component, or block a required fetch). If you cannot, record **Blocked** with the reason — do not silently skip it.                                      |
-| 24  | `app/global-error.tsx`          | **Not in this plan's original route table** — added 2026-08-04. Same method as row 23, in the root layout. Blocked-with-reason is acceptable.                                                                                                                 |
+> If `Ctrl` + `Enter` does nothing, click once on the snippet's name in the left-hand list first, then try again. You can also right-click the snippet name and choose **Run**.
 
-**Row 20 — Step 4 needs several separate runs**, because its states do not coexist:
+---
 
-1. Fresh load, nothing answered.
-2. A narrative answer typed, unapproved.
-3. **The "Not saved" banner** — type into an answer, set DevTools → Network → **Offline**, blur the field. This is `role="alert"` UI built under audit finding **M8** and did not exist when HT-05 ran, so it has never been swept. Go back online afterwards.
-4. The **governance panel** open, plus a manually added governance item.
-5. At least one answer **approved** — the progress bar's `aria-valuenow` changes and the approved badge renders.
-6. The **guideline viewer dialog** open from a Step 4 citation.
-7. Any tooltip visible — including the three `GAP-38` ones (`tt-budget-no-ai`, `tt-guidelines-choice`, `tt-summary-review`).
+### Step 3 — Do one page from start to finish
 
-**Row 22 — forcing the session-timeout modal.** The real threshold is **55 minutes** (`WARNING_MS` in `components/session-timeout-provider.tsx`), so do not wait for it. Temporarily change that line to `const WARNING_MS = 10 * 1000`, let HMR reload, then **do not touch the mouse or keyboard for ten seconds** — `mousemove` is one of the activity events that resets the timer. Run the snippet from a DevTools snippet shortcut once the modal is up. **Revert the line before committing anything.**
+**Do this exact page first, before the others.** It proves your setup works, because we already know what it should say.
 
-### Step 3 — Record every result
+1. Go to `localhost:3000` — the sign-in page. Sign out first if you are signed in.
+2. Click the **`Console`** tab so you can see the output.
+3. Press **`Ctrl` + `Enter`**.
 
-Fill this in as you go — a route with no row is an untested route, not a passing one.
+**You should see something very close to this:**
 
-| #   | Route | Nodes | Rule IDs | Notes |
-| --- | ----- | ----- | -------- | ----- |
-|     |       |       |          |       |
+```
+PAGE:   /
+RESULT: 2 problem(s), 0 needing a human check
 
-For each violation, copy the snippet's `console.table` output into the Notes below, or screenshot it. Then add a Defect Log row per **rule + route**.
+  PROBLEM: color-contrast  (severity: serious)
+  MEANS:   Elements must meet minimum color contrast ratio thresholds
+  ON:      .text-\[11px\]
+  DETAIL:  Element has insufficient color contrast of 2.44 ...
 
-**Two violations are already known**, found on 2026-08-04 before this case was expanded. They are not seeded examples — they are real, they are on the sign-in page, and they must appear in your sweep. **If your run of row 1 does not reproduce both, the snippet is not working — investigate that before trusting any other row:**
+  PROBLEM: target-size  (severity: serious)
+  MEANS:   All touch targets must be 24px large, or leave sufficient space
+  ON:      .absolute
+  DETAIL:  Target has insufficient size (16px by 16px, should be at least 24px by 24px) ...
+```
 
-| Rule             | SC    | Where                                                                              |
-| ---------------- | ----- | ---------------------------------------------------------------------------------- |
-| `color-contrast` | 1.4.3 | Version string, `text-[11px]` `#94A3B8` on `#FDF9F5` — **2.44:1**, needs 4.5:1     |
-| `target-size`    | 2.5.8 | "Show password" button — **16×16px**, needs 24×24, and fails the spacing exception |
+**These two are real problems, not test examples.** The first is the small grey version number at the bottom of the page, too faint to read. The second is the "Show password" eye button, too small to hit reliably.
 
-### Step 4 — Interpreting the output
+**This is your check that the tooling works:**
 
-- **`needs-review` (axe `incomplete`) is not a pass.** axe reports these when it cannot decide — commonly contrast over a gradient or image. Each one needs a manual check; record the verdict rather than ignoring the line.
-- **`target-size` hits overlap AC-11, and `color-contrast` overlaps AC-10.** Log each finding once, in the case where you first found it, and cross-reference from the other. Do not double-count them into two separate defects.
-- **A rule failing on many nodes is usually one fix.** Record the node count, but scope the defect to the shared component.
+- **You saw both** → your setup is correct. Continue to Step 4.
+- **You saw `0 problem(s)`** → **something is wrong with your setup, not with the page.** Do not continue and do not record the other pages as clean — a clean result cannot be trusted until this page reports two. Go back through Steps 1 and 2.
+- **You saw a red error** → write down exactly what it says and stop.
 
-**Expected result:** zero violation nodes on every route, with every `needs-review` item manually cleared. Given the two known failures above, **this case cannot currently pass** — the realistic outcome of a first run is a populated Defect Log, and the value of the sweep is finding out what else is in there.
+4. **Record it.** The result is already on your clipboard — paste it into the Notes area at the bottom of this case. Then fill in the row for page 1 in the results table in Step 6.
 
-**Note on scope creep:** HT-05 already ran this on 2026-07-25 across Profile, Steps 2–5, Account Settings, Register, landing and dashboard, with zero violations — but verbally, with no screenshots, and before Step 4's "Not saved" banner (M8) existed. **That result is now known to be worthless**, not merely unevidenced: the auto-reporting it relied on does not work, so "zero violations" was an empty console. Re-run everything; carry nothing forward.
+Now do the same thing on every remaining page.
+
+---
+
+### Step 4 — The important habit: make things appear before you run the sweep
+
+**axe can only see what is on the screen at that moment.** If an error message, a pop-up, or a panel is not currently showing, axe does not know it exists and will not check it. A page you simply look at and sweep will come back cleaner than it really is.
+
+So for most pages there is something you need to make happen first. The table in Step 5 tells you what, for each page. For example, "submit the empty form" means: click the main button without typing anything, so the red error messages appear — _then_ press `Ctrl` + `Enter`.
+
+**To go to a page**, type the address into Chrome's address bar. Where the table says `/profile`, that means `localhost:3000/profile`.
+
+---
+
+### Step 5 — Every page to sweep
+
+Work down this list. Do what the middle column says, **then** press `Ctrl` + `Enter`, then paste the result into your notes.
+
+| #   | Go to                   | Make this happen first, then sweep                                                                                                                                                                                                                                          |
+| --- | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/` (signed out)        | ✅ Done in Step 3. Also click the eye icon to show the password, and sweep again.                                                                                                                                                                                           |
+| 2   | `/register`             | Click "Create account" with every box empty, so all the red errors appear.                                                                                                                                                                                                  |
+| 3   | `/forgot-password`      | Submit with the box empty → error appears. Sweep. Then enter a real address and submit → the confirmation message appears. Sweep again.                                                                                                                                     |
+| 4   | `/verify-email`         | Sweep the page as it loads. Then use the "resend" form on it and sweep once the "sent" message appears.                                                                                                                                                                     |
+| 5   | `/verify-email/confirm` | Go there directly, with nothing after it in the address. You will get an error state — sweep that. **Write in your notes that you tested the error state**, not the success one (which needs a fresh registration).                                                         |
+| 6   | `/privacy`              | Scroll to the very bottom first, then sweep.                                                                                                                                                                                                                                |
+| 7   | `/terms`                | Same.                                                                                                                                                                                                                                                                       |
+| 8   | `/no-such-page`         | Any made-up address. This shows the "page not found" screen. Sweep it.                                                                                                                                                                                                      |
+| 9   | `/dashboard`            | Signed in, with at least one application showing. Open any menu or action on an application row, then sweep.                                                                                                                                                                |
+| 10  | `/dashboard` (empty)    | The version with no applications at all. If your test account has applications, **write "not covered — account has applications"** rather than reusing row 9.                                                                                                               |
+| 11  | `/profile`              | Three sweeps. (a) Empty a required box and save → errors appear. (b) Type a charity name into the Charity Commission search and sweep with the results list showing. (c) Pick one from the list and sweep once it has filled in the details.                                |
+| 12  | `/account`              | Submit the change-password form empty → errors appear. Hover or tab onto any tooltip so it shows, then sweep.                                                                                                                                                               |
+| 13  | `/account/delete`       | ⚠️ **Just look at the page and sweep it. Do NOT click the confirm button.** That permanently deletes the account and everything in it.                                                                                                                                      |
+| 14  | `/applications/new`     | Click continue with the boxes empty → errors appear.                                                                                                                                                                                                                        |
+| 15  | An existing application | Open one from the dashboard. If it jumps straight to a step, note that it did.                                                                                                                                                                                              |
+| 16  | Step 1                  | Continue with the boxes empty → errors appear.                                                                                                                                                                                                                              |
+| 17  | Step 2                  | Sweep with the upload area showing, then switch to the paste box and sweep again.                                                                                                                                                                                           |
+| 18  | Step 3                  | Sweep **while the summary is still generating** (the messages that change as it works), then again once it has finished. Then click a citation link to open the guidelines pop-up and sweep with it open. ⚠️ Regenerating a summary uses one of your 50 monthly AI actions. |
+| 19  | Step 4 gate             | The "Before you begin writing" checklist, **before** you tick anything.                                                                                                                                                                                                     |
+| 20  | Step 4 (main)           | The big one — see the seven sweeps listed below.                                                                                                                                                                                                                            |
+| 21  | Step 5                  | Sweep before ticking the review box, then after. Approve, then trigger the Word export and sweep.                                                                                                                                                                           |
+| 22  | Session-timeout pop-up  | See the instructions below.                                                                                                                                                                                                                                                 |
+| 23  | Error screen            | See the instructions below. **Recording this as Blocked is acceptable.**                                                                                                                                                                                                    |
+| 24  | Whole-site error screen | Same as 23. **Blocked is acceptable.**                                                                                                                                                                                                                                      |
+
+---
+
+#### Row 20 in detail — Step 4 needs seven separate sweeps
+
+Step 4 has several different things that can be on screen, and they cannot all be showing at once. Sweep after each.
+
+1. **Just arrived** — nothing answered yet.
+2. **An answer typed in**, not yet approved.
+3. **The "Not saved" warning.** To make it appear: type something into an answer box, then — in the developer tools — click the **`Network`** tab, find the dropdown that says **`No throttling`**, and change it to **`Offline`**. Now click outside the answer box. An orange "Not saved" bar should appear. Sweep it. **Then set that dropdown back to `No throttling`.** This bar has never been checked by anything, so it is worth getting right.
+4. **The governance panel open**, and add a governance item by hand.
+5. **At least one answer approved** — the progress bar and the approved badge change.
+6. **The guidelines pop-up open**, from a citation link on this step.
+7. **A tooltip showing.** Include the three that were recently fixed: the "no AI on budgets" one, the "guidelines choice" one, and the "summary review" one.
+
+#### Row 22 in detail — making the session-timeout pop-up appear
+
+This pop-up normally appears after **55 minutes** of doing nothing. You are not going to wait that long, so you will shorten it temporarily. This does involve editing one line of code.
+
+1. Open the file `components/session-timeout-provider.tsx` in your editor.
+2. Find this line near the top (line 9):
+
+```
+const WARNING_MS = 55 * 60 * 1000 // Show modal at 55 minutes
+```
+
+3. Change `55 * 60 * 1000` to `10 * 1000`. Save the file. The app reloads by itself.
+4. Go to any signed-in page and **take your hands off the mouse and keyboard for ten seconds.** Do not move the mouse — mouse movement counts as activity and restarts the timer.
+5. The pop-up appears. Run the sweep by right-clicking the `axe-sweep` snippet and choosing **Run** (using the keyboard is fine too, but the pop-up is already open so nothing will be disturbed).
+6. **Change that line back to `55 * 60 * 1000` and save.** Do not commit the shortened version.
+
+#### Rows 23 and 24 in detail — the error screens
+
+These are the screens shown when something goes badly wrong. Making them appear on purpose requires deliberately breaking something in the code, which is developer work rather than testing.
+
+**If you would rather not**, write **Blocked — needs a developer to force the error state** in the results table and move on. That is a legitimate result and better than a guess. Flag it and it can be covered separately.
+
+---
+
+### Step 6 — Record everything
+
+Fill in a row for every page, including the clean ones. **A page with no row is an untested page, not a passing one** — that ambiguity is exactly what went wrong with the previous attempt at this case.
+
+| #   | Page | Problems found | Names of the problems | Notes |
+| --- | ---- | -------------- | --------------------- | ----- |
+|     |      |                |                       |       |
+
+For anything you find, also add a row to the **Defect Log** at the bottom of this plan.
+
+---
+
+### Step 7 — Making sense of the results
+
+- **"Needing a human check" is not a pass.** axe says this when it cannot decide by itself — most often about faint text sitting on top of an image or a gradient. Look at it yourself and write down your verdict. Do not treat it as clean.
+- **The same problem on ten elements is usually one fix, not ten.** Record the number, but describe it as one problem with the shared component.
+- **Some findings belong to other cases too.** Anything about sizes overlaps AC-11; anything about colour overlaps AC-10. **Write it down once**, in whichever case you found it, and mention the other. Do not log it twice.
+- **Severity** — axe labels each as `minor`, `moderate`, `serious` or `critical`. Record what it says; you do not need to judge it yourself.
+
+**Expected result:** no problems on any page, and every "needs a human check" item looked at and cleared.
+
+**In practice this case cannot pass on its first run** — the two problems on the sign-in page are already known and real. A populated Defect Log is the expected outcome. The point of the exercise is finding out what else is there.
+
+**Do not reuse the earlier result.** HT-05 swept eight pages on 2026-07-25 and reported no problems. That result is now known to be **worthless rather than merely unrecorded**: it relied on the automatic reporting that does not work, so "no problems" was simply an empty screen. Sweep everything again; carry nothing forward.
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
 **Notes:**
-
----
 
 ## AC-02 — Lighthouse accessibility score
 
@@ -623,5 +781,6 @@ Neither is a test result; both were found by reading the governing documents aga
 
 | Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.2     | 2026-08-04 | Rapidglobe Ltd | **AC-01 rewritten again the same day, this time for a reader with no experience of browser developer tools** — WJ's request, and the correct call: v1.1 was precise but unusable, written in vocabulary ("DevTools", "snippet", "the DOM", "conditional UI", "violation nodes", "blur the field") that assumes the reader already knows the tool. It repeated the exact mistake the NVDA section of this plan exists to prevent, three cases later: **operating the tool, not the testing, is what blocks these passes.** AC-01 now opens the browser, presses `F12`, names the tabs, and explains what axe is for in one sentence before asking for anything. It warns about Chrome's "type `allow pasting`" refusal on first console paste — an unexplained dead end for a first-timer — and sidesteps it by having the one typed command be four words long. The saved snippet now also **copies its result to the clipboard**, so recording is a paste rather than a transcription. **A full worked example on the sign-in page comes before the route list**, with the exact expected output printed, so the tooling is proven on a known answer before twenty-three unknown ones — and `0 problem(s)` there is explicitly labelled a setup failure, not a clean page. Every "make this happen first" instruction rewritten in plain English; time estimate, resumability, and permission to record **Blocked** on the two error-screen rows added, since forcing those is developer work and a guess is worse than a gap.                                                                                                                                                                                                                   |
 | 1.1     | 2026-08-04 | Rapidglobe Ltd | **AC-01 rewritten from three lines into an executable procedure, after a pre-flight check found the case unfalsifiable as written.** `@axe-core/react`'s auto-reporting does not work — `axe-provider.tsx` swallows a React 19 incompatibility in a silent `catch`, so the original instruction ("check the dev console, expect zero violations") would have returned a **false Pass**: `/` produced an empty console while carrying two genuine AA violations (`color-contrast` 2.44:1 on the version string; `target-size` 16×16 on the show-password button). Both are now recorded in AC-01 as a **reproduction check** — a run that does not surface them proves the tooling, not the product, is broken. AC-01 now has: a Step 0 availability gate; a saved DevTools snippet that drives `axe.run()` explicitly and survives navigation; a **24-row route table naming the conditional UI to render before each run**, since axe only sees the current DOM and a passively-visited route reports clean on UI that never appeared; seven separate Step 4 states including the M8 "Not saved" banner (never swept — it postdates HT-05); the method for forcing the session-timeout modal without waiting 55 minutes; and guidance on `incomplete` results and on the deliberate overlap with AC-10/AC-11. `app/global-error.tsx` added to the route table. The broken auto-reporting is itself an `ADR-OPS-006` Decision-item defect and is to be logged separately from the violations it hid. HT-05's 2026-07-25 "zero violations across eight routes" is now known to be **worthless rather than merely unevidenced**. Vercel/Supabase production confirmed pointing at `grant-pathway-dev` (WJ, 2026-08-04), closing that open question. |
 | 1.0     | 2026-08-03 | Rapidglobe Ltd | Created as the seventh test layer under `DR-TEST-001` and P5.3's output artefact (WJ's decision, 2026-07-30; commissioned 2026-08-03). Covers all five of `ADR-OPS-006`'s manual pre-release items, the two guideline-viewer items in its Consequences, the five WCAG 2.2-specific criteria named in P5.3's 2026-07-30 note, and absorbs `help-and-tooltips-test-plan.md` HT-05 step 4, blocked since 2026-07-25. Includes an NVDA setup-and-operation section, written because NVDA operation — not the testing — was the actual blocker on 2026-07-25 and 2026-07-30. Two observations recorded: the undischarged Lighthouse CI consequence, and the ADR's stale Radix reference.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
