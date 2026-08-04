@@ -4,9 +4,9 @@
 **Volatility:** Medium
 **Update when:** A new route, modal, or interactive component is added; `ADR-OPS-006`'s manual list changes; or a WCAG success criterion in scope is re-targeted
 
-**Version:** 1.0
-**Date:** 2026-08-03
-**Status:** Created, not yet executed. This is P5.3's output artefact and its definition of done.
+**Version:** 1.1
+**Date:** 2026-08-04
+**Status:** Created, not yet executed. This is P5.3's output artefact and its definition of done. **AC-01 carries two known failures and a broken harness — read its Step 0 first.**
 **Tester:** WJ
 
 ---
@@ -56,6 +56,8 @@ This is the seventh test layer under `DR-TEST-001` (WJ's decision, 2026-07-30). 
 **1. A local dev server. This is not optional and not substitutable.**
 
 `@axe-core/react` mounts only when `NODE_ENV === 'development'` — it is stripped from production and preview builds entirely, so **no deployed Vercel URL can ever be used for AC-01**, regardless of which Supabase project it points at. This was found live on 2026-07-25 when HT-05's axe step was attempted against the deployed site and blocked.
+
+Separately, and confirmed 2026-08-04: the local dev build loads axe-core but its **auto-reporting does not work**, so AC-01 drives axe explicitly rather than watching the console. See **AC-01 Step 0** — do not start that case without reading it.
 
 ```bash
 npm run dev
@@ -156,7 +158,7 @@ Tick **"Show Speech Viewer on startup"** inside that window so it comes back eac
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | Public        | `/` (landing + sign-in), `/register`, `/forgot-password`, `/verify-email`, `/verify-email/confirm`, `/privacy`, `/terms`             |
 | Authenticated | `/dashboard`, `/profile`, `/account`, `/account/delete`, `/applications/new`, `/applications/[id]`, `/applications/[id]/step/1`–`/5` |
-| Error         | `not-found` (404), the authenticated `error.tsx` boundary                                                                            |
+| Error         | `not-found` (404), the authenticated `error.tsx` boundary, `app/global-error.tsx` (added 2026-08-04)                                 |
 
 **Modals in scope:** the session-timeout modal (`session-timeout-modal.tsx`) and the guideline viewer dialog (`application-step4-draft.tsx`, "Original guidelines — …"). Both use the same `components/ui/dialog.tsx` Base UI primitive.
 
@@ -188,17 +190,120 @@ Tick **"Show Speech Viewer on startup"** inside that window so it comes back eac
 
 ## AC-01 — axe-core clean sweep, all routes
 
-**Prerequisite:** local `npm run dev`, browser dev console open. See Prerequisites 1.
+**Prerequisite:** local `npm run dev`, signed in on the pre-seeded account, Chrome DevTools open. See Prerequisites 1 and 3.
 
-**Steps:**
+> **⚠️ Read Step 0 before anything else. Do not run this case by watching the console for axe output — that is what the case said until 2026-08-04, and it returns a false Pass.** `@axe-core/react`'s auto-reporting does not work: `components/axe-provider.tsx` wraps its initialisation in a **silent** `catch` for a React 19 incompatibility, so a clean console is indistinguishable from axe never having run. Proven on 2026-08-04 — `/` produced no console output while carrying two genuine AA violations. The steps below therefore run axe **explicitly**, which works today and produces evidence you can paste.
 
-1. Visit every route in the Test Data table above, signed in where required.
-2. On each, check the dev console for `axe-core` violations. Interact enough to render conditional UI — open the Step 4 governance panel, trigger a validation error on Profile, open both modals.
-3. Record the route and rule ID for every violation.
+### Step 0 — Confirm axe is actually available
 
-**Expected result:** zero violations on every route.
+In the DevTools console on any route, run:
 
-**Note on scope creep:** HT-05 already ran this on 2026-07-25 across Profile, Steps 2–5, Account Settings, Register, landing and dashboard, with zero violations — but verbally, with no screenshots, and before Step 4's "Not saved" banner (M8) existed. Re-run it; do not carry that result forward.
+```
+window.axe && window.axe.version
+```
+
+- **Returns a version string** (`4.12.1` at time of writing) → proceed. axe-core is loaded and callable even though the React integration is broken.
+- **Returns `undefined`** → the dynamic import in `axe-provider.tsx` failed outright, not just its React wiring. **Stop and record AC-01 as Blocked** with that fact; the whole case depends on it and this is a bigger finding than any individual violation.
+
+Also record, once, that the auto-reporting path is broken — it is a defect in its own right (it is an `ADR-OPS-006` Decision item: axe "runs on every development build to surface violations"). Log it in the Defect Log below, separately from any violation it hid.
+
+### Step 1 — Save the sweep snippet once
+
+**DevTools → Sources → Snippets → New snippet**, name it `axe-sweep`, paste the code below, `Ctrl+S` to save. Thereafter run it on any page with **`Ctrl+Enter`** — it survives navigation and full reloads, which a pasted console one-liner does not.
+
+```
+(async () => {
+  const tags = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
+  if (!window.axe) return console.error('AXE NOT LOADED — see AC-01 Step 0')
+  const r = await window.axe.run(document, { runOnly: { type: 'tag', values: tags } })
+  const rows = r.violations.flatMap((v) =>
+    v.nodes.map((n) => ({
+      rule: v.id,
+      impact: v.impact,
+      wcag: v.tags.filter((t) => /^wcag\d/.test(t)).join(' '),
+      target: n.target.join(' '),
+      detail: (n.failureSummary || '').split('\n').slice(1).join(' ').trim(),
+    }))
+  )
+  console.log(
+    `AXE ${location.pathname} — ${rows.length} violation node(s), ${r.passes.length} passes, ${r.incomplete.length} needs-review`
+  )
+  if (rows.length) console.table(rows)
+  if (r.incomplete.length) console.log('needs review:', r.incomplete.map((i) => i.id).join(', '))
+})()
+```
+
+Two notes on what it does. It scopes to the five WCAG tags that map to **AA and below**, so axe's "best-practice" rules — which are not WCAG failures — do not inflate the result; delete the `runOnly` option entirely if you want the wider sweep as well. And it reports **violation nodes, not rules**: one rule failing on three elements is three rows, which is what you want when recording.
+
+### Step 2 — Sweep every route
+
+Run the snippet on each row below **after** rendering the conditional UI named in the third column — axe only sees what is in the DOM at the moment it runs, so a passively-visited route reports clean on UI that never appeared. That is the single biggest way this case can produce a false Pass.
+
+| #   | Route                           | Render this first, then run the snippet                                                                                                                                                                                                                       |
+| --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `/` (signed out)                | Submit the empty form → validation errors. Click "Show password" → toggled state.                                                                                                                                                                             |
+| 2   | `/register`                     | Submit empty → all validation errors. The always-visible password-requirements hint.                                                                                                                                                                          |
+| 3   | `/forgot-password`              | Submit empty → error. Then submit a valid address → success state.                                                                                                                                                                                            |
+| 4   | `/verify-email`                 | Reachable directly. Render the resend form, then submit it → "sent" state.                                                                                                                                                                                    |
+| 5   | `/verify-email/confirm`         | Visit without a token → error state. **The success state needs a real registration** — either register a throwaway account or record which state you tested. Do not leave this row blank without saying which.                                                |
+| 6   | `/privacy`                      | Full page — long headings and lists. Scroll to bottom before running.                                                                                                                                                                                         |
+| 7   | `/terms`                        | Same.                                                                                                                                                                                                                                                         |
+| 8   | 404 (`/no-such-page`)           | `app/not-found.tsx`.                                                                                                                                                                                                                                          |
+| 9   | `/dashboard` (populated)        | Signed in, with at least one application. Open any per-application menu or action row.                                                                                                                                                                        |
+| 10  | `/dashboard` (empty)            | `dashboard-empty.tsx` — the three-column explainer. Needs an account with no applications; **if the seeded account has applications, record this row as not covered** rather than assuming it matches row 9.                                                  |
+| 11  | `/profile`                      | Clear a required field and submit → validation error naming the field. Then use the **Charity Commission lookup**: type a search, get the results list, select a result, let it pre-fill. Run the snippet with the results list open, and again after select. |
+| 12  | `/account`                      | Submit the change-password form empty → errors. Render the tooltip(s) on this page.                                                                                                                                                                           |
+| 13  | `/account/delete`               | ⚠️ **Render the confirmation page and run the snippet. Do not confirm.** This deletes the account and everything in it.                                                                                                                                       |
+| 14  | `/applications/new`             | Submit empty → validation errors.                                                                                                                                                                                                                             |
+| 15  | `/applications/[id]`            | The application shell. Note if it redirects to a step rather than rendering.                                                                                                                                                                                  |
+| 16  | Step 1                          | Funder and grant name. Submit empty → errors.                                                                                                                                                                                                                 |
+| 17  | Step 2                          | Both input paths: the upload control **and** the paste textarea. Trigger a rejected-file-type error if you can do so quickly.                                                                                                                                 |
+| 18  | Step 3                          | The generated summary. Run once **during** generation (staged loading messages) and once after. Reach a citation link and **open the guideline viewer dialog** — run the snippet with it open. Note: regenerating costs one AI action against the 50/month.   |
+| 19  | Step 4 gate                     | The "Before you begin writing" checklist, **before** ticking anything.                                                                                                                                                                                        |
+| 20  | Step 4 (main)                   | The heaviest route — see the sub-list below.                                                                                                                                                                                                                  |
+| 21  | Step 5                          | Review checkbox unticked, then ticked. Approve. Trigger the Word export.                                                                                                                                                                                      |
+| 22  | Session-timeout modal           | See the method below. Run the snippet with the modal open.                                                                                                                                                                                                    |
+| 23  | `app/(authenticated)/error.tsx` | Force a render error in an authenticated page (temporarily `throw new Error('axe test')` in a Server Component, or block a required fetch). If you cannot, record **Blocked** with the reason — do not silently skip it.                                      |
+| 24  | `app/global-error.tsx`          | **Not in this plan's original route table** — added 2026-08-04. Same method as row 23, in the root layout. Blocked-with-reason is acceptable.                                                                                                                 |
+
+**Row 20 — Step 4 needs several separate runs**, because its states do not coexist:
+
+1. Fresh load, nothing answered.
+2. A narrative answer typed, unapproved.
+3. **The "Not saved" banner** — type into an answer, set DevTools → Network → **Offline**, blur the field. This is `role="alert"` UI built under audit finding **M8** and did not exist when HT-05 ran, so it has never been swept. Go back online afterwards.
+4. The **governance panel** open, plus a manually added governance item.
+5. At least one answer **approved** — the progress bar's `aria-valuenow` changes and the approved badge renders.
+6. The **guideline viewer dialog** open from a Step 4 citation.
+7. Any tooltip visible — including the three `GAP-38` ones (`tt-budget-no-ai`, `tt-guidelines-choice`, `tt-summary-review`).
+
+**Row 22 — forcing the session-timeout modal.** The real threshold is **55 minutes** (`WARNING_MS` in `components/session-timeout-provider.tsx`), so do not wait for it. Temporarily change that line to `const WARNING_MS = 10 * 1000`, let HMR reload, then **do not touch the mouse or keyboard for ten seconds** — `mousemove` is one of the activity events that resets the timer. Run the snippet from a DevTools snippet shortcut once the modal is up. **Revert the line before committing anything.**
+
+### Step 3 — Record every result
+
+Fill this in as you go — a route with no row is an untested route, not a passing one.
+
+| #   | Route | Nodes | Rule IDs | Notes |
+| --- | ----- | ----- | -------- | ----- |
+|     |       |       |          |       |
+
+For each violation, copy the snippet's `console.table` output into the Notes below, or screenshot it. Then add a Defect Log row per **rule + route**.
+
+**Two violations are already known**, found on 2026-08-04 before this case was expanded. They are not seeded examples — they are real, they are on the sign-in page, and they must appear in your sweep. **If your run of row 1 does not reproduce both, the snippet is not working — investigate that before trusting any other row:**
+
+| Rule             | SC    | Where                                                                              |
+| ---------------- | ----- | ---------------------------------------------------------------------------------- |
+| `color-contrast` | 1.4.3 | Version string, `text-[11px]` `#94A3B8` on `#FDF9F5` — **2.44:1**, needs 4.5:1     |
+| `target-size`    | 2.5.8 | "Show password" button — **16×16px**, needs 24×24, and fails the spacing exception |
+
+### Step 4 — Interpreting the output
+
+- **`needs-review` (axe `incomplete`) is not a pass.** axe reports these when it cannot decide — commonly contrast over a gradient or image. Each one needs a manual check; record the verdict rather than ignoring the line.
+- **`target-size` hits overlap AC-11, and `color-contrast` overlaps AC-10.** Log each finding once, in the case where you first found it, and cross-reference from the other. Do not double-count them into two separate defects.
+- **A rule failing on many nodes is usually one fix.** Record the node count, but scope the defect to the shared component.
+
+**Expected result:** zero violation nodes on every route, with every `needs-review` item manually cleared. Given the two known failures above, **this case cannot currently pass** — the realistic outcome of a first run is a populated Defect Log, and the value of the sweep is finding out what else is in there.
+
+**Note on scope creep:** HT-05 already ran this on 2026-07-25 across Profile, Steps 2–5, Account Settings, Register, landing and dashboard, with zero violations — but verbally, with no screenshots, and before Step 4's "Not saved" banner (M8) existed. **That result is now known to be worthless**, not merely unevidenced: the auto-reporting it relied on does not work, so "zero violations" was an empty console. Re-run everything; carry nothing forward.
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
@@ -516,6 +621,7 @@ Neither is a test result; both were found by reading the governing documents aga
 
 ## Document History
 
-| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.0     | 2026-08-03 | Rapidglobe Ltd | Created as the seventh test layer under `DR-TEST-001` and P5.3's output artefact (WJ's decision, 2026-07-30; commissioned 2026-08-03). Covers all five of `ADR-OPS-006`'s manual pre-release items, the two guideline-viewer items in its Consequences, the five WCAG 2.2-specific criteria named in P5.3's 2026-07-30 note, and absorbs `help-and-tooltips-test-plan.md` HT-05 step 4, blocked since 2026-07-25. Includes an NVDA setup-and-operation section, written because NVDA operation — not the testing — was the actual blocker on 2026-07-25 and 2026-07-30. Two observations recorded: the undischarged Lighthouse CI consequence, and the ADR's stale Radix reference. |
+| Version | Date       | Author         | Summary of changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026-08-04 | Rapidglobe Ltd | **AC-01 rewritten from three lines into an executable procedure, after a pre-flight check found the case unfalsifiable as written.** `@axe-core/react`'s auto-reporting does not work — `axe-provider.tsx` swallows a React 19 incompatibility in a silent `catch`, so the original instruction ("check the dev console, expect zero violations") would have returned a **false Pass**: `/` produced an empty console while carrying two genuine AA violations (`color-contrast` 2.44:1 on the version string; `target-size` 16×16 on the show-password button). Both are now recorded in AC-01 as a **reproduction check** — a run that does not surface them proves the tooling, not the product, is broken. AC-01 now has: a Step 0 availability gate; a saved DevTools snippet that drives `axe.run()` explicitly and survives navigation; a **24-row route table naming the conditional UI to render before each run**, since axe only sees the current DOM and a passively-visited route reports clean on UI that never appeared; seven separate Step 4 states including the M8 "Not saved" banner (never swept — it postdates HT-05); the method for forcing the session-timeout modal without waiting 55 minutes; and guidance on `incomplete` results and on the deliberate overlap with AC-10/AC-11. `app/global-error.tsx` added to the route table. The broken auto-reporting is itself an `ADR-OPS-006` Decision-item defect and is to be logged separately from the violations it hid. HT-05's 2026-07-25 "zero violations across eight routes" is now known to be **worthless rather than merely unevidenced**. Vercel/Supabase production confirmed pointing at `grant-pathway-dev` (WJ, 2026-08-04), closing that open question. |
+| 1.0     | 2026-08-03 | Rapidglobe Ltd | Created as the seventh test layer under `DR-TEST-001` and P5.3's output artefact (WJ's decision, 2026-07-30; commissioned 2026-08-03). Covers all five of `ADR-OPS-006`'s manual pre-release items, the two guideline-viewer items in its Consequences, the five WCAG 2.2-specific criteria named in P5.3's 2026-07-30 note, and absorbs `help-and-tooltips-test-plan.md` HT-05 step 4, blocked since 2026-07-25. Includes an NVDA setup-and-operation section, written because NVDA operation — not the testing — was the actual blocker on 2026-07-25 and 2026-07-30. Two observations recorded: the undischarged Lighthouse CI consequence, and the ADR's stale Radix reference.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
