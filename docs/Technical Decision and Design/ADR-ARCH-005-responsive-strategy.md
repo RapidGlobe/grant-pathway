@@ -34,9 +34,22 @@ The application is built desktop-first. Layouts are functional at 1024px and abo
 
 ## Consequences
 
-- A banner or graceful degradation should be shown below 768px informing users the application is designed for desktop.
+- **Below 768px the UI is blocked**, not merely warned: a full-screen banner tells the user Grant Pathway is designed for desktop and asks them to switch to a desktop or laptop browser. Tracked as `GAP-05`.
+- **768px to 1023px is supported but not optimised** — the application functions, and layouts may be cramped. No banner is shown in this band. It is below the 1024px design target and above the blocking threshold, deliberately.
+- **1024px and above is the optimised target.** Layouts are designed and tested here.
 - Tailwind CSS responsive utilities (`sm:`, `md:`, `lg:`) are used but breakpoints below `lg` (1024px) are not a primary target.
-- The design-requirements.md specifies 1024px as the minimum viewport; this ADR confirms that constraint.
+- The design-requirements.md specifies 1024px as the minimum **optimised** viewport; this ADR confirms that as the design target, with 768px as the hard functional floor.
+- **Mobile browsers are not supported in v1.** Chrome on Android and Safari on iOS on a phone will meet the blocking banner. This is a deliberate consequence of the decision above, not a defect — `NFR-05`, `PRD` §12.5, `C16` and `P5.5`'s cross-browser step were corrected to match on 2026-08-05.
+
+### Amendment 2026-08-05 — the three bands stated explicitly (WJ's decision)
+
+**Raised by `P5.0`** (register refs **R-10** and **R-11**; `docs/Implementation Plan/pre-launch-reconciliation-2026-08-05.md`) and decided by WJ the same day.
+
+This section previously said only "a banner or graceful degradation should be shown below **768px**", while the Decision above sets a **1024px** minimum. Nothing said what happens in the **768–1023px** band — iPad portrait and smaller laptops — which was therefore below the stated minimum, given no banner, and left with no supported layout. The ADR contradicted itself, and `GAP-05` inherited the 768px figure without the gap being resolved.
+
+**WJ's decision: block below 768px, and treat 768–1023px as functional but not optimised.** The reasoning is that the band contains real users on real hardware — iPad portrait and older small laptops are common in small charities — so blocking them to satisfy a design target would cost more than the cramped layout does. Phones, where Step 4's two-column answer-and-guidelines layout genuinely cannot work, are blocked.
+
+**Also settled by the same decision: `NFR-05`'s "320px minimum" claim is withdrawn.** That figure originated in the Mark One BRD (Section 10.5) and was **already overridden by this ADR once** — the retired plan recorded the resolution explicitly ("ADR takes precedence… mobile is post-v1. No action required") — but the resolution never reached the live document set, so five live documents went on promising 320px and mobile-browser support for months. See register ref R-10 for the full instance list.
 
 ## Source
 

@@ -1089,7 +1089,9 @@ Full Privacy Policy, statically rendered at build time from `docs/legal/privacy-
 
 ### Cross-Cutting -- Contextual Tooltips (added 2026-07-25, `PDR-UI-008`)
 
-Not a screen of its own -- these 9 tooltips, plus one hover-disabled variant, appear across several of the screens above. Full implementation and testing detail: `PDR-UI-008` and `docs/Test Plans/help-and-tooltips-test-plan.md`.
+Not a screen of its own -- these **10 tooltips** appear across several of the screens above. Nine are plain hover/focus hints; the tenth, `tt-ready-to-assemble`, is the hover-disabled variant, rendered only while the "Ready to assemble" button is genuinely disabled, since a disabled element fires no hover or focus events of its own. Full implementation and testing detail: `PDR-UI-008` and `docs/Test Plans/help-and-tooltips-test-plan.md`.
+
+_Wording corrected 2026-08-05 (`P5.0`, register ref **R-08**). This previously read "these 9 tooltips, plus one hover-disabled variant" — arithmetically correct at 10, but the "9 + 1" split is **where the wrong count came from**: it was read as a total and propagated as "nine tooltips" into `GAP-38`'s register row, `accessibility-test-plan.md`, `TEST-DASHBOARD.md`, `help-and-tooltips-test-plan.md`'s own result notes, and `P5.3`'s plan bullet — while that test plan's table listed all ten throughout. WJ confirmed on 2026-08-05 that HT-02 exercised everything in the table, and the tenth tooltip is present in the original `PDR-UI-008` build commit, so it existed when HT-02 ran on 2026-07-25: the count was wrong, the testing was not. `PDR-UI-008` itself was right all along — 11 specified, **10 built**, `tt-register-password` deliberately excluded as a permanent visible hint rather than a tooltip._
 
 Every tooltip below is a plain hover/focus hint -- shows on mouse hover or keyboard focus, no dismiss (X) control, no persisted "seen" state, appears identically every time for every user.
 
@@ -1364,14 +1366,18 @@ Architecture should scale from launch to 12-18 month target without a major rebu
 
 ### 12.5 Browser & Device Support
 
-| Category             | Supported                                              |
-| -------------------- | ------------------------------------------------------ |
-| Desktop browsers     | Chrome, Edge, Firefox, Safari (latest 2 versions each) |
-| Mobile browsers      | Chrome on Android; Safari on iOS                       |
-| Minimum screen width | 320px                                                  |
-| Internet Explorer    | Not supported                                          |
+| Category                 | Supported                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| Desktop browsers         | Chrome, Edge, Firefox, Safari (latest 2 versions each)                               |
+| Mobile browsers (phones) | **Not supported in v1** — below 768px a blocking banner is shown (`GAP-05`)          |
+| Optimised viewport       | **1024px and above**                                                                 |
+| Functional floor         | **768px–1023px** — works but not optimised, no banner (iPad portrait, small laptops) |
+| Blocked                  | **Below 768px**                                                                      |
+| Internet Explorer        | Not supported                                                                        |
 
-The application is designed desktop-primary (PDR-UI-003). It must remain usable on mobile browsers as a byproduct of responsive layout. Full mobile optimisation is deferred to a future phase.
+The application is designed desktop-primary (PDR-UI-003) and **is not a mobile product in v1**. Full mobile support is deferred to a future phase.
+
+_Corrected 2026-08-05 (WJ's decision; `P5.0` register refs **R-10** and **R-11**). This table previously said "Minimum screen width — 320px" and "It must remain usable on mobile browsers as a byproduct of responsive layout", contradicting `ADR-ARCH-005` and the `GAP-05` blocking banner that `P5.3` will build. The 320px figure traces to the Mark One BRD and had already been overridden by that ADR once, in a resolution the live document set never received. See `ADR-ARCH-005`'s 2026-08-05 amendment for the three bands and the reasoning._
 
 ### 12.6 Accessibility
 

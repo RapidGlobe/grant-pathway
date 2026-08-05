@@ -46,7 +46,7 @@ The app does not automatically cross-reference or fact-check AI-generated conten
 
 ## Mobile Application
 
-The app is a web application only. A dedicated native mobile app (iOS or Android) is not in scope for v1. The web application will be designed to be responsive and usable on mobile browsers.
+The app is a web application only. A dedicated native mobile app (iOS or Android) is not in scope for v1. **Nor is phone support of any kind: the web application is desktop-primary and blocks viewports below 768px** with a full-screen banner (`ADR-ARCH-005`, `GAP-05`) — optimised at 1024px and above, functional but unoptimised from 768–1023px. _Corrected 2026-08-05 (WJ's decision; `P5.0` register ref R-10), having read "will be designed to be responsive and usable on mobile browsers"._ Full mobile support is deferred to a future phase.
 
 ## Multi-Region Data Hosting
 

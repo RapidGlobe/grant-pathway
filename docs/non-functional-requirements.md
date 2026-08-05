@@ -110,39 +110,23 @@ The main risk before the first marketing push is unmeasured AI route latency und
 
 ## NFR-05 — Browser and Device Support
 
-| Category             | Supported                             |
-| -------------------- | ------------------------------------- |
-| Desktop browsers     | Google Chrome (latest 2 versions)     |
-|                      | Microsoft Edge (latest 2 versions)    |
-|                      | Mozilla Firefox (latest 2 versions)   |
-|                      | Apple Safari (latest 2 versions)      |
-| Mobile browsers      | Chrome on Android                     |
-|                      | Safari on iOS                         |
-| Minimum screen width | 320px (small mobile) and above        |
-| Internet Explorer    | Not supported (end-of-life June 2022) |
+| Category                 | Supported                                                                             |
+| ------------------------ | ------------------------------------------------------------------------------------- |
+| Desktop browsers         | Google Chrome (latest 2 versions)                                                     |
+|                          | Microsoft Edge (latest 2 versions)                                                    |
+|                          | Mozilla Firefox (latest 2 versions)                                                   |
+|                          | Apple Safari (latest 2 versions)                                                      |
+| Mobile browsers (phones) | **Not supported in v1** — viewports below 768px meet a blocking banner (`GAP-05`)     |
+| Optimised viewport       | **1024px and above** — designed and tested here                                       |
+| Functional floor         | **768px to 1023px** — works, not optimised, no banner (iPad portrait, small laptops)  |
+| Blocked                  | **Below 768px** — full-screen banner asking the user to switch to a desktop or laptop |
+| Internet Explorer        | Not supported (end-of-life June 2022)                                                 |
 
-> ## ⚠️ OPEN CONFLICT — this table contradicts `ADR-ARCH-005` and the next scheduled build
->
-> **Raised 2026-08-05 by `P5.0` (register refs R-10 and R-11); awaiting WJ's decision. Do not treat the 320px figure or the mobile-browser rows below as settled.**
->
-> This table promises support that `P5.3`'s `GAP-05` task will actively remove:
->
-> | Source                                             | Position                                                                           |
-> | -------------------------------------------------- | ---------------------------------------------------------------------------------- |
-> | **NFR-05 (this table)**                            | Minimum width **320px**; Chrome Android and Safari iOS supported; usable on mobile |
-> | **`ADR-ARCH-005`** (Decision)                      | Minimum viewport **1024px**; mobile responsiveness deferred post-v1                |
-> | **`ADR-ARCH-005`** (Consequences) and **`GAP-05`** | Banner below **768px** that **blocks** the UI, not merely warns                    |
-> | **`design-requirements.md` §4**                    | Minimum supported viewport **1024px**                                              |
-> | **`accessibility-test-plan.md`**                   | "the sub-768px path is a blocking banner, not a supported experience"              |
->
-> Two things follow, and both need answers before `GAP-05` is built:
->
-> 1. **Is mobile supported or blocked?** If `GAP-05` ships as specified, an iPhone user cannot use the service at all — which contradicts this table, `C16`'s implication column, and `P5.5`'s cross-browser step ("confirm usable on Chrome Android and Safari iOS", a check that becomes unrunnable).
-> 2. **What happens between 768px and 1023px?** `ADR-ARCH-005` sets the minimum at 1024px but places the banner at 768px, so that band — iPad portrait, small laptops — is below the stated minimum, gets no banner, and has no supported layout.
->
-> **This conflict was identified and formally resolved once before, and the resolution never propagated.** The retired `docs/Old/Imp Plan/IMPLEMENTATION-STATUS.md` records it as OI-07: _"BRD Section 10.5 (320px) overridden by ADR-ARCH-005 (1024px desktop-first). ADR takes precedence. Mobile is post-v1. No action required."_ The live document set never received it. Nothing below has been edited pending the decision, so that the choice is recorded as a decision rather than applied as a silent correction.
+**Three bands, corrected 2026-08-05 (WJ's decision; `P5.0` register refs R-10 and R-11).** This table previously read "Minimum screen width — **320px** (small mobile) and above", with Chrome Android and Safari iOS listed as supported. That contradicted `ADR-ARCH-005` (1024px minimum) and, more concretely, the `GAP-05` task in `P5.3`, which adds a banner **blocking** the UI below 768px. Both could not be true, and `P5.5`'s cross-browser step was asking a tester to confirm mobile usability that the banner would make impossible.
 
-**Notes:** The application is designed desktop-primary (PDR-UI-003). It must remain usable on mobile browsers (C16) as a byproduct of responsive layout, but no active mobile optimisation is undertaken in v1. Full mobile optimisation is deferred to a future phase if user feedback supports demand. Chrome and Edge cover the majority of UK charity workers. Safari is required for iPhone users. Internet Explorer 11 is not supported — supporting it would add significant development cost for negligible benefit given its retirement.
+**The 320px figure came from the Mark One BRD (Section 10.5) and had already been overridden by `ADR-ARCH-005` once.** The retired plan recorded the resolution explicitly — _"ADR takes precedence… mobile is post-v1. No action required"_ — and **that resolution never reached the live document set**, so five live documents went on promising mobile support for months. WJ's 2026-08-05 decision settles it in the direction the ADR always intended, and additionally fills the gap the ADR left unspecified: the **768–1023px band** is functional but not optimised, rather than being blocked, because iPad portrait and older small laptops are common in small charities and blocking them would cost more than a cramped layout does. Phones are blocked, because Step 4's two-column answer-and-guidelines layout genuinely cannot work at that width. Full detail in `ADR-ARCH-005`'s 2026-08-05 amendment.
+
+**Notes:** The application is designed desktop-primary (PDR-UI-003) and **is not a mobile product in v1**. Full mobile support is deferred to a future phase if user feedback supports demand. Chrome and Edge cover the majority of UK charity workers. Safari is required for Mac users on desktop. Internet Explorer 11 is not supported — supporting it would add significant development cost for negligible benefit given its retirement. Note `C16` ("web application only; no native mobile app") remains correct on its own terms — there is no native app — but its implication column was corrected in the same pass, having read "must be responsive and usable on mobile browsers".
 
 ---
 

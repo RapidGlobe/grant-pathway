@@ -13,7 +13,7 @@
 
 ## Purpose
 
-`ADR-OPS-006` mandates a manual keyboard / focus / screen-reader / contrast pass **before each release**. Until now no test plan executed that for the product flow. The only accessibility case anywhere was `help-and-tooltips-test-plan.md` HT-05, scoped to tooltips — and that single feature-scoped keyboard step found `GAP-38`: **three of nine tooltips completely unreachable by keyboard, a real WCAG 2.1.1 failure that had shipped.** One narrow plan found a real failure. Nothing has looked at the rest of the service.
+`ADR-OPS-006` mandates a manual keyboard / focus / screen-reader / contrast pass **before each release**. Until now no test plan executed that for the product flow. The only accessibility case anywhere was `help-and-tooltips-test-plan.md` HT-05, scoped to tooltips — and that single feature-scoped keyboard step found `GAP-38`: **three of the ten tooltips completely unreachable by keyboard, a real WCAG 2.1.1 failure that had shipped.** One narrow plan found a real failure. Nothing has looked at the rest of the service.
 
 This is the seventh test layer under `DR-TEST-001` (WJ's decision, 2026-07-30). It sits alongside `help-and-tooltips-test-plan.md` as a horizontal, cross-cutting plan rather than a funder or guideline-shape plan, because accessibility is a property of every route at once.
 
