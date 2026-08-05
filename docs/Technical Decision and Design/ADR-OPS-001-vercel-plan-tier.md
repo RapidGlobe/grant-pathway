@@ -33,7 +33,7 @@ Vercel hosts Grant Pathway (ADR-STACK-004). The Hobby (free) plan has the follow
 - `maxDuration = 90` resolves the AI route timeout.
 - Direct-to-Supabase file upload (ADR-FILE-001) resolves the file size constraint independently.
 - Additional benefits: higher build minutes, better analytics, team collaboration features.
-- Cost is within the C1 budget constraint of £100/month.
+- Cost is within the C1 budget constraint of £150/month. _C1 raised from £100 to £150/month on 2026-08-05 (WJ's decision; `P5.0` register ref **R-06**) — the £100 total was already breached by committed spend before a single AI call._
 
 ### Option C — Alternative hosting (Railway, Render, AWS)
 
@@ -61,7 +61,7 @@ All other routes continue to use the default 10-second timeout.
 - Vercel Pro subscription must be activated before production deployment.
 - AI route files must include `export const maxDuration = 90`.
 - Monthly operating cost: ~~£16 (Vercel Pro) + Supabase Pro (~~£20/month) + Anthropic/Bedrock API usage.
-- Budget headroom: ~£64/month remaining against the £100/month C1 constraint.
+- Budget headroom: **~£114/month** remaining against the £150/month C1 constraint after ~£36 of fixed infrastructure — of which the Bedrock ceiling may consume up to ≈£100, leaving ~£14 unallocated. _Recomputed 2026-08-05 (`P5.0` ref R-06); previously "~£64/month remaining against the £100/month C1 constraint"._
 
 **Corrected 2026-07-10:** the two bullets above originally read "Supabase (free tier initially)" and "Budget headroom: ~£84/month remaining." Both were stale — Supabase Pro was activated 2026-06-22 (`ADR-DATA-005`), which already updated `technical-design.md`'s operating cost table accordingly, but this ADR was never updated to match. Total committed fixed costs are now ~£36/month (Vercel Pro ~£16 + Supabase Pro ~£20), leaving ~£64/month headroom against the £100/month C1 constraint for Bedrock API usage and other services.
 

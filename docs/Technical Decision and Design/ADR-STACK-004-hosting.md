@@ -29,7 +29,7 @@ Vercel is the hosting platform. The Pro plan is required to configure `maxDurati
 - Automatic preview deployments for every pull request support the development workflow.
 - Vercel's CDN and Edge Network provide optimal performance for a UK-based user base.
 - The Pro plan resolves the Vercel function timeout blocker (60-second AI generation vs 10-second Hobby limit).
-- Monthly cost of ~$20 is within the C1 budget constraint of £100/month operating cost.
+- Monthly cost of ~$20 is within the C1 budget constraint of £150/month operating cost. _C1 raised from £100 to £150/month on 2026-08-05 (WJ's decision; `P5.0` register ref **R-06**) — the £100 total was already breached by committed spend before a single AI call._
 
 ## Consequences
 

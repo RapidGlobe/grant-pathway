@@ -42,7 +42,9 @@
 
 **R-09 withdrawn — it was an error in the register, not a defect in `PDR-UI-008`.** The three tooltip ids flagged as unbuilt (`tt-approve-required`, `tt-help-improve`, `tt-prior-export-signoff`) appear in that PDR only inside its **findings against the earlier input spec** and the rationale for them — a record of what that spec got wrong, correctly preserved. The PDR's own inventory was right throughout: **11 specified, 10 built**, `tt-register-password` deliberately excluded as a permanent visible hint. Confirmed with `git log -S` on all three ids across `components/`, `app/` and `lib/`: zero commits, ever. Recorded rather than quietly deleted, because a register that only ever accumulates findings is not being checked either.
 
-**Still open: R-06.** WJ's decision is to keep `C1` as a **total** monthly cost and raise it to a realistic figure; the figure itself is not yet set, so `C1`, `A3`, `A13`, `OBJ-05` and the two PRD sections that read the same £100 three different ways are untouched pending it. **`P5.0` stays open until that number exists.**
+**Budget — `C1` becomes £150/month and stays a _total_.** £150 covers the ~£136 already committed (Vercel Pro ~£16 + Supabase Pro ~£20 + the ≈£100 Bedrock ceiling) with ~~£14 unallocated for the first usage-based service to leave its free tier — Axiom and Upstash being the likeliest. **The AWS Budget itself is unchanged at $127**; what changed is that ≈£100 is no longer the entire budget, so `PDR-AI-005`'s "matching the C1 budget" parenthetical was corrected in the same pass. Applied across **13 statements in 8 documents**: `C1`, `A3`, `A13`, `OBJ-05`, `success-metrics.md`, `PDR-AI-005` ×2, `ADR-OPS-001` ×2 (including a recomputed headroom figure, previously "~~£64/month remaining"), `ADR-STACK-004`, `technical-design.md`'s cost table, and — the two that were the actual divergence — **PRD §10's "total API spend" and §14's "AI API spend"**, both restated as total running cost.
+
+**`P5.0` is complete.** All 23 divergences dispositioned and applied; `P5.5` is no longer blocked by it.
 
 ---
 

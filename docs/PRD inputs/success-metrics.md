@@ -47,10 +47,10 @@ _The export completion rate is the single most important product metric — it c
 
 ## 5. Operational — Is the service sustainable?
 
-| Metric                                        | Indicative target | Notes                                                                                                                                                               |
-| --------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Monthly AI API spend                          | Within £100/month | Primary cost constraint (C1); monitored via Amazon Bedrock / AWS console                                                                                            |
-| Average AI requests per active user per month | Fewer than 10     | Well within the 50-request per user monthly limit (PDR-AI-005) _(corrected 2026-07-10, was 20 -- the cap was raised 2026-06-17, see PDR-AI-005's Revision History)_ |
+| Metric                                           | Indicative target | Notes                                                                                                                                                               |
+| ------------------------------------------------ | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Monthly total running cost (infrastructure + AI) | Within £150/month | Primary cost constraint (C1); monitored via Amazon Bedrock / AWS console                                                                                            |
+| Average AI requests per active user per month    | Fewer than 10     | Well within the 50-request per user monthly limit (PDR-AI-005) _(corrected 2026-07-10, was 20 -- the cap was raised 2026-06-17, see PDR-AI-005's Revision History)_ |
 
 ---
 

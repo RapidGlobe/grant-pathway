@@ -158,7 +158,7 @@ The document synthesises requirements from the Business Requirements Document, 2
 | OBJ-02 | Enable any UK charity to register and complete an application within a single session                                                   | Confirmed through user testing                                                         |
 | OBJ-03 | Reduce the time a non-specialist spends writing a grant application                                                                     | Evidenced through user feedback interviews                                             |
 | OBJ-04 | Achieve WCAG 2.2 Level AA accessibility from day one                                                                                    | Internal testing and checklist review pre-launch                                       |
-| OBJ-05 | Operate within a monthly running cost of £100                                                                                           | Monthly cost monitoring                                                                |
+| OBJ-05 | Operate within a monthly running cost of £150 (C1; raised from £100 on 2026-08-05 — `P5.0` register ref R-06)                           | Monthly cost monitoring                                                                |
 | OBJ-06 | Gather sufficient early user feedback to inform v2 planning                                                                             | Feedback interviews with opted-in users post-launch                                    |
 
 ---
@@ -1259,7 +1259,7 @@ The user may proceed with the full document. The warning is informational only.
 | Warning threshold      | Soft warning shown at 40 requests (80%)                                                                                                                                                                                                                                                                                                                                                                               |
 | Hard limit             | AI assist blocked at 50 requests; writing and saving answers is never restricted                                                                                                                                                                                                                                                                                                                                      |
 | Monitoring             | Usage tracked in `ai_usage_log` table; Amazon Bedrock / AWS console spend cap set as backstop                                                                                                                                                                                                                                                                                                                         |
-| Monthly target         | Under £100/month total API spend (C1)                                                                                                                                                                                                                                                                                                                                                                                 |
+| Monthly target         | Under £150/month **total running cost** — infrastructure and API together (C1). _Corrected 2026-08-05 (`P5.0` ref R-06): this read "total API spend", one of three incompatible readings of the same figure._                                                                                                                                                                                                         |
 
 ### 10.6 Error Handling
 
@@ -1468,10 +1468,10 @@ The export completion rate is the single most important product metric.
 
 ### 14.5 Operational
 
-| Metric                                        | Target            |
-| --------------------------------------------- | ----------------- |
-| Monthly AI API spend                          | Within £100/month |
-| Average AI requests per active user per month | Fewer than 10     |
+| Metric                                           | Target                                                                                                                  |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| Monthly total running cost (infrastructure + AI) | Within £150/month (C1) — _corrected 2026-08-05, `P5.0` ref R-06; previously "Monthly AI API spend — within £100/month"_ |
+| Average AI requests per active user per month    | Fewer than 10                                                                                                           |
 
 ### 14.6 User Feedback
 

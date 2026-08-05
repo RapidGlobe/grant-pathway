@@ -122,15 +122,15 @@ This document describes the technical design of Grant Pathway v1 — a free AI-a
 
 ### Operating costs (monthly)
 
-| Service                 | Cost                                                                               |
-| ----------------------- | ---------------------------------------------------------------------------------- |
-| Vercel Pro              | ~£16/month                                                                         |
-| Supabase Pro            | ~£20/month (ADR-DATA-005 — includes daily automated backups)                       |
-| Amazon Bedrock (Claude) | Usage-based (capped at 50 req/user/month)                                          |
-| Upstash                 | Free tier                                                                          |
-| Resend                  | Free tier (3,000 emails/month)                                                     |
-| Sentry                  | Free tier (5,000 errors/month)                                                     |
-| **Total fixed**         | **~£36/month** (well within £100/month C1 budget; ~£64/month headroom for Bedrock) |
+| Service                 | Cost                                                                                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Vercel Pro              | ~£16/month                                                                                                                           |
+| Supabase Pro            | ~£20/month (ADR-DATA-005 — includes daily automated backups)                                                                         |
+| Amazon Bedrock (Claude) | Usage-based (capped at 50 req/user/month)                                                                                            |
+| Upstash                 | Free tier                                                                                                                            |
+| Resend                  | Free tier (3,000 emails/month)                                                                                                       |
+| Sentry                  | Free tier (5,000 errors/month)                                                                                                       |
+| **Total fixed**         | **~£36/month** (within the £150/month C1 budget — raised from £100 on 2026-08-05, `P5.0` ref R-06; ~£114/month headroom for Bedrock) |
 
 ---
 
