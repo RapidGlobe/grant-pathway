@@ -2,8 +2,14 @@
 //
 // Deletes accounts where last_sign_in_at is 24 or more months ago.
 // Cascade deletion order (same as user-initiated deletion in S8.2):
-//   application_items → applications → charity_profiles →
-//   ai_usage_log → user_profiles → Supabase Auth deleteUser
+//   guidelines-temp Storage objects → application_items → applications →
+//   charity_profiles → ai_usage_log → user_profiles → Supabase Auth deleteUser
+//
+// application_guidelines is not deleted explicitly here, unlike in S8.2: its
+// foreign keys to both applications and auth.users carry ON DELETE CASCADE
+// (20260714000001_gap33_application_guidelines.sql), so deleting applications
+// below removes it. The explicit delete in S8.2 is belt-and-braces, not a
+// difference in what ends up deleted.
 //
 // Sends Email 4 (account-deleted-inactivity) immediately after each deletion.
 // Logs each deletion to console with user ID (not email — PII scrubbing).
@@ -30,6 +36,7 @@ import * as Sentry from '@sentry/nextjs'
 import { sendEmail } from '@/lib/emails/send'
 import { buildAccountDeletedInactivityEmail } from '@/lib/emails/account-deleted-inactivity'
 import { isDueForDeletion } from '@/lib/inactivity'
+import { deleteUserGuidelineFiles } from '@/lib/storage-guidelines'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('Authorization')
@@ -89,7 +96,32 @@ export async function GET(request: NextRequest) {
         const firstName = (user.user_metadata?.first_name as string | undefined) ?? 'there'
         const email = user.email ?? ''
 
-        // Cascade deletion (same order as user-initiated deletion)
+        // Cascade deletion (same order as user-initiated deletion), starting
+        // with the user's guideline uploads in Storage (PDR-DH-002).
+        //
+        // For this path the Storage step is all but certain to find nothing —
+        // the account has been idle 24 months and the bucket only holds files
+        // younger than an hour. It is here for symmetry with S8.2 rather than
+        // because it expects work: the comment above promises the two paths
+        // delete the same things in the same order, and both bugs found in this
+        // cascade so far (GAP-33's missing table, the missing service_role
+        // grants) came from the two routes drifting apart.
+        const storageResult = await deleteUserGuidelineFiles(service, userId)
+
+        if (storageResult.error) {
+          console.error(
+            `[inactivity-deletion] Failed to delete guideline files for ${userId}:`,
+            storageResult.error,
+          )
+          // Not "account deleted but…": this step runs before the cascade, and the
+          // auth delete below can still fail and `continue`.
+          Sentry.captureMessage('Guideline files could not be removed for inactive account', {
+            level: 'warning',
+            tags: { route: 'cron/inactivity-deletion', step: 'deleteGuidelineFiles' },
+            extra: { userId, detail: storageResult.error },
+          })
+        }
+
         const { data: apps } = await service.from('applications').select('id').eq('user_id', userId)
 
         const appIds = (apps ?? []).map((a: { id: string }) => a.id)

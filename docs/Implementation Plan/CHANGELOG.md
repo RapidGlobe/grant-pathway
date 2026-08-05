@@ -10,6 +10,48 @@
 
 ---
 
+## 2026-08-05 — GAP-39 built: account deletion now deletes the Storage files it always claimed to; the documented path for them never existed (GAP-40)
+
+Raised as a spec/code mismatch: `PDR-DH-002`'s "data deleted on inactivity closure" list has named _"uploaded funder guideline files (Supabase Storage)"_ since 2026-04-16, but neither deletion path — `app/api/account/delete/route.ts` (S8.2) nor `app/api/cron/inactivity-deletion/route.ts` (S8.3) — deleted anything from Storage. Both removed database rows only. `data-model.md` §6 had carried a note recording the mismatch rather than resolving it.
+
+Nothing was ever actually retained: `cleanup-guidelines` removes objects older than an hour, every 30 minutes, so a deleted user's file was gone within the hour regardless. That is why this was filed as a mismatch and not an incident.
+
+### The decision: fix the code, not the document
+
+Two options were on the table — add the Storage delete to both paths, or amend `PDR-DH-002` to make the cleanup job responsible. **Decision: WJ, on the author's recommendation.** The argument that settled it is an asymmetry in what the fallback can recover from:
+
+Every other way `cleanup-guidelines` can fail is self-healing, because the account that owns the file still exists — the link between object and person is re-derivable at any time. **Once the account is deleted, it is not.** The object name still embeds the user id, so it remains personal data, but there is no user left to ask about it and nothing to join it to. That is the one window the sweep cannot recover from, and it is entered by an explicit erasure request. Amending a document that carries a UK GDPR commitment, in order to match code that took twenty-five lines to correct, was the worse direction of travel.
+
+Applied to **both** paths, not just user-initiated deletion. For the inactivity cron the step is all but certain to find nothing — 24 months idle against a bucket holding only files younger than an hour — but the two routes are deliberately maintained as mirrors, the cron's own header comment promises the same order as S8.2, and **both** bugs found in this cascade so far came from the two drifting apart (`GAP-33`'s missing table; the missing `service_role` grants that made deletion fail outright on 2026-07-23). Symmetry is worth more than twelve saved lines.
+
+### Two design points in the implementation
+
+New `lib/storage-guidelines.ts`. Both call sites invoke it **before** the table cascade: at that point nothing is destroyed, so a Storage failure cannot leave a half-deleted account, and the objects are ephemeral anyway so removing them ahead of a later abort costs the user nothing.
+
+**Failure is non-fatal by design.** It reports to Sentry as a warning and deletion proceeds. The whole purpose of this step is defence in depth behind the cron; letting it abort an erasure request would convert a belt-and-braces measure into a new single point of failure — and the cron would have finished the job anyway. This matches the posture `/api/upload/process` already takes, where a failed Storage delete is logged and left to the same cron.
+
+### The part worth remembering: the documented object path did not exist
+
+**The task brief, `data-model.md` §6 and §7, and the schema migration's own comment all stated that objects live at `guidelines-temp/<user_id>/<filename>`. No such layout has ever existed.** Objects are flat at the bucket root, named `{user_id}_{timestamp}` — written that way deliberately by `app/api/upload/signed-url/route.ts` so `cleanup-guidelines`' `list('')` needs no recursive traversal, and it is the same prefix `/api/upload/process` already uses as its IDOR guard (`__tests__/upload-idor.test.ts`).
+
+Implementing the fix as documented would have deleted **nothing, silently** — a `remove()` against a folder prefix that matches no object returns success. The mismatch would have been replaced by something worse: code that looks compliant, reports success, and does nothing. All three places are corrected, and a test asserts the folder form is rejected so the assumption cannot quietly return.
+
+### GAP-40, raised not fixed: the storage RLS policies are inert
+
+The same wrong assumption is baked into the schema. The three `guidelines-temp` policies in `20260519000000_initial_schema.sql` gate on `(storage.foldername(name))[1] = auth.uid()::text`. With no `/` in the name that subscript is NULL, `NULL = auth.uid()::text` is NULL, and **all three policies have never granted anything.** Uploads work only because signed upload URLs are minted with the service role, which bypasses RLS.
+
+**Nothing is exposed.** The bucket is private, every path in and out goes through a route that verifies the caller owns the `{user_id}_` prefix, and `ADR-FILE-001`'s consequence explicitly accepts _"a storage RLS policy **or** service-role-only access"_ — the latter is what is in force. The defect is that dead code reads as though it were load-bearing, and `data-model.md` §7 positively asserted _"per-user RLS-scoped folders restricting each user to their own uploads"_, which was wrong on both counts.
+
+**Deliberately not fixed in this pass.** Changing a security control deserves its own task, ADR sweep and test rather than riding along on a documentation correction — bundling is how the wrong comment got there in the first place. Recommendation recorded for when it is picked up: **repoint the policies at the flat prefix rather than drop them**, since nothing depends on them today but they are a useful tripwire for whoever later adds a client-side Storage call and reasonably assumes they work. The applied migration was corrected by **comment only** — no SQL touched; a real fix needs a new migration.
+
+### Not changed, on purpose
+
+`AC-FR-41-03` deliberately omits uploaded guidelines from the deleted-data list shown on the confirmation screen (corrected 2026-07-13, consistent with `FR-22`). That stays: these files exist for seconds during extraction and are not user-visible saved data, so listing them would imply a persistence the product does not have. Recorded in `PDR-DH-002` so nobody reconciles the two lists by editing the screen.
+
+Docs updated: `PDR-DH-002` (implementation note), `data-model.md` §6 and §7, `technical-design.md` (retention cascade), `ADR-TRACEABILITY.md` (`GAP-39` resolved, `GAP-40` raised), `regression-test-plan.md` (RT-14 Storage step), `TEST-DASHBOARD.md`, `AGENTS.md` §1. `npm run type-check`, `lint`, and `test` (**159** tests, up from 145) all pass.
+
+---
+
 ## 2026-08-05 — GAP-31 built: the inactivity warning was sending thirty emails, not two
 
 **`P5.3b` item 2.** Two related reliability defects in the S8.3 inactivity crons, both raised on 2026-06-08 by the Knox "Idempotency" and "Graceful Degradation" reviews and both open since. Sequenced here because the fix needs a migration, and P5.4 pushes migrations to production — leaving it later means doing that push twice.

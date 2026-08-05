@@ -2,8 +2,15 @@
 //
 // Cascades deletion for a user-initiated account deletion request.
 // Deletion order per implementation plan:
-//   application_items, application_guidelines → applications → charity_profiles →
-//   ai_usage_log → user_profiles → Supabase Auth deleteUser
+//   guidelines-temp Storage objects → application_items, application_guidelines →
+//   applications → charity_profiles → ai_usage_log → user_profiles →
+//   Supabase Auth deleteUser
+//
+// The Storage step was added 2026-08-05 to close a gap between PDR-DH-002 —
+// which lists uploaded guideline files among the data deleted — and this route,
+// which deleted only tables. See lib/storage-guidelines.ts for why it is worth
+// doing even though cleanup-guidelines (S4.4) would remove the files within the
+// hour regardless.
 //
 // Uses the service role client for admin operations and auth.admin.deleteUser.
 // Uses the regular server client first to verify the caller is authenticated.
@@ -18,6 +25,7 @@ import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/emails/send'
 import { buildAccountDeletedByUserEmail } from '@/lib/emails/account-deleted-user'
+import { deleteUserGuidelineFiles } from '@/lib/storage-guidelines'
 
 export async function POST() {
   // 0. Preflight: confirm email service is configured before any irreversible action.
@@ -52,7 +60,30 @@ export async function POST() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
-  // 3. Cascade deletion in plan order
+  // 3. Storage first: remove any in-flight guideline uploads (PDR-DH-002).
+  //    Ordered ahead of the table cascade because nothing is destroyed yet at
+  //    this point, so a Storage problem cannot leave a half-deleted account. The
+  //    objects are ephemeral either way, so removing them before a later table
+  //    failure aborts the request costs the user nothing.
+  //
+  //    Failure is non-fatal and deliberately so: cleanup-guidelines (S4.4) still
+  //    sweeps the bucket every 30 minutes, and blocking an erasure request on a
+  //    transient Storage error would make this defence-in-depth step a new
+  //    single point of failure. Same posture as /api/upload/process.
+  const storageResult = await deleteUserGuidelineFiles(service, userId)
+
+  if (storageResult.error) {
+    console.error('[delete-account] Failed to delete guideline files:', storageResult.error)
+    // Worded without asserting the account was deleted: this step runs first, and
+    // a later table failure aborts the request with a 500.
+    Sentry.captureMessage('Guideline files could not be removed during account deletion', {
+      level: 'warning',
+      tags: { route: 'api/account/delete', step: 'deleteGuidelineFiles' },
+      extra: { userId, detail: storageResult.error },
+    })
+  }
+
+  // 4. Cascade deletion in plan order
 
   // Step 1: application_items, application_guidelines — fetch application IDs
   // first, then delete both (application_guidelines added GAP-33, 2026-07-14)
@@ -128,7 +159,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Deletion failed. Please try again.' }, { status: 500 })
   }
 
-  // 4. Send confirmation email (FR-44, Should Have)
+  // 5. Send confirmation email (FR-44, Should Have)
   //    Failure is logged but does not fail the request — the user is already deleted.
   if (userEmail) {
     try {

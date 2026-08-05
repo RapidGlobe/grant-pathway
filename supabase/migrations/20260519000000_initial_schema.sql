@@ -257,8 +257,28 @@ values (
 )
 on conflict (id) do nothing;
 
--- Storage RLS: users can upload, read, and delete only within their own folder.
--- Files are stored at guidelines-temp/<user_id>/<filename>.
+-- Storage RLS: intended to let users act only within their own folder.
+--
+-- ⚠️ CORRECTION 2026-08-05 (GAP-40) — comment only, no schema change; this
+-- migration is already applied and its SQL is untouched.
+--
+-- These three policies are INERT and have never granted anything. They gate on
+-- (storage.foldername(name))[1], but objects in this bucket are FLAT at the
+-- bucket root — named `{user_id}_{timestamp}`, containing no `/`. With no folder
+-- segment that subscript is NULL, so `NULL = auth.uid()::text` is NULL and the
+-- policies never match. The original comment below the header claimed files live
+-- at `guidelines-temp/<user_id>/<filename>`; that layout has never existed in the
+-- code. app/api/upload/signed-url/route.ts writes the flat name deliberately, so
+-- the cleanup-guidelines cron's list('') needs no recursive traversal.
+--
+-- Nothing is exposed by this. Uploads work because signed upload URLs are minted
+-- with the service role, which bypasses RLS; the bucket is private, and
+-- app/api/upload/process/route.ts checks the caller owns the `{user_id}_` prefix
+-- before reading. Service-role-only access is the control actually in force, and
+-- ADR-FILE-001 explicitly accepts it ("a storage RLS policy OR service-role-only
+-- access"). The policies are dead code that reads as though load-bearing —
+-- whether to repoint them at the flat prefix or drop them is tracked as GAP-40,
+-- deliberately left for its own task rather than bundled into GAP-39's fix.
 create policy "storage: upload own guidelines"
   on storage.objects for insert
   to authenticated

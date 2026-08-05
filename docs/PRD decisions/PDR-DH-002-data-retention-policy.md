@@ -42,6 +42,14 @@ An account is considered inactive if the user has not logged in for 24 consecuti
 - Uploaded funder guideline files (Supabase Storage)
 - AI usage records
 
+**Implementation note (2026-08-05, `GAP-39`) — this list is now accurate; it was not before.** The fourth item, uploaded funder guideline files, was named here from this decision's date but neither deletion path deleted anything from Supabase Storage: user-initiated deletion (`app/api/account/delete/route.ts`, S8.2) and the inactivity cron (`app/api/cron/inactivity-deletion/route.ts`, S8.3) both removed only database rows. The files were left entirely to the separate `cleanup-guidelines` job, which removes anything older than an hour every 30 minutes.
+
+Because of that sweep, nothing was ever actually retained — which is why this was recorded as a spec/code mismatch rather than a data-protection incident. Both paths now delete the user's Storage objects explicitly, via `lib/storage-guidelines.ts`, before the table cascade.
+
+The mismatch was resolved by changing the code to match this decision rather than by amending the decision to point at the cleanup job. The reasoning: once the account is deleted, nothing remains that ties an object to a person — the object name still embeds the user id, so it is still personal data, but there is no user left to ask about it and nothing to join it to. Every other way the sweep can fail is self-healing, because the owning account is still there to re-derive the link from. This is the single case where the fallback cannot recover, and it follows an explicit erasure request. Amending a decision that carries a UK GDPR commitment, to match code that was cheap to correct, was the worse direction of travel.
+
+**No change to the deletion confirmation screen.** `AC-FR-41-03` deliberately omits uploaded guidelines from the list of deleted data shown to the user (corrected 2026-07-13, consistent with `FR-22`), and that remains right: the files are transient working storage that exists for seconds during extraction, not user-visible saved data. Listing them would imply a persistence the product does not have. This note exists so nobody reconciles the two lists by adding the item to the screen.
+
 ### Reactivation
 
 There is no reactivation path — once deleted, the user must register again as a new account. This is clearly stated in the warning email.

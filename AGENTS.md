@@ -44,7 +44,9 @@ Paths are relative to `node_modules/next/dist/docs/`. The two top-level director
 
 Heed all deprecation notices. If the guide contradicts your training data, the guide wins.
 
-**If a path above does not exist,** list the directory and find the current location rather than skipping this check — Next.js reorganises its documentation tree between versions. Then correct the table here so the next session does not repeat the search. These paths were wrong from the project's start until 2026-07-29 (they pointed at a non-existent `app-router/` tree), which made this check unenforceable for months; the whole point of the rule is that it actually runs.
+**If the whole `node_modules/next/dist/docs/` tree appears to be missing,** check whether you are in a git worktree (`.claude/worktrees/…`) before concluding anything. Worktrees do not get their own `node_modules` — the docs live in the main checkout's copy, and the paths in the table below resolve correctly there. Read them from the main checkout; do not skip the check, and do not "correct" the table, which is not wrong in this case. Noted 2026-08-05, after a worktree session found the tree absent and had to establish that the paths were fine.
+
+**If an individual path above does not exist,** list the directory and find the current location rather than skipping this check — Next.js reorganises its documentation tree between versions. Then correct the table here so the next session does not repeat the search. These paths were wrong from the project's start until 2026-07-29 (they pointed at a non-existent `app-router/` tree), which made this check unenforceable for months; the whole point of the rule is that it actually runs.
 
 **Why:** Next.js App Router introduced breaking changes from the Pages Router. Code written from training data alone has repeatedly introduced subtle bugs and deprecated patterns into this codebase.
 
