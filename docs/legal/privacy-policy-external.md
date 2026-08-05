@@ -1,8 +1,8 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.5
-**Effective date: [TO BE CONFIRMED]**
-**Last updated: 30 July 2026**
+**Version:** 1.6
+**Effective date: 5 August 2026**
+**Last updated: 5 August 2026**
 
 ---
 
@@ -196,5 +196,5 @@ We would always prefer the opportunity to resolve any concern directly before a 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
 _Version: 1.5_
-_Effective date: [TO BE CONFIRMED]_
+_Effective date: 5 August 2026_
 _Last updated: 30 July 2026_

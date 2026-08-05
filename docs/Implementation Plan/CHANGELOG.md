@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-08-05 — Legal effective dates set, closing audit finding S2a
+
+**Both live legal documents now carry a real effective date: 5 August 2026.** They had read `Effective date: [TO BE CONFIRMED]` since first publication — the Privacy Policy since 2 July 2026, the Terms since 10 July — which the Opus audit raised as **S2** and rated **Severe**, on the grounds that a published privacy policy with no effective date is not a defensible position for a registered data controller (ICO ZC168720), and that it blocked asking external testers to rely on either document. S2 split into **S2a** (set the dates, needs no solicitor) and **S2b** (the independent review). **S2a is now closed. S2b remains open and is the only thing still holding `P5.1`.**
+
+**Eight replacements across four files**, each document carrying the date twice — once in the header block and once in the footer. The four are the two internal copies (`privacy-policy.md`, `terms-of-service.md`) and the two `-external.md` mirrors, and the mirrors matter most: `app/(public)/privacy/page.tsx` and `app/(public)/terms/page.tsx` read **the external copies**, not the internal ones, so setting the date in the internal files alone would have changed nothing a user sees. Versions bumped: privacy policy → **v1.6**, terms → **v1.5**.
+
+**Why today's date rather than a launch date, which is what the placeholder was waiting for.** Go-live is unscheduled — the working estimate is August–September 2026 and no date is committed. But the service is already deployed and in use by external testers at a hosted URL, and both documents are already served at `/privacy` and `/terms`. A future effective date would therefore have asserted that **no policy and no terms were in force while people were actually using the service** — worse than the placeholder it replaced. Dating each document from the day its current wording takes effect is accurate, and it is what the placeholder should always have been resolved to. Go-live does not change it; a future material revision would produce a new version and a new effective date, which is the normal mechanism.
+
+**One consequence to note, not yet actioned: the generated PDFs and Word files in `docs/legal/pdf/` are now stale.** They are `Grant-Pathway-Privacy-Policy-v1.5.pdf`/`.docx` and `Grant-Pathway-Terms-of-Service-v1.4.pdf`/`.docx`, all four still showing `[TO BE CONFIRMED]` and all four now a version behind. They exist to be sent to a legal reviewer, so they must be regenerated before S2b's outreach — otherwise the reviewer is sent the exact defect that was just fixed. Regeneration is pandoc → `.docx` → Word COM → PDF (LaTeX stalls on this machine); deliberately left until the reviewer is engaged, so it happens once against final text rather than twice.
+
+Also corrected in the same pass: `legal-review-options-2026-07-29.md`'s "Why this exists" paragraph, which stated in the present tense that both pages "currently publish" the placeholder. `P5.1`'s two document rows and its intro, and `P5.6`'s effective-date check — now a verification that the deployed pages render the date, rather than an action to set it.
+
+---
+
 ## 2026-08-05 — `P5.0` requirements reconciliation: 23 divergences, and a resolution that was written down and never propagated
 
 `P5.0` is the blocking Phase 5 task added on 2026-07-30 for the doc-vs-build comparison that no Phase 5 task performed. Register: **`docs/Implementation Plan/pre-launch-reconciliation-2026-08-05.md`**. **23 divergences, none left undispositioned** — 15 fixed or amended the same day, **5 held for WJ's decision**, 3 accepted and recorded.

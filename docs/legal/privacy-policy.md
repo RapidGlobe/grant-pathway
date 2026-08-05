@@ -1,8 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.5
-**Effective date: [TO BE CONFIRMED]**
-**Last updated: 30 July 2026**
+**Version:** 1.6
+**Effective date: 5 August 2026**
+**Last updated: 5 August 2026**
+
+> **Change from v1.5 (30 July 2026): the effective date is set — 5 August 2026.** It had read `[TO BE CONFIRMED]` since the policy was first published on 2 July 2026, which the 2026-07-29 Opus audit raised as finding **S2** and rated Severe: a published privacy policy with no effective date is not a defensible position for a registered data controller (ICO ZC168720), and it blocked external testers being asked to rely on it. **The date chosen is the date this text takes effect, not a future launch date.** The service has been live and in use by external testers at a hosted URL since before this change, so dating the policy from the day its current wording takes effect is accurate, where a future date would have claimed no policy was in force while people were already using the service. Go-live remains unscheduled (working estimate August–September 2026) and does not affect this date. Tracked as **S2a**; the independent legal review is **S2b** and remains open under `P5.1`. No other wording changed.
 
 > **Change from v1.4 (2 July 2026):** Three disclosure gaps closed, all found by comparing this policy against the notice produced by the ICO's own Privacy Notice Generator (see `docs/legal/legal-review-options-2026-07-29.md`, which recommends using the free ICO tools first). **(1) Section 2 now discloses your first and last name and your password's treatment.** Registration has always collected `first_name` and `last_name` (both required, used in email greetings and the nav bar) but the policy listed only the email address. **(2) Consent is now recorded as a legal basis, and the right to withdraw consent has been added to Section 8.** The optional "happy to be contacted" checkbox at registration (`feedback_consent`, FR-08) is consent-based processing; it appeared nowhere in this policy, and as a result the right to withdraw consent — which UK GDPR requires wherever consent is a basis — was missing. **(3) A new "Where we get your information from" subsection** in Section 2 states that almost everything comes directly from you, and discloses the one exception: the optional Charity Commission register lookup used to pre-fill organisation details. Also added a short legitimate-interests balancing statement to Section 4 and a note in Section 8 that which rights apply depends on the legal basis.
 
@@ -208,5 +210,5 @@ We would always prefer the opportunity to resolve any concern directly before a 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
 _Version: 1.5_
-_Effective date: [TO BE CONFIRMED]_
+_Effective date: 5 August 2026_
 _Last updated: 30 July 2026_

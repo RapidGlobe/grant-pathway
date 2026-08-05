@@ -1,8 +1,10 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.4
-**Effective date: [TO BE CONFIRMED]**
-**Last updated: 30 July 2026**
+**Version:** 1.5
+**Effective date: 5 August 2026**
+**Last updated: 5 August 2026**
+
+> **Change from v1.4 (30 July 2026): the effective date is set — 5 August 2026.** It had read `[TO BE CONFIRMED]` since these terms were first published on 10 July 2026 — audit finding **S2**, rated Severe, and a blocker on asking external testers to accept them. **The date is the date this text takes effect, not a future launch date**, since the service is already live and in use at a hosted URL; a future date would have asserted that no terms were in force while people were using the service. Go-live remains unscheduled and does not affect this date. Tracked as **S2a**; the independent legal review is **S2b** and remains open under `P5.1`. No other wording changed.
 
 > **Change from v1.3 (10 July 2026):** Three corrections, all found while preparing these terms for external legal review. **(1) Section 6's fair-use limit corrected from 20 to 50 AI-assisted requests per calendar month.** This is the most consequential: it is a binding contractual term, it was published, and it understated what the service actually provides by 60%. The cap was raised from 20 to 50 on 2026-06-17 (`PDR-AI-005`) and `lib/prompts.ts` has enforced `MONTHLY_CAP = 50` ever since; these terms were never updated to follow. **(2) The contact email in Sections 2, 3, 6 and 14 changed from `wjokhia@rapidglobe.com` to `admin@rapidglobe.com`.** The Privacy Policy made this change at its v1.3 on 2026-06-17; these terms did not, so the two live legal documents gave different contact addresses for the same company. **(3) Section 5's AWS paragraph** said "when you request a summary or draft answer" — a leftover from the abandoned draft-generation model that the rest of that same section had already been corrected to disprove at v1.1. Now reads "a summary, or ask for help improving an answer you have written".
 
@@ -201,5 +203,5 @@ For any questions about these terms, please contact us:
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
 _Version: 1.4_
-_Effective date: [TO BE CONFIRMED]_
+_Effective date: 5 August 2026_
 _Last updated: 30 July 2026_

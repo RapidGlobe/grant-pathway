@@ -1,8 +1,8 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.4
-**Effective date: [TO BE CONFIRMED]**
-**Last updated: 30 July 2026**
+**Version:** 1.5
+**Effective date: 5 August 2026**
+**Last updated: 5 August 2026**
 
 ---
 
@@ -191,5 +191,5 @@ For any questions about these terms, please contact us:
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
 _Version: 1.4_
-_Effective date: [TO BE CONFIRMED]_
+_Effective date: 5 August 2026_
 _Last updated: 30 July 2026_
