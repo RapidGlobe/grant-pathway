@@ -4,8 +4,8 @@
 **Volatility:** Low
 **Update when:** A reviewer is engaged (record who and what it cost), or the prices below are re-checked and found to have moved
 
-**Version:** 1.0
-**Last updated:** 29 July 2026
+**Version:** 1.1
+**Last updated:** 5 August 2026 — §6 added (enquiry template, chase email, route status). S2a is closed; the effective dates were set on 2026-08-05. Route status re-checked: **qLegal still not open**, Singleton's site loading with errors, one firm holding superseded copies and not responding.
 
 **Client:** RapidGlobe Ltd (company no. 05615649), ICO registration ZC168720
 **Documents:** `docs/legal/privacy-policy.md`, `docs/legal/terms-of-service.md` — both already drafted; this is a **review and sign-off** job
@@ -47,7 +47,7 @@ Covered areas include _"complying with your responsibilities to keep data secure
 
 **Constraints:**
 
-- **Currently closed for new enquiries; reopens July/August 2026** — i.e. right now. Apply as soon as the form is live.
+- **Closed for new enquiries. Checked again by WJ on 2026-08-05 — still closed.** The original research recorded "reopens July/August 2026", which has not happened. Re-check monthly; do not hold the paid route open waiting for it.
 - Cannot assist with _"matters involving disputes"_ (not relevant here).
 - Advice is delivered by postgraduate law students supervised by qualified lawyers. That is not the same as a solicitor's professional sign-off, and there is no professional indemnity comfort of the kind a regulated firm gives.
 - Document review is not advertised as a service — the model is an advice session. Expect a discussion of gaps, not tracked changes.
@@ -220,7 +220,7 @@ None of these count against the 10. Every hour of drafting quality you add here 
 The only published fixed fee found that covers **both documents in one price**, from an SRA-regulated solicitor with a genuine commercial/IT specialism. It resolves the whole blocker in one engagement with one invoice, at roughly the cost of buying two separate single-document reviews elsewhere. **Caveat:** the site was unreachable on 29 July 2026, so email to confirm the £480 still stands, that reviewing existing drafts (not drafting new ones) is in scope, and whether a second round on your amended drafts is included.
 
 **2. qLegal (QMUL) — £0 — run in parallel, starting immediately.**
-The only free scheme found whose published criteria **admit a for-profit limited company** (turnover under £100k). It covers data privacy compliance and business T&Cs, and reopens for enquiries in **July/August 2026** — now. Costs nothing but calendar time. Check RapidGlobe's turnover against the £100k threshold first. Treat the output as a gap-finding conversation, not a sign-off: students supervised by lawyers, no regulated-firm indemnity.
+The only free scheme found whose published criteria **admit a for-profit limited company** (turnover under £100k). It covers data privacy compliance and business T&Cs. **However — checked 2026-08-05, it is still not open**, despite the advertised July/August reopening, so it cannot currently be applied to. Costs nothing but calendar time whenever it does open. Check RapidGlobe's turnover against the £100k threshold first. Treat the output as a gap-finding conversation, not a sign-off: students supervised by lawyers, no regulated-firm indemnity.
 
 **3. Lawhive — c. £200–£400 for both documents — cheapest genuinely regulated route.**
 SRA-regulated (ID 8003766) with published indicative pricing of £100–£150 (up to £200) for website terms of use, free scoping consultation, and fast turnaround. Get a quote for both documents as one matter. Pick this over Singleton if Singleton's fee has risen or the firm cannot take the work quickly. **LawBite (from £165 + VAT per document) is the direct alternative** at similar cost — but verify its prices and its website availability directly, since lawbite.co.uk did not resolve when checked.
@@ -228,11 +228,11 @@ SRA-regulated (ID 8003766) with published indicative pricing of £100–£150 (u
 ### Cheapest credible path — c. £576 inc. VAT, or £0 if qLegal lands
 
 1. **Free, this week:** run the ICO Privacy Notice Generator and diff it against the privacy policy draft; complete the relevant ICO self-assessment; call the ICO SME helpline (0303 123 1113, option 4) with the AI/sub-processor questions. Fix everything this surfaces. Optionally spend £34.95 on the Legalo solicitor-drafted template as a second checklist. **Cost: £0–£35.**
-2. **Free, in parallel:** apply to qLegal the moment enquiries reopen, and book a University of Law Small Business Advice Line 30-minute slot. Use both to pressure-test specific questions. **Cost: £0.** Accept that neither yields written sign-off.
+2. **Free, in parallel — currently half-blocked:** qLegal **is still not open as of 2026-08-05**, so this reduces to booking a University of Law Small Business Advice Line 30-minute slot. Use it to pressure-test specific questions. **Cost: £0.** Accept that neither yields written sign-off. **Because qLegal is unavailable, the paid route is no longer optional** — see §6's route-status table.
 3. **Paid, once the drafts are clean:** engage **Singleton Solicitors at £480 + VAT** for a review of both documents. Because steps 1–2 removed the obvious defects, you are buying judgement rather than proofreading — the best possible use of a fixed fee. **Cost: c. £576 inc. VAT.**
 4. **Only if the privacy side proves genuinely complex** (e.g. the ICO helpline flags the AI processing as higher-risk, or a DPIA is indicated): scope **decoded.legal**'s Phase 3 "policies and procedures review", which is priced on sight of the materials and may land well below their phased figures given the drafts and data map already exist. Budget on the £600 + VAT order of magnitude, not the £1,200–£1,800 scoping tier.
 
-**Realistic total to unblock launch: c. £576 inc. VAT, with a plausible £0 outcome if qLegal accepts the application.** Do not exceed roughly £1,000 for these two documents at this stage of the business.
+**Realistic total to unblock launch: c. £576 inc. VAT. The £0 outcome is currently off the table** — qLegal, the only free scheme admitting a for-profit company, remains closed to new enquiries as of 2026-08-05. Do not exceed roughly £1,000 for these two documents at this stage of the business.
 
 ## 6. Enquiry template and contact routes (added 2026-08-05)
 
@@ -252,46 +252,59 @@ SRA-regulated (ID 8003766) with published indicative pricing of £100–£150 (u
 | Must be in scope    | The AI sub-processor chain, the "no data used to train models" representation, and retention of uploaded funder guidelines and user-authored answers. **A generic website-compliance review will skip all of these, and they are the parts most likely to be wrong** |
 | Ask                 | A **fixed fee for both documents**, whether a second round on amended drafts is included, and indicative turnaround                                                                                                                                                  |
 
-### Draft enquiry — send as-is
+### Draft enquiry — short version (revised 2026-08-05)
 
-> **Subject:** Fixed-fee review of a privacy policy and website terms — RapidGlobe Ltd
+**Shortened deliberately.** The first version of this template ran to ~350 words and led with the AI processing chain. That detail matters for _scope_ — a generic website-compliance review will skip it — but it is also what makes the job look complicated and therefore hard to price, and the observed failure mode here is **no reply at all**, not a reply declining the work. A firm triaging enquiries from unknown companies will park anything it cannot quote in under a minute. So: get a fee first, raise the specifics once someone is engaged.
+
+> **Subject:** Fixed-fee review of two documents — privacy policy and website terms
 >
 > Dear [name],
 >
-> I am the director of RapidGlobe Ltd (company no. 05615649, ICO registration ZC168720). We have built a free web tool that helps UK charities write grant applications. It is pre-launch and generates no revenue.
+> I am the director of RapidGlobe Ltd (company no. 05615649). We run a free web tool that helps UK charities write grant applications.
 >
-> I am looking for a **fixed-fee review of two documents that are already drafted**: a privacy policy (8 pages) and website terms of service (7 pages). I am not asking for drafting — both documents exist, have been through the ICO's own Privacy Notice Generator and self-assessment, and are published. I want a solicitor's eye on whether they are right.
+> I need a solicitor to review two documents that are already written: a privacy policy (8 pages) and website terms of service (7 pages). **Review only — no drafting.** Both are published and I can send PDFs straight over.
 >
-> The service processes charity staff names and email addresses, organisation profiles, and application text the charity writes itself. It takes no payment data. Two points I would specifically want covered, because I think a general website review would miss them:
+> It is an AI-assisted service, so the privacy policy carries a sub-processor section.
 >
-> 1. **The AI processing chain.** Application text is sent to Anthropic's Claude model via Amazon Bedrock in the London region, alongside Supabase (London), Vercel, Sentry (EU), Resend and Upstash. The policy names these as sub-processors and represents that no data is used to train models. I would like that disclosure and that representation checked.
-> 2. **A personal-data point I may be under-treating.** Organisation profiles are pre-filled from the Charity Commission register, and for a small charity the registered address is frequently a trustee's home address.
+> Could you give me a fixed fee for both documents and a rough turnaround?
 >
-> Could you tell me:
->
-> - a fixed fee for reviewing both documents;
-> - whether a second round, re-reading my amendments, is included or billed separately;
-> - and an indicative turnaround.
->
-> I can send both documents as PDFs, or you are welcome to read them live. Happy to handle everything by email rather than take up a call.
+> Happy to handle it entirely by email.
 >
 > Many thanks,
 > [name]
 > RapidGlobe Ltd
 
-### Routes, in the order to try them
+**Why the one AI line stays.** It is a single clause, not an explanation. Removing it entirely risks a fee quoted for a generic website review that then treats the sub-processor chain as out of scope — the most likely way this engagement produces a sign-off that does not cover the part most likely to be wrong. One clause is enough to make it in scope without making it look like a project. **Raise the full detail — Bedrock `eu-west-2`, the no-training representation, guideline and answer retention, and the trustee's-home-address point — once a fee is agreed.** The facts table above is the source for that conversation.
 
-| Order | Provider                 | Route                                                                                                   | Note                                                                                                                                                                                                                                                                                         |
-| ----- | ------------------------ | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1     | **qLegal (QMUL)**        | **Online application form**, not email — https://www.qmul.ac.uk/qlegal/clients/legaladvice/             | **£0.** Reopened for enquiries July/August 2026. Do this first because it costs nothing but calendar time. Gate is turnover under £100k. Expect a discussion of gaps, not tracked changes — and note the strict attendance rules (a missed or twice-rescheduled appointment closes the case) |
-| 2     | **Singleton Solicitors** | Email — the site was unreachable on 29 July 2026, so **confirm the £480 by email before relying on it** | The only published fixed fee covering **both** documents in one price. Ask explicitly that reviewing existing drafts is in scope at that fee                                                                                                                                                 |
-| 3     | **Lawhive**              | Free scoping consultation via https://lawhive.co.uk                                                     | SRA-regulated (ID 8003766). Cheapest genuinely regulated route, c. £200–£400 for both. Ask for both documents as **one matter**                                                                                                                                                              |
-| 4     | **LawBite**              | Free 15-minute consultation                                                                             | From £165 + VAT per document. **Verify prices and site availability directly** — lawbite.co.uk did not resolve on 29 July 2026                                                                                                                                                               |
-| 5     | **University of Law**    | sbal@law.ac.uk (Sheffield; Birmingham and London equivalents exist)                                     | £0, 30 minutes with a commercial solicitor, but **no written advice** — use it to pressure-test 3–4 specific questions, not for sign-off                                                                                                                                                     |
+### Chasing the firm that already has the documents
 
-**Run 1 and 2 in parallel.** qLegal costs nothing and may take weeks; Singleton is the paid answer and resolves the whole blocker in one engagement. Waiting for the free option to resolve before starting the paid one is how this item has stayed open since 29 July.
+One firm replied, asked for copies, and received them before 2026-08-05 — **so it holds the superseded versions showing `Effective date: [TO BE CONFIRMED]`.** That is worth knowing: an undated privacy policy is a reasonable thing for a reviewer to park. It also supplies a real reason to write again, which beats a second content-free chase.
 
-**Before attaching anything:** regenerate the PDFs in `docs/legal/pdf/`. As of 2026-08-05 they are `v1.5`/`v1.4` and still show `Effective date: [TO BE CONFIRMED]` — sending those would hand a reviewer the exact defect that was fixed that morning.
+> **Subject:** Re: privacy policy and terms — corrected versions attached
+>
+> Dear [name],
+>
+> Following up on the documents I sent. Two corrected versions are attached — both now carry an effective date (5 August 2026), which the copies you have were missing.
+>
+> Are you able to quote a fixed fee for reviewing the two?
+>
+> Many thanks,
+> [name]
+
+Attach `docs/legal/pdf/Grant-Pathway-Privacy-Policy-v1.6.pdf` and `Grant-Pathway-Terms-of-Service-v1.5.pdf`.
+
+### Route status — checked 2026-08-05
+
+| Provider                               | Status                                                                                                                                                                                                                                                                                                                             |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **qLegal (QMUL)**                      | ❌ **Still not open**, checked by WJ on 2026-08-05. The 2026-07-29 research recorded "reopens July/August 2026"; that has not happened yet. **The free route is unavailable, so the paid one is no longer optional** — re-check monthly rather than waiting on it                                                                  |
+| **Singleton Solicitors**               | ⚠️ Site took **two attempts to load and opens with errors** (WJ, 2026-08-05) — on top of failing entirely on 2026-07-29. Not our problem technically, but a sole practitioner with a broken site is a weak signal on email responsiveness. Still worth one email, given it is the only published fixed fee covering both documents |
+| **Firm already holding the documents** | Replied, requested copies, received them, chased 2026-08-04 — no response. **Highest-probability lead**, because it engaged once. Use the corrected-documents email above rather than a third bare chase                                                                                                                           |
+| **Lawhive**                            | Untried. SRA-regulated (8003766), free scoping consultation, c. £200–£400 for both. **Promote to the primary paid route if Singleton does not answer within a week** — an online marketplace answers enquiries as a matter of business model, which is exactly what has been failing elsewhere                                     |
+| **LawBite**                            | Untried. From £165 + VAT per document; verify prices directly (site did not resolve 2026-07-29)                                                                                                                                                                                                                                    |
+| **University of Law**                  | Untried. £0, 30 minutes, **no written advice** — a sanity check, not a sign-off                                                                                                                                                                                                                                                    |
+
+**The pattern to act on: silence, not refusal.** Nobody has assessed this work and declined it. That points at enquiry triage rather than at the job being unattractive, which is why the email above is short and asks one question. If the shortened version also draws no reply from two or three firms, the diagnosis changes — at that point the constraint is likely that a sub-£500 fixed-fee review from an unknown company is not worth a small firm's intake time, and the answer is a provider whose business model is precisely small fixed-fee work: **Lawhive or LawBite, not another traditional firm.**
 
 ---
 
