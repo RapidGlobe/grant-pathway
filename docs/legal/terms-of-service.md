@@ -1,11 +1,13 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.5
+**Version:** 1.6
 
 **Effective date: 5 August 2026**
 
 **Last updated: 5 August 2026**
 
+> **Change from v1.5 (5 August 2026, same day):** Section 5 restructured at WJ's request while a solicitor reviews both documents, to reduce ambiguity — no change in meaning. The no-guarantee-of-success statement ("We make no representation that using Grant Pathway will result in a successful grant application...") now sits under its own sub-heading, **"No Guarantee of Funding Success,"** rather than mid-paragraph between two unrelated statements (user responsibility for content, and how AI processing works). The AI-provider/data-processing paragraph was moved earlier in the section, ahead of the new sub-heading, so it does not end up nested under a heading about a different topic.
+>
 > **Change from v1.4 (30 July 2026): the effective date is set — 5 August 2026.** It had read `[TO BE CONFIRMED]` since these terms were first published on 10 July 2026 — audit finding **S2**, rated Severe, and a blocker on asking external testers to accept them. **The date is the date this text takes effect, not a future launch date**, since the service is already live and in use at a hosted URL; a future date would have asserted that no terms were in force while people were using the service. Go-live remains unscheduled and does not affect this date. Tracked as **S2a**; the independent legal review is **S2b** and remains open under `P5.1`. No other wording changed.
 
 > **Change from v1.3 (10 July 2026):** Three corrections, all found while preparing these terms for external legal review. **(1) Section 6's fair-use limit corrected from 20 to 50 AI-assisted requests per calendar month.** This is the most consequential: it is a binding contractual term, it was published, and it understated what the service actually provides by 60%. The cap was raised from 20 to 50 on 2026-06-17 (`PDR-AI-005`) and `lib/prompts.ts` has enforced `MONTHLY_CAP = 50` ever since; these terms were never updated to follow. **(2) The contact email in Sections 2, 3, 6 and 14 changed from `wjokhia@rapidglobe.com` to `admin@rapidglobe.com`.** The Privacy Policy made this change at its v1.3 on 2026-06-17; these terms did not, so the two live legal documents gave different contact addresses for the same company. **(3) Section 5's AWS paragraph** said "when you request a summary or draft answer" — a leftover from the abandoned draft-generation model that the rest of that same section had already been corrected to disprove at v1.1. Now reads "a summary, or ask for help improving an answer you have written".
@@ -87,9 +89,11 @@ Before any AI-generated content is saved to your application, you are asked to c
 
 **You are responsible for all content you submit in a grant application.** You write every answer. If you ask for help, Grant Pathway suggests an improved version of what you have already written — it does not create an answer from nothing. You decide whether to use the suggestion, edit it, or discard it entirely. We do not review your applications. We do not submit applications on your behalf.
 
-We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder.
-
 The AI features are powered by the Anthropic Claude model, accessed via Amazon Web Services' Bedrock service (eu-west-2, London). When you request a summary, or ask for help improving an answer you have written, the relevant content from your funder guidelines and organisation profile is processed within UK and European Economic Area infrastructure. Please see our **Privacy Policy** for full details of how your data is handled in this process.
+
+### No Guarantee of Funding Success
+
+We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder.
 
 ---
 

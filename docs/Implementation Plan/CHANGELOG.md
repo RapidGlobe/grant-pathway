@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-08-05 — Terms of Service v1.6: no-guarantee-of-funding statement given its own sub-heading
+
+**Requested by WJ, ahead of solicitor review (S2b).** Section 5 (AI-Generated Content) previously carried _"We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder"_ as a single sentence sitting between two unrelated paragraphs — user responsibility for submitted content, and how AI processing works. Nothing was wrong with the wording; it was just easy to skim past mid-paragraph, and a solicitor is about to read this document closely.
+
+**Added a `### No Guarantee of Funding Success` sub-heading directly above the sentence, unchanged.** The AI-provider/data-processing paragraph (Anthropic Claude via AWS Bedrock, eu-west-2) was moved earlier in the section, ahead of the new sub-heading — it is not about funding outcomes, and leaving it where it was would have put it visually underneath a heading about a different topic. No wording changed anywhere; this is a structural clarity edit, not a substantive one.
+
+**Worth naming, since it came up when deciding where to put it:** the statement isn't really AI-specific at all — a charity that writes every answer itself and never touches the AI features still gets no guarantee of success. It stays in Section 5 for this edit (cheapest change, matches what the solicitor will be expecting after seeing the pre-review version), but Section 4 ("Using the Service") would be the more precisely correct home if this document is restructured again.
+
+Applied to both `terms-of-service.md` (internal, new changelog blockquote for v1.6) and `terms-of-service-external.md` (the file `/terms` actually renders) — verified live against the running dev server, heading renders directly above the guarantee paragraph as intended. **PDF/docx regenerated:** `Grant-Pathway-Terms-of-Service-v1.6.{pdf,docx}` via the established pandoc → docx → Word COM → PDF pipeline, 7 pages, sub-heading confirmed in both the table of contents and the body text. The superseded v1.5 files were deleted rather than archived, matching how the v1.4→v1.5 regeneration was handled the same way on 2026-08-05 — `docs/legal/archive/` holds only the much older v1.0 exports.
+
+**Privacy Policy is untouched** — this request was scoped to the Terms of Service only, and the privacy policy has no equivalent statement to relocate.
+
+---
+
 ## 2026-08-05 — GAP-31 built: the inactivity warning was sending thirty emails, not two
 
 **`P5.3b` item 2.** Two related reliability defects in the S8.3 inactivity crons, both raised on 2026-06-08 by the Knox "Idempotency" and "Graceful Degradation" reviews and both open since. Sequenced here because the fix needs a migration, and P5.4 pushes migrations to production — leaving it later means doing that push twice.
