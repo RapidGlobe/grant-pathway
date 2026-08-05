@@ -14,6 +14,7 @@
 
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@/lib/supabase/server'
 import { sendEmail } from '@/lib/emails/send'
 import { buildAccountDeletedByUserEmail } from '@/lib/emails/account-deleted-user'
@@ -137,7 +138,13 @@ export async function POST() {
         html: buildAccountDeletedByUserEmail(firstName),
       })
     } catch (emailErr) {
+      // The header comment above has said "logged to Sentry" since this route
+      // was written; until 2026-08-05 (GAP-31) only the console line existed.
       console.error('[delete-account] Confirmation email failed to send:', emailErr)
+      Sentry.captureException(emailErr, {
+        tags: { route: 'api/account/delete', step: 'sendEmail' },
+        extra: { userId },
+      })
     }
   }
 

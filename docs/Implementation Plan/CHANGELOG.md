@@ -10,6 +10,48 @@
 
 ---
 
+## 2026-08-05 — GAP-31 built: the inactivity warning was sending thirty emails, not two
+
+**`P5.3b` item 2.** Two related reliability defects in the S8.3 inactivity crons, both raised on 2026-06-08 by the Knox "Idempotency" and "Graceful Degradation" reviews and both open since. Sequenced here because the fix needs a migration, and P5.4 pushes migrations to production — leaving it later means doing that push twice.
+
+### What the audit said, and what was actually happening
+
+`ADR-TRACEABILITY.md`'s GAP-31 row described the first defect as: _"if Vercel fires the cron twice users receive the warning email twice."_ Reading `app/api/cron/inactivity-warning/route.ts` against its own schedule shows that framing understates it by an order of magnitude, and no double-fire is required.
+
+The route's eligibility test is a **range**, not a threshold: `lastSignIn >= now-24months && lastSignIn < now-23months`. A user who crosses into it stays inside it for **a whole month**. The cron runs **daily** (`"0 8 * * *"`). With nothing recording what had already been sent, the eligible set was recomputed from scratch every morning, so a charity in that window was emailed _"Your Grant Pathway account will be deleted in 30 days"_ on roughly **thirty consecutive mornings** — and the "in 30 days" was only true on the first of them, since the deletion date shown is computed from the user's last sign-in and drew steadily closer while the subject line did not change.
+
+**This was never ambiguous in the spec.** `docs/PRD inputs/email-notifications.md` states under Email 3: _"Only one inactivity warning email is sent per inactivity cycle."_ `PDR-DH-002` says _"Send a warning email"_, singular. The code did not do what either said. Recording this because the generalisable lesson is not about idempotency in the abstract: **a scheduled job whose eligibility test is a range rather than a threshold will re-match the same row on every run, and must record what it has already done.** The sibling deletion cron needs no such guard precisely because its test _is_ a threshold and deleting a deleted user is a no-op — which is why the audit correctly cleared it and why the difference is worth naming.
+
+### The guard
+
+New nullable `user_profiles.last_inactivity_warned_at` (migration `20260805000000_gap31_inactivity_warning_dedup.sql`). The cron sends only when it is null or **earlier than the user's `auth.users.last_sign_in_at`**, and stamps it after a successful send.
+
+Comparing against `last_sign_in_at` rather than clearing the column on login is what makes it self-healing: a user who signs in after being warned moves `last_sign_in_at` past the stamp, so if they go quiet for another 23 months they are warned again — no reset step, and **nothing added to the sign-in path**, which matters because the sign-in path was the subject of a live anti-enumeration fix as recently as yesterday and is not somewhere to add incidental writes.
+
+**The stamp is written after the send, not before, and that ordering is deliberate.** Stamping first would give at-most-once delivery: a failed send would leave a user marked as warned and never retried, and they would be deleted 30 days later having been told nothing. Stamping after gives at-least-once: the worst case is one repeat warning. A duplicate email is recoverable; a silent deletion is not. Send failures and stamp failures both now reach Sentry, so a stuck row is visible rather than inferred.
+
+### The second defect: deletion could delete in complete silence
+
+The register's second item was that Email 4's failure is _"caught silently"_. It is worse than a swallowed exception: **`lib/emails/send.ts` returns normally, without throwing, when `RESEND_API_KEY` is unset.** So in exactly the configuration where _every_ send fails, the route's `try/catch` never fired at all — no exception, no log beyond one line from the email helper, and every account the cron touched deleted with no notification and nothing raised. The audit's stated worst case (both warning and deletion emails fail → a user deleted with zero communication) was not a remote coincidence; it was one unset environment variable.
+
+Fixed the way `/api/account/delete` already did it: **a preflight that aborts with 503 before deleting anything** if the key is missing. Deletion is irreversible, so being unable to tell someone is a reason to stop, not something to discover afterwards. Per-user failures now also reach Sentry — send failure, auth-delete failure, and the case of a deleted account with no email address on file, each tagged by `route` and `step` (`ADR-OPS-005`).
+
+**One divergence found and closed in passing:** `app/api/account/delete/route.ts`'s header comment has read _"The email failure is logged to Sentry"_ since the route was written, and it was not — only `console.error` existed. The comment is now true rather than being quietly deleted.
+
+### Supporting changes
+
+- **`lib/inactivity.ts`** (new) holds the date arithmetic and both eligibility tests. `subMonths` had been copy-pasted verbatim into both routes; more to the point, the two crons run an hour apart against the same user list and **no user may ever be claimed by both**, which is a property of the pair, not of either file. A test asserts it across 800 days of possible sign-in dates. `lib/inactivity.ts` also documents two `Date` quirks left in place deliberately: short months roll forward rather than clamp (31 March − 1 month = 3 March), and `setMonth` works in local time so a DST-observing host shifts the resulting instant by an hour. Both move a retention boundary by at most a few days out of 23 months, and both crons inherit the same skew.
+- **`__tests__/inactivity.test.ts`** — 18 new tests, suite 127 → 145. Includes the boundary pair (exactly 23 months is not yet eligible; exactly 24 months is warned, not deleted), a simulation confirming the old window matched on 25+ consecutive daily runs, and a simulation confirming the guard reduces that to exactly one send.
+- **The migration states the `service_role` grant explicitly.** Migration `20260723000000`'s comment records that the four original tables carry `service_role` privileges "granted ad hoc, outside any tracked migration" — that omission on the newer tables broke account deletion live on 2026-07-23. The cron writes this column with the service-role client, so relying on untracked history to survive **P5.4's fresh production push** would repeat that failure on purpose.
+
+**One test assertion had to be corrected before it passed, and the correction is the finding.** The short-month case initially asserted a fixed ISO string and failed by exactly one hour — `setMonth` is local-time, and the machine is on BST. Re-asserted on local calendar components so the suite is timezone-independent, and the behaviour is now documented rather than accidental.
+
+### Not applied, and why
+
+The migration is **not yet applied to `grant-pathway-dev`**. `supabase link --project-ref` needs an interactive database-password prompt, so it cannot be issued from a session — the same constraint recorded on 2026-06-29 when WJ ran the production migration repair from a real terminal himself. The command is in `IMPLEMENTATION-STATUS.md`'s notes. Until it runs, the warning cron's profile lookup will fail against dev and return 500 with a Sentry event, which is the loud failure it was designed to have.
+
+---
+
 ## 2026-08-05 — GAP-25 built: Zod on every Server Action, and an ownership gap found in the process
 
 **`P5.3b` item 1, the first of the six spec deviations and the one ordered first because it is a security gap rather than polish.** `ADR-ARCH-003` states "Zod is used for input validation on all Server Actions and API Routes". Only `actions/charity.ts` did. `applications.ts` and `auth.ts` reached Supabase with unvalidated input, and had done since they were written.

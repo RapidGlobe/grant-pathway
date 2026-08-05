@@ -105,6 +105,13 @@ Email delivery is handled by Supabase Auth for authentication emails (Email 1 an
 - A single login at any point before the deletion date resets the inactivity clock and cancels the scheduled deletion
 - Only one inactivity warning email is sent per inactivity cycle
 
+**Enforcement note (added 2026-08-05, GAP-31).** The "only one per inactivity cycle" rule above was specified from the start but not enforced in code until now. The cron's eligibility test is a month-wide range checked daily, so an affected user was in fact emailed this warning on roughly thirty consecutive mornings. Guarded from 2026-08-05 by `user_profiles.last_inactivity_warned_at` — see `data-model.md` §6.
+
+Two clarifications the fix confirmed, since both bear on the copy above:
+
+- **The deletion date is computed from the user's last sign-in plus 24 months, not literally from the send date plus 30 days.** On the first eligible run these agree to within a day, which is why the note above reads as it does and remains accurate. They diverged only because of the repeat sends: by the thirtieth email the body showed a date a day away while the subject still said "in 30 days".
+- **A login does not "cancel" a scheduled deletion in the sense of clearing anything.** There is no queued job to cancel — both crons read `last_sign_in_at` live on each run, so signing in moves the user out of both windows. The same mechanism makes the new warning guard self-healing, because it is compared against `last_sign_in_at` rather than reset.
+
 ---
 
 ## Email 4 — Account Deleted (Inactivity)

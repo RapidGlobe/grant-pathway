@@ -12,17 +12,24 @@
 // Runs one hour after the warning cron to avoid edge-case race conditions.
 //
 // Authentication: Authorization: Bearer [CRON_SECRET] header (ADR-OPS-004).
+//
+// Email failure reporting (GAP-31, 2026-08-05): Email 4 failures were caught
+// and written to console.error only, so a charity could be deleted with no
+// communication at all and nothing would raise an alarm. Failures now reach
+// Sentry (ADR-OPS-005), and a missing RESEND_API_KEY aborts the run before
+// anything is deleted — lib/emails/send.ts returns silently rather than
+// throwing in that case, so the catch below would never have fired for it,
+// which is precisely the configuration under which every user this cron
+// touched would have been deleted in silence. Mirrors the preflight that
+// app/api/account/delete/route.ts already performs for user-initiated
+// deletion.
 
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { sendEmail } from '@/lib/emails/send'
 import { buildAccountDeletedInactivityEmail } from '@/lib/emails/account-deleted-inactivity'
-
-function subMonths(date: Date, months: number): Date {
-  const result = new Date(date)
-  result.setMonth(result.getMonth() - months)
-  return result
-}
+import { isDueForDeletion } from '@/lib/inactivity'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('Authorization')
@@ -32,15 +39,29 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Preflight: refuse to delete anything if we cannot tell anyone we did.
+  // Deletion is irreversible, so an unsendable Email 4 is a reason to stop,
+  // not something to discover afterwards in a log line nobody reads.
+  if (!process.env.RESEND_API_KEY) {
+    console.error(
+      '[inactivity-deletion] RESEND_API_KEY is not set — refusing to delete accounts we cannot notify',
+    )
+    Sentry.captureMessage('Inactivity deletion aborted: RESEND_API_KEY not set', {
+      level: 'error',
+      tags: { route: 'cron/inactivity-deletion', step: 'preflight' },
+    })
+    return NextResponse.json({ error: 'Service configuration error.' }, { status: 503 })
+  }
+
   const service = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   )
 
   const now = new Date()
-  const twentyFourMonthsAgo = subMonths(now, 24)
 
   let deleted = 0
+  let notifyFailed = 0
   let page = 1
 
   while (true) {
@@ -48,6 +69,9 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('[inactivity-deletion] Failed to list users:', error)
+      Sentry.captureException(error, {
+        tags: { route: 'cron/inactivity-deletion', step: 'listUsers' },
+      })
       return NextResponse.json({ error: 'Failed to list users.' }, { status: 500 })
     }
 
@@ -60,7 +84,7 @@ export async function GET(request: NextRequest) {
       if (!lastSignIn) continue
 
       // 24+ months of inactivity
-      if (lastSignIn < twentyFourMonthsAgo) {
+      if (isDueForDeletion(lastSignIn, now)) {
         const userId = user.id
         const firstName = (user.user_metadata?.first_name as string | undefined) ?? 'there'
         const email = user.email ?? ''
@@ -83,23 +107,43 @@ export async function GET(request: NextRequest) {
 
         if (authErr) {
           console.error(`[inactivity-deletion] Failed to delete auth user ${userId}:`, authErr)
+          Sentry.captureException(authErr, {
+            tags: { route: 'cron/inactivity-deletion', step: 'deleteAuthUser' },
+            extra: { userId },
+          })
           continue
         }
 
         console.log(`[inactivity-deletion] Deleted inactive user ${userId}`)
         deleted++
 
-        // Send Email 4 — fire and forget; log failure but continue
-        if (email) {
-          try {
-            await sendEmail({
-              to: email,
-              subject: 'Your Grant Pathway account has been deleted',
-              html: buildAccountDeletedInactivityEmail(firstName),
-            })
-          } catch (emailErr) {
-            console.error(`[inactivity-deletion] Email 4 failed for user ${userId}:`, emailErr)
-          }
+        // Send Email 4. The account is already gone and cannot be restored, so
+        // a send failure cannot fail the run — but it must be visible, because
+        // it means a charity's account was deleted without being told.
+        if (!email) {
+          console.error(`[inactivity-deletion] Deleted user ${userId} had no email address`)
+          Sentry.captureMessage('Account deleted for inactivity with no address to notify', {
+            level: 'error',
+            tags: { route: 'cron/inactivity-deletion', step: 'noEmailAddress' },
+            extra: { userId },
+          })
+          notifyFailed++
+          continue
+        }
+
+        try {
+          await sendEmail({
+            to: email,
+            subject: 'Your Grant Pathway account has been deleted',
+            html: buildAccountDeletedInactivityEmail(firstName),
+          })
+        } catch (emailErr) {
+          console.error(`[inactivity-deletion] Email 4 failed for user ${userId}:`, emailErr)
+          Sentry.captureException(emailErr, {
+            tags: { route: 'cron/inactivity-deletion', step: 'sendEmail' },
+            extra: { userId },
+          })
+          notifyFailed++
         }
       }
     }
@@ -108,6 +152,8 @@ export async function GET(request: NextRequest) {
     page++
   }
 
-  console.log(`[inactivity-deletion] Deleted ${deleted} inactive account(s)`)
-  return NextResponse.json({ deleted })
+  console.log(
+    `[inactivity-deletion] Deleted ${deleted} inactive account(s); ${notifyFailed} could not be notified`,
+  )
+  return NextResponse.json({ deleted, notifyFailed })
 }
