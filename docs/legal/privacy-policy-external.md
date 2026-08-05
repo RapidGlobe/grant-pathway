@@ -1,7 +1,9 @@
 # Grant Pathway — Privacy Policy
 
 **Version:** 1.6
+
 **Effective date: 5 August 2026**
+
 **Last updated: 5 August 2026**
 
 ---

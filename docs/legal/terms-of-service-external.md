@@ -1,7 +1,9 @@
 # Grant Pathway — Terms of Service
 
 **Version:** 1.5
+
 **Effective date: 5 August 2026**
+
 **Last updated: 5 August 2026**
 
 ---

@@ -1,7 +1,9 @@
 # Grant Pathway — Privacy Policy
 
 **Version:** 1.6
+
 **Effective date: 5 August 2026**
+
 **Last updated: 5 August 2026**
 
 > **Change from v1.5 (30 July 2026): the effective date is set — 5 August 2026.** It had read `[TO BE CONFIRMED]` since the policy was first published on 2 July 2026, which the 2026-07-29 Opus audit raised as finding **S2** and rated Severe: a published privacy policy with no effective date is not a defensible position for a registered data controller (ICO ZC168720), and it blocked external testers being asked to rely on it. **The date chosen is the date this text takes effect, not a future launch date.** The service has been live and in use by external testers at a hosted URL since before this change, so dating the policy from the day its current wording takes effect is accurate, where a future date would have claimed no policy was in force while people were already using the service. Go-live remains unscheduled (working estimate August–September 2026) and does not affect this date. Tracked as **S2a**; the independent legal review is **S2b** and remains open under `P5.1`. No other wording changed.

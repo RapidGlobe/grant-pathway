@@ -1,7 +1,9 @@
 # Grant Pathway — Terms of Service
 
 **Version:** 1.5
+
 **Effective date: 5 August 2026**
+
 **Last updated: 5 August 2026**
 
 > **Change from v1.4 (30 July 2026): the effective date is set — 5 August 2026.** It had read `[TO BE CONFIRMED]` since these terms were first published on 10 July 2026 — audit finding **S2**, rated Severe, and a blocker on asking external testers to accept them. **The date is the date this text takes effect, not a future launch date**, since the service is already live and in use at a hosted URL; a future date would have asserted that no terms were in force while people were using the service. Go-live remains unscheduled and does not affect this date. Tracked as **S2a**; the independent legal review is **S2b** and remains open under `P5.1`. No other wording changed.
