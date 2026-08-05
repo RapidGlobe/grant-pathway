@@ -6,7 +6,9 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { uuidSchema, requiredText, optionalText, answerTextSchema } from '@/lib/validation'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
 import {
   resolveGovernanceInserts,
@@ -18,6 +20,113 @@ import type { AiSummaryData } from '@/app/api/generate-summary/route'
 // ---------------------------------------------------------------------------
 // Shared types
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Input validation (GAP-25, ADR-ARCH-003)
+//
+// Added 2026-08-05. ADR-ARCH-003 states "Zod is used for input validation on all
+// Server Actions and API Routes"; this file had none. Every exported action
+// below now parses its arguments before touching the database.
+//
+// These are called as typed functions from Client Components, so TypeScript
+// makes the arguments look safe. It does not: a Server Action compiles to a POST
+// endpoint reachable by anyone who can send the same request, and TypeScript
+// types are erased at runtime. Next.js's Server Actions guide puts it plainly —
+// "Treat every action as an untrusted entry point."
+//
+// **What Zod does not do here, and what does it instead.** Schema validation
+// checks shape, never entitlement: a perfectly-formed UUID can name a row
+// belonging to somebody else. Ownership is enforced by re-reading the session
+// server-side with `auth.getUser()` and constraining every query with
+// `.eq('user_id', user.id)`, backed by RLS. That pattern was already present
+// throughout this file and is unchanged.
+//
+// It was, however, missing in exactly two places — see `assertOwnsApplication`.
+// ---------------------------------------------------------------------------
+
+const applicationIdSchema = z.object({ applicationId: uuidSchema })
+
+const answerIdSchema = z.object({ answerId: uuidSchema })
+
+const previousApplicationSchema = z.object({
+  currentApplicationId: uuidSchema,
+  funderName: optionalText,
+})
+
+const step1Schema = z.object({
+  applicationId: uuidSchema,
+  funderName: requiredText('Please enter who is offering this grant'),
+  grantName: requiredText('Please enter the name of the grant'),
+  // Optional, but must be a real id when supplied — this one selects a previous
+  // application whose questions, guidelines and summary get cloned in (P6.5).
+  reuseFromApplicationId: uuidSchema.optional(),
+})
+
+const manualGovernanceSchema = z.object({
+  applicationId: uuidSchema,
+  // Membership of GOVERNANCE_FIELD_KEYS is still checked below, after parsing —
+  // that list is the authority on which facts exist, and duplicating it as a Zod
+  // enum here would create a second copy to keep in step.
+  fieldKeys: z.array(z.string()).min(1, 'Please select at least one item to add.'),
+})
+
+const saveAnswerSchema = z.object({
+  answerId: uuidSchema,
+  answerText: answerTextSchema,
+  // 'ai_generated' is deliberately absent: the charity-authored model has no
+  // code path that generates an answer from scratch, so accepting that value
+  // would let a crafted request mislabel an answer's provenance on a document
+  // that goes to a funder.
+  answerSource: z.enum(['user_edited', 'user_written']),
+})
+
+const manualAnswerSchema = z.object({
+  applicationId: uuidSchema,
+  questionText: requiredText('Please enter your application question.'),
+  answerText: answerTextSchema,
+})
+
+/**
+ * Confirms the authenticated user owns the named application.
+ *
+ * **Why this exists — the one place RLS does not cover.** `application_items`
+ * RLS keys entirely on `user_id` (`20260714000000_p6_2_application_item_graph.sql`),
+ * so an insert carrying the caller's own `user_id` satisfies it *regardless of
+ * which application the row points at*. Two actions —`saveManualAnswer` and
+ * `addManualGovernanceItems` — write `application_items` rows using an
+ * `application_id` supplied by the caller, and neither checked that the caller
+ * owns it. Every other action in this file constrains its query with
+ * `.eq('id', applicationId).eq('user_id', user.id)`, which makes a foreign id
+ * simply match nothing; these two do not, because they insert rather than update.
+ *
+ * The exposure is integrity and availability, not disclosure. A crafted call
+ * could not read or overwrite another charity's answer — the SELECT and UPDATE
+ * policies both filter on `user_id`, so the victim's rows stay invisible and
+ * untouchable. But `unique (application_id, item_order)` is a table constraint
+ * and is enforced independently of RLS, so a caller could occupy
+ * `(victim_application_id, item_order)` and make the victim's own upsert at that
+ * position fail against a row they can neither see nor remove.
+ *
+ * Found 2026-08-05 while implementing GAP-25, prompted by the Next.js Server
+ * Actions guide's warning that schema validation "only checks the shape of the
+ * input" — which is exactly the hole Zod alone would have left open here.
+ * Verification that this is now closed belongs to `GAP-17`, P5.2's cross-user
+ * RLS test.
+ */
+async function assertOwnsApplication(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  applicationId: string,
+  userId: string,
+): Promise<boolean> {
+  const { data } = await supabase
+    .from('applications')
+    .select('id')
+    .eq('id', applicationId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  return data !== null
+}
 
 export type ApplicationStatus = 'not_started' | 'in_progress' | 'approved' | 'exported' | 'mismatch'
 
@@ -99,6 +208,9 @@ export type DeleteApplicationResult = { ok: true } | { ok: false; error: string 
  * rows — the .eq('user_id', user.id) filter is belt-and-braces.
  */
 export async function deleteApplication(applicationId: string): Promise<DeleteApplicationResult> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -154,6 +266,9 @@ export async function getPreviousApplicationForFunder(
   currentApplicationId: string,
   funderName: string,
 ): Promise<PreviousApplicationOption | null> {
+  const parsed = previousApplicationSchema.safeParse({ currentApplicationId, funderName })
+  if (!parsed.success) return null
+
   const supabase = await createClient()
 
   const {
@@ -291,6 +406,29 @@ export async function saveApplicationStep1(
   grantName: string,
   reuseFromApplicationId?: string,
 ): Promise<{ ok: false; error: string }> {
+  const parsed = step1Schema.safeParse({
+    applicationId,
+    funderName,
+    grantName,
+    reuseFromApplicationId,
+  })
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Please check your answers.' }
+  }
+
+  // Use the parsed values, not the raw arguments. `requiredText` trims, and the
+  // trimmed value is the one that must be stored: `getPreviousApplicationForFunder`
+  // matches a previous application by trimmed, case-insensitive `funder_name`, so
+  // saving " Henry Smith Charity " here would silently stop P6.5's reuse prompt
+  // ever offering that application again. Validating and then writing the
+  // unvalidated value is the standard way schema validation gets bypassed by
+  // accident.
+  const {
+    funderName: parsedFunderName,
+    grantName: parsedGrantName,
+    reuseFromApplicationId: parsedReuseId,
+  } = parsed.data
+
   const supabase = await createClient()
 
   const {
@@ -308,17 +446,17 @@ export async function saveApplicationStep1(
       .eq('user_id', user.id)
       .single()
 
-    const newStep = reuseFromApplicationId
+    const newStep = parsedReuseId
       ? Math.max(existing?.current_step ?? 1, 3)
       : Math.max(existing?.current_step ?? 1, 2)
 
     const { error } = await supabase
       .from('applications')
       .update({
-        funder_name: funderName,
-        grant_name: grantName,
+        funder_name: parsedFunderName,
+        grant_name: parsedGrantName,
         current_step: newStep,
-        ...(reuseFromApplicationId ? { status: 'in_progress' as const } : {}),
+        ...(parsedReuseId ? { status: 'in_progress' as const } : {}),
       })
       .eq('id', applicationId)
       .eq('user_id', user.id)
@@ -327,8 +465,8 @@ export async function saveApplicationStep1(
       return { ok: false, error: 'Could not save your application. Please try again.' }
     }
 
-    if (reuseFromApplicationId) {
-      await cloneApplicationForReuse(supabase, user.id, reuseFromApplicationId, applicationId)
+    if (parsedReuseId) {
+      await cloneApplicationForReuse(supabase, user.id, parsedReuseId, applicationId)
     }
   } catch {
     // Network error or Supabase unavailable
@@ -338,7 +476,7 @@ export async function saveApplicationStep1(
     }
   }
 
-  redirect(`/applications/${applicationId}/step/${reuseFromApplicationId ? 3 : 2}`)
+  redirect(`/applications/${applicationId}/step/${parsedReuseId ? 3 : 2}`)
 }
 
 // ---------------------------------------------------------------------------
@@ -359,6 +497,9 @@ export async function saveApplicationStep1(
  * only when the DB update fails.
  */
 export async function advanceToStep3(applicationId: string): Promise<{ ok: false; error: string }> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -413,6 +554,9 @@ export async function advanceToStep3(applicationId: string): Promise<{ ok: false
  * only when the DB update fails.
  */
 export async function advanceToStep4(applicationId: string): Promise<{ ok: false; error: string }> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -474,6 +618,9 @@ export async function advanceToStep4(applicationId: string): Promise<{ ok: false
 export async function setApplicationMismatch(
   applicationId: string,
 ): Promise<{ ok: false; error: string }> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -512,6 +659,9 @@ export async function setApplicationMismatch(
 export async function setDraftInProgress(
   applicationId: string,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -689,6 +839,11 @@ export async function addManualGovernanceItems(
   applicationId: string,
   fieldKeys: GovernanceFieldKey[],
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  const parsed = manualGovernanceSchema.safeParse({ applicationId, fieldKeys })
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Please check your selection.' }
+  }
+
   const supabase = await createClient()
 
   const {
@@ -696,6 +851,13 @@ export async function addManualGovernanceItems(
   } = await supabase.auth.getUser()
 
   if (!user) redirect('/')
+
+  // Ownership check: this action INSERTS application_items rows rather than
+  // updating them, so RLS (which keys on user_id alone) would accept a row
+  // pointing at somebody else's application. See assertOwnsApplication.
+  if (!(await assertOwnsApplication(supabase, applicationId, user.id))) {
+    return { ok: false, error: 'That application could not be found.' }
+  }
 
   const validFieldKeys = fieldKeys.filter((key) => GOVERNANCE_FIELD_KEYS.includes(key))
 
@@ -751,6 +913,9 @@ export async function saveAnswer(
   answerText: string,
   answerSource: 'user_edited' | 'user_written',
 ): Promise<SaveAnswerResult> {
+  const parsed = saveAnswerSchema.safeParse({ answerId, answerText, answerSource })
+  if (!parsed.success) return { ok: false, error: 'Could not save your answer. Please try again.' }
+
   const supabase = await createClient()
 
   const {
@@ -786,6 +951,9 @@ export async function saveAnswer(
  * subsequently edits the answer (handled client-side via unapproveAnswer).
  */
 export async function approveAnswer(answerId: string): Promise<SaveAnswerResult> {
+  const parsed = answerIdSchema.safeParse({ answerId })
+  if (!parsed.success) return { ok: false, error: 'That answer could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -818,6 +986,11 @@ export async function saveManualAnswer(
   questionText: string,
   answerText: string,
 ): Promise<SaveAnswerResult> {
+  const parsed = manualAnswerSchema.safeParse({ applicationId, questionText, answerText })
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Please check your answer.' }
+  }
+
   const supabase = await createClient()
 
   const {
@@ -826,8 +999,11 @@ export async function saveManualAnswer(
 
   if (!user) return { ok: false, error: 'You must be signed in.' }
 
-  if (!questionText.trim()) {
-    return { ok: false, error: 'Please enter your application question.' }
+  // Ownership check — same reasoning as addManualGovernanceItems: this is an
+  // upsert into application_items, and RLS alone does not check that
+  // application_id belongs to the caller. See assertOwnsApplication.
+  if (!(await assertOwnsApplication(supabase, applicationId, user.id))) {
+    return { ok: false, error: 'That application could not be found.' }
   }
 
   const { error } = await supabase.from('application_items').upsert(
@@ -867,6 +1043,9 @@ export async function saveManualAnswer(
 export async function setDraftReadyToAssemble(
   applicationId: string,
 ): Promise<{ ok: false; error: string }> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -914,6 +1093,9 @@ export type AssembleAndAdvanceResult = { ok: true } | { ok: false; error: string
  * requires allAnswered), but the assembly is robust to partial completion.
  */
 export async function assembleAndAdvance(applicationId: string): Promise<AssembleAndAdvanceResult> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -1001,6 +1183,9 @@ export type ApproveApplicationResult = { ok: true } | { ok: false; error: string
  * updated_at is managed by the database trigger on both tables.
  */
 export async function approveApplication(applicationId: string): Promise<ApproveApplicationResult> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {
@@ -1042,6 +1227,9 @@ export type ReopenApplicationResult = { ok: true } | { ok: false; error: string 
  * updated_at is managed by the database trigger on both tables.
  */
 export async function reopenApplication(applicationId: string): Promise<ReopenApplicationResult> {
+  const parsed = applicationIdSchema.safeParse({ applicationId })
+  if (!parsed.success) return { ok: false, error: 'That application could not be found.' }
+
   const supabase = await createClient()
 
   const {

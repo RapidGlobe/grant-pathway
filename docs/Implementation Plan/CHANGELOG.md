@@ -10,6 +10,40 @@
 
 ---
 
+## 2026-08-05 — GAP-25 built: Zod on every Server Action, and an ownership gap found in the process
+
+**`P5.3b` item 1, the first of the six spec deviations and the one ordered first because it is a security gap rather than polish.** `ADR-ARCH-003` states "Zod is used for input validation on all Server Actions and API Routes". Only `actions/charity.ts` did. `applications.ts` and `auth.ts` reached Supabase with unvalidated input, and had done since they were written.
+
+**Now validated: all 15 input-taking actions in `applications.ts` and all 7 in `auth.ts`.** `createApplication` and `signOut` take no arguments, so 22 of 24 exported actions carry a schema and the other two have nothing to check. Shared schemas live in a new **`lib/validation.ts`**, with **26 new unit tests** in `__tests__/validation.test.ts` (suite 101 → 127).
+
+**The password policy now has one definition instead of four.** It was written out independently in `register-form.tsx`, `reset-password-form.tsx` and `account-settings-form.tsx` — three identical copies of `length < 12 || !/[a-zA-Z]/ || !/[0-9]/` — plus prose in `NFR-04`. The PRD's own 0.3 and 0.4 revisions record a live front-end/back-end password inconsistency being found and fixed once already, so this is a fourth-instance-waiting-to-happen. `lib/validation.ts` is now the single source; a test asserts both the length and the exact user-facing message, so a future divergence fails CI rather than reaching a user. **The three client components still hold their own copies** — deliberately not refactored here, because mixing a security fix with a UI refactor makes both harder to review, and those copies are currently _correct_. That is a follow-up, not a defect.
+
+### The ownership gap, which Zod alone would not have closed
+
+**Found because `AGENTS.md` §1's mandatory documentation check was actually run.** Next.js's Server Actions guide states plainly that schema validation "only checks the _shape_ of the input. A well-formed `Item` object can still refer to a row the caller does not own." That prompted checking entitlement as well as shape across all 24 actions — and 22 of them were already sound, constraining every query with `.eq('id', …).eq('user_id', user.id)` so a foreign id simply matches nothing.
+
+**Two were not.** `saveManualAnswer` and `addManualGovernanceItems` write `application_items` rows using an `application_id` supplied by the caller, and because they **insert** rather than update, there is no `user_id` filter to make a foreign id miss. `application_items` RLS keys entirely on `user_id` (`20260714000000_p6_2_application_item_graph.sql`), so a row carrying the caller's own `user_id` satisfies the INSERT policy **regardless of which application it points at**.
+
+**The exposure is integrity and availability, not disclosure**, and it is worth being precise rather than alarming: a crafted call could not read or overwrite another charity's answer, because the SELECT and UPDATE policies both filter on `user_id`, leaving the victim's rows invisible and untouchable. But `unique (application_id, item_order)` is a **table constraint, enforced independently of RLS** — so a caller could occupy `(victim_application_id, item_order)` and make the victim's own upsert at that position fail against a row they can neither see nor delete. A new `assertOwnsApplication` helper closes it in both actions. **Verification belongs to `GAP-17`**, P5.2's cross-user RLS test, which now has a specific case to exercise rather than a general intention.
+
+### Two judgement calls worth recording, because both could have made things worse
+
+**Sign-in validates presence only — not the password policy, and not email format.** Applying the 12-character rule there would lock out any account created before the 2026-06-29 hardening (VQ-009); applying strict RFC email validation would lock out any address whose format this regex and the one that accepted it at registration disagree about. Neither buys anything: the values go straight to GoTrue, which validates them itself. On a login path, a false rejection is worse than a permissive check.
+
+**`requestPasswordReset` returns `{ status: 'sent' }` even for a malformed address.** `AC-FR-05-02` requires that action to return the same result unconditionally so it cannot be used to probe which addresses are registered. Returning a validation error for malformed input would have introduced an observable behavioural difference — a smaller leak than confirming registration, but the same kind. Similarly, `signIn` returns its existing generic `credentials` error rather than a distinct "invalid input" state, per `AC-FR-04-03`.
+
+**No new error states anywhere.** Every schema failure maps onto a member of the action's existing result union, so no client component changed and no user can reach an unhandled state.
+
+### One bug caught by auditing rather than assuming
+
+After wiring everything, a check that validated values were actually _used_ — not merely validated — found `saveApplicationStep1` parsing its input and then writing the **raw** `funderName` and `grantName` to the database. Validating and then using the unvalidated value is the standard way schema validation gets bypassed by accident. It also mattered beyond tidiness: `getPreviousApplicationForFunder` matches a previous application on a **trimmed**, case-insensitive `funder_name`, so saving `" Henry Smith Charity "` would have silently stopped P6.5's reuse prompt ever offering that application again. Now uses the parsed values throughout.
+
+**Verified:** type-check, lint, **127 tests**, and `prettier --check` all clean. **Sign-in re-checked live against the running dev server** — valid input still passes the new schema, reaches Supabase, and returns the correct generic anti-enumeration message, with no console errors. The malformed-input server path is covered by unit tests rather than end-to-end, because client-side validation blocks it before it can be reached through the UI — which is precisely why the server-side check needed to exist.
+
+`ADR-ARCH-003`'s consequence is now discharged; `ADR-TRACEABILITY.md` → v2.19, with `GAP-25` moved from 📋 tasked to ✅ built.
+
+---
+
 ## 2026-08-05 — Legal effective dates set, closing audit finding S2a
 
 **Both live legal documents now carry a real effective date: 5 August 2026.** They had read `Effective date: [TO BE CONFIRMED]` since first publication — the Privacy Policy since 2 July 2026, the Terms since 10 July — which the Opus audit raised as **S2** and rated **Severe**, on the grounds that a published privacy policy with no effective date is not a defensible position for a registered data controller (ICO ZC168720), and that it blocked asking external testers to rely on either document. S2 split into **S2a** (set the dates, needs no solicitor) and **S2b** (the independent review). **S2a is now closed. S2b remains open and is the only thing still holding `P5.1`.**

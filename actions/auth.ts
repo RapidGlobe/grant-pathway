@@ -7,9 +7,98 @@
 import * as Sentry from '@sentry/nextjs'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { resendRatelimit } from '@/lib/rate-limit'
+import { emailSchema, passwordSchema, nameSchema } from '@/lib/validation'
 import type { EmailOtpType } from '@supabase/supabase-js'
+
+// ---------------------------------------------------------------------------
+// Input validation (GAP-25, ADR-ARCH-003)
+//
+// Added 2026-08-05. ADR-ARCH-003 requires Zod validation on all Server Actions;
+// this file had none, so `FormData` values reached Supabase Auth unchecked.
+// Every action below now parses its input before doing any work.
+//
+// Two deliberate choices about how failures are reported:
+//
+//   1. **No new error states.** Each schema failure maps onto a member of the
+//      action's existing result union, so no client component changes and no
+//      user can reach an unhandled state. A password-rule failure returns the
+//      existing `weak_password` (which is what it is, and is already rendered
+//      with the right message); anything else returns the existing generic
+//      failure.
+//
+//   2. **Anti-enumeration behaviour is preserved exactly.** `signIn` returns its
+//      single generic `credentials` error for malformed input, and
+//      `requestPasswordReset` still returns `{ status: 'sent' }` — see the note
+//      on that action. A validation error that distinguished "malformed" from
+//      "wrong" would hand back information AC-FR-04-03 and AC-FR-05-02 exist to
+//      withhold.
+//
+// These actions are reached from forms that validate client-side first, so in
+// normal use these schemas never fail. That is the point: the client check is a
+// courtesy to the user, and this is the security boundary. Next.js's Server
+// Actions guide is explicit that render-time gating is not a boundary, because
+// the action is reachable by anyone who can send the same POST.
+// ---------------------------------------------------------------------------
+
+const registerSchema = z.object({
+  firstName: nameSchema,
+  lastName: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+  feedbackConsent: z.boolean(),
+})
+
+const confirmEmailSchema = z
+  .object({
+    code: z.string(),
+    tokenHash: z.string(),
+    // The Supabase `EmailOtpType` union, spelled out so an arbitrary string
+    // cannot reach verifyOtp. Previously this was a bare `as EmailOtpType` cast,
+    // which asserts a type without checking one.
+    type: z.enum(['signup', 'invite', 'magiclink', 'recovery', 'email_change', 'email']).nullable(),
+  })
+  // verifyOtp needs both token_hash and type; exchangeCodeForSession needs code.
+  // Neither being present was previously handled by a synthetic error object
+  // further down; rejecting it here means the action never proceeds on input it
+  // cannot act on.
+  .refine((v) => v.code !== '' || (v.tokenHash !== '' && v.type !== null), {
+    message: 'Neither code nor token_hash supplied',
+  })
+
+const emailOnlySchema = z.object({ email: emailSchema })
+
+const passwordOnlySchema = z.object({ password: passwordSchema })
+
+/**
+ * Sign-in validates **presence only** — deliberately not the password policy,
+ * and deliberately not RFC email format.
+ *
+ * Not the password policy, because existing accounts predate the 2026-06-29
+ * hardening (VQ-009) and a 6-character password created before then must still
+ * be able to sign in; rejecting it here would lock the user out of the account
+ * rather than protecting it.
+ *
+ * Not the email format, for the same shape of reason: format validation on the
+ * login path buys nothing — the value is only ever handed to GoTrue, which
+ * validates it too — while any disagreement between this regex and the one that
+ * accepted the address at registration locks a real user out. Presence is the
+ * useful check here; correctness is GoTrue's to judge.
+ */
+const signInSchema = z.object({
+  email: z.preprocess(
+    (value) => (typeof value === 'string' ? value.trim() : value),
+    z.string().min(1).max(320),
+  ),
+  password: z.string().min(1),
+})
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: passwordSchema,
+})
 
 // ---------------------------------------------------------------------------
 // S0.1 — Registration
@@ -36,12 +125,25 @@ export async function registerUser(
   _prevState: RegisterState,
   formData: FormData,
 ): Promise<RegisterState> {
-  const firstName = ((formData.get('firstName') as string | null) ?? '').trim()
-  const lastName = ((formData.get('lastName') as string | null) ?? '').trim()
-  const email = (formData.get('email') as string | null) ?? ''
-  const password = (formData.get('password') as string | null) ?? ''
-  // Checkbox value is 'on' when checked, null when unchecked (standard HTML behaviour)
-  const feedbackConsent = formData.get('feedbackConsent') === 'on'
+  const parsed = registerSchema.safeParse({
+    firstName: formData.get('firstName') ?? '',
+    lastName: formData.get('lastName') ?? '',
+    email: formData.get('email') ?? '',
+    password: formData.get('password') ?? '',
+    // Checkbox value is 'on' when checked, null when unchecked (standard HTML behaviour)
+    feedbackConsent: formData.get('feedbackConsent') === 'on',
+  })
+
+  if (!parsed.success) {
+    // A password-rule failure is reported as what it is, using the state the
+    // form already renders with the correct message. Anything else (missing
+    // name, malformed email) can only be a direct POST or a client-side
+    // regression, so it gets the generic state rather than a new one.
+    const passwordFailed = parsed.error.issues.some((issue) => issue.path[0] === 'password')
+    return { error: passwordFailed ? 'weak_password' : 'unknown' }
+  }
+
+  const { firstName, lastName, email, password, feedbackConsent } = parsed.data
 
   // Use the request origin to build the emailRedirectTo URL so the
   // verification link in the email points to our /auth/callback route.
@@ -130,17 +232,27 @@ export async function confirmEmail(
   _prevState: ConfirmEmailState,
   formData: FormData,
 ): Promise<ConfirmEmailState> {
-  const code = (formData.get('code') as string | null) ?? ''
-  const tokenHash = (formData.get('token_hash') as string | null) ?? ''
-  const type = formData.get('type') as EmailOtpType | null
+  const parsed = confirmEmailSchema.safeParse({
+    code: formData.get('code') ?? '',
+    tokenHash: formData.get('token_hash') ?? '',
+    type: formData.get('type') ?? null,
+  })
+
+  // Covers the case previously handled by a synthetic error object below
+  // ("called with neither code nor token_hash"), plus a `type` that is not a
+  // real EmailOtpType — which the old `as EmailOtpType` cast asserted without
+  // checking.
+  if (!parsed.success) {
+    return { error: 'invalid' }
+  }
+
+  const { code, tokenHash, type } = parsed.data
 
   const supabase = await createClient()
 
   const { error } = code
     ? await supabase.auth.exchangeCodeForSession(code)
-    : tokenHash && type
-      ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type })
-      : { error: { message: 'confirmEmail called with neither code nor token_hash' } }
+    : await supabase.auth.verifyOtp({ token_hash: tokenHash, type: type as EmailOtpType })
 
   if (error) {
     return { error: 'invalid' }
@@ -185,7 +297,21 @@ export async function requestPasswordReset(
   _prevState: PasswordResetRequestState,
   formData: FormData,
 ): Promise<PasswordResetRequestState> {
-  const email = (formData.get('email') as string | null) ?? ''
+  const parsed = emailOnlySchema.safeParse({ email: formData.get('email') ?? '' })
+
+  // A malformed address returns { status: 'sent' } exactly as a valid one does,
+  // and simply skips the Supabase call. This is deliberate: AC-FR-05-02 requires
+  // this action to return the same result unconditionally so it can never be
+  // used to probe which addresses are registered. Returning a validation error
+  // here would be a behavioural difference an attacker could observe — a
+  // smaller leak than confirming registration, but the same kind, and there is
+  // no reason to introduce it. There is nothing useful to tell the user either:
+  // the page has already told them to check their inbox.
+  if (!parsed.success) {
+    return { status: 'sent' }
+  }
+
+  const { email } = parsed.data
   const origin = (await headers()).get('origin') ?? ''
 
   const supabase = await createClient()
@@ -219,7 +345,16 @@ export async function resetPassword(
   _prevState: ResetPasswordState,
   formData: FormData,
 ): Promise<ResetPasswordState> {
-  const password = (formData.get('password') as string | null) ?? ''
+  const parsed = passwordOnlySchema.safeParse({ password: formData.get('password') ?? '' })
+
+  // The only possible failure is the password policy, and `weak_password` is
+  // both accurate and already rendered by ResetPasswordForm with the correct
+  // message — so no new state is needed.
+  if (!parsed.success) {
+    return { status: 'weak_password' }
+  }
+
+  const { password } = parsed.data
 
   const supabase = await createClient()
 
@@ -287,9 +422,24 @@ export type SignInState = {
 export async function signIn(_prevState: SignInState, formData: FormData): Promise<SignInState> {
   // Trimmed defensively: a trailing space or newline picked up from a copy-paste
   // (mobile clipboards in particular) otherwise turns a correct password into
-  // a silent invalid_credentials failure. Found live, 2026-07-28.
-  const email = ((formData.get('email') as string | null) ?? '').trim()
-  const password = ((formData.get('password') as string | null) ?? '').trim()
+  // a silent invalid_credentials failure. Found live, 2026-07-28. The email
+  // trim now happens inside signInSchema; the password trim stays here because
+  // the schema deliberately does not touch the password value.
+  const parsed = signInSchema.safeParse({
+    email: formData.get('email') ?? '',
+    password: ((formData.get('password') as string | null) ?? '').trim(),
+  })
+
+  // Returns the same generic `credentials` error as a wrong password would.
+  // AC-FR-04-03 requires one indistinguishable message across wrong password,
+  // unknown email and rate limiting; a separate "invalid input" state would let
+  // a caller tell malformed input apart from rejected input, which is the
+  // beginning of the enumeration this rule exists to prevent.
+  if (!parsed.success) {
+    return { error: 'credentials' }
+  }
+
+  const { email, password } = parsed.data
 
   const supabase = await createClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
@@ -344,6 +494,17 @@ export async function changePassword(
   currentPassword: string,
   newPassword: string,
 ): Promise<ChangePasswordResult> {
+  const parsed = changePasswordSchema.safeParse({ currentPassword, newPassword })
+
+  if (!parsed.success) {
+    // An empty current password is reported as `wrong_password`, which is
+    // honest — it is not the user's password — and avoids a new state. A new
+    // password failing the policy is `weak_password`, already rendered by
+    // AccountSettingsForm with the right message.
+    const newPasswordFailed = parsed.error.issues.some((issue) => issue.path[0] === 'newPassword')
+    return { status: newPasswordFailed ? 'weak_password' : 'wrong_password' }
+  }
+
   const supabase = await createClient()
 
   const {
@@ -404,9 +565,16 @@ export async function resendVerificationEmail(
   _prevState: ResendState,
   formData: FormData,
 ): Promise<ResendState> {
-  const email = ((formData.get('email') as string | null) ?? '').trim()
+  const raw = ((formData.get('email') as string | null) ?? '').trim()
 
-  if (!email) return { status: 'missing_email' }
+  // Empty keeps its existing, more specific state; malformed falls to the
+  // generic one. Both are already handled by VerifyEmailResendForm.
+  if (!raw) return { status: 'missing_email' }
+
+  const parsed = emailOnlySchema.safeParse({ email: raw })
+  if (!parsed.success) return { status: 'error' }
+
+  const { email } = parsed.data
 
   // App-level rate limit (3/hour per email) — Supabase also enforces its own
   // server-side rate limit, but this gives us deterministic UI feedback.
