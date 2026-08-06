@@ -10,6 +10,36 @@
 
 ---
 
+## 2026-08-06 — Built: GAP-42, GAP-43, GAP-44 and GAP-45 (package A + the help deep-links)
+
+**The first code to land from the Stony Stratford review.** Everything below was logged earlier the same day and specified before a line was written.
+
+### What changed
+
+**Step 4's sub-heading (`GAP-42`, `GAP-43`).** Now reads _"Answer each question below. Your answers are saved automatically. You can close this page at any time and continue from your dashboard."_, with the free-form branch carrying the equivalent. Two changes in one string: the false "as you type" is gone, and the resumability sentence that was never there is in. The wording stops deliberately short of "return to the exact point" — return is to the step, not the question.
+
+**A per-answer "Saved" confirmation (`GAP-44`, `AC-FR-18-05`).** Fires on every successful save — blur, the 60-second sweep, and the flush before approve alike — and clears itself after 2.5 seconds with nothing to dismiss. It sits on governance `£` fields too, which carry no word counter: those are answers as much as narrative ones, and a figure typed into a field the user is unsure about is exactly where reassurance is wanted. Teal with a tick, against the red "Not saved." alert above it — a failure is something to act on, a success something to notice and forget.
+
+**Contextual help deep-links (`GAP-45`).** The nav Help button opens the help page for the current screen via `usePathname()` and a new `helpPathForRoute()` in `lib/help-centre.ts` — which finally calls `helpCentreUrl(path)`, the helper written for exactly this and never once invoked with a path. Footer and dashboard empty-state links still open the root, deliberately.
+
+### Two things worth recording from the build itself
+
+**A lint failure caught a real problem, not a style nit.** Extracting the "Saved" logic into a `markSaved()` helper made `react-hooks/exhaustive-deps` demand `doSave` as a dependency of the 60-second sweep effect — because the rule does not propagate stability through a component-scope function, so `doSave` calling one made `doSave` itself look unstable. Adding it to the dependency array would have **restarted the 60-second interval on every render**, quietly breaking the background save this whole package is about reassuring users over. The logic is inlined into `doSave` instead, which keeps it touching only setState and refs. Lint was clean before the change, so this was introduced and then caught rather than pre-existing — worth noting because `--max-warnings 0` is what made it visible at all.
+
+**All eight GitBook targets were fetched live, not inferred.** The sitemap gives canonical URLs, but a slug that parses is not the same as a page that exists. Each of the eight was fetched and its title confirmed against the expected page before the map was written. Guessing here would have been worse than doing nothing: a wrong path 404s, where the previous root landing at least worked.
+
+### Verification, and what is not verified
+
+`npm run type-check`, `lint` (`--max-warnings 0`) and `prettier --check` all clean. **18 new tests, suite 145 → 163:** ten in `__tests__/help-centre.test.ts` pinning the route→page map (including `/account/delete` not falling through to `/account`, and the exact Step 4 URL that was confirmed live), and eight in `__tests__/step4-save-reassurance.test.tsx` covering both sub-heading branches, the "Saved" tick appearing and self-clearing, its presence on a governance field, and per-answer independence. Two of those tests assert absence deliberately — that "as you type" never returns, and that the copy never promises a return to the exact question — because `GAP-43` was a wording defect that a loose assertion would let straight back in.
+
+⚠️ **Not verified in a browser.** Step 4 and the authenticated nav are behind sign-in, and the author does not enter credentials, so the visual result is unconfirmed by eye. What _was_ checked live on the running dev server: the public nav and footer Help links still resolve to the help centre root, which is the intended behaviour. **`help-and-tooltips-test-plan.md` HT-06 (now "not yet executed" rather than "not runnable") and a look at Step 4 are WJ's to run.**
+
+### Documents updated
+
+`ADR-TRACEABILITY.md` → **v2.26**, all four GAPs ✅ BUILT. `PRD-Grant-Pathway.md` → **v0.68**, clearing the "agreed, not yet built" flags added earlier the same day in §7 and FR-18. `acceptance-criteria.md` — `AC-FR-18-05` marked built, and **`AC-FR-49-01` amended** for the deep-links, with a note recording the one risk that cannot be engineered away. `design-requirements.md` §7.8 and `ui-inventory-and-data-contracts.md` both cleared. `help-and-tooltips-test-plan.md` → **v2.2**.
+
+---
+
 ## 2026-08-06 — GAP-45: the Help button always lands on the front page, and the deep-linking helper it needs already exists
 
 **Raised by WJ. Logged with a verified slug map; not built.**

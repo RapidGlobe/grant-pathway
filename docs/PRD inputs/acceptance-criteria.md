@@ -1009,7 +1009,7 @@ Two options were put to WJ (see the earlier draft of AC-FR-18-05). The narrower 
 
 **Why it covers background saves too, which required amending AC-FR-18-02.** WJ was offered a narrower option that would have left the 60-second sweep silent and needed no criterion changed. He chose the broader one deliberately: **a nervous user who steps away mid-sentence without moving focus is exactly the user this is for**, and the narrower option leaves that user with no signal at all. See AC-FR-18-02's amendment note for the full reasoning and for what was preserved from the original rule.
 
-**Not yet built** as of 2026-08-06 — logged as `GAP-44`, no covering task.
+**Built 2026-08-06** (`GAP-44`) — a per-answer "Saved" tick on every save path, governance fields included, clearing itself after 2.5s. Covered by `__tests__/step4-save-reassurance.test.tsx`; live confirmation is `help-and-tooltips-test-plan.md` HT-06 plus a look at Step 4.
 
 ---
 
@@ -2587,6 +2587,10 @@ _Added 2026-07-25. `PDR-UI-008` (help centre link + contextual tooltips) was bui
 - **When** I look for a way to get help
 - **Then** I find a "Help" link in the relevant navigation (public nav when signed out, authenticated nav when signed in), in the global footer, and — when signed in with zero applications — in the dashboard empty-state copy
 - **And** clicking any of these links opens the help centre in a **new browser tab**, leaving the Grant Pathway tab untouched
+- **And** _(added 2026-08-06, `GAP-45`)_ the **authenticated nav** link opens the help page for the screen I am on — Step 4 opens "Writing and editing an answer", Step 2 opens "Uploading funder guidelines", and so on — falling back to the help centre root on any screen with no page of its own
+- **And** the footer and dashboard empty-state links continue to open the **root**, deliberately: they are general-purpose, whereas the nav button means "help me with _this_ screen"
+
+**Note on the deep-link map (`GAP-45`, built 2026-08-06).** Every route→page pair lives in `ROUTE_HELP_PAGES` in `lib/help-centre.ts`, and all eight targets were fetched live and confirmed to resolve before the mapping was written. **The residual risk is not in this codebase:** the help centre is an external GitBook, so a page renamed there silently 404s one route's Help button, nothing in CI can detect it, and no runtime fallback is possible because a GitBook 404 is invisible to the app. `help-and-tooltips-test-plan.md` HT-06 is the only check that catches it, and is a standing re-run whenever the help centre is restructured.
 
 ---
 
@@ -2628,6 +2632,7 @@ _Added 2026-07-25. `PDR-UI-008` (help centre link + contextual tooltips) was bui
 
 ---
 
+_Last updated: 2026-08-06 (later) — **AC-FR-18-05 built, and AC-FR-49-01 amended for `GAP-45`’s contextual help deep-links.** The authenticated nav Help button now opens the help page for the current screen (Step 4 → "Writing and editing an answer"), falling back to the root where no page applies; footer and dashboard empty-state links deliberately still open the root. All eight targets were fetched live and confirmed before the mapping was written; the residual risk is external GitBook renames, which only `help-and-tooltips-test-plan.md` HT-06 can catch._
 _Last updated: 2026-08-06 — **AC-FR-18-02 amended and AC-FR-18-05 added, both on user feedback** (`GAP-44`). AC-FR-18-02's requirement that a background save show "no visible save indicator" is **withdrawn**; AC-FR-18-05 now requires every successful save to be visibly confirmed, including the 60-second sweep. WJ decided this after observing a real first-time user complete a Stony Stratford application with nothing on screen to suggest her work would survive leaving the page — **silence reads as "nothing is happening", not "everything is fine"**. He was offered a narrower option that would have left the sweep silent and changed no criterion, and chose the broader one deliberately, because a user who steps away mid-sentence without moving focus is exactly the nervous user this is for. What survives from the original rule: the confirmation must not interrupt, steal focus, or need dismissing. AC-FR-18-04's note rewritten — it described itself as an exception to a silence rule that no longer exists. Not built; logged as `GAP-44`._
 _Last updated: 2026-07-25 — added Section 9.12 in full (FR-49, `PDR-UI-008`), five new acceptance criteria (AC-FR-49-01 to 05) covering the help centre link and all 9 built contextual tooltips, written after live testing completed (`help-and-tooltips-test-plan.md` v2.0) rather than at build time, so the criteria reflect the final simplified (no-persistence) behaviour rather than the reversed v1 design._
 _Last updated: 2026-07-17_

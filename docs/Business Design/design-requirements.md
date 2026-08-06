@@ -942,7 +942,7 @@ The inline expansion is used because approval is reversible — the user can re-
 
 - Progress saved every 60 seconds during active editing, and on field blur
 - Progress also saved on "Continue"
-- **Amended 2026-08-06 (`GAP-44`, WJ):** every successful save is visibly confirmed, including the background sweep. This **reverses** the previous requirement — "No visible indicator for background auto-save (avoids distraction)" — after a real first-time user was observed completing an application with nothing on screen to suggest her work would survive leaving the page. Distraction is the lesser risk: **silence reads as "nothing is happening", not "everything is fine"**, and a nervous user given no signal assumes the worst. The confirmation must be unobtrusive — no modal, no focus theft, nothing to dismiss — and visually distinct from the "Not saved." failure alert. See `AC-FR-18-02` and `AC-FR-18-05`. **Not yet built.**
+- **Amended 2026-08-06 (`GAP-44`, WJ):** every successful save is visibly confirmed, including the background sweep. This **reverses** the previous requirement — "No visible indicator for background auto-save (avoids distraction)" — after a real first-time user was observed completing an application with nothing on screen to suggest her work would survive leaving the page. Distraction is the lesser risk: **silence reads as "nothing is happening", not "everything is fine"**, and a nervous user given no signal assumes the worst. The confirmation must be unobtrusive — no modal, no focus theft, nothing to dismiss — and visually distinct from the "Not saved." failure alert. See `AC-FR-18-02` and `AC-FR-18-05`. **Built 2026-08-06.**
 - If session expires, most-recent save is restored on next sign-in
 
 ---

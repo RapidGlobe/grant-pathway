@@ -120,6 +120,13 @@ interface ApplicationStep4DraftProps {
  * original guidelines" panel itself. */
 const CITATION_LABEL_MAX_LENGTH = 90
 
+/** How long a "Saved" confirmation stays on screen before clearing itself
+ * (AC-FR-18-05). Module scope, not component scope: a per-render const makes
+ * `markSaved` — and through it `doSave` — look unstable to
+ * react-hooks/exhaustive-deps, which then demands `doSave` as a dependency of
+ * the 60-second sweep effect and would restart the interval on every render. */
+const SAVED_INDICATOR_MS = 2500
+
 function truncateLabel(label: string, maxLength: number): string {
   if (label.length <= maxLength) return label
   const truncated = label.slice(0, maxLength)
@@ -261,6 +268,15 @@ export function ApplicationStep4Draft({
   // Set when a save fails at transport level rather than returning a result —
   // version skew or an expired session. Opus audit M8.
   const [saveError, setSaveError] = useState<string | null>(null)
+  // Per-answer "Saved" confirmation (AC-FR-18-05, GAP-44). Fires on every
+  // successful save — blur, the 60-second sweep, and the flush before approve
+  // alike. AC-FR-18-02 used to forbid any indicator on background saves; WJ
+  // withdrew that on 2026-08-06 after watching a first-time user hesitate to
+  // leave the screen, on the reasoning that silence reads as "nothing is
+  // happening" rather than "everything is fine". What survives from the old
+  // rule is that this must not interrupt: it appears, it clears itself, there
+  // is nothing to dismiss and focus is never moved.
+  const [recentlySaved, setRecentlySaved] = useState<Record<string, boolean>>({})
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
 
@@ -294,6 +310,7 @@ export function ApplicationStep4Draft({
   latestAnswers.current = answers
   const dirtyRef = useRef<Set<string>>(new Set())
   const pendingSaves = useRef(0)
+  const savedTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   // FR-32/FR-33: progress bar and gate use approved count, not just answered count
   const approvedCount = questions.filter((q) => approved[q.id]).length
@@ -350,6 +367,16 @@ export function ApplicationStep4Draft({
 
   // ── Auto-save ─────────────────────────────────────────────────────────────
 
+  // Clear pending indicator timers on unmount so none fires setState against a
+  // component that has gone (e.g. the user navigates away right after a save).
+  useEffect(() => {
+    const timers = savedTimers
+    return () => {
+      for (const timer of Object.values(timers.current)) clearTimeout(timer)
+      timers.current = {}
+    }
+  }, [])
+
   async function doSave(
     answerId: string,
     text: string,
@@ -362,6 +389,24 @@ export function ApplicationStep4Draft({
       // A save getting through clears any earlier failure notice — the user has
       // recovered (usually by reloading) and the banner would now be misleading.
       setSaveError(null)
+      // "Saved" confirmation (AC-FR-18-05). Inlined rather than extracted to a
+      // helper on purpose: react-hooks/exhaustive-deps does not propagate
+      // stability through a component-scope function, so calling one from here
+      // would make `doSave` itself look unstable and force it into the
+      // 60-second sweep effect's dependency array — restarting the interval on
+      // every render. Touching only setState and refs keeps `doSave` stable.
+      setRecentlySaved((prev) => ({ ...prev, [answerId]: true }))
+      // Restart rather than stack: a fast second save must not have its tick
+      // cleared early by the first save's timer still running.
+      clearTimeout(savedTimers.current[answerId])
+      savedTimers.current[answerId] = setTimeout(() => {
+        setRecentlySaved((prev) => {
+          const next = { ...prev }
+          delete next[answerId]
+          return next
+        })
+        delete savedTimers.current[answerId]
+      }, SAVED_INDICATOR_MS)
     } catch {
       // Previously silent, on the reasoning that blur would retry on the next
       // edit. It does — but if the cause is version skew or an expired session
@@ -805,9 +850,18 @@ export function ApplicationStep4Draft({
 
       <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
       <p className="mb-6 text-[14px] text-[#64748B]">
+        {/* GAP-42/GAP-43. Two changes from the previous copy, both deliberate:
+            "as you type" is gone because it was false — saving is on blur plus
+            a 60-second sweep, so up to a minute of typing can be lost, which
+            AC-FR-18-03 explicitly accepts; and the resumability sentence is new,
+            because nothing on this screen ever told the user a part-written
+            application can be abandoned and picked up later. "Continue from
+            your dashboard" must not be strengthened to "return to the exact
+            point" — return is to the step, not the question, so on a long
+            question list the user still has to scroll to find their place. */}
         {funderType === 'free_form'
-          ? 'Write your content for each section below. Your work is saved automatically as you type.'
-          : 'Answer each question below. Your work is saved automatically as you type.'}
+          ? 'Write your content for each section below. Your work is saved automatically. You can close this page at any time and continue from your dashboard.'
+          : 'Answer each question below. Your answers are saved automatically. You can close this page at any time and continue from your dashboard.'}
       </p>
 
       {/* AI limit banners */}
@@ -1072,19 +1126,40 @@ export function ApplicationStep4Draft({
                 />
               )}
 
-              {/* Word count — narrative questions/sections only, governance items have no limit */}
-              {!isGovernanceItem && (
-                <p
-                  className={`mt-1 text-right text-[12px] ${
-                    isOver ? 'text-[#DC2626]' : isNear ? 'text-[#D97706]' : 'text-[#94A3B8]'
-                  }`}
-                  aria-live="polite"
+              {/* Save confirmation + word count.
+                  The "Saved" tick (AC-FR-18-05) sits on every item type,
+                  governance fields included — they are answers too, and a £
+                  figure typed into a field the user is nervous about is
+                  exactly where the reassurance is wanted. The word count is
+                  narrative-only, since governance items carry no limit.
+                  Deliberately teal and iconographic against the red "Not
+                  saved." alert above: a failure is something to act on, a
+                  success is something to notice and forget. */}
+              <div className="mt-1 flex items-center justify-between gap-3">
+                <span
+                  role="status"
+                  className="flex items-center gap-1 text-[12px] font-medium text-[#0D6E6E]"
                 >
-                  {limit
-                    ? `${count} / ${limit} ${useChars ? 'characters' : 'words'}`
-                    : `${words} words`}
-                </p>
-              )}
+                  {recentlySaved[q.id] && (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      Saved
+                    </>
+                  )}
+                </span>
+                {!isGovernanceItem && (
+                  <p
+                    className={`text-right text-[12px] ${
+                      isOver ? 'text-[#DC2626]' : isNear ? 'text-[#D97706]' : 'text-[#94A3B8]'
+                    }`}
+                    aria-live="polite"
+                  >
+                    {limit
+                      ? `${count} / ${limit} ${useChars ? 'characters' : 'words'}`
+                      : `${words} words`}
+                  </p>
+                )}
+              </div>
 
               {/* Refine answer — non-budget narrative questions only; AI assist doesn't apply to governance facts */}
               {!q.isBudgetQuestion && !isGovernanceItem && (
