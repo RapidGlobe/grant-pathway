@@ -1,7 +1,7 @@
 // Deletion of a user's in-flight guideline uploads from the `guidelines-temp`
 // Storage bucket, for the two account-deletion paths (S8.2, S8.3).
 //
-// Added 2026-08-05. PDR-DH-002's "data deleted on inactivity closure" list has
+// Added 2026-08-06. PDR-DH-002's "data deleted on inactivity closure" list has
 // always named "uploaded funder guideline files (Supabase Storage)", but neither
 // deletion path touched Storage. The files were left entirely to the
 // cleanup-guidelines cron (S4.4), which removes anything older than an hour,

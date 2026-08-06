@@ -10,7 +10,7 @@
 
 ---
 
-## 2026-08-05 — GAP-47 built: account deletion now deletes the Storage files it always claimed to; the documented path for them never existed (GAP-48)
+## 2026-08-06 — GAP-47 built: account deletion now deletes the Storage files it always claimed to; the documented path for them never existed (GAP-48)
 
 Raised as a spec/code mismatch: `PDR-DH-002`'s "data deleted on inactivity closure" list has named _"uploaded funder guideline files (Supabase Storage)"_ since 2026-04-16, but neither deletion path — `app/api/account/delete/route.ts` (S8.2) nor `app/api/cron/inactivity-deletion/route.ts` (S8.3) — deleted anything from Storage. Both removed database rows only. `data-model.md` §6 had carried a note recording the mismatch rather than resolving it.
 
@@ -44,11 +44,285 @@ The same wrong assumption is baked into the schema. The three `guidelines-temp` 
 
 **Deliberately not fixed in this pass.** Changing a security control deserves its own task, ADR sweep and test rather than riding along on a documentation correction — bundling is how the wrong comment got there in the first place. Recommendation recorded for when it is picked up: **repoint the policies at the flat prefix rather than drop them**, since nothing depends on them today but they are a useful tripwire for whoever later adds a client-side Storage call and reasonably assumes they work. The applied migration was corrected by **comment only** — no SQL touched; a real fix needs a new migration.
 
+### These were first numbered GAP-39 and GAP-40 — read the next entries down carefully
+
+**Two sessions ran on 2026-08-06 and both allocated `GAP-39` and `GAP-40`, for entirely unrelated things.** The entries immediately below this one use those numbers for the extraction-rule work (merged sub-questions, dropped short-answer questions). This session used them for the Storage-deletion mismatch and the inert RLS policies, and has renumbered to **`GAP-47`** and **`GAP-48`**. The other session's numbering stands: it reached `master` first and is cited by its own commits and documents.
+
+**Both sessions checked the register before allocating, and both checks were correct against the tree each could see.** This one ran in a git worktree branched from `53ede57`; the other session's commits were not in it, so GAP-38 was genuinely the highest number present, with nothing to indicate the register was a day stale. That is the lesson worth keeping: **the GAP sequence is a single shared counter with no reservation step, so reading the register is not enough — it has to be read against a freshly fetched `origin/master`.** A worktree, or any branch that has not fetched, shows a stale register that looks authoritative.
+
+Recorded here rather than only in `ADR-TRACEABILITY.md` because the confusing artefact is this file: four consecutive entries dated the same day, two of which discuss a different `GAP-39`/`GAP-40` from the two directly above them.
+
 ### Not changed, on purpose
 
 `AC-FR-41-03` deliberately omits uploaded guidelines from the deleted-data list shown on the confirmation screen (corrected 2026-07-13, consistent with `FR-22`). That stays: these files exist for seconds during extraction and are not user-visible saved data, so listing them would imply a persistence the product does not have. Recorded in `PDR-DH-002` so nobody reconciles the two lists by editing the screen.
 
-Docs updated: `PDR-DH-002` (implementation note), `data-model.md` §6 and §7, `technical-design.md` (retention cascade), `ADR-TRACEABILITY.md` (`GAP-47` resolved, `GAP-48` raised), `regression-test-plan.md` (RT-14 Storage step), `TEST-DASHBOARD.md`, `AGENTS.md` §1. `npm run type-check`, `lint`, and `test` (**159** tests, up from 145) all pass.
+Docs updated: `PDR-DH-002` (implementation note), `data-model.md` §6 and §7, `technical-design.md` (retention cascade), `ADR-TRACEABILITY.md` (`GAP-47` resolved, `GAP-48` raised), `regression-test-plan.md` (RT-14 Storage step), `TEST-DASHBOARD.md`, `AGENTS.md` §1. `npm run type-check`, `lint`, and `test` (**205** tests, up from 191) all pass — counted after merging the parallel session's work, which had taken the suite to 191 on its own.
+
+---
+
+## 2026-08-06 — Package C: GAP-39 and GAP-40 rules rewritten, and deliberately not signed off
+
+**Code complete. Not behaviourally verified, and the distinction is the point of this entry.**
+
+### GAP-39 — fixed at the level of the principle, not with a third exception
+
+The extraction rule excluded "data-entry fields (name, address, phone, email, website, charity number, dates, postcode)". That list is about **administrative identity and contact details** — the things a form fills in from a record. But it _read_ as though it were about **answer length**, and that is how three separate questions were dropped across three funders: a project funding amount (MK Community Foundation), a funding-amount row in a table (Idlewild), and now a beneficiary count and a project duration (Stony Stratford).
+
+Both earlier instances were closed by adding a budget-shaped exception beside the list. **Being the sole exception is exactly why the third case had nothing to appeal to** — a beneficiary count is neither a contact detail nor a budget figure, so it fell through a gap that had been narrowed twice without ever being closed.
+
+The rule now states outright that **the test is what a question is about, never how long its answer is**; names the cases that were lost (people reached or served, project duration, start and end dates, sessions or places provided); forbids dropping a question solely because its answer is a number, date, duration or quantity; and ends with "when in doubt, extract". Budget and cost questions are recast as **a case of that rule rather than an exception to it**.
+
+The TABLE FORMAT skip-list carried its own independent copy of the flaw — which is precisely why the Idlewild instance survived the MK Community Foundation fix made the same day — and is now explicitly subordinated to the same principle, with a note that it exists to remove contact details, consents and uploads, **not short answers**.
+
+### GAP-40 — the missing rule, and why the existing one didn't bind
+
+The prompt already said, verbatim, "DO NOT MERGE ADJACENT QUESTIONS… never combine two related-but-distinct questions into one". §10's a) and b) merged anyway.
+
+The likely reason is worth recording, because it is not disobedience: **neither sub-part reads as a complete question on its own.** The form has a shared stem — "Please state what you hope to have achieved:" — above "a) Six months after receiving a grant" and "b) Twelve months after receiving a grant". Extracting b) alone produces a fragment, so merging looks like the only way to produce something coherent.
+
+The fix supplies the missing option: **combine the stem with each sub-part** to form a self-contained question for each. It also closes the escape hatch by name ("do NOT merge them on the grounds that a sub-part cannot stand alone") and adds that **a bare section heading is not a question** — which keeps §1 "PURPOSE OF APPLICATION"'s correct non-extraction correct, rather than inviting an over-correction in the other direction.
+
+### Why this is not marked done
+
+**Nine new prompt tests, suite 176 → 185** — and every one of them asserts that a rule is present and correctly framed. **A prompt test cannot tell you what the model does with the prompt.** They will catch a future edit that reintroduces length-based reasoning; they prove nothing about whether §4e now appears.
+
+A live extraction against the Stony Stratford form was attempted, to check behaviour directly. **It could not run: the AWS credentials in `.env.local` are rejected by Bedrock with a 403 signature mismatch** — correctly shaped at 20 and 40 characters, so almost certainly rotated since they were entered by hand on 2026-08-04. `AWS_REGION` is empty in that file too (harmless, the client defaults to `eu-west-2`). **This blocks all local AI testing, not just this check**, and is worth fixing independently of package C.
+
+So `GAP-39` and `GAP-40` are 🔵, not ✅, and `guideline-capability-matrix-test-plan.md` GCM-06 stays **Fail** with the capability matrix **🔴** on the dashboard. What a re-run must confirm: §4 produces six cards including §4e and §4f, §10 produces two — **and GCM-01 to GCM-05 still pass**, because a rule loosened to stop dropping short answers is exactly the change that could start extracting contact details and consent boxes instead.
+
+### A document was truncated and restored during this work
+
+`ADR-TRACEABILITY.md` was briefly emptied. A scripted edit opened it with mode `'w'` — which truncates on open — and then raised a `UnicodeEncodeError` before writing anything; a follow-up script read the now-empty file and wrote it back. The empty version was committed in `fd80101` and pushed. Caught while starting package C, restored from `77dc577`, and the lost v2.27 content (GAP-41's built status, the GAP-46 row) re-applied. Scripted whole-file rewrites of that register now assert on line count and output size before writing. No other document was affected — all eleven touched today were checked.
+
+---
+
+## 2026-08-06 — Built: GAP-41, and the check it demanded found GAP-46
+
+**Package B. The fix took ten lines; the check attached to it found a second defect that would have made the fix look broken.**
+
+### GAP-41 — the Word export now keeps every line break
+
+`app/api/export/[applicationId]/route.ts` passed each whole answer to the `docx` library as a **single `TextRun`**, and that library ignores `\n` inside a run. Every paragraph break, blank line and hyphen bullet an applicant typed was silently discarded. The helper now splits on `\n` and emits one run per line with `break: 1` on all but the first — soft line breaks _within_ one paragraph, so the existing paragraph spacing is untouched. CRLF is normalised first, so an answer pasted from a Windows-authored document doesn't gain a blank line between every real one.
+
+**The helper moved to `lib/docx-text.ts`, and that is not tidiness.** It previously lived inside the route handler, where nothing could test it — which is part of why this shipped and then survived a passing RT-09.
+
+### The verification is the interesting part
+
+The tests generate a **real `.docx`**, unzip it, and count `<w:br/>` in the WordprocessingML. That was a deliberate choice: the defect was invisible at the level of "did we pass the right string", because **the string was always right**. It only existed in the file.
+
+Running the old code path the same way confirms it exactly — **zero `<w:br/>` elements**, with the answer sitting in a single node as `<w:t xml:space="preserve">one\ntwo\nthree</w:t>`. The newlines were in the XML all along; WordprocessingML simply treats a literal newline inside `<w:t>` as whitespace. Any assertion that stopped at the run level would have passed against the broken code — **which is precisely how `regression-test-plan.md` RT-09 passed over this bug on 2026-07-28.**
+
+### GAP-46 — "Help me improve this" was instructed to destroy the layout
+
+`GAP-41`'s task note said to check the refine round-trip in the same pass. **The check found a real defect, not a clean bill.**
+
+`buildRefinePrompt()` opens by asking the model to _"Improve the **structure**, flow, and clarity of their answer"_ and said nothing anywhere about preserving line or paragraph structure. "Structure" reads naturally as licence to reflow a deliberately bulleted, blank-line-separated answer into running prose.
+
+**Why this mattered so much to `GAP-41`.** Had only the export been fixed, an applicant who laid an answer out carefully and then clicked "Help me improve this" would have had that layout flattened one step earlier — in the database — and the export would then have faithfully reproduced the flattened version. The bug would have appeared to persist. The export fix would have looked unreliable rather than simply incomplete, and the obvious next move would have been to re-investigate the export, which was by then correct.
+
+Not hypothetical for this user: the real Stony Stratford answer that exposed `GAP-41` is exactly the shape at risk — a bulleted facilities list, a "Funding to Date" block and a worked calculation, on a question that offers the refine button.
+
+**The fix** adds an explicit `PRESERVE THE APPLICANT'S LAYOUT` instruction naming what must survive, and **disambiguates the word that caused the problem**: "structure" means argument, order and sentence construction, never visual layout. Explicit prohibitions on reflowing a list into a running sentence, merging paragraphs, and adding layout the applicant did not use — plus a line on _why_, since charities lay answers out to fit a funder's form and that layout is part of their work.
+
+### Verification
+
+**13 new tests, suite 163 → 176.** Nine in `__tests__/docx-text.test.ts` (five on the runs, four on the packed document, including the real applicant answer as a fixture), four in `__tests__/prompts.test.ts` — one of which asserts the layout instruction survives **all three** word-limit branches, because the over-limit branch tells the model to cut content and is where it is most tempted to restructure wholesale. Type-check, lint (`--max-warnings 0`) and `prettier --check` all clean.
+
+⚠️ **RT-09 stays Pass (caveat) and still needs a human.** No automated test opens the finished document in Word, and the original defect was found by a person reading her own download. `regression-test-plan.md` → **v2.13**, D-015 closed in code with the manual re-run still outstanding; the plan stays 🟡 on the dashboard until WJ runs it.
+
+---
+
+## 2026-08-06 — Built: GAP-42, GAP-43, GAP-44 and GAP-45 (package A + the help deep-links)
+
+**The first code to land from the Stony Stratford review.** Everything below was logged earlier the same day and specified before a line was written.
+
+### What changed
+
+**Step 4's sub-heading (`GAP-42`, `GAP-43`).** Now reads _"Answer each question below. Your answers are saved automatically. You can close this page at any time and continue from your dashboard."_, with the free-form branch carrying the equivalent. Two changes in one string: the false "as you type" is gone, and the resumability sentence that was never there is in. The wording stops deliberately short of "return to the exact point" — return is to the step, not the question.
+
+**A per-answer "Saved" confirmation (`GAP-44`, `AC-FR-18-05`).** Fires on every successful save — blur, the 60-second sweep, and the flush before approve alike — and clears itself after 2.5 seconds with nothing to dismiss. It sits on governance `£` fields too, which carry no word counter: those are answers as much as narrative ones, and a figure typed into a field the user is unsure about is exactly where reassurance is wanted. Teal with a tick, against the red "Not saved." alert above it — a failure is something to act on, a success something to notice and forget.
+
+**Contextual help deep-links (`GAP-45`).** The nav Help button opens the help page for the current screen via `usePathname()` and a new `helpPathForRoute()` in `lib/help-centre.ts` — which finally calls `helpCentreUrl(path)`, the helper written for exactly this and never once invoked with a path. Footer and dashboard empty-state links still open the root, deliberately.
+
+### Two things worth recording from the build itself
+
+**A lint failure caught a real problem, not a style nit.** Extracting the "Saved" logic into a `markSaved()` helper made `react-hooks/exhaustive-deps` demand `doSave` as a dependency of the 60-second sweep effect — because the rule does not propagate stability through a component-scope function, so `doSave` calling one made `doSave` itself look unstable. Adding it to the dependency array would have **restarted the 60-second interval on every render**, quietly breaking the background save this whole package is about reassuring users over. The logic is inlined into `doSave` instead, which keeps it touching only setState and refs. Lint was clean before the change, so this was introduced and then caught rather than pre-existing — worth noting because `--max-warnings 0` is what made it visible at all.
+
+**All eight GitBook targets were fetched live, not inferred.** The sitemap gives canonical URLs, but a slug that parses is not the same as a page that exists. Each of the eight was fetched and its title confirmed against the expected page before the map was written. Guessing here would have been worse than doing nothing: a wrong path 404s, where the previous root landing at least worked.
+
+### Verification, and what is not verified
+
+`npm run type-check`, `lint` (`--max-warnings 0`) and `prettier --check` all clean. **18 new tests, suite 145 → 163:** ten in `__tests__/help-centre.test.ts` pinning the route→page map (including `/account/delete` not falling through to `/account`, and the exact Step 4 URL that was confirmed live), and eight in `__tests__/step4-save-reassurance.test.tsx` covering both sub-heading branches, the "Saved" tick appearing and self-clearing, its presence on a governance field, and per-answer independence. Two of those tests assert absence deliberately — that "as you type" never returns, and that the copy never promises a return to the exact question — because `GAP-43` was a wording defect that a loose assertion would let straight back in.
+
+⚠️ **Not verified in a browser.** Step 4 and the authenticated nav are behind sign-in, and the author does not enter credentials, so the visual result is unconfirmed by eye. What _was_ checked live on the running dev server: the public nav and footer Help links still resolve to the help centre root, which is the intended behaviour. **`help-and-tooltips-test-plan.md` HT-06 (now "not yet executed" rather than "not runnable") and a look at Step 4 are WJ's to run.**
+
+### Documents updated
+
+`ADR-TRACEABILITY.md` → **v2.26**, all four GAPs ✅ BUILT. `PRD-Grant-Pathway.md` → **v0.68**, clearing the "agreed, not yet built" flags added earlier the same day in §7 and FR-18. `acceptance-criteria.md` — `AC-FR-18-05` marked built, and **`AC-FR-49-01` amended** for the deep-links, with a note recording the one risk that cannot be engineered away. `design-requirements.md` §7.8 and `ui-inventory-and-data-contracts.md` both cleared. `help-and-tooltips-test-plan.md` → **v2.2**.
+
+---
+
+## 2026-08-06 — GAP-45: the Help button always lands on the front page, and the deep-linking helper it needs already exists
+
+**Raised by WJ. Logged with a verified slug map; not built.**
+
+WJ's question was simple: pressing **Help** from Step 4 should open "Writing and editing an answer", not the help centre front page a user then has to navigate from.
+
+**The plumbing has been there all along and was never connected.** `lib/help-centre.ts` exposes `helpCentreUrl(path)` specifically for this, and its header comment names the use case almost word for word — _"future deep-linking (e.g. linking Step 2's upload screen straight to the relevant help page) a one-line call site rather than a redesign."_ But `nav-authenticated.tsx` links to the bare `HELP_CENTRE_BASE_URL` constant instead of calling the helper, so **the function built for deep-linking is unused at precisely the place that most needs it.** The only caller anywhere in the codebase is `dashboard-empty.tsx`, and it passes no path. `nav-authenticated.tsx` is already `'use client'`, so `usePathname()` supplies the current route with no prop drilling — the change is a route map in `lib/help-centre.ts` plus one lookup in the nav.
+
+**Slugs fetched and verified rather than guessed.** The live GitBook sitemap was read (21 pages) and the Step 4 target fetched to confirm it resolves to a real page rather than a 404. Guessed slugs would have been worse than the current behaviour: a wrong path 404s, where today's root landing at least works.
+
+| Screen                      | Help page (path relative to the base URL)           |
+| --------------------------- | --------------------------------------------------- |
+| `/applications/new`, Step 1 | `applications/choosing-your-funder-and-grant`       |
+| Step 2                      | `applications/uploading-funder-guidelines`          |
+| Step 3                      | `applications/reviewing-the-ai-summary`             |
+| **Step 4**                  | **`writing-answers/writing-and-editing-an-answer`** |
+| Step 5                      | `finishing-up/final-review`                         |
+| `/profile`                  | `getting-started/setting-up-your-charity-profile`   |
+| `/account`                  | `account-settings/changing-your-password`           |
+| `/account/delete`           | `account-settings/deleting-your-account`            |
+
+**Two decisions left open for WJ.** `/dashboard` has no clean match — nearest is `reference-and-faqs/application-status-labels`, and the default is to leave it on the root. And the public routes could deep-link too (`/register` → `getting-started/creating-your-account`, sign-in and forgot-password → `getting-started/signing-in`), but WJ scoped this to the authenticated nav, so they are recorded rather than assumed.
+
+**Deliberately not deep-linked:** the footer "Help centre" link and the dashboard empty-state link stay on the root. They are general-purpose; the nav button is the "help me with _this_ screen" affordance.
+
+**Six of the 21 help pages cover Step 4 alone** — writing-and-editing, word-and-character-limits, getting-ai-help, sections-with-financial-information, adding-a-financial-or-governance-detail, approving-answers. One nav link can only target one. Landing the user in the right _section_ and letting GitBook's own sidebar carry them the rest of the way is the intended outcome, not a shortfall — worth stating so it is not later mistaken for incomplete work.
+
+**⚠️ A maintenance risk that needs to be owned, not implied.** The help centre is an external GitBook. Today a broken URL is one obvious failure anyone would notice; with nine deep links, a page renamed on the GitBook side silently 404s one route's Help button. **Nothing in CI can catch this**, and there is no client-side fallback available — a GitBook 404 is invisible to the app, so we cannot detect it and drop back to the root. Two mitigations, both cheap and both now in place: the entire map lives in `lib/help-centre.ts` so there is one file to check, and **`help-and-tooltips-test-plan.md` gains HT-06** (v2.1) — click Help on every screen, confirm the right page, re-run whenever the help centre is restructured. HT-06 is written now and marked **not runnable** until the feature exists, so the coverage cannot be forgotten between logging and building.
+
+**Documentation consequence for build time:** `AC-FR-49-01` says clicking Help "opens the help centre in a new browser tab" and will need to read _the relevant page of_ the help centre. It is accurate today and deliberately left unchanged until the behaviour changes.
+
+---
+
+## 2026-08-06 — AC-FR-18-02's silence rule withdrawn: every successful save will be visibly confirmed
+
+**Decided by WJ the same day `GAP-44` was raised. Six statements of the old rule across four live documents amended in one pass. No code changed.**
+
+`GAP-44` surfaced a conflict rather than a straightforward gap: adding the save confirmation WJ wanted would violate `AC-FR-18-02`, which required that during a background auto-save "no visible save indicator is shown to the user". That was a deliberate decision, not an oversight — `AC-FR-18-04`'s 2026-07-29 amendment had already carved **failures** out of the silence rule and pointedly left success alone.
+
+Two options were put to WJ. The narrower one — confirm blur and explicit saves, keep the 60-second sweep silent — would have delivered the reassurance while satisfying every existing criterion unamended, and was the recommendation.
+
+**WJ chose the broader option: amend `AC-FR-18-02` and confirm every save, sweep included.** His reasoning is a product judgement worth preserving in full, because it overturns the assumption the original rule rested on:
+
+> Silence was chosen to avoid nagging the user with an indicator firing every 60 seconds regardless of what they were doing. Weighed against a real applicant's hesitancy to close a browser tab containing hours of writing, that is the lesser concern. **Silence reads as "nothing is happening", not "everything is fine"** — a nervous user given no signal assumes the worst. And the user who steps away mid-sentence _without_ moving focus is precisely the nervous user this is for; the narrower option is the one that leaves them with nothing.
+
+**What survives from the withdrawn rule.** Its intent — do not get in the user's way — is now a constraint written into `AC-FR-18-05`: the confirmation must not interrupt typing, steal focus, or require dismissal, and must be visually distinct from `AC-FR-18-04`'s "Not saved." alert, which is an alert the user must act on rather than a confirmation they need not. Only the assumption that silence was the way to achieve that intent has been dropped.
+
+**Amended as a class, not an instance.** The rule appeared in **six statements across four live documents**, and all six were changed together rather than only the one that prompted the question:
+
+- `acceptance-criteria.md` — `AC-FR-18-02` rewritten with a full amendment note; `AC-FR-18-04`'s "Note on the deliberate exception to AC-FR-18-02" rewritten, since it described itself as an exception to a rule that no longer exists; `AC-FR-18-05` promoted from draft to criterion
+- `PRD-Grant-Pathway.md` (**v0.67**) — FR-18's implementation notes and Section 7's auto-save line
+- `docs/Business Design/design-requirements.md` §7.8 — "No visible indicator for background auto-save (avoids distraction)" reversed with the reasoning recorded
+- `docs/Business Design/ui-inventory-and-data-contracts.md` — the cross-step auto-save statement
+
+This project has now recorded the fix-the-instance-not-the-class failure seven times, most recently in `GAP-43` earlier the same day. Amending one statement and leaving five contradicting it would have been the eighth.
+
+**`AC-FR-18-05` (now a criterion, not a draft):** every successful save is visibly confirmed — blur, background sweep and explicit alike — unobtrusively, without stealing focus or needing dismissal, and visually distinct from the failure alert. **Not built.** `GAP-42`, `GAP-43` and `GAP-44` all remain open with no covering task.
+
+---
+
+## 2026-08-06 — Step 4 never says you can stop and come back: GAP-42, GAP-43, GAP-44
+
+**Raised by WJ after watching his wife work through a real application. All three approved, none built — one of them cannot be built until WJ rules on a spec conflict.**
+
+WJ's observation was narrow and correct: Step 4 has an Approve action on every card and a sticky "N of N questions approved" bar, and between them the screen reads as _finish this in one sitting_. Nothing anywhere tells a charity worker they can close the tab on a part-written application and pick it up tomorrow. Checking it turned up two further problems behind the one he asked about.
+
+### GAP-42 — the reassurance is missing, and it is purely a copy gap
+
+**The capability already works.** The dashboard's Continue link goes to `/applications/[id]/step/[currentStep]` (`dashboard-populated.tsx`) and Step 4 rehydrates every answer and its approved state. She can genuinely leave and return; the product just never says so. The nearest existing wording — "Your work is saved automatically as you type" — asserts the data is safe _now_, which is a different reassurance from _the journey is resumable_, and the second is the one a first-time user closing a browser tab on two hours of writing actually needs.
+
+**Agreed wording (WJ, 2026-08-06):** _"Answer each question below. Your answers are saved automatically. You can close this page at any time and continue from your dashboard."_
+
+**"Continue from your dashboard" is deliberate and should not be strengthened.** Return is to the **step**, not the question — with 17 questions the user lands at the top of a long page and scrolls to find their place. "Return to the exact point" would be a promise the product does not keep.
+
+### GAP-43 — the copy being replaced was false, and the PRD contradicted itself
+
+"Saved automatically **as you type**" is not what happens. `handleAnswerChange` only updates local React state and marks the answer dirty; the writes are on **blur** and via a **60-second background sweep**. There is no debounce timer and no `beforeunload` guard anywhere in the codebase. Someone typing steadily for 59 seconds who closes the tab without clicking away loses that work.
+
+**The behaviour is correct — the copy was wrong.** `AC-FR-18-03` explicitly accepts "at most 60 seconds of edits potentially lost", and the PRD's own FR-18 implementation notes describe blur + sweep accurately, including a **2026-07-13 correction that specifically disproved a "400ms-debounced auto-save as the user pauses typing" claim**. That correction fixed the implementation note and never checked the user-facing string specified in §7 of the same document. So this is PRD-versus-PRD, not code-versus-copy — and **the seventh recorded instance on this project of fixing an instance rather than the class.** The replacement string drops "as you type" entirely, so `GAP-42` and `GAP-43` close together.
+
+Separately worth considering, not decided: a short debounce on typing would make a stronger claim honest and shrink the loss window. Recorded so the option isn't lost; the copy fix stands on its own.
+
+### GAP-44 — nothing ever confirms a save succeeded, and fixing that collides with an existing criterion
+
+The only save-related feedback in the entire component is the failure path: `saveError` renders "**Not saved.**" (added 2026-07-29, Opus audit M8, `AC-FR-18-04`). There is no "Saved" tick, no "Saving…" state, no positive signal of any kind. That makes `GAP-42`'s reassurance an assertion the screen never demonstrates — it tells the user their work is safe and then never shows it once. For a first-time user about to close a tab, a visible confirmation does more than any sentence of copy. WJ approved adding one.
+
+**⚠️ It cannot be built yet.** `AC-FR-18-02` requires that during a background auto-save "no visible save indicator is shown to the user", and PRD FR-18's implementation notes repeat it. `AC-FR-18-04`'s 2026-07-29 amendment carved **failures** out of that silence rule and deliberately left success untouched.
+
+**Two resolutions, written into `acceptance-criteria.md` as draft `AC-FR-18-05` for WJ to choose between:**
+
+1. **Scope the indicator to blur and explicit saves, leaving the 60-second sweep silent.** `AC-FR-18-02` is written specifically about background saves, so on this reading nothing needs amending. **Recommended** — it delivers the reassurance while preserving the reason that criterion exists, which is that an indicator firing every 60 seconds regardless of user action is noise rather than information.
+2. **Amend `AC-FR-18-02` to permit a success indicator on all saves.** Simpler, but reverses a deliberate decision and reintroduces the periodic-noise problem.
+
+`AC-FR-18-05` is explicitly marked a draft, not a criterion, until that is closed. A build against option 1 satisfies every existing criterion; a build against option 2 requires the amendment first.
+
+**Documents updated:** `PRD-Grant-Pathway.md` → **v0.66** (§7 Step 4 sub-heading respecified, flagged as agreed-not-built, with the live string recorded alongside it), `acceptance-criteria.md` (draft `AC-FR-18-05`), `ADR-TRACEABILITY.md` → **v2.23**.
+
+---
+
+## 2026-08-06 — GAP-41: the Word export destroys every line break, and rich-text editing deferred
+
+**Found by WJ, same real application as `GAP-39`/`GAP-40`. No code changed — logging only, on WJ's instruction.**
+
+His wife took the trouble to lay out her §4b answer (Q6, 215 words) properly: blank lines between paragraphs, a hyphen-bulleted list of the facilities York House charges for, a "Funding to Date" block, and a worked calculation. The `.docx` she downloaded rendered all of it as one continuous run of prose.
+
+**The formatting is not lost anywhere else in the pipeline, which is what makes this cheap to fix.** The `<Textarea>` stores `\n` intact, the Step 5 preview renders it correctly via `whitespace-pre-wrap` (`application-step5-approve.tsx`), and the `format=txt` export is unaffected because it builds its output by joining an array of lines. The defect is confined to the Word generator: `app/api/export/[applicationId]/route.ts` puts the entire answer body into a **single** `TextRun` — once in the `assembled_draft` branch, once in the per-answer fallback — and the `docx` library ignores `\n` inside a run. That is a documented footgun of the library, not a subtle interaction.
+
+**Agreed fix (not built):** split on `\n` and emit one `TextRun` per line with `break: 1` on all but the first. That reproduces the textarea exactly — soft line breaks inside one paragraph — so the existing spacing model is untouched. Roughly a ten-line helper applied in two places, no schema change, no new dependency. It covers the budget narrative field too, which is an ordinary `Textarea`; the two governance `£` inputs are single numbers and unaffected. **One thing to check in the same pass:** whether "Help me improve this" preserves line structure on the round-trip. The refine prompt takes and returns plain text with no instruction to keep layout, so a flattening round-trip would make the export fix feel unreliable even once it is correct.
+
+**A test passed straight over this, and that is worth recording as its own finding.** `regression-test-plan.md` RT-09 ran against this exact code on 2026-07-28 and passed, verifying "no corrupted or missing content" — a bar that single-paragraph test answers clear while every line break in the document is being silently discarded. The defect was found by a user reading her own downloaded file, not by the plan whose job it was. RT-09 and RT-10 both gained an explicit multi-line fidelity step (v2.12) requiring an answer with blank lines and a bulleted list; RT-09's result is downgraded to **Pass (caveat)** and must be re-run once `GAP-41` is fixed. RT-10 gets the same check as a comparison case — its path was never affected, so a divergence between the two formats is the fastest signal of a regression in either.
+
+### Rich-text formatting in answer fields — considered, deferred (FP-11)
+
+WJ raised a second, larger question alongside the bug: should the fields offer real formatting controls (bold, italic, bullet and numbered lists) rather than leaving applicants to improvise with blank lines and hyphens?
+
+**Deferred, on WJ's reasoning:** most charity workers transfer their answers into the funder's own web portal, which strips rich formatting on paste regardless of what the service produced. Rich text is therefore only genuinely valuable in the narrower case where a funder still requires a downloadable Word or PDF form — real, but not the common path and not a demonstrated demand. Fixing `GAP-41` already delivers line breaks, blank lines and hyphen bullets, all of which survive a portal paste, and those are precisely what the applicant reached for when she had no other tools.
+
+Recorded as **`FP-11`** in `future-phases.md`, with the full implementation cost written down (editor component, storage format and migration, XSS sanitisation, markup-aware word/character counting against `PDR-AI-006`/`PDR-AI-012`, preview rendering, docx mapping to real bold runs and numbering, `.txt` degradation, refine prompts that preserve markup, and an `ADR-OPS-006` keyboard/screen-reader pass) so the cost is not re-derived next time it comes up. **No DR was raised** — nothing in any ADR, PDR or requirement document promises rich text, so no decision is being reversed; this records a considered "not now" and why. Trigger to revisit: evidence of repeated submission via downloadable Word/PDF forms rather than portals.
+
+**Scope clarification worth keeping:** "all fields including budget" resolves to all _narrative_ fields. The budget narrative (§5a expenditure details) is an ordinary `Textarea` and is in scope for both the fix and any future editor; the two governance cards are single `£` numeric inputs and the yes/no governance items are dropdowns, where formatting has no meaning.
+
+---
+
+## 2026-08-06 — Two extraction defects found in a real, live grant application: GAP-39 and GAP-40
+
+**Found by WJ. No code changed — logging only, on WJ's instruction, pending further review of the same application.**
+
+This is the first defect report on this project drawn from a **genuine grant application submitted through the live service** rather than from a scripted test. WJ's wife completed a real Stony Stratford Town Council application for Stony Stratford Community Larder, using `docs/Grant Org Guidelines/Stony Stratford Grant-Application-Form-2026.docx` as the uploaded guidelines. Reconciling her 17 completed answers against the source form found two things wrong.
+
+**What the app produced:** 17 cards on Step 4 = **2 governance facts** (§7 total expenditure and reserves, tagged "Budget", per `PDR-AI-008`) + **15 extracted questions**. The form contains 17 narrative asks. The mapping is recorded in full in `guideline-capability-matrix-test-plan.md` GCM-06.
+
+**`GAP-39` (High) — two substantive questions were never extracted.** §4 has six lettered sub-questions; only a–d reached Step 4. Missing: **§4e "Please give an accurate figure for the number of people in the parish the project will serve"** and **§4f "For how long will the project run?"**. For a town council assessing a parish grant, beneficiary reach is close to the whole decision. Root cause is in `lib/prompts.ts`: the "questions" rule excludes data-entry fields and the TABLE FORMAT rule skips short numerical fields, and the **only** carve-out from either is the BUDGET/COST exception. Beneficiary counts and project durations are neither budget nor data-entry, so they fall straight through.
+
+**The pattern matters more than the instance.** This is the **third** time a substantive question has been dropped for the sole reason that its answer is short — after MK Community Foundation and Idlewild, both on 2026-07-27 (`guideline-capability-matrix-test-plan.md` Defect Log #1). Each of the first two was closed by adding its own narrowly-scoped exception beside the others rather than by correcting the underlying rule, which is why a third case with a slightly different flavour of short answer was able to appear. When this is tasked, the fix should be to the rule — a short answer is not the same thing as a non-narrative question — not a third one-off exception.
+
+**`GAP-40` (Medium) — two adjacent sub-questions merged into one card.** §10 MONITORING PROGRESS asks a) what you hope to have achieved six months after receiving a grant and b) twelve months after; both arrived as a single card (Q16), text concatenated. `lib/prompts.ts` already carries the governing rule verbatim — _"DO NOT MERGE ADJACENT QUESTIONS: even within a single form, each distinct question or ask must be extracted as its own separate item — never combine two related-but-distinct questions into one, even if they are adjacent, thematically similar, or commonly answered together"_ — and six-month versus twelve-month outcomes are precisely that case. **Nothing is lost to this applicant** (both asks are visible and one box answered both), which is why it is Medium and not High; a funder with per-question word limits, or two asks that diverge more sharply, would be materially misrepresented. Note the two defects need different remedies even though they live in the same file: `GAP-39` is a rule with an inadequate exception, `GAP-40` is an adequate rule the model did not follow.
+
+**Checked and found correct, so recorded here to stop them being re-investigated:**
+
+- **§1 "PURPOSE OF APPLICATION" is absent, and that is fine.** It is a numbered heading with no ask beneath it — only the skip note for recognised annual events. There was nothing to extract, and §2's wording ("a full description of your project, **or the purpose you require the grant for**") covers the same ground.
+- **§7's reserves-justification prose is not missing.** "If your organisation holds a large amount of reserves, please state what these reserves are for" appears as the helper text on the Reserves governance card, which is the `PDR-AI-008` behaviour, not a drop.
+- **Everything non-narrative was excluded correctly** — the front organisation-details table, §3's seven-principle tick-list, §5's expenditure/income table totals, §9's address and phone, §12's contact-person block, §13's supporting-documents checklist, and both signature blocks.
+- **No "Finances of Your Group" catch-all card appeared.** `PDR-AI-010` Option C governs `free_form` **sections** mode; this document extracted in **questions** mode, so that decision is out of scope here rather than regressed. Worth confirming deliberately if this fixture is ever run through the paste path.
+
+**Test coverage added the same day:** new **GCM-06** case in `guideline-capability-matrix-test-plan.md` (v1.5) — a docx **application form** rather than guidance about one, the only fixture in the corpus exercising lettered sub-question flattening and short-answer narrative asks. It is recorded as **Fail** and stays that way until both defects are fixed. `TEST-DASHBOARD.md` (v2.18) moves that plan 🟢 → 🔴, the first red on the dashboard since its 2026-07-16 reset.
+
+**Practical consequence for the applicant, recorded because it is the actual cost of the bug:** §4e and §4f will be blank when the answers are transcribed onto the real form, and she has to write them herself with no prompt from the service. She only discovers this by reading the original form — which is exactly what the product exists to save her from.
+
+---
+
+## 2026-08-05 — Terms of Service v1.6: no-guarantee-of-funding statement given its own sub-heading
+
+**Requested by WJ, ahead of solicitor review (S2b).** Section 5 (AI-Generated Content) previously carried _"We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder"_ as a single sentence sitting between two unrelated paragraphs — user responsibility for submitted content, and how AI processing works. Nothing was wrong with the wording; it was just easy to skim past mid-paragraph, and a solicitor is about to read this document closely.
+
+**Added a `### No Guarantee of Funding Success` sub-heading directly above the sentence, unchanged.** The AI-provider/data-processing paragraph (Anthropic Claude via AWS Bedrock, eu-west-2) was moved earlier in the section, ahead of the new sub-heading — it is not about funding outcomes, and leaving it where it was would have put it visually underneath a heading about a different topic. No wording changed anywhere; this is a structural clarity edit, not a substantive one.
+
+**Worth naming, since it came up when deciding where to put it:** the statement isn't really AI-specific at all — a charity that writes every answer itself and never touches the AI features still gets no guarantee of success. It stays in Section 5 for this edit (cheapest change, matches what the solicitor will be expecting after seeing the pre-review version), but Section 4 ("Using the Service") would be the more precisely correct home if this document is restructured again.
+
+Applied to both `terms-of-service.md` (internal, new changelog blockquote for v1.6) and `terms-of-service-external.md` (the file `/terms` actually renders) — verified live against the running dev server, heading renders directly above the guarantee paragraph as intended. **PDF/docx regenerated:** `Grant-Pathway-Terms-of-Service-v1.6.{pdf,docx}` via the established pandoc → docx → Word COM → PDF pipeline, 7 pages, sub-heading confirmed in both the table of contents and the body text. The superseded v1.5 files were deleted rather than archived, matching how the v1.4→v1.5 regeneration was handled the same way on 2026-08-05 — `docs/legal/archive/` holds only the much older v1.0 exports.
+
+**Privacy Policy is untouched** — this request was scoped to the Terms of Service only, and the privacy policy has no equivalent statement to relocate.
 
 ---
 

@@ -259,7 +259,7 @@ on conflict (id) do nothing;
 
 -- Storage RLS: intended to let users act only within their own folder.
 --
--- ⚠️ CORRECTION 2026-08-05 (GAP-48) — comment only, no schema change; this
+-- ⚠️ CORRECTION 2026-08-06 (GAP-48) — comment only, no schema change; this
 -- migration is already applied and its SQL is untouched.
 --
 -- These three policies are INERT and have never granted anything. They gate on

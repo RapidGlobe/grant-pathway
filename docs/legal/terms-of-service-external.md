@@ -1,6 +1,6 @@
 # Grant Pathway — Terms of Service
 
-**Version:** 1.5
+**Version:** 1.6
 
 **Effective date: 5 August 2026**
 
@@ -75,9 +75,11 @@ Before any AI-generated content is saved to your application, you are asked to c
 
 **You are responsible for all content you submit in a grant application.** You write every answer. If you ask for help, Grant Pathway suggests an improved version of what you have already written — it does not create an answer from nothing. You decide whether to use the suggestion, edit it, or discard it entirely. We do not review your applications. We do not submit applications on your behalf.
 
-We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder.
-
 The AI features are powered by the Anthropic Claude model, accessed via Amazon Web Services' Bedrock service (eu-west-2, London). When you request a summary, or ask for help improving an answer you have written, the relevant content from your funder guidelines and organisation profile is processed within UK and European Economic Area infrastructure. Please see our **Privacy Policy** for full details of how your data is handled in this process.
+
+### No Guarantee of Funding Success
+
+We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder.
 
 ---
 

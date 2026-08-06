@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/actions/auth'
-import { HELP_CENTRE_BASE_URL } from '@/lib/help-centre'
+import { helpCentreUrl, helpPathForRoute } from '@/lib/help-centre'
 
 interface NavAuthenticatedProps {
   firstName?: string
@@ -87,8 +87,13 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
 
         {/* Right — help link + account dropdown */}
         <div className="flex items-center gap-2">
+          {/* Opens the help page for the current screen, falling back to the
+              help centre root where no page applies (GAP-45). The footer and
+              dashboard empty-state links stay on the root deliberately — they
+              are general-purpose, whereas this button means "help me with
+              *this* screen". */}
           <Link
-            href={HELP_CENTRE_BASE_URL}
+            href={helpCentreUrl(helpPathForRoute(pathname))}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[14px] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"

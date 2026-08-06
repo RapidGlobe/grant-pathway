@@ -42,7 +42,7 @@ An account is considered inactive if the user has not logged in for 24 consecuti
 - Uploaded funder guideline files (Supabase Storage)
 - AI usage records
 
-**Implementation note (2026-08-05, `GAP-47`) — this list is now accurate; it was not before.** The fourth item, uploaded funder guideline files, was named here from this decision's date but neither deletion path deleted anything from Supabase Storage: user-initiated deletion (`app/api/account/delete/route.ts`, S8.2) and the inactivity cron (`app/api/cron/inactivity-deletion/route.ts`, S8.3) both removed only database rows. The files were left entirely to the separate `cleanup-guidelines` job, which removes anything older than an hour every 30 minutes.
+**Implementation note (2026-08-06, `GAP-47`) — this list is now accurate; it was not before.** The fourth item, uploaded funder guideline files, was named here from this decision's date but neither deletion path deleted anything from Supabase Storage: user-initiated deletion (`app/api/account/delete/route.ts`, S8.2) and the inactivity cron (`app/api/cron/inactivity-deletion/route.ts`, S8.3) both removed only database rows. The files were left entirely to the separate `cleanup-guidelines` job, which removes anything older than an hour every 30 minutes.
 
 Because of that sweep, nothing was ever actually retained — which is why this was recorded as a spec/code mismatch rather than a data-protection incident. Both paths now delete the user's Storage objects explicitly, via `lib/storage-guidelines.ts`, before the table cascade.
 

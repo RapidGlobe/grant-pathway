@@ -954,12 +954,20 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
-**AC-FR-18-02 — Background auto-save every 60 seconds**
+**AC-FR-18-02 — Background auto-save every 60 seconds** _(amended 2026-08-06 after user feedback — see note below)_
 
 - **Given** I am on an active step of the application flow with unsaved edits
 - **When** 60 seconds pass without me clicking Continue
-- **Then** my progress is saved silently in the background
-- **And** no visible save indicator is shown to the user during the background save
+- **Then** my progress is saved in the background without interrupting my work
+- **And** the save is visibly confirmed to me, per AC-FR-18-05
+
+**Amendment note (2026-08-06, WJ).** This criterion previously read "my progress is saved **silently** in the background" and "**no visible save indicator** is shown to the user during the background save". **That requirement is withdrawn, and the reason is user feedback rather than a change of technical opinion.**
+
+WJ observed a first-time user — a charity worker completing a real Stony Stratford Town Council application — and found that nothing on Step 4 gave her any reason to believe her work was safe if she left the screen. The original rule was written to avoid nagging the user with a periodic indicator firing regardless of what they were doing. Weighed against a real applicant's hesitancy to close a browser tab containing hours of writing, that concern is the lesser one: **silence reads as "nothing is happening", not as "everything is fine".** A nervous user given no signal assumes the worst.
+
+Two options were put to WJ (see the earlier draft of AC-FR-18-05). The narrower one — confirm only blur and explicit saves, keep the 60-second sweep silent — would have satisfied this criterion unamended. **WJ chose the broader option deliberately**, on the grounds that a user who steps away mid-sentence without moving focus is precisely the nervous user this is for, and they are the one the narrower option leaves with no signal at all.
+
+**What is preserved:** the confirmation must not interrupt. It is an unobtrusive indication that a save happened, not a modal, a toast that steals focus, or anything requiring dismissal. The original criterion's underlying intent — do not get in the user's way — survives; only the assumption that silence is the way to achieve it has been dropped.
 
 ---
 
@@ -984,7 +992,24 @@ _Note: the final set of profile fields was refined during screen requirements. T
 - **And** the alert cannot be scrolled out of view while I continue typing
 - **And** the alert clears automatically if a later save succeeds
 
-**Note on the deliberate exception to AC-FR-18-02.** AC-FR-18-02 requires background saves to be **silent** with no visible indicator. That still holds for saves that _succeed_ — silence is correct when there is nothing for the user to act on. It does not extend to failures: prior to this change a failed save was also silent, so a user could continue writing for a long period believing their work was saved when nothing was persisting. This was found in production (Sentry `GRANT-PATHWAY-6`, 8 events over three weeks, 88% on Step 4), where the rejection reached the browser's global unhandled-rejection handler and nothing surfaced in the UI.
+**Note on the relationship to AC-FR-18-02.** _(Rewritten 2026-08-06 — this note previously described AC-FR-18-04 as a deliberate **exception** to AC-FR-18-02's silence rule. That rule has since been withdrawn, so there is no longer an exception to describe.)_ When this criterion was added on 2026-07-29, AC-FR-18-02 required background saves to be silent, and success was deliberately left silent while failure was carved out. The problem being solved was that a failed save was **also** silent, so a user could write for a long period believing their work was saved when nothing was persisting — found in production (Sentry `GRANT-PATHWAY-6`, 8 events over three weeks, 88% on Step 4), where the rejection reached the browser's global unhandled-rejection handler and nothing surfaced in the UI. As of AC-FR-18-02's 2026-08-06 amendment, **both** outcomes are now surfaced: success under AC-FR-18-05, failure under this criterion. The two must remain visually distinct — a failure is an alert the user has to act on, a success is an unobtrusive confirmation they do not.
+
+---
+
+**AC-FR-18-05 — A successful save is visibly confirmed** _(added 2026-08-06, `GAP-44`; decided by WJ the same day — AC-FR-18-02 amended to permit it)_
+
+- **Given** I am writing answers on Step 4
+- **When** an answer of mine is saved — whether on blur, by the 60-second background sweep, or on an explicit action
+- **And** the save succeeds
+- **Then** a visible confirmation appears against that answer
+- **And** the confirmation does not interrupt my typing, steal focus, or require dismissal
+- **And** it is visually distinct from the "**Not saved.**" alert of AC-FR-18-04
+
+**Why this exists.** Step 4 gave the user no positive signal of any kind: the only save-related feedback in the entire component was the failure path from AC-FR-18-04. Without a success signal, the resumability reassurance added under `GAP-42` — "your answers are saved automatically, you can close this page at any time" — is an assertion the screen never demonstrates.
+
+**Why it covers background saves too, which required amending AC-FR-18-02.** WJ was offered a narrower option that would have left the 60-second sweep silent and needed no criterion changed. He chose the broader one deliberately: **a nervous user who steps away mid-sentence without moving focus is exactly the user this is for**, and the narrower option leaves that user with no signal at all. See AC-FR-18-02's amendment note for the full reasoning and for what was preserved from the original rule.
+
+**Built 2026-08-06** (`GAP-44`) — a per-answer "Saved" tick on every save path, governance fields included, clearing itself after 2.5s. Covered by `__tests__/step4-save-reassurance.test.tsx`; live confirmation is `help-and-tooltips-test-plan.md` HT-06 plus a look at Step 4.
 
 ---
 
@@ -2562,6 +2587,10 @@ _Added 2026-07-25. `PDR-UI-008` (help centre link + contextual tooltips) was bui
 - **When** I look for a way to get help
 - **Then** I find a "Help" link in the relevant navigation (public nav when signed out, authenticated nav when signed in), in the global footer, and — when signed in with zero applications — in the dashboard empty-state copy
 - **And** clicking any of these links opens the help centre in a **new browser tab**, leaving the Grant Pathway tab untouched
+- **And** _(added 2026-08-06, `GAP-45`)_ the **authenticated nav** link opens the help page for the screen I am on — Step 4 opens "Writing and editing an answer", Step 2 opens "Uploading funder guidelines", and so on — falling back to the help centre root on any screen with no page of its own
+- **And** the footer and dashboard empty-state links continue to open the **root**, deliberately: they are general-purpose, whereas the nav button means "help me with _this_ screen"
+
+**Note on the deep-link map (`GAP-45`, built 2026-08-06).** Every route→page pair lives in `ROUTE_HELP_PAGES` in `lib/help-centre.ts`, and all eight targets were fetched live and confirmed to resolve before the mapping was written. **The residual risk is not in this codebase:** the help centre is an external GitBook, so a page renamed there silently 404s one route's Help button, nothing in CI can detect it, and no runtime fallback is possible because a GitBook 404 is invisible to the app. `help-and-tooltips-test-plan.md` HT-06 is the only check that catches it, and is a standing re-run whenever the help centre is restructured.
 
 ---
 
@@ -2603,6 +2632,8 @@ _Added 2026-07-25. `PDR-UI-008` (help centre link + contextual tooltips) was bui
 
 ---
 
+_Last updated: 2026-08-06 (later) — **AC-FR-18-05 built, and AC-FR-49-01 amended for `GAP-45`’s contextual help deep-links.** The authenticated nav Help button now opens the help page for the current screen (Step 4 → "Writing and editing an answer"), falling back to the root where no page applies; footer and dashboard empty-state links deliberately still open the root. All eight targets were fetched live and confirmed before the mapping was written; the residual risk is external GitBook renames, which only `help-and-tooltips-test-plan.md` HT-06 can catch._
+_Last updated: 2026-08-06 — **AC-FR-18-02 amended and AC-FR-18-05 added, both on user feedback** (`GAP-44`). AC-FR-18-02's requirement that a background save show "no visible save indicator" is **withdrawn**; AC-FR-18-05 now requires every successful save to be visibly confirmed, including the 60-second sweep. WJ decided this after observing a real first-time user complete a Stony Stratford application with nothing on screen to suggest her work would survive leaving the page — **silence reads as "nothing is happening", not "everything is fine"**. He was offered a narrower option that would have left the sweep silent and changed no criterion, and chose the broader one deliberately, because a user who steps away mid-sentence without moving focus is exactly the nervous user this is for. What survives from the original rule: the confirmation must not interrupt, steal focus, or need dismissing. AC-FR-18-04's note rewritten — it described itself as an exception to a silence rule that no longer exists. Not built; logged as `GAP-44`._
 _Last updated: 2026-07-25 — added Section 9.12 in full (FR-49, `PDR-UI-008`), five new acceptance criteria (AC-FR-49-01 to 05) covering the help centre link and all 9 built contextual tooltips, written after live testing completed (`help-and-tooltips-test-plan.md` v2.0) rather than at build time, so the criteria reflect the final simplified (no-persistence) behaviour rather than the reversed v1 design._
 _Last updated: 2026-07-17_
 _2026-07-17 second addendum: new AC-FR-37-03A added — export date fixed to one timestamp per application (`applications.first_exported_at`), not one per request._

@@ -6,7 +6,7 @@
 //   applications → charity_profiles → ai_usage_log → user_profiles →
 //   Supabase Auth deleteUser
 //
-// The Storage step was added 2026-08-05 to close a gap between PDR-DH-002 —
+// The Storage step was added 2026-08-06 to close a gap between PDR-DH-002 —
 // which lists uploaded guideline files among the data deleted — and this route,
 // which deleted only tables. See lib/storage-guidelines.ts for why it is worth
 // doing even though cleanup-guidelines (S4.4) would remove the files within the

@@ -56,6 +56,10 @@ const A4_WIDTH_TWIPS = 11906
 const A4_HEIGHT_TWIPS = 16838
 import { createClient } from '@/lib/supabase/server'
 import { getAppVersion } from '@/lib/version'
+// GAP-41 — the `docx` library ignores `\n` inside a TextRun, so an answer must
+// be split into one run per line or every line break the applicant typed is
+// silently discarded. See lib/docx-text.ts for the full history.
+import { answerRuns } from '@/lib/docx-text'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -392,15 +396,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                 }),
                 new Paragraph({
                   spacing: { after: 200 },
-                  children: [
-                    new TextRun({
-                      text: body || '[No answer provided]',
-                      font: 'Calibri',
-                      size: pt(11),
-                      color: body ? '000000' : '888888',
-                      italics: !body,
-                    }),
-                  ],
+                  children: answerRuns(body || '[No answer provided]', {
+                    color: body ? '000000' : '888888',
+                    italics: !body,
+                  }),
                 }),
               ])
             : answers.flatMap((answer) => {
@@ -422,15 +421,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
                   }),
                   new Paragraph({
                     spacing: { after: 200 },
-                    children: [
-                      new TextRun({
-                        text: aText || '[No answer provided]',
-                        font: 'Calibri',
-                        size: pt(11),
-                        color: aText ? '000000' : '888888',
-                        italics: !aText,
-                      }),
-                    ],
+                    children: answerRuns(aText || '[No answer provided]', {
+                      color: aText ? '000000' : '888888',
+                      italics: !aText,
+                    }),
                   }),
                 ]
               })),

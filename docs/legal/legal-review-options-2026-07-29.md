@@ -12,7 +12,7 @@
 **Researched:** 29 July 2026 (all prices checked on that date unless stated)
 **Scope cap:** maximum 10 providers across all routes, per client instruction
 
-**Why this exists.** Both live legal pages published `**Effective date: [TO BE CONFIRMED]**` — **resolved 2026-08-05: both dates are now set to 5 August 2026, closing S2a** (privacy policy → v1.6, terms → v1.5, all four files including the two `-external.md` mirrors the routes actually render). The remaining half, **S2b**, is the independent review this document exists to unblock. Originally raised by the Opus audit as finding **S2** — indefensible for a registered data controller processing charity personal data, and a blocker on letting external testers verify the service. S2 splits in two: **S2a**, setting the two effective dates, which is not blocked and needs no solicitor; and **S2b**, obtaining an independent review, which was blocked on finding an affordable reviewer. This document exists to unblock S2b. It belongs to **P5.1 Compliance**, which also carries `GAP-20` (dependency licence review).
+**Why this exists.** Both live legal pages published `**Effective date: [TO BE CONFIRMED]**` — **resolved 2026-08-05: both dates are now set to 5 August 2026, closing S2a** (privacy policy → v1.6, terms → v1.6 as of the same day's later sub-heading restructure, all four files including the two `-external.md` mirrors the routes actually render). The remaining half, **S2b**, is the independent review this document exists to unblock. Originally raised by the Opus audit as finding **S2** — indefensible for a registered data controller processing charity personal data, and a blocker on letting external testers verify the service. S2 splits in two: **S2a**, setting the two effective dates, which is not blocked and needs no solicitor; and **S2b**, obtaining an independent review, which was blocked on finding an affordable reviewer. This document exists to unblock S2b. It belongs to **P5.1 Compliance**, which also carries `GAP-20` (dependency licence review).
 
 **Prices decay.** Every figure below is sourced and dated, but treat anything older than a few months as indicative and confirm before committing. Two entries could not be verified against the provider's own site on the day (Singleton Solicitors and LawBite — both sites failed to resolve); those are flagged in place and must be confirmed directly.
 
@@ -243,7 +243,7 @@ SRA-regulated (ID 8003766) with published indicative pricing of £100–£150 (u
 | Field               | Detail                                                                                                                                                                                                                                                               |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Entity              | RapidGlobe Ltd, company no. **05615649**; ICO registration **ZC168720**                                                                                                                                                                                              |
-| Documents           | Privacy Policy **v1.6** (~8pp) and Terms of Service **v1.5** (~7pp), both drafted, both already published                                                                                                                                                            |
+| Documents           | Privacy Policy **v1.6** (~8pp) and Terms of Service **v1.6** (~7pp), both drafted, both already published                                                                                                                                                            |
 | Job                 | **Review and sign-off of existing drafts** — not drafting from scratch                                                                                                                                                                                               |
 | Service             | Free web tool helping UK charities write grant applications. Pre-launch, no revenue, no payment data taken                                                                                                                                                           |
 | Personal data       | Name, email, charity profile, and user-written application answers. **Flag explicitly:** a small charity's registered address is often a trustee's home address, pre-filled from the Charity Commission register                                                     |
@@ -291,7 +291,7 @@ One firm replied, asked for copies, and received them before 2026-08-05 — **so
 > Many thanks,
 > [name]
 
-Attach `docs/legal/pdf/Grant-Pathway-Privacy-Policy-v1.6.pdf` and `Grant-Pathway-Terms-of-Service-v1.5.pdf`.
+Attach `docs/legal/pdf/Grant-Pathway-Privacy-Policy-v1.6.pdf` and `Grant-Pathway-Terms-of-Service-v1.6.pdf`.
 
 ### Route status — checked 2026-08-05
 
