@@ -276,9 +276,13 @@ on conflict (id) do nothing;
 -- app/api/upload/process/route.ts checks the caller owns the `{user_id}_` prefix
 -- before reading. Service-role-only access is the control actually in force, and
 -- ADR-FILE-001 explicitly accepts it ("a storage RLS policy OR service-role-only
--- access"). The policies are dead code that reads as though load-bearing —
--- whether to repoint them at the flat prefix or drop them is tracked as GAP-48,
--- deliberately left for its own task rather than bundled into GAP-47's fix.
+-- access"). The policies were dead code that read as though load-bearing.
+--
+-- ✅ SUPERSEDED the same day by 20260806000000_gap48_storage_rls_flat_prefix.sql,
+-- which drops all three policies below and recreates them against the flat
+-- `{user_id}_` prefix using starts_with(). The definitions below are therefore
+-- historical: do not read them as the live policy set. They are left exactly as
+-- applied because this migration has already run everywhere.
 create policy "storage: upload own guidelines"
   on storage.objects for insert
   to authenticated

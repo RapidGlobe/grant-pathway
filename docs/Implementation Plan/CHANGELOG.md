@@ -10,6 +10,50 @@
 
 ---
 
+## 2026-08-06 — GAP-48 fixed: the bucket's security policies now actually grant, for the first time since May
+
+Follow-on from `GAP-47`, taken as its own task rather than bundled into it, which was the point of raising it separately.
+
+### What was wrong
+
+The three RLS policies on the `guidelines-temp` bucket, created in `20260519000000_initial_schema.sql`, gated on:
+
+```
+(storage.foldername(name))[1] = auth.uid()::text
+```
+
+That assumes objects live at `guidelines-temp/<user_id>/<filename>`. They do not, and never have — `app/api/upload/signed-url/route.ts` writes a flat name at the bucket root, `{user_id}_{timestamp}`, deliberately, so the cleanup cron's `list('')` needs no recursive traversal. `storage.foldername()` returns the directory components of a path; for a name with no `/` there are none, the subscript yields NULL, and `NULL = auth.uid()::text` is never true.
+
+**So all three policies denied every request from 2026-05-19 to 2026-08-06 — eleven weeks.** Nothing was exposed and nothing broke, because no client ever relied on them: the bucket is private, uploads use a signed URL minted with the service role (which bypasses RLS entirely), and server-side reads and deletes run as service role behind a route that checks prefix ownership. `ADR-FILE-001` explicitly accepts that arrangement on its own. The defect was dead code that read as though it were load-bearing.
+
+### Repointed, not dropped
+
+**Decision: WJ.** Both were viable — nothing depends on these policies, so deleting them would have been honest too. Repointing wins on one argument: the next person to add a client-side Storage call will reasonably assume per-user scoping exists, and with the policies in place it does. Dropping them removes the tripwire and leaves nothing to catch that assumption.
+
+They are **defence in depth, not the primary control.** Service-role-only access remains the thing actually protecting the bucket.
+
+### Two implementation details worth recording
+
+**`starts_with()`, not `LIKE`.** The obvious form, `name like auth.uid()::text || '_%'`, is wrong in a way that is easy to miss: in a LIKE pattern `_` is a single-character wildcard, so it also matches `<uuid>Xanything`, and would need `'\_%'` to mean a literal underscore. `starts_with()` takes no pattern and has no escaping rules. It also mirrors `objectName.startsWith(userId + '_')` in `lib/storage-guidelines.ts` and `app/api/upload/process/route.ts` exactly — all three have to agree, and now they read the same.
+
+**The trailing underscore is load-bearing.** Without it, a user id that is a string prefix of another would match that other user's objects.
+
+### Not verified, and marked 🔵 rather than ✅
+
+CI's `validate-migrations` replays the migration, which proves the SQL is valid — not that the predicate grants. **These policies have never been observed to grant in either form:** the original denied everything, and the replacement is so far only argued. Confirming it needs the anon key plus a real user JWT against a running project, which this session had no credentials for.
+
+`ADR-SEC-002` requires cross-user access to be _tested_, not declared, so the case is written into `GAP-17`'s cross-user RLS test in `P5.2` with the two traps named: run it with a user JWT and **never** the service role, which bypasses RLS and would make any such test pass; and include a name starting with the user's id but missing the underscore, since that separator is the whole prefix guard.
+
+### Why a dedicated RLS sweep missed this
+
+`20260622000003_rls_hardening.sql` revised the policies on **every** table on 2026-06-22 — replacing `auth.uid()` with `(select auth.uid())`, adding missing `WITH CHECK` clauses — and did not touch these three. Storage policies live on `storage.objects`, not a `public` table, so a table-by-table sweep does not see them. Worth remembering the next time an audit is scoped by iterating tables.
+
+⚠️ **The migration is not yet applied to `grant-pathway-dev` or `grant-pathway-prod`** — `supabase link` prompts interactively for the database password, so it needs WJ. Until it runs, the inert originals stay live: the status quo of the last eleven weeks, exposing nothing.
+
+Docs updated: `data-model.md` §7 (v1.21), `ADR-TRACEABILITY.md` (v2.30, `GAP-48` → 🔵), `IMPLEMENTATION-PLAN.md` (`GAP-17`/`P5.2` storage case), and a superseded-by pointer in the original schema migration's comment. `type-check`, `lint`, `prettier` and 205 tests all pass — no application code changed, so the suite is unchanged by design.
+
+---
+
 ## 2026-08-06 — GAP-47 built: account deletion now deletes the Storage files it always claimed to; the documented path for them never existed (GAP-48)
 
 Raised as a spec/code mismatch: `PDR-DH-002`'s "data deleted on inactivity closure" list has named _"uploaded funder guideline files (Supabase Storage)"_ since 2026-04-16, but neither deletion path — `app/api/account/delete/route.ts` (S8.2) nor `app/api/cron/inactivity-deletion/route.ts` (S8.3) — deleted anything from Storage. Both removed database rows only. `data-model.md` §6 had carried a note recording the mismatch rather than resolving it.
