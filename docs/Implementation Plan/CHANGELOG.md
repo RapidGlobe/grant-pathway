@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-08-06 — GAP-41: the Word export destroys every line break, and rich-text editing deferred
+
+**Found by WJ, same real application as `GAP-39`/`GAP-40`. No code changed — logging only, on WJ's instruction.**
+
+His wife took the trouble to lay out her §4b answer (Q6, 215 words) properly: blank lines between paragraphs, a hyphen-bulleted list of the facilities York House charges for, a "Funding to Date" block, and a worked calculation. The `.docx` she downloaded rendered all of it as one continuous run of prose.
+
+**The formatting is not lost anywhere else in the pipeline, which is what makes this cheap to fix.** The `<Textarea>` stores `\n` intact, the Step 5 preview renders it correctly via `whitespace-pre-wrap` (`application-step5-approve.tsx`), and the `format=txt` export is unaffected because it builds its output by joining an array of lines. The defect is confined to the Word generator: `app/api/export/[applicationId]/route.ts` puts the entire answer body into a **single** `TextRun` — once in the `assembled_draft` branch, once in the per-answer fallback — and the `docx` library ignores `\n` inside a run. That is a documented footgun of the library, not a subtle interaction.
+
+**Agreed fix (not built):** split on `\n` and emit one `TextRun` per line with `break: 1` on all but the first. That reproduces the textarea exactly — soft line breaks inside one paragraph — so the existing spacing model is untouched. Roughly a ten-line helper applied in two places, no schema change, no new dependency. It covers the budget narrative field too, which is an ordinary `Textarea`; the two governance `£` inputs are single numbers and unaffected. **One thing to check in the same pass:** whether "Help me improve this" preserves line structure on the round-trip. The refine prompt takes and returns plain text with no instruction to keep layout, so a flattening round-trip would make the export fix feel unreliable even once it is correct.
+
+**A test passed straight over this, and that is worth recording as its own finding.** `regression-test-plan.md` RT-09 ran against this exact code on 2026-07-28 and passed, verifying "no corrupted or missing content" — a bar that single-paragraph test answers clear while every line break in the document is being silently discarded. The defect was found by a user reading her own downloaded file, not by the plan whose job it was. RT-09 and RT-10 both gained an explicit multi-line fidelity step (v2.12) requiring an answer with blank lines and a bulleted list; RT-09's result is downgraded to **Pass (caveat)** and must be re-run once `GAP-41` is fixed. RT-10 gets the same check as a comparison case — its path was never affected, so a divergence between the two formats is the fastest signal of a regression in either.
+
+### Rich-text formatting in answer fields — considered, deferred (FP-11)
+
+WJ raised a second, larger question alongside the bug: should the fields offer real formatting controls (bold, italic, bullet and numbered lists) rather than leaving applicants to improvise with blank lines and hyphens?
+
+**Deferred, on WJ's reasoning:** most charity workers transfer their answers into the funder's own web portal, which strips rich formatting on paste regardless of what the service produced. Rich text is therefore only genuinely valuable in the narrower case where a funder still requires a downloadable Word or PDF form — real, but not the common path and not a demonstrated demand. Fixing `GAP-41` already delivers line breaks, blank lines and hyphen bullets, all of which survive a portal paste, and those are precisely what the applicant reached for when she had no other tools.
+
+Recorded as **`FP-11`** in `future-phases.md`, with the full implementation cost written down (editor component, storage format and migration, XSS sanitisation, markup-aware word/character counting against `PDR-AI-006`/`PDR-AI-012`, preview rendering, docx mapping to real bold runs and numbering, `.txt` degradation, refine prompts that preserve markup, and an `ADR-OPS-006` keyboard/screen-reader pass) so the cost is not re-derived next time it comes up. **No DR was raised** — nothing in any ADR, PDR or requirement document promises rich text, so no decision is being reversed; this records a considered "not now" and why. Trigger to revisit: evidence of repeated submission via downloadable Word/PDF forms rather than portals.
+
+**Scope clarification worth keeping:** "all fields including budget" resolves to all _narrative_ fields. The budget narrative (§5a expenditure details) is an ordinary `Textarea` and is in scope for both the fix and any future editor; the two governance cards are single `£` numeric inputs and the yes/no governance items are dropdowns, where formatting has no meaning.
+
+---
+
 ## 2026-08-06 — Two extraction defects found in a real, live grant application: GAP-39 and GAP-40
 
 **Found by WJ. No code changed — logging only, on WJ's instruction, pending further review of the same application.**

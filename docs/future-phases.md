@@ -10,18 +10,19 @@ This document records items that are explicitly out of scope for v1 and are to b
 
 ## Status of All Items
 
-| Item  | Description                                                     | Decision Record      | Status                                    |
-| ----- | --------------------------------------------------------------- | -------------------- | ----------------------------------------- |
-| FP-01 | Grant discovery phase                                           | DR-PS-002            | To be confirmed post-launch               |
-| FP-02 | 360Giving integration                                           | DR-IN-002            | To be confirmed post-launch               |
-| FP-03 | CIC formation                                                   | DR-OD-001            | To be confirmed post-launch               |
-| FP-04 | Satisfaction survey & feedback framework                        | DR-SM-001, DR-SM-002 | To be confirmed post-launch               |
-| FP-05 | Independent accessibility audit                                 | DR-LC-003            | To be confirmed pre-scaling               |
-| FP-06 | Liability insurance review                                      | DR-LC-002            | To be confirmed when CIC is established   |
-| FP-07 | OSCR (Scotland) and CCNI (NI) register lookup                   | BD-02                | **Planned before general release**        |
-| FP-08 | Full question-level typing implementation (BD-04)               | BD-04                | Planned — pre-launch or early post-launch |
-| FP-09 | Thick profile completeness-driven pre-fill for all funder tiers | BD-02, BD-07         | Planned — iterative post-launch           |
-| FP-10 | Streaming AI responses                                          | ADR-AI-010           | Deferred post-v1                          |
+| Item  | Description                                                     | Decision Record      | Status                                              |
+| ----- | --------------------------------------------------------------- | -------------------- | --------------------------------------------------- |
+| FP-01 | Grant discovery phase                                           | DR-PS-002            | To be confirmed post-launch                         |
+| FP-02 | 360Giving integration                                           | DR-IN-002            | To be confirmed post-launch                         |
+| FP-03 | CIC formation                                                   | DR-OD-001            | To be confirmed post-launch                         |
+| FP-04 | Satisfaction survey & feedback framework                        | DR-SM-001, DR-SM-002 | To be confirmed post-launch                         |
+| FP-05 | Independent accessibility audit                                 | DR-LC-003            | To be confirmed pre-scaling                         |
+| FP-06 | Liability insurance review                                      | DR-LC-002            | To be confirmed when CIC is established             |
+| FP-07 | OSCR (Scotland) and CCNI (NI) register lookup                   | BD-02                | **Planned before general release**                  |
+| FP-08 | Full question-level typing implementation (BD-04)               | BD-04                | Planned — pre-launch or early post-launch           |
+| FP-09 | Thick profile completeness-driven pre-fill for all funder tiers | BD-02, BD-07         | Planned — iterative post-launch                     |
+| FP-10 | Streaming AI responses                                          | ADR-AI-010           | Deferred post-v1                                    |
+| FP-11 | Rich-text formatting in answer fields                           | WJ, 2026-08-06       | Deferred — revisit only if docx-form demand appears |
 
 ---
 
@@ -145,6 +146,27 @@ Pre-requisites before scoping streaming:
 
 ---
 
+## FP-11 — Rich-Text Formatting in Answer Fields
+
+**Decision record:** WJ, 2026-08-06 (no DR raised — see below)
+**Status:** Deferred. Revisit only if evidence appears that users are routinely submitting via downloadable Word forms.
+
+Every answer field in Step 4 is a plain `<Textarea>` holding plain text. There is no bold, italic, bulleted or numbered list support. This was raised on 2026-08-06 after WJ's wife completed a real Stony Stratford Town Council application and hand-formatted a 215-word answer using blank lines and hyphen bullets — the only formatting tools available to her.
+
+**Two separate things came out of that, and they must not be conflated.** The Word export was discarding her line breaks entirely; that is a defect, `GAP-41`, and is being fixed on its own terms. Rich text is the different, larger question of whether the fields should offer real formatting controls at all.
+
+**Deferred, on WJ's reasoning (2026-08-06):** most charity workers transfer these answers into the funder's own web portal, where any rich formatting is stripped on paste regardless of what the service produced. Rich text is therefore only genuinely valuable in the narrower case where the funder still requires a downloadable Word or PDF form — real, but not the common path, and not demonstrated as a demand. Fixing `GAP-41` already delivers line breaks, blank lines and hyphen bullets, which survive a portal paste and cover what the applicant actually reached for.
+
+**What building it would involve, recorded so the cost is not re-derived:** an editor component; a storage format (sanitised HTML or markdown) and a migration of `application_items.answer_text`; XSS sanitisation on stored markup; word and character counting that ignores markup, against the existing limit logic (`PDR-AI-006`, `PDR-AI-012`); preview rendering; docx mapping to real bold runs and real numbering rather than literal characters; graceful degradation in the `format=txt` export; refine prompts that preserve markup on the AI round-trip; and a fresh keyboard/screen-reader pass under `ADR-OPS-006` for a new interactive control.
+
+**Scope note:** "all fields" means all _narrative_ fields. The two governance cards (total annual expenditure, reserves) are single `£` numeric inputs, and the yes/no governance items are dropdowns — formatting does not apply. The budget _narrative_ field (e.g. §5a expenditure details) is an ordinary `Textarea` and would be in scope.
+
+**No DR was raised.** Nothing in any ADR, PDR or requirement document promises rich-text editing, so there is no decision being reversed — this records a considered "not now" and the reasoning behind it, so the question is not re-opened from scratch.
+
+**Trigger to revisit:** user feedback showing repeated submission via downloadable Word/PDF forms rather than portals, or a funder in `target-funder-list.md` requiring formatted submission.
+
+---
+
 ## Checklist Coverage
 
 | Checklist Item | Description                                | Status           |
@@ -158,5 +180,5 @@ Pre-requisites before scoping streaming:
 
 ---
 
-_Last updated: 2026-06-30_
+_Last updated: 2026-08-06 (FP-11 added — rich-text formatting in answer fields, deferred by WJ)_
 _Sources: BRD Information Gathering Checklist items 48–53; DR-PS-002, DR-IN-002, DR-OD-001, DR-SM-001, DR-SM-002, DR-LC-003, DR-LC-002; v1-out-of-scope.md; BRD Mark Two BD-02, BD-04, BD-07_
