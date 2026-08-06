@@ -10,6 +10,39 @@
 
 ---
 
+## 2026-08-06 — GAP-45: the Help button always lands on the front page, and the deep-linking helper it needs already exists
+
+**Raised by WJ. Logged with a verified slug map; not built.**
+
+WJ's question was simple: pressing **Help** from Step 4 should open "Writing and editing an answer", not the help centre front page a user then has to navigate from.
+
+**The plumbing has been there all along and was never connected.** `lib/help-centre.ts` exposes `helpCentreUrl(path)` specifically for this, and its header comment names the use case almost word for word — _"future deep-linking (e.g. linking Step 2's upload screen straight to the relevant help page) a one-line call site rather than a redesign."_ But `nav-authenticated.tsx` links to the bare `HELP_CENTRE_BASE_URL` constant instead of calling the helper, so **the function built for deep-linking is unused at precisely the place that most needs it.** The only caller anywhere in the codebase is `dashboard-empty.tsx`, and it passes no path. `nav-authenticated.tsx` is already `'use client'`, so `usePathname()` supplies the current route with no prop drilling — the change is a route map in `lib/help-centre.ts` plus one lookup in the nav.
+
+**Slugs fetched and verified rather than guessed.** The live GitBook sitemap was read (21 pages) and the Step 4 target fetched to confirm it resolves to a real page rather than a 404. Guessed slugs would have been worse than the current behaviour: a wrong path 404s, where today's root landing at least works.
+
+| Screen                      | Help page (path relative to the base URL)           |
+| --------------------------- | --------------------------------------------------- |
+| `/applications/new`, Step 1 | `applications/choosing-your-funder-and-grant`       |
+| Step 2                      | `applications/uploading-funder-guidelines`          |
+| Step 3                      | `applications/reviewing-the-ai-summary`             |
+| **Step 4**                  | **`writing-answers/writing-and-editing-an-answer`** |
+| Step 5                      | `finishing-up/final-review`                         |
+| `/profile`                  | `getting-started/setting-up-your-charity-profile`   |
+| `/account`                  | `account-settings/changing-your-password`           |
+| `/account/delete`           | `account-settings/deleting-your-account`            |
+
+**Two decisions left open for WJ.** `/dashboard` has no clean match — nearest is `reference-and-faqs/application-status-labels`, and the default is to leave it on the root. And the public routes could deep-link too (`/register` → `getting-started/creating-your-account`, sign-in and forgot-password → `getting-started/signing-in`), but WJ scoped this to the authenticated nav, so they are recorded rather than assumed.
+
+**Deliberately not deep-linked:** the footer "Help centre" link and the dashboard empty-state link stay on the root. They are general-purpose; the nav button is the "help me with _this_ screen" affordance.
+
+**Six of the 21 help pages cover Step 4 alone** — writing-and-editing, word-and-character-limits, getting-ai-help, sections-with-financial-information, adding-a-financial-or-governance-detail, approving-answers. One nav link can only target one. Landing the user in the right _section_ and letting GitBook's own sidebar carry them the rest of the way is the intended outcome, not a shortfall — worth stating so it is not later mistaken for incomplete work.
+
+**⚠️ A maintenance risk that needs to be owned, not implied.** The help centre is an external GitBook. Today a broken URL is one obvious failure anyone would notice; with nine deep links, a page renamed on the GitBook side silently 404s one route's Help button. **Nothing in CI can catch this**, and there is no client-side fallback available — a GitBook 404 is invisible to the app, so we cannot detect it and drop back to the root. Two mitigations, both cheap and both now in place: the entire map lives in `lib/help-centre.ts` so there is one file to check, and **`help-and-tooltips-test-plan.md` gains HT-06** (v2.1) — click Help on every screen, confirm the right page, re-run whenever the help centre is restructured. HT-06 is written now and marked **not runnable** until the feature exists, so the coverage cannot be forgotten between logging and building.
+
+**Documentation consequence for build time:** `AC-FR-49-01` says clicking Help "opens the help centre in a new browser tab" and will need to read _the relevant page of_ the help centre. It is accurate today and deliberately left unchanged until the behaviour changes.
+
+---
+
 ## 2026-08-06 — AC-FR-18-02's silence rule withdrawn: every successful save will be visibly confirmed
 
 **Decided by WJ the same day `GAP-44` was raised. Six statements of the old rule across four live documents amended in one pass. No code changed.**

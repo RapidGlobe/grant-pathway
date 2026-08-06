@@ -4,9 +4,9 @@
 **Volatility:** Low
 **Update when:** A tooltip is added, removed, or its content/placement changes (`PDR-UI-008`)
 
-**Version:** 2.0
-**Date:** 2026-07-25
-**Status:** Under `DR-TEST-001` (capability-based test strategy). HT-01 and HT-02 executed; HT-03 onward not yet run.
+**Version:** 2.1
+**Date:** 2026-08-06
+**Status:** Under `DR-TEST-001` (capability-based test strategy). HT-01 to HT-04 Pass; HT-05 Blocked on its screen-reader step, which now runs as `accessibility-test-plan.md` AC-08. **HT-06 added 2026-08-06 and is not runnable yet** — it covers `GAP-45`'s contextual help deep-links, which are logged but not built.
 **Tester:** WJ
 
 ---
@@ -45,13 +45,14 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 ## Test Results Summary
 
-| Test ID | Test Name                                                             | Result  | Notes                                                                                                                                      |
-| ------- | --------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| HT-01   | Help centre links — presence, target, new-tab behaviour               | Pass    |                                                                                                                                            |
-| HT-02   | All tooltips — show on hover/focus, no dismiss control, never persist | Pass    | Core behaviour confirmed on all 10; `GAP-36` (`tt-charity-lookup` flash) and `GAP-37` (`tt-summary-review` wrong copy) both fixed same day |
-| HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass    |                                                                                                                                            |
-| HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass    |                                                                                                                                            |
-| HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Blocked | Steps 1-3 pass (axe-core clean; `GAP-38` keyboard fix; focus order confirmed logical). Step 4 (screen reader) deferred                     |
+| Test ID | Test Name                                                             | Result       | Notes                                                                                                                                      |
+| ------- | --------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| HT-01   | Help centre links — presence, target, new-tab behaviour               | Pass         |                                                                                                                                            |
+| HT-02   | All tooltips — show on hover/focus, no dismiss control, never persist | Pass         | Core behaviour confirmed on all 10; `GAP-36` (`tt-charity-lookup` flash) and `GAP-37` (`tt-summary-review` wrong copy) both fixed same day |
+| HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass         |                                                                                                                                            |
+| HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass         |                                                                                                                                            |
+| HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Blocked      | Steps 1-3 pass (axe-core clean; `GAP-38` keyboard fix; focus order confirmed logical). Step 4 (screen reader) deferred                     |
+| HT-06   | Contextual help deep-links — every screen opens the right page        | Not runnable | Added 2026-08-06 ahead of the feature. `GAP-45` not built — Help still opens the root everywhere. Slugs verified against the live sitemap  |
 
 ---
 
@@ -181,9 +182,50 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 ---
 
+### HT-06 — Contextual Help Deep-Links — Every Screen Opens the Right Page
+
+**Status: not yet runnable — `GAP-45` is logged but not built.** Added 2026-08-06 so the coverage exists before the feature does, and so the maintenance risk below has a home.
+
+**Prerequisite:** Signed in, with at least one application far enough through the flow to reach Step 5.
+
+**Background:** The nav "Help" button currently opens the help centre **root** from every screen. `GAP-45` wires it to `lib/help-centre.ts`'s existing `helpCentreUrl(path)` so each route opens its own page. **This case matters more than a normal UI check because the target is an external GitBook.** A page renamed or moved on the GitBook side silently 404s one route's Help button, **nothing in CI can detect it**, and no client-side fallback is possible — a GitBook 404 is invisible to the app. This case is the only mechanism that will catch it.
+
+**Steps:**
+
+1. From each screen below, click **Help** in the authenticated nav
+2. Confirm it opens in a **new tab** (unchanged behaviour, `AC-FR-49-01`) and lands on the page named — not the root, and not a 404
+3. Note any that 404 or land on the wrong page
+
+| Screen                   | Expected help page                             |
+| ------------------------ | ---------------------------------------------- |
+| Step 1 / new application | Choosing your funder and grant                 |
+| Step 2                   | Uploading funder guidelines                    |
+| Step 3                   | Reviewing the AI summary                       |
+| **Step 4**               | **Writing and editing an answer**              |
+| Step 5                   | Final review                                   |
+| Profile                  | Setting up your charity profile                |
+| Account settings         | Changing your password                         |
+| Delete account           | Deleting your account                          |
+| Dashboard                | Help centre root (no clean match — see GAP-45) |
+
+4. Confirm the **footer** "Help centre" link and the dashboard empty-state link still open the **root** — they are general-purpose and deliberately not deep-linked
+5. Re-run step 2 for every row whenever the help centre is restructured
+
+**Expected result:**
+
+- Every screen opens its own help page, in a new tab, with no 404s
+- Footer and empty-state links unchanged, still landing on the root
+
+**Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☒ **Not runnable — feature not built**
+
+**Notes:** Slugs verified against the live GitBook sitemap on 2026-08-06 (21 pages), and the Step 4 target was fetched and confirmed live rather than assumed. Two rows remain WJ's call: the Dashboard has no clean match (nearest is `reference-and-faqs/application-status-labels`), and whether the public routes deep-link too (`/register` → creating-your-account, sign-in and forgot-password → signing-in) — currently scoped to the authenticated nav only. **Six of the 21 help pages cover Step 4 alone**; one nav link can only target one, so landing users in the right section and letting GitBook's sidebar do the rest is the intended outcome, not a shortfall.
+
+---
+
 ## Document History
 
-| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| ------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2.0     | 2026-07-25 | Rapidglobe Ltd | Rewritten for `PDR-UI-008` v3.0's simplification (persistence removed). Old HT-02 (dismiss-and-persist), HT-03 (first-click auto-dismiss), HT-05 (persistent variant), and HT-07 (cross-device persistence) collapsed into a single new HT-02, since all 10 tooltips now behave identically (plain hover/focus, no dismiss, no memory). Old HT-04/HT-06/HT-08 renumbered to HT-03/HT-04/HT-05 with dismiss-specific steps removed. HT-01 (Pass) and old HT-02 (Pass, superseded) results carried forward from v1.0 live testing. |
-| 1.0     | 2026-07-24 | Rapidglobe Ltd | New plan created under `DR-TEST-001`, covering `PDR-UI-008` (help centre link + 9 persisted tooltips + 1 non-persisted password hint) as its own horizontal UI layer rather than folding coverage into the flagship or capability-matrix plans. Covers all 5 trigger variants, cross-session persistence, and the ADR-OPS-006 accessibility pass. Not yet executed.                                                                                                                                                              |
+| Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------- | ---------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.1     | 2026-08-06 | Rapidglobe Ltd | **HT-06 added ahead of the feature it tests (`GAP-45`, contextual help deep-links).** The nav Help button currently opens the help centre root from every screen; `GAP-45` wires it to the per-route page. The case is written now, marked **not runnable**, for a specific reason: the help centre is an **external GitBook**, so a page renamed on that side silently 404s one route's Help button, **nothing in CI can detect it**, and no client-side fallback is possible because a GitBook 404 is invisible to the app. HT-06 is the only mechanism that will catch it, and step 5 makes it a standing re-run whenever the help centre is restructured. All nine target slugs verified against the live sitemap on 2026-08-06 (21 pages), with the Step 4 target fetched and confirmed live rather than assumed. Two rows left as WJ's call: the Dashboard has no clean match, and whether public routes deep-link too. |
+| 2.0     | 2026-07-25 | Rapidglobe Ltd | Rewritten for `PDR-UI-008` v3.0's simplification (persistence removed). Old HT-02 (dismiss-and-persist), HT-03 (first-click auto-dismiss), HT-05 (persistent variant), and HT-07 (cross-device persistence) collapsed into a single new HT-02, since all 10 tooltips now behave identically (plain hover/focus, no dismiss, no memory). Old HT-04/HT-06/HT-08 renumbered to HT-03/HT-04/HT-05 with dismiss-specific steps removed. HT-01 (Pass) and old HT-02 (Pass, superseded) results carried forward from v1.0 live testing.                                                                                                                                                                                                                                                                                                                                                                                              |
+| 1.0     | 2026-07-24 | Rapidglobe Ltd | New plan created under `DR-TEST-001`, covering `PDR-UI-008` (help centre link + 9 persisted tooltips + 1 non-persisted password hint) as its own horizontal UI layer rather than folding coverage into the flagship or capability-matrix plans. Covers all 5 trigger variants, cross-session persistence, and the ADR-OPS-006 accessibility pass. Not yet executed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
