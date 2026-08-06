@@ -10,6 +10,42 @@
 
 ---
 
+## 2026-08-06 — Package C: GAP-39 and GAP-40 rules rewritten, and deliberately not signed off
+
+**Code complete. Not behaviourally verified, and the distinction is the point of this entry.**
+
+### GAP-39 — fixed at the level of the principle, not with a third exception
+
+The extraction rule excluded "data-entry fields (name, address, phone, email, website, charity number, dates, postcode)". That list is about **administrative identity and contact details** — the things a form fills in from a record. But it _read_ as though it were about **answer length**, and that is how three separate questions were dropped across three funders: a project funding amount (MK Community Foundation), a funding-amount row in a table (Idlewild), and now a beneficiary count and a project duration (Stony Stratford).
+
+Both earlier instances were closed by adding a budget-shaped exception beside the list. **Being the sole exception is exactly why the third case had nothing to appeal to** — a beneficiary count is neither a contact detail nor a budget figure, so it fell through a gap that had been narrowed twice without ever being closed.
+
+The rule now states outright that **the test is what a question is about, never how long its answer is**; names the cases that were lost (people reached or served, project duration, start and end dates, sessions or places provided); forbids dropping a question solely because its answer is a number, date, duration or quantity; and ends with "when in doubt, extract". Budget and cost questions are recast as **a case of that rule rather than an exception to it**.
+
+The TABLE FORMAT skip-list carried its own independent copy of the flaw — which is precisely why the Idlewild instance survived the MK Community Foundation fix made the same day — and is now explicitly subordinated to the same principle, with a note that it exists to remove contact details, consents and uploads, **not short answers**.
+
+### GAP-40 — the missing rule, and why the existing one didn't bind
+
+The prompt already said, verbatim, "DO NOT MERGE ADJACENT QUESTIONS… never combine two related-but-distinct questions into one". §10's a) and b) merged anyway.
+
+The likely reason is worth recording, because it is not disobedience: **neither sub-part reads as a complete question on its own.** The form has a shared stem — "Please state what you hope to have achieved:" — above "a) Six months after receiving a grant" and "b) Twelve months after receiving a grant". Extracting b) alone produces a fragment, so merging looks like the only way to produce something coherent.
+
+The fix supplies the missing option: **combine the stem with each sub-part** to form a self-contained question for each. It also closes the escape hatch by name ("do NOT merge them on the grounds that a sub-part cannot stand alone") and adds that **a bare section heading is not a question** — which keeps §1 "PURPOSE OF APPLICATION"'s correct non-extraction correct, rather than inviting an over-correction in the other direction.
+
+### Why this is not marked done
+
+**Nine new prompt tests, suite 176 → 185** — and every one of them asserts that a rule is present and correctly framed. **A prompt test cannot tell you what the model does with the prompt.** They will catch a future edit that reintroduces length-based reasoning; they prove nothing about whether §4e now appears.
+
+A live extraction against the Stony Stratford form was attempted, to check behaviour directly. **It could not run: the AWS credentials in `.env.local` are rejected by Bedrock with a 403 signature mismatch** — correctly shaped at 20 and 40 characters, so almost certainly rotated since they were entered by hand on 2026-08-04. `AWS_REGION` is empty in that file too (harmless, the client defaults to `eu-west-2`). **This blocks all local AI testing, not just this check**, and is worth fixing independently of package C.
+
+So `GAP-39` and `GAP-40` are 🔵, not ✅, and `guideline-capability-matrix-test-plan.md` GCM-06 stays **Fail** with the capability matrix **🔴** on the dashboard. What a re-run must confirm: §4 produces six cards including §4e and §4f, §10 produces two — **and GCM-01 to GCM-05 still pass**, because a rule loosened to stop dropping short answers is exactly the change that could start extracting contact details and consent boxes instead.
+
+### A document was truncated and restored during this work
+
+`ADR-TRACEABILITY.md` was briefly emptied. A scripted edit opened it with mode `'w'` — which truncates on open — and then raised a `UnicodeEncodeError` before writing anything; a follow-up script read the now-empty file and wrote it back. The empty version was committed in `fd80101` and pushed. Caught while starting package C, restored from `77dc577`, and the lost v2.27 content (GAP-41's built status, the GAP-46 row) re-applied. Scripted whole-file rewrites of that register now assert on line count and output size before writing. No other document was affected — all eleven touched today were checked.
+
+---
+
 ## 2026-08-06 — Built: GAP-41, and the check it demanded found GAP-46
 
 **Package B. The fix took ten lines; the check attached to it found a second defect that would have made the fix look broken.**
