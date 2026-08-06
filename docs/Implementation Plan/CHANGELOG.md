@@ -10,6 +10,33 @@
 
 ---
 
+## 2026-08-06 — Two extraction defects found in a real, live grant application: GAP-39 and GAP-40
+
+**Found by WJ. No code changed — logging only, on WJ's instruction, pending further review of the same application.**
+
+This is the first defect report on this project drawn from a **genuine grant application submitted through the live service** rather than from a scripted test. WJ's wife completed a real Stony Stratford Town Council application for Stony Stratford Community Larder, using `docs/Grant Org Guidelines/Stony Stratford Grant-Application-Form-2026.docx` as the uploaded guidelines. Reconciling her 17 completed answers against the source form found two things wrong.
+
+**What the app produced:** 17 cards on Step 4 = **2 governance facts** (§7 total expenditure and reserves, tagged "Budget", per `PDR-AI-008`) + **15 extracted questions**. The form contains 17 narrative asks. The mapping is recorded in full in `guideline-capability-matrix-test-plan.md` GCM-06.
+
+**`GAP-39` (High) — two substantive questions were never extracted.** §4 has six lettered sub-questions; only a–d reached Step 4. Missing: **§4e "Please give an accurate figure for the number of people in the parish the project will serve"** and **§4f "For how long will the project run?"**. For a town council assessing a parish grant, beneficiary reach is close to the whole decision. Root cause is in `lib/prompts.ts`: the "questions" rule excludes data-entry fields and the TABLE FORMAT rule skips short numerical fields, and the **only** carve-out from either is the BUDGET/COST exception. Beneficiary counts and project durations are neither budget nor data-entry, so they fall straight through.
+
+**The pattern matters more than the instance.** This is the **third** time a substantive question has been dropped for the sole reason that its answer is short — after MK Community Foundation and Idlewild, both on 2026-07-27 (`guideline-capability-matrix-test-plan.md` Defect Log #1). Each of the first two was closed by adding its own narrowly-scoped exception beside the others rather than by correcting the underlying rule, which is why a third case with a slightly different flavour of short answer was able to appear. When this is tasked, the fix should be to the rule — a short answer is not the same thing as a non-narrative question — not a third one-off exception.
+
+**`GAP-40` (Medium) — two adjacent sub-questions merged into one card.** §10 MONITORING PROGRESS asks a) what you hope to have achieved six months after receiving a grant and b) twelve months after; both arrived as a single card (Q16), text concatenated. `lib/prompts.ts` already carries the governing rule verbatim — _"DO NOT MERGE ADJACENT QUESTIONS: even within a single form, each distinct question or ask must be extracted as its own separate item — never combine two related-but-distinct questions into one, even if they are adjacent, thematically similar, or commonly answered together"_ — and six-month versus twelve-month outcomes are precisely that case. **Nothing is lost to this applicant** (both asks are visible and one box answered both), which is why it is Medium and not High; a funder with per-question word limits, or two asks that diverge more sharply, would be materially misrepresented. Note the two defects need different remedies even though they live in the same file: `GAP-39` is a rule with an inadequate exception, `GAP-40` is an adequate rule the model did not follow.
+
+**Checked and found correct, so recorded here to stop them being re-investigated:**
+
+- **§1 "PURPOSE OF APPLICATION" is absent, and that is fine.** It is a numbered heading with no ask beneath it — only the skip note for recognised annual events. There was nothing to extract, and §2's wording ("a full description of your project, **or the purpose you require the grant for**") covers the same ground.
+- **§7's reserves-justification prose is not missing.** "If your organisation holds a large amount of reserves, please state what these reserves are for" appears as the helper text on the Reserves governance card, which is the `PDR-AI-008` behaviour, not a drop.
+- **Everything non-narrative was excluded correctly** — the front organisation-details table, §3's seven-principle tick-list, §5's expenditure/income table totals, §9's address and phone, §12's contact-person block, §13's supporting-documents checklist, and both signature blocks.
+- **No "Finances of Your Group" catch-all card appeared.** `PDR-AI-010` Option C governs `free_form` **sections** mode; this document extracted in **questions** mode, so that decision is out of scope here rather than regressed. Worth confirming deliberately if this fixture is ever run through the paste path.
+
+**Test coverage added the same day:** new **GCM-06** case in `guideline-capability-matrix-test-plan.md` (v1.5) — a docx **application form** rather than guidance about one, the only fixture in the corpus exercising lettered sub-question flattening and short-answer narrative asks. It is recorded as **Fail** and stays that way until both defects are fixed. `TEST-DASHBOARD.md` (v2.18) moves that plan 🟢 → 🔴, the first red on the dashboard since its 2026-07-16 reset.
+
+**Practical consequence for the applicant, recorded because it is the actual cost of the bug:** §4e and §4f will be blank when the answers are transcribed onto the real form, and she has to write them herself with no prompt from the service. She only discovers this by reading the original form — which is exactly what the product exists to save her from.
+
+---
+
 ## 2026-08-05 — Terms of Service v1.6: no-guarantee-of-funding statement given its own sub-heading
 
 **Requested by WJ, ahead of solicitor review (S2b).** Section 5 (AI-Generated Content) previously carried _"We make no representation that using Grant Pathway will result in a successful grant application. Funding decisions rest entirely with the relevant funder"_ as a single sentence sitting between two unrelated paragraphs — user responsibility for submitted content, and how AI processing works. Nothing was wrong with the wording; it was just easy to skim past mid-paragraph, and a solicitor is about to read this document closely.
