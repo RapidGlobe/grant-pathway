@@ -10,6 +10,33 @@
 
 ---
 
+## 2026-08-06 — AC-FR-18-02's silence rule withdrawn: every successful save will be visibly confirmed
+
+**Decided by WJ the same day `GAP-44` was raised. Six statements of the old rule across four live documents amended in one pass. No code changed.**
+
+`GAP-44` surfaced a conflict rather than a straightforward gap: adding the save confirmation WJ wanted would violate `AC-FR-18-02`, which required that during a background auto-save "no visible save indicator is shown to the user". That was a deliberate decision, not an oversight — `AC-FR-18-04`'s 2026-07-29 amendment had already carved **failures** out of the silence rule and pointedly left success alone.
+
+Two options were put to WJ. The narrower one — confirm blur and explicit saves, keep the 60-second sweep silent — would have delivered the reassurance while satisfying every existing criterion unamended, and was the recommendation.
+
+**WJ chose the broader option: amend `AC-FR-18-02` and confirm every save, sweep included.** His reasoning is a product judgement worth preserving in full, because it overturns the assumption the original rule rested on:
+
+> Silence was chosen to avoid nagging the user with an indicator firing every 60 seconds regardless of what they were doing. Weighed against a real applicant's hesitancy to close a browser tab containing hours of writing, that is the lesser concern. **Silence reads as "nothing is happening", not "everything is fine"** — a nervous user given no signal assumes the worst. And the user who steps away mid-sentence _without_ moving focus is precisely the nervous user this is for; the narrower option is the one that leaves them with nothing.
+
+**What survives from the withdrawn rule.** Its intent — do not get in the user's way — is now a constraint written into `AC-FR-18-05`: the confirmation must not interrupt typing, steal focus, or require dismissal, and must be visually distinct from `AC-FR-18-04`'s "Not saved." alert, which is an alert the user must act on rather than a confirmation they need not. Only the assumption that silence was the way to achieve that intent has been dropped.
+
+**Amended as a class, not an instance.** The rule appeared in **six statements across four live documents**, and all six were changed together rather than only the one that prompted the question:
+
+- `acceptance-criteria.md` — `AC-FR-18-02` rewritten with a full amendment note; `AC-FR-18-04`'s "Note on the deliberate exception to AC-FR-18-02" rewritten, since it described itself as an exception to a rule that no longer exists; `AC-FR-18-05` promoted from draft to criterion
+- `PRD-Grant-Pathway.md` (**v0.67**) — FR-18's implementation notes and Section 7's auto-save line
+- `docs/Business Design/design-requirements.md` §7.8 — "No visible indicator for background auto-save (avoids distraction)" reversed with the reasoning recorded
+- `docs/Business Design/ui-inventory-and-data-contracts.md` — the cross-step auto-save statement
+
+This project has now recorded the fix-the-instance-not-the-class failure seven times, most recently in `GAP-43` earlier the same day. Amending one statement and leaving five contradicting it would have been the eighth.
+
+**`AC-FR-18-05` (now a criterion, not a draft):** every successful save is visibly confirmed — blur, background sweep and explicit alike — unobtrusively, without stealing focus or needing dismissal, and visually distinct from the failure alert. **Not built.** `GAP-42`, `GAP-43` and `GAP-44` all remain open with no covering task.
+
+---
+
 ## 2026-08-06 — Step 4 never says you can stop and come back: GAP-42, GAP-43, GAP-44
 
 **Raised by WJ after watching his wife work through a real application. All three approved, none built — one of them cannot be built until WJ rules on a spec conflict.**

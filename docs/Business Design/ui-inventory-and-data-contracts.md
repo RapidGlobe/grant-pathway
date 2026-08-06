@@ -329,7 +329,7 @@ Authenticated Navigation Bar, Global Footer.
 
 All application flow steps share the Step Indicator panel and are contained within the `/applications/[id]` route (or `/applications/new` for the initial Step 1 creation). Steps are UI states within a single page, not separate routes.
 
-Auto-save behaviour applies across all steps: progress is saved on Continue and silently every 60 seconds in the background.
+Auto-save behaviour applies across all steps: progress is saved on Continue, on field blur, and every 60 seconds in the background. **Amended 2026-08-06 (`GAP-44`):** background saves are no longer silent — every successful save is visibly confirmed to the user, unobtrusively and without stealing focus (`AC-FR-18-05`). Not yet built.
 
 ---
 
