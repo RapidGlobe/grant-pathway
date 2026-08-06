@@ -10,6 +10,42 @@
 
 ---
 
+## 2026-08-06 — Built: GAP-41, and the check it demanded found GAP-46
+
+**Package B. The fix took ten lines; the check attached to it found a second defect that would have made the fix look broken.**
+
+### GAP-41 — the Word export now keeps every line break
+
+`app/api/export/[applicationId]/route.ts` passed each whole answer to the `docx` library as a **single `TextRun`**, and that library ignores `\n` inside a run. Every paragraph break, blank line and hyphen bullet an applicant typed was silently discarded. The helper now splits on `\n` and emits one run per line with `break: 1` on all but the first — soft line breaks _within_ one paragraph, so the existing paragraph spacing is untouched. CRLF is normalised first, so an answer pasted from a Windows-authored document doesn't gain a blank line between every real one.
+
+**The helper moved to `lib/docx-text.ts`, and that is not tidiness.** It previously lived inside the route handler, where nothing could test it — which is part of why this shipped and then survived a passing RT-09.
+
+### The verification is the interesting part
+
+The tests generate a **real `.docx`**, unzip it, and count `<w:br/>` in the WordprocessingML. That was a deliberate choice: the defect was invisible at the level of "did we pass the right string", because **the string was always right**. It only existed in the file.
+
+Running the old code path the same way confirms it exactly — **zero `<w:br/>` elements**, with the answer sitting in a single node as `<w:t xml:space="preserve">one\ntwo\nthree</w:t>`. The newlines were in the XML all along; WordprocessingML simply treats a literal newline inside `<w:t>` as whitespace. Any assertion that stopped at the run level would have passed against the broken code — **which is precisely how `regression-test-plan.md` RT-09 passed over this bug on 2026-07-28.**
+
+### GAP-46 — "Help me improve this" was instructed to destroy the layout
+
+`GAP-41`'s task note said to check the refine round-trip in the same pass. **The check found a real defect, not a clean bill.**
+
+`buildRefinePrompt()` opens by asking the model to _"Improve the **structure**, flow, and clarity of their answer"_ and said nothing anywhere about preserving line or paragraph structure. "Structure" reads naturally as licence to reflow a deliberately bulleted, blank-line-separated answer into running prose.
+
+**Why this mattered so much to `GAP-41`.** Had only the export been fixed, an applicant who laid an answer out carefully and then clicked "Help me improve this" would have had that layout flattened one step earlier — in the database — and the export would then have faithfully reproduced the flattened version. The bug would have appeared to persist. The export fix would have looked unreliable rather than simply incomplete, and the obvious next move would have been to re-investigate the export, which was by then correct.
+
+Not hypothetical for this user: the real Stony Stratford answer that exposed `GAP-41` is exactly the shape at risk — a bulleted facilities list, a "Funding to Date" block and a worked calculation, on a question that offers the refine button.
+
+**The fix** adds an explicit `PRESERVE THE APPLICANT'S LAYOUT` instruction naming what must survive, and **disambiguates the word that caused the problem**: "structure" means argument, order and sentence construction, never visual layout. Explicit prohibitions on reflowing a list into a running sentence, merging paragraphs, and adding layout the applicant did not use — plus a line on _why_, since charities lay answers out to fit a funder's form and that layout is part of their work.
+
+### Verification
+
+**13 new tests, suite 163 → 176.** Nine in `__tests__/docx-text.test.ts` (five on the runs, four on the packed document, including the real applicant answer as a fixture), four in `__tests__/prompts.test.ts` — one of which asserts the layout instruction survives **all three** word-limit branches, because the over-limit branch tells the model to cut content and is where it is most tempted to restructure wholesale. Type-check, lint (`--max-warnings 0`) and `prettier --check` all clean.
+
+⚠️ **RT-09 stays Pass (caveat) and still needs a human.** No automated test opens the finished document in Word, and the original defect was found by a person reading her own download. `regression-test-plan.md` → **v2.13**, D-015 closed in code with the manual re-run still outstanding; the plan stays 🟡 on the dashboard until WJ runs it.
+
+---
+
 ## 2026-08-06 — Built: GAP-42, GAP-43, GAP-44 and GAP-45 (package A + the help deep-links)
 
 **The first code to land from the Stony Stratford review.** Everything below was logged earlier the same day and specified before a line was written.

@@ -334,6 +334,8 @@ export function buildRefinePrompt(
 
   return `A UK charity is writing a grant application. Improve the structure, flow, and clarity of their answer provided in the <original_answer> tag below. Correct any spelling errors and grammatical mistakes. You must not add any information that is not already in the answer, and any facts, dates, figures, names, or claims that you keep must not be altered. If you need to shorten the answer to meet a word limit, you may omit less essential detail, examples, or repetition — do not preserve every sentence at the cost of exceeding the limit. Maintain their first-person plural voice ("we", "our", "us").
 
+PRESERVE THE APPLICANT'S LAYOUT. Keep their paragraph breaks, their blank lines between paragraphs, and any list they have written as separate lines (for example lines beginning with a hyphen, a bullet, or a number) on their own separate lines. "Structure" in the instruction above means the structure of the writing — argument, order, sentence construction — and never the visual layout. Do not reflow a list into a running sentence, do not merge separate paragraphs into a single block, and do not add layout the applicant did not use. Charities lay answers out deliberately to fit a funder's form, and that layout is part of their work.
+
 ${limitInstruction}
 
 Always correct any spelling errors and grammatical mistakes, even if the answer is very short. If the answer is too short or unclear to meaningfully improve in terms of structure or flow, make only spelling and grammar corrections and return the answer without other changes. Never decline to produce a refined answer — always attempt the improvements above, regardless of the word-limit instruction above or how irrelevant the content seems.
