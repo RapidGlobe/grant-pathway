@@ -10,6 +10,48 @@
 
 ---
 
+## 2026-08-06 — The four register defects fixed; gaps register sorted and colour-coded
+
+Follow-on from the gate walk earlier the same day, on WJ's instruction. Everything that walk found is now repaired, and the register has a Status column.
+
+### The four fixes
+
+**1. `GAP-32` added to the register.** It had lived only in the `ADR-DATA-002` consequence table since 2026-07-10, so no register-based triage could ever see it. It is now the register's **only 🔴**: `FR-22` and `AC-FR-22-01/02/03` still state the retired "never store guidelines" rule, four weeks after `ADR-DATA-002` was reversed and guidelines began being retained in `application_guidelines` (migration `20260714000001`). The PRD and acceptance criteria currently describe behaviour the product deliberately no longer has. **It still has no task** — that is what 🔴 means, and it is now visible.
+
+**2. `GAP-01`, `GAP-02` and `GAP-04` corrected to ✅** in the ADR consequence tables, where they read ⚠️ Gap while the register recorded all three built on 2026-05-21. **Verified in the code first rather than taken on the register's word** — `lib/prompts.ts`, whose header comment says "GAP-01 resolved" in as many words; the asymptotic `p += (89 - p) * 0.04` progress bar with `clearInterval`/`setProgress(100)` in `components/application-step3-summary.tsx`; and `httpStatusForError()`/`aiErrorBody()` in `lib/ai-error-handler.ts`, used by every AI route.
+
+**3. Task column re-pointed** where the 2026-07-30 restructure moved work without updating the register: `GAP-21`/`GAP-22`/`GAP-23` → `P5.3b`, `GAP-12` → `P5.6`. Each correction records what the cell used to say, so anyone following an older reference can tell it has moved rather than concluding the register is wrong.
+
+**4. `GAP-27` given the 🔵 symbol it never had.** Its status cell read the bare word "Partial" — it predates the 2026-07-30 key and was not among the sixteen rows reclassified that day, so it was invisible to any scan for non-built rows.
+
+### Sorted, and colour-coded
+
+**Sorted numerically.** The register had drifted into insertion order — …31, 30, 35, 38, 37, 36, 33, 39… — which makes it impossible to see at a glance which numbers are in use. That is a contributing condition to both `GAP-32` sitting outside the register for four weeks and the duplicate `GAP-39`/`GAP-40` issued by two parallel sessions on 2026-08-06. All numbers 01–48 are now present, each exactly once, and the instruction to add new gaps in numeric position is written above the table.
+
+**New Status column**, first column so the colours align down one edge:
+
+| Status         | Meaning                                             |
+| -------------- | --------------------------------------------------- |
+| 🔴 No task     | No covering task exists anywhere                    |
+| 🟡 Tasked only | A step exists in the plan and **the code does not** |
+| 🔵 Partial     | Some of it is built; the row says which part is not |
+| ⚪ Accepted    | Consciously not doing it, decision recorded         |
+| 🟢 Built       | The consequence is genuinely discharged             |
+
+**These are the five categories established on 2026-07-30 — the discs add contrast, not meaning.** WJ asked for red and green and then asked whether a third category deserved highlighting. It does, and it is the most important one: **🟡**. 📋 is a beige clipboard, so the single category that means _promised but does not exist_ looked the mildest thing in the table. That is precisely how the Phase 4 → Phase 5 gate came to sign off nine gaps as "resolved" when only one had been built. Two further categories earned discs on the same reasoning — 🔵 partial, which is one named check away from done and should not be mistaken for either end, and ⚪ accepted, which is finished business and should not draw the eye at all.
+
+Each disc is paired with a word rather than standing alone. Colour on its own is not an accessible signal, and this project holds itself to that standard elsewhere (`NFR-06`).
+
+### Where the register now stands
+
+**48 rows: 31 🟢 · 8 🟡 · 4 🔵 · 4 ⚪ · 1 🔴.**
+
+The 🟡 rows remain the ones that matter — `GAP-03`, `GAP-05`, `GAP-12`, `GAP-17`, `GAP-21`, `GAP-22`, `GAP-23`, `GAP-28`, each a promise with no code behind it, and all now carried by the new `P5.5` item 4 before the Go-Live gate can be signed.
+
+The v2.31 gate row was **annotated rather than rewritten**, so the finding and the fix stay legible as two separate events rather than collapsing into a tidy history that never had a problem in it.
+
+---
+
 ## 2026-08-06 — Nothing in Phase 5 audits the gaps register; a gate row and a P5.5 task now do
 
 WJ asked a one-line question — is `ADR-TRACEABILITY.md`'s Gaps register audited as part of Phase 5? — and the answer is no.
