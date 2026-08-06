@@ -10,6 +10,38 @@
 
 ---
 
+## 2026-08-06 — GAP-32 scoped properly: its own description was wrong, and the real work was six other documents
+
+WJ asked what needed doing to tidy up `GAP-32`. Answering it properly meant checking the gap's own claim first, which turned out to be false.
+
+### The gap was describing work that finished four weeks ago
+
+`GAP-32` read: "`FR-22` and its three acceptance criteria (`AC-FR-22-01/02/03`) reworded to match the reversed decision — not yet scheduled to a task." **All four of those had already been done**, on 2026-07-10 and 2026-07-14. `AC-FR-22-01/02/03` all describe retention; a fourth, `AC-FR-22-04`, was added; `moscow-feature-register.md`'s `FR-22` entry was updated; and `ADR-DATA-002` itself records the rewording as "done the same day".
+
+What had **not** been done was everything else. Grepping the whole `docs/` tree for the pre-reversal claim found six documents still asserting that guidelines are not stored — none of them the ones the gap named. **A gap's own text is a claim, not evidence.** This one had been carrying a stale scope since 2026-07-10 and would have been "closed" by anyone who trusted it and checked only the four things it listed.
+
+### Split three ways
+
+**A — done today.** Four plain factual contradictions:
+
+- `data-model.md` **twice**, and this is the worst of them: the `applications` key-constraints bullet and §7's "Data Not Stored" table both said guidelines are session-use only, while **§4a of the same document specifies the `application_guidelines` table in full and the ERD at the top of it shows the table**. The document had been contradicting itself since 2026-07-14. §7's row is now re-headed to name the uploaded **file**, which genuinely does belong in a "not stored" table; the extracted **text** no longer does.
+- `ui-inventory-and-data-contracts.md`, Screen 2's description.
+- `AC-FR-22-04`, whose closing clause said the retained text "isn't surfaced back to the user anywhere yet (`P6.4` builds the viewer that will)". That was written on 2026-07-14 — **the same day `P6.4` shipped that viewer** — and never revisited. Its `GAP-34` reference was stale too; that gap closed on 2026-07-25.
+
+**B — drafted, pending sign-off.** `ADR-ARCH-004` and `ADR-FILE-004`, updated as a pair because `ADR-ARCH-004`'s own 2026-07-10 note says to. Both carried a note promising a real update "once `P6.2a` ships"; it shipped on 2026-07-14, so the trigger has been met. Corrections are stated in new dated notes rather than edited into the Context, following this repository's convention of leaving superseded text intact — the same way `ADR-DATA-002` keeps its original decision. Neither decision changes: `ADR-ARCH-004` chose the database as primary state store _despite_ the guidelines being unstorable, so removing that weakness only strengthens it.
+
+`ADR-FILE-004`'s note also states the one genuine open question, and deliberately does not answer it: **should the `sessionStorage` round-trip be removed now the text can be re-read from the server?** That is a code change and WJ's call. The recommendation recorded there is not to touch it before go-live — the retention path is not in production yet and `P5.5` has not tested it there, so removing a working mechanism to fix a cosmetic gap trades real risk for a small gain.
+
+**C — tasked into `P5.4`.** The PRD's `FR-22` row is the one place still carrying the old wording **legitimately**. It says guidelines "shall not be permanently stored", qualified "**True of the product as it exists in production today; changing under Phase 6**" — and that is accurate, because the retention migration has reached `grant-pathway-dev` only. **Correcting it today would make the PRD wrong in the other direction.** So `P5.4` gains a nested trigger under its migration-push step, saying explicitly not to fix it early and specifying what to change when `supabase migration list` shows the versions matched on prod.
+
+### Where this leaves the register
+
+`GAP-32` moves 🔴 → 🔵. **The register now has no red rows: 48 rows — 31 🟢 · 8 🟡 · 5 🔵 · 4 ⚪ · 0 🔴.**
+
+`ADR-INDEX.md` needs no change — both ADRs remain ✅ Decided, because their decisions stand and only their Context was corrected.
+
+---
+
 ## 2026-08-06 — The four register defects fixed; gaps register sorted and colour-coded
 
 Follow-on from the gate walk earlier the same day, on WJ's instruction. Everything that walk found is now repaired, and the register has a Status column.

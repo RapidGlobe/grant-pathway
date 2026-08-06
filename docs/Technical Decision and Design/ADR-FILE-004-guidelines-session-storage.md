@@ -83,8 +83,26 @@ This ADR will need a real update once P6.2a ships. At that point, the client-sid
 
 This should be updated together with `ADR-ARCH-004`, which currently shares the same "guidelines can't be stored" assumption (see that ADR's matching 2026-07-10 note).
 
+## Note — 2026-08-06 (`GAP-32`) — the 2026-07-10 note's trigger has been met
+
+**DRAFT — pending WJ's sign-off.** `P6.2a` shipped on 2026-07-14, so the "will need a real update once P6.2a ships" condition above is satisfied. The correction below is stated here rather than edited into the Context, following this repository's convention of leaving superseded text intact (as `ADR-DATA-002` does with its original decision).
+
+**Context correction.** The opening line reads: "Funder guidelines are not persisted to the database (ADR-DATA-002, FR-22)." **This is no longer true.** The extracted, marker-tagged guideline text is retained for the life of the application in `application_guidelines` (migration `20260714000001`). What is still never persisted is the uploaded **file** — it goes to the `guidelines-temp` bucket, is read once, and is deleted.
+
+**Still true in production, for now.** The retention migration has reached `grant-pathway-dev` only. Until `P5.4` pushes migrations to `grant-pathway-prod`, the live service behaves exactly as this ADR originally described, `sessionStorage` and all.
+
+### The open question — for WJ, not settled here
+
+**Should the `sessionStorage` round-trip be removed now that the text can be re-read from the server?** This is a code change, not a documentation change, which is why this note stops short of deciding it. The trade-off:
+
+- **Keep it.** It is built, it works, and it costs nothing per request. It is also the only mechanism that survives the dev/prod split described above — it works identically whether or not the retention migration has landed.
+- **Remove it.** The client-side copy is the reason the Step 2 input area still appears empty on return (`AC-FR-22-04`), and the reason `GAP-34`'s "not saved" copy was misleading enough to need removing on 2026-07-25. Re-reading from `application_guidelines` would let Step 2 repopulate, which is the behaviour a user would expect.
+
+**Recommendation: do not touch it before go-live.** The retention path is not yet in production and `P5.5` has not tested it there. Removing a working mechanism to fix a cosmetic gap, in the window before launch, trades a real risk for a small gain. Revisit once `P5.4` has pushed migrations and `P5.5` has exercised retention against production.
+
 ## Revision History
 
-| Date       | Change                                                                                                                                                                                                                                                                                                                                                  |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-07-10 | Added forward-looking note: `ADR-DATA-002`'s reversal means guideline text is now retained server-side, so the `sessionStorage` round-trip described here — still accurate today — likely becomes unnecessary once P6.2a ships. To be updated together with `ADR-ARCH-004`, which shares the same now-outdated "guidelines can't be stored" assumption. |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-06 | **DRAFT, pending WJ.** `GAP-32`: the 2026-07-10 note's trigger condition is met — `P6.2a` shipped 2026-07-14. Added a note correcting the Context's "not persisted to the database" without editing it in place, distinguishing the retained **text** from the never-persisted **file**, and recording that production still behaves as originally written until `P5.4` pushes migrations. States the open `sessionStorage` question in full for WJ, with a recommendation not to touch it before go-live. |
+| 2026-07-10 | Added forward-looking note: `ADR-DATA-002`'s reversal means guideline text is now retained server-side, so the `sessionStorage` round-trip described here — still accurate today — likely becomes unnecessary once P6.2a ships. To be updated together with `ADR-ARCH-004`, which shares the same now-outdated "guidelines can't be stored" assumption.                                                                                                                                                    |

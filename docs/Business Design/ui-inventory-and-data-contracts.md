@@ -373,7 +373,7 @@ Authenticated Navigation Bar, Global Footer, Step Indicator.
 
 **Route:** `/applications/[id]`
 **Auth state:** Authenticated only.
-**Description:** Upload or paste the funder's guidelines. Guidelines are not stored — they are passed to AI processing in-session only (FR-22).
+**Description:** Upload or paste the funder's guidelines. The extracted, marker-tagged guideline **text** is retained for the life of the application in `application_guidelines`; the uploaded PDF or Word **file** is never stored (FR-22, as revised by `ADR-DATA-002` on 2026-07-10). _Corrected 2026-08-06 (`GAP-32`) — this read "Guidelines are not stored — they are passed to AI processing in-session only", which stopped being true when the retention table was created on 2026-07-14._
 
 ### Data In
 
@@ -901,6 +901,6 @@ None. Display only. Button disabling is a side effect handled by the parent page
 
 ---
 
-_Last updated: 2026-04-17_
+_Last updated: 2026-08-06 — Screen 2's description corrected (`GAP-32`, item A). It had read "Guidelines are not stored — they are passed to AI processing in-session only (FR-22)", which stopped being true on 2026-07-14 when the `application_guidelines` retention table was created following `ADR-DATA-002`'s reversal. The extracted, marker-tagged **text** is retained for the life of the application; the uploaded PDF or Word **file** is what is never stored._
 _Status: Complete_
 _Sources: PRD-Grant-Pathway.md (Section 7, previously screen-requirements.md, retired 2026-07-13), information-architecture-and-navigation.md, application-status-model.md, data-model.md, design decision records DDR-LA-001, DDR-LA-002, DDR-CS-005, DDR-IP-001_

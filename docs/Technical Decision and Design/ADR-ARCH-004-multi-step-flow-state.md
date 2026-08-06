@@ -92,8 +92,25 @@ However, `ADR-DATA-002` reversed the "guidelines are never stored" decision on 2
 
 This should be updated together with `ADR-FILE-004`, which currently shares the same "guidelines can't be stored" assumption (see that ADR's matching 2026-07-10 note).
 
+## Note — 2026-08-06 (`GAP-32`) — the 2026-07-10 note's trigger has been met
+
+**DRAFT — pending WJ's sign-off.** `P6.2a` shipped on 2026-07-14, so the "once P6.2a ships" condition above is satisfied and the real update it promised is now due. Two statements in this ADR are false as written. **They are corrected here rather than edited in place**, following this repository's convention of leaving superseded text intact for the historical record (as `ADR-DATA-002` does with its original decision):
+
+- **Context** reads: "The funder guidelines text is session-use only (FR-22 — not stored in the database)." **This is no longer true.** The extracted, `[PAGE N]`/`[SECTION: …]`-tagged guideline text is retained for the life of the application in `application_guidelines` (migration `20260714000001`). Only the uploaded PDF or Word **file** is not persisted.
+- **Option A's weakness** reads: "The funder guidelines (Step 2 input) cannot be stored — must be held in session/memory and re-submitted if the user navigates away." **That weakness no longer exists.**
+- **The Decision section's "Funder guidelines (Step 2)" line** reads: "Not stored in the database per ADR-DATA-002. Handled via `sessionStorage` — see ADR-FILE-004." **The first sentence is no longer true**; the second still is, and is the subject of the open question below.
+
+**Unchanged and still accurate:** the Consequences bullet "The AI API routes receive guidelines text in the POST body (not from the database)" — that is how the routes still work, and retention did not change it.
+
+**The decision itself is unaffected, and is if anything strengthened.** Option A (database as primary state store) was chosen despite that weakness; removing the weakness removes the only part of the flow that Option A could not persist.
+
+**Still true in production, for now.** The retention migration has reached `grant-pathway-dev` only. Until `P5.4` pushes migrations to `grant-pathway-prod`, production behaves exactly as this ADR originally described. Do not read the correction above as a statement about the live service yet.
+
+**One open question, deliberately not settled here — it is WJ's call and it changes code, not just this document.** `ADR-FILE-004`'s `sessionStorage` round-trip may now be unnecessary for returning to Step 2, since the text can be re-read from the server. See that ADR's matching 2026-08-06 note for the full statement of the question.
+
 ## Revision History
 
-| Date       | Change                                                                                                                                                                                                                                                                               |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-07-10 | Added forward-looking note: `ADR-DATA-002`'s reversal means the Option A weakness ("guidelines cannot be stored") goes away once P6.2a ships — guidelines become retrievable server-side. To be updated together with `ADR-FILE-004`, which shares the same now-outdated assumption. |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-08-06 | **DRAFT, pending WJ.** `GAP-32`: the 2026-07-10 note's trigger condition is met — `P6.2a` shipped 2026-07-14. Added a note correcting the two false statements (Context's "session-use only", Option A's "cannot be stored") without editing them in place, recording that the chosen option is unaffected and strengthened, and flagging that production still behaves as originally written until `P5.4` pushes migrations. The `sessionStorage` question is left open to WJ in `ADR-FILE-004`'s matching note. |
+| 2026-07-10 | Added forward-looking note: `ADR-DATA-002`'s reversal means the Option A weakness ("guidelines cannot be stored") goes away once P6.2a ships — guidelines become retrievable server-side. To be updated together with `ADR-FILE-004`, which shares the same now-outdated assumption.                                                                                                                                                                                                                              |
