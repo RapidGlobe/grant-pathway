@@ -10,6 +10,45 @@
 
 ---
 
+## 2026-08-06 — Nothing in Phase 5 audits the gaps register; a gate row and a P5.5 task now do
+
+WJ asked a one-line question — is `ADR-TRACEABILITY.md`'s Gaps register audited as part of Phase 5? — and the answer is no.
+
+### What the check found
+
+**The phase-gate mechanism exists and had stopped running.** `ADR-TRACEABILITY.md` opens its sign-off section with "Before each phase begins, this section must be completed by reviewing the gaps register", and `AGENTS.md` §2 makes a full ADR-consequences sweep mandatory before a new phase starts. The table's last row is **Phase 4 → Phase 5, signed 2026-06-17**. Phase 6 began on 2026-07-05 and P6.1–P6.5 are built. The sweep that should have preceded Phase 6 never happened.
+
+**No Phase 5 task covers it either.** All eleven were checked (`P5.PERF1`, `P5.0`, `P5.1`, `P5.2`, `P5.3`, `P5.3b`, `P5.4`, `P5.5`, `P5.5b`, `P5.6`, `P5.7`). `P5.0`'s requirements reconciliation is the closest thing and it was scoped to the PRD, BRD, NFRs, technical design, data model and acceptance criteria — `pre-launch-reconciliation-2026-08-05.md` names `ADR-TRACEABILITY.md` exactly twice, both times as a document to _correct_ in passing (`R-08`'s tooltip count, `R-17`'s axe/`NFR-06` finding), never as one to audit. `P5.5` executes test plans against production and does not touch it.
+
+**This matters because of what the last audit found.** The Phase 4 → Phase 5 row carries a 2026-07-30 annotation: of nine gaps it recorded as "resolved", only one had actually been built. The rest were _tasked_ — a step written into the plan and nothing more. That is why the 📋 symbol was created. The register had been read wrongly for roughly ten weeks.
+
+### State of the register, walked row by row on 2026-08-06
+
+All 47 rows, reading each Resolved cell directly: **31 ✅ built · 4 partial · 8 📋 tasked-only · 4 ➖ accepted deviation · 0 ⚠️**.
+
+The **8 📋 rows are the ones that matter** — each is a promise with no code behind it: `GAP-03`, `GAP-05`, `GAP-12`, `GAP-17`, `GAP-21`, `GAP-22`, `GAP-23`, `GAP-28`. The 4 partials are `GAP-27` (Sentry performance monitoring), `GAP-39` and `GAP-40` (prompt rules rewritten the same day, awaiting a live `GCM-06` re-run) and `GAP-48` (migration written, not yet applied to either Supabase project).
+
+Four defects surfaced that only a full pass can surface:
+
+1. **`GAP-32` is not in the register at all.** The register's preamble says "All ⚠️ rows consolidated here for easy triage". `GAP-32` (`ADR-DATA-002` — rewording `FR-22` and `AC-FR-22-01/02/03` after the "never store guidelines" reversal) has sat as ⚠️ in the ADR consequence table since 2026-07-10 with a Task cell reading "Not yet scheduled to a task", and was never copied across. It is the only number between 01 and 48 with no register row. Beyond triage, that makes the register unsafe as the source for the next free GAP number — the same hazard that let two parallel sessions each issue `GAP-39` and `GAP-40` on 2026-08-06.
+2. **The document's two halves disagree.** `GAP-01`, `GAP-02` and `GAP-04` still read ⚠️ Gap in the `ADR-AI-003`, `ADR-AI-005` and `ADR-AI-009` consequence rows while the register records all three as built on 2026-05-21. This is the 2026-07-30 split running the other way, and it is not harmless: `AGENTS.md` §2 sends every session to the ADR-consequence half, so a stale ⚠️ there buys wasted re-work exactly as a stale ✅ there buys a missing feature.
+3. **The Task column points at pre-restructure tasks.** `GAP-21`/`GAP-22`/`GAP-23` read `P5.3`, but the 2026-07-30 restructure created `P5.3b` to hold the spec deviations and the Go-Live gate lists all three under it. `GAP-12` reads `P5.4`, but the `v1.0.0` tag was moved to `P5.6` that same day. Following the register's own pointers today leads to the wrong task.
+4. **`GAP-27` has no status symbol** — the cell reads the bare word "Partial". It predates the 2026-07-30 key and was not among the sixteen rows reclassified that day.
+
+### What changed
+
+**A Phase 5 → Phase 6 gate row** in `ADR-TRACEABILITY.md` (v2.31), recording the above. It is **deliberately left unsigned**, and says so in the sign-off cell: the row was written after Phase 6 was built, and a retrospective gate must not be dressed up as one that ran on time. It records state; it does not clear Phase 6's entry.
+
+**`P5.5` item 4** in `IMPLEMENTATION-PLAN.md` (v3.25) — the register audit as a real pre-go-live task. Every non-✅ row disposed of explicitly, the two halves reconciled, Task pointers corrected, every ⚠️ row confirmed present in the register, every GAP number confirmed used once, output as a dated artefact in the manner of `pre-launch-reconciliation-2026-08-05.md`. It carries its own line on the **Phase 6 → Go-Live Gate** rather than hiding inside `P5.5`, because it is the only gate item that checks whether the gate's own inputs are honest. **The gate must not be signed with a 📋 row left unexplained** — either it is built, or launching without it is a recorded decision.
+
+**Not done unilaterally:** both were drafted on WJ's instruction after the finding was put to him. Neither adds work to Phase 6 or changes any existing task's scope.
+
+### Incidental fix in the same pass
+
+The v2.30 document-history row in `ADR-TRACEABILITY.md` contained an unescaped `\|\|` inside a code span (`starts_with(name, (select auth.uid())::text \|\| '_')`), which split that row into six cells in a four-column table. Prettier then padded the two stray cells with 1,941 spaces, so the corruption rendered as a plausible-looking table and nothing failed. Same class as the `\n`-in-a-Python-string corruption of `IMPLEMENTATION-STATUS.md` found the same day, and the same lesson: **prettier disguises structural table damage rather than revealing it.** Pipes inside code spans in a markdown table must be escaped.
+
+---
+
 ## 2026-08-06 — GAP-48 fixed: the bucket's security policies now actually grant, for the first time since May
 
 Follow-on from `GAP-47`, taken as its own task rather than bundled into it, which was the point of raising it separately.
