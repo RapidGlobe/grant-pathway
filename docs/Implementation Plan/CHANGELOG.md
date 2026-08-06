@@ -10,6 +10,45 @@
 
 ---
 
+## 2026-08-06 — Step 4 never says you can stop and come back: GAP-42, GAP-43, GAP-44
+
+**Raised by WJ after watching his wife work through a real application. All three approved, none built — one of them cannot be built until WJ rules on a spec conflict.**
+
+WJ's observation was narrow and correct: Step 4 has an Approve action on every card and a sticky "N of N questions approved" bar, and between them the screen reads as _finish this in one sitting_. Nothing anywhere tells a charity worker they can close the tab on a part-written application and pick it up tomorrow. Checking it turned up two further problems behind the one he asked about.
+
+### GAP-42 — the reassurance is missing, and it is purely a copy gap
+
+**The capability already works.** The dashboard's Continue link goes to `/applications/[id]/step/[currentStep]` (`dashboard-populated.tsx`) and Step 4 rehydrates every answer and its approved state. She can genuinely leave and return; the product just never says so. The nearest existing wording — "Your work is saved automatically as you type" — asserts the data is safe _now_, which is a different reassurance from _the journey is resumable_, and the second is the one a first-time user closing a browser tab on two hours of writing actually needs.
+
+**Agreed wording (WJ, 2026-08-06):** _"Answer each question below. Your answers are saved automatically. You can close this page at any time and continue from your dashboard."_
+
+**"Continue from your dashboard" is deliberate and should not be strengthened.** Return is to the **step**, not the question — with 17 questions the user lands at the top of a long page and scrolls to find their place. "Return to the exact point" would be a promise the product does not keep.
+
+### GAP-43 — the copy being replaced was false, and the PRD contradicted itself
+
+"Saved automatically **as you type**" is not what happens. `handleAnswerChange` only updates local React state and marks the answer dirty; the writes are on **blur** and via a **60-second background sweep**. There is no debounce timer and no `beforeunload` guard anywhere in the codebase. Someone typing steadily for 59 seconds who closes the tab without clicking away loses that work.
+
+**The behaviour is correct — the copy was wrong.** `AC-FR-18-03` explicitly accepts "at most 60 seconds of edits potentially lost", and the PRD's own FR-18 implementation notes describe blur + sweep accurately, including a **2026-07-13 correction that specifically disproved a "400ms-debounced auto-save as the user pauses typing" claim**. That correction fixed the implementation note and never checked the user-facing string specified in §7 of the same document. So this is PRD-versus-PRD, not code-versus-copy — and **the seventh recorded instance on this project of fixing an instance rather than the class.** The replacement string drops "as you type" entirely, so `GAP-42` and `GAP-43` close together.
+
+Separately worth considering, not decided: a short debounce on typing would make a stronger claim honest and shrink the loss window. Recorded so the option isn't lost; the copy fix stands on its own.
+
+### GAP-44 — nothing ever confirms a save succeeded, and fixing that collides with an existing criterion
+
+The only save-related feedback in the entire component is the failure path: `saveError` renders "**Not saved.**" (added 2026-07-29, Opus audit M8, `AC-FR-18-04`). There is no "Saved" tick, no "Saving…" state, no positive signal of any kind. That makes `GAP-42`'s reassurance an assertion the screen never demonstrates — it tells the user their work is safe and then never shows it once. For a first-time user about to close a tab, a visible confirmation does more than any sentence of copy. WJ approved adding one.
+
+**⚠️ It cannot be built yet.** `AC-FR-18-02` requires that during a background auto-save "no visible save indicator is shown to the user", and PRD FR-18's implementation notes repeat it. `AC-FR-18-04`'s 2026-07-29 amendment carved **failures** out of that silence rule and deliberately left success untouched.
+
+**Two resolutions, written into `acceptance-criteria.md` as draft `AC-FR-18-05` for WJ to choose between:**
+
+1. **Scope the indicator to blur and explicit saves, leaving the 60-second sweep silent.** `AC-FR-18-02` is written specifically about background saves, so on this reading nothing needs amending. **Recommended** — it delivers the reassurance while preserving the reason that criterion exists, which is that an indicator firing every 60 seconds regardless of user action is noise rather than information.
+2. **Amend `AC-FR-18-02` to permit a success indicator on all saves.** Simpler, but reverses a deliberate decision and reintroduces the periodic-noise problem.
+
+`AC-FR-18-05` is explicitly marked a draft, not a criterion, until that is closed. A build against option 1 satisfies every existing criterion; a build against option 2 requires the amendment first.
+
+**Documents updated:** `PRD-Grant-Pathway.md` → **v0.66** (§7 Step 4 sub-heading respecified, flagged as agreed-not-built, with the live string recorded alongside it), `acceptance-criteria.md` (draft `AC-FR-18-05`), `ADR-TRACEABILITY.md` → **v2.23**.
+
+---
+
 ## 2026-08-06 — GAP-41: the Word export destroys every line break, and rich-text editing deferred
 
 **Found by WJ, same real application as `GAP-39`/`GAP-40`. No code changed — logging only, on WJ's instruction.**

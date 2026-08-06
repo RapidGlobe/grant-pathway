@@ -988,6 +988,26 @@ _Note: the final set of profile fields was refined during screen requirements. T
 
 ---
 
+**AC-FR-18-05 — A successful save is visibly confirmed** _(added 2026-08-06, `GAP-44`)_ — ⚠️ **DRAFT: awaiting WJ's ruling on the AC-FR-18-02 conflict. Do not build against this until it is resolved.**
+
+- **Given** I am writing answers on Step 4
+- **When** I finish editing an answer and move focus away from the field
+- **And** the save succeeds
+- **Then** a brief visible confirmation appears against that answer
+
+**Why this is a draft and not yet a criterion.** WJ approved a visible save confirmation on 2026-08-06, after observing that Step 4 currently gives the user no positive signal of any kind — the only save-related feedback in the component is the "**Not saved.**" failure path from AC-FR-18-04. Without it, the resumability reassurance being added under `GAP-42` is an assertion the screen never demonstrates.
+
+**The conflict.** AC-FR-18-02 states that during a background auto-save "no visible save indicator is shown to the user", and PRD FR-18's implementation notes repeat it. AC-FR-18-04's 2026-07-29 amendment carved **failures** out of that silence rule and deliberately left success untouched.
+
+**Proposed resolution, for WJ to confirm — two options, not equivalent:**
+
+1. **Scope the indicator to blur and explicit saves only, leaving the 60-second background sweep silent.** AC-FR-18-02 is written specifically about background saves, so on this reading it stands unamended and no criterion changes. This is the recommended option: it delivers the user-visible reassurance while preserving the reason AC-FR-18-02 exists — that an indicator firing every 60 seconds regardless of user action is noise, not information.
+2. **Amend AC-FR-18-02 to permit a success indicator on all saves, including background sweeps.** Simpler to reason about and to implement, but reverses a deliberate decision and reintroduces the periodic-noise problem.
+
+Until one is chosen, this entry is a placeholder recording an approved intent, not a testable criterion. **A build against option 1 would satisfy every existing criterion; a build against option 2 requires AC-FR-18-02 to be amended first.**
+
+---
+
 ### FR-19 — Must Have
 
 **Requirement:** The system shall allow a user to delete a saved application.
@@ -2603,6 +2623,7 @@ _Added 2026-07-25. `PDR-UI-008` (help centre link + contextual tooltips) was bui
 
 ---
 
+_Last updated: 2026-08-06 — **AC-FR-18-05 added as a ⚠️ DRAFT, not a criterion** (`GAP-44`). WJ approved a visible confirmation that a Step 4 save succeeded, after it emerged that the only save-related feedback in the whole component is the "Not saved." failure path from AC-FR-18-04 — so the resumability reassurance being added under `GAP-42` would be an assertion the screen never demonstrates. **It is a draft because it conflicts with AC-FR-18-02**, which requires background saves to show no visible indicator. Two resolutions are written out for WJ to choose between; option 1 (scope the indicator to blur/explicit saves, leave the 60-second sweep silent) satisfies every existing criterion unamended and is recommended. Do not build against AC-FR-18-05 until that is closed._
 _Last updated: 2026-07-25 — added Section 9.12 in full (FR-49, `PDR-UI-008`), five new acceptance criteria (AC-FR-49-01 to 05) covering the help centre link and all 9 built contextual tooltips, written after live testing completed (`help-and-tooltips-test-plan.md` v2.0) rather than at build time, so the criteria reflect the final simplified (no-persistence) behaviour rather than the reversed v1 design._
 _Last updated: 2026-07-17_
 _2026-07-17 second addendum: new AC-FR-37-03A added — export date fixed to one timestamp per application (`applications.first_exported_at`), not one per request._
