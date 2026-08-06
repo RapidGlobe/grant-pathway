@@ -259,7 +259,7 @@ on conflict (id) do nothing;
 
 -- Storage RLS: intended to let users act only within their own folder.
 --
--- ⚠️ CORRECTION 2026-08-05 (GAP-40) — comment only, no schema change; this
+-- ⚠️ CORRECTION 2026-08-05 (GAP-48) — comment only, no schema change; this
 -- migration is already applied and its SQL is untouched.
 --
 -- These three policies are INERT and have never granted anything. They gate on
@@ -277,8 +277,8 @@ on conflict (id) do nothing;
 -- before reading. Service-role-only access is the control actually in force, and
 -- ADR-FILE-001 explicitly accepts it ("a storage RLS policy OR service-role-only
 -- access"). The policies are dead code that reads as though load-bearing —
--- whether to repoint them at the flat prefix or drop them is tracked as GAP-40,
--- deliberately left for its own task rather than bundled into GAP-39's fix.
+-- whether to repoint them at the flat prefix or drop them is tracked as GAP-48,
+-- deliberately left for its own task rather than bundled into GAP-47's fix.
 create policy "storage: upload own guidelines"
   on storage.objects for insert
   to authenticated

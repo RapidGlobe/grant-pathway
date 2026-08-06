@@ -10,7 +10,7 @@
 
 ---
 
-## 2026-08-05 — GAP-39 built: account deletion now deletes the Storage files it always claimed to; the documented path for them never existed (GAP-40)
+## 2026-08-05 — GAP-47 built: account deletion now deletes the Storage files it always claimed to; the documented path for them never existed (GAP-48)
 
 Raised as a spec/code mismatch: `PDR-DH-002`'s "data deleted on inactivity closure" list has named _"uploaded funder guideline files (Supabase Storage)"_ since 2026-04-16, but neither deletion path — `app/api/account/delete/route.ts` (S8.2) nor `app/api/cron/inactivity-deletion/route.ts` (S8.3) — deleted anything from Storage. Both removed database rows only. `data-model.md` §6 had carried a note recording the mismatch rather than resolving it.
 
@@ -36,7 +36,7 @@ New `lib/storage-guidelines.ts`. Both call sites invoke it **before** the table 
 
 Implementing the fix as documented would have deleted **nothing, silently** — a `remove()` against a folder prefix that matches no object returns success. The mismatch would have been replaced by something worse: code that looks compliant, reports success, and does nothing. All three places are corrected, and a test asserts the folder form is rejected so the assumption cannot quietly return.
 
-### GAP-40, raised not fixed: the storage RLS policies are inert
+### GAP-48, raised not fixed: the storage RLS policies are inert
 
 The same wrong assumption is baked into the schema. The three `guidelines-temp` policies in `20260519000000_initial_schema.sql` gate on `(storage.foldername(name))[1] = auth.uid()::text`. With no `/` in the name that subscript is NULL, `NULL = auth.uid()::text` is NULL, and **all three policies have never granted anything.** Uploads work only because signed upload URLs are minted with the service role, which bypasses RLS.
 
@@ -48,7 +48,7 @@ The same wrong assumption is baked into the schema. The three `guidelines-temp` 
 
 `AC-FR-41-03` deliberately omits uploaded guidelines from the deleted-data list shown on the confirmation screen (corrected 2026-07-13, consistent with `FR-22`). That stays: these files exist for seconds during extraction and are not user-visible saved data, so listing them would imply a persistence the product does not have. Recorded in `PDR-DH-002` so nobody reconciles the two lists by editing the screen.
 
-Docs updated: `PDR-DH-002` (implementation note), `data-model.md` §6 and §7, `technical-design.md` (retention cascade), `ADR-TRACEABILITY.md` (`GAP-39` resolved, `GAP-40` raised), `regression-test-plan.md` (RT-14 Storage step), `TEST-DASHBOARD.md`, `AGENTS.md` §1. `npm run type-check`, `lint`, and `test` (**159** tests, up from 145) all pass.
+Docs updated: `PDR-DH-002` (implementation note), `data-model.md` §6 and §7, `technical-design.md` (retention cascade), `ADR-TRACEABILITY.md` (`GAP-47` resolved, `GAP-48` raised), `regression-test-plan.md` (RT-14 Storage step), `TEST-DASHBOARD.md`, `AGENTS.md` §1. `npm run type-check`, `lint`, and `test` (**159** tests, up from 145) all pass.
 
 ---
 
