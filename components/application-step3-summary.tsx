@@ -39,7 +39,18 @@ import { ContextualTooltip } from '@/components/contextual-tooltip'
 import { structuredSummaryCount, freeFormSummaryCount } from '@/lib/summary-counts'
 
 type DisplayState =
-  'loading' | 'content' | 'mismatch' | 'failure' | 'persistent-failure' | 'no-guidelines'
+  | 'loading'
+  | 'content'
+  | 'mismatch'
+  | 'failure'
+  | 'persistent-failure'
+  // GAP-52: the model hit its output ceiling and the answer was cut off. Its
+  // own state because it is the one failure here with no retry — the same
+  // document against the same ceiling overflows every time, so the "Try again"
+  // the generic failure state offers would send the user round a loop that
+  // cannot end.
+  | 'too-long'
+  | 'no-guidelines'
 
 interface ApplicationStep3SummaryProps {
   applicationId: string
@@ -103,6 +114,10 @@ export function ApplicationStep3Summary({
   const [guidelinesFilename, setGuidelinesFilename] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
   const [loadingMessage, setLoadingMessage] = useState(LOADING_MESSAGES[0].text)
+  // Server-supplied copy for the 'too-long' state (GAP-52). Held rather than
+  // hard-coded here so the wording lives in one place — `ERROR_MESSAGES` in
+  // lib/ai-error-handler.ts, alongside every other AI error message.
+  const [tooLongMessage, setTooLongMessage] = useState<string | null>(null)
 
   // Track whether the current loading cycle is a "Try again" retry.
   // First failure → failure state; retry failure → persistent-failure state.
@@ -197,6 +212,14 @@ export function ApplicationStep3Summary({
         if (!res.ok || !data.summary) {
           // Stop the progress bar, show error state
           if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
+          // GAP-52: a truncated response is the one failure with no retry, so
+          // it bypasses the failure → persistent-failure ladder entirely. That
+          // ladder assumes a second attempt is worth making; here it is not.
+          if (data.error === 'response_too_long') {
+            setTooLongMessage(data.message ?? null)
+            setDisplayState('too-long')
+            return
+          }
           setDisplayState(isRetry ? 'persistent-failure' : 'failure')
           return
         }
@@ -343,6 +366,42 @@ export function ApplicationStep3Summary({
           <Link
             href={`/applications/${applicationId}/step/2`}
             className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          >
+            Back
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Response-too-long state (GAP-52) ────────────────────────────────────────
+  // No "Try again" button, deliberately. The model hit its output ceiling, and
+  // the same guidelines against the same ceiling overflow identically every
+  // time — offering a retry would be offering a loop with no exit. Support is
+  // the only thing that can actually move this, so that is what it says.
+  if (displayState === 'too-long') {
+    return (
+      <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
+        <StepIndicator currentStep={3} />
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
+          <div>
+            <p className="text-[14px] text-[#991B1B]">
+              {tooLongMessage ??
+                'These guidelines contain more than we can summarise in one go. This is a limit on our side, not a problem with your document — please contact support so we can raise it.'}
+            </p>
+            <p className="mt-2 text-[14px] text-[#991B1B]">
+              Your guidelines are saved. Nothing you have entered has been lost.
+            </p>
+          </div>
+        </div>
+        <div className="mt-6">
+          <Link
+            href={`/applications/${applicationId}/step/2`}
+            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 focus-visible:outline-none"
           >
             Back
           </Link>

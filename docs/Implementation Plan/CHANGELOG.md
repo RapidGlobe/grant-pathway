@@ -10,6 +10,62 @@
 
 ---
 
+## 2026-08-07 — GCM-07 passes, and the ceiling it walked into (GAP-52)
+
+`GAP-51`'s rule works. §5 now produces four cards — §5a's itemised breakdown plus all three of §5 b)'s labelled figures, each Budget-tagged, separately worded, none merged — and all three reach the exported Word document carrying the applicant's figures.
+
+| Card |                                                                |        |
+| ---- | -------------------------------------------------------------- | ------ |
+| 9    | §5a — _Give details of expenditure required for your project…_ | Budget |
+| 10   | **Total needed for this project £**                            | Budget |
+| 11   | **Amount requested from SSTC £**                               | Budget |
+| 12   | **Balance outstanding £**                                      | Budget |
+
+**The over-correction check is what makes this credible.** `AMOUNT REQUESTED £` appears twice in this form: once in the front administrative details table, which must stay out, and once as §5 b)'s own ask, which must come in. The new rule tells the model to draw exactly that line, and a blunter "extract money figures" rule would have flattened it into a spurious card. It held. `GCM-01`–`GCM-06` did not regress either, which mattered — a rule loosened to stop dropping money fields is precisely what starts extracting contact details instead.
+
+Verified from the persisted `ai_summary` rather than from the screen, and the export by unzipping the real download and reading `word/document.xml`.
+
+### The re-run failed first, and that is the bigger finding
+
+Step 3 came back with **"We couldn't generate your summary right now. This is usually temporary — please try again."** Untrue on both counts.
+
+`SUMMARY_MAX_TOKENS` was **4000**, and a code comment described it as comfortable headroom for large question sets. It was not. Step 3 had been clearing it **by roughly forty tokens**, and `GAP-51`'s two extra cards were the margin gone.
+
+**It was invisible in three separate ways, and each is worth naming:**
+
+1. **Nothing recorded the output count.** The route logged `input + output` combined; `ai_usage_log` stores only that same combined figure. The one number that mattered existed nowhere, so establishing the cause meant reconstructing it across two days of usage rows.
+2. **`stop_reason` was on every response the whole time and was never read.** It says `max_tokens` outright.
+3. **A truncation was classified as a parse failure and retried against the identical ceiling.** That cannot produce a shorter answer. One click spent two Bedrock calls to fail the same way twice, then offered a button for a third.
+
+**Confirmed by measurement, not inference.** Working back from a clamped output of 4000 predicted an input of 7636 tokens. The run after the fix reported exactly `7636 in + 4210/6000 out`. 4210 is over the old ceiling; subtracting the ~340 tokens GAP-51's rule added to the prompt puts the morning's successful outputs at ~3877 and ~3958 against 4000.
+
+**The fix:**
+
+- **Cap 4000 → 6000.** Not higher: generation runs at ~130 tokens/sec, so 6000 is ~46s and fits the existing `AbortSignal.timeout(60_000)`, while 8000 would be ~62s and would trade a parse failure for a timeout. Beyond 6000 means raising that abort and `maxDuration` as well — a latency decision in its own right.
+- **The log line now reads `7636 in + 4210/6000 out = 11846 tokens, stop_reason: end_turn`.** Output printed against its own ceiling, so proximity is legible at a glance.
+- **Truncation is detected before parsing and no longer retried.** Before parsing deliberately: truncated JSON occasionally parses into a valid-looking object silently missing questions, which is worse than a visible failure. The slot is refunded and Sentry tagged `ai_error: 'response_too_long'`.
+- **New `response_too_long` code, distinct from `parse_error`.** Both produce unparseable JSON, but they are opposite problems — a parse error may clear on a retry and a truncation never will. Step 3 gets a dedicated state with **no "Try again" button**, because the old one was a loop with no exit.
+
+17 new tests, suite **249 → 266**.
+
+**`GAP-52` stays 🔵, not 🟢.** The cap raise and the logging are live-verified. The guard, the new error body and Step 3's new state have never fired, because nothing has exceeded 6000 since. Closing it needs a document large enough to force a real truncation.
+
+### Two things flagged rather than folded in
+
+**`REFINE_MAX_TOKENS` is 800** in `app/api/refine-answer/route.ts`. A 500-word answer is ~670 tokens before the JSON wrapper and any warning prefix. Same class of problem, different route, and no `stop_reason` check there either.
+
+**`ADR-AI-007` has no output-side policy.** It governs guideline **input** truncation at 150,000 characters and says nothing about the response. The ceiling that actually broke the feature was named in no document at all — it existed only as a constant in one file, which is a contributing condition rather than a footnote. Raising it does not give the project a position on what should happen when a funder's form is simply too big to summarise in one call.
+
+### Also confirmed by this export
+
+The downloaded `.docx` contains two genuinely multi-line answers and four `<w:br/>` tags, so **`GAP-41`'s line-break fix is confirmed in a real user download** — the evidence `RT-09` has been waiting for since 2026-08-06. `regression-test-plan.md` stays 🟡 until WJ opens the file in Word, since RT-09's criterion is a person reading their own download and reading the XML is not that.
+
+### One observation for WJ
+
+**Card 9 drops a sentence from its source question.** The form reads "…Provide a separate cost for each item. **For items of a significant nature, the Council may wish to see three quotations for these items.** If you expect this project to generate any income, please also provide details below." The extracted question omits the bolded sentence, against a prompt rule that says to extract questions exactly as written — and on a money question, where what is lost is a concrete instruction about supplying quotations. The citation quote retains the full text, so nothing is unrecoverable, but an applicant reading the card would not know to gather three quotes. Pre-existing, visible in `GCM-06` too, and a different capability from `GCM-07`'s subject.
+
+---
+
 ## 2026-08-07 — §5b settled: don't exclude a budget question the funder actually asked
 
 WJ's ruling on the second of the two observations GCM-06's live re-run left open, and the one that turned out to be a defect rather than a wrong expectation.

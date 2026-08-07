@@ -45,11 +45,31 @@ describe('GAP-21 — AI routes tag their Bedrock errors for Sentry', () => {
 
     // Every place the route classifies a Bedrock error is a failure path that
     // returns an error to the user, so every one of them should report.
-    const failurePaths = src.match(/classifyBedrockError\(/g)?.length ?? 0
-    const taggedReports = src.match(/Sentry\.captureException\(/g)?.length ?? 0
+    //
+    // Checked site-by-site rather than by counting both and comparing, which is
+    // what this originally did. Counting assumed every failure path is a caught
+    // exception, and GAP-52 added one that is not: a response that arrives
+    // successfully but truncated at `max_tokens` never reaches a catch block and
+    // has no error object to classify, yet is very much a failure worth
+    // reporting. The count-based form failed on it — correctly noticing a third
+    // tag, but for the wrong reason, and the only ways to satisfy it would have
+    // been to drop a legitimate tag or to loosen it to `>=`, which would let a
+    // catch block quietly lose its tag so long as some other line gained one.
+    const sites = [...src.matchAll(/classifyBedrockError\(/g)]
+    expect(sites.length).toBeGreaterThan(0)
 
-    expect(failurePaths).toBeGreaterThan(0)
-    expect(taggedReports).toBe(failurePaths)
+    for (const site of sites) {
+      // The tag follows the classification within the same catch block.
+      const block = src.slice(site.index, site.index + 800)
+      expect(block, `untagged classifyBedrockError at index ${site.index} in ${path}`).toContain(
+        'Sentry.captureException(',
+      )
+    }
+
+    // Extra tags beyond the caught-exception sites are expected and welcome —
+    // the truncation guard is one — but there must never be fewer.
+    const taggedReports = src.match(/Sentry\.captureException\(/g)?.length ?? 0
+    expect(taggedReports).toBeGreaterThanOrEqual(sites.length)
   })
 
   it.each(AI_ROUTES)('%s tags with the route name §14 specifies', (path) => {

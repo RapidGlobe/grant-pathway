@@ -123,11 +123,30 @@ const aiSummarySchema = z.object({
 
 export const maxDuration = 90
 
-// Raised to 4000: complex structured documents (e.g. AB Charitable Trust with
-// 33 questions across 4 sections) were truncating at 2000 tokens, producing
-// invalid JSON. 4000 gives headroom for large question sets while remaining
-// well within Claude's output limits.
-const SUMMARY_MAX_TOKENS = 4000
+// Raised to 2000 → 4000 originally: complex structured documents (e.g. AB
+// Charitable Trust with 33 questions across 4 sections) were truncating at
+// 2000 tokens, producing invalid JSON.
+//
+// Raised to 6000 on 2026-08-07 (GAP-52). 4000 was not the comfortable headroom
+// the previous comment assumed — it had been running with almost none, and no
+// signal existed to say so. Reconstructed from `ai_usage_log`, which stores
+// input+output: the Stony Stratford form summarised successfully that morning
+// at 11173 and 11254 total tokens, and failed that afternoon at 11636 twice.
+// Two independent calls reporting an *identical* total is a clamp, not model
+// variance (the two successful ones differed by 81). Working back from a
+// clamped output of 4000 puts that afternoon's input at 7636; subtracting the
+// ~340 tokens GAP-51's new rule added to the prompt puts the morning's input at
+// ~7296, and therefore its outputs at roughly 3877 and 3958. **It cleared a
+// 4000-token ceiling by about forty tokens.** GAP-51 then asked the model for
+// two more budget cards, ~60–100 tokens each, and that was the margin gone.
+//
+// 6000 and not more, because generation ran at ~130 tokens/sec: 6000 is ~46s,
+// inside the 60s AbortSignal below, while 8000 would be ~62s and would trade a
+// parse failure for a timeout. Going beyond 6000 means raising that abort and
+// `maxDuration` too — a latency change that is its own decision, not a
+// side-effect of this one. See GAP-52 for the standing risk: this ceiling
+// scales with question count and will be reached again.
+const SUMMARY_MAX_TOKENS = 6000
 
 export async function POST(request: NextRequest) {
   // ── 0. Kill-switch ─────────────────────────────────────────────────────────
@@ -330,9 +349,43 @@ export async function POST(request: NextRequest) {
   let tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
 
+  // GAP-52: input and output are logged separately, and `stop_reason` with
+  // them. Only the combined figure was ever recorded, and `ai_usage_log` stores
+  // only that — so when the 4000-token output ceiling was hit on 2026-08-07 it
+  // took a reconstruction across two days of usage rows to establish what a
+  // single field would have said outright. `stop_reason: "max_tokens"` IS the
+  // diagnosis; everything else about a truncation looks like a parse failure.
   console.log(
-    `[generate-summary] Bedrock latency: ${Date.now() - bedrockStart}ms, ${tokenCount} tokens`,
+    `[generate-summary] Bedrock latency: ${Date.now() - bedrockStart}ms, ` +
+      `${bedrockResponse.usage?.input_tokens ?? 0} in + ` +
+      `${bedrockResponse.usage?.output_tokens ?? 0}/${SUMMARY_MAX_TOKENS} out ` +
+      `= ${tokenCount} tokens, stop_reason: ${bedrockResponse.stop_reason}`,
   )
+
+  // A truncated response is not a parse failure and must not be treated as one.
+  // The retry below re-asks with the same `max_tokens`, so against a truncation
+  // it cannot succeed — it just spends a second Bedrock call to fail the same
+  // way, which is exactly what happened on 2026-08-07. Bail out here instead,
+  // and return an error that says something true (see `response_too_long` in
+  // lib/ai-error-handler.ts). Checked before parsing, because truncated JSON
+  // occasionally still parses into a valid-looking but silently incomplete
+  // object — a worse outcome than a visible failure.
+  if (bedrockResponse.stop_reason === 'max_tokens') {
+    console.error(
+      `[generate-summary] Response truncated at the ${SUMMARY_MAX_TOKENS}-token ceiling. ` +
+        `Not retrying — an identical cap cannot produce a shorter answer.`,
+    )
+    Sentry.captureException(
+      new Error(`generate-summary response truncated at ${SUMMARY_MAX_TOKENS} output tokens`),
+      {
+        tags: { route: 'generate-summary', step: 'bedrock', ai_error: 'response_too_long' },
+      },
+    )
+    await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
+    return NextResponse.json(aiErrorBody('response_too_long'), {
+      status: httpStatusForError('response_too_long'),
+    })
+  }
 
   // Strip markdown code fences if Claude wrapped the JSON (ADR-AI-004)
   const cleaned = rawText

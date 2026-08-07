@@ -14,6 +14,7 @@
 //   503  timeout        — request timed out waiting for Bedrock
 //   500  server_error   — Bedrock returned 5xx
 //   500  parse_error    — response was not valid JSON
+//   500  response_too_long — model hit max_tokens; the answer was cut off
 //   500  auth_error     — Bedrock access/credentials error
 //   500  unknown        — unexpected error
 //
@@ -34,6 +35,13 @@ export type AiErrorCode =
   | 'timeout' // Request timed out
   | 'server_error' // Bedrock 5xx
   | 'parse_error' // JSON parse failed
+  // Model stopped at max_tokens — the response was cut off mid-structure.
+  // Deliberately distinct from 'parse_error' (GAP-52, 2026-08-07). Both end up
+  // as unparseable JSON, but they are opposite problems: a parse error may well
+  // clear on a retry, and a truncation never will, because the same document
+  // and the same ceiling produce the same overflow every time. Collapsing them
+  // is what produced a "please try again" button that could not succeed.
+  | 'response_too_long'
   | 'auth_error' // Bedrock auth failure
   | 'unknown' // Anything else
 
@@ -70,6 +78,11 @@ const ERROR_MESSAGES: Record<AiErrorCode, string> = {
   timeout: 'The request took too long. Please try again.',
   server_error: 'The AI service returned an error. Please try again.',
   parse_error: 'We could not read the AI response. Please try again.',
+  // No "please try again" — it would fail identically. The user cannot fix this
+  // and should not be sent round a loop that cannot end; the honest thing is to
+  // say the document is too big for us and point them at someone who can act.
+  response_too_long:
+    'These guidelines contain more than we can summarise in one go. This is a limit on our side, not a problem with your document — please contact support so we can raise it.',
   auth_error: 'AI service configuration error. Please contact support.',
   unknown: 'An unexpected error occurred. Please try again.',
 }
