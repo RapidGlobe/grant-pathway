@@ -377,7 +377,7 @@ export function ApplicationStep5Approve({
                     </div>
                     <p
                       className={`whitespace-pre-wrap text-[14px] leading-relaxed ${
-                        answer.answerText ? 'text-[#374151]' : 'italic text-[#94A3B8]'
+                        answer.answerText ? 'text-[#374151]' : 'italic text-[#64748B]'
                       }`}
                     >
                       {answer.answerText || 'No answer provided.'}

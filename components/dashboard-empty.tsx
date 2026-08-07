@@ -93,7 +93,7 @@ export function DashboardEmpty({
           />
         </div>
 
-        <p className="mt-8 text-[13px] text-[#94A3B8]">
+        <p className="mt-8 text-[13px] text-[#64748B]">
           Need a hand? Visit our{' '}
           <a
             href={helpCentreUrl()}
@@ -134,7 +134,7 @@ function Step({ icon, label, step }: { icon: React.ReactNode; label: string; ste
       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#E6F4F4]">
         {icon}
       </div>
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-[#94A3B8]">
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B]">
         Step {step}
       </span>
       <span className="text-[13px] font-medium text-[#1E293B]">{label}</span>

@@ -19,12 +19,21 @@ import type { ApplicationSummary, ApplicationStatus } from '@/actions/applicatio
 
 const AI_REQUESTS_LIMIT = 50
 
+// Pill text is 12px, so WCAG 1.4.3 AA requires 4.5:1 against the pill's own
+// background — not against the page. Four of these five failed that on
+// 2026-08-07 (`DEF-01`); the ratio each now achieves is recorded beside it so a
+// future palette change cannot quietly undo the fix.
+//
+// AC-01 measured only `in_progress` and `mismatch`, because the dashboard it
+// swept happened to show no other status. `not_started` and `approved` were
+// found by checking the whole config rather than the two rows that were
+// visible — worth remembering when reading any "N violations" count as a total.
 const STATUS_CONFIG: Record<ApplicationStatus, { label: string; bg: string; text: string }> = {
-  not_started: { label: 'Not started', bg: '#F1F5F9', text: '#64748B' },
-  in_progress: { label: 'In progress', bg: '#FEF3C7', text: '#D97706' },
-  approved: { label: 'Approved', bg: '#DCFCE7', text: '#16A34A' },
-  exported: { label: 'Exported', bg: '#E6F4F4', text: '#0D6E6E' },
-  mismatch: { label: 'Ineligible', bg: '#FEF2F2', text: '#DC2626' },
+  not_started: { label: 'Not started', bg: '#F1F5F9', text: '#475569' }, // 6.92 (was #64748B, 4.34)
+  in_progress: { label: 'In progress', bg: '#FEF3C7', text: '#92400E' }, // 6.37 (was #D97706, 2.86)
+  approved: { label: 'Approved', bg: '#DCFCE7', text: '#166534' }, // 6.49 (was #16A34A, 3.00)
+  exported: { label: 'Exported', bg: '#E6F4F4', text: '#0D6E6E' }, // 5.36 — already passed, unchanged
+  mismatch: { label: 'Ineligible', bg: '#FEF2F2', text: '#B91C1C' }, // 5.91 (was #DC2626, 4.41)
 }
 
 function deleteModalText(status: ApplicationStatus): string {
@@ -191,7 +200,7 @@ export function DashboardPopulated({
                   >
                     {pill.label}
                   </span>
-                  <span className="text-[13px] text-[#94A3B8]">
+                  <span className="text-[13px] text-[#64748B]">
                     Last updated {formatDate(app.lastUpdated)}
                   </span>
                 </div>

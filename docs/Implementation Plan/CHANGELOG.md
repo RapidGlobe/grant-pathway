@@ -10,6 +10,52 @@
 
 ---
 
+## 2026-08-07 — DEF-01 resolved: Light slate retired as a text colour, and four of five status pills were failing
+
+WJ's decision, from the options and measured ratios put to him. This closes the last of AC-01's four defects that needed a judgement rather than a code fix.
+
+### There was no middle option, and that is what decided it
+
+`#94A3B8` — the palette's "Light slate", specified for tertiary text, upcoming step labels and disabled states — fails WCAG 2.2 AA on every background this product uses: **2.45** on page cream, **2.56** on card white, **2.47** on the amber card, against the 4.5:1 required for text under 18.66px.
+
+The instinct is to darken it slightly. That is not available. Every candidate between Light slate and Mid slate still fails — `#7C8AA0` 3.34, `#748196` 3.77, `#6B7A8F` 4.17 — and **`#64748B`, the palette's existing Mid slate, is the lightest colour that passes at all** (4.54 / 4.76 / 4.59). **Nor does making the text bigger rescue it:** large text needs only 3:1, and `#94A3B8` scores 2.56, so it fails even that threshold.
+
+So the real question was never which grey. It was whether the Light slate tier can exist as text, and at these sizes it cannot.
+
+**All eleven text uses moved to `#64748B`.** The accepted cost, recorded as a trade-off rather than passed over: the three-tier text hierarchy is now two tiers for text, with size and weight carrying the distinction instead.
+
+**`#94A3B8` survives for two exempt uses:** decorative icons marked `aria-hidden="true"` (Step 2's upload icon, the 404 icon), and the disabled-button background — inactive controls are explicitly excluded from 1.4.3. `design-requirements.md`'s palette table now says so, struck through and annotated, so it cannot be reintroduced for text by someone reading the spec.
+
+### Four of the five status pills were failing, not the two AC-01 recorded
+
+Checking the whole `STATUS_CONFIG` rather than the two rows that happened to be on screen found two more:
+
+| Pill        | Was                               | Now                       |
+| ----------- | --------------------------------- | ------------------------- |
+| Not started | `#64748B` on `#F1F5F9` — **4.34** | `#475569` — 6.92          |
+| In progress | `#D97706` on `#FEF3C7` — **2.86** | `#92400E` — 6.37          |
+| Approved    | `#16A34A` on `#DCFCE7` — **3.00** | `#166534` — 6.49          |
+| Exported    | `#0D6E6E` on `#E6F4F4` — 5.36     | unchanged, already passed |
+| Ineligible  | `#DC2626` on `#FEF2F2` — **4.41** | `#B91C1C` — 5.91          |
+
+A third miss came from the same cause: **the Step 4 word count's "near limit" state** (`#D97706`, 3.19 on white and 3.07 in an amber card) was never measured because the sweep never typed enough text to trigger it. Now `#92400E` — 7.09 / 6.84. The "over limit" red already passes at 4.83 and is left alone.
+
+**This is the finding worth carrying forward, more than the colours.** A sweep sees only the states that happen to be rendered. `DEF-01`'s original five rows read like a complete list and were a floor — the real count was eight. Any "N violations" total from an automated pass is a lower bound on a UI with conditional states, and AC-01's own Step 4 already says as much about making things appear before sweeping; this is that warning coming true in the results.
+
+Each pill's ratio is now recorded inline beside its value in `components/dashboard-populated.tsx`, so a future palette change cannot quietly undo the fix.
+
+### Verified
+
+A script measuring computed styles against computed backgrounds reports **zero** small-text contrast failures on `/` and `/register`. The authenticated pages need a signed-in browser and could not be re-measured in this session, so the pills and Step 4 counts rest on their recorded ratios until AC-01 run 2. Said plainly rather than implied: those two are calculated, not observed.
+
+**One thing found and deliberately left open.** Placeholder text: `design-requirements.md` specifies `#64748B`, but `input.tsx` and `textarea.tsx` use `placeholder:text-muted-foreground`, which resolves to `oklch(0.556 0 0)` — a neutral grey outside this palette entirely. Its contrast has never been measured. Outside `DEF-01`'s scope and not folded in silently; flagged for **AC-10**.
+
+Emails were included: all three templates used `#94A3B8` for 12px footer text. WCAG does not govern email, but the readability problem is identical and the fix was one value each.
+
+`type-check`, `lint` and all 224 tests pass.
+
+---
+
 ## 2026-08-07 — GAP-50: the startup check that exists to catch bad configuration let the bad configuration through
 
 WJ's decision, after the defect was flagged twice during the day's work. Both halves — the blank-value fix and the Charity Commission warning — were his call from the options put to him.

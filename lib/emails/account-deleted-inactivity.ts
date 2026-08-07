@@ -53,7 +53,7 @@ export function buildAccountDeletedInactivityEmail(firstName: string): string {
           <!-- Footer -->
           <tr>
             <td style="padding:16px 32px;border-top:1px solid #E2E8F0;">
-              <p style="margin:0;font-size:12px;color:#94A3B8;line-height:1.6;">
+              <p style="margin:0;font-size:12px;color:#64748B;line-height:1.6;">
                 This email was sent by Grant Pathway, a service of RapidGlobe Ltd.<br />
                 Your account was deleted because it had been inactive for 24 months.
               </p>

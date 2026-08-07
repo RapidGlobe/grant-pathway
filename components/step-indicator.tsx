@@ -45,7 +45,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
                       ? 'bg-[#0D6E6E] text-white'
                       : isComplete
                         ? 'bg-[#0D6E6E] text-white'
-                        : 'border-2 border-[#E2E8F0] bg-white text-[#94A3B8]'
+                        : 'border-2 border-[#E2E8F0] bg-white text-[#64748B]'
                   }`}
                   aria-current={isCurrent ? 'step' : undefined}
                 >
@@ -69,7 +69,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
                     ? 'font-semibold text-[#0D6E6E]'
                     : isComplete
                       ? 'font-medium text-[#0D6E6E]'
-                      : 'text-[#94A3B8]'
+                      : 'text-[#64748B]'
                 }`}
                 aria-hidden="true"
               >

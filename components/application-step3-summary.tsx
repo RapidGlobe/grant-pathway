@@ -620,7 +620,7 @@ export function ApplicationStep3Summary({
           Regenerate summary
         </button>
         {!guidelinesAvailable && (
-          <p className="mt-1.5 text-[12px] text-[#94A3B8]">
+          <p className="mt-1.5 text-[12px] text-[#64748B]">
             You&apos;ll need to re-upload your guidelines to regenerate.
           </p>
         )}

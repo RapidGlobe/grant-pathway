@@ -715,7 +715,7 @@ export function ApplicationStep4Draft({
               placeholder="Write your answer here&hellip;"
               className="text-[14px]"
             />
-            <p className="mt-1 text-right text-[12px] text-[#94A3B8]">
+            <p className="mt-1 text-right text-[12px] text-[#64748B]">
               {countWords(manualAnswer)} {countWords(manualAnswer) === 1 ? 'word' : 'words'}
             </p>
           </div>
@@ -793,7 +793,7 @@ export function ApplicationStep4Draft({
               {approvedCount === 1 ? itemLabel : itemLabelPlural} approved
             </span>
             {isSaving && (
-              <span className="text-[12px] text-[#94A3B8]" aria-live="polite">
+              <span className="text-[12px] text-[#64748B]" aria-live="polite">
                 Saving&hellip;
               </span>
             )}
@@ -1150,7 +1150,14 @@ export function ApplicationStep4Draft({
                 {!isGovernanceItem && (
                   <p
                     className={`text-right text-[12px] ${
-                      isOver ? 'text-[#DC2626]' : isNear ? 'text-[#D97706]' : 'text-[#94A3B8]'
+                      // 12px, so all three states need 4.5:1 against both white
+                      // and the amber card (#FFFBEB) this can sit inside.
+                      // `isNear` was #D97706 — 3.19 on white, 3.07 on amber —
+                      // and AC-01 never caught it, because the sweep never
+                      // typed enough text to reach the near-limit state at all
+                      // (`DEF-01`). #92400E gives 7.09 / 6.84. `isOver` at
+                      // #DC2626 already passes (4.83 / 4.66) and is left alone.
+                      isOver ? 'text-[#DC2626]' : isNear ? 'text-[#92400E]' : 'text-[#64748B]'
                     }`}
                     aria-live="polite"
                   >

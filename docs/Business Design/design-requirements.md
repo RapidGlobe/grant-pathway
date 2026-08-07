@@ -77,15 +77,29 @@ The Warm & Approachable direction is built for users who are new to AI tools, wo
 
 ### 2.3 Neutral Colours
 
-| Role            | Name        | Hex       | Usage                                                                 |
-| --------------- | ----------- | --------- | --------------------------------------------------------------------- |
-| Body text       | Slate       | `#1E293B` | All body copy, headings, form labels, card titles                     |
-| Muted text      | Mid slate   | `#64748B` | Secondary text, form hints, placeholder text, card meta, footer links |
-| Light text      | Light slate | `#94A3B8` | Tertiary text, upcoming step labels, disabled states                  |
-| Border          | Light grey  | `#E2E8F0` | Card borders, form field borders (default), dividers                  |
-| Border strong   | Mid grey    | `#CBD5E1` | Form field borders (focused state), secondary button borders          |
-| Page background | Warm white  | `#FDF9F5` | Page background (Warm & Approachable direction only)                  |
-| Card background | White       | `#FFFFFF` | Cards, form fields, modals, navigation bar, step indicator bar        |
+| Role            | Name        | Hex       | Usage                                                                                                                                                |
+| --------------- | ----------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Body text       | Slate       | `#1E293B` | All body copy, headings, form labels, card titles                                                                                                    |
+| Muted text      | Mid slate   | `#64748B` | Secondary text, form hints, placeholder text, card meta, footer links                                                                                |
+| ~~Light text~~  | Light slate | `#94A3B8` | ⚠️ **NOT FOR TEXT (2026-08-07, `DEF-01`).** Decorative icons and disabled-control backgrounds only — both exempt from WCAG 1.4.3. See the note below |
+| Border          | Light grey  | `#E2E8F0` | Card borders, form field borders (default), dividers                                                                                                 |
+| Border strong   | Mid grey    | `#CBD5E1` | Form field borders (focused state), secondary button borders                                                                                         |
+| Page background | Warm white  | `#FDF9F5` | Page background (Warm & Approachable direction only)                                                                                                 |
+| Card background | White       | `#FFFFFF` | Cards, form fields, modals, navigation bar, step indicator bar                                                                                       |
+
+**⚠️ Light slate was retired as a text colour on 2026-08-07. WJ's decision, on AC-01's `DEF-01`.**
+
+`#94A3B8` fails WCAG 2.2 AA on every background this product uses — **2.45** on page cream, **2.56** on card white, **2.47** on the amber card — against the 4.5:1 required for text under 18.66px. All eleven text uses moved to **Mid slate `#64748B`**.
+
+**There was no middle option, and that is what decided it.** Every candidate between the two tokens still fails: `#7C8AA0` gives 3.34, `#748196` gives 3.77, `#6B7A8F` gives 4.17. `#64748B` is the lightest slate that passes at all (4.54 / 4.76 / 4.59). **Nor does making the text larger help** — large text needs only 3:1, and `#94A3B8` scores 2.56, so it fails even that.
+
+**The cost, recorded honestly:** the three-tier text hierarchy is now two tiers for text. Tertiary and secondary copy share a colour, and hierarchy is carried by size and weight instead. That was accepted rather than overlooked.
+
+**`#94A3B8` remains valid for two things**, both exempt from 1.4.3: decorative icons marked `aria-hidden="true"` (the Step 2 upload icon, the 404 icon), and the disabled-button background in §on buttons below, since inactive controls are explicitly excluded. **Do not reintroduce it for text.**
+
+**Status pill colours were fixed in the same pass, and four of five were failing** — not the two AC-01 measured. The sweep only saw the statuses that happened to be on the dashboard that day, which is worth remembering before reading any violation count as a total. Current values and their ratios are recorded in `components/dashboard-populated.tsx`'s `STATUS_CONFIG`.
+
+**Known stale, not yet resolved:** the placeholder-text row above still specifies `#64748B`, but `components/ui/input.tsx` and `textarea.tsx` use Tailwind's `placeholder:text-muted-foreground`, which resolves to `oklch(0.556 0 0)` — a neutral grey, not this palette's slate. Placeholder contrast has not been measured and is not covered by `DEF-01`; flagged for AC-10.
 
 ### 2.4 Focus Indicator
 
@@ -304,7 +318,7 @@ Same base specification as unauthenticated, with these differences:
 
 **Right:** Horizontal link list — "Privacy policy", "Terms of service" — 13px, `#64748B`; hover: `#1E293B`
 
-**Footer tagline** (below copyright, smaller): "Your free grant writing companion for UK charities" — 12px, `#94A3B8`
+**Footer tagline** (below copyright, smaller): "Your free grant writing companion for UK charities" — 12px, `#64748B` (was `#94A3B8` until 2026-08-07 — `DEF-01`)
 
 ---
 
@@ -318,13 +332,13 @@ All buttons: 14px, 600 weight, `border-radius: 8px`, `line-height: 1`, `padding:
 
 Used for: primary workflow actions — Continue, Save profile, Save changes, Sign in, Register.
 
-| State         | Style                                    |
-| ------------- | ---------------------------------------- |
-| Default       | Background `#0D6E6E`, text white         |
-| Hover         | Background `#0A5A5A`                     |
-| Active        | `transform: translateY(1px)`             |
-| Focus visible | Amber outline ring                       |
-| Disabled      | Background `#94A3B8`, cursor not-allowed |
+| State         | Style                                                                                                                                                         |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Default       | Background `#0D6E6E`, text white                                                                                                                              |
+| Hover         | Background `#0A5A5A`                                                                                                                                          |
+| Active        | `transform: translateY(1px)`                                                                                                                                  |
+| Focus visible | Amber outline ring                                                                                                                                            |
+| Disabled      | Background `#94A3B8`, cursor not-allowed — **unchanged by `DEF-01`**: inactive controls are exempt from WCAG 1.4.3, and this is a background rather than text |
 
 #### Accent button (amber fill)
 
@@ -429,7 +443,7 @@ Same as text input. `min-height: 96px`, `resize: vertical`, `line-height: 1.6`.
 
 #### Form section divider
 
-Horizontal rule with centred label for separating logical form sections (e.g. between registration details and charity description). Line: `1px solid #E2E8F0`. Label: 11px, 600 weight, `#94A3B8`, uppercase.
+Horizontal rule with centred label for separating logical form sections (e.g. between registration details and charity description). Line: `1px solid #E2E8F0`. Label: 11px, 600 weight, `#64748B`, uppercase (was `#94A3B8` until 2026-08-07 — `DEF-01`; at 11px this needed 4.5:1 and had 2.45).
 
 ---
 
