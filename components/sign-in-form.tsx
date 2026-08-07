@@ -2,10 +2,11 @@
 
 import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 import { signIn } from '@/actions/auth'
 
 interface FieldErrors {
@@ -32,7 +33,6 @@ export function SignInForm({
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -170,31 +170,15 @@ export function SignInForm({
           <Label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
             Password
           </Label>
-          <div className="relative">
-            <Input
-              id="password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              aria-invalid={!!fieldErrors.password || undefined}
-              aria-describedby={fieldErrors.password ? 'signin-password-error' : undefined}
-              className="h-10 pr-10 text-[14px]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" aria-hidden="true" />
-              ) : (
-                <Eye className="h-4 w-4" aria-hidden="true" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aria-invalid={!!fieldErrors.password || undefined}
+            aria-describedby={fieldErrors.password ? 'signin-password-error' : undefined}
+          />
           {fieldErrors.password && (
             <p
               id="signin-password-error"

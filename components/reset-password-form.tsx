@@ -2,10 +2,10 @@
 
 import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff, CheckCircle, Clock, AlertCircle } from 'lucide-react'
+import { CheckCircle, Clock, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 import { resetPassword, type ResetPasswordState } from '@/actions/auth'
 
 interface FieldErrors {
@@ -26,8 +26,6 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
 
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   // ── Expired view ─────────────────────────────────────────────────────────
@@ -159,31 +157,15 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           >
             New password
           </Label>
-          <div className="relative">
-            <Input
-              id="new-password"
-              name="password"
-              type={showPassword ? 'text' : 'password'}
-              autoComplete="new-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              aria-invalid={!!fieldErrors.password || undefined}
-              aria-describedby={fieldErrors.password ? 'new-password-error' : 'new-password-hint'}
-              className="h-10 pr-10 text-[14px]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" aria-hidden="true" />
-              ) : (
-                <Eye className="h-4 w-4" aria-hidden="true" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="new-password"
+            name="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            aria-invalid={!!fieldErrors.password || undefined}
+            aria-describedby={fieldErrors.password ? 'new-password-error' : 'new-password-hint'}
+          />
           {fieldErrors.password ? (
             <p id="new-password-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
               {fieldErrors.password}
@@ -203,32 +185,17 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           >
             Confirm new password
           </Label>
-          <div className="relative">
-            <Input
-              id="confirm-new-password"
-              type={showConfirmPassword ? 'text' : 'password'}
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              aria-invalid={!!fieldErrors.confirmPassword || undefined}
-              aria-describedby={
-                fieldErrors.confirmPassword ? 'confirm-new-password-error' : undefined
-              }
-              className="h-10 pr-10 text-[14px]"
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword((v) => !v)}
-              aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-            >
-              {showConfirmPassword ? (
-                <EyeOff className="h-4 w-4" aria-hidden="true" />
-              ) : (
-                <Eye className="h-4 w-4" aria-hidden="true" />
-              )}
-            </button>
-          </div>
+          <PasswordInput
+            id="confirm-new-password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            aria-invalid={!!fieldErrors.confirmPassword || undefined}
+            aria-describedby={
+              fieldErrors.confirmPassword ? 'confirm-new-password-error' : undefined
+            }
+            toggleLabel="confirm password"
+          />
           {fieldErrors.confirmPassword && (
             <p
               id="confirm-new-password-error"

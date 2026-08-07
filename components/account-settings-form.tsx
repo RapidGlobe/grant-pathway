@@ -2,10 +2,10 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react'
+import { CheckCircle, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 import { changePassword } from '@/actions/auth'
 import { ContextualTooltip } from '@/components/contextual-tooltip'
 
@@ -24,9 +24,6 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [showCurrent, setShowCurrent] = useState(false)
-  const [showNew, setShowNew] = useState(false)
-  const [showConfirm, setShowConfirm] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [passwordUpdated, setPasswordUpdated] = useState(false)
   const [serverError, setServerError] = useState('')
@@ -132,30 +129,15 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
             >
               Current password
             </Label>
-            <div className="relative">
-              <Input
-                id="currentPassword"
-                type={showCurrent ? 'text' : 'password'}
-                autoComplete="current-password"
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                aria-invalid={!!fieldErrors.currentPassword || undefined}
-                aria-describedby={fieldErrors.currentPassword ? 'currentPassword-error' : undefined}
-                className="h-10 pr-10 text-[14px]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowCurrent((v) => !v)}
-                aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-              >
-                {showCurrent ? (
-                  <EyeOff className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <Eye className="h-4 w-4" aria-hidden="true" />
-                )}
-              </button>
-            </div>
+            <PasswordInput
+              id="currentPassword"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              aria-invalid={!!fieldErrors.currentPassword || undefined}
+              aria-describedby={fieldErrors.currentPassword ? 'currentPassword-error' : undefined}
+              toggleLabel="current password"
+            />
             {fieldErrors.currentPassword && (
               <p
                 id="currentPassword-error"
@@ -175,32 +157,15 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
             >
               New password
             </Label>
-            <div className="relative">
-              <Input
-                id="newPassword"
-                type={showNew ? 'text' : 'password'}
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                aria-invalid={!!fieldErrors.newPassword || undefined}
-                aria-describedby={
-                  fieldErrors.newPassword ? 'newPassword-error' : 'newPassword-hint'
-                }
-                className="h-10 pr-10 text-[14px]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowNew((v) => !v)}
-                aria-label={showNew ? 'Hide new password' : 'Show new password'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-              >
-                {showNew ? (
-                  <EyeOff className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <Eye className="h-4 w-4" aria-hidden="true" />
-                )}
-              </button>
-            </div>
+            <PasswordInput
+              id="newPassword"
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              aria-invalid={!!fieldErrors.newPassword || undefined}
+              aria-describedby={fieldErrors.newPassword ? 'newPassword-error' : 'newPassword-hint'}
+              toggleLabel="new password"
+            />
             {fieldErrors.newPassword ? (
               <p id="newPassword-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
                 {fieldErrors.newPassword}
@@ -220,30 +185,15 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
             >
               Confirm new password
             </Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirm ? 'text' : 'password'}
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                aria-invalid={!!fieldErrors.confirmPassword || undefined}
-                aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
-                className="h-10 pr-10 text-[14px]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm((v) => !v)}
-                aria-label={showConfirm ? 'Hide confirm password' : 'Show confirm password'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 rounded text-[#64748B] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
-              >
-                {showConfirm ? (
-                  <EyeOff className="h-4 w-4" aria-hidden="true" />
-                ) : (
-                  <Eye className="h-4 w-4" aria-hidden="true" />
-                )}
-              </button>
-            </div>
+            <PasswordInput
+              id="confirmPassword"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              aria-invalid={!!fieldErrors.confirmPassword || undefined}
+              aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
+              toggleLabel="confirm password"
+            />
             {fieldErrors.confirmPassword && (
               <p
                 id="confirmPassword-error"

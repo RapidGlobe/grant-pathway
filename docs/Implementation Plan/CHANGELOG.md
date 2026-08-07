@@ -10,6 +10,39 @@
 
 ---
 
+## 2026-08-07 — DEF-02 resolved: a shared PasswordInput, and the recorded count was wrong twice
+
+WJ's decision, after being shown that the four copies were near-identical and that extraction would therefore be a clean two-prop component rather than a props-explosion.
+
+### Both halves of how AC-01 recorded this were wrong
+
+The defect log said "one component, six instances" of a 16×16 show/hide-password toggle, against the 24×24 minimum WCAG 2.2 SC 2.5.8 requires.
+
+- **Eight instances, not six.** `reset-password-form.tsx` holds two the sweep never saw, because reaching that page needs a real reset link from an email.
+- **Four copies of the same markup, not one component.** sign-in (1), `/register` (2), reset-password (2), `/account` (3).
+
+Neither correction changes the severity, but both change the fix: "patch one component" was never available.
+
+### Why extraction won
+
+The toggle's markup and classes were byte-identical across all eight. Only `autoComplete` and the `aria-label` noun varied, so the shared component takes two props and absorbs the eight separate `useState` toggles.
+
+The supporting argument was history rather than tidiness. `GAP-25` found the password **policy** written out separately in three of these same four files, and the PRD's 0.3/0.4 revisions record a live client/server divergence that resulted. This markup is that pattern one step further along, and the parts most likely to drift — the accessible name and the target size — are invisible until somebody tests with a keyboard or a screen reader. Which is precisely how eight instances went unnoticed.
+
+**The toggle is 28×28, not the bare 24×24 minimum**, matching the comfortable-margin preference taken on the status pills earlier the same day. **The icon does not move:** it stays 16×16, and the button's offset was set so its centre sits where it always did — measured at 20px from the field's right edge both before and after.
+
+### Verified, and what was not
+
+Measured in the browser on `/` and `/register`: every toggle 28×28, icon 16×16, button inside the field's 40px right padding with no text overlap, `type="button"` so revealing a password cannot submit a half-filled form, and the reveal/re-mask round-trip working with the accessible name changing correctly.
+
+⚠️ **`/account` and `/reset-password` were not verified in the browser, and are not recorded as if they were.** `/account` needs a signed-in session; `/reset-password` needs a live reset link from an email — the same barrier that hid its two instances in the first place. Both render the same component with the same classes and are covered by unit tests, so the residual risk is low but real. Flagged for confirmation during AC-01 run 2.
+
+9 new tests, suite **224 → 233**, including a scan that fails if an inline `type={show… ? 'text' : 'password'}` reappears anywhere in `components/`. An extraction is only worth doing if a ninth copy cannot quietly appear.
+
+**This closes AC-01's defect list.** `DEF-01` fixed, `DEF-02` fixed, `DEF-03` raised as `GAP-49`, `DEF-04` feeding `GAP-15`. The plan stays 🔴 — **twelve of twenty-four rows have never been swept and fourteen of fifteen cases have not started.** Fixing defects does not create coverage.
+
+---
+
 ## 2026-08-07 — DEF-01 resolved: Light slate retired as a text colour, and four of five status pills were failing
 
 WJ's decision, from the options and measured ratios put to him. This closes the last of AC-01's four defects that needed a judgement rather than a code fix.
