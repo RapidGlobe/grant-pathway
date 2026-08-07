@@ -10,6 +10,50 @@
 
 ---
 
+## 2026-08-07 — GCM-06 re-run live: GAP-39 and GAP-40 closed, and GAP-40 is the argument for live testing
+
+Run against a working local service — the 403 that blocked the 2026-08-06 attempt turned out to be a wrong AWS secret access key, fixed earlier today. A fresh application, upload path, **"Start fresh" chosen deliberately**: reusing the previous Stony Stratford application would have carried the old questions across and proved nothing.
+
+**Both defects are fixed.** §4 produced all six lettered sub-questions, including §4e ("an accurate figure for the number of people in the parish the project will serve") and §4f ("For how long will the project run?") which `GAP-39` had lost entirely. §10 produced two cards, one per reporting point, closing `GAP-40`. 21 Step 4 cards in total: 19 narrative questions and 2 Budget-tagged governance facts.
+
+Nothing that should have stayed out became a narrative question — the front details table, §3's tick-list, §9's address and phone, and §12's contact person are all absent, and §1 was absorbed into §2's description card exactly as the case anticipated.
+
+### GAP-40 is the reason this could not be closed on unit tests, and that is worth stating plainly
+
+The two gaps were fixed differently, and only one of them was ever provable without a live run.
+
+**`GAP-39` was a rule that was wrong.** It excluded data-entry fields, and a short answer was being treated as equivalent to a non-narrative one. It was fixed at the level of the principle rather than with a third exception — the test is now what a question is _about_, never how long its answer is — which matters because this exact failure had already recurred twice, at Idlewild and at MK Community Foundation, each time patched with its own carve-out.
+
+**`GAP-40` was a rule that was right and ignored.** `lib/prompts.ts` already carried "DO NOT MERGE ADJACENT QUESTIONS… never combine two related-but-distinct questions into one, even if they are adjacent, thematically similar, or commonly answered together" — verbatim — and the model merged them anyway.
+
+**A rule that is present and disobeyed is invisible to every test that asserts the rule is present.** The nine prompt tests written on 2026-08-06 would all have passed against the broken behaviour, and a green suite would have read as proof. Holding GCM-06 at Fail that day, rather than letting the tests close it, is the decision that made today's result mean anything.
+
+### One row of AC-01 fell out for free
+
+GCM-06 needs a brand-new application, which is precisely the state **AC-01 row 19** — the Step 4 "Before you begin writing" gate — had been blocked on since 2026-08-05, every application on the account having already passed it. Swept while it was on screen: **0 violations, 0 `incomplete`.** Banked in `accessibility-test-plan.md`.
+
+The scheduling lesson is worth more than the row: it was never a hard test, it just needed a state that existed for twenty minutes during an unrelated run.
+
+### A bug in the sweep snippet this morning's work introduced
+
+`document.getAnimations().forEach(a => a.finish())` — added to AC-01's snippet today to stop axe measuring a control mid-fade — **throws** on any looping animation: `Cannot finish Animation with an infinite target effect end`. One throw aborts the whole sweep before axe runs. It surfaced on the first page that had a spinner. Now wrapped in a `try`/`catch`, with the reason recorded in the snippet so nobody "tidies" it away.
+
+### Two observations, recorded rather than logged
+
+**Step 3 says "We found 21 application questions" above a list of 19.** The count includes the two governance cards; the list does not. Both numbers are individually defensible and together they suggest something has gone missing, on the screen whose entire job is telling the applicant what the AI found. A copy decision for WJ, not a capability-matrix defect.
+
+**§5b's three table totals are handled inconsistently — and this plan's own expectation may be the thing that is wrong.** "Total needed for this project" became a Budget-tagged card; "Amount requested from SSTC" and "Balance outstanding" did not. GCM-06's step 7 lists §5's table totals among the material that should be excluded, so read strictly, one leaked. But `lib/prompts.ts` says the opposite deliberately: since the MK Community Foundation work of 2026-07-27, project-specific budget and cost questions are **never** excluded, because the model had been dropping "What is the total cost of your project?" altogether. "Total needed for this project" is exactly that kind of ask.
+
+So the defect, if there is one, is that **two of the three did not appear** — not that one did. Left for WJ rather than settled by editing either document: should all three produce Budget cards, or none? Either way step 7 needs correcting.
+
+### Also corrected: this dashboard had been miscounting itself
+
+`TEST-DASHBOARD.md`'s RAG tallies written earlier today were wrong twice — both said "3 🟢 / 1 🟡 / 3 🔴" when the true figure was 3/2/2, and one claimed `help-and-tooltips-test-plan.md` was the only 🟡 when `regression-test-plan.md` is amber too. Counted by hand from prose instead of from the table. Corrected, and recorded rather than quietly fixed, because a dashboard that miscounts itself is worse than one that says nothing. **The suite now stands at 4 🟢, 2 🟡, 1 🔴.**
+
+The test application was deleted afterwards. **The run cost two AI requests, not the one predicted** — usage went from 6 to 8 of 50; which second call fired has not been chased.
+
+---
+
 ## 2026-08-07 — DEF-02 resolved: a shared PasswordInput, and the recorded count was wrong twice
 
 WJ's decision, after being shown that the four copies were near-identical and that extraction would therefore be a clean two-prop component rather than a props-explosion.
@@ -232,7 +276,7 @@ Two things were added from the same run. **Incognito is now a prerequisite for A
 
 The defect is ordinary; the process failure is not. A Level A accessibility failure was known to two people on 2026-08-05 and had no number, no register row and no covering task until 2026-08-07, during which time `ADR-TRACEABILITY.md` and `TEST-DASHBOARD.md` both read as complete and current. The dashboard actively said the plan was "created, not yet executed" on 2026-08-06, a day after it had failed. **Test results are banked into the repository in the same session they are read**, not carried in a scratchpad to the next one — and the sequencing that AC-01 slipped twice against (2026-08-05 and 2026-08-06, both to other work) is exactly the condition that makes that rule necessary rather than tidy.
 
-Documents updated: `accessibility-test-plan.md` v1.2 → v1.3, `ADR-TRACEABILITY.md` v2.33 → v2.34 (`GAP-49` added, register now 01–49), `TEST-DASHBOARD.md` v2.23 → v2.24 (accessibility plan 🟡 → 🔴, suite now 3 🟢 / 1 🟡 / 3 🔴).
+Documents updated: `accessibility-test-plan.md` v1.2 → v1.3, `ADR-TRACEABILITY.md` v2.33 → v2.34 (`GAP-49` added, register now 01–49), `TEST-DASHBOARD.md` v2.23 → v2.24 (accessibility plan 🟡 → 🔴, suite 3 🟢 / 2 🟡 / 2 🔴 — corrected later the same day; this entry originally said 3/1/3, miscounted by hand).
 
 ---
 
