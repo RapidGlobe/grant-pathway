@@ -10,6 +10,50 @@
 
 ---
 
+## 2026-08-07 — AC-01's results banked two days after they were gathered, and a WCAG Level A failure got its number
+
+The first run of `AC-01` (`accessibility-test-plan.md`) happened on 2026-08-05: twenty of the twenty-four routes and states were swept with `axe-core`, WJ running rows 1–9 in a Chrome Incognito window and Claude driving rows 10–21 through Claude-in-Chrome. **Nothing was written into the repository.** The results table in the plan was still empty checkboxes, and the findings lived in one markdown file in a session scratchpad under the operating system's temp directory — a location that is cleared without warning and belongs to no version control. They survived to today by luck.
+
+That is the reason this entry leads with the delay rather than the defect.
+
+### What the run found
+
+Four defects, now recorded as `DEF-01` to `DEF-04` in the plan's Defect Log.
+
+**`DEF-01` — one colour token, not five bugs.** `#94A3B8` fails AA contrast on every background it is used against: 2.44 on `#FDF9F5` (footer version line, step labels under the progress bar), 2.56 on `#FFFFFF` (dashboard card metadata, Step 4 word counts), 2.47 on `#FFFBEB` (Step 4 word counts in amber cards). Two status pills fail separately — `#D97706` on `#FEF3C7` at 2.86, and `#DC2626` on `#FEF2F2` at 4.41, a near miss against the 4.5 floor. This is one design-token decision and it is **WJ's to make**, not something to be fixed by picking a darker grey here; it is recorded and left open deliberately.
+
+**`DEF-02` — one component, six instances.** The show/hide-password eye button renders 16×16 against WCAG 2.2's 24×24 minimum, on sign-in (1), `/register` (2) and `/account` (3).
+
+**`DEF-03` — the only Level A failure, now `GAP-49`.** On Step 4, the pop-up opened from a "Page N of the guidelines" citation link contains a scrolling box (`.max-h-[60vh]` in `application-step4-draft.tsx`) with no `tabIndex`. It never takes focus, so the arrow keys have nothing to scroll. A keyboard-only user can open the dialog and close it, sees the first screenful, and cannot reach anything below it. **This is worse than a one-node count suggests, because of which feature it is.** The dialog exists for exactly one purpose — showing the applicant the funder's original wording so they can check the AI's summary against the source. For a keyboard-only user it does not degrade, it fails at the single thing it is for. Raised as `GAP-49`, 🟡 against `P5.3`'s existing "run `@axe-core/react` and fix all violations" bullet; the row names the specific defect so that a re-run which never opens the dialog cannot sign it off. The likely fix is `tabIndex={0}` plus `role="region"` and an accessible name, and it should be done alongside AC-05 — the focus-management case for this same dialog, and the register's only 🔵 `ADR-OPS-006` row.
+
+**`DEF-04` — the harness, not the product.** `@axe-core/react`'s automatic reporting does not work: `components/axe-provider.tsx` swallows a React 19 incompatibility in a silent `catch`, so a page carrying real violations produces an empty console. Found 2026-08-04 and confirmed by this run. It feeds `GAP-15`, whose accepted deviation waiving Lighthouse CI was justified partly on axe catching regressions during development — half of a justification that has been false since React 19.
+
+**One reading was discarded rather than logged.** A contrast failure of 2.23 on the "Look up charity" button was an artefact: the tab was in the background, where Chrome freezes CSS transitions, and axe measured the button halfway through a 150 ms fade. The snippet now finishes all animations before measuring, so it cannot recur.
+
+### The coverage is partial, and that only cuts one way
+
+Twelve rows are unswept — row 10, 11b/11c (blocked on the Charity Commission key), Step 3's citation pop-up, the Step 4 gate, three Step 4 states, Step 5, the session-timeout pop-up and the two error screens — and two `incomplete` findings need a human verdict (whether you can Tab to controls behind an open pop-up, and the `color-contrast` items axe could not measure). **Run 2 can add defects and cannot remove any**, so the Fail already recorded is safe even though the run is not finished.
+
+### Five wrong instructions in the case itself, all of which cost time on the day
+
+Worth listing, because each one is the kind of error that only surfaces when a non-developer executes a procedure written by someone who did not:
+
+- **`Ctrl`+`Enter` does not run a DevTools snippet** once focus has left the code editor — and every sweep requires clicking onto the page first. It fails silently: no error, no output. Right-click → `Run` is now the only method the case gives.
+- **The snippet's `copy()` call never fired.** Console Utilities exist only when typed into the Console command line, not inside a snippet, so "the result is already on your clipboard" was simply untrue. Removed; the case now says to right-click the Console output block and choose `Copy`, which works because the snippet deliberately emits everything as one message.
+- **Row 9 described a menu that does not exist.** It said to "open any menu or action on an application row"; there is no row menu. The actions are plain `Delete` and `Re-open`/`Continue` buttons, always visible, and the first two open confirmation dialogs worth sweeping in their own right. Rewritten as three explicit sweeps.
+- **Row 17 asked for two sweeps of Step 2**, switching between the upload area and the paste box. They are on screen together; one sweep covers both.
+- **Row 5 needed a note that the sweep prints the wrong path.** `/verify-email/confirm` redirects, so the output reads `PAGE: /verify-email` and two different states produce identical-looking rows unless the tester writes down which one they were on.
+
+Two things were added from the same run. **Incognito is now a prerequisite for AC-01** — browser extensions inject into password fields, which caused a React hydration error on the sign-in page and can produce violations that belong to the extension rather than the product. And the sweep snippet now calls `document.getAnimations().forEach(a => a.finish())` before running, which is what makes the discarded 2.23 reading impossible to repeat.
+
+### Why this is in the changelog at all
+
+The defect is ordinary; the process failure is not. A Level A accessibility failure was known to two people on 2026-08-05 and had no number, no register row and no covering task until 2026-08-07, during which time `ADR-TRACEABILITY.md` and `TEST-DASHBOARD.md` both read as complete and current. The dashboard actively said the plan was "created, not yet executed" on 2026-08-06, a day after it had failed. **Test results are banked into the repository in the same session they are read**, not carried in a scratchpad to the next one — and the sequencing that AC-01 slipped twice against (2026-08-05 and 2026-08-06, both to other work) is exactly the condition that makes that rule necessary rather than tidy.
+
+Documents updated: `accessibility-test-plan.md` v1.2 → v1.3, `ADR-TRACEABILITY.md` v2.33 → v2.34 (`GAP-49` added, register now 01–49), `TEST-DASHBOARD.md` v2.23 → v2.24 (accessibility plan 🟡 → 🔴, suite now 3 🟢 / 1 🟡 / 3 🔴).
+
+---
+
 ## 2026-08-06 — GAP-32 scoped properly: its own description was wrong, and the real work was six other documents
 
 WJ asked what needed doing to tidy up `GAP-32`. Answering it properly meant checking the gap's own claim first, which turned out to be false.
