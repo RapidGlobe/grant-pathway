@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-08-07 — Both pending migrations applied to `grant-pathway-dev`; the schema is no longer behind the code
+
+`20260805000000` (`GAP-31`, the inactivity-warning dedup column) and `20260806000000` (`GAP-48`, the storage RLS repoint) are both live on `grant-pathway-dev`. Run by WJ with `npx supabase db push` and verified with `npx supabase migration list`: **every migration in the list now shows the same value in Local and Remote, with no drift anywhere** — not just the two that were outstanding.
+
+`GAP-31`'s had been pending since 2026-08-05, `GAP-48`'s since 2026-08-06. Both needed a real terminal because `supabase db push` prompts interactively for the database password, which no session can answer.
+
+**One live nuisance ends here.** Since 2026-08-05 the inactivity-warning cron had been failing against dev every morning, returning 500 with a Sentry event, because it queried a column that existed in the repository and not in the database. That was the loud-failure design working as intended, but it was noise with a known cause.
+
+**`grant-pathway-prod` was deliberately not pushed.** Nothing runs against it — `grantpathway.org.uk` and the external tester both use `grant-pathway-dev` (confirmed by WJ 2026-08-04) — and `P5.4` performs a full migration push at cutover. Pushing now would mean pushing twice, and the second push is the one that matters.
+
+**`GAP-48` stays 🔵, and applying the migration does not change why.** The three storage policies are now live in their repointed form, but they still have never been _observed_ to grant anything. A migration applying cleanly proves the SQL executes; it does not prove the policy admits the right rows and refuses the wrong ones. That distinction is the whole history of this gap — the original policies also applied cleanly, and then denied every request for eleven weeks. `ADR-SEC-002` requires cross-user access to be tested rather than declared, so this closes at `GAP-17`'s test in `P5.2` and nowhere earlier.
+
+With this, all four of the session's opening blockers are cleared: the Charity Commission key, the AWS Bedrock credentials, and both migrations.
+
+---
+
 ## 2026-08-07 — GAP-22 and GAP-21 built: two specified behaviours that had never existed
 
 Both had been written into `technical-design.md` since April and neither was implemented. Both are small. Both were invisible for the same reason — nothing failed, so nothing complained.
