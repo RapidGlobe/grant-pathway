@@ -155,6 +155,82 @@ describe('buildSummaryPrompt — lettered sub-parts stay separate (GAP-40)', () 
   })
 })
 
+describe('buildSummaryPrompt — grouped budget figures (GAP-51)', () => {
+  // Stony Stratford §5 "BUDGET FOR THIS PROJECT" b) asks for three labelled
+  // money figures in a run — "Total needed for this project", "Amount requested
+  // from SSTC", "Balance outstanding". GCM-06's live re-run produced a card for
+  // the first and nothing for the other two.
+  //
+  // WJ's ruling, 2026-08-07: a project budget question the funder has actually
+  // asked is never excluded. That is what this file has said since 2026-07-27;
+  // what it lacked was anything covering a *group* of them.
+  //
+  // Two failure modes are pinned separately below, because the rule has to name
+  // both sides of the line or it just moves the problem:
+  //   1. Three labelled currency lines look like a table summary, and every
+  //      other thing this prompt says about totals is about excluding them.
+  //   2. "AMOUNT REQUESTED £" also sits in the form's front administrative
+  //      details table, which IS correctly excluded — so the exclusion appears
+  //      to have attached to the name rather than the field and travelled.
+  //
+  // As with GAP-40: these assert the words are present. They cannot say what
+  // the model does with them. GCM-07 closes on a live re-run, not on green here.
+  const prompt = () =>
+    buildSummaryPrompt('Some funder guidelines.', {
+      charityName: 'Test Charity',
+      charityNumber: null,
+      charitableObjects: 'Objects',
+      region: 'Milton Keynes',
+      beneficiaries: 'Local residents',
+    } as never)
+
+  it('states that each grouped money label is its own question', () => {
+    expect(prompt()).toContain('GROUPED BUDGET FIGURES ARE SEPARATE QUESTIONS')
+    expect(prompt()).toMatch(/EACH LABEL IS ITS OWN BUDGET QUESTION/i)
+  })
+
+  it('names the three figures that were actually asked for', () => {
+    expect(prompt()).toMatch(/Total needed for this project/i)
+    expect(prompt()).toMatch(/Amount requested from us/i)
+    expect(prompt()).toMatch(/Balance outstanding/i)
+  })
+
+  it('forbids extracting only the first, and forbids merging the group', () => {
+    // Extracting one of three is exactly what happened.
+    expect(prompt()).toMatch(/do not extract only the first/i)
+    expect(prompt()).toMatch(/do not merge them into a single item/i)
+  })
+
+  it('rejects the "these are table totals" reading', () => {
+    expect(prompt()).toMatch(/ARE NOT "TABLE TOTALS"/i)
+    expect(prompt()).toMatch(
+      /a run of labelled currency fields under a budget heading is a set of separate asks/i,
+    )
+  })
+
+  it('stops an administrative copy of a figure from suppressing the budget ask', () => {
+    // The mechanism, not just the symptom: excluding the front-table
+    // "AMOUNT REQUESTED" box must not exclude §5b's ask for the same number.
+    expect(prompt()).toMatch(/EVEN WHEN THE SAME FIGURE ALSO APPEARS ELSEWHERE/i)
+    expect(prompt()).toMatch(/NEVER licenses excluding the budget section's own ask/i)
+  })
+
+  it('still excludes the arithmetic footer of an itemised costs table', () => {
+    // The other side of the line. §5a's breakdown instruction is already a
+    // question; "TOTAL EXPENDITURE =" sums cells belonging to it. A rule that
+    // only said "extract money figures" would start extracting these.
+    expect(prompt()).toMatch(/THE ONE MONEY TOTAL THAT IS EXCLUDED/i)
+    expect(prompt()).toMatch(/TOTAL EXPENDITURE =/)
+    expect(prompt()).toMatch(/merely sums cells belonging to it/i)
+  })
+
+  it('keeps the group tagged as budget so AI assist stays blocked', () => {
+    // These are the applicant's own figures. A Budget tag is what stops the
+    // model from being invited to invent them.
+    expect(prompt()).toMatch(/each with "is_budget_question" set to true/i)
+  })
+})
+
 describe('buildRefinePrompt — layout preservation (GAP-46)', () => {
   // Found while fixing GAP-41 (the Word export was discarding line breaks).
   // Fixing the export alone would not have been enough: this prompt opened by

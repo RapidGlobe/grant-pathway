@@ -10,6 +10,42 @@
 
 ---
 
+## 2026-08-07 — §5b settled: don't exclude a budget question the funder actually asked
+
+WJ's ruling on the second of the two observations GCM-06's live re-run left open, and the one that turned out to be a defect rather than a wrong expectation.
+
+**The question was whether Stony Stratford's §5 b) should produce Budget cards.** It asks for three labelled money figures — "Total needed for this project", "Amount requested from SSTC", "Balance outstanding". The re-run produced a card for the first and nothing for the other two. Yesterday's write-up called this a contradiction between step 7 of the GCM-06 case (which lists "§5's expenditure/income table totals" among correctly-excluded material) and `lib/prompts.ts` (which has deliberately not excluded project budget questions since 2026-07-27).
+
+**Reading the source form shows there is no contradiction, and the write-up was wrong.** §5 is titled "BUDGET FOR THIS PROJECT" and has two parts:
+
+```
+a) Give details of expenditure required for your project... separate cost for each item
+   [ EXPENDITURE | INCOME grid ]  →  TOTAL EXPENDITURE =  |  TOTAL INCOME =
+b) Total needed for this project  £
+   Amount requested from SSTC     £
+   Balance outstanding            £
+```
+
+Step 7 means the `TOTAL EXPENDITURE =` / `TOTAL INCOME =` footer **inside** §5a's grid, which is correctly excluded: §5a's own instruction is already a card, and the footer sums cells belonging to it. §5 b)'s three lines are not table cells at all — they sit below the grid as standalone labelled asks. Two different things, conflated. Step 7 has been reworded so it cannot be read that way again.
+
+**WJ's ruling — a project budget question the funder has actually asked is never excluded.** So the defect is that **two of three are missing, not that one leaked**. "Amount requested" is the single figure a grant decision turns on. "Balance outstanding" is the input to §6's four narrative questions, which are literally headed "HOW WILL YOU RAISE ANY OUTSTANDING BALANCE?". An application exported without them is incomplete.
+
+**Two suspected mechanisms, and the rule answers both.** Three labelled currency lines read as a table summary, and everything else in the prompt about totals is about excluding them. And `AMOUNT REQUESTED £` also appears in the form's front administrative details table — correctly excluded — so the exclusion appears to have attached to the _name_ rather than the _field_ and travelled to the budget section's own ask.
+
+The new rule states that each label in a run of budget figures is its own question, that excluding an administrative copy of a figure never licenses excluding the budget section's ask for it, and — in the same breath, because a rule that only said "extract money figures" would start extracting table footers — that the arithmetic footer of an itemised costs grid stays excluded.
+
+**This is the fourth missing money question, and the first that is not the same failure as the other three.** Idlewild (Defect Log #1), MK Community Foundation (same day, 2026-07-27), and the budget half of `GAP-39` were all about _whether a budget question counts as a question_. Those fixes are still correct and they held here — the figure that reads like a question was extracted. What was missing is a rule about **the shape a budget ask arrives in**, which is why this is a new rule rather than a fourth exception.
+
+**Raised as `GAP-51` and split out as a new `GCM-07` case** rather than reopening GCM-06. GCM-06's Pass is honest: it met every expectation it was written to test. Grouped money fields are a distinct capability, and the matrix is organised by capability. `GCM-07` is derived from GCM-06's own run output rather than a separate execution, and its steps 8 and 9 (the front-table box stays excluded; all three figures reach the Word export) are unevidenced, because that run predates the case.
+
+**7 prompt tests, suite 242 → 249 — and the row stays 🔵, not 🟢.** They assert the words are present, which is all a prompt test can do. That distinction is exactly what `GAP-40` established on this same fixture eleven days earlier: its rule was in `lib/prompts.ts` verbatim and the model ignored it, so nine passing tests would have read as proof of broken behaviour. Half of this gap is that shape again — the prompt already said _how much money is requested_ must always be extracted, and "Amount requested from SSTC" was dropped anyway. `GCM-07` closes on a live re-run, not on a green suite.
+
+**`guideline-capability-matrix-test-plan.md` therefore goes 🟢 → 🔴 an hour after going 🔴 → 🟢.** Both moves are correct. The two defects the re-run existed to check really were fixed; the third came from re-reading the same output with a question settled.
+
+Also fixed in passing: four register rows (`GAP-21`, `GAP-22`, `GAP-39`, `GAP-40` — the four closed earlier today) carried a stray trailing empty table cell. Harmless in rendering, since GFM drops cells beyond the header count, but it broke a column-consistency check and is the kind of thing that hides a real breakage later.
+
+---
+
 ## 2026-08-07 — Step 3 no longer contradicts its own list
 
 WJ's decision, on the first of the two observations GCM-06's re-run left open.
