@@ -6,14 +6,14 @@ export const metadata: Metadata = {
 }
 
 interface Props {
-  searchParams: Promise<{ deleted?: string }>
+  searchParams: Promise<{ deleted?: string; timeout?: string }>
 }
 
 export default async function SignInPage({ searchParams }: Props) {
-  const { deleted } = await searchParams
+  const { deleted, timeout } = await searchParams
   return (
     <div className="flex flex-1 items-center justify-center px-6 py-12">
-      <SignInForm accountDeleted={deleted === 'true'} />
+      <SignInForm accountDeleted={deleted === 'true'} signedOutForInactivity={timeout === 'true'} />
     </div>
   )
 }

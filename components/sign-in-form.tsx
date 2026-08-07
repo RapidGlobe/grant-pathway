@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import Link from 'next/link'
-import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,9 +16,18 @@ interface FieldErrors {
 interface SignInFormProps {
   /** True when the user has just deleted their account (shows a confirmation banner). */
   accountDeleted?: boolean
+  /**
+   * True when the user arrived here from the 60-minute inactivity timeout
+   * (`/?timeout=true`) — covers both the automatic sign-out and the warning
+   * modal's "Sign out now" button, per `technical-design.md` §5. GAP-22.
+   */
+  signedOutForInactivity?: boolean
 }
 
-export function SignInForm({ accountDeleted = false }: SignInFormProps) {
+export function SignInForm({
+  accountDeleted = false,
+  signedOutForInactivity = false,
+}: SignInFormProps) {
   const [state, action, isPending] = useActionState(signIn, { error: null })
 
   const [email, setEmail] = useState('')
@@ -55,6 +64,24 @@ export function SignInForm({ accountDeleted = false }: SignInFormProps) {
       <p className="mb-8 text-center text-[16px] text-[#64748B]">
         Your free grant writing companion for UK charities
       </p>
+
+      {/*
+        Signed out by the inactivity timer (GAP-22). Amber notice rather than
+        the red error style: nothing has gone wrong and nothing was lost —
+        auto-save (ADR-ARCH-004) has already persisted the user's work.
+      */}
+      {signedOutForInactivity && (
+        <div
+          role="status"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
+        >
+          <Clock className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#B45309]" aria-hidden="true" />
+          <p className="text-[14px] text-[#78350F]">
+            You&apos;ve been signed out due to inactivity. Your work has been saved — sign in again
+            to carry on.
+          </p>
+        </div>
+      )}
 
       {/* Account deleted confirmation banner */}
       {accountDeleted && (

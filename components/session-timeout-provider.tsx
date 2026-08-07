@@ -22,9 +22,14 @@ const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'touchstart'] as const
  *
  * - Any user activity (mouse, keyboard, touch) resets the timer.
  * - At 55 minutes of inactivity the warning modal opens with a countdown.
- * - At 60 minutes signOut() is called and the user is sent to /.
+ * - At 60 minutes signOut() is called and the user is sent to /?timeout=true,
+ *   where the sign-in page explains why (GAP-22).
  * - "I'm still here" resets the timer and closes the modal.
- * - "Sign out now" signs out immediately.
+ * - "Sign out now" signs out immediately — and also lands on /?timeout=true.
+ *   That is deliberate and specified: technical-design.md §5 says the message
+ *   is shown whether the modal is dismissed via "Sign out now" OR ignored to
+ *   the 60-minute mark. Both paths run through doSignOut() below, so there is
+ *   nothing to branch on here.
  * - While the modal is open, ambient activity is ignored — only its own
  *   buttons can end the warning state (see modalOpenRef below).
  */
@@ -48,7 +53,11 @@ export function SessionTimeoutProvider() {
     modalOpenRef.current = false
     setShowModal(false)
     await signOut()
-    router.push('/')
+    // GAP-22: the param is what tells the sign-in page to explain the sign-out.
+    // Without it the user is dumped on / with no indication of what happened —
+    // which is what shipped, and is why technical-design.md §5's stated message
+    // had no way to appear.
+    router.push('/?timeout=true')
   }, [router])
 
   const resetTimers = useCallback(() => {

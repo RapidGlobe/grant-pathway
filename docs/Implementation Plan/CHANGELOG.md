@@ -10,6 +10,51 @@
 
 ---
 
+## 2026-08-07 — GAP-22 and GAP-21 built: two specified behaviours that had never existed
+
+Both had been written into `technical-design.md` since April and neither was implemented. Both are small. Both were invisible for the same reason — nothing failed, so nothing complained.
+
+### GAP-22 — the inactivity sign-out said nothing
+
+`technical-design.md` §5 and `ADR-SEC-003` have specified since 2026-04-21 that a user signed out by the 60-minute inactivity timer lands on the sign-in page with the message _"You've been signed out due to inactivity."_ What shipped called `router.push('/')`. With no parameter, the sign-in page had no way to know why the user had arrived, so the specified message had no mechanism to appear. The user was simply dumped on the sign-in screen with no explanation — the exact experience the message exists to prevent.
+
+`doSignOut()` now pushes `/?timeout=true`. `app/(public)/page.tsx` reads it and passes `signedOutForInactivity` into `SignInForm`.
+
+**Built on the pattern already there.** The same page already reads `?deleted=true` to show an account-deletion confirmation. GAP-22 is the same shape in the same file — one extra param, one extra prop — rather than a second mechanism doing the same job.
+
+**Both sign-out paths show the message, and that is the specification rather than a shortcut.** §5 says it appears whether the modal is dismissed via "Sign out now" **or** ignored to the 60-minute mark. Both already ran through `doSignOut()`, so there was nothing to branch on. The ordinary nav sign-out still goes to a bare `/`, and account deletion still goes to `/?deleted=true`; both verified unaffected.
+
+**Amber notice, not a red error, and `role="status"` rather than `role="alert"`.** Nothing has gone wrong and nothing has been lost — auto-save has already persisted the work, which is why the banner can say so. An alert would interrupt a screen-reader user for something they cannot act on. The amber pairing chosen (`#78350F` on `#FFFBEB`) is the one used eleven times already in the codebase, and deliberately not the `#D97706` on `#FEF3C7` combination that AC-01 measured at 2.86 the same week and logged as `DEF-01`.
+
+Verified in the browser: banner present on `/?timeout=true`, absent on `/`, no console errors. Five tests.
+
+**One thing found on the way, flagged rather than fixed.** `ADR-SEC-003` says the user is redirected to `/sign-in`. That route does not exist — sign-in is served at `/`, and `technical-design.md` §5 already says `/`. The ADR is Tier 3 and the decision itself is unaffected, so it is recorded here rather than edited.
+
+### GAP-21 — every AI error reached Sentry unattributed
+
+`technical-design.md` §14 has specified route tagging on the AI routes since 2026-04-21. Neither `generate-summary` nor `refine-answer` imported Sentry **at all**, so every Bedrock failure since those routes were written arrived in the dashboard as an untagged error, indistinguishable from anything else in the service.
+
+Three call sites now tag: `generate-summary` on its primary Bedrock call and again on the JSON-reprompt retry, and `refine-answer` on its single call. The retry is tagged separately on purpose — it only runs after the model has already returned unparseable JSON once, so it fails for different reasons and is worth filtering apart.
+
+**Two deliberate deviations from what §14 showed:**
+
+- **`Sentry.captureException(err, { tags })` rather than `Sentry.withScope(scope => scope.setTag(…))`.** Functionally identical for tagging. The chosen form matches the six Sentry call sites already in `app/api/account/delete/route.ts` and `app/api/cron/inactivity-deletion/route.ts`, so the codebase now has one Sentry idiom instead of two. §14 has been updated to show the form actually used, rather than leaving the document describing something the code does not do — which is how this class of gap starts.
+- **An `ai_error` tag beyond the spec**, carrying the `classifyBedrockError()` code. A wave of `throttled` and a wave of `unavailable` are different incidents; the route tag alone cannot tell them apart, and the code is already computed on every one of these paths.
+
+**Deliberately not claimed as verified.** The tests prove the call is made with the right tags. Only the Sentry dashboard can prove a tagged event arrives, and that is `P5.4`'s work — GAP-21's own task text says to do it in that sitting. The Go-Live gate now records that outstanding check rather than reading P5.3b as finished.
+
+**What the tests actually guard.** There is no pure function here to test, and this project's route-level tests deliberately cover extracted logic rather than booting handlers with Supabase, Upstash and Bedrock all mocked. So the coverage is a source scan, and what it guards is the regression that produced `GAP-21` in the first place: an AI failure path that exists without a tag. It fails if a third Bedrock route is added and left untagged — which is exactly the omission that went unnoticed for three months.
+
+### Also in this change
+
+**A sixth wrong instruction found in AC-01, on top of this morning's five.** Row 11 told the tester to sweep the charity lookup "with the results list showing" and then "pick one from the list". There is no list. `lookupCharity()` takes the first match only and `charity-profile-form.tsx` fills the fields immediately — it is one action, not two. Row 11 rewritten around the three states that do exist (populated, not found, unreachable), and the results table's `11b`/`11c` rows corrected: what run 1 actually swept was the `unavailable` state, and it recorded `11c` as "blocked — no results list to pick from", which was describing UI that has never existed.
+
+**The Charity Commission key is in `.env.local` and verified working** (HTTP 200 against the live API), so rows `11c` and `11d` are unblocked. **`AWS_REGION` was empty, not absent, and that is a defect in its own right:** `lib/env.ts` declares `AWS_REGION: z.string().default('eu-west-2')`, but a Zod default only fires on `undefined` — an empty string satisfies `z.string()` and passes straight through. Both AI routes then use `process.env.AWS_REGION ?? 'eu-west-2'`, and `??` also ignores `''`. So an empty region reached the AWS signer and every AI call returned 403 while the app booted perfectly clean. Set to `eu-west-2`. The startup validation that exists specifically to catch missing configuration did not catch it, which is worth its own gap.
+
+Suite **205 → 217**. `type-check`, `lint` and all 217 tests pass.
+
+---
+
 ## 2026-08-07 — AC-01's results banked two days after they were gathered, and a WCAG Level A failure got its number
 
 The first run of `AC-01` (`accessibility-test-plan.md`) happened on 2026-08-05: twenty of the twenty-four routes and states were swept with `axe-core`, WJ running rows 1–9 in a Chrome Incognito window and Claude driving rows 10–21 through Claude-in-Chrome. **Nothing was written into the repository.** The results table in the plan was still empty checkboxes, and the findings lived in one markdown file in a session scratchpad under the operating system's temp directory — a location that is cleared without warning and belongs to no version control. They survived to today by luck.

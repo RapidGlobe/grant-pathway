@@ -21,6 +21,7 @@
 // but still require more than the 10 s default Vercel function timeout.
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+import * as Sentry from '@sentry/nextjs'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { aiRatelimit } from '@/lib/rate-limit'
@@ -198,6 +199,12 @@ export async function POST(request: NextRequest) {
       code,
       err,
     )
+    // GAP-21 / ADR-OPS-005: tag by route so AI failures can be filtered apart
+    // from the rest of the service in Sentry. `code` is on the tag too — a
+    // wave of `throttled` reads very differently from a wave of `unavailable`.
+    Sentry.captureException(err, {
+      tags: { route: 'refine-answer', step: 'bedrock', ai_error: code },
+    })
     await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
     return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
   }
