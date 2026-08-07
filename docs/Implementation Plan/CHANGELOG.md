@@ -10,6 +10,48 @@
 
 ---
 
+## 2026-08-07 — GAP-50: the startup check that exists to catch bad configuration let the bad configuration through
+
+WJ's decision, after the defect was flagged twice during the day's work. Both halves — the blank-value fix and the Charity Commission warning — were his call from the options put to him.
+
+### The defect
+
+`lib/env.ts` is imported by `instrumentation.ts` specifically so the process throws before serving a request if configuration is incomplete. On 2026-08-07 `AWS_REGION=` — the name present, the value **empty** — passed it, and cost most of a session.
+
+It slipped two guards that each look sufficient on their own:
+
+- **`z.string().default('eu-west-2')`** — a Zod default only fires on `undefined`. An empty string satisfies `z.string()` and is returned unchanged.
+- **`process.env.AWS_REGION ?? 'eu-west-2'`** in both AI routes — `??` also only fires on null/undefined, never on `''`.
+
+So the empty region reached the AWS request signer, every Bedrock call returned `403 signature does not match`, and the app booted reporting itself perfectly healthy. The module whose entire job is refusing to start on bad configuration waved it straight through.
+
+**It was not a one-off.** `APP_VERSION ?? 'dev'` in `lib/version.ts` has the identical defect, found while fixing the first. Two instances is what turned this from a stricter rule on one variable into a fix for the class — and is why the "fix AWS_REGION only" option was not the one recommended.
+
+### The fix
+
+New `lib/env-vars.ts` holds `APP_ENV_VARS` — the eighteen variables this application reads — and `normaliseBlankEnvVars()`, which deletes any set to an empty or whitespace-only value. **"Set to nothing" and "not set" now mean the same thing everywhere:** `.default()` fires, every `??` fallback fires, and a blank secret fails `.min(1)` loudly at startup instead of being signed with. It runs first in `validateEnv()`, before parsing.
+
+Three deliberate choices worth recording:
+
+- **Scoped to a declared list, not all of `process.env`.** Deleting arbitrary empty variables from a process environment could affect Node, Next or the host OS in ways this code cannot reason about.
+- **Whitespace-only counts as blank.** A stray space from a copy-paste satisfies `.min(1)` and would be signed with — harder to spot than an empty value, and identical in effect.
+- **Extracted to its own module.** `lib/env.ts` throws on import by design, so it cannot be imported by a test without a fully populated environment. `lib/inactivity.ts` and `lib/docx-text.ts` were extracted for exactly this reason, and the note on `GAP-41` says it plainly: logic that cannot be imported cannot be tested, and untested logic is how this survived.
+
+**Second half, same decision:** `CHARITY_COMMISSION_API_KEY` now produces a startup **warning**, not a failure. It is optional by design — the lookup degrades to manual entry — so it must not block boot. But its only visible symptom when absent is "We couldn't reach the Charity Commission right now", which reads as an outage at the Charity Commission rather than as missing local configuration. That misreading is exactly what happened earlier the same day, and it is why AC-01 rows 11c/11d were recorded as blocked.
+
+### Verified end-to-end, and the first run found two more
+
+`AWS_REGION` was temporarily blanked, the dev server restarted, the warning observed in the log, and the app confirmed still serving `200` — the default now reaching the routes because the key is deleted rather than empty. Restored immediately afterwards.
+
+That single run surfaced **two blank variables nobody knew about**, which is the tool doing its job on first use:
+
+- **`PREPROCESS_CHAR_CEILING` — harmless.** It is read with a truthiness check, so `''` already fell through to the default.
+- **`CRON_SECRET` — not harmless, and flagged for `P5.4`.** All three cron routes guard with `if (!process.env.CRON_SECRET || header !== expected)`. An empty string is falsy, so it **fails closed** — no security exposure, and that is the right direction, in contrast to `AWS_REGION` where the empty value was passed onward. But failing closed also means every cron call is rejected with 401. Locally that only blocks cron testing. **Production is not affected on the record available:** `P5.4` carries a ✅ line stating `CRON_SECRET` was added to Vercel and all three cron jobs confirmed active. That is a recorded confirmation rather than a live check, so it is worth re-confirming when `P5.4` is worked — but it should not be reported as a production incident, and an earlier draft of this entry did exactly that before the `P5.4` line was read.
+
+7 new tests, suite **217 → 224**. One of them scans the codebase for `process.env.X` and fails if anything read is missing from `APP_ENV_VARS`, so the list cannot quietly go stale; it also pins a floor on how many it expects to find, because a scan that finds nothing would otherwise pass for the wrong reason. Writing that test immediately caught it reading its own documentation — the modules explaining this rule necessarily write `process.env.NAME` in prose — so comments are stripped before matching.
+
+---
+
 ## 2026-08-07 — Both pending migrations applied to `grant-pathway-dev`; the schema is no longer behind the code
 
 `20260805000000` (`GAP-31`, the inactivity-warning dedup column) and `20260806000000` (`GAP-48`, the storage RLS repoint) are both live on `grant-pathway-dev`. Run by WJ with `npx supabase db push` and verified with `npx supabase migration list`: **every migration in the list now shows the same value in Local and Remote, with no drift anywhere** — not just the two that were outstanding.
