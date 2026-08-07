@@ -10,6 +10,30 @@
 
 ---
 
+## 2026-08-07 — Step 3 no longer contradicts its own list
+
+WJ's decision, on the first of the two observations GCM-06's re-run left open.
+
+Step 3 said **"We found 21 application questions in these guidelines"** directly above a list of **19**. Both numbers were correct about different things — the total counted `questions + governanceFacts`, the list rendered `questions` alone — and together they told the applicant that two questions had gone missing, on the one screen whose entire job is telling them what the AI found.
+
+**The fix names the split rather than picking a number:**
+
+> We found 19 application questions, plus 2 financial details you'll complete with your own figures. You'll work through all 21 in the next step.
+
+That keeps faith with the list and with Step 4, and does a second job — it warns the applicant before they start that some items need their own figures, which is the same message the Step 4 "Before you begin writing" gate carries. Counting only 19 would have matched the list and then surprised them with two unannounced cards.
+
+**The `free_form` branch had the identical defect** — `sections + governanceFacts` against a list of sections — two lines above, and was fixed in the same pass rather than left to be found separately by whoever next tests a free-form funder.
+
+**Both were moved out of the component into `lib/summary-counts.ts`.** They were inline IIFEs inside the JSX, which is precisely why the mismatch survived: there was nothing importable to assert on. That is the same extraction, for the same reason, as `lib/inactivity.ts`, `lib/docx-text.ts` and today's `lib/env-vars.ts` and `components/ui/password-input.tsx`.
+
+9 new tests, suite **233 → 242**. The assertions pin whole sentences rather than checking a number appears, because a test looking only for "19" would have passed against the broken version too — the defect was in the relationship between two numbers, not in either one.
+
+**Verified live** on an existing free-form application: 11 sections stated, 11 listed. That exercises the no-governance branch; the with-governance branch rests on the unit tests and on having watched the broken 21-over-19 case render earlier the same day. Not re-generated to see it, because that would spend another AI action to confirm a string.
+
+**Still open from GCM-06:** the §5b table totals question — whether all three of "Total needed for this project", "Amount requested from SSTC" and "Balance outstanding" should produce Budget cards, or none. That one is a genuine conflict between the test plan's step 7 and `lib/prompts.ts`, not a copy fix.
+
+---
+
 ## 2026-08-07 — GCM-06 re-run live: GAP-39 and GAP-40 closed, and GAP-40 is the argument for live testing
 
 Run against a working local service — the 403 that blocked the 2026-08-06 attempt turned out to be a wrong AWS secret access key, fixed earlier today. A fresh application, upload path, **"Start fresh" chosen deliberately**: reusing the previous Stony Stratford application would have carried the old questions across and proved nothing.

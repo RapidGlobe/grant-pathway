@@ -36,6 +36,7 @@ import { getGuidelines, clearGuidelines, getGuidelinesFilename } from '@/lib/gui
 import { advanceToStep4, setApplicationMismatch } from '@/actions/applications'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 import { ContextualTooltip } from '@/components/contextual-tooltip'
+import { structuredSummaryCount, freeFormSummaryCount } from '@/lib/summary-counts'
 
 type DisplayState =
   'loading' | 'content' | 'mismatch' | 'failure' | 'persistent-failure' | 'no-guidelines'
@@ -573,22 +574,15 @@ export function ApplicationStep3Summary({
             ✓
           </span>
           <p className="text-[13px] text-[#065F46]">
-            {summary.funder_type === 'free_form' ? (
-              <>
-                {(() => {
-                  const total =
-                    (summary.sections?.length ?? 0) + (summary.governanceFacts?.length ?? 0)
-                  return `We identified ${total} ${total === 1 ? 'section' : 'sections'} to complete. In the next step, you'll write your content section by section.`
-                })()}
-              </>
-            ) : (
-              <>
-                {(() => {
-                  const total = summary.questions.length + (summary.governanceFacts?.length ?? 0)
-                  return `We found ${total} application ${total === 1 ? 'question' : 'questions'} in these guidelines. You'll answer each one in the next step.`
-                })()}
-              </>
-            )}
+            {summary.funder_type === 'free_form'
+              ? freeFormSummaryCount(
+                  summary.sections?.length ?? 0,
+                  summary.governanceFacts?.length ?? 0,
+                )
+              : structuredSummaryCount(
+                  summary.questions.length,
+                  summary.governanceFacts?.length ?? 0,
+                )}
           </p>
         </div>
       ) : summary.funder_type === 'free_form' ? (
