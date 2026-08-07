@@ -1039,7 +1039,7 @@ Sentry.captureException(err, {
 })
 ```
 
-**Built 2026-08-07 (`GAP-21`).** Three call sites: `generate-summary` tags its primary Bedrock call and its JSON-reprompt retry separately, and `refine-answer` tags its single call.
+**Built 2026-08-07 (`GAP-21`).** **Four** call sites: `generate-summary` tags its primary Bedrock call, its JSON-reprompt retry, and — added the same day by `GAP-52` — a **response truncated at `max_tokens`**, which is a failure path with no caught exception to classify and so has to raise its own error to report; `refine-answer` tags its single call. The truncation tag uses `ai_error: 'response_too_long'`, deliberately distinct from `parse_error`: both arrive as unparseable JSON, but a parse error may clear on a retry and a truncation never will, so a wave of one means something very different from a wave of the other.
 
 Two deviations from the original specification, both deliberate:
 

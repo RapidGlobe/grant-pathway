@@ -10,6 +10,43 @@
 
 ---
 
+## 2026-08-07 — Documentation sweep: four docs were stating things that had stopped being true
+
+Run as the end-of-session tier checklist rather than as a task in its own right, and it found more than expected. Recording what was wrong, because in each case the doc had been left behind by a change made earlier the same day.
+
+**`PRD-Grant-Pathway.md` §7 — two corrections, both Tier 1.**
+
+The Step 3 "Questions found" row still carried the **old count line** — "We found [n] application questions in these guidelines" — which was replaced this morning precisely because it stated `questions + governanceFacts` above a list of `questions` alone. The PRD is the specification for that screen's copy, so leaving it was documenting the defect as the requirement. Now records both branches, with and without financial details, and says why.
+
+And Step 3 has a **new error state** that was not in §7 at all: `GAP-52`'s response-too-long message, which deliberately has **no Try again button**. §7 already documented the generic API failure and the second-consecutive-failure states, so a third that behaves differently from both belongs beside them.
+
+**`non-functional-requirements.md` NFR-01 — a target was exceeded, measured, and the fix widens the gap.**
+
+The Stony Stratford form (9,005 characters, a standard document by NFR-01's own definition) took **38.6 seconds** against a **30-second** target. More importantly, `GAP-52` raised `SUMMARY_MAX_TOKENS` to 6000 to stop real documents truncating, and at ~130 tokens/sec that permits generation of roughly **46 seconds** — past the 30s standard-document target and past the 45s large-document target too.
+
+That ceiling was chosen against the 60-second `AbortSignal` in the route, **not against these targets**, which is the honest thing to record: the decision was made without this document in view. The two should be reconciled deliberately. Neither target has ever been measured at scale — the only summarisation evidence is from 2026-06-04, predating citation extraction (P6.3) and every prompt rule added since, each of which lengthens the response. **For WJ:** raising a ceiling to stop truncation while an NFR says responses must be faster is a real tension, not bookkeeping.
+
+**`technical-design.md` §14 — a factual claim that went stale within hours.**
+
+It said the Sentry AI tagging has "**Three** call sites". `GAP-52` added a fourth the same day. Now four, with the reason spelled out: the truncation path has no caught exception to classify and has to raise its own error to report, and its `response_too_long` tag is deliberately distinct from `parse_error` because a wave of one means something very different from a wave of the other.
+
+**`accessibility-test-plan.md` — row 19 was recorded wrongly in two different ways.**
+
+Banking it this morning wrote the result (`0`) **over the instruction text** in the step table, and left the results table still saying "Blocked — every application on the account has already passed the gate", which had stopped being true hours earlier. A tester reading the plan would have found no instruction and a stale blocker. Both fixed; the instruction now says the row needs a fresh application and is **free alongside any `GCM-` case**, which is the actual lesson — the row was never hard, it had sat blocked since 2026-08-05 for want of a state nothing had been arranging.
+
+**Rows 20.2, 20.5 and 21 are unblocked for the same reason and their stated reasons are now stale too.** `GCM-07`'s application was taken through a typed answer, an approval, Step 5 and a Word export, so all three states exist on the account.
+
+### The BRD was checked and does not change
+
+Asked directly, and worth answering with the reasoning rather than a yes/no. **No change is needed**, on all four counts checked:
+
+- **Budget questions.** The BRD says budget/financial questions carry `is_budget_question` and have no AI assist (§5.5, §6.3, §7). Still exactly true. `GAP-51` changed **which** questions are correctly identified as budget questions, not what happens to one — a fidelity fix against a requirement the BRD already states, not a new requirement.
+- **Extraction.** §5.5 records narrative-only extraction plus the `is_budget_question` flag. Unchanged.
+- **Step 3/4 adaptivity.** §5.1 says both steps adapt to what the AI extracts. Unchanged, and slightly more true than it was.
+- **Document size.** The BRD says nothing at all about a document being too large to process — and after `GAP-52` that is arguably a genuine BRD-level absence rather than a non-issue, since the limit is now known to be real and reachable. **Flagged for WJ, not written:** the BRD is Tier 3, and this needs a product decision about what the service promises for very large forms, not an implementation note.
+
+---
+
 ## 2026-08-07 — GCM-07 passes, and the ceiling it walked into (GAP-52)
 
 `GAP-51`'s rule works. §5 now produces four cards — §5a's itemised breakdown plus all three of §5 b)'s labelled figures, each Budget-tagged, separately worded, none merged — and all three reach the exported Word document carrying the applicant's figures.
