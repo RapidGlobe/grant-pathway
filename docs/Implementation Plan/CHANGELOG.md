@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-09 — `DEF-03`/`GAP-49` fixed: the sweep's only Level A failure
+
+The Step 4 guidelines dialog's scroll container (`GuidelineTextPanel` in `components/application-step4-draft.tsx`) could be opened and closed by keyboard but never scrolled — everything below the first screenful of the funder's original wording was unreachable without a mouse. It's fixed: the container now carries `tabIndex={0}`, `role="region"`, and an `aria-label` built from the same citation label already shown in the dialog's title (e.g. "Original guideline text — 7. FINANCES OF YOUR GROUP."), rather than a generic accessible name.
+
+Verified with real keyboard input rather than by inspection alone: opened the live dialog, confirmed Base UI's dialog auto-focuses the region on open, drove actual `ArrowDown` key presses, and watched `scrollTop` move from 0 to 200. A fresh axe sweep of the same page then returned 0 violations — `scrollable-region-focusable` no longer fires.
+
+`AC-05`, the dedicated focus-management test case covering this same dialog (trap-through-scroll, close-button focus return, `role="dialog"`/`aria-modal`), was not run as part of this fix. This closes the specific `DEF-03`/`GAP-49` defect only; `ADR-OPS-006`'s P6.4 guideline-viewer consequence stays 🔵 until AC-05 itself is formally executed.
+
+`type-check`, `lint --max-warnings 0` and all 266 tests pass. No new automated test — a three-attribute JSX change with no new logic, verified live instead. AC-01 now stands at 4 of its 5 logged defects fixed; only `DEF-04`/`GAP-15` (the broken `@axe-core/react` harness) remains open.
+
+---
+
 ## 2026-08-09 — `DEF-05` fixed same day it was found
 
 The "Answer approved — edit above to revise" contrast failure (`DEF-05`, logged earlier today in `accessibility-test-plan.md`) is fixed. WJ's decision: recolour the text from `#059669` to `#065F46` rather than pick a new shade — that darker green is already the established pairing for a `#059669` decorative checkmark elsewhere in the codebase (`charity-profile-form.tsx`'s "Details retrieved" banner, `application-step3-summary.tsx`'s question-count line both keep the icon light and darken only the text), so this fix follows an existing convention instead of introducing a third dark-green token.

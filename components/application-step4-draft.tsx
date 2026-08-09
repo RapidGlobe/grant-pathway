@@ -1489,7 +1489,11 @@ export function ApplicationStep4Draft({
             </DialogDescription>
           </DialogHeader>
           {viewingCitation && guidelineText && (
-            <GuidelineTextPanel text={guidelineText} quote={viewingCitation.quote} />
+            <GuidelineTextPanel
+              text={guidelineText}
+              quote={viewingCitation.quote}
+              label={citationLabel(viewingCitation)}
+            />
           )}
         </DialogContent>
       </Dialog>
@@ -1505,7 +1509,15 @@ export function ApplicationStep4Draft({
  * the full text is still shown, just without a highlight — a graceful
  * degradation, not an error.
  */
-function GuidelineTextPanel({ text, quote }: { text: string; quote: string }) {
+function GuidelineTextPanel({
+  text,
+  quote,
+  label,
+}: {
+  text: string
+  quote: string
+  label: string
+}) {
   const highlightRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -1518,7 +1530,12 @@ function GuidelineTextPanel({ text, quote }: { text: string; quote: string }) {
   const after = range ? text.slice(range.end) : ''
 
   return (
-    <div className="max-h-[60vh] overflow-y-auto rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
+    <div
+      className="max-h-[60vh] overflow-y-auto rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4"
+      tabIndex={0}
+      role="region"
+      aria-label={`Original guideline text — ${label}`}
+    >
       <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#334155]">
         {before}
         {match && (
