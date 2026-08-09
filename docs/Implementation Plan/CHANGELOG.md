@@ -10,6 +10,12 @@
 
 ---
 
+## 2026-08-09 — AC-01 marked Pass: WJ confirmed a fourth full re-sweep would not add value
+
+Asked directly whether re-running the full 24-row sweep after the `DEF-06`/`DEF-07` fixes would add value, the answer was no. `GAP-54`'s harness swap changed the detection mechanism itself, so every row was a genuine unknown and re-checking all of them was warranted. These two fixes are different in kind: two isolated hex-value edits to two specific, non-shared elements (the dashboard button's own background/hover pairing, one Step 4 badge's text colour), neither touching a shared token or any other component's logic. Both were already verified live via `axe-core` at zero violations on the exact affected elements — that check _is_ the risk surface for this change, not a sample of it.
+
+AC-01's Result changed from Fail to Pass on this basis. All seven of its logged defects (`DEF-01`–`DEF-07`) are now fixed. `accessibility-test-plan.md` → **v1.15**.
+
 ## 2026-08-09 — `DEF-06`/`GAP-55` and `DEF-07`/`GAP-56` fixed same day: AC-01's defect log is closed, seven for seven
 
 WJ approved both fixes immediately after run 3's write-up, choosing the recommended option each time. `DEF-06`: the empty-dashboard "Complete your profile" button's background darkened from `#D97706` to `#B45309` — the button's own existing hover shade, promoted to base colour (5.0:1, passes AA); hover darkened further to `#92400E`. `DEF-07`: only the Step 4 word-limit badge's text darkened, from `#64748B` to `#475569` (6.9:1) — the shared `#64748B` token, used in 30+ other places on backgrounds `DEF-01` already confirmed safe, is untouched.
