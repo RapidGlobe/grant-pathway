@@ -960,7 +960,7 @@ export function ApplicationStep4Draft({
                 </p>
                 <div className="flex shrink-0 items-center gap-2">
                   {limit && (
-                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]">
+                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#475569]">
                       {limit}&nbsp;{useChars ? 'characters' : 'words'}
                     </span>
                   )}
