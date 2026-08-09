@@ -35,7 +35,7 @@ export function DashboardEmpty({
           </div>
           <Link
             href="/profile"
-            className="flex-shrink-0 rounded-md bg-[#D97706] px-3 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#B45309] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+            className="flex-shrink-0 rounded-md bg-[#B45309] px-3 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#92400E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
           >
             Complete your profile
           </Link>
