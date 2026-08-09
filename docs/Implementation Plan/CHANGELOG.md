@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-09 — AC-01 accessibility sweep finished; charity lookup 404-misclassification bug found and fixed (`GAP-53`)
+
+AC-01 (the axe-core accessibility sweep across every route and state) reaches full coverage for the first time, across two runs — rows 1–20 on 2026-08-05, the remaining twelve rows plus two manual checks on 2026-08-09. Full detail lives in `accessibility-test-plan.md` (v1.9); this entry records the two findings significant enough to warrant a changelog line.
+
+**`DEF-05` — a WCAG AA contrast failure invisible to run 1.** The green "Answer approved — edit above to revise" text (`#059669` on `#F0FDF4`, 13px) measures 3.6:1 against the 4.5:1 floor. Run 1 never approved an answer during its Step 4 sweeps, so this state — and this defect — did not exist on any page it actually rendered. Found at one instance, then sixteen once an application with more approved answers was checked. This is the third time this project has recorded the same lesson (`DEF-01`, `DEF-02`, now `DEF-05`): an automated accessibility sweep only reports on the states that happen to be on screen, and a defect count from a partial sweep is a floor, not a total. Recorded, not fixed — the same kind of colour-token decision `DEF-01` needed from WJ.
+
+**`GAP-53` — a functional bug found while reaching AC-01 row 11d, unrelated to accessibility but fixed the same day.** `actions/charity.ts`'s charity-name search branch was missing the `res.status === 404` check that its registration-number sibling already had. A genuine "we found nothing" search from the Charity Commission's name-search endpoint returns a bare `404`, not a `200` with an empty array — confirmed directly against the live API — so the code's generic `!res.ok` fallback caught it and reported "we couldn't reach the Charity Commission right now" instead of "we couldn't find that charity." This is the same class of misdiagnosis as `GAP-50`: a local condition (here, a missing branch check; there, a blank env var) presenting to the user as an external service outage. Fixed by adding the same one-line check already proven in the sibling branch; verified live by re-running the search and watching the message change. No new automated test — `actions/charity.ts` has no existing test coverage of any kind, and building a full mock of its auth/fetch/Bedrock chain to cover a one-line fix was judged disproportionate to the change; this is recorded here and in `accessibility-test-plan.md`'s run 2 write-up rather than left silently uncovered.
+
+Also worth recording as a tooling note rather than a design change: a fresh `npm run dev` initially 404'd every `/applications/[id]/...` route. The `.next` build cache was three dependency bumps stale relative to the installed Next.js version; deleting it and restarting resolved the issue completely. Not a product defect — recorded so a future session facing the same symptom checks cache age before suspecting a regression.
+
+---
+
 ## 2026-08-09 — Independent solicitor review complete: Privacy Policy and Terms of Service finalized, closing S2b / `P5.1`
 
 The independent solicitor review of both documents (`S2b`, the item that had kept `P5.1 — Compliance` open since the effective dates were set on 2026-08-05) came back and was incorporated as the "v1.6-final" text, dated 7 August 2026. The version number was not bumped — the review corrected and clarified the existing v1.6 drafts rather than replacing them with a new policy or commercial position. **Reviewer: Susan Singleton (Singleton Solicitors), £360 + VAT for both documents** — below the £480 + VAT figure originally sourced from the firm's website.

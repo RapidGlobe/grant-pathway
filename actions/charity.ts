@@ -251,6 +251,7 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
         CC_TIMEOUT_MS,
       )
 
+      if (res.status === 404) return { ok: false, reason: 'not_found' }
       if (!res.ok) return { ok: false, reason: 'unavailable' }
 
       const data = (await res.json()) as unknown
