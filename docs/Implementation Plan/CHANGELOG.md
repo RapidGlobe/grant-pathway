@@ -10,6 +10,20 @@
 
 ---
 
+## 2026-08-09 — Full AC-01 regression re-sweep (run 3): `GAP-54` caused no regressions; two new, unrelated defects found (`GAP-55`, `GAP-56`)
+
+Requested by WJ, immediately after `GAP-54` fixed the broken axe harness, to confirm the `@axe-core/react` → `axe-core` swap hadn't changed what the tool reports. It hadn't: all five previously-fixed defects (`DEF-01`–`DEF-05`) stayed fixed across every one of AC-01's 24 rows, including several brand-new states no earlier run had reached — a fresh unapproved answer, a second approved answer, a governance card added moments before the sweep.
+
+Run from a fresh throwaway account rather than the long-lived seeded one, since the sandboxed browser driving this run had no signed-in session, and the repo's local-only `supabase/seed.sql` test account does not exist in the shared `grant-pathway-dev` project it points to. A confirmed test user was created via the Supabase admin API (`SUPABASE_SERVICE_ROLE_KEY`, already in `.env.local` for the app's own use) on WJ's explicit choice between three options, and deleted again once the sweep finished.
+
+**The re-sweep did what a real regression check is supposed to do — it found two genuine, pre-existing defects that three prior sweeps had missed, because none of them had ever used a fresh account.** `DEF-06`/`GAP-55`: the dashboard's "Complete your profile" button, shown only when the charity profile is incomplete, fails contrast (white on `#D97706`, 3.18:1) — every earlier account already had a complete profile, which is also why row 10 (`/dashboard`, empty) had been recorded "not covered" twice before. `DEF-07`/`GAP-56`: Step 4's word-limit badge fails contrast (`#64748B` on `#F1F5F9`, 4.34:1) — `#64748B` is `DEF-01`'s own replacement colour, confirmed safe on three backgrounds at the time, failing on a fourth nobody had checked; the badge itself (a question's word _limit_) is distinct from the word-_count_ pills `DEF-01` already covered, and only appeared because run 3's fresh account generated new questions from a fresh AI extraction. Neither is a `GAP-54` regression — both are pre-existing colour-token gaps needing a WJ design decision, same class as `DEF-01`, and neither has been fixed yet.
+
+Two rows could not be reproduced and are flagged rather than silently passed: the offline "Not saved" bar (this sandboxed session has no DevTools Network-throttle equivalent; a scripted `fetch` rejection didn't trigger the save path) and the guidelines citation pop-up (this run's plain-text application had no page markers to produce a citation) — both already verified clean independently, in run 2 and earlier this session respectively.
+
+**AC-01 stays Fail — for a new reason.** Not unconfirmed regression risk any more; two open, unfixed defects. `accessibility-test-plan.md` → v1.13, `ADR-TRACEABILITY.md` → v2.45 (56 rows).
+
+---
+
 ## 2026-08-09 — `DEF-04`/`GAP-54` fixed: the accessibility harness itself, the last of AC-01's five defects
 
 `@axe-core/react`'s automatic reporting has not worked since the project moved to React 19: its own React-integration glue depends on mutable module exports that React 19 makes read-only, and `components/axe-provider.tsx` swallowed the resulting crash in a silent `catch`. A page carrying real WCAG violations produced an empty console — indistinguishable from a genuinely clean one. Every AC-01 sweep in this plan had to fall back to a manual DevTools snippet for exactly this reason.
