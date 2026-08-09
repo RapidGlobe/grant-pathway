@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-08-09 — Five low-risk Dependabot PRs merged; the accepted `brace-expansion` advisory is resolved, a new `nanoid` one surfaces
+
+PRs #94 (`brace-expansion` 1.1.16→1.1.18), #95 (`fast-uri`), #92 (`undici`), #91 (`ip-address`) and #96 (`hono`) merged after a quick review — all patch/minor bumps to transitive dependencies not reachable from this app's own code, all CI-green on a branch freshly updated against master. `#94` specifically resolves the `brace-expansion` GHSA-mh99-v99m-4gvg advisory that's sat as an accepted-risk red `audit` check since 2026-07-25 (see the note above) — no ESLint 10 upgrade needed after all.
+
+Checking that closure surfaced a new, unrelated high-severity advisory: `nanoid <3.3.17`, transitive via `postcss` → `@tailwindcss/postcss`. Fixable with `npm audit fix` and no `package.json` change, but not applied tonight — flagged for the next session rather than fixed unprompted at day's end.
+
+Two PRs deliberately held rather than merged: **#97** (dev-dependency group) has a genuinely red CI check, not a flaky one — `eslint-config-next` 16.3.0's newer ruleset catches two pre-existing `window.location.href` internal-navigation calls the old config missed, needing a small code fix first. **#98** (production-dependency group) is CI-green but bumps `next` itself (16.2.12→16.3.0); given this project's history with Next.js version surprises, that gets a look at the release notes before merging rather than a same-day rubber stamp.
+
 ## 2026-08-09 — AC-01 marked Pass: WJ confirmed a fourth full re-sweep would not add value
 
 Asked directly whether re-running the full 24-row sweep after the `DEF-06`/`DEF-07` fixes would add value, the answer was no. `GAP-54`'s harness swap changed the detection mechanism itself, so every row was a genuine unknown and re-checking all of them was warranted. These two fixes are different in kind: two isolated hex-value edits to two specific, non-shared elements (the dashboard button's own background/hover pairing, one Step 4 badge's text colour), neither touching a shared token or any other component's logic. Both were already verified live via `axe-core` at zero violations on the exact affected elements — that check _is_ the risk surface for this change, not a sample of it.
