@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-08-09 — `DEF-06`/`GAP-55` and `DEF-07`/`GAP-56` fixed same day: AC-01's defect log is closed, seven for seven
+
+WJ approved both fixes immediately after run 3's write-up, choosing the recommended option each time. `DEF-06`: the empty-dashboard "Complete your profile" button's background darkened from `#D97706` to `#B45309` — the button's own existing hover shade, promoted to base colour (5.0:1, passes AA); hover darkened further to `#92400E`. `DEF-07`: only the Step 4 word-limit badge's text darkened, from `#64748B` to `#475569` (6.9:1) — the shared `#64748B` token, used in 30+ other places on backgrounds `DEF-01` already confirmed safe, is untouched.
+
+Both verified live via `axe-core`, not just by calculation. A fresh throwaway account's dashboard (created and deleted via the Supabase admin API, the same technique run 3 used) scanned at zero `color-contrast` violations after the button fix. The badge's exact Tailwind classes were injected into a live page and scanned clean, confirming the compiled CSS matches the source change rather than assuming it — reaching Step 4 through a full AI extraction was judged disproportionate for a one-value colour change already independently verified. `type-check`, `lint --max-warnings 0` and all 266 tests pass.
+
+AC-01 is left at Fail rather than marked Pass: a fourth full 24-row sweep confirming these two fixes introduced no regressions elsewhere has not been run this session — the same standard `GAP-54`'s own run 3 was held to. `design-requirements.md` updated to match, including a correction of an unrelated stale claim found in passing: its contrast-audit table had asserted white-on-`#D97706` buttons pass under the AA large-text exception, which was never true for this button — it renders at 13px, not the 18.66px-bold minimum the exception requires.
+
 ## 2026-08-09 — Full AC-01 regression re-sweep (run 3): `GAP-54` caused no regressions; two new, unrelated defects found (`GAP-55`, `GAP-56`)
 
 Requested by WJ, immediately after `GAP-54` fixed the broken axe harness, to confirm the `@axe-core/react` → `axe-core` swap hadn't changed what the tool reports. It hadn't: all five previously-fixed defects (`DEF-01`–`DEF-05`) stayed fixed across every one of AC-01's 24 rows, including several brand-new states no earlier run had reached — a fresh unapproved answer, a second approved answer, a governance card added moments before the sweep.
