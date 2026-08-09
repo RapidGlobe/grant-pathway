@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-09 — `DEF-04`/`GAP-54` fixed: the accessibility harness itself, the last of AC-01's five defects
+
+`@axe-core/react`'s automatic reporting has not worked since the project moved to React 19: its own React-integration glue depends on mutable module exports that React 19 makes read-only, and `components/axe-provider.tsx` swallowed the resulting crash in a silent `catch`. A page carrying real WCAG violations produced an empty console — indistinguishable from a genuinely clean one. Every AC-01 sweep in this plan had to fall back to a manual DevTools snippet for exactly this reason.
+
+Fixed by dropping the incompatible half rather than patching it. `axe-core` — the engine underneath `@axe-core/react`, with no React-integration layer to be incompatible — is the same engine the manual snippet already drives via `window.axe.run()`. `components/axe-provider.tsx` now imports `axe-core` directly and runs it itself: once on mount, then again whenever a `MutationObserver` on `document.body` sees the DOM settle (debounced 1000ms after the last mutation), covering route changes, dialogs opening, and validation errors appearing without patching React internals to detect re-renders. Violations log to the console in the same `PAGE` / `RESULT` / `PROBLEM` shape as the manual snippet. `window.axe` is still set on load, so that manual snippet is entirely unaffected. `package.json` swaps `@axe-core/react` for `axe-core` (same `4.12.1`, previously only a transitive dependency).
+
+Verified live by injection, not by inspection alone: the sign-in page's own seeded violations are already fixed by `DEF-01`/`DEF-02`, so a clean initial load would have proved nothing. A genuine `color-contrast` violation was injected into the running DOM via script with no manual sweep triggered, and the console printed `axe: 1 problem(s) on /` with the violation detail, unprompted, inside the debounce window. `window.axe.version` confirmed present and unchanged (`'4.12.1'`) throughout.
+
+`type-check`, `lint --max-warnings 0` and all 266 tests pass. No new automated test — a dev-only harness swap with no product-facing behaviour, verified live instead. **This restores, rather than reopens, `GAP-15`'s justification**: its 2026-06-16 accepted deviation (waiving Lighthouse CI for v1) cited "`@axe-core/react` catches regressions during development" as half its reasoning, which had been false for as long as `DEF-04` stood. **AC-01's defect log is now fully closed, five for five** — but the plan itself stays ❌ Fail until a full 24-row re-sweep with the fixed harness confirms zero regressions; that re-sweep has not yet been run.
+
+---
+
 ## 2026-08-09 — `DEF-03`/`GAP-49` fixed: the sweep's only Level A failure
 
 The Step 4 guidelines dialog's scroll container (`GuidelineTextPanel` in `components/application-step4-draft.tsx`) could be opened and closed by keyboard but never scrolled — everything below the first screenful of the funder's original wording was unreachable without a mouse. It's fixed: the container now carries `tabIndex={0}`, `role="region"`, and an `aria-label` built from the same citation label already shown in the dialog's title (e.g. "Original guideline text — 7. FINANCES OF YOUR GROUP."), rather than a generic accessible name.

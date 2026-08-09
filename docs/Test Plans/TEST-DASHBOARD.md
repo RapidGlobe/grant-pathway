@@ -4,9 +4,11 @@
 **Volatility:** Medium
 **Update when:** After every funder test session, or when a new funder test plan is created
 
-**Version:** 2.32
+**Version:** 2.33
 **Last updated:** 2026-08-09
-**Status:** ⚠️ **`GAP-49`/`DEF-03` fixed the same day as `DEF-05` — AC-01 stands at 4 of 5 defects fixed, still 🔴 on the one genuinely open (`DEF-04`/`GAP-15`).** The Step 4 guidelines-dialog scroll container given `tabIndex`, `role="region"` and a citation-specific accessible name; verified with real `ArrowDown` key presses moving `scrollTop`, and a clean axe re-sweep. `AC-05` itself remains not yet formally run, so `ADR-OPS-006`'s P6.4 consequence stays 🔵 until that case closes it. Plan → v1.11. Suite unchanged at 4 🟢, 2 🟡, 1 🔴.
+**Status:** ⚠️ **`GAP-54`/`DEF-04` fixed — AC-01's defect log is now fully closed, five for five, but the plan stays 🔴.** `@axe-core/react`'s automatic reporting had not worked since React 19 (its React-integration glue depends on module exports React 19 makes read-only); `components/axe-provider.tsx` now drives `axe-core` directly instead, running on mount and on a debounced `MutationObserver`, with `window.axe` still set so the manual DevTools snippet is unaffected. Verified live by injecting a genuine violation into the running DOM — the console reported it unprompted. **Stays 🔴**: a full 24-row re-sweep with the fixed harness has not yet confirmed zero regressions. Plan → v1.12. Suite unchanged at 4 🟢, 2 🟡, 1 🔴.
+
+**Previously (2026-08-09, earlier):** `GAP-49`/`DEF-03` fixed the same day as `DEF-05` — AC-01 stood at 4 of 5 defects fixed. The Step 4 guidelines-dialog scroll container given `tabIndex`, `role="region"` and a citation-specific accessible name; verified with real `ArrowDown` key presses moving `scrollTop`, and a clean axe re-sweep. `AC-05` itself remains not yet formally run, so `ADR-OPS-006`'s P6.4 consequence stays 🔵 until that case closes it. Plan → v1.11.
 
 **Previously (2026-08-09, earlier):** `DEF-05` fixed the same day it was found — "Answer approved" text recoloured `#059669` → `#065F46`, matching the existing icon-plus-text convention used elsewhere in the app; 6.8:1 against the 4.5:1 floor, verified live at 0 violations on the page that had shown 16.
 

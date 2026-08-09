@@ -1,41 +1,97 @@
 'use client'
 
-// Accessibility testing — development only (ADR-OPS-006, GAP-14)
+// Accessibility testing — development only (ADR-OPS-006, GAP-54)
 //
-// @axe-core/react runs in the browser during development and logs WCAG violations
-// to the browser console. The dynamic import inside the NODE_ENV guard is dead code
-// in production builds — Next.js/webpack removes it via tree-shaking, so
-// @axe-core/react is not included in any production bundle.
+// Drives axe-core directly, not through @axe-core/react. That wrapper's own
+// React-integration glue is incompatible with React 19's read-only module
+// exports (DEF-04, accessibility-test-plan.md) and silently produced an empty
+// console on every page, violations included. axe-core itself has no such
+// dependency — it is the same engine the manual DevTools sweep in
+// accessibility-test-plan.md already drives via `window.axe.run()`.
 //
-// Violations are reported to the browser DevTools console with severity, WCAG
-// rule reference, and the affected DOM node. Fix all violations before shipping
-// any slice — accessibility failures are treated as bugs (ADR-OPS-006).
+// A MutationObserver re-scans after the DOM settles, so client-side updates
+// (route changes, dialogs opening, validation errors appearing) are covered
+// without patching React internals to detect re-renders. Violations are
+// logged in the same format as the manual sweep's snippet, so the output is
+// immediately recognisable. Dead code in production builds — Next.js
+// tree-shakes the dynamic import via the NODE_ENV guard.
 
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+
+declare global {
+  interface Window {
+    // Exposed so accessibility-test-plan.md's manual DevTools snippet
+    // (`window.axe.run()`) keeps working alongside the automatic scan below.
+    axe?: typeof import('axe-core')
+  }
+}
+
+const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
+const SCAN_DEBOUNCE_MS = 1000
 
 export default function AxeProvider() {
+  const pathname = usePathname()
+
   useEffect(() => {
     if (process.env.NODE_ENV !== 'development') return
 
-    void (async () => {
-      try {
-        const [{ default: axe }, React, ReactDOM] = await Promise.all([
-          import('@axe-core/react'),
-          import('react'),
-          import('react-dom'),
-        ])
-        // 1000ms delay gives React time to finish rendering before axe scans the DOM
-        // Note: @axe-core/react v4 is not fully compatible with React 19's read-only
-        // module exports. Wrapped in try/catch to prevent crashing the app in dev.
-        // Replace with a React 19 compatible version when available (ADR-OPS-006).
-        await axe(React, ReactDOM, 1000)
-      } catch {
-        // axe-core/react v4 incompatible with React 19 read-only module exports.
-        // Silently suppressed — does not affect functionality or production builds.
-      }
-    })()
-  }, [])
+    let cancelled = false
+    let debounceTimer: ReturnType<typeof setTimeout> | undefined
+    let observer: MutationObserver | undefined
 
-  // Renders nothing — this component exists only for its side effect
+    void (async () => {
+      const { default: axe } = await import('axe-core')
+      if (cancelled) return
+
+      window.axe = axe
+
+      const runScan = () => {
+        void axe
+          .run(document, { runOnly: { type: 'tag', values: WCAG_TAGS } })
+          .then((results) => {
+            const count = results.violations.reduce((n, v) => n + v.nodes.length, 0)
+            if (count === 0) return
+
+            console.group(
+              `%caxe: ${count} problem(s) on ${location.pathname}`,
+              'color: #DC2626; font-weight: bold',
+            )
+            results.violations.forEach((violation) =>
+              violation.nodes.forEach((node) => {
+                const detail = (node.failureSummary ?? '').split('\n').slice(1).join(' ').trim()
+                console.error(
+                  `${violation.id} (${violation.impact}): ${violation.help}\non ${node.target.join(' ')}${detail ? `\n${detail}` : ''}`,
+                )
+              }),
+            )
+            console.groupEnd()
+          })
+          .catch(() => {
+            // axe-core can throw scanning a DOM mid-transition (e.g. a dialog
+            // closing) — not worth crashing the dev session over a re-scan
+          })
+      }
+
+      observer = new MutationObserver(() => {
+        clearTimeout(debounceTimer)
+        debounceTimer = setTimeout(runScan, SCAN_DEBOUNCE_MS)
+      })
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      })
+
+      debounceTimer = setTimeout(runScan, SCAN_DEBOUNCE_MS)
+    })()
+
+    return () => {
+      cancelled = true
+      clearTimeout(debounceTimer)
+      observer?.disconnect()
+    }
+  }, [pathname])
+
   return null
 }
