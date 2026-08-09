@@ -2,9 +2,11 @@
 
 **Version:** 1.6
 
-**Effective date: 5 August 2026**
+**Effective date: 7 August 2026**
 
-**Last updated: 5 August 2026**
+**Last updated: 7 August 2026**
+
+> **Change from v1.6 (5 August 2026) to v1.6-final (7 August 2026): independent solicitor review complete — closes S2b under `P5.1`.** The solicitor-reviewed final versions were returned and incorporated without a version-number bump, since the review corrected and clarified the existing v1.6 text rather than introducing a new policy position. Changes: **(1)** Section 6 (International Data Transfers) widened to cover any future replacement provider based outside the UK, not just the two named today. **(2)** Section 7 (retention) closes with a recommendation that users keep their own copy of anything they may need after deletion. **(3)** Section 12 (How to Complain) now states we will acknowledge a complaint made to us within 30 days, ahead of the existing ICO escalation route. **(4)** Minor wording clarifications in Sections 2 and 6 ("whom you help", "may look up"). No change in legal basis, retention periods, or sub-processor list.
 
 > **Change from v1.5 (30 July 2026): the effective date is set — 5 August 2026.** It had read `[TO BE CONFIRMED]` since the policy was first published on 2 July 2026, which the 2026-07-29 Opus audit raised as finding **S2** and rated Severe: a published privacy policy with no effective date is not a defensible position for a registered data controller (ICO ZC168720), and it blocked external testers being asked to rely on it. **The date chosen is the date this text takes effect, not a future launch date.** The service has been live and in use by external testers at a hosted URL since before this change, so dating the policy from the day its current wording takes effect is accurate, where a future date would have claimed no policy was in force while people were already using the service. Go-live remains unscheduled (working estimate August–September 2026) and does not affect this date. Tracked as **S2a**; the independent legal review is **S2b** and remains open under `P5.1`. No other wording changed.
 
@@ -47,7 +49,7 @@ When you register and use Grant Pathway, you provide:
 - **Your name** — your first and last name, collected when you register. We use them to address you by name in emails and in the service
 - **Your email address** — used to create and identify your account
 - **Your password** — stored only as a secure one-way hash. We never see, store, or have any way to recover your actual password
-- **Your organisation's details** — the name, description, who you help, and where you work, as entered in your organisation profile
+- **Your organisation's details** — the name, description, whom you help, and where you work, as entered in your organisation profile
 - **Grant application content** — funder guidelines you upload or paste in, and the answers you write and refine within the tool
 - **Any AI-suggested improvements** you choose to accept, and any further edits you make, before saving your answer
 - **Your feedback preference** — whether you tick the optional box at registration saying you are happy to be contacted about your experience of using the service. This is entirely optional, ticking it is not a condition of using Grant Pathway, and you can change your mind at any time (see Section 8)
@@ -62,7 +64,7 @@ When you register and use Grant Pathway, you provide:
 
 Almost everything we hold comes **directly from you** — you type it in when you register, complete your organisation profile, or work on an application.
 
-There is one exception. If you enter your charity's registration number, Grant Pathway can look that number up in the **public register maintained by the Charity Commission for England and Wales** and pre-fill some of your organisation's details, to save you typing them again. This is optional — you can leave the registration number blank and enter everything yourself. The information returned is public register data about the organisation, not about you personally, and we only use it to populate your organisation profile.
+There is one exception. If you enter your charity's registration number, Grant Pathway may look that number up in the **public register maintained by the Charity Commission for England and Wales** and pre-fill some of your organisation's details, to save you typing them again. This is optional — you can leave the registration number blank and enter everything yourself. The information returned is public register data about the organisation, not about you personally, and we only use it to populate your organisation profile.
 
 We do not buy personal information, receive it from data brokers, or obtain it from any other third-party source.
 
@@ -120,7 +122,7 @@ Each provider is bound by a data processing agreement and is only permitted to u
 
 ## 6. International Data Transfers
 
-Two of our service providers are based outside the United Kingdom — Resend and Vercel (both United States). Where personal data is transferred to these providers, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent standard contractual clauses — so that your data continues to be protected to the same standard as within the UK.
+Two of our service providers are based outside the United Kingdom — Resend and Vercel (both United States). Where personal data is transferred to these providers, or to any provider outside the United Kingdom we may substitute for these in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK.
 
 AI processing (Amazon Web Services Bedrock) takes place within the UK or EEA and does not constitute an international transfer.
 
@@ -143,6 +145,8 @@ Error reports processed by Sentry are stored in the European Union, which is cov
 **Inactivity deletion:** If your account has not been used for two years, we will send a warning email to your registered address. If you do not log in within 30 days of that warning, your account and all associated data will be permanently deleted. You will receive no further warning before deletion occurs.
 
 **Account deletion on request:** You can delete your account at any time from within the service. Your data is removed from our live systems immediately and permanently. As part of our operational backup infrastructure, automated backup copies are permanently removed within 7 days as part of the standard backup rotation cycle. These backup copies are not accessible to users and cannot be used to restore deleted content.
+
+It is recommended that you store any information that may be deleted separately if you think you may need to use it after it is deleted as set out above.
 
 ---
 
@@ -199,6 +203,8 @@ We aim to respond to all enquiries within five working days.
 
 ## 12. How to Complain
 
+You have a right to complain to us about the handling of your personal data by emailing **admin@rapidglobe.com**. We will acknowledge your complaint within 30 days and will aim to resolve it as soon as possible after that.
+
 If you are not satisfied with how we have handled your personal data, you have the right to lodge a complaint with the **Information Commissioner's Office (ICO)**, the UK's data protection authority:
 
 - **Website:** [ico.org.uk](https://ico.org.uk)
@@ -211,6 +217,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.5_
-_Effective date: 5 August 2026_
-_Last updated: 30 July 2026_
+_Version: 1.6_
+_Effective date: 7 August 2026_
+_Last updated: 7 August 2026_

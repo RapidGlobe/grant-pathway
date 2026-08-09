@@ -4,8 +4,9 @@
 **Volatility:** Low
 **Update when:** A reviewer is engaged (record who and what it cost), or the prices below are re-checked and found to have moved
 
-**Version:** 1.1
-**Last updated:** 5 August 2026 — §6 added (enquiry template, chase email, route status). S2a is closed; the effective dates were set on 2026-08-05. Route status re-checked: **qLegal still not open**, Singleton's site loading with errors, one firm holding superseded copies and not responding.
+**Version:** 1.2
+**Last updated:** 9 August 2026 — **S2b is now closed.** An independent solicitor review of both documents came back and was incorporated as the "v1.6-final" text (dated 7 August 2026); see `docs/legal/privacy-policy.md` and `docs/legal/terms-of-service.md` for the change log. Reviewer identity and fee were not recorded at the time this was closed out — if you have them, add them here. `P5.1` is complete; this document is retained as the record of the routes considered, not as an open task.
+**Previously (5 August 2026):** §6 added (enquiry template, chase email, route status). S2a is closed; the effective dates were set on 2026-08-05. Route status re-checked: **qLegal still not open**, Singleton's site loading with errors, one firm holding superseded copies and not responding.
 
 **Client:** RapidGlobe Ltd (company no. 05615649), ICO registration ZC168720
 **Documents:** `docs/legal/privacy-policy.md`, `docs/legal/terms-of-service.md` — both already drafted; this is a **review and sign-off** job

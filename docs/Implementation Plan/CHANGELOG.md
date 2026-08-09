@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-09 — Independent solicitor review complete: Privacy Policy and Terms of Service finalized, closing S2b / `P5.1`
+
+The independent solicitor review of both documents (`S2b`, the item that had kept `P5.1 — Compliance` open since the effective dates were set on 2026-08-05) came back and was incorporated as the "v1.6-final" text, dated 7 August 2026. The version number was not bumped — the review corrected and clarified the existing v1.6 drafts rather than replacing them with a new policy or commercial position. Reviewer identity and fee were not recorded in this pass.
+
+**Terms of Service:** Section 1 now defines "you" as covering both the organisation and the individual who registers on its behalf, with both required to comply. Section 3 clarifies one account per organisation regardless of employee count, and bars using an account across multiple organisations. Section 4 adds an indemnity: a user who breaches the terms and causes loss or a third-party claim against RapidGlobe Ltd, its directors, or its shareholders must indemnify them. Section 5 states RapidGlobe is not a fact-checker of submitted data. A new **Section 15 (General)** adds severability, entire agreement, no waiver by delay, no assignment between charities, no third-party rights under the Contracts (Rights of Third Parties) Act 1999, a lawful-basis undertaking for personal data supplied to the service, and a confidentiality obligation on non-public business/technical/financial information. Section 14 is renamed "Contact and Notices". No change to the fair-use limit, liability position, or governing law.
+
+**Privacy Policy:** Section 6 (International Data Transfers) is widened to cover any future replacement provider based outside the UK, not only the two named today. Section 7 (retention) now recommends users keep their own copy of anything they may need after deletion. Section 12 (How to Complain) now states RapidGlobe will acknowledge a complaint made directly to it within 30 days, ahead of the existing ICO escalation route. No change to legal basis, retention periods, or the sub-processor list.
+
+All four source files were updated to match: `docs/legal/privacy-policy.md`, `docs/legal/privacy-policy-external.md`, `docs/legal/terms-of-service.md`, `docs/legal/terms-of-service-external.md`. The live `/privacy` and `/terms` pages render the two `-external.md` files and needed no code change — only their markdown source changed. `IMPLEMENTATION-PLAN.md`'s `P5.1` row and the Phase 5 → Go-Live Gate checklist are marked complete; `docs/legal/legal-review-options-2026-07-29.md` is retained as the record of routes considered, now closed out.
+
+---
+
 ## 2026-08-07 — Documentation sweep: four docs were stating things that had stopped being true
 
 Run as the end-of-session tier checklist rather than as a task in its own right, and it found more than expected. Recording what was wrong, because in each case the doc had been left behind by a change made earlier the same day.
