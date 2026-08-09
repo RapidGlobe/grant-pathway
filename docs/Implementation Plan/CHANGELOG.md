@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-08-09 — `DEF-05` fixed same day it was found
+
+The "Answer approved — edit above to revise" contrast failure (`DEF-05`, logged earlier today in `accessibility-test-plan.md`) is fixed. WJ's decision: recolour the text from `#059669` to `#065F46` rather than pick a new shade — that darker green is already the established pairing for a `#059669` decorative checkmark elsewhere in the codebase (`charity-profile-form.tsx`'s "Details retrieved" banner, `application-step3-summary.tsx`'s question-count line both keep the icon light and darken only the text), so this fix follows an existing convention instead of introducing a third dark-green token.
+
+Measures 6.8:1 against the 4.5:1 AA floor, computed from `#065F46` on the card's `#F0FDF4` background. Verified live, not just by calculation: computed style on the rendered page confirms `rgb(6, 95, 70)`, and a fresh axe sweep of the same application that had produced 16 `DEF-05` violations earlier today now returns 0. The decorative `CheckCheck` icon stays `#059669` — `aria-hidden="true"`, exempt from 1.4.3, matching how the other two instances of this pattern already handle it. CSS-only change; `type-check`, `lint --max-warnings 0` and all 266 tests pass with no new test needed.
+
+AC-01 now stands at 3 of 5 defects fixed (`DEF-01`, `DEF-02`, `DEF-05`); `DEF-03`/`GAP-49` (the Level A keyboard trap) and `DEF-04`/`GAP-15` (the broken axe harness) remain the only open items.
+
+---
+
 ## 2026-08-09 — AC-01 accessibility sweep finished; charity lookup 404-misclassification bug found and fixed (`GAP-53`)
 
 AC-01 (the axe-core accessibility sweep across every route and state) reaches full coverage for the first time, across two runs — rows 1–20 on 2026-08-05, the remaining twelve rows plus two manual checks on 2026-08-09. Full detail lives in `accessibility-test-plan.md` (v1.9); this entry records the two findings significant enough to warrant a changelog line.
