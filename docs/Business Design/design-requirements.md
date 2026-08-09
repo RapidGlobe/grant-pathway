@@ -54,14 +54,14 @@ The Warm & Approachable direction is built for users who are new to AI tools, wo
 
 ### 2.1 Brand Colours
 
-| Role          | Name       | Hex       | Usage                                                                                                                |
-| ------------- | ---------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
-| Primary       | Deep teal  | `#0D6E6E` | Navigation, primary workflow buttons (Continue, Save), active states, step indicator, headings, interactive elements |
-| Primary light | Soft teal  | `#E6F4F4` | Section backgrounds (lookup panels, review panels), hover states, active nav links, card answer backgrounds          |
-| Primary dark  | Dark teal  | `#0A5A5A` | Primary button hover state                                                                                           |
-| Accent        | Warm amber | `#D97706` | Primary call-to-action buttons (New application, Start first application, Complete profile), loading progress bar    |
-| Accent dark   | Dark amber | `#B45309` | Accent button hover state                                                                                            |
-| Accent light  | Pale amber | `#FEF3C7` | Warning backgrounds, empty state icon containers                                                                     |
+| Role          | Name       | Hex       | Usage                                                                                                                           |
+| ------------- | ---------- | --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Primary       | Deep teal  | `#0D6E6E` | Navigation, primary workflow buttons (Continue, Save), active states, step indicator, headings, interactive elements            |
+| Primary light | Soft teal  | `#E6F4F4` | Section backgrounds (lookup panels, review panels), hover states, active nav links, card answer backgrounds                     |
+| Primary dark  | Dark teal  | `#0A5A5A` | Primary button hover state                                                                                                      |
+| Accent        | Warm amber | `#D97706` | Primary call-to-action buttons, loading progress bar. ⚠️ Not the "Complete your profile" button — see the note below (`DEF-06`) |
+| Accent dark   | Dark amber | `#B45309` | Accent button hover state generally; base (non-hover) background of the "Complete your profile" button since `DEF-06`           |
+| Accent light  | Pale amber | `#FEF3C7` | Warning backgrounds, empty state icon containers                                                                                |
 
 ### 2.2 Semantic Colours
 
@@ -100,6 +100,13 @@ The Warm & Approachable direction is built for users who are new to AI tools, wo
 **Status pill colours were fixed in the same pass, and four of five were failing** — not the two AC-01 measured. The sweep only saw the statuses that happened to be on the dashboard that day, which is worth remembering before reading any violation count as a total. Current values and their ratios are recorded in `components/dashboard-populated.tsx`'s `STATUS_CONFIG`.
 
 **Known stale, not yet resolved:** the placeholder-text row above still specifies `#64748B`, but `components/ui/input.tsx` and `textarea.tsx` use Tailwind's `placeholder:text-muted-foreground`, which resolves to `oklch(0.556 0 0)` — a neutral grey, not this palette's slate. Placeholder contrast has not been measured and is not covered by `DEF-01`; flagged for AC-10.
+
+**⚠️ Resolved 2026-08-09 — WJ's decision (`DEF-06`, `DEF-07`).** Two contrast failures found by AC-01's run 3, both reachable only from UI states no earlier sweep's account had rendered:
+
+- **The dashboard "Complete your profile" button** (§5.11) was white text on `#D97706`, 13px, **3.18:1** — below the 4.5:1 floor. This is the one place in the codebase that still rendered white-on-base-amber; the other buttons this document's §5 catalogue describes as "accent (amber)" (Go to my dashboard, Start your first application) are teal `#0D6E6E` in the actual code, not amber — a pre-existing documentation/code mismatch, not part of this fix. Fixed by promoting the button's own existing hover shade to its base colour: **`#B45309`, 5.0:1**, comfortably over the floor. Hover darkened further to **`#92400E`** so a hover state still exists. No new colour introduced.
+- **Step 4's word-limit badge** ("200 words", shown before an answer is typed) was `#64748B` — the colour `DEF-01` moved 11 text uses to, confirmed safe on three backgrounds at the time — on `#F1F5F9`, a fourth background nobody had checked, 11px, **4.34:1**. Rather than touch the shared `#64748B` token again (used in 30+ other places, all on backgrounds already confirmed safe), only this one badge's text was darkened to **`#475569`, 6.9:1** — a shade already used elsewhere in the app for hover states. `#64748B` itself is unchanged everywhere else.
+
+Both verified live via `axe-core`, not just by calculation: the dashboard's own contrast scan returned zero violations after the fix, and the exact badge markup (same Tailwind classes, confirming the utility compiled to the intended hex values) was injected into a live page and scanned clean.
 
 ### 2.4 Focus Indicator
 
@@ -350,6 +357,8 @@ Used for: top-level calls to action — New application, Start your first applic
 | Hover         | Background `#B45309`             |
 | Active        | `transform: translateY(1px)`     |
 | Focus visible | Amber outline ring               |
+
+**Exception — "Complete your profile" (§5.11):** Background `#B45309` (not `#D97706`), hover `#92400E`. Fixed 2026-08-09, `DEF-06` — white text on the base amber measured 3.18:1, below the 4.5:1 AA floor. See §2.3's resolution note. "Go to my dashboard" and "Start your first application" render teal (`#0D6E6E`) in the actual code, not amber — a pre-existing documentation/code mismatch, unrelated to this fix.
 
 #### Secondary button (grey outline)
 
@@ -644,7 +653,7 @@ Padding: `3px 10px`. The dot is a `6px × 6px` circle, `border-radius: 50%`.
 
 **Left:** Warning icon (`#D97706`) + "Your charity profile isn't complete yet. You'll need to fill it in before you can start an application." — 14px, 500, `#92400E`
 
-**Right:** "Complete your profile" — accent (amber) button, small variant, links to `/profile`
+**Right:** "Complete your profile" — accent (amber) button, small variant, links to `/profile`. Since `DEF-06` (2026-08-09) this button is the documented exception in §5's Accent button entry: `#B45309` background, not `#D97706`.
 
 ---
 
@@ -969,17 +978,20 @@ Grant Pathway v1 must achieve **WCAG 2.2 Level AA** compliance (NFR-06, C15).
 
 All text and interactive elements must meet WCAG SC 1.4.3 and 1.4.11. Key verified pairs:
 
-| Combination            | Ratio  | Requirement         | Status                  |
-| ---------------------- | ------ | ------------------- | ----------------------- |
-| `#1E293B` on `#FFFFFF` | 16.1:1 | AA (4.5:1)          | ✓                       |
-| `#1E293B` on `#FDF9F5` | 15.8:1 | AA (4.5:1)          | ✓                       |
-| `#0D6E6E` on `#FFFFFF` | 4.54:1 | AA (4.5:1)          | ✓                       |
-| `#0D6E6E` on `#E6F4F4` | 3.09:1 | AA large text (3:1) | ✓ (labels only)         |
-| `#D97706` on `#FFFFFF` | 3.15:1 | AA large text (3:1) | ✓ (headings/large only) |
-| White on `#0D6E6E`     | 4.54:1 | AA (4.5:1)          | ✓                       |
-| White on `#D97706`     | 3.15:1 | AA large text (3:1) | ✓ (buttons only)        |
-| `#92400E` on `#FEF3C7` | 5.21:1 | AA (4.5:1)          | ✓                       |
-| `#166534` on `#F0FDF4` | 7.34:1 | AA (4.5:1)          | ✓                       |
+| Combination            | Ratio  | Requirement         | Status                                                                                                               |
+| ---------------------- | ------ | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `#1E293B` on `#FFFFFF` | 16.1:1 | AA (4.5:1)          | ✓                                                                                                                    |
+| `#1E293B` on `#FDF9F5` | 15.8:1 | AA (4.5:1)          | ✓                                                                                                                    |
+| `#0D6E6E` on `#FFFFFF` | 4.54:1 | AA (4.5:1)          | ✓                                                                                                                    |
+| `#0D6E6E` on `#E6F4F4` | 3.09:1 | AA large text (3:1) | ✓ (labels only)                                                                                                      |
+| `#D97706` on `#FFFFFF` | 3.15:1 | AA large text (3:1) | ✓ (headings/large only)                                                                                              |
+| White on `#0D6E6E`     | 4.54:1 | AA (4.5:1)          | ✓                                                                                                                    |
+| White on `#D97706`     | 3.15:1 | AA large text (3:1) | ⚠️ no longer used for buttons — the one button this applied to failed at actual (13px, not large) size; see `DEF-06` |
+| White on `#B45309`     | 5.0:1  | AA (4.5:1)          | ✓ — "Complete your profile" button since `DEF-06` (2026-08-09)                                                       |
+| `#475569` on `#F1F5F9` | 6.9:1  | AA (4.5:1)          | ✓ — Step 4 word-limit badge since `DEF-07` (2026-08-09)                                                              |
+| `#64748B` on `#F1F5F9` | 4.34:1 | AA (4.5:1)          | ✗ — was the word-limit badge's colour until `DEF-07`; `#64748B` itself is unchanged everywhere else                  |
+| `#92400E` on `#FEF3C7` | 5.21:1 | AA (4.5:1)          | ✓                                                                                                                    |
+| `#166534` on `#F0FDF4` | 7.34:1 | AA (4.5:1)          | ✓                                                                                                                    |
 
 **Never rely on colour alone** to convey meaning. Every status badge includes both a colour and a text label. Every alert includes an icon and text.
 
