@@ -4,8 +4,9 @@
 **Volatility:** Low
 **Update when:** A reviewer is engaged (record who and what it cost), or the prices below are re-checked and found to have moved
 
-**Version:** 1.2
-**Last updated:** 9 August 2026 — **S2b is now closed.** An independent solicitor review of both documents came back and was incorporated as the "v1.6-final" text (dated 7 August 2026); see `docs/legal/privacy-policy.md` and `docs/legal/terms-of-service.md` for the change log. Reviewer identity and fee were not recorded at the time this was closed out — if you have them, add them here. `P5.1` is complete; this document is retained as the record of the routes considered, not as an open task.
+**Version:** 1.3
+**Last updated:** 9 August 2026 — **Reviewer and fee recorded.** The engagement was **Singleton Solicitors (Susan Singleton)** — option #6 in the comparison table — at **£360 + VAT** for both documents, below the £480 + VAT figure originally sourced from the firm's website (§2, option 6) and reconfirmed directly rather than through the site, which had been failing to resolve since 29 July 2026. Reviewed drafts were returned and incorporated as the "v1.6-final" text (dated 7 August 2026); see `docs/legal/privacy-policy.md` and `docs/legal/terms-of-service.md` for the change log.
+**Previously (9 August 2026):** **S2b is now closed.** `P5.1` is complete; this document is retained as the record of the routes considered, not as an open task.
 **Previously (5 August 2026):** §6 added (enquiry template, chase email, route status). S2a is closed; the effective dates were set on 2026-08-05. Route status re-checked: **qLegal still not open**, Singleton's site loading with errors, one firm holding superseded copies and not responding.
 
 **Client:** RapidGlobe Ltd (company no. 05615649), ICO registration ZC168720
@@ -111,9 +112,11 @@ Published: **£34.99/mo charged monthly**, or **£17.49/mo charged annually at �
 
 Source: https://www.rocketlawyer.com/gb/en/pricing
 
-### 6. Singleton Solicitors — £480 + VAT for BOTH documents
+### 6. Singleton Solicitors — £480 + VAT for BOTH documents — **ENGAGED, actual fee £360 + VAT**
 
 This is the **only published fixed fee found that covers the exact job in one price**: £480 to check a website's terms and conditions **and** privacy policy and confirm the site's legal compliance, plus VAT where applicable. Susan Singleton is a solicitor, a Law Society member, and SRA-regulated, with a long-standing specialism in commercial, IT and EU/competition law.
+
+**Outcome (2026-08-09):** this is the route taken. Susan Singleton reviewed both documents; final fee **£360 + VAT**, below the £480 + VAT published figure. Reviewed drafts incorporated as the "v1.6-final" text dated 7 August 2026 — see the change log in `docs/legal/privacy-policy.md` and `docs/legal/terms-of-service.md`.
 
 **Constraints:**
 
