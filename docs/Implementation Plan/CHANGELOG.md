@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-08-10 — AC-07 continuing, WJ resumed live: `GAP-68` found and fixed same day
+
+WJ resumed the live NVDA session on Step 3. Step 1's two required fields both confirmed live as now announcing "required," closing `GAP-65`'s open item for that page. Step 2 (Uploaded Guidelines) landing state read clean, no defects.
+
+Moving into AI-summary generation surfaced a new finding: NVDA gave only its own default high-pitched progress-bar beeps during generation, then silence — no speech at all describing what stage the process was at, or when it finished. Source inspection found the progress bar itself is correctly built (`role="progressbar"` with full `aria-valuenow`/`min`/`max`/`aria-label`), so the beeps are NVDA's own expected behaviour for that widget. The real gap was the visible loading-message text above it: `application-step3-summary.tsx`'s `loadingMessage` state cycles through three real stages ("Reading your funder guidelines…" → "Identifying key information…" → "Almost there…") on a 200ms interval as generation progresses, but the paragraph carried no live-region role, so none of those stage changes ever reached assistive technology — the same class of gap as `GAP-67`, on a screen the earlier structural sweep hadn't covered because it only renders mid-generation, not in any static read.
+
+Logged and fixed as `GAP-68`: added `role="status"` to the loading-message paragraph. `type-check` and `lint --max-warnings 0` pass. Not yet live-verified — confirming NVDA now speaks each stage change needs WJ to re-run an actual generation with NVDA active. AC-07 remains **Blocked**. Full detail in `ADR-TRACEABILITY.md` v2.51 and `accessibility-test-plan.md`'s AC-07 write-up.
+
 ## 2026-08-10 — AC-07 started (NVDA, five-step flow), in progress: three GAPs found and fixed same day (`GAP-65`–`GAP-67`)
 
 WJ chose to drive NVDA live himself — relaying Speech Viewer transcripts and Elements List screenshots back — rather than defer both remaining NVDA cases, since Claude-in-Chrome cannot launch, drive, or read NVDA's own OS-level window.

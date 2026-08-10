@@ -321,7 +321,9 @@ export function ApplicationStep3Summary({
       <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
         <StepIndicator currentStep={3} />
         <div className="rounded-xl border border-[#E2E8F0] bg-white p-8">
-          <p className="mb-4 text-[15px] font-medium text-[#1E293B]">{loadingMessage}</p>
+          <p role="status" className="mb-4 text-[15px] font-medium text-[#1E293B]">
+            {loadingMessage}
+          </p>
           <div className="h-2 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
             <div
               className="h-full rounded-full bg-[#0D6E6E] transition-all duration-200"
