@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-08-10 — AC-02 run and marked Pass: every page scores 100/100 on Lighthouse Accessibility; `GAP-57` accepted as a tooling limitation
+
+Run programmatically — `lighthouse` and `puppeteer` installed to a throwaway scratch directory (never added to `package.json`), attached to a single authenticated Chromium session — rather than by hand through Chrome DevTools nine separate times. `/` and `/register` were audited signed out; a fresh throwaway Supabase account (created via the admin API, same pattern already established for AC-01's run 3) then completed a full charity profile and a full AB Charitable Trust application — pasted-text guidelines, a real AI summary, all 5 Step 4 sections written, AI-assisted, and approved, through to the assembled Step 5 draft — so `/dashboard`, `/profile`, and all five step pages were audited in a real, populated state rather than their empty defaults.
+
+Every one of the 9 pages scored 100/100, comfortably clearing the 95+ bar `ADR-OPS-006` requires.
+
+One recurring finding, `GAP-57`, surfaced on all 7 authenticated pages and was **accepted as an axe-core tooling limitation rather than fixed**, WJ's decision (author recommended): the header's account-menu button (`components/nav-authenticated.tsx`) fails axe-core's `label-content-name-mismatch` because a decorative, `aria-hidden` single-letter avatar initial gets glued (no separator) onto the visible display name by axe's "visible text" extraction — which ignores `aria-hidden` by design — and the resulting string can never appear verbatim in any reasonably-worded accessible name. An aria-label including the full display name was tried live and still failed; confirmed directly against axe-core's own `isStringContained`/`visibleVirtual` internals in the browser console rather than inferred from the report. Two code fixes were considered and rejected: squashing the label text together with no separator would clear the automated check but read as a run-on string to a screen reader, and removing the visible avatar letter is a visual design change made solely to satisfy a rule the tools themselves don't fully trust — `label-content-name-mismatch` is tagged `experimental` by axe-core's own maintainers and carries a Lighthouse scoring weight of **0**. No code change made.
+
+`accessibility-test-plan.md` → **v1.16**; `ADR-TRACEABILITY.md` → **v2.47** (`GAP-57` added, 57 rows); `TEST-DASHBOARD.md` → **v2.37**.
+
 ## 2026-08-09 — Five low-risk Dependabot PRs merged; the accepted `brace-expansion` advisory is resolved, a new `nanoid` one surfaces
 
 PRs #94 (`brace-expansion` 1.1.16→1.1.18), #95 (`fast-uri`), #92 (`undici`), #91 (`ip-address`) and #96 (`hono`) merged after a quick review — all patch/minor bumps to transitive dependencies not reachable from this app's own code, all CI-green on a branch freshly updated against master. `#94` specifically resolves the `brace-expansion` GHSA-mh99-v99m-4gvg advisory that's sat as an accepted-risk red `audit` check since 2026-07-25 (see the note above) — no ESLint 10 upgrade needed after all.
