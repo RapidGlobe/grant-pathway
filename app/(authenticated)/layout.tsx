@@ -18,7 +18,7 @@ export default async function AuthenticatedLayout({ children }: { children: Reac
     <>
       <NavAuthenticated firstName={firstName} email={email} />
 
-      <main id="main-content" className="flex flex-1 flex-col">
+      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col outline-none">
         {children}
       </main>
 

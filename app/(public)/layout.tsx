@@ -6,7 +6,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <>
       <NavPublic />
 
-      <main id="main-content" className="flex flex-1 flex-col">
+      <main id="main-content" tabIndex={-1} className="flex flex-1 flex-col outline-none">
         {children}
       </main>
 
