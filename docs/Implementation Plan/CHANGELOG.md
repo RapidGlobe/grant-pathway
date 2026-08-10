@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-10 — Disable Next.js dev-mode indicator permanently: false alarm traced to `next dev` tooling, not the app
+
+WJ tabbed back to the Step 3 heading and confirmed `GAP-69`'s fix works: NVDA now speaks the tooltip content.
+
+Continuing onto Step 4's "Before you begin writing" gate screen, testing its step indicator and checklists needed Say All rather than Tab (the content is deliberately non-interactive, which is correct — confirmed already in AC-04). Say All repeatedly went silent after only the skip link and logo, or otherwise needed constant manual re-triggering to keep reading — reproducible, not a one-off glitch.
+
+Investigated rather than assumed: `step-indicator.tsx`'s markup was read in full and confirmed structurally sound — nothing hides any of the five steps from assistive technology. The decisive test was running an actual `next build` + `next start` production server (none of `next dev`'s tooling present) and repeating the same Say All check: it read the entire page, start to finish, on the first attempt, with zero interruption. That proves the app itself was never the problem.
+
+A garbled Say All fragment along the way ("JSDF tools") pointed at the likely cause: Next.js's own dev-mode floating indicator overlay, which renders inside a Shadow DOM boundary — a known category of screen-reader traversal hazard. WJ decided to disable it permanently: `devIndicators: false` in `next.config.ts`, a dev-only setting the Next.js docs confirm has zero effect on the production build and no functional downside (compile/runtime errors still surface). `components/axe-provider.tsx` (the other dev-only candidate investigated along the way, a background `MutationObserver`-driven `axe-core` re-scanner) was left enabled — it remains useful for other testing modes, and the production-build workaround now covers any future Say-All-dependent check in dev regardless of whether `AxeProvider` alone would also have been sufficient.
+
+Not logged as a GAP in `ADR-TRACEABILITY.md` — nothing here reaches real users, and the production-build test is the proof. `type-check`, `lint --max-warnings 0` and all 266 tests pass. Testing continued on a local production build for the remainder of the session. Full detail in `accessibility-test-plan.md` v1.23.
+
 ## 2026-08-10 — AC-07 continuing: `GAP-68` live-verified, `GAP-69` found and fixed same day (no tooltip in the app reached a screen reader)
 
 WJ re-ran the AI summary generation with NVDA active and confirmed `GAP-68`'s fix works: it now speaks "Identifying key information" and "Almost there" as the loading stages change.

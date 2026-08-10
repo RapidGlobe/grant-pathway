@@ -35,6 +35,15 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Disabled 2026-08-10 during AC-07 (accessibility-test-plan.md): the
+  // dev-mode indicator overlay uses a Shadow DOM boundary that genuinely
+  // disrupted NVDA's Say All while testing -- confirmed by reproducing full,
+  // uninterrupted Say All on a `next build` + `next start` production
+  // server, which carries no dev indicator at all. Not an app defect --
+  // this setting has zero effect on the production build regardless -- but
+  // worth keeping off permanently so it doesn't cause the same false alarm
+  // in a future testing session.
+  devIndicators: false,
   env: {
     APP_VERSION: appVersion,
   },
