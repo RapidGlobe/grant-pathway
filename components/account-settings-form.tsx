@@ -227,14 +227,12 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
           profile and saved applications. This cannot be undone.
         </p>
         <ContextualTooltip content="This permanently deletes your charity profile and all saved applications. This can't be undone.">
-          <Link href="/account/delete">
-            <Button
-              type="button"
-              className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C]"
-            >
-              Delete my account
-            </Button>
-          </Link>
+          <Button
+            render={<Link href="/account/delete" />}
+            className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C]"
+          >
+            Delete my account
+          </Button>
         </ContextualTooltip>
       </section>
     </div>

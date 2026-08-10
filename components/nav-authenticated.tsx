@@ -42,7 +42,7 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
   function navLinkClass(href: string): string {
     const isActive = pathname === href || pathname.startsWith(href + '/')
     return [
-      'rounded-md px-3 py-1.5 text-[14px] transition-colors',
+      'rounded-md px-3 py-1.5 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2',
       isActive
         ? 'bg-[#E6F4F4] font-semibold text-[#0D6E6E]'
         : 'font-medium text-[#64748B] hover:bg-[#E6F4F4] hover:text-[#1E293B]',
@@ -62,7 +62,11 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
       <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between">
         {/* Left — logo + nav links */}
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" aria-label="Grant Pathway home">
+          <Link
+            href="/dashboard"
+            aria-label="Grant Pathway home"
+            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+          >
             <Logo />
           </Link>
 

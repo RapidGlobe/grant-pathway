@@ -25,7 +25,18 @@ export function SessionTimeoutModal({
   const minuteLabel = minutesRemaining === 1 ? 'minute' : 'minutes'
 
   return (
-    <Dialog open={isOpen}>
+    // Escape is the only way Base UI can close a controlled dialog without a
+    // dedicated button; per design-requirements.md §8.5 ("Escape key closes
+    // all modals") it must do something, and per this modal's own reasoning
+    // (see session-timeout-provider.tsx) closing without extending the
+    // session would be worse than not closing at all — so Escape here is
+    // treated identically to "I'm still here".
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onExtend()
+      }}
+    >
       <DialogContent showCloseButton={false} className="max-w-[440px] rounded-xl p-8">
         <DialogHeader>
           <DialogTitle className="text-[18px] font-bold tracking-tight text-[#1E293B]">

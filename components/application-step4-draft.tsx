@@ -812,7 +812,7 @@ export function ApplicationStep4Draft({
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:ring-2 focus-visible:ring-[#DC2626] focus-visible:outline-none"
+                className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:outline-none"
               >
                 Reload now
               </button>

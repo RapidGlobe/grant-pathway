@@ -10,6 +10,32 @@
 
 ---
 
+## 2026-08-10 — AC-06 run and marked Pass: Focus Appearance sitewide; five ring defects found and fixed same day (`GAP-61`–`GAP-64`)
+
+Continued keyboard-only testing via Claude-in-Chrome, Tabbing through every interactive element on `/`, `/register`, `/profile`, `/dashboard`, Steps 1–5, and `/account`. A methodology issue surfaced first and shaped the rest of the case: verifying a ring fix via a programmatic `.focus()` call gave false "no ring" readings, because Chromium's `:focus-visible` heuristic doesn't reliably activate for JS-triggered focus — every check from that point was redone via genuine `Tab` keypresses through the `computer` tool.
+
+Five defects found, all against `DDR-AC-001`'s single amber `#D97706` ring with no per-component overrides, and all fixed the same day. **`GAP-61`:** the authenticated header's logo and both main nav links (`nav-authenticated.tsx`) had no focus ring at all — not a wrong colour, a complete absence. **`GAP-62`:** all three footer links had no ring, on every page in the app, since `site-footer.tsx` is shared by both layouts. **`GAP-63`:** two controls overrode the ring colour with red — Step 4's "Not saved" banner's "Reload now" link, and the shared `Button`'s unused `destructive` variant. **`GAP-64`:** `/account`'s "Delete my account" was invalid nested-interactive HTML (`<Link href="..."><Button>...</Button></Link>`), producing a duplicate, invisible Tab stop; collapsed to one valid element via Base UI's `render` prop, the same polymorphic-rendering pattern already used elsewhere in this codebase.
+
+Two risk areas named in the case were checked directly rather than assumed clean: sticky-element obscuring (Step 4's progress bar and "Not saved" banner) — confirmed the browser's native `scrollIntoView`-on-focus correctly accounts for the sticky bar's space; and dark-mode contrast — ruled out of scope as unreachable dead code, since no `.dark`-class-toggling wiring exists anywhere in the app. Step 5 was not driven through (this run's account hadn't cleared Step 4's approval gate) — treated as covered by the same shared components' extensive verification elsewhere in this run, not as a gap.
+
+`accessibility-test-plan.md` → **v1.19**; `TEST-DASHBOARD.md` → **v2.40**; `ADR-TRACEABILITY.md` → **v2.49** (`GAP-61`–`GAP-64`).
+
+---
+
+## 2026-08-10 — AC-05 run and marked Pass: focus management on both modals; `GAP-59` and `GAP-60` found and fixed same day
+
+Continued keyboard-only testing via Claude-in-Chrome. Discharges the two manual items `ADR-OPS-006`'s Consequences attach to the P6.4 guideline viewer, plus the general modal requirement.
+
+**Session-timeout modal:** triggering it (forced in dev, always reverted after) moved focus in and trapped it correctly, and both "Sign out now" and "I'm still here" were keyboard-operable. Pressing Escape surfaced a genuinely undefined behaviour — `session-timeout-modal.tsx` had no `onOpenChange` handler at all, so Escape did nothing, against `design-requirements.md` §8.5 ("Escape key closes all modals and dropdowns"). This wasn't a straightforward bug fix: closing without extending the session would be worse than not closing at all, per this modal's own reasoning (see `D-013`, 2026-07-28). **Escalated to WJ via `AskUserQuestion`** with three real options rather than decided unilaterally; **WJ chose "Escape = 'I'm still here'."** Implemented as `onOpenChange={(open) => { if (!open) onExtend() }}`, and verified live that it genuinely extends the session (re-triggered the warning after the full window, confirmed it didn't fire early), not just that the dialog visually closes. Logged as **`GAP-60`**.
+
+Checking the dialog's `role`, `aria-modal` and accessible name directly (per this step's own instruction, not assumed) found `aria-modal` missing everywhere — Base UI's `Dialog.Popup` never renders it regardless of the `modal` prop, confirmed via an exhaustive grep of the entire `@base-ui/react` package. Fixed once, at the shared `components/ui/dialog.tsx` primitive, covering every dialog in the app (guideline viewer, session-timeout modal, delete-application confirmation) at once. Logged as **`GAP-59`**.
+
+**Guideline viewer sub-case recorded Blocked, not Fail:** the `file_upload` tool failed on every attempt (`"paths": expected array, received undefined`) — the same persistent tooling limitation already on record from AC-03/AC-04 — so no citation link could be generated to open the dialog, leaving the citation-link-specific focus-return check (step 3) unverified this run. The dialog-primitive checks (step 4) were confirmed directly, independent of real citation content.
+
+`accessibility-test-plan.md` → **v1.19** (see also AC-06, above); `ADR-TRACEABILITY.md` → **v2.49** (`GAP-59`, `GAP-60`).
+
+---
+
 ## 2026-08-10 — AC-04 run and marked Pass: skip link, nav, footer, focus order; `GAP-58` found and fixed same day
 
 Continued keyboard-only testing via Claude-in-Chrome (established as the correct tool for this in AC-03 — the sandboxed Browser pane can't genuinely simulate Enter/Space/Escape). A fresh throwaway Supabase account walked a public sign-in page, the authenticated dashboard, and a real Step 1 application page.

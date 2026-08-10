@@ -24,7 +24,9 @@ const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'click', 'touchstart'] as const
  * - At 55 minutes of inactivity the warning modal opens with a countdown.
  * - At 60 minutes signOut() is called and the user is sent to /?timeout=true,
  *   where the sign-in page explains why (GAP-22).
- * - "I'm still here" resets the timer and closes the modal.
+ * - "I'm still here" resets the timer and closes the modal — as does Escape,
+ *   wired in session-timeout-modal.tsx to the same onExtend callback (AC-05,
+ *   design-requirements.md §8.5: "Escape key closes all modals").
  * - "Sign out now" signs out immediately — and also lands on /?timeout=true.
  *   That is deliberate and specified: technical-design.md §5 says the message
  *   is shown whether the modal is dismissed via "Sign out now" OR ignored to
