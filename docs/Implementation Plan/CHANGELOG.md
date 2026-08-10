@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-08-10 — MK Community Foundation guidelines refreshed to June 2026 edition ahead of a live demo; flagship test plan re-pointed, prior results not carried forward
+
+WJ downloaded the current MKCF Oak, Seed, and Sapling grant criteria from the MK Community Foundation website tonight, ahead of a live demo with a charity the next day, and added them to `docs/Grant Org Guidelines/` (`MK Comm Found oak-grants-criteria-final-june-2026.pdf` plus Seed/Sapling variants). The existing November 2025 Oak file — the one `MK-Community-Foundation-test-plan.md` was executed and last passed against on 2026-07-27 (MKCF-01–09, 19 questions upload path / 16 paste path) — was moved to `docs/Grant Org Guidelines/archive/` rather than deleted, following the plan's own "deliberate change" rule set after audit finding L6 (never overwrite or substitute a guideline source silently).
+
+The flagship plan (`MK-Community-Foundation-test-plan.md` v2.3) is re-pointed at the new Oak file in both its Overview and "Guidelines — access before testing" section. Its 2026-07-27 Pass results explicitly do not carry forward: question counts, match-funding wording, or anything else the AI extracts may differ under the new edition, and nothing has re-run against it yet. `TEST-DASHBOARD.md`'s row for this flagship moved 🟢 → 🟡 (v2.45) to reflect that — not a new failure, but loss of current evidence. `target-funder-list.md` (v1.4) logs the same source refresh as a notice; its funder table itself has not been individually re-checked against the new documents.
+
+MKCF-01–09 needs a live re-run against the June 2026 edition before this flagship can be relied on again as evidence of current app behaviour.
+
 ## 2026-08-10 — Disable Next.js dev-mode indicator permanently: false alarm traced to `next dev` tooling, not the app
 
 WJ tabbed back to the Step 3 heading and confirmed `GAP-69`'s fix works: NVDA now speaks the tooltip content.
