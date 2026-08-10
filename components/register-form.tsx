@@ -129,7 +129,10 @@ export function RegisterForm() {
             htmlFor="first-name"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            First name
+            First name{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <Input
             id="first-name"
@@ -138,6 +141,7 @@ export function RegisterForm() {
             autoComplete="given-name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.firstName || undefined}
             aria-describedby={fieldErrors.firstName ? 'first-name-error' : undefined}
             className="h-10 text-[14px]"
@@ -155,7 +159,10 @@ export function RegisterForm() {
             htmlFor="last-name"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            Last name
+            Last name{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <Input
             id="last-name"
@@ -164,6 +171,7 @@ export function RegisterForm() {
             autoComplete="family-name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.lastName || undefined}
             aria-describedby={fieldErrors.lastName ? 'last-name-error' : undefined}
             className="h-10 text-[14px]"
@@ -178,7 +186,10 @@ export function RegisterForm() {
         {/* Email address */}
         <div className="mb-5">
           <Label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
-            Email address
+            Email address{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <Input
             id="email"
@@ -187,6 +198,7 @@ export function RegisterForm() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.email || undefined}
             aria-describedby={fieldErrors.email ? 'email-error' : undefined}
             className="h-10 text-[14px]"
@@ -201,7 +213,10 @@ export function RegisterForm() {
         {/* Password */}
         <div className="mb-5">
           <Label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
-            Password
+            Password{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <PasswordInput
             id="password"
@@ -209,6 +224,7 @@ export function RegisterForm() {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.password || undefined}
             aria-describedby={fieldErrors.password ? 'password-error' : 'password-hint'}
           />
@@ -229,13 +245,17 @@ export function RegisterForm() {
             htmlFor="confirm-password"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            Confirm password
+            Confirm password{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <PasswordInput
             id="confirm-password"
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.confirmPassword || undefined}
             aria-describedby={fieldErrors.confirmPassword ? 'confirm-password-error' : undefined}
             toggleLabel="confirm password"
@@ -259,6 +279,7 @@ export function RegisterForm() {
               type="checkbox"
               checked={terms}
               onChange={(e) => setTerms(e.target.checked)}
+              aria-required="true"
               aria-invalid={!!fieldErrors.terms || undefined}
               aria-describedby={fieldErrors.terms ? 'terms-error' : undefined}
               className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer accent-[#0D6E6E]"

@@ -55,11 +55,23 @@ export function ContextualTooltip({
   if (active === false) return children
 
   const useSpanWrapper = active !== undefined || wrapInStableSpan
+  // The span itself only needs to be a tab stop when it's standing in for a
+  // control that can go keyboard-unreachable (a disabled Button drops out of
+  // the tab order entirely). A native form control wrapped via
+  // wrapInStableSpan is already focusable on its own -- giving the span its
+  // own tabIndex too just creates a second, redundant stop, and the
+  // wrapper's computed accessible name ends up echoing the input's own
+  // aria-label, so screen readers announce the label twice.
+  const spanIsFocusTarget = active !== undefined
 
   return (
     <Tooltip>
       {useSpanWrapper ? (
-        <TooltipTrigger tabIndex={0} className={cn('inline-flex', spanClassName)} render={<span />}>
+        <TooltipTrigger
+          tabIndex={spanIsFocusTarget ? 0 : undefined}
+          className={cn('inline-flex', spanClassName)}
+          render={<span />}
+        >
           {children}
         </TooltipTrigger>
       ) : (

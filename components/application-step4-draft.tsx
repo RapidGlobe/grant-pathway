@@ -1349,7 +1349,7 @@ export function ApplicationStep4Draft({
 
               {/* Approved confirmation banner */}
               {isApprovedQ && (
-                <div className="mt-4 flex items-center gap-2">
+                <div role="status" className="mt-4 flex items-center gap-2">
                   <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
                   <span className="text-[13px] font-medium text-[#065F46]">
                     Answer approved — edit above to revise

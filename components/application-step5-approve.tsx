@@ -272,7 +272,10 @@ export function ApplicationStep5Approve({
 
       {/* ── Approval status banner ─────────────────────────────────────────── */}
       {isApproved && (
-        <div className="mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4">
+        <div
+          role="status"
+          className="mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4"
+        >
           <CheckCircle2 className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
           <div>
             <p className="text-[14px] font-medium text-[#166534]">
@@ -511,7 +514,10 @@ export function ApplicationStep5Approve({
             </DialogDescription>
           </DialogHeader>
           {reopenError && (
-            <p className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]">
+            <p
+              role="alert"
+              className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]"
+            >
               {reopenError}
             </p>
           )}

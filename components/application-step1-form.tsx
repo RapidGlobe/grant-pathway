@@ -141,6 +141,7 @@ export function ApplicationStep1Form({
             value={funderName}
             onChange={(e) => handleFunderNameChange(e.target.value)}
             onBlur={() => checkPreviousApplication(funderName)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.funder || undefined}
             aria-describedby={fieldErrors.funder ? 'funder-error' : undefined}
             className="h-10 text-[14px]"
@@ -171,6 +172,7 @@ export function ApplicationStep1Form({
             placeholder="e.g. Awards for All England"
             value={grantName}
             onChange={(e) => setGrantName(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.grantName || undefined}
             aria-describedby={fieldErrors.grantName ? 'grantName-error' : undefined}
             className="h-10 text-[14px]"

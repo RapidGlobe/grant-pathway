@@ -450,9 +450,9 @@ export function ApplicationStep3Summary({
         <div role="alert" className="rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] p-6">
           <div className="mb-4 flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
-            <h2 className="text-[16px] font-semibold text-[#991B1B]">
+            <h1 className="text-[16px] font-semibold text-[#991B1B]">
               Eligibility mismatch — this application cannot proceed
-            </h2>
+            </h1>
           </div>
           <p className="mb-4 text-[14px] text-[#991B1B]">{reason}</p>
           <p className="mb-6 text-[14px] text-[#991B1B]">

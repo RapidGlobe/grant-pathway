@@ -255,6 +255,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             autoComplete="organization"
             value={charityName}
             onChange={(e) => setCharityName(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.charityName || undefined}
             aria-describedby={fieldErrors.charityName ? 'charityName-error' : undefined}
             className="h-10 text-[14px]"
@@ -302,6 +303,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             value={whatDoes}
             onChange={(e) => setWhatDoes(e.target.value)}
             rows={3}
+            aria-required="true"
             aria-invalid={!!fieldErrors.whatDoes || undefined}
             aria-describedby={
               ['whatDoes-hint', fieldErrors.whatDoes ? 'whatDoes-error' : '']
@@ -335,6 +337,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             value={whoHelps}
             onChange={(e) => setWhoHelps(e.target.value)}
             rows={3}
+            aria-required="true"
             aria-invalid={!!fieldErrors.whoHelps || undefined}
             aria-describedby={
               ['whoHelps-hint', fieldErrors.whoHelps ? 'whoHelps-error' : '']
@@ -368,6 +371,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             type="text"
             value={whereWorks}
             onChange={(e) => setWhereWorks(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.whereWorks || undefined}
             aria-describedby={
               ['whereWorks-hint', fieldErrors.whereWorks ? 'whereWorks-error' : '']

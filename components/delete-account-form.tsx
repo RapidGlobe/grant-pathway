@@ -102,7 +102,10 @@ export function DeleteAccountForm() {
             htmlFor="confirmDelete"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            Type <span className="font-mono font-bold">DELETE</span> to confirm
+            Type <span className="font-mono font-bold">DELETE</span> to confirm{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <Input
             id="confirmDelete"
@@ -113,6 +116,7 @@ export function DeleteAccountForm() {
               setConfirmText(e.target.value)
               if (fieldError) setFieldError('')
             }}
+            aria-required="true"
             aria-invalid={!!fieldError || undefined}
             aria-describedby={fieldError ? 'confirmDelete-error' : undefined}
             className="h-10 max-w-[240px] font-mono text-[14px]"

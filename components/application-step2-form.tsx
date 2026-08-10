@@ -329,7 +329,10 @@ export function ApplicationStep2Form({
 
         {/* Uploaded — success */}
         {uploadState === 'uploaded' && (
-          <div className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white p-4">
+          <div
+            role="status"
+            className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white p-4"
+          >
             <FileText className="h-5 w-5 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
             <span className="flex-1 truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
             <button
@@ -345,7 +348,10 @@ export function ApplicationStep2Form({
 
         {/* Session restored — guidelines loaded from this session */}
         {guidelinesRestored && uploadState === 'idle' && !uploadError && (
-          <div className="flex items-center gap-3 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4">
+          <div
+            role="status"
+            className="flex items-center gap-3 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4"
+          >
             <FileText className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
             <span className="flex-1 text-[14px] text-[#15803D]">
               Guidelines loaded from this session

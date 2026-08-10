@@ -71,7 +71,10 @@ export function ForgotPasswordRequestForm() {
             htmlFor="reset-email"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            Email address
+            Email address{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <Input
             id="reset-email"
@@ -80,6 +83,7 @@ export function ForgotPasswordRequestForm() {
             autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.email || undefined}
             aria-describedby={fieldErrors.email ? 'reset-email-error' : undefined}
             className="h-10 text-[14px]"

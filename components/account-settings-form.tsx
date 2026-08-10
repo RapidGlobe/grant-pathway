@@ -127,13 +127,17 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
               htmlFor="currentPassword"
               className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
             >
-              Current password
+              Current password{' '}
+              <span className="text-[#DC2626]" aria-hidden="true">
+                *
+              </span>
             </Label>
             <PasswordInput
               id="currentPassword"
               autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
+              aria-required="true"
               aria-invalid={!!fieldErrors.currentPassword || undefined}
               aria-describedby={fieldErrors.currentPassword ? 'currentPassword-error' : undefined}
               toggleLabel="current password"
@@ -155,13 +159,17 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
               htmlFor="newPassword"
               className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
             >
-              New password
+              New password{' '}
+              <span className="text-[#DC2626]" aria-hidden="true">
+                *
+              </span>
             </Label>
             <PasswordInput
               id="newPassword"
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
+              aria-required="true"
               aria-invalid={!!fieldErrors.newPassword || undefined}
               aria-describedby={fieldErrors.newPassword ? 'newPassword-error' : 'newPassword-hint'}
               toggleLabel="new password"
@@ -183,13 +191,17 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
               htmlFor="confirmPassword"
               className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
             >
-              Confirm new password
+              Confirm new password{' '}
+              <span className="text-[#DC2626]" aria-hidden="true">
+                *
+              </span>
             </Label>
             <PasswordInput
               id="confirmPassword"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              aria-required="true"
               aria-invalid={!!fieldErrors.confirmPassword || undefined}
               aria-describedby={fieldErrors.confirmPassword ? 'confirmPassword-error' : undefined}
               toggleLabel="confirm password"

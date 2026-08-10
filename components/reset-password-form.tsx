@@ -155,7 +155,10 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             htmlFor="new-password"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            New password
+            New password{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <PasswordInput
             id="new-password"
@@ -163,6 +166,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.password || undefined}
             aria-describedby={fieldErrors.password ? 'new-password-error' : 'new-password-hint'}
           />
@@ -183,13 +187,17 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             htmlFor="confirm-new-password"
             className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
           >
-            Confirm new password
+            Confirm new password{' '}
+            <span className="text-[#DC2626]" aria-hidden="true">
+              *
+            </span>
           </Label>
           <PasswordInput
             id="confirm-new-password"
             autoComplete="new-password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            aria-required="true"
             aria-invalid={!!fieldErrors.confirmPassword || undefined}
             aria-describedby={
               fieldErrors.confirmPassword ? 'confirm-new-password-error' : undefined
