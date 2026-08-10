@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-08-10 — AC-07 continuing: `GAP-68` live-verified, `GAP-69` found and fixed same day (no tooltip in the app reached a screen reader)
+
+WJ re-ran the AI summary generation with NVDA active and confirmed `GAP-68`'s fix works: it now speaks "Identifying key information" and "Almost there" as the loading stages change.
+
+A device restart briefly interrupted the session (dev server restarted cleanly; one stale-build runtime error on an already-open tab, resolved with a hard refresh — not an app defect).
+
+Resuming on the Step 3 summary screen surfaced a second, much larger finding. Tabbing to the "Your funder guidelines — summary" heading — deliberately `tabIndex={0}` to anchor a `ContextualTooltip` explaining the summary — produced only "heading level 1, clickable," with no tooltip content, confirmed twice. An exhaustive, case-insensitive grep of the entire `@base-ui/react/tooltip` package source for `describedby`, `role.*tooltip`, and `'tooltip'` returned zero matches anywhere. Base UI's `Tooltip` primitive never wires an accessible link between trigger and content at all — the popup renders as a bare `<div>` with no `role`, and the trigger sets no `aria-describedby`. This is exactly the premise `AC-08` exists to test, confirmed to fail before that case was even formally run — and the scope is total: all ten component files using tooltips in the app are affected identically (nine via `ContextualTooltip`, one — `dashboard-empty.tsx` — via the raw `Tooltip`/`TooltipTrigger`/`TooltipContent` primitives directly, which is why the fix belongs in the shared primitive rather than the wrapper alone).
+
+Logged and fixed as `GAP-69`: added a `TooltipIdContext` in `components/ui/tooltip.tsx` generating one `React.useId()` per `<Tooltip>`, shared between the trigger (`aria-describedby`) and the popup (`id` plus `role="tooltip"`) — fixing all ten usages at once by construction. `type-check` and `lint --max-warnings 0` pass; not yet live-verified — WJ is already on the page that surfaced it, re-checking with the fix live next. AC-07 remains **Blocked**. Full detail in `ADR-TRACEABILITY.md` v2.52 and `accessibility-test-plan.md`'s AC-07 and AC-08 write-ups.
+
 ## 2026-08-10 — AC-07 continuing, WJ resumed live: `GAP-68` found and fixed same day
 
 WJ resumed the live NVDA session on Step 3. Step 1's two required fields both confirmed live as now announcing "required," closing `GAP-65`'s open item for that page. Step 2 (Uploaded Guidelines) landing state read clean, no defects.

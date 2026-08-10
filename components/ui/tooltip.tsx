@@ -1,19 +1,34 @@
 'use client'
 
+import * as React from 'react'
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip'
 
 import { cn } from '@/lib/utils'
+
+// Base UI's Tooltip never wires aria-describedby/role="tooltip" itself (confirmed
+// via an exhaustive grep of @base-ui/react/tooltip's source, GAP-69) -- the popup
+// is purely a visual hover/focus card with no accessible link to its trigger, so
+// screen readers announce the trigger and nothing else, ever. This context shares
+// one id, generated once per <Tooltip>, between the trigger and the popup so the
+// two can be connected explicitly below.
+const TooltipIdContext = React.createContext<string | undefined>(undefined)
 
 function TooltipProvider({ delay = 0, ...props }: TooltipPrimitive.Provider.Props) {
   return <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delay} {...props} />
 }
 
 function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+  const id = React.useId()
+  return (
+    <TooltipIdContext.Provider value={id}>
+      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+    </TooltipIdContext.Provider>
+  )
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+  const id = React.useContext(TooltipIdContext)
+  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" aria-describedby={id} {...props} />
 }
 
 function TooltipContent({
@@ -26,6 +41,7 @@ function TooltipContent({
   ...props
 }: TooltipPrimitive.Popup.Props &
   Pick<TooltipPrimitive.Positioner.Props, 'align' | 'alignOffset' | 'side' | 'sideOffset'>) {
+  const id = React.useContext(TooltipIdContext)
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Positioner
@@ -36,6 +52,8 @@ function TooltipContent({
         className="isolate z-50"
       >
         <TooltipPrimitive.Popup
+          id={id}
+          role="tooltip"
           data-slot="tooltip-content"
           className={cn(
             'z-50 inline-flex w-fit max-w-xs origin-(--transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
