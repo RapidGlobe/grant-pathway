@@ -53,7 +53,10 @@ export function ApplicationStep4PrepChecklist({
       const result = await setDraftInProgress(applicationId)
       if (result.ok) {
         // Hard navigation bypasses the Next.js Router Cache so Step 4 renders
-        // fresh with the rows written by setDraftInProgress (D-HSF-03 fix)
+        // fresh with the rows written by setDraftInProgress (D-HSF-03 fix).
+        // router.push() would resurrect the stale-render bug D-HSF-03 fixed
+        // (CHANGELOG.md, 2026-06-07), so this intentionally isn't a soft nav.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.href = `/applications/${applicationId}/step/4`
       } else {
         setServerError(result.error)
