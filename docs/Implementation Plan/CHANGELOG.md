@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-08-12 (just now, later) — `GAP-79` decided, not built: convert to `rem`, deferred to a later session
+
+WJ asked for `GAP-79`'s resolution to be documented before it could be lost, having flagged that no code change would happen this session (to manage weekly usage). Preceded by two plain-English questions: what "px + zoom" vs "convert to rem" actually means (zoom scales the whole viewport including `px`; the browser's font-size preference instead resizes only the `rem` base, which is the exact mechanism AC-15's Step 4 proxy exercised and found unresponsive), and what the recommendation was — convert to `rem`, because some users rely specifically on the font-size preference rather than zoom, and amending `design-requirements` §8.6 to accept `px` + zoom would mean formally accepting a real AA gap against `ADR-OPS-006`.
+
+Before recording an effort estimate, re-verified the scope directly against the live codebase rather than trusting `GAP-79`'s original figure: `grep -c 'text-\[[0-9]+px\]'` across `*.tsx` confirmed 384 occurrences across 30 files (a first pass over-counted at 770/59 files — traced to a stray, already-known, fully-committed leftover git worktree at `.claude/worktrees/peaceful-lamarr-4605b5` duplicating the same files, excluded once found). The 384 occurrences collapse into only **11 distinct pixel values**, with `14px` (165), `13px` (106), `15px` (45) and `12px` (27) covering roughly 90% between them — the same substitution repeated, not 384 independent decisions. Revised effort estimate: **around half a day** — an 11-row `px`→`rem` lookup table, a scripted substitution across the 30 files, re-running AC-15's Step 4 check to confirm it now responds, and a spot-check of a few screens. This is smaller than `GAP-79`'s "Large" size classification suggested; that classification was about instance/file-count breadth, not difficulty, and at the default font size a `px` value and its `rem` equivalent render identically, so no visual regression is expected.
+
+Documented in four places, no code changed: `ADR-TRACEABILITY.md` (`GAP-79`'s row moves 🔴 No task → 🟡 Tasked only, v2.57), `IMPLEMENTATION-PLAN.md` (new `P5.3b` item 6, v3.31, plus a correction to the Go-Live Gate checklist line that had drifted to say "only GAP-23 remains"), `accessibility-test-plan.md` (AC-15's Notes and Document History, v1.31 — the case stays recorded Fail; a decision to fix is not the fix itself), and `IMPLEMENTATION-STATUS.md`.
+
+---
+
 ## 2026-08-12 (just now, next) — AC-15 (text sizing, 200% zoom, reflow) run solo and marked Fail; two GAPs found and fixed live, one left open pending a decision
 
 AC-15 closes out the AC-10–AC-15 run. Unlike the preceding cases, this one was explicitly pre-diagnosed by the plan itself: `design-requirements` §8.6 requires `rem` sizing for browser font-size preference support, but the components use hardcoded `px` extensively — Step 4 was called out by name as "likely to fail."
