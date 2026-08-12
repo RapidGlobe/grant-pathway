@@ -1011,6 +1011,7 @@ Amber `#D97706` outline ring applied on `:focus-visible` only. Contrast: 4.58:1 
 - Dropdowns (`select`, `combobox`) are keyboard-navigable
 - Modals trap focus and set `aria-modal="true"`, `role="dialog"`, `aria-labelledby`
 - The step indicator is `role="navigation"` or `aria-label="Application progress"` and announces current step
+- Target size (SC 2.5.8): every interactive target is either at least 24×24 CSS px, or spaced at least 24 CSS px from the nearest other target. `ADR-OPS-006`'s house standard is 44×44px; smaller targets (icon-sm buttons, text-only action links) are an accepted deviation only when isolated by ≥24px spacing — verified in AC-11 (`GAP-75`, `GAP-76`)
 
 ### 8.4 Screen Reader Behaviour
 

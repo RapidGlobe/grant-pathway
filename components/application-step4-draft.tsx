@@ -1252,7 +1252,7 @@ export function ApplicationStep4Draft({
                           {`This suggestion is still ${suggestionShortfall} ${useChars ? 'character' : 'word'}${suggestionShortfall === 1 ? '' : 's'} over the limit — AI can't always hit an exact ${useChars ? 'character' : 'word'} count. Check the counter and trim it further, or try again.`}
                         </p>
                       )}
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-6">
                         <Button
                           type="button"
                           onClick={() => handleUseRefined(q.id, refineState.refinedText)}

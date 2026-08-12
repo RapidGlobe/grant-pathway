@@ -26,7 +26,7 @@ export function SiteFooter() {
                 href={HELP_CENTRE_BASE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                className="inline-block rounded py-1.5 text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
                 Help centre<span className="sr-only"> (opens in a new tab)</span>
               </Link>
@@ -36,7 +36,7 @@ export function SiteFooter() {
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                className="inline-block rounded py-1.5 text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
                 Privacy policy<span className="sr-only"> (opens in a new tab)</span>
               </Link>
@@ -46,7 +46,7 @@ export function SiteFooter() {
                 href="/terms"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                className="inline-block rounded py-1.5 text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
                 Terms of service<span className="sr-only"> (opens in a new tab)</span>
               </Link>
