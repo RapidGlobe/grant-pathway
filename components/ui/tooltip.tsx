@@ -17,8 +17,9 @@ function TooltipProvider({ delay = 0, ...props }: TooltipPrimitive.Provider.Prop
   return <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delay} {...props} />
 }
 
-function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-  const id = React.useId()
+function Tooltip({ id: idOverride, ...props }: TooltipPrimitive.Root.Props & { id?: string }) {
+  const generatedId = React.useId()
+  const id = idOverride ?? generatedId
   return (
     <TooltipIdContext.Provider value={id}>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
