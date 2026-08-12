@@ -10,6 +10,12 @@
 
 ---
 
+## 2026-08-12 (just now, latest) — `accessibility-test-plan.md`'s Test Results Summary table corrected for AC-02 through AC-07
+
+Documentation-consistency fix only — no new testing, no code touched. The table's Result column had left AC-02 through AC-07 at their original ☐ placeholder despite the top Status paragraph and each case's own Result checkbox/Notes already recording them complete; the same class of drift was caught and fixed once already for AC-10 through AC-14 (v1.29), but the sweep never reached further up the table until now.
+
+AC-02, AC-03, AC-04, AC-06 and AC-07 are straightforwardly Pass, each summarised from its own case Notes. **AC-05 needed a closer read rather than a blanket Pass**, per the request that prompted this fix: its own Result line reads Pass overall, but its Notes record the guideline-viewer sub-case as Blocked — not reproduced this run, on a persistent `file_upload` tool bug (`mcp__claude-in-chrome__file_upload` erroring on every attempt) rather than an app defect, the same limitation already on record from AC-03/AC-04. The summary row now states that explicitly rather than collapsing it to a plain Pass. `accessibility-test-plan.md` → v1.33.
+
 ## 2026-08-12 (just now, even later) — AC-08 (NVDA, tooltips) run live and marked Pass — three distinct GAPs found and fixed
 
 WJ drove NVDA live through all four of AC-08's steps, absorbing `help-and-tooltips-test-plan.md`'s `HT-05` step 4 as this case's own instructions require. Every prior tooltip fix (`GAP-38`'s keyboard reachability, `GAP-69`'s shared `aria-describedby`/`role="tooltip"` wiring at the `components/ui/tooltip.tsx` primitive) had already landed, but NVDA still never announced tooltip content at three of the app's ten usage sites — three genuinely different root causes, none fixable by the same mechanism, all traced through Base UI's own source rather than guessed from symptoms.
