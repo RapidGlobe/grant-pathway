@@ -10,6 +10,16 @@
 
 ---
 
+## 2026-08-12 (newest) — AC-13 (Accessible Authentication) run solo and marked Pass; a clean pass, no GAP
+
+With AC-12 closed, AC-13 went next. A real OS-level paste gesture cannot be simulated reliably from the sandboxed Browser pane (the same class of limitation recorded against `file_upload` and synthetic keypresses in earlier sessions), so this case relied on source inspection plus a same-effect proxy rather than a literal paste.
+
+All eight password fields in the app — sign-in (1), register (2), reset-password (2), and account settings' change-password form (3) — go through one shared component, `components/ui/password-input.tsx`, itself wrapping the shared `components/ui/input.tsx`. Both were read in full: neither has an `onPaste` handler, `readOnly`, or any value-clearing logic, and a codebase-wide grep for paste-blocking patterns returned zero matches. The mechanism a paste actually exercises was checked live on `/register`'s password field: setting the value via the native `HTMLInputElement.prototype.value` setter and dispatching an `input` event (the same sequence a real paste triggers before React's controlled-value tracking sees it) left the value intact. Every instance sets a correct, specific `autocomplete` value rather than suppressing autofill, and a codebase-wide grep for CAPTCHA/puzzle terms returned zero matches — nothing in the auth path asks for anything beyond the user's own credentials.
+
+Register's always-visible password-requirements hint was confirmed as a genuine programmatic association, not loose adjacent text: `aria-describedby="password-hint"` on the field, pointing to a real `<p id="password-hint">`, live-confirmed to match. This wasn't re-verified with NVDA speech (no live session was running), but — unlike `GAP-69`'s Base UI `Tooltip` finding, which was a genuine undocumented wiring gap in a custom widget — this is a native `<input aria-describedby>` pointing to a plain paragraph, well-established and reliable screen-reader behaviour, so the source-level confirmation is treated as sufficient for a Pass here.
+
+No GAP raised — nothing here deviated from the requirement.
+
 ## 2026-08-12 (latest) — AC-12 (Consistent Help) run solo and marked Pass; a clean pass, no GAP
 
 With AC-11 closed, AC-12 went next — a structural case, checked entirely by source inspection of the three shared containers (`nav-public.tsx`, `nav-authenticated.tsx`, `site-footer.tsx`) plus a live spot-check on the public routes. No test account or NVDA was needed, since the four steps ask about position and disclosure, not behaviour.
