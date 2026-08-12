@@ -10,6 +10,18 @@
 
 ---
 
+## 2026-08-12 (just now) — AC-14 (Redundant Entry) run solo and marked Pass; a clean pass, no GAP
+
+With AC-13 closed, AC-14 went next — the last of the solo-run cases before AC-15. This one needed a live test, since it hinges on P6.5's own reuse mechanism actually carrying content forward rather than just describing that it should.
+
+Set up a fresh throwaway Supabase test account (`ac14-test@example.com`) with a charity profile via a real Charity Commission lookup ("Oxfam", reg 202918 — pre-filled `charityName`/`regNumber`/`whatCharityDoes`/`whoCharityHelps` correctly, live-confirmed). Created a first application ("AC-14 Test Foundation" / "Fund One") with three narrative-only synthetic guideline questions, wrote and approved a real 38-word answer for Section 1, then started a second application to the same funder name ("Fund Two"). The soft funder-name match on blur correctly offered the reuse choice; selecting it skipped guideline re-upload and AI-summary regeneration entirely (both showed "completed" immediately, reusing the prior extraction) and Step 4 showed all three sections tagged "Carried over — please review," with Section 1's textarea live-confirmed via its `.value` to hold the exact previously-approved text verbatim. A clean, live-verified Pass for SC 3.3.7 on the mechanism the product actually built.
+
+A related question was investigated in depth rather than assumed either way: should the charity profile's own "what do you do" / "who do you help" text also feed Step 4's narrative answers, to avoid retyping similar content when applying to a _different_ funder? Traced through `app/api/generate-summary/route.ts` and `lib/prompts.ts` — the charity profile is fetched and passed into the Step 3 summary prompt, but explicitly only to help note eligibility considerations, and `docs/PRD-Grant-Pathway.md` (line 1241) already scopes the separate Step 4 refine prompt to the charity's own written answer text only, "not funder summary or charity profile." This is a deliberate, already-decided scope boundary, not an oversight, so it was recorded as a scope note rather than raised as a new GAP or escalated to WJ.
+
+One genuine tooling gap was found and fixed along the way, unrelated to the accessibility case itself: `npm run lint -- --max-warnings 0` was failing on two warnings that turned out to come entirely from `.claude/worktrees/peaceful-lamarr-4605b5`, a stale, fully-committed, detached-HEAD worktree left over from an earlier session (2026-08-06). `eslint.config.mjs` had no ignore for `.claude/worktrees/**`, so agent-created scratch worktrees were being linted as part of the repository's own source. Added the ignore rather than touching the worktree itself; `lint` is clean again. The Test Results Summary table in `accessibility-test-plan.md` was also found out of date — left at ☐ for AC-10 through AC-14 despite each being recorded Pass in its own section — and corrected in the same pass.
+
+No GAP raised — nothing here deviated from the requirement.
+
 ## 2026-08-12 (newest) — AC-13 (Accessible Authentication) run solo and marked Pass; a clean pass, no GAP
 
 With AC-12 closed, AC-13 went next. A real OS-level paste gesture cannot be simulated reliably from the sandboxed Browser pane (the same class of limitation recorded against `file_upload` and synthetic keypresses in earlier sessions), so this case relied on source inspection plus a same-effect proxy rather than a literal paste.

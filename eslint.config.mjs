@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     // Generated Vercel build output — not source code
     '.vercel/**',
+    // Agent-created git worktrees — isolated scratch checkouts, not source to lint here
+    '.claude/worktrees/**',
   ]),
   // Prettier last — disables ESLint style rules that conflict with Prettier.
   prettierConfig,
