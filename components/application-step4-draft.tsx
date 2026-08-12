@@ -1263,7 +1263,7 @@ export function ApplicationStep4Draft({
                         <button
                           type="button"
                           onClick={() => handleKeepOriginal(q.id)}
-                          className="text-[13px] text-[#64748B] underline hover:no-underline"
+                          className="text-[13px] text-[#475569] underline hover:no-underline"
                         >
                           Keep my original
                         </button>

@@ -990,6 +990,9 @@ All text and interactive elements must meet WCAG SC 1.4.3 and 1.4.11. Key verifi
 | White on `#B45309`     | 5.0:1  | AA (4.5:1)          | ✓ — "Complete your profile" button since `DEF-06` (2026-08-09)                                                       |
 | `#475569` on `#F1F5F9` | 6.9:1  | AA (4.5:1)          | ✓ — Step 4 word-limit badge since `DEF-07` (2026-08-09)                                                              |
 | `#64748B` on `#F1F5F9` | 4.34:1 | AA (4.5:1)          | ✗ — was the word-limit badge's colour until `DEF-07`; `#64748B` itself is unchanged everywhere else                  |
+| `#475569` on `#EFF6FF` | 6.96:1 | AA (4.5:1)          | ✓ — Step 4 "Keep my original" link since `GAP-74` (2026-08-12)                                                       |
+| `#64748B` on `#EFF6FF` | 4.37:1 | AA (4.5:1)          | ✗ — was the "Keep my original" link's colour until `GAP-74`; `#64748B` itself is unchanged everywhere else           |
+| `#B45309` on `#EFF6FF` | 4.62:1 | AA (4.5:1)          | ✓ — Step 4 AI-suggestion word-count advisory, confirmed live 2026-08-12 (not previously documented)                  |
 | `#92400E` on `#FEF3C7` | 5.21:1 | AA (4.5:1)          | ✓                                                                                                                    |
 | `#166534` on `#F0FDF4` | 7.34:1 | AA (4.5:1)          | ✓                                                                                                                    |
 
