@@ -10,6 +10,14 @@
 
 ---
 
+## 2026-08-12 (latest) — AC-12 (Consistent Help) run solo and marked Pass; a clean pass, no GAP
+
+With AC-11 closed, AC-12 went next — a structural case, checked entirely by source inspection of the three shared containers (`nav-public.tsx`, `nav-authenticated.tsx`, `site-footer.tsx`) plus a live spot-check on the public routes. No test account or NVDA was needed, since the four steps ask about position and disclosure, not behaviour.
+
+All three containers place Help as the first item in their trailing cluster: `nav-public.tsx`'s right-hand nav is `[Help, Register]`, `nav-authenticated.tsx`'s right-hand controls are `[Help, Account dropdown]`, and `site-footer.tsx`'s legal-links list is `[Help centre, Privacy policy, Terms of service]` — consistent relative order throughout, including on the four public routes where Register is conditionally hidden (Help remains the only, and so still first, item). Both `(public)/layout.tsx` and `(authenticated)/layout.tsx` render their nav and footer unconditionally around every page in their group, so Help reaches every route in the app with no per-page gap. `dashboard-empty.tsx`'s separate "Need a hand? Visit our help centre…" is inline body prose, not a second nav position, and doesn't contradict the placement. All instances disclose their new-tab behaviour via the same `sr-only` "(opens in a new tab)" pattern — live-confirmed via `element.textContent` on the two public-nav instances, source-confirmed identical on the authenticated nav (no live session was available by the time this case started; the code is unambiguous).
+
+No GAP raised — nothing here deviated from the requirement.
+
 ## 2026-08-12 (even later) — AC-11 (target size / touch targets) run solo and marked Pass; two new GAPs found and fixed live, one sitewide
 
 With AC-10 closed, AC-11 went next: a second fresh throwaway Supabase test account was created via the admin API, and a full application run through Step 4 was completed — a real charity profile, real pasted funder guidelines, a real AI summary, and real content typed into a Draft Answers field, including triggering "Help me improve this" to render the AI-suggested-improvement panel. DevTools cannot be driven programmatically from the sandboxed Browser pane, so measurement used `getBoundingClientRect()` and `getComputedStyle()` directly via JS injection instead — the same underlying box-model data, read a different way.
