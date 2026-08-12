@@ -51,8 +51,8 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
                 >
                   {isComplete ? <Check className="h-4 w-4" aria-hidden="true" /> : step}
                   <span className="sr-only">
-                    {isComplete ? 'Completed: ' : isCurrent ? 'Current: ' : ''}
-                    {label}
+                    Step {step} of {STEPS.length}, {label}
+                    {isComplete ? ', completed' : ''}
                   </span>
                 </div>
 

@@ -270,25 +270,34 @@ export function ApplicationStep5Approve({
         )}
       </p>
 
-      {/* ── Approval status banner ─────────────────────────────────────────── */}
-      {isApproved && (
-        <div
-          role="status"
-          className="mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4"
-        >
-          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
-          <div>
-            <p className="text-[14px] font-medium text-[#166534]">
-              {isExported ? 'Application approved and exported.' : 'Application approved.'}
-            </p>
-            {isExported && lastExported && (
-              <p className="mt-0.5 text-[13px] text-[#16A34A]">
-                Last exported: {formatExportDate(lastExported)}
+      {/* ── Approval status banner — stays mounted at all times (only its
+          content toggles) so NVDA is already watching it when approval
+          happens; a freshly inserted role="status" node is not reliably
+          announced. See application-step4-draft.tsx's identical fix. ────── */}
+      <div
+        role="status"
+        className={
+          isApproved
+            ? 'mb-5 flex items-center gap-2 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4'
+            : 'sr-only'
+        }
+      >
+        {isApproved && (
+          <>
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
+            <div>
+              <p className="text-[14px] font-medium text-[#166534]">
+                {isExported ? 'Application approved and exported.' : 'Application approved.'}
               </p>
-            )}
-          </div>
-        </div>
-      )}
+              {isExported && lastExported && (
+                <p className="mt-0.5 text-[13px] text-[#166534]">
+                  Last exported: {formatExportDate(lastExported)}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+      </div>
 
       {/* ── Review checklist (only shown while pending) ────────────────────── */}
       {!isApproved && (

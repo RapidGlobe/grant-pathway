@@ -12,3 +12,13 @@ public/
 # reformatting it. This was the one *genuine* format:check failure among the 23 reported —
 # every other one was a CRLF-versus-LF false failure, now fixed by `.gitattributes`.
 supabase/.temp/
+
+# ADR-TRACEABILITY.md — added 2026-08-12, WJ's decision.
+# Prettier 3.9.6 has a reproducible bug: reformatting this file's Gaps register table
+# corrupts the entire table (truncated words, dropped punctuation, duplicated markup)
+# once any cell grows near the current longest-row size (~6,000+ characters). Confirmed
+# on a scratch copy before it reached the committed file. New rows are edited by hand to
+# approximate the existing column-padding style; `prettier --check` would otherwise flag
+# this file on every future edit. Revisit if the table is restructured or the bug is
+# fixed upstream — see the note at the top of that file's "Gaps register" section.
+docs/Implementation Plan/ADR-TRACEABILITY.md

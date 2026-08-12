@@ -967,7 +967,7 @@ export function ApplicationStep4Draft({
                   {!limit && combinedLimitQuestionIds.has(q.id) && (
                     <span
                       title={`This section shares the funder's overall ${overallWordLimit}-word limit with other sections — see the combined count near the top of the page.`}
-                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#475569]"
                     >
                       Counts toward {overallWordLimit}-word total
                     </span>
@@ -991,7 +991,7 @@ export function ApplicationStep4Draft({
                   {q.addedManually && (
                     <span
                       title="You added this — it wasn't found in the funder's guidelines"
-                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#64748B]"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#475569]"
                     >
                       Added by you
                     </span>
@@ -1347,15 +1347,23 @@ export function ApplicationStep4Draft({
                   </div>
                 )}
 
-              {/* Approved confirmation banner */}
-              {isApprovedQ && (
-                <div role="status" className="mt-4 flex items-center gap-2">
-                  <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
-                  <span className="text-[13px] font-medium text-[#065F46]">
-                    Answer approved — edit above to revise
-                  </span>
-                </div>
-              )}
+              {/* Approved confirmation banner — this role="status" element stays
+                  mounted at all times (only its content toggles) so NVDA is
+                  already watching it when the approval happens; a freshly
+                  inserted role="status" node is not reliably announced. */}
+              <div
+                role="status"
+                className={isApprovedQ ? 'mt-4 flex items-center gap-2' : 'sr-only'}
+              >
+                {isApprovedQ && (
+                  <>
+                    <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
+                    <span className="text-[13px] font-medium text-[#065F46]">
+                      Answer approved — edit above to revise
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           )
         })}
