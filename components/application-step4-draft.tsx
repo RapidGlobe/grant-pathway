@@ -953,27 +953,27 @@ export function ApplicationStep4Draft({
               }`}
             >
               {/* Card header */}
-              <div className="mb-2 flex items-start justify-between gap-3">
+              <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
                 <p className="text-[15px] font-semibold leading-snug text-[#1E293B]">
                   <span className="mr-0.5">{displayNumber}.&nbsp;</span>
                   {q.questionText}
                 </p>
-                <div className="flex shrink-0 items-center gap-2">
+                <div className="flex max-w-full shrink-0 flex-wrap items-center gap-2">
                   {limit && (
-                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#475569]">
+                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#475569]">
                       {limit}&nbsp;{useChars ? 'characters' : 'words'}
                     </span>
                   )}
                   {!limit && combinedLimitQuestionIds.has(q.id) && (
                     <span
                       title={`This section shares the funder's overall ${overallWordLimit}-word limit with other sections — see the combined count near the top of the page.`}
-                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#475569]"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#475569]"
                     >
                       Counts toward {overallWordLimit}-word total
                     </span>
                   )}
                   {q.isBudgetQuestion && (
-                    <span className="rounded bg-[#FDE68A] px-2 py-0.5 text-[11px] font-semibold text-[#78350F]">
+                    <span className="rounded bg-[#FDE68A] px-2 py-0.5 text-[12px] font-semibold text-[#78350F]">
                       Budget
                     </span>
                   )}
@@ -982,16 +982,16 @@ export function ApplicationStep4Draft({
                       type="button"
                       onClick={() => setViewingCitation(q.guidelineReference)}
                       title={citationFullLabel(q.guidelineReference)}
-                      className="flex items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[11px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
+                      className="flex min-w-0 max-w-full items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[12px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
                     >
-                      <FileText className="h-3 w-3" aria-hidden="true" />
-                      {citationLabel(q.guidelineReference)}
+                      <FileText className="h-3 w-3 shrink-0" aria-hidden="true" />
+                      <span className="truncate">{citationLabel(q.guidelineReference)}</span>
                     </button>
                   )}
                   {q.addedManually && (
                     <span
                       title="You added this — it wasn't found in the funder's guidelines"
-                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[11px] font-medium text-[#475569]"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#475569]"
                     >
                       Added by you
                     </span>

@@ -373,7 +373,7 @@ export function ApplicationStep5Approve({
                       <div className="flex shrink-0 items-center gap-2">
                         {badge && (
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${badge.className}`}
+                            className={`rounded-full px-2 py-0.5 text-[12px] font-medium ${badge.className}`}
                           >
                             {badge.label}
                           </span>

@@ -14,7 +14,7 @@ export function SiteFooter() {
           <p className="mt-0.5 text-[12px] text-[#64748B]">
             Your free grant writing companion for UK charities
           </p>
-          <p className="mt-0.5 text-[11px] text-[#64748B]">Grant Pathway v{appVersion}</p>
+          <p className="mt-0.5 text-[12px] text-[#64748B]">Grant Pathway v{appVersion}</p>
         </div>
 
         <nav aria-label="Legal links">
