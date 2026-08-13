@@ -224,7 +224,13 @@ Narrow container:  max-width 680px for form-heavy pages
 
 ### 4.5 Responsive Scope
 
-Grant Pathway v1 is desktop-primary (PDR-UI-003). The minimum supported viewport is **1024px wide**. No mobile-specific layouts are required for v1.
+Grant Pathway v1 is desktop-primary (PDR-UI-003), per `ADR-ARCH-005`'s three-band strategy (amended 2026-08-05):
+
+- **1024px and above — optimised.** Layouts are designed and tested here.
+- **768–1023px — functional but not optimised.** The application works; layouts may be cramped. No mobile-specific layout is provided for this band, but it is not blocked — real users on iPad portrait or older small laptops are common in small charities.
+- **Below 768px — blocked.** A full-screen banner (`GAP-05`, built 2026-08-13 — see `DDR-CS-007`) tells the user Grant Pathway is designed for desktop and to switch to a desktop or laptop browser. No mobile-specific layout is required or provided.
+
+No mobile browser support in v1 (`NFR-05`). This corrects an earlier version of this section, which said only "the minimum supported viewport is 1024px wide" and predated the ADR's 2026-08-05 amendment establishing the 768–1023px functional band.
 
 ---
 

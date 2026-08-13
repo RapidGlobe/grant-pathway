@@ -24,6 +24,8 @@
 
 Documented in `ADR-TRACEABILITY.md` (`GAP-05` row 🟡 → 🟢 Built, v2.61), `accessibility-test-plan.md` (v1.36, plan-level 🔴 → 🟢), `IMPLEMENTATION-PLAN.md` (P5.3 marked built), `TEST-DASHBOARD.md` (v2.57), and `IMPLEMENTATION-STATUS.md`. **P5.3 — Accessibility (WCAG 2.2 Level AA) is now complete.**
 
+**Follow-up, same day:** `design-requirements.md` §4.5 was flagged during this sweep as stale — it still said "the minimum supported viewport is 1024px wide, no mobile-specific layouts required," predating `ADR-ARCH-005`'s 2026-08-05 three-band amendment. Corrected on WJ's go-ahead to state all three bands (1024px+ optimised, 768–1023px functional-but-not-optimised, below 768px blocked by `GAP-05`'s banner), with a note explaining the correction so the drift doesn't look like a new decision.
+
 ## 2026-08-13 (earlier) — `GAP-79` built: `text-[Npx]` → `rem` conversion, closing AC-15's sole open gap — all 15 accessibility cases now Pass
 
 `GAP-79` (decided 2026-08-12, deferred to this session) is now built: all 384 `text-[Npx]` font-size instances across 30 component/page files converted to `rem`, so text responds to the browser's font-size preference as `design-requirements.md` §8.6 requires. Scope was re-verified against the live codebase before building — still exactly 384 instances, 30 files, 11 distinct pixel values, matching the 2026-08-12 estimate.
