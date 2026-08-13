@@ -1011,6 +1011,8 @@ Two options were put to WJ (see the earlier draft of AC-FR-18-05). The narrower 
 
 **Built 2026-08-06** (`GAP-44`) — a per-answer "Saved" tick on every save path, governance fields included, clearing itself after 2.5s. Covered by `__tests__/step4-save-reassurance.test.tsx`; live confirmation is `help-and-tooltips-test-plan.md` HT-06 plus a look at Step 4.
 
+**Amendment note (2026-08-13, WJ — `GAP-87`, found live under `accessibility-test-plan.md` AC-09).** The "does not interrupt" line above was written for a sighted user and is unchanged for one: the confirmation still doesn't steal focus, require dismissal, or block typing. But for a screen-reader user it was not being heard at all — NVDA live-testing found the confirmation used `role="status"` (a "polite" announcement), which waits for a quiet moment in the user's own typing that, in practice, never arrived before the 2.5s indicator cleared itself. Presented to WJ as a genuine trade-off (extend the display window / make the announcement interrupt speech / leave it open), **WJ chose to make it interrupt**: the element now uses `role="alert"`, which NVDA speaks immediately even over ongoing speech. This means the criterion's "does not interrupt" guarantee now holds for the visual/interaction channel only, not for the screen-reader announcement channel — the two were not previously understood to differ, and this note records that they do. No change to the visible behaviour above; the 2.5s indicator, its styling, and its distinctness from AC-FR-18-04's alert are all unchanged.
+
 ---
 
 ### FR-19 — Must Have

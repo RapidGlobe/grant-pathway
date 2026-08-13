@@ -788,7 +788,12 @@ export function ApplicationStep4Draft({
       <div className="sticky top-16 z-10 -mx-4 mb-6 border-b border-[#E2E8F0] bg-white px-4 py-3 shadow-sm sm:-mx-6 sm:px-6">
         <div className="mx-auto max-w-[960px]">
           <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-[13px] text-[#64748B]">
+            {/* GAP-89: this text is always mounted and only its count changes,
+                so role="status" is the reliable case (GAP-68's shape) — the
+                adjacent role="progressbar" doesn't announce its own value
+                change unless focused, so this is what actually conveys the
+                approval count updating to NVDA. */}
+            <span className="text-[13px] text-[#64748B]" role="status">
               {approvedCount} of {questions.length}{' '}
               {approvedCount === 1 ? itemLabel : itemLabelPlural} approved
             </span>
@@ -802,22 +807,34 @@ export function ApplicationStep4Draft({
               alongside "Saving…" because that is where the user already looks
               for save state, and being sticky means it cannot be scrolled past
               while they carry on typing into an answer that is not persisting.
-              role="alert" so it is announced immediately rather than politely. */}
-          {saveError && (
-            <div
-              role="alert"
-              className="mb-1.5 rounded-md border border-[#DC2626] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#991B1B]"
-            >
-              <span className="font-semibold">Not saved.</span> {saveError}{' '}
-              <button
-                type="button"
-                onClick={() => window.location.reload()}
-                className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:outline-none"
-              >
-                Reload now
-              </button>
-            </div>
-          )}
+              role="alert" so it is announced immediately rather than politely.
+              GAP-88: live NVDA testing found this silent despite role="alert"
+              — the user had usually already moved focus on (blur, then tab to
+              the next control) by the time the async save failure resolved.
+              Kept always mounted (sr-only when inactive), the same fix already
+              proven for role="status" elsewhere in this codebase, as the
+              first thing to try before anything more invasive. */}
+          <div
+            role="alert"
+            className={
+              saveError
+                ? 'mb-1.5 rounded-md border border-[#DC2626] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#991B1B]'
+                : 'sr-only'
+            }
+          >
+            {saveError && (
+              <>
+                <span className="font-semibold">Not saved.</span> {saveError}{' '}
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  className="font-semibold underline underline-offset-2 hover:no-underline focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:outline-none"
+                >
+                  Reload now
+                </button>
+              </>
+            )}
+          </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
             <div
               className="h-full rounded-full bg-[#0D6E6E] transition-all duration-300"
@@ -1134,10 +1151,16 @@ export function ApplicationStep4Draft({
                   narrative-only, since governance items carry no limit.
                   Deliberately teal and iconographic against the red "Not
                   saved." alert above: a failure is something to act on, a
-                  success is something to notice and forget. */}
+                  success is something to notice and forget.
+                  role="alert" (GAP-87): this was originally role="status"
+                  (polite, non-interrupting), but live NVDA testing found it
+                  effectively inaudible — the 2.5s window closes before a
+                  "polite" announcement gets a quiet moment while the user is
+                  still typing or has moved focus on. WJ's decision: trade
+                  the "must not interrupt" goal for actually being heard. */}
               <div className="mt-1 flex items-center justify-between gap-3">
                 <span
-                  role="status"
+                  role="alert"
                   className="flex items-center gap-1 text-[12px] font-medium text-[#0D6E6E]"
                 >
                   {recentlySaved[q.id] && (

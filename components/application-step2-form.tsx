@@ -74,6 +74,12 @@ export function ApplicationStep2Form({
   showLargeWarning = false,
 }: ApplicationStep2FormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  // Focus target for when the dropzone (role="button", the element that had
+  // focus when the file picker opened) unmounts the instant upload starts —
+  // without this, focus is orphaned and NVDA announces "unknown" (GAP-85).
+  // This wrapper persists across all upload states, so focus stays put while
+  // its children swap.
+  const uploadRegionRef = useRef<HTMLDivElement>(null)
 
   const [uploadState, setUploadState] = useState<UploadState>('idle')
   const [uploadError, setUploadError] = useState<UploadError>(initialError)
@@ -125,6 +131,9 @@ export function ApplicationStep2Form({
     setUploadedFileName(file.name)
     setUploadProgress(0)
     setUploadState('uploading')
+    // Move focus onto the persistent wrapper before the dropzone (which
+    // currently has focus) unmounts — see uploadRegionRef's declaration.
+    uploadRegionRef.current?.focus()
 
     try {
       // Step 1: Get signed upload URL
@@ -248,7 +257,7 @@ export function ApplicationStep2Form({
       </ContextualTooltip>
 
       {/* ── File upload area ── */}
-      <div className="mb-4">
+      <div ref={uploadRegionRef} tabIndex={-1} className="mb-4 outline-none">
         {/* Idle — dropzone */}
         {uploadState === 'idle' && !uploadError && !guidelinesRestored && (
           <div
@@ -280,7 +289,7 @@ export function ApplicationStep2Form({
                 Drag and drop your document here, or{' '}
                 <span className="text-[#0D6E6E] underline">click to browse</span>
               </p>
-              <p className="mt-1 text-[13px] text-[#64748B]">PDF or Word (.docx) · max 10MB</p>
+              <p className="mt-1 text-[13px] text-[#475569]">PDF or Word (.docx) · max 10MB</p>
             </div>
           </div>
         )}
@@ -303,7 +312,9 @@ export function ApplicationStep2Form({
                 aria-label="Upload progress"
               />
             </div>
-            <p className="mt-2 text-[12px] text-[#64748B]">Uploading…</p>
+            <p role="status" className="mt-2 text-[12px] text-[#64748B]">
+              Uploading…
+            </p>
           </div>
         )}
 
@@ -323,49 +334,58 @@ export function ApplicationStep2Form({
                 aria-label="Processing document"
               />
             </div>
-            <p className="mt-2 text-[12px] text-[#64748B]">Processing document…</p>
+            <p role="status" className="mt-2 text-[12px] text-[#64748B]">
+              Processing document…
+            </p>
           </div>
         )}
 
-        {/* Uploaded — success */}
-        {uploadState === 'uploaded' && (
-          <div
-            role="status"
-            className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white p-4"
-          >
-            <FileText className="h-5 w-5 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
-            <span className="flex-1 truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
-            <button
-              type="button"
-              onClick={handleRemove}
-              aria-label={`Remove ${uploadedFileName}`}
-              className="rounded text-[#64748B] transition-colors hover:text-[#DC2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706]"
-            >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
-        )}
-
-        {/* Session restored — guidelines loaded from this session */}
-        {guidelinesRestored && uploadState === 'idle' && !uploadError && (
-          <div
-            role="status"
-            className="flex items-center gap-3 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4"
-          >
-            <FileText className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
-            <span className="flex-1 text-[14px] text-[#15803D]">
-              Guidelines loaded from this session
-            </span>
-            <button
-              type="button"
-              onClick={handleRemove}
-              aria-label="Remove guidelines and upload a different document"
-              className="rounded text-[#64748B] transition-colors hover:text-[#DC2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706]"
-            >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
-        )}
+        {/* Uploaded success / session-restored banner (GAP-86): this
+            role="status" element stays mounted at all times (only its
+            visible class and inner content toggle) so NVDA is already
+            watching it — a freshly inserted role="status" node is not
+            reliably announced, same issue as GAP-67/68/71/84. */}
+        <div
+          role="status"
+          className={
+            uploadState === 'uploaded'
+              ? 'flex items-center gap-3 rounded-xl border border-[#E2E8F0] bg-white p-4'
+              : guidelinesRestored && uploadState === 'idle' && !uploadError
+                ? 'flex items-center gap-3 rounded-xl border border-[#DCFCE7] bg-[#F0FDF4] p-4'
+                : 'sr-only'
+          }
+        >
+          {uploadState === 'uploaded' && (
+            <>
+              <FileText className="h-5 w-5 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
+              <span className="flex-1 truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
+              <button
+                type="button"
+                onClick={handleRemove}
+                aria-label={`Remove ${uploadedFileName}`}
+                className="rounded text-[#64748B] transition-colors hover:text-[#DC2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706]"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </>
+          )}
+          {guidelinesRestored && uploadState === 'idle' && !uploadError && (
+            <>
+              <FileText className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
+              <span className="flex-1 text-[14px] text-[#15803D]">
+                Guidelines loaded from this session
+              </span>
+              <button
+                type="button"
+                onClick={handleRemove}
+                aria-label="Remove guidelines and upload a different document"
+                className="rounded text-[#64748B] transition-colors hover:text-[#DC2626] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706]"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </>
+          )}
+        </div>
 
         {/* Upload error */}
         {uploadError && (
