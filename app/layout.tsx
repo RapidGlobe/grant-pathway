@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { headers } from 'next/headers'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import AxeProvider from '@/components/axe-provider'
+import { MobileViewportBanner } from '@/components/mobile-viewport-banner'
 import { SITE_URL } from '@/lib/site-url'
 import './globals.css'
 
@@ -46,7 +47,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <TooltipProvider>{children}</TooltipProvider>
+        <MobileViewportBanner />
+        <div className="hidden md:flex md:flex-1 md:flex-col">
+          <TooltipProvider>{children}</TooltipProvider>
+        </div>
         <AxeProvider />
       </body>
     </html>

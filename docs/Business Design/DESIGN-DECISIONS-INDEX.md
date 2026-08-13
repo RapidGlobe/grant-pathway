@@ -10,9 +10,9 @@ Decisions are grouped by category and should be worked through in the order show
 
 | Status  | Count |
 | ------- | ----- |
-| Decided | 14    |
+| Decided | 15    |
 | Pending | 0     |
-| Total   | 14    |
+| Total   | 15    |
 
 ---
 
@@ -58,6 +58,7 @@ Decisions are grouped by category and should be worked through in the order show
 | DDR-CS-004 | Step Indicator Visual Design            | Decided |
 | DDR-CS-005 | Loading State During AI Generation      | Decided |
 | DDR-CS-006 | Empty State Treatment                   | Decided |
+| DDR-CS-007 | Mobile Viewport Banner                  | Decided |
 
 **Note:** DDR-CS-004 (step indicator) is related to DDR-LA-001. A vertical sidebar stepper (Option E in DDR-CS-004) is only viable if a sidebar layout is chosen in DDR-LA-001.
 
@@ -97,5 +98,5 @@ Decisions are grouped by category and should be worked through in the order show
 
 ---
 
-_Last updated: 2026-04-17_
-_Status: 0 of 14 decisions resolved_
+_Last updated: 2026-08-13_
+_Status: 15 of 15 decisions resolved_
