@@ -14,24 +14,24 @@ export function LegalDocument({ markdown }: { markdown: string }) {
         remarkPlugins={[remarkGfm]}
         components={{
           h1: ({ children }) => (
-            <h1 className="text-[28px] font-bold leading-tight text-[#1E293B]">{children}</h1>
+            <h1 className="text-[1.75rem] font-bold leading-tight text-[#1E293B]">{children}</h1>
           ),
           h2: ({ children }) => (
-            <h2 className="mt-10 mb-3 text-[20px] font-semibold text-[#1E293B]">{children}</h2>
+            <h2 className="mt-10 mb-3 text-[1.25rem] font-semibold text-[#1E293B]">{children}</h2>
           ),
           h3: ({ children }) => (
-            <h3 className="mt-6 mb-2 text-[16px] font-semibold text-[#1E293B]">{children}</h3>
+            <h3 className="mt-6 mb-2 text-[1rem] font-semibold text-[#1E293B]">{children}</h3>
           ),
           p: ({ children }) => (
-            <p className="mt-3 text-[15px] leading-relaxed text-[#334155]">{children}</p>
+            <p className="mt-3 text-[0.9375rem] leading-relaxed text-[#334155]">{children}</p>
           ),
           ul: ({ children }) => (
-            <ul className="mt-3 list-disc space-y-1.5 pl-6 text-[15px] leading-relaxed text-[#334155]">
+            <ul className="mt-3 list-disc space-y-1.5 pl-6 text-[0.9375rem] leading-relaxed text-[#334155]">
               {children}
             </ul>
           ),
           ol: ({ children }) => (
-            <ol className="mt-3 list-decimal space-y-1.5 pl-6 text-[15px] leading-relaxed text-[#334155]">
+            <ol className="mt-3 list-decimal space-y-1.5 pl-6 text-[0.9375rem] leading-relaxed text-[#334155]">
               {children}
             </ol>
           ),
@@ -53,7 +53,7 @@ export function LegalDocument({ markdown }: { markdown: string }) {
           hr: () => <hr className="my-8 border-[#EDE8E1]" />,
           table: ({ children }) => (
             <div className="mt-3 overflow-x-auto">
-              <table className="w-full border-collapse text-[14px]">{children}</table>
+              <table className="w-full border-collapse text-[0.875rem]">{children}</table>
             </div>
           ),
           // GFM requires a header row, so headerless tables in the source

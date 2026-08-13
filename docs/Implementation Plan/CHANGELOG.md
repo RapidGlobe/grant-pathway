@@ -10,7 +10,19 @@
 
 ---
 
-## 2026-08-13 (latest) — AC-09 (NVDA, live regions and status announcements) run live and marked Pass — six GAPs found and fixed
+## 2026-08-13 (latest) — `GAP-79` built: `text-[Npx]` → `rem` conversion, closing AC-15's sole open gap — all 15 accessibility cases now Pass
+
+`GAP-79` (decided 2026-08-12, deferred to this session) is now built: all 384 `text-[Npx]` font-size instances across 30 component/page files converted to `rem`, so text responds to the browser's font-size preference as `design-requirements.md` §8.6 requires. Scope was re-verified against the live codebase before building — still exactly 384 instances, 30 files, 11 distinct pixel values, matching the 2026-08-12 estimate.
+
+An 11-row lookup table (`11px→0.6875rem` through `28px→1.75rem`) was derived against the app's unmodified 16px root, so every conversion is an exact fraction, not a rounded approximation. A one-off script substituted every instance mechanically. **Arbitrary `rem` values were used deliberately, not Tailwind's named scale classes** (`text-sm` etc.) — each named class carries its own paired `line-height`, which would have silently overridden the `leading-*` classes already set correctly and independently throughout the app. This kept the change to `font-size` alone, with zero visual regression at the default root size. `type-check`, `lint --max-warnings 0` and all 266 tests pass — no logic touched, pure className strings.
+
+**Live-verified by reusing AC-15's own repro** — the same check that found the bug: doubling the root element's font size directly (the actual mechanism a browser font-size preference uses) on `/` and `/register`. Previously-inert `px` text now scales correctly (e.g. a `0.875rem` link went 14px → 28px); resetting to the default confirmed zero visual regression.
+
+`IMPLEMENTATION-PLAN.md` P5.3b item 6 marked built, `accessibility-test-plan.md` → v1.35 (AC-15 Fail → Pass), `ADR-TRACEABILITY.md` → v2.60 (`GAP-79` row 🟡 Tasked only → 🟢 Built). **AC-01 through AC-15 now all Pass — every accessibility case in this plan is complete.** This does **not** move `TEST-DASHBOARD.md`'s `accessibility-test-plan.md` row to 🟢, however: the plan's own "Known dependency" note explicitly bars a 🟢 mark while `GAP-05` (the below-768px mobile viewport banner, still 🟡 Tasked only, unbuilt) is open, since AC-11 and AC-15 both touch the small-viewport path it gates. Both cases already handled this correctly by carving that specific sub-check out of scope rather than blocking their own Pass on it — but the plan-level colour itself stays 🟡 until `GAP-05` is built and that sub-check can genuinely run.
+
+**Two stale rows in `accessibility-test-plan.md`'s Test Results Summary table were also found and fixed in passing**, while updating AC-15's own row: AC-01 still read ❌ Fail there despite its own dedicated Result line recording Pass since 2026-08-09 — the same table-drift pattern already caught for AC-10 through AC-14 (v1.29) and AC-02 through AC-07 (v1.33).
+
+## 2026-08-13 (earlier) — AC-09 (NVDA, live regions and status announcements) run live and marked Pass — six GAPs found and fixed
 
 WJ drove NVDA live through all six of AC-09's steps, using NVDA's Speech Viewer for verbatim transcripts throughout — adopted this session after an initial dictated-transcription attempt proved unusable and unreadable. Six new gaps found and fixed, including a live confirmation of a suspicion `GAP-71` had explicitly deferred rather than assumed.
 

@@ -73,7 +73,7 @@ export function RegisterForm() {
 
   return (
     <div className="w-full max-w-[400px]">
-      <h1 className="mb-8 text-center text-[22px] font-bold text-[#1E293B]">
+      <h1 className="mb-8 text-center text-[1.375rem] font-bold text-[#1E293B]">
         Create your free account
       </h1>
 
@@ -84,7 +84,7 @@ export function RegisterForm() {
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             An account with this email address already exists.{' '}
             <Link
               href="/"
@@ -103,7 +103,7 @@ export function RegisterForm() {
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Your password must be at least 12 characters and include both letters and numbers.
           </p>
         </div>
@@ -116,7 +116,7 @@ export function RegisterForm() {
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Something went wrong. Please try again in a moment.
           </p>
         </div>
@@ -127,7 +127,7 @@ export function RegisterForm() {
         <div className="mb-5">
           <Label
             htmlFor="first-name"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             First name{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -144,10 +144,14 @@ export function RegisterForm() {
             aria-required="true"
             aria-invalid={!!fieldErrors.firstName || undefined}
             aria-describedby={fieldErrors.firstName ? 'first-name-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.firstName && (
-            <p id="first-name-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="first-name-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldErrors.firstName}
             </p>
           )}
@@ -157,7 +161,7 @@ export function RegisterForm() {
         <div className="mb-5">
           <Label
             htmlFor="last-name"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Last name{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -174,10 +178,10 @@ export function RegisterForm() {
             aria-required="true"
             aria-invalid={!!fieldErrors.lastName || undefined}
             aria-describedby={fieldErrors.lastName ? 'last-name-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.lastName && (
-            <p id="last-name-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="last-name-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.lastName}
             </p>
           )}
@@ -185,7 +189,10 @@ export function RegisterForm() {
 
         {/* Email address */}
         <div className="mb-5">
-          <Label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="email"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             Email address{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
@@ -201,10 +208,10 @@ export function RegisterForm() {
             aria-required="true"
             aria-invalid={!!fieldErrors.email || undefined}
             aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.email && (
-            <p id="email-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="email-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.email}
             </p>
           )}
@@ -212,7 +219,10 @@ export function RegisterForm() {
 
         {/* Password */}
         <div className="mb-5">
-          <Label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="password"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             Password{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
@@ -229,11 +239,11 @@ export function RegisterForm() {
             aria-describedby={fieldErrors.password ? 'password-error' : 'password-hint'}
           />
           {fieldErrors.password ? (
-            <p id="password-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="password-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.password}
             </p>
           ) : (
-            <p id="password-hint" className="mt-1.5 text-[13px] text-[#64748B]">
+            <p id="password-hint" className="mt-1.5 text-[0.8125rem] text-[#64748B]">
               At least 12 characters, including letters and numbers
             </p>
           )}
@@ -243,7 +253,7 @@ export function RegisterForm() {
         <div className="mb-6">
           <Label
             htmlFor="confirm-password"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Confirm password{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -264,7 +274,7 @@ export function RegisterForm() {
             <p
               id="confirm-password-error"
               role="alert"
-              className="mt-1.5 text-[13px] text-[#DC2626]"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
             >
               {fieldErrors.confirmPassword}
             </p>
@@ -286,7 +296,7 @@ export function RegisterForm() {
             />
             <Label
               htmlFor="terms"
-              className="cursor-pointer text-[14px] font-normal leading-snug text-[#1E293B]"
+              className="cursor-pointer text-[0.875rem] font-normal leading-snug text-[#1E293B]"
             >
               I have read and agree to the{' '}
               <a
@@ -309,7 +319,7 @@ export function RegisterForm() {
             </Label>
           </div>
           {fieldErrors.terms && (
-            <p id="terms-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="terms-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.terms}
             </p>
           )}
@@ -328,7 +338,7 @@ export function RegisterForm() {
             />
             <Label
               htmlFor="feedback-opt-in"
-              className="cursor-pointer text-[14px] font-normal leading-snug text-[#64748B]"
+              className="cursor-pointer text-[0.875rem] font-normal leading-snug text-[#64748B]"
             >
               I&apos;m happy to be contacted occasionally to share feedback about Grant Pathway
             </Label>
@@ -339,14 +349,14 @@ export function RegisterForm() {
         <Button
           type="submit"
           disabled={isPending}
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+          className="h-10 w-full bg-[#0D6E6E] text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
           {isPending ? 'Creating account…' : 'Create account'}
         </Button>
       </form>
 
       {/* Sign in prompt */}
-      <p className="mt-6 text-center text-[14px] text-[#64748B]">
+      <p className="mt-6 text-center text-[0.875rem] text-[#64748B]">
         Already have an account?{' '}
         <Link href="/" className="font-medium text-[#0D6E6E] hover:underline">
           Sign in

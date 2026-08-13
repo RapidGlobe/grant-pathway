@@ -16,13 +16,13 @@ export function FormErrorSummary({ errors }: FormErrorSummaryProps) {
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
         <div>
-          <p id="form-error-heading" className="text-[14px] font-semibold text-[#991B1B]">
+          <p id="form-error-heading" className="text-[0.875rem] font-semibold text-[#991B1B]">
             There {errors.length === 1 ? 'is' : 'are'} {errors.length}{' '}
             {errors.length === 1 ? 'error' : 'errors'} in this form
           </p>
           <ul className="mt-2 space-y-1">
             {errors.map(({ field, fieldId, message }) => (
-              <li key={fieldId} className="text-[13px] text-[#991B1B]">
+              <li key={fieldId} className="text-[0.8125rem] text-[#991B1B]">
                 <a
                   href={`#${fieldId}`}
                   className="underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"

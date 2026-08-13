@@ -70,11 +70,11 @@ export function ApplicationStep4PrepChecklist({
 
       <div className="mb-6 flex items-center gap-3">
         <ClipboardList className="h-6 w-6 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
-        <h1 className="text-[24px] font-bold text-[#1E293B]">Before you begin writing</h1>
+        <h1 className="text-[1.5rem] font-bold text-[#1E293B]">Before you begin writing</h1>
       </div>
 
       <div className="mb-6 rounded-xl border border-[#E2E8F0] bg-white p-6">
-        <p className="mb-4 text-[15px] text-[#374151]">
+        <p className="mb-4 text-[0.9375rem] text-[#374151]">
           The financial sections of this application cannot be completed by AI. Before you start,
           gather:
         </p>
@@ -89,7 +89,7 @@ export function ApplicationStep4PrepChecklist({
 
         {supportingDocuments.length > 0 && (
           <>
-            <p className="mb-4 text-[15px] text-[#374151]">
+            <p className="mb-4 text-[0.9375rem] text-[#374151]">
               {funderName || 'This funder'} also asks you to submit:
             </p>
             <ul className="mb-5 space-y-3">
@@ -104,7 +104,7 @@ export function ApplicationStep4PrepChecklist({
 
         <div className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
+          <p className="text-[0.8125rem] text-[#78350F]">
             It is worth involving a senior colleague — such as your CEO, treasurer, or a trustee —
             before reaching the financial questions.
           </p>
@@ -114,7 +114,7 @@ export function ApplicationStep4PrepChecklist({
       {serverError && (
         <p
           role="alert"
-          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[0.8125rem] text-[#DC2626]"
         >
           {serverError}
         </p>
@@ -123,7 +123,7 @@ export function ApplicationStep4PrepChecklist({
       <div className="flex items-center justify-between">
         <Link
           href={`/applications/${applicationId}/step/3`}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Back
         </Link>
@@ -131,7 +131,7 @@ export function ApplicationStep4PrepChecklist({
           type="button"
           onClick={handleStart}
           disabled={isPending}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
+          className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
         >
           {isPending ? 'Saving…' : 'I have what I need — start writing'}
         </Button>
@@ -144,12 +144,12 @@ function ChecklistItem({ index, children }: { index: number; children: React.Rea
   return (
     <li className="flex items-start gap-3">
       <span
-        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#0D6E6E] text-[11px] font-bold text-[#0D6E6E]"
+        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#0D6E6E] text-[0.6875rem] font-bold text-[#0D6E6E]"
         aria-hidden="true"
       >
         {index}
       </span>
-      <span className="text-[14px] text-[#374151]">{children}</span>
+      <span className="text-[0.875rem] text-[#374151]">{children}</span>
     </li>
   )
 }

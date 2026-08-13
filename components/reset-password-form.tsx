@@ -40,15 +40,15 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">This link has expired</h1>
+        <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">This link has expired</h1>
 
-        <p className="mb-8 text-[15px] text-[#64748B]">
+        <p className="mb-8 text-[0.9375rem] text-[#64748B]">
           Your reset link is no longer valid. Please request a new one.
         </p>
 
         <Link
           href="/forgot-password"
-          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
         >
           Request a new link
         </Link>
@@ -66,13 +66,13 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Password updated</h1>
+        <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">Password updated</h1>
 
-        <p className="mb-8 text-[15px] text-[#64748B]">Your password has been updated.</p>
+        <p className="mb-8 text-[0.9375rem] text-[#64748B]">Your password has been updated.</p>
 
         <Link
           href="/"
-          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
         >
           Sign in
         </Link>
@@ -108,7 +108,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
   // ── Reset form ────────────────────────────────────────────────────────────
   return (
     <div className="w-full max-w-[400px]">
-      <h1 className="mb-8 text-[22px] font-bold text-[#1E293B]">Choose a new password</h1>
+      <h1 className="mb-8 text-[1.375rem] font-bold text-[#1E293B]">Choose a new password</h1>
 
       {/* Same password error */}
       {state.status === 'same_password' && (
@@ -117,7 +117,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Your new password must be different from your current password. Please choose a
             different one.
           </p>
@@ -131,7 +131,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Your password must be at least 12 characters and include both letters and numbers.
           </p>
         </div>
@@ -144,7 +144,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">Something went wrong. Please try again.</p>
+          <p className="text-[0.875rem] text-[#991B1B]">Something went wrong. Please try again.</p>
         </div>
       )}
 
@@ -153,7 +153,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
         <div className="mb-5">
           <Label
             htmlFor="new-password"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             New password{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -171,11 +171,15 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             aria-describedby={fieldErrors.password ? 'new-password-error' : 'new-password-hint'}
           />
           {fieldErrors.password ? (
-            <p id="new-password-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="new-password-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldErrors.password}
             </p>
           ) : (
-            <p id="new-password-hint" className="mt-1.5 text-[13px] text-[#64748B]">
+            <p id="new-password-hint" className="mt-1.5 text-[0.8125rem] text-[#64748B]">
               At least 12 characters, including letters and numbers
             </p>
           )}
@@ -185,7 +189,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
         <div className="mb-6">
           <Label
             htmlFor="confirm-new-password"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Confirm new password{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -208,7 +212,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
             <p
               id="confirm-new-password-error"
               role="alert"
-              className="mt-1.5 text-[13px] text-[#DC2626]"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
             >
               {fieldErrors.confirmPassword}
             </p>
@@ -218,7 +222,7 @@ export function ResetPasswordForm({ isExpired = false }: ResetPasswordFormProps)
         <Button
           type="submit"
           disabled={isPending}
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+          className="h-10 w-full bg-[#0D6E6E] text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
           {isPending ? 'Saving…' : 'Save new password'}
         </Button>

@@ -676,8 +676,8 @@ export function ApplicationStep4Draft({
     return (
       <div className="mx-auto w-full max-w-[960px] px-4 py-10 sm:px-6">
         <StepIndicator currentStep={4} />
-        <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
-        <p className="mb-8 text-[14px] text-[#64748B]">
+        <h1 className="mb-2 text-[1.5rem] font-bold text-[#1E293B]">Your draft answers</h1>
+        <p className="mb-8 text-[0.875rem] text-[#64748B]">
           No specific questions were found in the funder&apos;s guidelines. Enter your application
           question below and write your answer.
         </p>
@@ -686,7 +686,7 @@ export function ApplicationStep4Draft({
           <div>
             <Label
               htmlFor="manualQuestion"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+              className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
             >
               Application question
             </Label>
@@ -696,14 +696,14 @@ export function ApplicationStep4Draft({
               value={manualQuestion}
               onChange={(e) => setManualQuestion(e.target.value)}
               placeholder="e.g. Describe your project and who it will help."
-              className="h-10 text-[14px]"
+              className="h-10 text-[0.875rem]"
               aria-describedby={manualError ? 'manual-error' : undefined}
             />
           </div>
           <div>
             <Label
               htmlFor="manualAnswer"
-              className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+              className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
             >
               Your answer
             </Label>
@@ -713,9 +713,9 @@ export function ApplicationStep4Draft({
               value={manualAnswer}
               onChange={(e) => setManualAnswer(e.target.value)}
               placeholder="Write your answer here&hellip;"
-              className="text-[14px]"
+              className="text-[0.875rem]"
             />
-            <p className="mt-1 text-right text-[12px] text-[#64748B]">
+            <p className="mt-1 text-right text-[0.75rem] text-[#64748B]">
               {countWords(manualAnswer)} {countWords(manualAnswer) === 1 ? 'word' : 'words'}
             </p>
           </div>
@@ -728,7 +728,7 @@ export function ApplicationStep4Draft({
             className="mt-4 flex items-start gap-2 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-3"
           >
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-            <p className="text-[13px] text-[#991B1B]">{manualError}</p>
+            <p className="text-[0.8125rem] text-[#991B1B]">{manualError}</p>
           </div>
         )}
 
@@ -738,14 +738,14 @@ export function ApplicationStep4Draft({
             className="mt-4 flex items-start gap-2 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-3"
           >
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-            <p className="text-[13px] text-[#991B1B]">{manualContinueError}</p>
+            <p className="text-[0.8125rem] text-[#991B1B]">{manualContinueError}</p>
           </div>
         )}
 
         <div className="mt-8 flex items-center justify-between">
           <Link
             href={`/applications/${applicationId}/step/3`}
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+            className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Back
           </Link>
@@ -753,7 +753,7 @@ export function ApplicationStep4Draft({
             type="button"
             onClick={() => void handleManualContinue()}
             disabled={isSavingManual || isManualContinuing}
-            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+            className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
           >
             {isSavingManual || isManualContinuing ? 'Saving…' : 'Ready to assemble'}
           </Button>
@@ -770,7 +770,7 @@ export function ApplicationStep4Draft({
 
       {/* Funder context bar — Back link + funder name */}
       <div className="mb-4 flex items-center justify-between rounded-lg bg-[#0D6E6E] px-4 py-3">
-        <p className="text-[13px] font-medium text-white">
+        <p className="text-[0.8125rem] font-medium text-white">
           {funderName}
           {grantName && grantName !== funderName && (
             <span className="ml-2 font-normal opacity-80">&middot; {grantName}</span>
@@ -778,7 +778,7 @@ export function ApplicationStep4Draft({
         </p>
         <Link
           href={`/applications/${applicationId}/step/3`}
-          className="text-[13px] text-white opacity-80 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
+          className="text-[0.8125rem] text-white opacity-80 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1"
         >
           ← Back
         </Link>
@@ -793,12 +793,12 @@ export function ApplicationStep4Draft({
                 adjacent role="progressbar" doesn't announce its own value
                 change unless focused, so this is what actually conveys the
                 approval count updating to NVDA. */}
-            <span className="text-[13px] text-[#64748B]" role="status">
+            <span className="text-[0.8125rem] text-[#64748B]" role="status">
               {approvedCount} of {questions.length}{' '}
               {approvedCount === 1 ? itemLabel : itemLabelPlural} approved
             </span>
             {isSaving && (
-              <span className="text-[12px] text-[#64748B]" aria-live="polite">
+              <span className="text-[0.75rem] text-[#64748B]" aria-live="polite">
                 Saving&hellip;
               </span>
             )}
@@ -818,7 +818,7 @@ export function ApplicationStep4Draft({
             role="alert"
             className={
               saveError
-                ? 'mb-1.5 rounded-md border border-[#DC2626] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#991B1B]'
+                ? 'mb-1.5 rounded-md border border-[#DC2626] bg-[#FEF2F2] px-3 py-2 text-[0.8125rem] text-[#991B1B]'
                 : 'sr-only'
             }
           >
@@ -848,7 +848,7 @@ export function ApplicationStep4Draft({
           </div>
           {overallWordLimit != null && (
             <p
-              className={`mt-1.5 text-[14px] font-bold ${
+              className={`mt-1.5 text-[0.875rem] font-bold ${
                 combinedIsOver
                   ? 'text-[#DC2626]'
                   : combinedIsNear
@@ -865,8 +865,8 @@ export function ApplicationStep4Draft({
         </div>
       </div>
 
-      <h1 className="mb-2 text-[24px] font-bold text-[#1E293B]">Your draft answers</h1>
-      <p className="mb-6 text-[14px] text-[#64748B]">
+      <h1 className="mb-2 text-[1.5rem] font-bold text-[#1E293B]">Your draft answers</h1>
+      <p className="mb-6 text-[0.875rem] text-[#64748B]">
         {/* GAP-42/GAP-43. Two changes from the previous copy, both deliberate:
             "as you type" is gone because it was false — saving is on blur plus
             a 60-second sweep, so up to a minute of typing can be lost, which
@@ -888,7 +888,7 @@ export function ApplicationStep4Draft({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
+          <p className="text-[0.8125rem] text-[#78350F]">
             You&apos;ve used most of your monthly AI allowance. &ldquo;Help me improve this&rdquo;
             may not be available for all {itemLabelPlural}.
           </p>
@@ -900,7 +900,7 @@ export function ApplicationStep4Draft({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[13px] text-[#991B1B]">
+          <p className="text-[0.8125rem] text-[#991B1B]">
             You&apos;ve reached your monthly AI limit. You can still write and edit your answers —
             AI writing assistance is unavailable until next month.
           </p>
@@ -971,26 +971,26 @@ export function ApplicationStep4Draft({
             >
               {/* Card header */}
               <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
-                <p className="text-[15px] font-semibold leading-snug text-[#1E293B]">
+                <p className="text-[0.9375rem] font-semibold leading-snug text-[#1E293B]">
                   <span className="mr-0.5">{displayNumber}.&nbsp;</span>
                   {q.questionText}
                 </p>
                 <div className="flex max-w-full shrink-0 flex-wrap items-center gap-2">
                   {limit && (
-                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#475569]">
+                    <span className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[0.75rem] font-medium text-[#475569]">
                       {limit}&nbsp;{useChars ? 'characters' : 'words'}
                     </span>
                   )}
                   {!limit && combinedLimitQuestionIds.has(q.id) && (
                     <span
                       title={`This section shares the funder's overall ${overallWordLimit}-word limit with other sections — see the combined count near the top of the page.`}
-                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#475569]"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[0.75rem] font-medium text-[#475569]"
                     >
                       Counts toward {overallWordLimit}-word total
                     </span>
                   )}
                   {q.isBudgetQuestion && (
-                    <span className="rounded bg-[#FDE68A] px-2 py-0.5 text-[12px] font-semibold text-[#78350F]">
+                    <span className="rounded bg-[#FDE68A] px-2 py-0.5 text-[0.75rem] font-semibold text-[#78350F]">
                       Budget
                     </span>
                   )}
@@ -999,7 +999,7 @@ export function ApplicationStep4Draft({
                       type="button"
                       onClick={() => setViewingCitation(q.guidelineReference)}
                       title={citationFullLabel(q.guidelineReference)}
-                      className="flex min-w-0 max-w-full items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[12px] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
+                      className="flex min-w-0 max-w-full items-center gap-1 rounded bg-[#EFF6FF] px-2 py-0.5 text-[0.75rem] font-medium text-[#1D4ED8] hover:bg-[#DBEAFE]"
                     >
                       <FileText className="h-3 w-3 shrink-0" aria-hidden="true" />
                       <span className="truncate">{citationLabel(q.guidelineReference)}</span>
@@ -1008,13 +1008,13 @@ export function ApplicationStep4Draft({
                   {q.addedManually && (
                     <span
                       title="You added this — it wasn't found in the funder's guidelines"
-                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[12px] font-medium text-[#475569]"
+                      className="rounded bg-[#F1F5F9] px-2 py-0.5 text-[0.75rem] font-medium text-[#475569]"
                     >
                       Added by you
                     </span>
                   )}
                   {q.isCarriedOver && (
-                    <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-1 text-[13px] font-bold text-[#92400E]">
+                    <span className="flex items-center gap-1 rounded bg-[#FEF3C7] px-2 py-1 text-[0.8125rem] font-bold text-[#92400E]">
                       <History className="h-3.5 w-3.5" aria-hidden="true" />
                       Carried over — please review
                     </span>
@@ -1027,7 +1027,9 @@ export function ApplicationStep4Draft({
                     the removed "Governance and reserves" section header) */}
               {((funderType === 'free_form' && !q.isBudgetQuestion) || isGovernanceItem) &&
                 q.guidance && (
-                  <p className="mb-3 text-[13px] leading-relaxed text-[#64748B]">{q.guidance}</p>
+                  <p className="mb-3 text-[0.8125rem] leading-relaxed text-[#64748B]">
+                    {q.guidance}
+                  </p>
                 )}
 
               {/* Budget warning — first budget-type card only gets the
@@ -1044,7 +1046,7 @@ export function ApplicationStep4Draft({
                         className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
                         aria-hidden="true"
                       />
-                      <p className="text-[12px] text-[#78350F]">
+                      <p className="text-[0.75rem] text-[#78350F]">
                         {funderType === 'free_form'
                           ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
                           : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
@@ -1057,7 +1059,7 @@ export function ApplicationStep4Draft({
                       className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#B45309]"
                       aria-hidden="true"
                     />
-                    <p className="text-[12px] text-[#78350F]">
+                    <p className="text-[0.75rem] text-[#78350F]">
                       {funderType === 'free_form'
                         ? 'Budget sections must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'
                         : 'Budget questions must be completed using your own figures, as AI cannot assist you with this. Please ensure all numbers are accurate before proceeding.'}
@@ -1069,7 +1071,7 @@ export function ApplicationStep4Draft({
               {isGovernanceItem && q.itemType === 'number' && q.isBudgetQuestion && (
                 <div className="relative sm:w-60">
                   <span
-                    className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-[14px] text-[#64748B]"
+                    className="pointer-events-none absolute inset-y-0 left-2.5 flex items-center text-[0.875rem] text-[#64748B]"
                     aria-hidden="true"
                   >
                     £
@@ -1082,7 +1084,7 @@ export function ApplicationStep4Draft({
                     onChange={(e) => handleAnswerChange(q.id, e.target.value.replace(/\D/g, ''))}
                     onBlur={() => handleAnswerBlur(q.id)}
                     aria-label={q.questionText}
-                    className="h-10 pl-6 text-[14px]"
+                    className="h-10 pl-6 text-[0.875rem]"
                   />
                 </div>
               )}
@@ -1096,7 +1098,7 @@ export function ApplicationStep4Draft({
                   onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                   onBlur={() => handleAnswerBlur(q.id)}
                   aria-label={q.questionText}
-                  className="h-10 text-[14px] sm:w-60"
+                  className="h-10 text-[0.875rem] sm:w-60"
                 />
               )}
               {isGovernanceItem && q.itemType === 'data' && (
@@ -1113,7 +1115,7 @@ export function ApplicationStep4Draft({
                   onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                   onBlur={() => handleAnswerBlur(q.id)}
                   aria-label={q.questionText}
-                  className="h-10 w-full rounded-md border border-[#D1D5DB] bg-transparent px-3 text-[14px] sm:w-60"
+                  className="h-10 w-full rounded-md border border-[#D1D5DB] bg-transparent px-3 text-[0.875rem] sm:w-60"
                 >
                   <option value="Not sure yet">Not sure yet</option>
                   <option value="No">No</option>
@@ -1139,7 +1141,7 @@ export function ApplicationStep4Draft({
                       ? 'Write your content here…'
                       : 'Write your answer here…'
                   }
-                  className="text-[14px]"
+                  className="text-[0.875rem]"
                 />
               )}
 
@@ -1161,7 +1163,7 @@ export function ApplicationStep4Draft({
               <div className="mt-1 flex items-center justify-between gap-3">
                 <span
                   role="alert"
-                  className="flex items-center gap-1 text-[12px] font-medium text-[#0D6E6E]"
+                  className="flex items-center gap-1 text-[0.75rem] font-medium text-[#0D6E6E]"
                 >
                   {recentlySaved[q.id] && (
                     <>
@@ -1172,7 +1174,7 @@ export function ApplicationStep4Draft({
                 </span>
                 {!isGovernanceItem && (
                   <p
-                    className={`text-right text-[12px] ${
+                    className={`text-right text-[0.75rem] ${
                       // 12px, so all three states need 4.5:1 against both white
                       // and the amber card (#FFFBEB) this can sit inside.
                       // `isNear` was #D97706 — 3.19 on white, 3.07 on amber —
@@ -1204,7 +1206,7 @@ export function ApplicationStep4Draft({
                             type="button"
                             onClick={() => void handleRefine(q)}
                             disabled={isEmpty || limitReached || isApprovedQ}
-                            className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                            className="flex items-center gap-1.5 rounded text-[0.8125rem] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                           >
                             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                             Help me improve this
@@ -1215,7 +1217,7 @@ export function ApplicationStep4Draft({
                           type="button"
                           onClick={() => void handleRefine(q)}
                           disabled={isEmpty || limitReached || isApprovedQ}
-                          className="flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                          className="flex items-center gap-1.5 rounded text-[0.8125rem] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                         >
                           <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                           Help me improve this
@@ -1223,7 +1225,7 @@ export function ApplicationStep4Draft({
                       )}
                       {isOver && (
                         <>
-                          <p className="mt-1 text-[12px] text-[#DC2626]">
+                          <p className="mt-1 text-[0.75rem] text-[#DC2626]">
                             Your answer exceeds the funder&apos;s word limit. Please trim it or use
                             AI to bring it within the limit before approving.
                           </p>
@@ -1235,7 +1237,7 @@ export function ApplicationStep4Draft({
                             type="button"
                             onClick={() => handleTrimToLimit(q)}
                             disabled={isApprovedQ}
-                            className="mt-1 flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                            className="mt-1 flex items-center gap-1.5 rounded text-[0.8125rem] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                           >
                             <Scissors className="h-3.5 w-3.5" aria-hidden="true" />
                             Trim to limit
@@ -1246,16 +1248,16 @@ export function ApplicationStep4Draft({
                   )}
 
                   {refineState.status === 'loading' && (
-                    <p className="text-[13px] text-[#64748B]">Improving your answer&hellip;</p>
+                    <p className="text-[0.8125rem] text-[#64748B]">Improving your answer&hellip;</p>
                   )}
 
                   {refineState.status === 'error' && (
                     <div className="flex items-center gap-3">
-                      <p className="text-[13px] text-[#DC2626]">{refineState.message}</p>
+                      <p className="text-[0.8125rem] text-[#DC2626]">{refineState.message}</p>
                       <button
                         type="button"
                         onClick={() => dismissRefineError(q.id)}
-                        className="text-[13px] text-[#64748B] underline hover:no-underline"
+                        className="text-[0.8125rem] text-[#64748B] underline hover:no-underline"
                       >
                         Dismiss
                       </button>
@@ -1264,14 +1266,14 @@ export function ApplicationStep4Draft({
 
                   {refineState.status === 'showing' && (
                     <div className="mt-3 rounded-lg border border-[#BFDBFE] bg-[#EFF6FF] p-4">
-                      <p className="mb-2 text-[12px] font-semibold uppercase tracking-wide text-[#1D4ED8]">
+                      <p className="mb-2 text-[0.75rem] font-semibold uppercase tracking-wide text-[#1D4ED8]">
                         Suggested improvement
                       </p>
-                      <p className="mb-4 whitespace-pre-wrap text-[14px] leading-relaxed text-[#1E293B]">
+                      <p className="mb-4 whitespace-pre-wrap text-[0.875rem] leading-relaxed text-[#1E293B]">
                         {refineState.refinedText}
                       </p>
                       {suggestionStillOver && (
-                        <p className="mb-4 text-[12px] text-[#B45309]">
+                        <p className="mb-4 text-[0.75rem] text-[#B45309]">
                           {`This suggestion is still ${suggestionShortfall} ${useChars ? 'character' : 'word'}${suggestionShortfall === 1 ? '' : 's'} over the limit — AI can't always hit an exact ${useChars ? 'character' : 'word'} count. Check the counter and trim it further, or try again.`}
                         </p>
                       )}
@@ -1279,14 +1281,14 @@ export function ApplicationStep4Draft({
                         <Button
                           type="button"
                           onClick={() => handleUseRefined(q.id, refineState.refinedText)}
-                          className="h-8 bg-[#1D4ED8] px-4 text-[13px] font-semibold text-white hover:bg-[#1E40AF]"
+                          className="h-8 bg-[#1D4ED8] px-4 text-[0.8125rem] font-semibold text-white hover:bg-[#1E40AF]"
                         >
                           Use this improved version
                         </Button>
                         <button
                           type="button"
                           onClick={() => handleKeepOriginal(q.id)}
-                          className="text-[13px] text-[#475569] underline hover:no-underline"
+                          className="text-[0.8125rem] text-[#475569] underline hover:no-underline"
                         >
                           Keep my original
                         </button>
@@ -1303,14 +1305,14 @@ export function ApplicationStep4Draft({
                   preserving the "AI never sees financial figures" guarantee. */}
               {q.isBudgetQuestion && !isGovernanceItem && isOver && (
                 <div className="mt-3">
-                  <p className="text-[12px] text-[#DC2626]">
+                  <p className="text-[0.75rem] text-[#DC2626]">
                     {`Your answer exceeds the funder's ${useChars ? 'character' : 'word'} limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving.`}
                   </p>
                   <button
                     type="button"
                     onClick={() => handleTrimToLimit(q)}
                     disabled={isApprovedQ}
-                    className="mt-1 flex items-center gap-1.5 rounded text-[13px] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
+                    className="mt-1 flex items-center gap-1.5 rounded text-[0.8125rem] text-[#0D6E6E] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-40 disabled:no-underline"
                   >
                     <Scissors className="h-3.5 w-3.5" aria-hidden="true" />
                     Trim to limit
@@ -1328,25 +1330,25 @@ export function ApplicationStep4Draft({
                 !isApprovedQ &&
                 refineState.status !== 'showing' && (
                   <div className="mt-5 rounded-lg border border-[#CBD5E1] bg-[#F8FAFC] p-4">
-                    <p className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#475569]">
+                    <p className="mb-3 text-[0.75rem] font-semibold uppercase tracking-wide text-[#475569]">
                       Before you approve, check:
                     </p>
                     <ul className="mb-4 space-y-2">
-                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                      <li className="flex items-start gap-2 text-[0.8125rem] text-[#1E293B]">
                         <CheckCircle2
                           className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
                           aria-hidden="true"
                         />
                         Does this accurately describe your charity and project?
                       </li>
-                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                      <li className="flex items-start gap-2 text-[0.8125rem] text-[#1E293B]">
                         <CheckCircle2
                           className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
                           aria-hidden="true"
                         />
                         Are all figures, dates, and facts correct?
                       </li>
-                      <li className="flex items-start gap-2 text-[13px] text-[#1E293B]">
+                      <li className="flex items-start gap-2 text-[0.8125rem] text-[#1E293B]">
                         <CheckCircle2
                           className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]"
                           aria-hidden="true"
@@ -1355,7 +1357,7 @@ export function ApplicationStep4Draft({
                       </li>
                     </ul>
                     {approveError && (
-                      <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
+                      <p className="mb-3 text-[0.8125rem] text-[#DC2626]" role="alert">
                         {approveError}
                       </p>
                     )}
@@ -1363,7 +1365,7 @@ export function ApplicationStep4Draft({
                       type="button"
                       onClick={() => void handleApprove(q.id)}
                       disabled={isApprovingQ}
-                      className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+                      className="h-9 bg-[#0D6E6E] px-5 text-[0.8125rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
                     >
                       {isApprovingQ ? 'Approving…' : 'Approve this answer'}
                     </Button>
@@ -1381,7 +1383,7 @@ export function ApplicationStep4Draft({
                 {isApprovedQ && (
                   <>
                     <CheckCheck className="h-4 w-4 text-[#059669]" aria-hidden="true" />
-                    <span className="text-[13px] font-medium text-[#065F46]">
+                    <span className="text-[0.8125rem] font-medium text-[#065F46]">
                       Answer approved — edit above to revise
                     </span>
                   </>
@@ -1402,7 +1404,7 @@ export function ApplicationStep4Draft({
               <button
                 type="button"
                 onClick={() => setShowManualAddPanel(true)}
-                className="text-[13px] text-[#64748B] underline-offset-2 hover:text-[#1E293B] hover:underline"
+                className="text-[0.8125rem] text-[#64748B] underline-offset-2 hover:text-[#1E293B] hover:underline"
               >
                 Need to add something about your finances or governance that wasn&apos;t asked
                 above? Add it.
@@ -1410,14 +1412,14 @@ export function ApplicationStep4Draft({
             </ContextualTooltip>
           ) : (
             <div className="rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
-              <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+              <p className="mb-3 text-[0.875rem] font-medium text-[#1E293B]">
                 Add a financial or governance detail
               </p>
               <div className="mb-4 space-y-3">
                 {missingGovernanceItems.map((item) => (
                   <label
                     key={item.field_key}
-                    className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]"
+                    className="flex cursor-pointer items-start gap-2 text-[0.8125rem] text-[#334155]"
                   >
                     <input
                       type="checkbox"
@@ -1438,7 +1440,7 @@ export function ApplicationStep4Draft({
                 ))}
               </div>
               {manualAddError && (
-                <p className="mb-3 text-[13px] text-[#DC2626]" role="alert">
+                <p className="mb-3 text-[0.8125rem] text-[#DC2626]" role="alert">
                   {manualAddError}
                 </p>
               )}
@@ -1447,7 +1449,7 @@ export function ApplicationStep4Draft({
                   type="button"
                   onClick={() => void handleAddManualGovernanceItems()}
                   disabled={isSavingManualAdd}
-                  className="h-9 bg-[#0D6E6E] px-5 text-[13px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+                  className="h-9 bg-[#0D6E6E] px-5 text-[0.8125rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
                 >
                   {isSavingManualAdd ? 'Adding…' : 'Add selected'}
                 </Button>
@@ -1458,7 +1460,7 @@ export function ApplicationStep4Draft({
                     setSelectedManualFieldKeys(new Set())
                     setManualAddError(null)
                   }}
-                  className="text-[13px] text-[#64748B] hover:text-[#1E293B]"
+                  className="text-[0.8125rem] text-[#64748B] hover:text-[#1E293B]"
                 >
                   Cancel
                 </button>
@@ -1475,7 +1477,7 @@ export function ApplicationStep4Draft({
           className="mb-6 flex items-start gap-2 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-3"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[13px] text-[#991B1B]">{assembleError}</p>
+          <p className="text-[0.8125rem] text-[#991B1B]">{assembleError}</p>
         </div>
       )}
 
@@ -1483,7 +1485,7 @@ export function ApplicationStep4Draft({
       <div className="flex items-center justify-between">
         <Link
           href={`/applications/${applicationId}/step/3`}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Back
         </Link>
@@ -1495,7 +1497,7 @@ export function ApplicationStep4Draft({
             type="button"
             onClick={handleReadyToAssemble}
             disabled={!allApproved || isAssembling}
-            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+            className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
           >
             {isAssembling ? 'Saving…' : 'Ready to assemble'}
           </Button>
@@ -1567,7 +1569,7 @@ function GuidelineTextPanel({
       role="region"
       aria-label={`Original guideline text — ${label}`}
     >
-      <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-[#334155]">
+      <p className="whitespace-pre-wrap text-[0.8125rem] leading-relaxed text-[#334155]">
         {before}
         {match && (
           <mark ref={highlightRef} className="rounded bg-[#FDE68A] px-0.5 text-[#78350F]">

@@ -298,7 +298,7 @@ export function ApplicationStep3Summary({
           className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[14px] text-[#78350F]">
+          <p className="text-[0.875rem] text-[#78350F]">
             Your guidelines document is no longer available. Please go back to Step 2 and upload or
             paste your guidelines again.
           </p>
@@ -306,7 +306,7 @@ export function ApplicationStep3Summary({
         <div className="mt-6">
           <Link
             href={`/applications/${applicationId}/step/2`}
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+            className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Back to Step 2
           </Link>
@@ -321,7 +321,7 @@ export function ApplicationStep3Summary({
       <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
         <StepIndicator currentStep={3} />
         <div className="rounded-xl border border-[#E2E8F0] bg-white p-8">
-          <p role="status" className="mb-4 text-[15px] font-medium text-[#1E293B]">
+          <p role="status" className="mb-4 text-[0.9375rem] font-medium text-[#1E293B]">
             {loadingMessage}
           </p>
           <div className="h-2 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
@@ -351,14 +351,14 @@ export function ApplicationStep3Summary({
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
           <div>
-            <p className="text-[14px] text-[#991B1B]">
+            <p className="text-[0.875rem] text-[#991B1B]">
               We couldn&apos;t generate your summary right now. This is usually temporary — please
               try again.
             </p>
             <Button
               type="button"
               onClick={handleTryAgain}
-              className="mt-3 h-9 bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white hover:bg-[#0A5A5A]"
+              className="mt-3 h-9 bg-[#0D6E6E] px-4 text-[0.875rem] font-semibold text-white hover:bg-[#0A5A5A]"
             >
               Try again
             </Button>
@@ -367,7 +367,7 @@ export function ApplicationStep3Summary({
         <div className="mt-6">
           <Link
             href={`/applications/${applicationId}/step/2`}
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+            className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Back
           </Link>
@@ -391,11 +391,11 @@ export function ApplicationStep3Summary({
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
           <div>
-            <p className="text-[14px] text-[#991B1B]">
+            <p className="text-[0.875rem] text-[#991B1B]">
               {tooLongMessage ??
                 'These guidelines contain more than we can summarise in one go. This is a limit on our side, not a problem with your document — please contact support so we can raise it.'}
             </p>
-            <p className="mt-2 text-[14px] text-[#991B1B]">
+            <p className="mt-2 text-[0.875rem] text-[#991B1B]">
               Your guidelines are saved. Nothing you have entered has been lost.
             </p>
           </div>
@@ -403,7 +403,7 @@ export function ApplicationStep3Summary({
         <div className="mt-6">
           <Link
             href={`/applications/${applicationId}/step/2`}
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 focus-visible:outline-none"
+            className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 focus-visible:outline-none"
           >
             Back
           </Link>
@@ -422,14 +422,14 @@ export function ApplicationStep3Summary({
           className="flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             If this keeps happening, please try again later. Your work has been saved.
           </p>
         </div>
         <div className="mt-6">
           <Link
             href={`/applications/${applicationId}/step/2`}
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+            className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Back
           </Link>
@@ -452,12 +452,12 @@ export function ApplicationStep3Summary({
         <div role="alert" className="rounded-xl border border-[#FCA5A5] bg-[#FEF2F2] p-6">
           <div className="mb-4 flex items-start gap-3">
             <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
-            <h1 className="text-[16px] font-semibold text-[#991B1B]">
+            <h1 className="text-[1rem] font-semibold text-[#991B1B]">
               Eligibility mismatch — this application cannot proceed
             </h1>
           </div>
-          <p className="mb-4 text-[14px] text-[#991B1B]">{reason}</p>
-          <p className="mb-6 text-[14px] text-[#991B1B]">
+          <p className="mb-4 text-[0.875rem] text-[#991B1B]">{reason}</p>
+          <p className="mb-6 text-[0.875rem] text-[#991B1B]">
             To apply for this grant, your charity profile must accurately reflect work that aligns
             with this funder&apos;s eligibility criteria. Please update your charity profile and
             start a new application.
@@ -466,7 +466,7 @@ export function ApplicationStep3Summary({
             type="button"
             disabled={isContinuing}
             onClick={handleAcknowledgeMismatch}
-            className="h-10 bg-[#DC2626] px-6 text-[15px] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-70"
+            className="h-10 bg-[#DC2626] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-70"
           >
             {isContinuing ? 'Saving…' : 'I understand — return to my dashboard'}
           </Button>
@@ -487,19 +487,21 @@ export function ApplicationStep3Summary({
       <ContextualTooltip content="This is an AI-generated summary of the funder's guidelines — check it looks right before continuing. You can regenerate it if anything looks off.">
         <h1
           tabIndex={0}
-          className="mb-1 rounded text-[24px] font-bold text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="mb-1 rounded text-[1.5rem] font-bold text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Your funder guidelines — summary
         </h1>
       </ContextualTooltip>
-      <p className="mb-1 text-[14px] font-medium text-[#0D6E6E]">
+      <p className="mb-1 text-[0.875rem] font-medium text-[#0D6E6E]">
         {funderName}
         {grantName && grantName !== funderName && (
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
         )}
       </p>
       {guidelinesFilename && (
-        <p className="mb-6 text-[13px] text-[#64748B]">Guidelines loaded: {guidelinesFilename}</p>
+        <p className="mb-6 text-[0.8125rem] text-[#64748B]">
+          Guidelines loaded: {guidelinesFilename}
+        </p>
       )}
       {!guidelinesFilename && <div className="mb-6" />}
 
@@ -510,7 +512,7 @@ export function ApplicationStep3Summary({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
+          <p className="text-[0.8125rem] text-[#78350F]">
             {formSectionPrioritized ? (
               <>
                 Your guidelines document is very large and was partially summarised. We identified
@@ -537,7 +539,7 @@ export function ApplicationStep3Summary({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
+          <p className="text-[0.8125rem] text-[#78350F]">
             You&apos;re approaching your monthly AI request limit. You have a limited number of
             requests remaining this month — use Regenerate sparingly.
           </p>
@@ -549,7 +551,7 @@ export function ApplicationStep3Summary({
         {/* About this grant — full width */}
         <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 md:col-span-2">
           <CardTitle>About this grant</CardTitle>
-          <p className="text-[14px] text-[#374151]">{summary.aboutGrant}</p>
+          <p className="text-[0.875rem] text-[#374151]">{summary.aboutGrant}</p>
         </div>
 
         {/* Grant amount — half width if Who can apply exists, full width otherwise */}
@@ -557,7 +559,7 @@ export function ApplicationStep3Summary({
           className={`rounded-xl border border-[#E2E8F0] bg-white p-5${!(summary.whoCanApply?.length > 0) ? ' md:col-span-2' : ''}`}
         >
           <CardTitle>Grant amount</CardTitle>
-          <p className="text-[14px] text-[#374151]">{summary.amount}</p>
+          <p className="text-[0.875rem] text-[#374151]">{summary.amount}</p>
         </div>
 
         {/* Who can apply — half width (conditional) */}
@@ -583,7 +585,7 @@ export function ApplicationStep3Summary({
             <div className="space-y-2">
               {summary.questions.map((q) => (
                 <div key={q.number}>
-                  <p className="text-[14px] text-[#374151]">
+                  <p className="text-[0.875rem] text-[#374151]">
                     <span className="font-medium">{q.number}.</span> {q.text}
                     {q.wordLimit && <span className="text-[#64748B]"> ({q.wordLimit} words)</span>}
                   </p>
@@ -600,7 +602,7 @@ export function ApplicationStep3Summary({
             <div className="space-y-2">
               {summary.sections.map((s) => (
                 <div key={s.number}>
-                  <p className="text-[14px] text-[#374151]">
+                  <p className="text-[0.875rem] text-[#374151]">
                     <span className="font-medium">{s.number}.</span> {s.title}
                     {s.wordLimit && <span className="text-[#64748B]"> ({s.wordLimit} words)</span>}
                   </p>
@@ -629,12 +631,12 @@ export function ApplicationStep3Summary({
       {questionsFound ? (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-4">
           <span
-            className="mt-0.5 h-4 w-4 shrink-0 text-center text-[13px] font-bold leading-4 text-[#059669]"
+            className="mt-0.5 h-4 w-4 shrink-0 text-center text-[0.8125rem] font-bold leading-4 text-[#059669]"
             aria-hidden="true"
           >
             ✓
           </span>
-          <p className="text-[13px] text-[#065F46]">
+          <p className="text-[0.8125rem] text-[#065F46]">
             {summary.funder_type === 'free_form'
               ? freeFormSummaryCount(
                   summary.sections?.length ?? 0,
@@ -649,7 +651,7 @@ export function ApplicationStep3Summary({
       ) : summary.funder_type === 'free_form' ? (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
-          <p className="text-[13px] text-[#475569]">
+          <p className="text-[0.8125rem] text-[#475569]">
             This funder asks for a narrative document. We couldn&apos;t identify specific sections —
             you&apos;ll be able to enter your content in the next step.
           </p>
@@ -657,7 +659,7 @@ export function ApplicationStep3Summary({
       ) : (
         <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#64748B]" aria-hidden="true" />
-          <p className="text-[13px] text-[#475569]">
+          <p className="text-[0.8125rem] text-[#475569]">
             We couldn&apos;t identify specific application questions in this document. You&apos;ll
             be able to enter them in the next step.
           </p>
@@ -669,13 +671,13 @@ export function ApplicationStep3Summary({
         <button
           type="button"
           onClick={handleRegenerate}
-          className="flex items-center gap-1.5 rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="flex items-center gap-1.5 rounded text-[0.875rem] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
           Regenerate summary
         </button>
         {!guidelinesAvailable && (
-          <p className="mt-1.5 text-[12px] text-[#64748B]">
+          <p className="mt-1.5 text-[0.75rem] text-[#64748B]">
             You&apos;ll need to re-upload your guidelines to regenerate.
           </p>
         )}
@@ -685,7 +687,7 @@ export function ApplicationStep3Summary({
       {continueError && (
         <p
           role="alert"
-          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[0.8125rem] text-[#DC2626]"
         >
           {continueError}
         </p>
@@ -695,7 +697,7 @@ export function ApplicationStep3Summary({
       <div className="flex items-center justify-between">
         <Link
           href={`/applications/${applicationId}/step/2`}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Back
         </Link>
@@ -703,7 +705,7 @@ export function ApplicationStep3Summary({
           type="button"
           disabled={isContinuing}
           onClick={handleContinue}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
+          className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
         >
           {isContinuing ? 'Saving…' : 'Continue'}
         </Button>
@@ -716,7 +718,7 @@ export function ApplicationStep3Summary({
 
 function CardTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mb-3 border-l-4 border-[#0D6E6E] pl-3 text-[15px] font-semibold text-[#1E293B]">
+    <h2 className="mb-3 border-l-4 border-[#0D6E6E] pl-3 text-[0.9375rem] font-semibold text-[#1E293B]">
       {children}
     </h2>
   )
@@ -726,7 +728,7 @@ function BulletList({ items }: { items: string[] }) {
   return (
     <ul className="space-y-1">
       {items.map((item, i) => (
-        <li key={i} className="flex items-start gap-2 text-[14px] text-[#374151]">
+        <li key={i} className="flex items-start gap-2 text-[0.875rem] text-[#374151]">
           <span
             className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0D6E6E]"
             aria-hidden="true"

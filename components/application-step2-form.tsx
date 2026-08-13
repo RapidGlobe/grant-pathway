@@ -238,10 +238,10 @@ export function ApplicationStep2Form({
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
       <StepIndicator currentStep={2} />
 
-      <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-1 text-[1.5rem] font-bold text-[#1E293B]">
         Add the funder&apos;s guidelines
       </h1>
-      <p className="mb-1 text-[14px] font-medium text-[#0D6E6E]">
+      <p className="mb-1 text-[0.875rem] font-medium text-[#0D6E6E]">
         {funderName}
         {grantName && grantName !== funderName && (
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
@@ -250,7 +250,7 @@ export function ApplicationStep2Form({
       <ContextualTooltip content="For the best results, upload or paste just the section with the application questions — you can skip the funder's background information or T&Cs.">
         <p
           tabIndex={0}
-          className="mb-6 rounded text-[15px] text-[#64748B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="mb-6 rounded text-[0.9375rem] text-[#64748B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Upload the funder&apos;s guidelines document, or paste the text directly below.
         </p>
@@ -285,11 +285,11 @@ export function ApplicationStep2Form({
               aria-hidden="true"
             />
             <div className="text-center">
-              <p className="text-[14px] font-medium text-[#1E293B]">
+              <p className="text-[0.875rem] font-medium text-[#1E293B]">
                 Drag and drop your document here, or{' '}
                 <span className="text-[#0D6E6E] underline">click to browse</span>
               </p>
-              <p className="mt-1 text-[13px] text-[#475569]">PDF or Word (.docx) · max 10MB</p>
+              <p className="mt-1 text-[0.8125rem] text-[#475569]">PDF or Word (.docx) · max 10MB</p>
             </div>
           </div>
         )}
@@ -299,7 +299,7 @@ export function ApplicationStep2Form({
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
             <div className="mb-3 flex items-center gap-3">
               <FileText className="h-5 w-5 shrink-0 text-[#64748B]" aria-hidden="true" />
-              <span className="truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
+              <span className="truncate text-[0.875rem] text-[#1E293B]">{uploadedFileName}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
               <div
@@ -312,7 +312,7 @@ export function ApplicationStep2Form({
                 aria-label="Upload progress"
               />
             </div>
-            <p role="status" className="mt-2 text-[12px] text-[#64748B]">
+            <p role="status" className="mt-2 text-[0.75rem] text-[#64748B]">
               Uploading…
             </p>
           </div>
@@ -323,7 +323,7 @@ export function ApplicationStep2Form({
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-5">
             <div className="mb-3 flex items-center gap-3">
               <FileText className="h-5 w-5 shrink-0 text-[#64748B]" aria-hidden="true" />
-              <span className="truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
+              <span className="truncate text-[0.875rem] text-[#1E293B]">{uploadedFileName}</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-[#E2E8F0]">
               {/* Indeterminate animation while server extracts text */}
@@ -334,7 +334,7 @@ export function ApplicationStep2Form({
                 aria-label="Processing document"
               />
             </div>
-            <p role="status" className="mt-2 text-[12px] text-[#64748B]">
+            <p role="status" className="mt-2 text-[0.75rem] text-[#64748B]">
               Processing document…
             </p>
           </div>
@@ -358,7 +358,9 @@ export function ApplicationStep2Form({
           {uploadState === 'uploaded' && (
             <>
               <FileText className="h-5 w-5 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
-              <span className="flex-1 truncate text-[14px] text-[#1E293B]">{uploadedFileName}</span>
+              <span className="flex-1 truncate text-[0.875rem] text-[#1E293B]">
+                {uploadedFileName}
+              </span>
               <button
                 type="button"
                 onClick={handleRemove}
@@ -372,7 +374,7 @@ export function ApplicationStep2Form({
           {guidelinesRestored && uploadState === 'idle' && !uploadError && (
             <>
               <FileText className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
-              <span className="flex-1 text-[14px] text-[#15803D]">
+              <span className="flex-1 text-[0.875rem] text-[#15803D]">
                 Guidelines loaded from this session
               </span>
               <button
@@ -395,12 +397,12 @@ export function ApplicationStep2Form({
               className="flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
             >
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
-              <p className="text-[14px] text-[#991B1B]">{UPLOAD_ERROR_MESSAGES[uploadError]}</p>
+              <p className="text-[0.875rem] text-[#991B1B]">{UPLOAD_ERROR_MESSAGES[uploadError]}</p>
             </div>
             <button
               type="button"
               onClick={handleRemove}
-              className="mt-2 rounded text-[13px] text-[#64748B] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+              className="mt-2 rounded text-[0.8125rem] text-[#64748B] underline hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
             >
               Try a different file
             </button>
@@ -425,7 +427,7 @@ export function ApplicationStep2Form({
           className="mb-4 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[13px] text-[#78350F]">
+          <p className="text-[0.8125rem] text-[#78350F]">
             Your guidelines document is quite long. For the best results, we recommend uploading
             only the core sections — such as eligibility criteria, application questions, and
             assessment criteria. Very long documents may reduce the quality of your AI summary.
@@ -435,7 +437,10 @@ export function ApplicationStep2Form({
 
       {/* Paste text area */}
       <div className="mb-8">
-        <Label htmlFor="pasteText" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
+        <Label
+          htmlFor="pasteText"
+          className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
+        >
           Or paste the guidelines text here
         </Label>
         <Textarea
@@ -451,7 +456,7 @@ export function ApplicationStep2Form({
           }}
           rows={8}
           placeholder="Paste the full text of the funder's guidelines here…"
-          className="text-[14px]"
+          className="text-[0.875rem]"
         />
       </div>
 
@@ -459,7 +464,7 @@ export function ApplicationStep2Form({
       {continueError && (
         <p
           role="alert"
-          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[0.8125rem] text-[#DC2626]"
         >
           {continueError}
         </p>
@@ -469,7 +474,7 @@ export function ApplicationStep2Form({
       <div className="flex items-center justify-between">
         <Link
           href={`/applications/${applicationId}/step/1`}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Back
         </Link>
@@ -482,7 +487,7 @@ export function ApplicationStep2Form({
             uploadState === 'processing'
           }
           onClick={handleContinue}
-          className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isContinuing ? 'Saving…' : 'Continue'}
         </Button>

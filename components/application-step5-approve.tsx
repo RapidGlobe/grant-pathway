@@ -260,10 +260,10 @@ export function ApplicationStep5Approve({
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
       <StepIndicator currentStep={5} />
 
-      <h1 className="mb-1 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-1 text-[1.5rem] font-bold text-[#1E293B]">
         Review and approve your application
       </h1>
-      <p className="mb-6 text-[14px] font-medium text-[#0D6E6E]">
+      <p className="mb-6 text-[0.875rem] font-medium text-[#0D6E6E]">
         {funderName}
         {grantName && grantName !== funderName && (
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
@@ -286,11 +286,11 @@ export function ApplicationStep5Approve({
           <>
             <CheckCircle2 className="h-5 w-5 shrink-0 text-[#16A34A]" aria-hidden="true" />
             <div>
-              <p className="text-[14px] font-medium text-[#166534]">
+              <p className="text-[0.875rem] font-medium text-[#166534]">
                 {isExported ? 'Application approved and exported.' : 'Application approved.'}
               </p>
               {isExported && lastExported && (
-                <p className="mt-0.5 text-[13px] text-[#166534]">
+                <p className="mt-0.5 text-[0.8125rem] text-[#166534]">
                   Last exported: {formatExportDate(lastExported)}
                 </p>
               )}
@@ -302,7 +302,7 @@ export function ApplicationStep5Approve({
       {/* ── Review checklist (only shown while pending) ────────────────────── */}
       {!isApproved && (
         <div className="mb-6 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-          <p className="mb-3 text-[14px] font-semibold text-[#1E293B]">
+          <p className="mb-3 text-[0.875rem] font-semibold text-[#1E293B]">
             Before you approve, please confirm:
           </p>
           <ul className="space-y-3">
@@ -317,7 +317,7 @@ export function ApplicationStep5Approve({
                 />
                 <label
                   htmlFor={`check-${item.id}`}
-                  className="cursor-pointer text-[14px] leading-snug text-[#374151]"
+                  className="cursor-pointer text-[0.875rem] leading-snug text-[#374151]"
                 >
                   {item.label}
                 </label>
@@ -332,7 +332,7 @@ export function ApplicationStep5Approve({
         {assembledDraft ? (
           // Assembled draft view — shown for Q&A model applications (S6.8)
           <div className="rounded-xl border border-[#E2E8F0] bg-white p-6">
-            <p className="mb-4 text-[12px] font-semibold uppercase tracking-wide text-[#64748B]">
+            <p className="mb-4 text-[0.75rem] font-semibold uppercase tracking-wide text-[#64748B]">
               Assembled draft
             </p>
             {assembledDraft.split('\n\n---\n\n').map((block, i) => {
@@ -341,9 +341,9 @@ export function ApplicationStep5Approve({
               const body = newlineIdx === -1 ? '' : block.slice(newlineIdx + 2).trim()
               return (
                 <div key={i} className={i > 0 ? 'mt-6 border-t border-[#F1F5F9] pt-6' : ''}>
-                  <p className="mb-2 text-[14px] font-semibold text-[#1E293B]">{heading}</p>
+                  <p className="mb-2 text-[0.875rem] font-semibold text-[#1E293B]">{heading}</p>
                   {body && (
-                    <p className="whitespace-pre-wrap text-[14px] leading-relaxed text-[#374151]">
+                    <p className="whitespace-pre-wrap text-[0.875rem] leading-relaxed text-[#374151]">
                       {body}
                     </p>
                   )}
@@ -355,7 +355,7 @@ export function ApplicationStep5Approve({
           // Individual answer cards — shown for legacy applications (old AI-on-load model)
           <div className="space-y-5">
             {answers.length === 0 ? (
-              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 text-center text-[14px] text-[#64748B]">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white p-5 text-center text-[0.875rem] text-[#64748B]">
                 No answers found for this application.
               </div>
             ) : (
@@ -367,20 +367,20 @@ export function ApplicationStep5Approve({
                 return (
                   <div key={answer.id} className="rounded-xl border border-[#E2E8F0] bg-white p-5">
                     <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-                      <p className="text-[14px] font-semibold text-[#1E293B]">
+                      <p className="text-[0.875rem] font-semibold text-[#1E293B]">
                         {answer.questionOrder}.&nbsp;{answer.questionText}
                       </p>
                       <div className="flex shrink-0 items-center gap-2">
                         {badge && (
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[12px] font-medium ${badge.className}`}
+                            className={`rounded-full px-2 py-0.5 text-[0.75rem] font-medium ${badge.className}`}
                           >
                             {badge.label}
                           </span>
                         )}
                         {answer.wordLimit !== null && (
                           <span
-                            className={`text-[12px] font-medium ${overLimit ? 'text-[#DC2626]' : 'text-[#64748B]'}`}
+                            className={`text-[0.75rem] font-medium ${overLimit ? 'text-[#DC2626]' : 'text-[#64748B]'}`}
                           >
                             {wordCount} / {answer.wordLimit} words
                           </span>
@@ -388,14 +388,14 @@ export function ApplicationStep5Approve({
                       </div>
                     </div>
                     <p
-                      className={`whitespace-pre-wrap text-[14px] leading-relaxed ${
+                      className={`whitespace-pre-wrap text-[0.875rem] leading-relaxed ${
                         answer.answerText ? 'text-[#374151]' : 'italic text-[#64748B]'
                       }`}
                     >
                       {answer.answerText || 'No answer provided.'}
                     </p>
                     {overLimit && (
-                      <p className="mt-2 flex items-center gap-1 text-[12px] text-[#DC2626]">
+                      <p className="mt-2 flex items-center gap-1 text-[0.75rem] text-[#DC2626]">
                         <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
                         Answer exceeds the word limit.
                       </p>
@@ -419,8 +419,8 @@ export function ApplicationStep5Approve({
             variant={isApproved ? 'outline' : 'default'}
             className={
               isApproved
-                ? 'h-10 w-full border-[#0D6E6E] text-[15px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40'
-                : 'h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40'
+                ? 'h-10 w-full border-[#0D6E6E] text-[0.9375rem] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4] disabled:cursor-not-allowed disabled:opacity-40'
+                : 'h-10 w-full bg-[#0D6E6E] text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:cursor-not-allowed disabled:opacity-40'
             }
           >
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -434,7 +434,7 @@ export function ApplicationStep5Approve({
           onClick={() => void handleDownloadClick('txt')}
           disabled={(!isApproved && !allChecked) || isDownloading}
           variant="outline"
-          className="h-10 w-full border-[#CBD5E1] text-[15px] font-semibold text-[#475569] hover:bg-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-10 w-full border-[#CBD5E1] text-[0.9375rem] font-semibold text-[#475569] hover:bg-[#F8FAFC] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
           {isDownloadingTxt ? 'Downloading…' : 'Download as plain text (.txt)'}
@@ -445,7 +445,7 @@ export function ApplicationStep5Approve({
       {approveError && (
         <p
           role="alert"
-          className="mb-4 flex items-center gap-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]"
+          className="mb-4 flex items-center gap-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-[0.8125rem] text-[#DC2626]"
         >
           <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
           {approveError}
@@ -456,7 +456,7 @@ export function ApplicationStep5Approve({
       {downloadError && (
         <p
           role="alert"
-          className="mb-4 flex items-center gap-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]"
+          className="mb-4 flex items-center gap-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-3 py-2 text-[0.8125rem] text-[#DC2626]"
         >
           <AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />
           {downloadError}
@@ -471,7 +471,7 @@ export function ApplicationStep5Approve({
         <button
           type="button"
           onClick={() => setShowReOpenDialog(true)}
-          className="rounded text-[14px] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+          className="rounded text-[0.875rem] text-[#64748B] underline hover:text-[#1E293B] hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
         >
           Re-open application to make changes
         </button>
@@ -525,7 +525,7 @@ export function ApplicationStep5Approve({
           {reopenError && (
             <p
               role="alert"
-              className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[13px] text-[#DC2626]"
+              className="rounded-md bg-[#FEF2F2] px-3 py-2 text-[0.8125rem] text-[#DC2626]"
             >
               {reopenError}
             </p>

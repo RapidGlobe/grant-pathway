@@ -36,7 +36,7 @@ export function ConfirmEmailForm({ code, tokenHash, type }: Props) {
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             We couldn&apos;t confirm your email with this link. It may have already been used, or
             it&apos;s no longer valid. If you&apos;ve already verified, try signing in below —
             otherwise, request a new link.
@@ -54,7 +54,7 @@ export function ConfirmEmailForm({ code, tokenHash, type }: Props) {
       {type && <input type="hidden" name="type" value={type} />}
       <div role="status" className="flex items-center justify-center gap-2 text-[#64748B]">
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-        <span className="text-[14px]">Confirming…</span>
+        <span className="text-[0.875rem]">Confirming…</span>
       </div>
     </form>
   )

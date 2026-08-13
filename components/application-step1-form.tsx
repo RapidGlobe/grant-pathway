@@ -116,7 +116,7 @@ export function ApplicationStep1Form({
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
       <StepIndicator currentStep={1} />
 
-      <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-6 text-[1.5rem] font-bold text-[#1E293B]">
         {isNew ? 'Start a new application' : 'Continue your application'}
       </h1>
 
@@ -127,7 +127,7 @@ export function ApplicationStep1Form({
         <div className="mb-5">
           <Label
             htmlFor="funderName"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Who is offering this grant?{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -144,10 +144,10 @@ export function ApplicationStep1Form({
             aria-required="true"
             aria-invalid={!!fieldErrors.funder || undefined}
             aria-describedby={fieldErrors.funder ? 'funder-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.funder && (
-            <p id="funder-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="funder-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.funder}
             </p>
           )}
@@ -159,7 +159,7 @@ export function ApplicationStep1Form({
         <div className="mb-5">
           <Label
             htmlFor="grantName"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             What is the grant called?{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -175,10 +175,10 @@ export function ApplicationStep1Form({
             aria-required="true"
             aria-invalid={!!fieldErrors.grantName || undefined}
             aria-describedby={fieldErrors.grantName ? 'grantName-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.grantName && (
-            <p id="grantName-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="grantName-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.grantName}
             </p>
           )}
@@ -187,11 +187,11 @@ export function ApplicationStep1Form({
         {/* P6.5 — Start fresh vs reuse a previous application to this funder */}
         {previousApplication && (
           <div className="mb-5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-4">
-            <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+            <p className="mb-3 text-[0.875rem] font-medium text-[#1E293B]">
               You&apos;ve applied to {funderName.trim()} before
             </p>
             <div className="space-y-2">
-              <label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]">
+              <label className="flex cursor-pointer items-start gap-2 text-[0.8125rem] text-[#334155]">
                 <input
                   type="radio"
                   name="reuseChoice"
@@ -201,7 +201,7 @@ export function ApplicationStep1Form({
                 />
                 <span>Start fresh — upload guidelines and let the AI read them again</span>
               </label>
-              <label className="flex cursor-pointer items-start gap-2 text-[13px] text-[#334155]">
+              <label className="flex cursor-pointer items-start gap-2 text-[0.8125rem] text-[#334155]">
                 <input
                   type="radio"
                   name="reuseChoice"
@@ -224,7 +224,7 @@ export function ApplicationStep1Form({
         {saveError && (
           <p
             role="alert"
-            className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+            className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[0.8125rem] text-[#DC2626]"
           >
             {saveError}
           </p>
@@ -234,14 +234,14 @@ export function ApplicationStep1Form({
         <div className="mt-8 flex items-center justify-between">
           <Link
             href="/dashboard"
-            className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+            className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
           >
             Cancel
           </Link>
           <Button
             type="submit"
             disabled={isSaving}
-            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
+            className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
           >
             {isSaving ? 'Saving…' : 'Continue'}
           </Button>

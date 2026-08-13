@@ -10,11 +10,11 @@ export function SiteFooter() {
     <footer className="border-t border-[#EDE8E1] bg-[#FDF9F5]">
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-start justify-between gap-4 px-10 py-[22px]">
         <div>
-          <p className="text-[13px] text-[#64748B]">© RapidGlobe Ltd {year}</p>
-          <p className="mt-0.5 text-[12px] text-[#64748B]">
+          <p className="text-[0.8125rem] text-[#64748B]">© RapidGlobe Ltd {year}</p>
+          <p className="mt-0.5 text-[0.75rem] text-[#64748B]">
             Your free grant writing companion for UK charities
           </p>
-          <p className="mt-0.5 text-[12px] text-[#64748B]">Grant Pathway v{appVersion}</p>
+          <p className="mt-0.5 text-[0.75rem] text-[#64748B]">Grant Pathway v{appVersion}</p>
         </div>
 
         <nav aria-label="Legal links">
@@ -26,7 +26,7 @@ export function SiteFooter() {
                 href={HELP_CENTRE_BASE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded py-1.5 text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                className="inline-block rounded py-1.5 text-[0.8125rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
                 Help centre<span className="sr-only"> (opens in a new tab)</span>
               </Link>
@@ -36,7 +36,7 @@ export function SiteFooter() {
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded py-1.5 text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                className="inline-block rounded py-1.5 text-[0.8125rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
                 Privacy policy<span className="sr-only"> (opens in a new tab)</span>
               </Link>
@@ -46,7 +46,7 @@ export function SiteFooter() {
                 href="/terms"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block rounded py-1.5 text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                className="inline-block rounded py-1.5 text-[0.8125rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
               >
                 Terms of service<span className="sr-only"> (opens in a new tab)</span>
               </Link>

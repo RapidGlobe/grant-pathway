@@ -50,17 +50,19 @@ function AwaitingState({ email }: { email: string }) {
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Check your email</h1>
+        <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">Check your email</h1>
 
-        <p className="mb-1 text-[15px] text-[#64748B]">We&apos;ve sent a verification link to</p>
-        {email && <p className="mb-6 text-[15px] font-semibold text-[#1E293B]">{email}</p>}
-        <p className="mb-8 text-[15px] text-[#64748B]">
+        <p className="mb-1 text-[0.9375rem] text-[#64748B]">
+          We&apos;ve sent a verification link to
+        </p>
+        {email && <p className="mb-6 text-[0.9375rem] font-semibold text-[#1E293B]">{email}</p>}
+        <p className="mb-8 text-[0.9375rem] text-[#64748B]">
           Click the link in the email to activate your account.
         </p>
 
         <VerifyEmailResendForm email={email} mode="awaiting" />
 
-        <p className="mt-6 text-[14px] text-[#64748B]">
+        <p className="mt-6 text-[0.875rem] text-[#64748B]">
           Wrong email address?{' '}
           <Link
             href="/"
@@ -86,15 +88,15 @@ function VerifiedState() {
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Email verified</h1>
+        <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">Email verified</h1>
 
-        <p className="mb-8 text-[15px] text-[#64748B]">
+        <p className="mb-8 text-[0.9375rem] text-[#64748B]">
           Your account is now active. Sign in to get started.
         </p>
 
         <Link
           href="/"
-          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+          className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#0D6E6E] px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
         >
           Sign in
         </Link>
@@ -115,9 +117,9 @@ function ExpiredState({ email }: { email: string }) {
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">This link has expired</h1>
+        <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">This link has expired</h1>
 
-        <p className="mb-8 text-[15px] text-[#64748B]">
+        <p className="mb-8 text-[0.9375rem] text-[#64748B]">
           Your verification link is no longer valid. Request a new one below.
         </p>
 

@@ -43,7 +43,7 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
   function navLinkClass(href: string): string {
     const isActive = pathname === href || pathname.startsWith(href + '/')
     return [
-      'rounded-md px-3 py-1.5 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2',
+      'rounded-md px-3 py-1.5 text-[0.875rem] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2',
       isActive
         ? 'bg-[#E6F4F4] font-semibold text-[#0D6E6E]'
         : 'font-medium text-[#64748B] hover:bg-[#E6F4F4] hover:text-[#1E293B]',
@@ -56,7 +56,7 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
           the header landmark so axe-core "content not in landmark" rule is satisfied */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[200] focus:left-4 focus:top-4 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[14px] focus:font-medium focus:text-[#0D6E6E] focus:shadow-md focus:ring-2 focus:ring-[#D97706]"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[200] focus:left-4 focus:top-4 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[0.875rem] focus:font-medium focus:text-[#0D6E6E] focus:shadow-md focus:ring-2 focus:ring-[#D97706]"
       >
         Skip to main content
       </a>
@@ -101,7 +101,7 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
             href={helpCentreUrl(helpPathForRoute(pathname))}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[14px] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+            className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[0.875rem] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
           >
             <HelpCircle className="h-4 w-4" aria-hidden="true" />
             Help<span className="sr-only"> (opens in a new tab)</span>
@@ -116,9 +116,11 @@ export function NavAuthenticated({ firstName, email }: NavAuthenticatedProps) {
                 className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#0D6E6E]"
                 aria-hidden="true"
               >
-                <span className="text-[11px] font-bold leading-none text-white">{initials}</span>
+                <span className="text-[0.6875rem] font-bold leading-none text-white">
+                  {initials}
+                </span>
               </div>
-              <span className="text-[14px] font-semibold text-[#0D6E6E]">{displayName}</span>
+              <span className="text-[0.875rem] font-semibold text-[#0D6E6E]">{displayName}</span>
               <ChevronDown className="h-3.5 w-3.5 text-[#0D6E6E]" aria-hidden="true" />
             </DropdownMenuTrigger>
 

@@ -133,13 +133,13 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
       <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
         <div className="rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] p-8 text-center">
           <CheckCircle className="mx-auto mb-4 h-12 w-12 text-[#16A34A]" aria-hidden="true" />
-          <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Profile saved</h1>
-          <p className="mb-6 text-[15px] text-[#374151]">
+          <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">Profile saved</h1>
+          <p className="mb-6 text-[0.9375rem] text-[#374151]">
             Your charity profile has been saved. You&apos;re ready to start your first application.
           </p>
           <Link
             href="/dashboard"
-            className="inline-flex h-10 items-center rounded-md bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+            className="inline-flex h-10 items-center rounded-md bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
           >
             Go to my dashboard
           </Link>
@@ -150,13 +150,13 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
 
   return (
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
-      <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">
+      <h1 className="mb-6 text-[1.5rem] font-bold text-[#1E293B]">
         {isEdit ? 'Your charity profile' : 'Set up your charity profile'}
       </h1>
 
       {/* ── Charity Commission lookup ────────────────────────────────────── */}
       <div className="mb-6 rounded-xl border border-[#EDE8E1] bg-[#FDF9F5] p-5">
-        <p className="mb-3 text-[14px] font-medium text-[#1E293B]">
+        <p className="mb-3 text-[0.875rem] font-medium text-[#1E293B]">
           Find your charity on the Charity Commission register
         </p>
         <div className="flex gap-2">
@@ -173,7 +173,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
               onChange={(e) => setLookupQuery(e.target.value)}
               onKeyDown={handleLookupKeyDown}
               aria-label="Search by charity name or registration number"
-              className="h-10 flex-1 text-[14px]"
+              className="h-10 flex-1 text-[0.875rem]"
               disabled={isLookingUp}
             />
           </ContextualTooltip>
@@ -181,7 +181,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             type="button"
             onClick={handleLookup}
             disabled={isLookingUp || !lookupQuery.trim()}
-            className="h-10 shrink-0 bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white hover:bg-[#0A5A5A]"
+            className="h-10 shrink-0 bg-[#0D6E6E] px-4 text-[0.875rem] font-semibold text-white hover:bg-[#0A5A5A]"
           >
             <Search className="mr-1.5 h-4 w-4" aria-hidden="true" />
             {isLookingUp ? 'Searching…' : 'Look up charity'}
@@ -192,7 +192,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         {lookupResult === 'match' && (
           <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-3">
             <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#059669]" aria-hidden="true" />
-            <p className="text-[13px] text-[#065F46]">
+            <p className="text-[0.8125rem] text-[#065F46]">
               Details retrieved from the Charity Commission register. You can edit these fields
               before saving.
             </p>
@@ -206,7 +206,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             className="mt-2 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3"
           >
             <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-            <p className="text-[13px] text-[#78350F]">
+            <p className="text-[0.8125rem] text-[#78350F]">
               The descriptions below were drafted by AI from your Charity Commission entry. Please
               review and personalise them before saving.
             </p>
@@ -217,7 +217,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         {lookupResult === 'no-match' && (
           <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-            <p className="text-[13px] text-[#78350F]">
+            <p className="text-[0.8125rem] text-[#78350F]">
               We couldn&apos;t find that charity. Please enter your details manually.
             </p>
           </div>
@@ -227,7 +227,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         {lookupResult === 'unavailable' && (
           <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-            <p className="text-[13px] text-[#78350F]">
+            <p className="text-[0.8125rem] text-[#78350F]">
               We couldn&apos;t reach the Charity Commission right now. You can try again using the{' '}
               <span className="font-semibold">Look up charity</span> button above, or fill in your
               details manually in the fields below.
@@ -242,7 +242,7 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         <div className="mb-5">
           <Label
             htmlFor="charityName"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Charity name{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -258,10 +258,14 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
             aria-required="true"
             aria-invalid={!!fieldErrors.charityName || undefined}
             aria-describedby={fieldErrors.charityName ? 'charityName-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.charityName && (
-            <p id="charityName-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="charityName-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldErrors.charityName}
             </p>
           )}
@@ -271,29 +275,32 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
         <div className="mb-5">
           <Label
             htmlFor="regNumber"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Charity registration number{' '}
-            <span className="text-[14px] font-normal text-[#64748B]">(optional)</span>
+            <span className="text-[0.875rem] font-normal text-[#64748B]">(optional)</span>
           </Label>
           <Input
             id="regNumber"
             type="text"
             value={regNumber}
             onChange={(e) => setRegNumber(e.target.value)}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
         </div>
 
         {/* What does your charity do? */}
         <div className="mb-5">
-          <Label htmlFor="whatDoes" className="mb-1 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="whatDoes"
+            className="mb-1 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             What does your charity do?{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
             </span>
           </Label>
-          <p id="whatDoes-hint" className="mb-1.5 text-[13px] text-[#64748B]">
+          <p id="whatDoes-hint" className="mb-1.5 text-[0.8125rem] text-[#64748B]">
             {paraphrasedFromLookup
               ? 'Drafted from your Charity Commission entry — edit to personalise.'
               : 'Your Charity Commission entry (see the lookup above) lists your charitable objects — this is a good starting point. Your website’s ‘About us’ page is another useful source.'}
@@ -310,10 +317,10 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
                 .filter(Boolean)
                 .join(' ') || undefined
             }
-            className="text-[14px]"
+            className="text-[0.875rem]"
           />
           {fieldErrors.whatDoes && (
-            <p id="whatDoes-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="whatDoes-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.whatDoes}
             </p>
           )}
@@ -321,13 +328,16 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
 
         {/* Who does your charity help? */}
         <div className="mb-5">
-          <Label htmlFor="whoHelps" className="mb-1 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="whoHelps"
+            className="mb-1 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             Who does your charity help?{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
             </span>
           </Label>
-          <p id="whoHelps-hint" className="mb-1.5 text-[13px] text-[#64748B]">
+          <p id="whoHelps-hint" className="mb-1.5 text-[0.8125rem] text-[#64748B]">
             {paraphrasedFromLookup
               ? 'Drafted from your Charity Commission entry — edit to personalise.'
               : 'Think about the people your charity serves — their age, background, or circumstances. Your Charity Commission entry may also describe your beneficiaries.'}
@@ -344,10 +354,10 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
                 .filter(Boolean)
                 .join(' ') || undefined
             }
-            className="text-[14px]"
+            className="text-[0.875rem]"
           />
           {fieldErrors.whoHelps && (
-            <p id="whoHelps-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p id="whoHelps-error" role="alert" className="mt-1.5 text-[0.8125rem] text-[#DC2626]">
               {fieldErrors.whoHelps}
             </p>
           )}
@@ -355,13 +365,16 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
 
         {/* Where do you work? */}
         <div className="mb-8">
-          <Label htmlFor="whereWorks" className="mb-1 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="whereWorks"
+            className="mb-1 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             Where do you work?{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
             </span>
           </Label>
-          <p id="whereWorks-hint" className="mb-1.5 text-[13px] text-[#64748B]">
+          <p id="whereWorks-hint" className="mb-1.5 text-[0.8125rem] text-[#64748B]">
             Enter a town, county, or region — for example, &lsquo;Leeds&rsquo; or &lsquo;South
             Yorkshire&rsquo;. If you work across the whole country, enter &lsquo;National&rsquo;. If
             you&apos;re not sure, use the town or city where your charity is based.
@@ -378,10 +391,14 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
                 .filter(Boolean)
                 .join(' ') || undefined
             }
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.whereWorks && (
-            <p id="whereWorks-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="whereWorks-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldErrors.whereWorks}
             </p>
           )}
@@ -396,14 +413,14 @@ export function CharityProfileForm({ initialData, isEdit = false }: CharityProfi
               className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]"
               aria-hidden="true"
             />
-            <p className="text-[14px] text-[#991B1B]">{saveError}</p>
+            <p className="text-[0.875rem] text-[#991B1B]">{saveError}</p>
           </div>
         )}
 
         <Button
           type="submit"
           disabled={isSaving}
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+          className="h-10 w-full bg-[#0D6E6E] text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
           {isSaving ? 'Saving…' : isEdit ? 'Save changes' : 'Save profile'}
         </Button>

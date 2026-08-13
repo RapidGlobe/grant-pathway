@@ -123,7 +123,7 @@ export function DashboardPopulated({
     <div className="mx-auto w-full max-w-[1200px] px-10 py-10">
       {/* Heading + New Application button */}
       <div className="mb-6 flex items-center justify-between gap-4">
-        <h1 className="text-[24px] font-bold text-[#1E293B]">My Applications</h1>
+        <h1 className="text-[1.5rem] font-bold text-[#1E293B]">My Applications</h1>
         {/* Form + Server Action prevents /applications/new from entering
             browser history — Back from Step 1 returns here, not to the
             creation intermediary which would spawn another empty record. */}
@@ -133,7 +133,7 @@ export function DashboardPopulated({
       </div>
 
       {/* Summary strip */}
-      <div className="mb-4 flex flex-wrap items-center gap-x-2 text-[14px] text-[#64748B]">
+      <div className="mb-4 flex flex-wrap items-center gap-x-2 text-[0.875rem] text-[#64748B]">
         <span className="font-semibold text-[#1E293B]">
           {applications.length} application{applications.length !== 1 ? 's' : ''}
         </span>
@@ -150,7 +150,7 @@ export function DashboardPopulated({
         <span aria-hidden="true" className="mx-2">
           |
         </span>
-        <span className="text-[13px]">
+        <span className="text-[0.8125rem]">
           {aiRequestsUsed} of {AI_REQUESTS_LIMIT} AI requests used this month
         </span>
       </div>
@@ -160,14 +160,14 @@ export function DashboardPopulated({
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border-[1.5px] border-[#FDE68A] bg-[#FEF3C7] px-5 py-[14px]">
           <div className="flex items-start gap-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#D97706]" aria-hidden="true" />
-            <p className="text-[14px] font-medium text-[#92400E]">
+            <p className="text-[0.875rem] font-medium text-[#92400E]">
               Your charity profile isn&apos;t complete yet. You&apos;ll need to fill it in before
               you can start an application.
             </p>
           </div>
           <Link
             href="/profile"
-            className="flex-shrink-0 rounded-md bg-[#B45309] px-3 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#92400E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+            className="flex-shrink-0 rounded-md bg-[#B45309] px-3 py-1.5 text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#92400E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
           >
             Complete your profile
           </Link>
@@ -191,16 +191,16 @@ export function DashboardPopulated({
             >
               {/* Left: app details */}
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[16px] font-bold text-[#1E293B]">{displayFunder}</p>
-                <p className="mt-0.5 truncate text-[14px] text-[#64748B]">{displayGrant}</p>
+                <p className="truncate text-[1rem] font-bold text-[#1E293B]">{displayFunder}</p>
+                <p className="mt-0.5 truncate text-[0.875rem] text-[#64748B]">{displayGrant}</p>
                 <div className="mt-3 flex items-center gap-3">
                   <span
-                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[12px] font-semibold"
+                    className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[0.75rem] font-semibold"
                     style={{ backgroundColor: pill.bg, color: pill.text }}
                   >
                     {pill.label}
                   </span>
-                  <span className="text-[13px] text-[#64748B]">
+                  <span className="text-[0.8125rem] text-[#64748B]">
                     Last updated {formatDate(app.lastUpdated)}
                   </span>
                 </div>
@@ -214,7 +214,7 @@ export function DashboardPopulated({
                     setDeleteError(null)
                     setDeleteTarget(app)
                   }}
-                  className="rounded text-[13px] font-medium text-[#DC2626] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
+                  className="rounded text-[0.8125rem] font-medium text-[#DC2626] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1"
                 >
                   Delete
                 </button>
@@ -230,7 +230,7 @@ export function DashboardPopulated({
                       setReopenError(null)
                       setReopenTarget(app)
                     }}
-                    className="h-9 border border-[#0D6E6E] bg-white px-4 text-[13px] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4]"
+                    className="h-9 border border-[#0D6E6E] bg-white px-4 text-[0.8125rem] font-semibold text-[#0D6E6E] hover:bg-[#E6F4F4]"
                   >
                     Re-open
                   </Button>
@@ -238,7 +238,7 @@ export function DashboardPopulated({
                   // Continue navigates directly to the application's current step (S2.3)
                   <Link
                     href={`/applications/${app.id}/step/${app.currentStep}`}
-                    className="inline-flex h-9 items-center rounded-md bg-[#0D6E6E] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+                    className="inline-flex h-9 items-center rounded-md bg-[#0D6E6E] px-4 text-[0.8125rem] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
                   >
                     Continue
                   </Link>
@@ -258,14 +258,14 @@ export function DashboardPopulated({
       >
         <DialogContent showCloseButton={false} className="max-w-[440px]">
           <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-[16px] font-bold text-[#1E293B]">
+            <DialogTitle className="text-[1rem] font-bold text-[#1E293B]">
               Delete application
             </DialogTitle>
-            <DialogDescription className="mt-2 text-[14px] text-[#64748B]">
+            <DialogDescription className="mt-2 text-[0.875rem] text-[#64748B]">
               {deleteTarget ? deleteModalText(deleteTarget.status) : ''}
             </DialogDescription>
             {deleteError && (
-              <p role="alert" className="mt-2 text-[13px] text-[#DC2626]">
+              <p role="alert" className="mt-2 text-[0.8125rem] text-[#DC2626]">
                 {deleteError}
               </p>
             )}
@@ -276,7 +276,7 @@ export function DashboardPopulated({
                 <Button
                   variant="outline"
                   disabled={isDeleting}
-                  className="border-[#E2E8F0] text-[14px] font-semibold text-[#1E293B]"
+                  className="border-[#E2E8F0] text-[0.875rem] font-semibold text-[#1E293B]"
                 />
               }
             >
@@ -286,7 +286,7 @@ export function DashboardPopulated({
               type="button"
               onClick={handleDeleteConfirm}
               disabled={isDeleting}
-              className="bg-[#DC2626] text-[14px] font-semibold text-white hover:bg-[#B91C1C]"
+              className="bg-[#DC2626] text-[0.875rem] font-semibold text-white hover:bg-[#B91C1C]"
             >
               {isDeleting ? 'Deleting…' : 'Delete'}
             </Button>
@@ -303,15 +303,15 @@ export function DashboardPopulated({
       >
         <DialogContent showCloseButton={false} className="max-w-[440px]">
           <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-[16px] font-bold text-[#1E293B]">
+            <DialogTitle className="text-[1rem] font-bold text-[#1E293B]">
               Re-open application
             </DialogTitle>
-            <DialogDescription className="mt-2 text-[14px] text-[#64748B]">
+            <DialogDescription className="mt-2 text-[0.875rem] text-[#64748B]">
               Re-opening this application will remove your approval. You will need to review and
               approve your answers again before you can export.
             </DialogDescription>
             {reopenError && (
-              <p role="alert" className="mt-2 text-[13px] text-[#DC2626]">
+              <p role="alert" className="mt-2 text-[0.8125rem] text-[#DC2626]">
                 {reopenError}
               </p>
             )}
@@ -322,7 +322,7 @@ export function DashboardPopulated({
                 <Button
                   variant="outline"
                   disabled={isReopening}
-                  className="border-[#E2E8F0] text-[14px] font-semibold text-[#1E293B]"
+                  className="border-[#E2E8F0] text-[0.875rem] font-semibold text-[#1E293B]"
                 />
               }
             >
@@ -332,7 +332,7 @@ export function DashboardPopulated({
               type="button"
               onClick={handleReopenConfirm}
               disabled={isReopening}
-              className="bg-[#0D6E6E] text-[14px] font-semibold text-white hover:bg-[#0A5A5A]"
+              className="bg-[#0D6E6E] text-[0.875rem] font-semibold text-white hover:bg-[#0A5A5A]"
             >
               {isReopening ? 'Re-opening…' : 'Re-open'}
             </Button>
@@ -350,7 +350,7 @@ function NewApplicationButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex h-10 items-center gap-1.5 rounded-md bg-[#0D6E6E] px-4 text-[14px] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
+      className="inline-flex h-10 items-center gap-1.5 rounded-md bg-[#0D6E6E] px-4 text-[0.875rem] font-semibold text-white transition-colors hover:bg-[#0A5A5A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed"
     >
       {pending ? 'Creating…' : '+ New Application'}
     </button>

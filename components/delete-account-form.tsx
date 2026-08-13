@@ -56,12 +56,12 @@ export function DeleteAccountForm() {
 
   return (
     <div className="mx-auto w-full max-w-[640px] px-4 py-10 sm:px-0">
-      <h1 className="mb-6 text-[24px] font-bold text-[#1E293B]">Delete your account</h1>
+      <h1 className="mb-6 text-[1.5rem] font-bold text-[#1E293B]">Delete your account</h1>
 
       {/* Warning banner */}
       <div className="mb-6 flex items-start gap-3 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-4">
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
-        <p className="text-[14px] text-[#991B1B]">
+        <p className="text-[0.875rem] text-[#991B1B]">
           <span className="font-semibold">This cannot be undone.</span> Deleting your account will
           permanently remove all your data from Grant Pathway.
         </p>
@@ -69,12 +69,12 @@ export function DeleteAccountForm() {
 
       {/* Data summary */}
       <div className="mb-8 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-4">
-        <p className="mb-3 text-[14px] font-semibold text-[#1E293B]">
+        <p className="mb-3 text-[0.875rem] font-semibold text-[#1E293B]">
           The following will be permanently deleted:
         </p>
         <ul className="space-y-2">
           {DATA_SUMMARY.map((item) => (
-            <li key={item} className="flex items-start gap-2 text-[14px] text-[#374151]">
+            <li key={item} className="flex items-start gap-2 text-[0.875rem] text-[#374151]">
               <span
                 className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#DC2626]"
                 aria-hidden="true"
@@ -91,7 +91,7 @@ export function DeleteAccountForm() {
           role="alert"
           className="mb-6 rounded-lg border border-[#FECACA] bg-[#FEF2F2] px-4 py-3"
         >
-          <p className="text-[14px] text-[#991B1B]">{serverError}</p>
+          <p className="text-[0.875rem] text-[#991B1B]">{serverError}</p>
         </div>
       )}
 
@@ -100,7 +100,7 @@ export function DeleteAccountForm() {
         <div className="mb-6">
           <Label
             htmlFor="confirmDelete"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Type <span className="font-mono font-bold">DELETE</span> to confirm{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -119,11 +119,15 @@ export function DeleteAccountForm() {
             aria-required="true"
             aria-invalid={!!fieldError || undefined}
             aria-describedby={fieldError ? 'confirmDelete-error' : undefined}
-            className="h-10 max-w-[240px] font-mono text-[14px]"
+            className="h-10 max-w-[240px] font-mono text-[0.875rem]"
             placeholder="DELETE"
           />
           {fieldError && (
-            <p id="confirmDelete-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="confirmDelete-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldError}
             </p>
           )}
@@ -133,7 +137,7 @@ export function DeleteAccountForm() {
           <Button
             type="submit"
             disabled={isPending}
-            className="h-10 bg-[#DC2626] px-5 text-[14px] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-60"
+            className="h-10 bg-[#DC2626] px-5 text-[0.875rem] font-semibold text-white hover:bg-[#B91C1C] disabled:opacity-60"
           >
             {isPending ? 'Deleting…' : 'Permanently delete my account'}
           </Button>
@@ -142,7 +146,7 @@ export function DeleteAccountForm() {
             variant="outline"
             disabled={isPending}
             onClick={() => router.push('/account')}
-            className="h-10 px-5 text-[14px] font-semibold"
+            className="h-10 px-5 text-[0.875rem] font-semibold"
           >
             Cancel
           </Button>

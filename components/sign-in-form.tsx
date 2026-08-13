@@ -60,10 +60,10 @@ export function SignInForm({
 
   return (
     <div className="w-full max-w-[400px]">
-      <h1 className="mb-2 text-center text-[22px] font-bold text-[#1E293B]">Sign in</h1>
+      <h1 className="mb-2 text-center text-[1.375rem] font-bold text-[#1E293B]">Sign in</h1>
 
       {/* Tagline */}
-      <p className="mb-8 text-center text-[16px] text-[#64748B]">
+      <p className="mb-8 text-center text-[1rem] text-[#64748B]">
         Your free grant writing companion for UK charities
       </p>
 
@@ -78,7 +78,7 @@ export function SignInForm({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
         >
           <Clock className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[14px] text-[#78350F]">
+          <p className="text-[0.875rem] text-[#78350F]">
             You&apos;ve been signed out due to inactivity. Your work has been saved — sign in again
             to carry on.
           </p>
@@ -92,7 +92,7 @@ export function SignInForm({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4"
         >
           <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#16A34A]" aria-hidden="true" />
-          <p className="text-[14px] text-[#166534]">
+          <p className="text-[0.875rem] text-[#166534]">
             Your account has been deleted. We&apos;ve sent you a confirmation email.
           </p>
         </div>
@@ -105,7 +105,7 @@ export function SignInForm({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Your email address or password is incorrect. Please try again.
           </p>
         </div>
@@ -118,7 +118,7 @@ export function SignInForm({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Please verify your email address before signing in.{' '}
             <Link
               href={`/verify-email?email=${encodeURIComponent(email)}`}
@@ -137,7 +137,7 @@ export function SignInForm({
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
-          <p className="text-[14px] text-[#991B1B]">
+          <p className="text-[0.875rem] text-[#991B1B]">
             Something went wrong. Please try again in a moment.
           </p>
         </div>
@@ -146,7 +146,10 @@ export function SignInForm({
       <form noValidate action={action} onSubmit={handleSubmit}>
         {/* Email address */}
         <div className="mb-5">
-          <Label htmlFor="email" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="email"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             Email address{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
@@ -162,10 +165,14 @@ export function SignInForm({
             aria-required="true"
             aria-invalid={!!fieldErrors.email || undefined}
             aria-describedby={fieldErrors.email ? 'signin-email-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.email && (
-            <p id="signin-email-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="signin-email-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldErrors.email}
             </p>
           )}
@@ -173,7 +180,10 @@ export function SignInForm({
 
         {/* Password */}
         <div className="mb-2">
-          <Label htmlFor="password" className="mb-1.5 block text-[14px] font-medium text-[#1E293B]">
+          <Label
+            htmlFor="password"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
+          >
             Password{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
               *
@@ -193,7 +203,7 @@ export function SignInForm({
             <p
               id="signin-password-error"
               role="alert"
-              className="mt-1.5 text-[13px] text-[#DC2626]"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
             >
               {fieldErrors.password}
             </p>
@@ -204,7 +214,7 @@ export function SignInForm({
         <div className="mb-6 flex justify-end">
           <Link
             href="/forgot-password"
-            className="text-[13px] text-[#64748B] transition-colors hover:text-[#1E293B]"
+            className="text-[0.8125rem] text-[#64748B] transition-colors hover:text-[#1E293B]"
           >
             Forgot password?
           </Link>
@@ -214,14 +224,14 @@ export function SignInForm({
         <Button
           type="submit"
           disabled={isPending}
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+          className="h-10 w-full bg-[#0D6E6E] text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
           {isPending ? 'Signing in…' : 'Sign in'}
         </Button>
       </form>
 
       {/* Register prompt */}
-      <p className="mt-6 text-center text-[14px] text-[#64748B]">
+      <p className="mt-6 text-center text-[0.875rem] text-[#64748B]">
         New to Grant Pathway?{' '}
         <Link href="/register" className="font-medium text-[#0D6E6E] hover:underline">
           Register for free

@@ -47,9 +47,9 @@ export function ForgotPasswordRequestForm() {
           </div>
         </div>
 
-        <h1 className="mb-4 text-[22px] font-bold text-[#1E293B]">Check your email</h1>
+        <h1 className="mb-4 text-[1.375rem] font-bold text-[#1E293B]">Check your email</h1>
 
-        <p className="text-[15px] text-[#64748B]">
+        <p className="text-[0.9375rem] text-[#64748B]">
           If an account exists for that email address, you&apos;ll receive a reset link shortly.
           Check your spam folder if it doesn&apos;t arrive within a few minutes.
         </p>
@@ -59,9 +59,9 @@ export function ForgotPasswordRequestForm() {
 
   return (
     <div className="w-full max-w-[400px]">
-      <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Reset your password</h1>
+      <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">Reset your password</h1>
 
-      <p className="mb-8 text-[15px] text-[#64748B]">
+      <p className="mb-8 text-[0.9375rem] text-[#64748B]">
         Enter the email address for your account and we&apos;ll send you a reset link.
       </p>
 
@@ -69,7 +69,7 @@ export function ForgotPasswordRequestForm() {
         <div className="mb-6">
           <Label
             htmlFor="reset-email"
-            className="mb-1.5 block text-[14px] font-medium text-[#1E293B]"
+            className="mb-1.5 block text-[0.875rem] font-medium text-[#1E293B]"
           >
             Email address{' '}
             <span className="text-[#DC2626]" aria-hidden="true">
@@ -86,10 +86,14 @@ export function ForgotPasswordRequestForm() {
             aria-required="true"
             aria-invalid={!!fieldErrors.email || undefined}
             aria-describedby={fieldErrors.email ? 'reset-email-error' : undefined}
-            className="h-10 text-[14px]"
+            className="h-10 text-[0.875rem]"
           />
           {fieldErrors.email && (
-            <p id="reset-email-error" role="alert" className="mt-1.5 text-[13px] text-[#DC2626]">
+            <p
+              id="reset-email-error"
+              role="alert"
+              className="mt-1.5 text-[0.8125rem] text-[#DC2626]"
+            >
               {fieldErrors.email}
             </p>
           )}
@@ -98,13 +102,13 @@ export function ForgotPasswordRequestForm() {
         <Button
           type="submit"
           disabled={isPending}
-          className="h-10 w-full bg-[#0D6E6E] text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
+          className="h-10 w-full bg-[#0D6E6E] text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-60"
         >
           {isPending ? 'Sending…' : 'Send reset link'}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-[14px] text-[#64748B]">
+      <p className="mt-6 text-center text-[0.875rem] text-[#64748B]">
         Remembered your password?{' '}
         <Link href="/" className="font-medium text-[#0D6E6E] hover:underline">
           Sign in

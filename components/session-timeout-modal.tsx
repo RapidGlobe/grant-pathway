@@ -39,22 +39,22 @@ export function SessionTimeoutModal({
     >
       <DialogContent showCloseButton={false} className="max-w-[440px] rounded-xl p-8">
         <DialogHeader>
-          <DialogTitle className="text-[18px] font-bold tracking-tight text-[#1E293B]">
+          <DialogTitle className="text-[1.125rem] font-bold tracking-tight text-[#1E293B]">
             Are you still there?
           </DialogTitle>
-          <DialogDescription className="mt-2 text-[14px] leading-relaxed text-[#64748B]">
+          <DialogDescription className="mt-2 text-[0.875rem] leading-relaxed text-[#64748B]">
             {`You'll be signed out in ${minutesRemaining} ${minuteLabel} due to inactivity. Make sure you've saved any work before your session ends.`}
           </DialogDescription>
         </DialogHeader>
 
         <div className="mt-6 flex items-center justify-end gap-2.5">
-          <Button variant="outline" size="default" onClick={onSignOut} className="text-[14px]">
+          <Button variant="outline" size="default" onClick={onSignOut} className="text-[0.875rem]">
             Sign out now
           </Button>
           <Button
             size="default"
             onClick={onExtend}
-            className="bg-[#0D6E6E] text-[14px] text-white hover:bg-[#0A5A5A]"
+            className="bg-[#0D6E6E] text-[0.875rem] text-white hover:bg-[#0A5A5A]"
           >
             I&apos;m still here
           </Button>

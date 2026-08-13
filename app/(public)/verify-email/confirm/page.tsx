@@ -34,9 +34,9 @@ export default async function ConfirmEmailPage({ searchParams }: Props) {
           </div>
         </div>
 
-        <h1 className="mb-3 text-[22px] font-bold text-[#1E293B]">Confirming your email</h1>
+        <h1 className="mb-3 text-[1.375rem] font-bold text-[#1E293B]">Confirming your email</h1>
 
-        <p className="mb-8 text-[15px] text-[#64748B]">This will only take a moment.</p>
+        <p className="mb-8 text-[0.9375rem] text-[#64748B]">This will only take a moment.</p>
 
         <ConfirmEmailForm code={code ?? null} tokenHash={tokenHash ?? null} type={type ?? null} />
       </div>

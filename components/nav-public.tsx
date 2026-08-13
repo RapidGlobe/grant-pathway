@@ -14,7 +14,7 @@ export function NavPublic() {
           header landmark so axe-core "content not in landmark" rule is satisfied */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-[200] focus:left-4 focus:top-4 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[14px] focus:font-medium focus:text-[#0D6E6E] focus:shadow-md focus:ring-2 focus:ring-[#D97706]"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[200] focus:left-4 focus:top-4 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-[0.875rem] focus:font-medium focus:text-[#0D6E6E] focus:shadow-md focus:ring-2 focus:ring-[#D97706]"
       >
         Skip to main content
       </a>
@@ -40,7 +40,7 @@ export function NavPublic() {
                 href={HELP_CENTRE_BASE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 rounded-md px-3 py-2 text-[14px] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+                className="flex items-center gap-1.5 rounded-md px-3 py-2 text-[0.875rem] font-medium text-[#64748B] transition-colors hover:bg-[#E6F4F4] hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
               >
                 <HelpCircle className="h-4 w-4" aria-hidden="true" />
                 Help<span className="sr-only"> (opens in a new tab)</span>
@@ -53,7 +53,7 @@ export function NavPublic() {
                 <li>
                   <Link
                     href="/register"
-                    className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[14px] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
+                    className="rounded-lg border border-[#0D6E6E] px-3 py-2 text-[0.875rem] font-semibold text-[#0D6E6E] transition-colors hover:bg-[#E6F4F4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-2"
                   >
                     Register — it&apos;s free
                   </Link>

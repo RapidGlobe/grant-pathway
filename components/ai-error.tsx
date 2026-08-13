@@ -12,10 +12,10 @@ export function AiError({ persistent = false, onRetry }: AiErrorProps) {
       <div className="flex items-start gap-3">
         <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-[#DC2626]" aria-hidden="true" />
         <div className="flex-1">
-          <p className="text-[14px] font-semibold text-[#991B1B]">
+          <p className="text-[0.875rem] font-semibold text-[#991B1B]">
             {persistent ? 'Something went wrong' : "We couldn't complete that request"}
           </p>
-          <p className="mt-1 text-[13px] text-[#991B1B]">
+          <p className="mt-1 text-[0.8125rem] text-[#991B1B]">
             {persistent
               ? 'If this keeps happening, please try again later. Your work has been saved.'
               : 'This sometimes happens with AI requests. Please try again.'}
@@ -25,7 +25,7 @@ export function AiError({ persistent = false, onRetry }: AiErrorProps) {
               type="button"
               onClick={onRetry}
               variant="outline"
-              className="mt-3 h-8 border-[#DC2626] px-4 text-[13px] font-semibold text-[#DC2626] hover:bg-[#FEF2F2]"
+              className="mt-3 h-8 border-[#DC2626] px-4 text-[0.8125rem] font-semibold text-[#DC2626] hover:bg-[#FEF2F2]"
             >
               Try again
             </Button>

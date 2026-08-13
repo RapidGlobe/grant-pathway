@@ -52,15 +52,15 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
 
       <div className="mb-6 flex items-center gap-3">
         <Users className="h-6 w-6 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
-        <h1 className="text-[24px] font-bold text-[#1E293B]">Before we put it together</h1>
+        <h1 className="text-[1.5rem] font-bold text-[#1E293B]">Before we put it together</h1>
       </div>
 
       <div className="mb-6 rounded-xl border border-[#E2E8F0] bg-white p-6">
-        <p className="mb-4 text-[15px] text-[#374151]">
+        <p className="mb-4 text-[0.9375rem] text-[#374151]">
           Your answers have been saved. Before your draft is assembled, please confirm that a senior
           colleague — such as your CEO, treasurer, or a trustee — has reviewed your budget answers.
         </p>
-        <p className="text-[14px] text-[#64748B]">
+        <p className="text-[0.875rem] text-[#64748B]">
           Funders verify financial information. Inaccurate budget answers are one of the most common
           reasons grant applications are unsuccessful or withdrawn. Once assembled, you will be able
           to review and approve the full draft before it is exported.
@@ -70,7 +70,7 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
       {assembleError && (
         <p
           role="alert"
-          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[0.8125rem] text-[#DC2626]"
         >
           {assembleError}
         </p>
@@ -79,7 +79,7 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
       {backError && (
         <p
           role="alert"
-          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[13px] text-[#DC2626]"
+          className="mb-5 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] px-4 py-3 text-[0.8125rem] text-[#DC2626]"
         >
           {backError}
         </p>
@@ -90,7 +90,7 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
           type="button"
           onClick={handleBack}
           disabled={isGoingBack || isAssembling}
-          className="rounded text-[14px] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:opacity-50"
+          className="rounded text-[0.875rem] text-[#64748B] transition-colors hover:text-[#1E293B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D97706] focus-visible:ring-offset-1 disabled:opacity-50"
         >
           {isGoingBack ? 'Going back…' : 'Back to editing'}
         </button>
@@ -99,7 +99,7 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
             type="button"
             onClick={handleAssemble}
             disabled={isAssembling || isGoingBack}
-            className="h-10 bg-[#0D6E6E] px-6 text-[15px] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
+            className="h-10 bg-[#0D6E6E] px-6 text-[0.9375rem] font-semibold text-white hover:bg-[#0A5A5A] disabled:opacity-70"
           >
             {isAssembling ? 'Assembling…' : 'Yes — assemble my draft'}
           </Button>

@@ -48,7 +48,7 @@ export function PasswordInput({
       <Input
         {...inputProps}
         type={visible ? 'text' : 'password'}
-        className={cn('h-10 pr-10 text-[14px]', className)}
+        className={cn('h-10 pr-10 text-[0.875rem]', className)}
       />
       <button
         type="button"

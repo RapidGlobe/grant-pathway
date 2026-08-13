@@ -40,7 +40,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
 
                 {/* Circle */}
                 <div
-                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold ${
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[0.8125rem] font-semibold ${
                     isCurrent
                       ? 'bg-[#0D6E6E] text-white'
                       : isComplete
@@ -64,7 +64,7 @@ export function StepIndicator({ currentStep }: StepIndicatorProps) {
 
               {/* Label */}
               <span
-                className={`mt-2 w-full px-0.5 text-center text-[11px] leading-tight ${
+                className={`mt-2 w-full px-0.5 text-center text-[0.6875rem] leading-tight ${
                   isCurrent
                     ? 'font-semibold text-[#0D6E6E]'
                     : isComplete
