@@ -348,6 +348,10 @@ export async function POST(request: NextRequest) {
 
   let tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
+  // Tracked alongside tokenCount (GAP-93, ADR-AI-011) so real headroom
+  // against SUMMARY_MAX_TOKENS is measurable from the DB, not just consoles.
+  let inputTokenCount = bedrockResponse.usage?.input_tokens ?? 0
+  let outputTokenCount = bedrockResponse.usage?.output_tokens ?? 0
 
   // GAP-52: input and output are logged separately, and `stop_reason` with
   // them. Only the combined figure was ever recorded, and `ai_usage_log` stores
@@ -497,6 +501,8 @@ export async function POST(request: NextRequest) {
 
       tokenCount +=
         (confirmResponse.usage?.input_tokens ?? 0) + (confirmResponse.usage?.output_tokens ?? 0)
+      inputTokenCount += confirmResponse.usage?.input_tokens ?? 0
+      outputTokenCount += confirmResponse.usage?.output_tokens ?? 0
 
       const confirmText =
         confirmResponse.content[0]?.type === 'text' ? confirmResponse.content[0].text : ''
@@ -633,6 +639,8 @@ export async function POST(request: NextRequest) {
     p_log_id: logId,
     p_user_id: user.id,
     p_token_count: tokenCount,
+    p_input_token_count: inputTokenCount,
+    p_output_token_count: outputTokenCount,
   })
 
   // ── 10. Return response ────────────────────────────────────────────────────

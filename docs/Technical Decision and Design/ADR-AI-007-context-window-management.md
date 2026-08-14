@@ -57,6 +57,8 @@ Separately, and independently of the above, `lib/preprocess-text.ts` (governed b
 
 **Flagged, not resolved here:** this ADR's original Decision/Rationale/Consequences (2026-04-17) describe a 150,000-character, sentence-boundary truncation mechanism that does not match either the superseded decision (`ADR-TRACEABILITY.md`) or the live code (`lib/preprocess-text.ts`'s 20,000/50,000-character ceiling). This needs its own correction pass -- reconciling the ADR's text against `PDR-AI-004`'s actual 100,000-token figure and the live preprocessing ceiling -- rather than being folded into this P6.2a forward-reference note.
 
+**Note (2026-08-14):** this ADR governs input-side truncation only. The corresponding output-side policy — what happens when an AI _response_ (not the guidelines input) hits its own token ceiling — is covered separately by `ADR-AI-011` (`GAP-93`), rather than being added here on top of the corrections already pending above.
+
 ## Revision History
 
 | Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |

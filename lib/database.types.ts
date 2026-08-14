@@ -6,31 +6,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: '14.5'
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       ai_usage_log: {
@@ -38,6 +13,8 @@ export type Database = {
           application_id: string | null
           created_at: string
           id: string
+          input_token_count: number | null
+          output_token_count: number | null
           request_type: Database['public']['Enums']['ai_request_type']
           token_count: number | null
           user_id: string
@@ -46,6 +23,8 @@ export type Database = {
           application_id?: string | null
           created_at?: string
           id?: string
+          input_token_count?: number | null
+          output_token_count?: number | null
           request_type: Database['public']['Enums']['ai_request_type']
           token_count?: number | null
           user_id: string
@@ -54,6 +33,8 @@ export type Database = {
           application_id?: string | null
           created_at?: string
           id?: string
+          input_token_count?: number | null
+          output_token_count?: number | null
           request_type?: Database['public']['Enums']['ai_request_type']
           token_count?: number | null
           user_id?: string
@@ -336,6 +317,7 @@ export type Database = {
           feedback_consent: boolean
           first_name: string
           id: string
+          last_inactivity_warned_at: string | null
           last_name: string
           updated_at: string
           user_id: string
@@ -345,6 +327,7 @@ export type Database = {
           feedback_consent?: boolean
           first_name: string
           id?: string
+          last_inactivity_warned_at?: string | null
           last_name: string
           updated_at?: string
           user_id: string
@@ -354,6 +337,7 @@ export type Database = {
           feedback_consent?: boolean
           first_name?: string
           id?: string
+          last_inactivity_warned_at?: string | null
           last_name?: string
           updated_at?: string
           user_id?: string
@@ -377,6 +361,11 @@ export type Database = {
         Args: { p_application_id: string; p_user_id: string }
         Returns: undefined
       }
+      // reserve_ai_slot's Args/Returns are hand-corrected after `supabase gen
+      // types` (2026-08-14): the CLI infers `p_application_id: string`
+      // (charity_paraphrase legitimately passes null) and `Returns: Json`
+      // (loses the jsonb_build_object shape entirely) — regenerating this
+      // file will need these two put back.
       reserve_ai_slot: {
         Args: {
           p_application_id: string | null
@@ -393,7 +382,13 @@ export type Database = {
         }
       }
       update_ai_slot_token_count: {
-        Args: { p_log_id: string; p_token_count: number; p_user_id: string }
+        Args: {
+          p_input_token_count?: number
+          p_log_id: string
+          p_output_token_count?: number
+          p_token_count: number
+          p_user_id: string
+        }
         Returns: undefined
       }
     }
@@ -539,9 +534,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       ai_request_type: [

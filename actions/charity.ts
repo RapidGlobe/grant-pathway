@@ -369,6 +369,8 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
             p_log_id: logId,
             p_user_id: user.id,
             p_token_count: tokenCount,
+            p_input_token_count: message.usage?.input_tokens ?? undefined,
+            p_output_token_count: message.usage?.output_tokens ?? undefined,
           })
         } catch {
           // Bedrock unavailable, timeout, or JSON parse error — cancel slot so

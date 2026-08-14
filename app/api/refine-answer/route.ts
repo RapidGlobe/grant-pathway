@@ -44,7 +44,13 @@ const refineSchema = z.object({ refinedText: z.string().min(1) })
 
 export const maxDuration = 60
 
-const REFINE_MAX_TOKENS = 800
+// Raised 800 -> 3000 (GAP-93, ADR-AI-011, 2026-08-14). Real production data
+// showed answers up to 630 words already sitting at ~840+ output tokens
+// before the JSON wrapper — essentially no headroom under the old cap.
+// Bedrock only generates the tokens an answer actually needs, so a higher
+// ceiling costs nothing unless genuinely used; it just makes truncation a
+// real edge case instead of a routine one.
+const REFINE_MAX_TOKENS = 3000
 
 export async function POST(request: NextRequest) {
   // ── 0. Kill-switch ─────────────────────────────────────────────────────────
@@ -271,10 +277,14 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 8. Commit AI usage with token count (ADR-AI-008) ──────────────────────
+  // Input/output logged separately (GAP-93, ADR-AI-011) so real headroom
+  // against REFINE_MAX_TOKENS is measurable from the DB, not just consoles.
   await supabase.rpc('update_ai_slot_token_count', {
     p_log_id: logId,
     p_user_id: user.id,
     p_token_count: tokenCount,
+    p_input_token_count: bedrockResponse.usage?.input_tokens ?? undefined,
+    p_output_token_count: bedrockResponse.usage?.output_tokens ?? undefined,
   })
 
   // ── 9. Return response ─────────────────────────────────────────────────────
