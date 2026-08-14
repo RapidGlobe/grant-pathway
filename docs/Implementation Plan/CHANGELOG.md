@@ -10,7 +10,29 @@
 
 ---
 
-## 2026-08-14 (latest) — Full suite goes green for the first time; two new gaps found, fixed and live-verified same day; a third pulled forward on request; output-truncation policy decided and built as a new ADR
+## 2026-08-14 (latest) — Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected; two count-drift problems removed rather than re-synced
+
+**Documentation consistency only — no code changed, no test re-run, no decision reversed.**
+
+**Phase 5 now has a breakdown table in `IMPLEMENTATION-STATUS.md`, which it has never had.** The live status document tracked Phase 6 in a table and Phase 5 in a single prose sentence, so there was no place to see what remained or in what order. The new **Phase 5 — remaining run order** table gives each task a run-order number, its counts, and a plain-English Notes column saying what the task is and why it sits where it does. It also states explicitly that Phase 5 numbering is not execution order and never has been — `P5.3` is complete while `P5.2` has not started, and `P5.PERF1` ran before `P5.1`.
+
+**Two stale rows found on the Phase 6 → Go-Live Gate while building it, both corrected in `IMPLEMENTATION-PLAN.md`:**
+
+- **`P5.3` was still `[ ]`** although accessibility completed **2026-08-13**, with all 15 cases (AC-01–AC-15) Pass and `accessibility-test-plan.md` 🟢 in `TEST-DASHBOARD.md`. `GAP-05` closed the plan's last open dependency that day and the gate row was not ticked.
+- **`P5.3b`'s row still read "GAP-23 and GAP-79 remain"** when **`GAP-79` was built 2026-08-13**. The wording was accurate when written on 2026-08-12 and was simply not re-checked the next day. Only `GAP-23` (deferrable post-launch) and `GAP-21`'s live Sentry check now remain.
+
+In both cases the original wording is preserved as a dated inline note rather than deleted — the point of the audit trail is that a correction shows what it corrected. This is the second and third instance of the drift `P5.5` item 4 exists to catch, found in a single sitting, which strengthens rather than weakens the case for that task.
+
+**Two count-drift problems were addressed structurally rather than by correcting the figure again:**
+
+- The sentence "Phase 5 stands at **9 tasks, 2 done**" predated `P5.1` (complete 2026-08-09) and `P5.3` (complete 2026-08-13), and appears never to have counted `P5.7` (added 2026-07-31). Rather than update it to "10 tasks, 4 done" and wait for it to go stale a third time, **the sentence now points at the table and the count lives in exactly one place.** Restating a number in two files is the mechanism; removing the second statement is the fix.
+- **`Plan version` in `IMPLEMENTATION-STATUS.md` was found at 3.24 against `IMPLEMENTATION-PLAN.md`'s 3.35 — eleven revisions behind, the widest gap yet.** Its own note already recorded finding A4 fixing this on 2026-07-30 and it drifting "on the very next plan revision", and a further re-sync by `P5.0` on 2026-08-05. It has now been **fixed three times and drifted three times.** The figure is corrected, but the note now says plainly that the recurrence is the finding and asks for this to be raised as its own gap rather than re-synced a fourth time. Nothing checks it, and nothing will until something is built to.
+
+**A `P5.4a` row appears in the table marked "Proposed — not approved, not counted".** A migration from Vercel to Railway hosting is under consideration (WJ, 2026-08-14). It is shown because, if approved, it would change the order of everything after it — most of what remains in Phase 5 either names Vercel explicitly or must be verified against whichever host is actually live, so moving afterwards would mean repeating that work, including the whole of `P5.5`'s production test pass. **It is deliberately excluded from both totals and from the Go-Live Gate checklist, and changes nothing until that decision is taken.** No ADR has been superseded; `ADR-STACK-004` (hosting) and `ADR-OPS-001` (Vercel plan tier) stand unamended.
+
+---
+
+## 2026-08-14 — Full suite goes green for the first time; two new gaps found, fixed and live-verified same day; a third pulled forward on request; output-truncation policy decided and built as a new ADR
 
 **`help-and-tooltips-test-plan.md`'s HT-06 ran live and passed — every row in `TEST-DASHBOARD.md` is 🟢 for the first time since the 2026-07-16 reset.** Worth stating plainly, as the dashboard itself now does: all-green records that every planned case has run and passed, not that the app has zero known issues.
 
