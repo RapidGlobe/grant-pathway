@@ -215,9 +215,37 @@ export async function POST(request: NextRequest) {
   const tokenCount =
     (bedrockResponse.usage?.input_tokens ?? 0) + (bedrockResponse.usage?.output_tokens ?? 0)
 
+  // GAP-92: input/output logged separately, with stop_reason, same as
+  // generate-summary's GAP-52 fix — the combined figure alone can't tell a
+  // truncation apart from a normal short answer after the fact.
   console.log(
-    `[refine-answer] Bedrock latency: ${Date.now() - bedrockStart}ms, ${tokenCount} tokens`,
+    `[refine-answer] Bedrock latency: ${Date.now() - bedrockStart}ms, ` +
+      `${bedrockResponse.usage?.input_tokens ?? 0} in + ` +
+      `${bedrockResponse.usage?.output_tokens ?? 0}/${REFINE_MAX_TOKENS} out ` +
+      `= ${tokenCount} tokens, stop_reason: ${bedrockResponse.stop_reason}`,
   )
+
+  // A truncated response is not a parse failure and must not be treated as
+  // one — the retry below would re-ask with the same REFINE_MAX_TOKENS and
+  // fail identically. Checked before parsing, because truncated JSON
+  // occasionally still parses into a valid-looking but silently incomplete
+  // object (GAP-52).
+  if (bedrockResponse.stop_reason === 'max_tokens') {
+    console.error(
+      `[refine-answer] Response truncated at the ${REFINE_MAX_TOKENS}-token ceiling. ` +
+        `Not retrying — an identical cap cannot produce a shorter answer.`,
+    )
+    Sentry.captureException(
+      new Error(`refine-answer response truncated at ${REFINE_MAX_TOKENS} output tokens`),
+      {
+        tags: { route: 'refine-answer', step: 'bedrock', ai_error: 'answer_too_long' },
+      },
+    )
+    await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
+    return NextResponse.json(aiErrorBody('answer_too_long'), {
+      status: httpStatusForError('answer_too_long'),
+    })
+  }
 
   const cleaned = rawText
     .replace(/^```(?:json)?\s*/i, '')

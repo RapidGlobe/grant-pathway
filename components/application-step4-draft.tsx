@@ -471,6 +471,7 @@ export function ApplicationStep4Draft({
       const data = (await res.json()) as {
         refinedText?: string
         error?: string
+        message?: string
         approachingLimit?: boolean
         currentUsage?: number
       }
@@ -480,7 +481,7 @@ export function ApplicationStep4Draft({
           ...prev,
           [q.id]: {
             status: 'error',
-            message: data.error ?? 'Could not improve your answer. Please try again.',
+            message: data.message ?? 'Could not improve your answer. Please try again.',
           },
         }))
         return

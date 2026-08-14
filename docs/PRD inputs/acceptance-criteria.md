@@ -1750,6 +1750,16 @@ _Note (2026-07-17): WJ found "Help me improve this" declined outright on clearly
 
 ---
 
+**AC-FR-30-06 — "Help me improve this" shows a distinct message when the improved answer is too long to return** _(Added 2026-08-14, `GAP-92`)_
+
+- **Given** I click "Help me improve this" on a question
+- **When** the AI's improved answer would exceed the response length the AI can return in one call
+- **Then** the inline error reads _"We couldn't fit an improved answer within our AI response limit. This is a limit on our side, not a problem with your answer — please try shortening it yourself, or contact support."_
+- **And** my own written answer is unchanged — a failed refine never overwrites it
+- **And** this is carried by a distinct `answer_too_long` error code, not the generic API-error/timeout message (AC-FR-27-01's equivalent for this action), and no "Try again" is implied since an identical response-length ceiling cannot produce a shorter answer on retry — mirrors AC-FR-27-05's `response_too_long` reasoning for Step 3 (`GAP-52`)
+
+---
+
 ### FR-31 — Must Have
 
 **Requirement:** Budget questions shall be visually distinct and the AI assist shall be disabled for them.

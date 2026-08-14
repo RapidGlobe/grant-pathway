@@ -42,6 +42,12 @@ export type AiErrorCode =
   // and the same ceiling produce the same overflow every time. Collapsing them
   // is what produced a "please try again" button that could not succeed.
   | 'response_too_long'
+  // Same failure mode as 'response_too_long', but for /api/refine-answer
+  // (GAP-92). Kept as a distinct code rather than reused because the two
+  // routes' messages must say different things: 'response_too_long' talks
+  // about guidelines documents being too big to summarise, which would be a
+  // confusing thing to show someone whose 500-word answer got cut off.
+  | 'answer_too_long'
   | 'auth_error' // Bedrock auth failure
   | 'unknown' // Anything else
 
@@ -83,6 +89,10 @@ const ERROR_MESSAGES: Record<AiErrorCode, string> = {
   // say the document is too big for us and point them at someone who can act.
   response_too_long:
     'These guidelines contain more than we can summarise in one go. This is a limit on our side, not a problem with your document — please contact support so we can raise it.',
+  // Same reasoning as response_too_long above: no "please try again" — an
+  // identical token ceiling cannot produce a shorter answer next time.
+  answer_too_long:
+    "We couldn't fit an improved answer within our AI response limit. This is a limit on our side, not a problem with your answer — please try shortening it yourself, or contact support.",
   auth_error: 'AI service configuration error. Please contact support.',
   unknown: 'An unexpected error occurred. Please try again.',
 }
