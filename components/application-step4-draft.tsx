@@ -15,6 +15,7 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react'
 import Link from 'next/link'
+import { unstable_rethrow } from 'next/navigation'
 import {
   AlertTriangle,
   AlertCircle,
@@ -622,7 +623,12 @@ export function ApplicationStep4Draft({
       try {
         const result = await setDraftReadyToAssemble(applicationId)
         if (result && !result.ok) setAssembleError(result.error)
-      } catch {
+      } catch (err) {
+        // GAP-91: setDraftReadyToAssemble's success path ends in redirect(),
+        // which throws a NEXT_REDIRECT control-flow error by design — that is
+        // not a transport failure and must be let through, or a working
+        // redirect flashes this catch's error message for an instant first.
+        unstable_rethrow(err)
         // Transport-level failure — see lib/action-error.ts. Without this the
         // rejection escaped the transition unhandled and the button reverted to
         // its idle label with nothing explaining why. Opus audit M8.
@@ -663,7 +669,10 @@ export function ApplicationStep4Draft({
           setManualContinueError(result.error)
           setIsSavingManual(false)
         }
-      } catch {
+      } catch (err) {
+        // GAP-91: same redirect-vs-transport-failure distinction as
+        // handleReadyToAssemble above — see the comment there.
+        unstable_rethrow(err)
         setManualContinueError(ACTION_FAILED_MESSAGE)
         setIsSavingManual(false)
       }
