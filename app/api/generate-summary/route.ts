@@ -446,6 +446,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(aiErrorBody(code), { status: httpStatusForError(code) })
     }
 
+    // GAP-95: this retry's usage was never added to any total, combined or
+    // split, understating real cost whenever this path fired — found while
+    // wiring up GAP-93's input/output split, which is what surfaced it.
+    tokenCount +=
+      (retryResponse.usage?.input_tokens ?? 0) + (retryResponse.usage?.output_tokens ?? 0)
+    inputTokenCount += retryResponse.usage?.input_tokens ?? 0
+    outputTokenCount += retryResponse.usage?.output_tokens ?? 0
+
     const retryText = retryResponse.content[0]?.type === 'text' ? retryResponse.content[0].text : ''
     const retryCleaned = retryText
       .replace(/^```(?:json)?\s*/i, '')
