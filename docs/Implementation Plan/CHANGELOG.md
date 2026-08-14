@@ -10,9 +10,13 @@
 
 ---
 
-## 2026-08-14 (latest) — Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected; two count-drift problems removed rather than re-synced
+## 2026-08-14 (latest) — `IMPLEMENTATION-STATUS.md` reordered so the summary opens the file; Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected; two count-drift problems removed rather than re-synced
 
 **Documentation consistency only — no code changed, no test re-run, no decision reversed.**
+
+**`IMPLEMENTATION-STATUS.md` reordered so the summary is visible on opening (WJ's request).** The file is Tier 1 and is meant to answer "where are we?" at a glance, but roughly 150 lines of "Last updated / Previously" narrative sat between the header and the summary, so answering that question meant scrolling past every session note back to July. `Plan version`, `Overall status`, `Target launch`, the `## Summary` table and the new Phase 5 run-order table now sit directly under the file header; the narrative has moved into a new `## Session log` section below them.
+
+The block was **moved wholesale, not rewritten** — verified line-for-line against a backup, with the only additions being the `## Session log` heading and its two explanatory lines, and both tables re-checked for column integrity after Prettier (Summary 13 rows × 4 columns; run-order 17 rows × 6 columns). The convention is unchanged: new entries still go at the head of the log, just in its new position. **One rendering bug fixed in passing** — the last `Previously` entry ran directly into `**Plan version:**` with no blank line, so markdown rendered them as a single paragraph.
 
 **Phase 5 now has a breakdown table in `IMPLEMENTATION-STATUS.md`, which it has never had.** The live status document tracked Phase 6 in a table and Phase 5 in a single prose sentence, so there was no place to see what remained or in what order. The new **Phase 5 — remaining run order** table gives each task a run-order number, its counts, and a plain-English Notes column saying what the task is and why it sits where it does. It also states explicitly that Phase 5 numbering is not execution order and never has been — `P5.3` is complete while `P5.2` has not started, and `P5.PERF1` ran before `P5.1`.
 
