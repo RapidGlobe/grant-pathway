@@ -13,6 +13,13 @@ name: Security Audit
 # Splitting it out keeps the scan running and reporting, while letting ci.yml
 # reflect only checks that should block. This workflow is deliberately NOT a
 # required status check on master.
+#
+# Note (2026-08-14): the brace-expansion advisory above was resolved by
+# Dependabot PR #94 on 2026-08-09, and `npm audit --audit-level=high` now
+# reports 0 vulnerabilities. That does NOT make this split redundant — the
+# rationale is about advisory noise masking real CI failures, which recurs
+# every time a new unfixable advisory lands, not about that one advisory.
+# Do not fold this back into ci.yml.
 
 on:
   schedule:

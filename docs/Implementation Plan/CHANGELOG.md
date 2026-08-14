@@ -10,7 +10,30 @@
 
 ---
 
-## 2026-08-14 (latest) — `IMPLEMENTATION-STATUS.md` reordered so the summary opens the file; Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected; two count-drift problems removed rather than re-synced
+## 2026-08-14 (latest) — `npm audit` back to zero and `P5.2`'s accepted-deviation bullet rewritten; `IMPLEMENTATION-STATUS.md` reordered so the summary opens the file; Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected
+
+**`master`'s `audit` check is green for the first time since 2026-07-25, and `P5.2` no longer has an accepted deviation to record.**
+
+Traced from WJ's question about which Phase 5 step owns the red `audit` check. Answer: **`P5.2` — Security**, the "record the dependency-vulnerability position, including accepted deviations" bullet. Checking it exposed that the bullet was describing a world that no longer existed.
+
+**The bullet named `brace-expansion`** (via `eslint`/`eslint-config-next`, both devDependencies) as **knowingly accepted** because it was unfixable short of the ESLint 10 upgrade blocked upstream. That was true when written on 2026-07-30, and Dependabot PR #94 resolved it on 2026-08-09. **`nanoid` (via `postcss` → `@tailwindcss/postcss`) had surfaced in its place** — so the check was still red, but for a reason that inverted the correct response:
+
+|                     | `brace-expansion`               | `nanoid`                  |
+| ------------------- | ------------------------------- | ------------------------- |
+| Fixable             | No — blocked upstream           | **Yes — `npm audit fix`** |
+| Correct disposition | Record as assessed and accepted | **Just fix it**           |
+
+Recording `nanoid` as an accepted deviation would have meant documenting a decision not to run one command. **Fixed instead.** Lockfile only: `3.3.16` → `3.3.18`, no `package.json` change, and confirmed by reading the diff rather than trusting npm's "changed 23 packages" summary — `nanoid` was the sole version change. Verified with `type-check`, `lint --max-warnings 0`, all 280 tests, and a full `next build`; **the build was the check that mattered**, since `nanoid` sits in the CSS pipeline. `npm audit --audit-level=high` now reports **0 vulnerabilities**.
+
+**`P5.2`'s bullet rewritten** to stop naming a specific advisory. It now tells the sign-off to re-run the audit and record the dated result, and — for anything open — to decide explicitly whether it is genuinely unfixable (record as accepted, with the reason) or fixable (fix it). The position has changed three times in three weeks, so a bullet that hard-codes one advisory goes stale faster than it gets read. The original principle is kept verbatim: a sign-off that does not record the position reads as though nobody looked.
+
+**Two stale notes in `IMPLEMENTATION-STATUS.md` replaced with the current position**, with the superseded history retained beneath it. They had also ended up reading back-to-front after the reorder — the 2026-08-09 note said "the advisory above is resolved" while pointing at a note that now sat below it. One further staleness recorded: that note said `nanoid <3.3.17`; the advisory range has since widened to `<3.3.18`.
+
+**A note added to `.github/workflows/security-audit.yml`** stating that the resolved advisory does **not** make the ci.yml split redundant — the rationale is about advisory noise masking real CI failures, which recurs with every new unfixable advisory. Added because a future reader, seeing the named advisory fixed, could reasonably conclude the split had served its purpose and fold it back in.
+
+---
+
+## 2026-08-14 — `IMPLEMENTATION-STATUS.md` reordered so the summary opens the file; Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected; two count-drift problems removed rather than re-synced
 
 **Documentation consistency only — no code changed, no test re-run, no decision reversed.**
 
