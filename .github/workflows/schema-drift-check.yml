@@ -11,7 +11,17 @@ name: Schema Drift Check
 # gap was invisible from inside the app and from CI. See CHANGELOG.md,
 # 2026-07-01, for the full story.
 #
-# SCHEDULED RUNS CHECK dev ONLY, UNTIL P5.4 PROVISIONS PRODUCTION.
+# ✅ PROD LEG RE-ENABLED 2026-08-15. P5.4 pushed Phase 6's fourteen dev-only
+# migrations to grant-pathway-prod, so all 32 now match Local/Remote on both
+# projects and the condition below is satisfied. Scheduled runs check dev AND
+# prod again. NOTE both the input `default:` and the matrix fallback had to
+# change -- see the comment at the matrix. A green run here is P5.4's exit
+# test, but green does NOT mean P5.4 is complete: Sentry, Axiom, the cron-job
+# test and the SENTRY_AUTH_TOKEN were all still outstanding when this was
+# switched back on.
+#
+# HISTORICAL, kept because it explains why the leg was ever off:
+# SCHEDULED RUNS CHECKED dev ONLY, UNTIL P5.4 PROVISIONED PRODUCTION.
 # Decision: WJ, 2026-08-03. grant-pathway-prod does not have Phase 6's
 # migrations, so the prod leg failed every scheduled run from at least
 # 2026-07-24 -- and a check that is expected to be red cannot signal
@@ -39,7 +49,7 @@ on:
       environments:
         description: 'Databases to check (scheduled runs always use the default)'
         type: choice
-        default: '["dev"]'
+        default: '["dev","prod"]'
         options:
           - '["dev"]'
           - '["dev","prod"]'
@@ -51,8 +61,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Scheduled runs supply no inputs, so they fall through to ["dev"].
-        environment: ${{ fromJSON(github.event.inputs.environments || '["dev"]') }}
+        # Scheduled runs supply no inputs, so they fall through to this literal
+        # -- NOT to the `default:` above, which only pre-selects the dropdown for
+        # manual runs. Both were '["dev"]' and BOTH had to change to re-enable
+        # prod (2026-08-15). P5.4's instruction named only the input default,
+        # which on its own would have left scheduled runs dev-only while
+        # appearing to discharge the exit test.
+        environment: ${{ fromJSON(github.event.inputs.environments || '["dev","prod"]') }}
     steps:
       - uses: actions/checkout@v7
 
