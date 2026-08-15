@@ -41,6 +41,64 @@ Redirect URLs (`GAP-100`) · custom SMTP (`GAP-101`) · Vercel Production env va
 
 ---
 
+## ✅ RESULT — audit run 2026-08-15, programmatically
+
+Run against the Supabase Management API (`GET /v1/projects/{ref}/config/auth`) using a temporary account token, comparing **all 242 auth-configuration keys** on both projects. This replaces the manual screenshot comparison the checklist below was written for, and **it can be re-run at any time** — which matters, because production configuration keeps changing through `P5.4` and `P5.6`.
+
+**229 of 242 keys are identical. 13 differ.** Of those, **5 are real problems, 6 are the known template gap, and 2 are correct by design.**
+
+### 🔴 Real divergence — production is missing dev's password hardening entirely
+
+| Setting                                             | Dev              | Prod      |
+| --------------------------------------------------- | ---------------- | --------- |
+| `password_min_length`                               | **12**           | **6**     |
+| `password_required_characters`                      | letters + digits | **none**  |
+| `password_hibp_enabled` (leaked-password check)     | **true**         | **false** |
+| `security_update_password_require_current_password` | **true**         | **false** |
+| `security_update_password_require_reauthentication` | **true**         | **false** |
+
+**This is `GAP-104`, and it is worse than first assessed.** The initial reading of production alone suggested weak settings. The comparison shows **dev has every one of them correct** — production is simply missing the hardening pass applied to dev on 2026-06-29 (`VQ-009`, the 6 → 12 change). It is not a difference of opinion between two environments; it is one environment that was hardened and one that never received it.
+
+**Two consequences follow, and only one is mitigated:**
+
+- The **12-character rule is not at risk** — `lib/validation.ts` enforces it in the application, so registration cannot accept a shorter password regardless of the Supabase floor.
+- **`password_hibp_enabled` has no application-side equivalent.** It is a Supabase feature backed by HaveIBeenPwned. With it off, that element of the documented `FR-02` policy **is not in force on production at all**, and no amount of application code compensates.
+- **`security_update_password_require_current_password`** resolves the assumption `P5.4` flagged: `actions/auth.ts`'s `changePassword` unconditionally sends `current_password`, and it has only ever been exercised against **dev, where the setting is ON**. Its behaviour on production, with the setting OFF, has never been observed.
+
+**Recommended action: set production to match dev on all five.** Dev is right; no decision is needed beyond confirming that.
+
+### 🟠 Email templates — the known gap, now fully scoped
+
+Production runs Supabase's stock templates. **Exactly two are customised on dev**, and both differ:
+
+| Key                                     | Dev                                   | Prod                         |
+| --------------------------------------- | ------------------------------------- | ---------------------------- |
+| `mailer_subjects_confirmation`          | "Verify your email — Grant Pathway"   | "Confirm your email address" |
+| `mailer_templates_confirmation_content` | 2,201 chars (branded)                 | 184 chars (default)          |
+| `mailer_subjects_recovery`              | "Reset your password — Grant Pathway" | "Reset your password"        |
+| `mailer_templates_recovery_content`     | 2,229 chars (branded)                 | 254 chars (default)          |
+
+**Useful finding: only confirmation and recovery were ever customised.** Invite, magic link, email-change and reauthentication are stock on **both** — so `ADR-OPS-003`'s template table, which lists three templates as requiring customisation, overstates what was actually done. Magic link is listed there and was never customised on either environment.
+
+**Recommended action: copy dev's two templates and subjects into production verbatim.** They are the approved wording; nothing needs rewriting.
+
+### ✅ Correct by design — no action
+
+| Setting          | Why the difference is right                                                                                                               |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `uri_allow_list` | Dev carries `http://localhost:3000/**` for local development; prod carries the three real hosts set by `GAP-100`. **They should differ.** |
+| `smtp_pass`      | Different stored values. See the credential note below.                                                                                   |
+
+### ✅ Verified identical — 229 keys, including everything else on this checklist
+
+**Rate limits** (`rate_limit_email_sent` 30, `rate_limit_verify` 30, `rate_limit_token_refresh` 150, `rate_limit_anonymous_users` 30) — **section D closes with no action**; dev and prod match exactly, so `GAP-99`'s recorded figures apply to both.
+
+**Sessions** (`sessions_inactivity_timeout` 0, `sessions_timebox` 0, `jwt_exp` 3600), **CAPTCHA** (off both), **all MFA settings**, **all security-notification toggles** (all off on both — so `C1`–`C4` is a genuine shared choice, not a divergence), **OTP settings** (3600s / 8 digits), `mailer_secure_email_change_enabled` (true both), `disable_signup` (false both), and **SMTP host, user, sender name and admin email** — all identical. **Sections C, D and E close with no action.**
+
+> ⚠️ **Still not covered by this audit, because it is not part of auth config:** section **F** — the `guidelines-temp` Storage bucket settings and database extensions. **F1 remains the most likely quiet failure** and needs a separate check.
+
+---
+
 ## The checklist
 
 Record **both** values. A setting that matches is as worth recording as one that doesn't — otherwise the next session re-checks it.
