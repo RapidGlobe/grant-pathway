@@ -130,7 +130,17 @@ That is a real trade-off nobody had recorded, and it cuts against this ADR's pur
 - **Cap on (current):** spend is bounded, which suits `C1`'s £150/month ceiling — only ~£14 of which is unallocated. But exceeding quota takes **production read-only or unresponsive**, which for a live service is a hard outage with no warning.
 - **Cap off:** the service stays up; spend is unbounded.
 
-**Recommendation, pending WJ: leave it enabled for now.** Pro's included quota (8GB database, 250GB bandwidth, 100,000 monthly active users) is orders of magnitude above current usage — a handful of test accounts and roughly 320 AI requests in total — and an unbounded bill is the larger risk to a personally-funded service. **Revisit once real charities are using the service**, since the failure mode is an outage rather than a slowdown. The UptimeRobot monitor (`ADR-OPS-007`, `P5.4`) is what would surface it if it ever bit.
+**⚠️ Supabase gives no warning before the cap bites. Verified against their own documentation 2026-08-15:** the spend cap "doesn't allow for fine-grained cost control, such as setting budgets for specific usage item or **receiving notifications when certain costs are reached**", and on exceeding quota "further usage of that item is disallowed until the next billing cycle". There is no email, no threshold alert. Supabase directs users to check the organisation's **Usage** dashboard and the billing page's **Upcoming Invoice** manually.
+
+**This materially changes what "leave the cap on" means:** the first sign of trouble would be the service failing, not a warning. Two consequences follow — **the UptimeRobot monitor (`ADR-OPS-007`, `P5.4`) stops being a nice-to-have and becomes the only automatic signal**, and someone has to look at the Usage page periodically, because nothing will prompt them.
+
+**Decision: leave the spend cap ENABLED. WJ, 2026-08-15.**
+
+Reasoning, recorded so it can be re-examined rather than re-argued: an unbounded bill is the larger risk to a service funded personally until CIC grant funding is secured, `C1` leaves only ~£14/month unallocated, and current usage is orders of magnitude below the included quota (8GB database, 250GB bandwidth, 100,000 monthly active users against a handful of test accounts and roughly 320 AI requests in total). A brief outage on a service with no live users costs less than a surprise invoice.
+
+**Revisit when real charities depend on the service.** At that point the balance inverts: the outage becomes the more serious harm, and the absence of any warning mechanism is what makes it serious.
+
+**Superseded recommendation, kept for the trail:** Pro's included quota (8GB database, 250GB bandwidth, 100,000 monthly active users) is orders of magnitude above current usage — a handful of test accounts and roughly 320 AI requests in total — and an unbounded bill is the larger risk to a personally-funded service. **Revisit once real charities are using the service**, since the failure mode is an outage rather than a slowdown. The UptimeRobot monitor (`ADR-OPS-007`, `P5.4`) is what would surface it if it ever bit.
 
 ## Source
 
