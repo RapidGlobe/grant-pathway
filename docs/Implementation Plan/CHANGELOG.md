@@ -10,7 +10,46 @@
 
 ---
 
-## 2026-08-15 (latest) — Production database is schema-current for the first time; `FR-22`'s hedge stops being true and is rewritten
+## 2026-08-15 (latest) — The live site had been using the development database all along; `GAP-103` found, fixed and verified, and an earlier "proven on production" result retracted
+
+**`P5.4` continued. Five of the Supabase steps complete, the Vercel environment variables set, UptimeRobot live, and two decisions taken.** The session's most important outcome is a correction.
+
+### `GAP-103` — production was configured and entirely unused
+
+After configuring production's redirect URLs and SMTP, a real registration through the live site appeared to prove both worked. Production's Users list then showed **no users at all**. WJ flagged that as "bizarre"; querying `grant-pathway-dev` directly found the account sitting there, created 10:46 UTC.
+
+**Vercel's Production-scope environment variables had never been set.** The live deployment was reading and writing the development database. `grant-pathway-prod` was fully configured — 32 migrations, corrected redirect URLs, custom SMTP — and connected to nothing.
+
+**Every "production" verification recorded earlier that day had in fact exercised dev**, which is also why the branded email from the correct sender looked so convincing: dev has had all of that configured for months.
+
+**Fixed and verified by differential test**, not by inspection: dev's user count was recorded (32), a registration completed through the live site, and dev re-counted — **unchanged at 32**, newest account still dated 10 August. The signup had gone elsewhere; WJ confirmed it in production and deleted it.
+
+> **The transferable lesson is not "set the environment variables".** It is that **a verification which cannot distinguish two environments proves nothing** — the earlier test would have passed identically whether production was configured or not. `GAP-101`'s row has been corrected in place to record that its original evidence was invalid; the SMTP configuration itself was always right, and is now genuinely proven.
+
+**One process failure is recorded alongside it:** this runbook had filed the environment variables under Phase B, "no production risk, can run in parallel". That was true and useless in the same breath — the step carried no risk and was simultaneously **the gate on every other step**.
+
+### Also completed
+
+- **UptimeRobot monitor live** (`ADR-OPS-007` consequence discharged) — HTTP check on `/api/health` every 5 minutes, email alerts. An HTTP monitor suffices because the endpoint returns **503** when the database is unreachable. ⚠️ **A _keyword_ monitor will be needed for `grantpathway.org.uk` at `P5.6`**, because the apex currently returns **HTTP 200 while serving GoDaddy's parking page** — a plain status check would report Up while the service was unreachable.
+- **`GAP-99` closed.** Production auth rate limits read and recorded: sign-ups/sign-ins **30 per 5 minutes per IP** (360/hour), emails **30/hour**, IP forwarding off. Adequate; no application-level limit warranted. Two caveats recorded — the limits are per-IP, and the 30/hour email ceiling is shared across verification, reset and change-email.
+- **Two decisions taken:** Resend TLS → **Enforced** (`ADR-OPS-003`, recorded as **decided but not yet applied**), and the Supabase **spend cap → leave enabled** (`ADR-DATA-005`). On the latter, WJ asked whether Supabase warns before the cap bites; **it does not** — verified in their documentation. That makes the UptimeRobot monitor the only automatic signal, which is now recorded.
+
+### Two new gaps
+
+- **`GAP-104`** (🟡) — production's password settings are weaker than the documented `FR-02` policy: minimum length **6**, no password requirements, and **"Prevent use of leaked passwords" OFF**. The 12-character rule is safe because `lib/validation.ts` enforces it application-side, but **the leaked-password check cannot be performed by the application** — it is a Supabase feature, so that element of the documented policy is simply not in force on production.
+- **`GAP-102`** raised earlier the same day remains open (Privacy Policy places Resend in the US; the console shows Ireland).
+
+### A self-inflicted documentation failure, recorded because it matters
+
+Three rows in `P5.4-RUNBOOK.md` were stale — two Progress rows and the logo entry. They had been "updated" by a script that hard-coded the table's column padding; Prettier re-pads tables on every write, so after the first format run the match found nothing, **and the script printed "updated" regardless of whether it had changed anything.** It reported success twice while doing nothing.
+
+That is the same drift this project keeps catching in its own documents, except self-inflicted and hidden behind a success message. Fixed with edits that fail loudly, then verified by grepping for every stale marker and every expected replacement.
+
+`ADR-TRACEABILITY.md` → v2.78, **104 rows**, verified complete with no gaps or duplicates.
+
+---
+
+## 2026-08-15 — Production database is schema-current for the first time; `FR-22`'s hedge stops being true and is rewritten
 
 **`P5.4` steps 1–3 of the Supabase sequence complete, driven by WJ at the dashboard and terminal.** The largest irreversible action in Phase 5 is done.
 
