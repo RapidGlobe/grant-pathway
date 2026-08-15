@@ -10,7 +10,44 @@
 
 ---
 
-## 2026-08-15 (latest) — `P5.2` (Security) complete: `GAP-17` and `GAP-48` close on evidence after months open, four new findings, three fixed the same day
+## 2026-08-15 (latest) — `P5.3b` complete: `GAP-23` built as four Suspense boundaries, not eleven, and the obvious placement would have done nothing
+
+**Phase 5 is now six done, four to go.** `GAP-23` was the last unbuilt item in `P5.3b` and the only one where nothing was actually wrong — perceived-performance polish, explicitly deferrable post-launch.
+
+### What was built
+
+Four `loading.tsx` files — `dashboard/`, `profile/`, `account/` and `applications/` — each rendering the existing `PageSkeleton`, covering all eleven authenticated routes.
+
+**Two deviations from the task text, both deliberate and recorded rather than silent:**
+
+- **The plan said "seven route folders". There are eleven** page routes under `app/(authenticated)/`: `dashboard`, `profile`, `account`, `account/delete`, `applications/new`, `applications/[id]`, and `applications/[id]/step/1`–`5`. The figure had gone stale since 2026-07-30.
+- **Four boundaries rather than one per folder.** Next.js wraps "page.js **and any children below**" in the Suspense boundary, and **there is no nested layout anywhere beneath these points** — so a boundary at `applications/` replaces exactly the same region of the screen that seven separate boundaries under it would. Eleven identical three-line files would have been duplication with a maintenance cost and no behavioural difference. If a route later wants a tailored skeleton — the dashboard is a list and Step 4 is a split view, so both plausibly might — a nearer `loading.tsx` takes precedence automatically.
+
+### The placement is the part worth remembering
+
+The obvious single-file answer is `app/(authenticated)/loading.tsx`. **It would have done nothing.** `app/(authenticated)/layout.tsx` is `async` and calls `supabase.auth.getUser()`, and the bundled `loading.js` file-convention documentation is explicit: if a layout accesses uncached or runtime data, "`loading.js` will not show a fallback for it — navigation blocks until the layout finishes rendering." A boundary above that layout would never render, and the feature would have looked built while doing nothing at all.
+
+This was found by reading the bundled Next.js 16.3 docs before writing, per `AGENTS.md` §1 — not from training data, which is exactly the failure mode that rule exists for.
+
+### Verified live, not by inspection
+
+With a real signed-in account, a `MutationObserver` recorded the skeleton **genuinely mounting** during client-side navigation to `/dashboard`, `/profile` and `/applications/[id]/step/4` — the last confirming the `applications/` boundary serves its nested children. `/account` and `/applications/new` were confirmed by finding the fallback in the streamed server HTML.
+
+**`/account/delete` emits no fallback, and that is correct.** Its page is a _synchronous_ server component with no data access, so nothing ever suspends. This is why each route was checked individually rather than assumed from one result: **an absent fallback can mean "no boundary" or "nothing to wait for"**, and only reading the page tells you which. Assuming the first would have produced a phantom bug; assuming the second would have hidden a real one.
+
+`type-check`, `lint --max-warnings 0`, 280 tests and a clean `next build` from an empty `.next`.
+
+### `P5.3b`'s Go-Live Gate row, and one honest caveat
+
+The gate row is now ticked, with a caveat stated rather than glossed: **every code item in `P5.3b` is built, but `GAP-21` still needs one live confirmation that a tagged event actually reaches Sentry.** The code has been in place since 2026-08-07; what is missing is the observation, and it can only happen against the live site at `P5.4`. If the gate is read strictly as "nothing outstanding at all", that check is the one thing between this row and that reading.
+
+Separately, **`GAP-99` was added to `P5.4`'s checklist** (the `P5.2` finding on unverified authentication rate limits). It was recorded in three places but was not a checklist item in the task where it has to happen — the difference between "recorded" and "will actually get done". It sits alongside the `GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD` reconciliation, both being dashboard reads on the same screen.
+
+`ADR-TRACEABILITY.md` → v2.75 (`GAP-23` 🟡 → 🟢; register unchanged at 99 rows).
+
+---
+
+## 2026-08-15 — `P5.2` (Security) complete: `GAP-17` and `GAP-48` close on evidence after months open, four new findings, three fixed the same day
 
 **Artefact: `docs/legal/security-review-2026-08-15.md` (new).** Outcome: **pass, with four findings.** Phase 5 is now five done, five to go.
 
