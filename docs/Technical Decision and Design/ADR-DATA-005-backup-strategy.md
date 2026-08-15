@@ -109,6 +109,29 @@ Completed as part of independent system specialist pre-launch review:
 
 ---
 
+## Production verification — 2026-08-15 (P5.4)
+
+Re-verified on `grant-pathway-prod` directly, during `P5.4`'s Supabase walkthrough. Three findings, one of which is a decision this ADR did not previously record.
+
+**1. Daily backups confirmed working.** Eight snapshots visible — 08 to 15 August 2026 inclusive — taken consistently around 03:05 UTC, type `PHYSICAL`, each with a Restore action. That spans the seven days this ADR specifies and the Privacy Policy discloses. **No discrepancy.**
+
+**2. The Pro plan is an _organisation_-level subscription, not per-project.** The billing page states it plainly: "Each organization has it's own subscription plan, billing cycle, payment methods and usage quotas." The organisation is **RapidGlobe**, marked PRO, and **both** `grant-pathway-dev` and `grant-pathway-prod` sit inside it. This retires a genuine ambiguity: this ADR's consequence said "Supabase Pro must be activated **on the production project**" and recorded it "✅ Activated 2026-06-22" without naming a project, which was impossible to verify as written. Both projects are also confirmed `AWS | eu-west-2` — London — which is independent evidence for `C13` alongside the `X-Vercel-Id: lhr1` finding recorded in `security-review-2026-08-15.md`.
+
+**3. ⚠️ Backups do not include Storage objects.** The dashboard states: "Database backups do not include objects stored via the Storage API, as the database only includes metadata about these objects. Restoring an old backup does not restore objects that have been deleted since then."
+
+**This costs nothing today, but by design rather than by luck, and that distinction is the reason it is recorded here.** The only bucket is `guidelines-temp`; per `ADR-FILE-001` the raw guideline file is deleted immediately after text extraction, with the 30-minute `cleanup-guidelines` cron sweeping orphans. Nothing of durable value ever lives in Storage — the retained text lives in the `application_guidelines` **table**, which _is_ backed up. **The exposure would begin the moment anything durable is stored in a bucket**, and a reader seeing "daily backups, 7-day retention" would reasonably assume otherwise. Any future feature that writes to Storage must revisit this section before it ships.
+
+### Open decision — Cost Control spend cap
+
+**Spend cap is currently _enabled_ on the RapidGlobe organisation.** The dashboard's own wording: "You won't be charged any extra for usage. However, your projects could become unresponsive or enter read only mode if you exceed the included quota."
+
+That is a real trade-off nobody had recorded, and it cuts against this ADR's purpose:
+
+- **Cap on (current):** spend is bounded, which suits `C1`'s £150/month ceiling — only ~£14 of which is unallocated. But exceeding quota takes **production read-only or unresponsive**, which for a live service is a hard outage with no warning.
+- **Cap off:** the service stays up; spend is unbounded.
+
+**Recommendation, pending WJ: leave it enabled for now.** Pro's included quota (8GB database, 250GB bandwidth, 100,000 monthly active users) is orders of magnitude above current usage — a handful of test accounts and roughly 320 AI requests in total — and an unbounded bill is the larger risk to a personally-funded service. **Revisit once real charities are using the service**, since the failure mode is an outage rather than a slowdown. The UptimeRobot monitor (`ADR-OPS-007`, `P5.4`) is what would surface it if it ever bit.
+
 ## Source
 
 Risk assessment informed by DR-DP-001 (data stored), ADR-DATA-003 (data retention), ADR-STACK-002 (database), NFR-02 (99.5% uptime target), C1 (operating budget constraint).

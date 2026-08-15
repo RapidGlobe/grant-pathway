@@ -10,7 +10,39 @@
 
 ---
 
-## 2026-08-15 (latest) — `P5.3b` complete: `GAP-23` built as four Suspense boundaries, not eleven, and the obvious placement would have done nothing
+## 2026-08-15 (latest) — Production database is schema-current for the first time; `FR-22`'s hedge stops being true and is rewritten
+
+**`P5.4` steps 1–3 of the Supabase sequence complete, driven by WJ at the dashboard and terminal.** The largest irreversible action in Phase 5 is done.
+
+### Production was 14 migrations behind, with zero drift
+
+Compared before pushing, via the dashboard's read-only Migrations page rather than by trusting the CLI. Production stopped at `20260701000000` with 18 migrations — exactly matching the 2026-07-01 reconciliation record.
+
+**The important negative result: zero orphans.** Nothing appeared in Remote that was absent from Local, meaning **nothing has been applied to production by hand since 1 July**. `ADR-DATA-004`'s prohibition on dashboard SQL has held — and that prohibition existing is precisely because breaking it caused the 1 July drift, where the CLI's tracking table had been stale since 20 May.
+
+**All 14 applied cleanly; all 32 now match Local/Remote on both projects.** Includes `20260723000000_grant_service_role_item_graph_tables`, without which account deletion fails on production with `42501: permission denied` — the error found live on dev on 23 July. Two of the 14 create a tooltip table and drop it again; net effect nothing, expected in the output.
+
+The CLI was re-linked to dev immediately afterwards and **verified** — left pointed at production, every future migration would have targeted it by accident.
+
+### `FR-22`'s qualification stopped being true, exactly as predicted
+
+`PRD-Grant-Pathway.md` §6.4 stated guidelines "shall not be permanently stored", qualified as "true of the product as it exists in production today; changing under Phase 6". The plan carried an explicit instruction — **"do not fix it early"** — because that qualification was genuinely accurate. It stopped being accurate the moment `20260714000001_gap33_application_guidelines` reached production.
+
+Three places corrected: the `FR-22` row itself (now stating retained **text**, with the raw file never retained), the status note beneath it (rewritten to record _when and why_ the wording changed rather than re-explaining a gap that no longer exists), and §9.3's data-handling table, where one row became two — extracted text is retained, the raw file is discarded. `GAP-32` discharged.
+
+### Two findings on `ADR-DATA-005`, one of them an open decision
+
+**Backups exclude Storage objects.** The dashboard says so explicitly. **This costs nothing today, but by design rather than by luck** — the only bucket holds transient files deleted immediately after extraction, and the retained text lives in a table that _is_ backed up. Recorded because "daily backups, 7-day retention" reads as covering everything, and would be wrong the moment anything durable is written to a bucket.
+
+**⚠️ The spend cap is enabled, and nobody had recorded that as a decision.** Supabase's wording: projects "could become unresponsive or enter read only mode if you exceed the included quota". For a live service that is a hard outage. Against `C1`'s £150/month with ~£14 unallocated, an unbounded bill is the larger risk today and current usage is orders of magnitude below quota — so the recommendation is to leave it on and **revisit once real charities depend on it.** Recorded in `ADR-DATA-005` as an open decision for WJ rather than settled.
+
+**Also resolved:** Pro is an **organisation**-level plan on **RapidGlobe** covering both projects, which retires a real ambiguity — `ADR-DATA-005` said Pro must be active "on the production project" and recorded it activated without naming one. Both projects confirmed `eu-west-2` (London), independent evidence for `C13` alongside the `X-Vercel-Id: lhr1` finding from the security review.
+
+**Still outstanding in the Supabase sequence:** redirect URLs (step 4) and custom SMTP plus auth reconciliation (step 5) — the two the ADR sweep flagged as the "nobody can register on day one" pair.
+
+---
+
+## 2026-08-15 — `P5.3b` complete: `GAP-23` built as four Suspense boundaries, not eleven, and the obvious placement would have done nothing
 
 **Phase 5 is now six done, four to go.** `GAP-23` was the last unbuilt item in `P5.3b` and the only one where nothing was actually wrong — perceived-performance polish, explicitly deferrable post-launch.
 
