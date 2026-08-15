@@ -10,7 +10,35 @@
 
 ---
 
-## 2026-08-15 (latest) — `P5.4a` evaluated in full: the hosting proposal does not survive its own evidence, and Railway fails the project's own UK-region constraint
+## 2026-08-15 (latest) — `P5.4a` closed: staying on Vercel, two stale rationales in `ADR-STACK-004` corrected, proposal row removed
+
+**WJ's decision, taken on the evaluation below: stay on Vercel, correct the two overstated rationales, remove `P5.4a`, proceed to `P5.2`.** Documentation only — no code changed.
+
+### `ADR-STACK-004` — decision reaffirmed, two rationales corrected
+
+The decision (Vercel) is **unchanged**. What changed is why, which is the point of correcting rather than leaving it:
+
+- **"Vercel is built by the creators of Next.js and provides first-class support"** — struck through and corrected. Next.js 16.3's bundled documentation states that to run Next.js "your platform needs **a Node.js server. That's it**", that a single `next start` handles Server Components, ISR, PPR, Cache Components, Server Actions, Proxy and `after()` correctly, and that "there are **no private framework hooks or integration paths**: Vercel's adapter uses the same public API as every other adapter." The accurate, narrower claim is now recorded: Vercel leads on **performance fidelity**, not **functional fidelity**, which any Node.js server achieves. Likely accurate when written on 2026-04-17.
+- **"Automatic preview deployments for every pull request support the development workflow"** — struck through and corrected. This does not describe how the project is developed and appears never to have: all 15 most recent PRs are Dependabot bumps, `master`'s history is perfectly linear, and every commit of first-party work goes straight to `master`. The only previews ever generated are on dependency bumps, gated by CI rather than by anyone opening the URL. **Recorded as carrying no weight in any future hosting comparison.**
+- **Option B (Railway) amended** with the fact that decided the matter and was missing: **no UK region** (EU West is Amsterdam), against `C13`.
+- **Reaffirmation recorded in the Decision section**, including the conditional under which Railway becomes viable again — a formal relaxation of `C13` to UK-or-EEA, which is a data-protection decision to be taken on its own merits rather than as a route to a preferred host.
+- **Revision History table added** — this ADR had none.
+
+Original wording is struck through and preserved inline rather than deleted, per the standing convention that a correction should show what it corrected.
+
+### `technology-stack.md` TS-04 — qualified, to stop the same drift
+
+TS-04 carried the same "built by the same team as Next.js" framing. Its operational claims (single-command deployment, no infrastructure management) hold and are untouched; a dated note now records that the framing is **not a technical dependency**, so this section does not drift from the ADR corrected the same day. → v1.13.
+
+### `P5.4a` removed
+
+The row is gone from `IMPLEMENTATION-STATUS.md`'s Phase 5 run-order table rather than left sitting undecided in a Tier 1 document. A short closure note beneath the table records what it was, what was found, and where the full analysis lives. **The counting basis is unchanged — `P5.4a` was never counted in either total.** `P5.2`'s row also lost a now-dead conditional ("if the hosting move happens, those two need the new host to be live first").
+
+**Hosting is closed for pre-launch, not closed forever.** The review records the post-launch revisit and the conditions under which the answer changes.
+
+---
+
+## 2026-08-15 — `P5.4a` evaluated in full: the hosting proposal does not survive its own evidence, and Railway fails the project's own UK-region constraint
 
 **Documentation and research only — no code changed, no decision taken.** `ADR-STACK-004` and `ADR-OPS-001` stand unamended. New document: `docs/Technical Decision and Design/hosting-platform-review-2026-08-15.md`.
 
