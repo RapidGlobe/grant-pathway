@@ -93,7 +93,11 @@ Pinging the homepage confirms the CDN is responding, but not that the applicatio
 
 - app/api/health/route.ts is added to the project.
 - /api/health is added to the public routes list in middleware.ts.
-- UptimeRobot account created and monitor configured before launch (pre-launch checklist — ADR-OPS-002).
+- ~~UptimeRobot account created and monitor configured before launch (pre-launch checklist — ADR-OPS-002).~~ ✅ **DONE 2026-08-15 (P5.4).** Account created under **RapidGlobe**; monitor "Grant Pathway — production" is **Up**, HTTP/S against `https://grant-pathway-three.vercel.app/api/health`, 5-minute interval, email alerts to WJ. Free plan (50 monitors available, 1 used).
+  - **An HTTP monitor is sufficient here, and that is a deliberate conclusion rather than a shortcut.** `/api/health` returns **503** when the database is unreachable, so a plain non-200 check already catches the failure this ADR exists to detect. A keyword check was considered and rejected as unnecessary for this host, which can only ever serve this application.
+  - ⚠️ **A keyword monitor _will_ be required for `grantpathway.org.uk` at `P5.6`**, and for a specific reason found on 2026-08-15: the apex currently returns **HTTP 200 while serving GoDaddy's parking page** (a 114-byte redirect to `/lander`). A plain status check against the real domain would therefore report **Up** while the service was entirely unreachable there. Use a **Keyword** monitor looking for `"status":"ok"`.
+  - **Add the second monitor rather than re-pointing this one.** Keeping both is diagnostic: both green means healthy; domain red with Vercel green isolates the fault to DNS or the certificate rather than the application; both red means the app itself is down.
+  - **Observed:** checks run from **North America** (free plan auto-selects region) with a ~1,930 ms response. Adequate for availability measurement, but it is not a UK-user latency figure and should not be read as one.
 - No additional environment variables required — the health endpoint uses the Supabase connection already configured.
 
 ## Observability Stack — Complete Picture
