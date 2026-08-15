@@ -88,6 +88,8 @@ All three are sent via `sendEmail()` in `lib/emails/send.ts` — a thin wrapper 
 
 **Decision: Enforced TLS on the `grantpathway.org.uk` sending domain, not Opportunistic.**
 
+> ⚠️ **DECIDED, NOT YET APPLIED (as at 2026-08-15).** The decision below is taken and final; **the Resend setting is still on Opportunistic.** Recorded this way deliberately at WJ's instruction, because a decision written up as though it were live is exactly the drift this project keeps finding — `P5.3`'s gate row and `P5.3b`'s status line were both wrong for the same reason. **Flip the setting in Resend → Domains → `grantpathway.org.uk` → Configuration → TLS, then amend this line to "Applied YYYY-MM-DD".** Until then the live behaviour is Opportunistic, and the exposure described below is real rather than historical.
+
 This ADR previously said nothing about transport security at all, so the setting sat at Resend's default with nobody having chosen it.
 
 **What the setting governs.** The last hop only — Resend handing the message to the recipient's mail provider. The app-to-Resend connection is already encrypted (`smtp.resend.com:465`) and is unaffected. Resend's documentation: _"If the receiving server does not support TLS, your email will not be sent."_ Opportunistic instead falls back to sending **unencrypted**.
@@ -104,7 +106,16 @@ This was originally argued in favour of Enforced on the grounds that such failur
 
 **Why this is not merely academic:** the assumption that "a charity who cannot register will get in touch" is weak. A charity that cannot complete registration for a free tool it has just discovered is more likely to close the tab than to report a fault, and silent attrition is indistinguishable from nobody having tried.
 
-**Action owed:** ask Resend support directly whether a TLS-enforcement failure surfaces in the Emails dashboard, and record the answer here. **A post-launch option that would make the question moot:** Resend supports webhooks for email events — wiring `email.bounced` into Sentry would surface delivery failures regardless of Resend's default logging. That is build work, not configuration, so it does not belong in `P5.4`.
+**Partial answer received 2026-08-15 — from Resend's documentation chatbot, not their support team.** Provenance matters here and is recorded rather than glossed: the reply narrated its own documentation searches and closed by offering to raise a ticket, so it is a search over the public docs, not a statement from someone with visibility of the platform's behaviour.
+
+What it said, and how much of it to rely on:
+
+- **Claimed:** a `failed` status exists among Resend's email events, meaning "the email failed to be sent", distinct from `bounced` (where the receiving server accepts the connection and then rejects the message). On that basis it asserted the failure "is not a silent failure — it's visible to you."
+- **Immediately qualified:** the documentation "doesn't specify the exact failure reason text that appears for TLS-related rejections", and it recommended a support ticket to confirm.
+
+**Treat this as encouraging but not settled.** The existence of a `failed` event is a documented fact; that an Enforced-TLS rejection is _reported through it_, and distinguishably, is the inference — which is precisely the shape of the mistake this section already records once. **The open question stands.**
+
+**Action owed:** raise the support ticket to confirm the exact status and reason text for a TLS rejection, and record the answer here. **A post-launch option that would make the question moot:** Resend supports webhooks for email events — wiring `email.bounced` into Sentry would surface delivery failures regardless of Resend's default logging. That is build work, not configuration, so it does not belong in `P5.4`.
 
 ## Sending region — recorded 2026-08-15
 
