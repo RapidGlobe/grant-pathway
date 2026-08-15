@@ -10,7 +10,62 @@
 
 ---
 
-## 2026-08-14 (latest) — `npm audit` back to zero and `P5.2`'s accepted-deviation bullet rewritten; `IMPLEMENTATION-STATUS.md` reordered so the summary opens the file; Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected
+## 2026-08-15 (latest) — `P5.4a` evaluated in full: the hosting proposal does not survive its own evidence, and Railway fails the project's own UK-region constraint
+
+**Documentation and research only — no code changed, no decision taken.** `ADR-STACK-004` and `ADR-OPS-001` stand unamended. New document: `docs/Technical Decision and Design/hosting-platform-review-2026-08-15.md`.
+
+WJ asked to start `P5.4a` (the Vercel → Railway proposal raised the previous day) and, on being shown that its stated drivers did not hold up, asked whether the wider market was worth evaluating before committing to Railway specifically. It was — `ADR-STACK-004` gives Railway one line and `ADR-OPS-001` lumps "Railway, Render, AWS" into a single bullet ending "Not recommended". There was no analysis to update, only a gap to fill.
+
+### Two of the three drivers were already resolved
+
+WJ's stated drivers were function timeouts, cron limitations, and vendor lock-in.
+
+- **Timeouts.** `ADR-AI-006` Option A records that **Vercel Pro permits `maxDuration` up to 300 seconds**. The app is set to 90s and the slowest real summary on record is 40–47s — roughly 6× unused headroom, available without changing anything.
+- **Cron.** `ADR-OPS-004` chose Vercel Cron and all three jobs are live, including the 30-minute `cleanup-guidelines`.
+
+Both were **Hobby-plan** limits. They stopped applying when Vercel Pro was activated. The ADRs still read as though the constraints bind because they were written before the upgrade and never revisited — which is why a proposal could be built on them in good faith. **Only lock-in survives**, and §4 of the review measures it as low.
+
+### The named platform fails `C13`
+
+**Railway has four regions and none is in the UK** — US West, US East, EU West (Amsterdam) and Southeast Asia. `C13` requires UK-region hosting, and its implementation note records Vercel's function region being pinned to London (`lhr1`) on **2026-05-29 expressly to satisfy it**: "all compute and AI calls now execute in UK region; no international transfer occurs; must be stated in the Privacy Policy."
+
+Moving to Amsterdam would make that sentence false and reopen `C13`, `DR-DP-002` and the published Privacy Policy — **after `P5.1` closed, including independent solicitor review.** Not fatal (EEA, adequacy applies, and WJ has signalled flexibility), but a cost the proposal never priced. **Render fails identically** (Frankfurt). **AWS App Runner eliminated outright** — it supports `eu-west-2` but has been closed to new customers since 2026-04-30.
+
+The two candidates that preserve UK region are each weaker on the criterion weighted next-highest:
+
+- **Fly.io** (`lhr`, no seat fee, ~£3–6/month) has **no native scheduled-job feature**. Its documented approach is a self-deployed `cron-manager` app. For three production crons — one of which irreversibly deletes accounts and already required `GAP-31`'s dedup guard — that is a reliability step backwards, landing on an operator who is not a developer.
+- **Google Cloud Run** (`europe-west2`) pairs with Cloud Scheduler, a genuine managed scheduler, but brings Artifact Registry, Cloud Build, IAM and Secret Manager configuration, plus cold starts on a low-traffic service unless `min-instances=1` is pinned — which removes the cost advantage.
+
+### Exit cost measured rather than assumed
+
+Twenty-five files outside `docs/` mention Vercel; **most are comments**. The genuine couplings are one build-time env var (`VERCEL_GIT_COMMIT_SHA`), the three `vercel.json` crons, the `lhr1` region pin, and **Skew Protection**.
+
+Skew Protection is the one worth understanding. It was enabled 2026-07-29 to mitigate Sentry issue `GRANT-PATHWAY-6` — **88% of whose events landed on Step 4**, where users are writing grant answers. Next.js supports an equivalent off-Vercel via `deploymentId`, but the bundled documentation is explicit that the behaviours differ: Vercel routes the stale client to the old deployment invisibly, whereas `deploymentId` forces a **hard page reload**, with the docs noting "component state like `useState` would be lost". Autosave should cover it; "should" is doing work there, and it would need explicit re-testing rather than assumption.
+
+The 4.5MB request-body limit is listed as a coupling in some earlier notes but is **not** one: `ADR-FILE-001`'s direct-to-Supabase upload already architected around it, so a container host offers no gain there.
+
+### Two findings outside the question asked
+
+- **`ADR-STACK-004`'s central rationale is materially weaker in Next.js 16.3.** Its bundled documentation states that to run Next.js "your platform needs a Node.js server. That's it", that a single `next start` handles Server Components, ISR, Server Actions, Proxy and `after()` correctly, and — directly on the point — that "there are no private framework hooks or integration paths: Vercel's adapter uses the same public API as every other adapter." Vercel's remaining advantage is performance fidelity, not functional fidelity. **That ADR needs correcting whichever way the hosting decision goes.**
+- **Preview deployments should be dropped as a selection criterion.** `ADR-STACK-004` lists them as a main reason for choosing Vercel. All 15 most recent PRs are Dependabot bumps and `master`'s history is perfectly linear — every commit of first-party work goes straight to `master`. The only previews ever generated are on dependency bumps, which are gated by CI, not by anyone opening a preview URL.
+
+### Cost — the driver WJ did not name
+
+~£16/month fixed on Vercel Pro, against ~£4 (Railway Hobby) or ~~£3–6 (Fly.io, no seat fee). `ADR-OPS-001` records only **~~£14/month unallocated** against `C1`'s £150 ceiling, so a ~£12 saving would roughly double the headroom on a budget already breached once. Real, but not a reason to pre-empt a launch.
+
+### Recommendation, and the argument against it
+
+**Stay on Vercel through launch; revisit hosting afterwards as a deliberate decision.** No alternative wins: the one with the best developer experience and smallest migration (Railway) fails the region constraint, and the ones that pass it are worse on operational burden for a one-person team.
+
+The review records the honest counter-argument rather than burying it: **migrating after launch means migrating a live service with real charities on it**, which is strictly harder than migrating now while production does not yet exist. The counterweight is the measured exit cost — **lock-in that costs roughly a day to escape does not justify pre-empting a launch.** Had exit cost come out high, the recommendation would have gone the other way.
+
+**Conditional recorded:** if `C13` is formally relaxed to UK-or-EEA, Railway becomes genuinely viable and is the strongest candidate on developer experience, cron and cost. That is a data-protection decision and should be taken on its own merits, not as a side effect of preferring a different host.
+
+**The decision itself remains open and is WJ's to take.** `IMPLEMENTATION-STATUS.md`'s `P5.4a` row is updated to record the evaluation and no longer names Railway in its title; it remains excluded from both totals and from the Go-Live Gate.
+
+---
+
+## 2026-08-14 — `npm audit` back to zero and `P5.2`'s accepted-deviation bullet rewritten; `IMPLEMENTATION-STATUS.md` reordered so the summary opens the file; Phase 5 gains a run-order table; two stale Go-Live Gate rows corrected
 
 **`master`'s `audit` check is green for the first time since 2026-07-25, and `P5.2` no longer has an accepted deviation to record.**
 
