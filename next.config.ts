@@ -35,6 +35,13 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  // Suppress the `X-Powered-By: Next.js` response header (GAP-98, P5.2 security
+  // review 2026-08-15). Confirmed live on the deployed host before the fix. It
+  // is information disclosure only — knowing the framework does not by itself
+  // grant anything — but it hands an attacker free reconnaissance for choosing
+  // which framework-specific advisories to try, and removing it costs nothing.
+  poweredByHeader: false,
+
   // Disabled 2026-08-10 during AC-07 (accessibility-test-plan.md): the
   // dev-mode indicator overlay uses a Shadow DOM boundary that genuinely
   // disrupted NVDA's Say All while testing -- confirmed by reproducing full,

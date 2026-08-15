@@ -49,6 +49,14 @@ All major security headers are applied to every response. CSP uses `'unsafe-inli
 
 Headers are defined in the `headers()` async function in `next.config.js` and apply globally to all routes. After first production deployment, validate at securityheaders.com and tighten the CSP iteratively. If third-party scripts are added post-v1 (e.g., analytics), the `script-src` directive must be updated.
 
+> **The CSP value in the table above is the value decided on 2026-05-14 and is no longer what is deployed.** It is left as written because it records the decision; the deployed policy is maintained in `technical-design.md`, which is the Tier 1 document and the one to trust. The tightening was authorised by this ADR's own instruction to "tighten the CSP iteratively" and by `P5.2`'s equivalent bullet, so no decision has been overridden. Divergences as at **2026-08-15**:
+>
+> - `script-src` is `'self' 'nonce-{per-request}'`, **not** `'unsafe-inline'` — the nonce-based CSP anticipated in consequence 3 below was implemented, which is a material strengthening.
+> - `connect-src` gained `https://*.ingest.de.sentry.io`, without which the browser Sentry SDK's requests are silently blocked.
+> - `base-uri 'self'`, `form-action 'self'` and `object-src 'none'` were added (`GAP-96`, `GAP-97`). **`base-uri` and `form-action` do not fall back to `default-src`** — the specification's fallback chain covers fetch directives only — so their absence meant no protection at all on either axis, not the inherited `'self'` a reader of this table would reasonably assume.
+> - `Content-Security-Policy` is no longer set in `next.config.ts` at all; it is stamped per-request in `middleware.ts` so it can carry the nonce. **Consequence 1 below is stale for this one header** and correct for the other five.
+> - `X-Powered-By` is now suppressed via `poweredByHeader: false` (`GAP-98`). It was never in this table because Next.js adds it automatically rather than it being configured.
+
 ## Consequences
 
 - Headers are defined in `next.config.js` under the `headers()` async function.

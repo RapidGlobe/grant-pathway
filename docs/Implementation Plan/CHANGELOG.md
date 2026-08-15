@@ -10,7 +10,57 @@
 
 ---
 
-## 2026-08-15 (latest) — `P5.4a` closed: staying on Vercel, two stale rationales in `ADR-STACK-004` corrected, proposal row removed
+## 2026-08-15 (latest) — `P5.2` (Security) complete: `GAP-17` and `GAP-48` close on evidence after months open, four new findings, three fixed the same day
+
+**Artefact: `docs/legal/security-review-2026-08-15.md` (new).** Outcome: **pass, with four findings.** Phase 5 is now five done, five to go.
+
+### The ADR sweep found four uncovered consequences before any work started
+
+`AGENTS.md` §2 requires that every relevant ADR consequence has a covering step **before** the task begins. Four bullets across three security ADRs had none, and all four were added to `P5.2` first:
+
+- **`ADR-SEC-004`** — "CSP must be tested against all pages to ensure no resources are blocked." Genuinely distinct from the existing securityheaders.com bullet: that checks headers are _present and well-formed_; this checks the policy doesn't silently _break_ something. A CSP can score an A and still block a legitimate script.
+- **`ADR-SEC-006`** — server-only secrets must be unreachable from client code ("a lint rule or code review check should confirm this"). No lint rule exists, so this review is the code-review half being performed and recorded.
+- **`ADR-SEC-006`** — `.env.example` must hold placeholders only. Distinct from "no secrets committed": it is the one env file `.gitignore` _deliberately_ un-ignores, so a real value pasted in would be committed by design, not by accident.
+- **`ADR-SEC-003`** — Supabase session expiry must be aligned with or longer than the 60-minute app timeout. If Supabase expires first, the app's warning modal never fires and the user is signed out with no warning and no auto-save — which presents as data loss, not as a security control working.
+
+### Two long-standing gaps closed, on evidence rather than argument
+
+**`GAP-17` (cross-user RLS) — open since 2026-06-16, now 22/22 assertions passed.** Two throwaway confirmed users; A's data seeded with the service role so seeding could not itself be blocked by the policies under test; **every attack run from an anon-key client carrying B's real JWT** — never the service role, which bypasses RLS entirely and would have made every assertion pass regardless. Six positive controls were included deliberately, because a policy that denies everyone passes a negative-only test. Coverage spans SELECT (6 tables), UPDATE (5), DELETE (4), and the `WITH CHECK` forged-insert case where reads are correctly hidden but a row can still be created under another user's id — rejected.
+
+**`GAP-48` (storage policies) — 7/7 passed, and the first time these policies have been _observed_ to grant.** Their own migration made the point: applying cleanly proves the SQL executes, not that the predicate admits the right rows and refuses the wrong ones — the originals applied cleanly and then denied every request for eleven weeks. The separator case is confirmed too: `<A_id>x…` without the underscore is denied, which is what stops one user id that is a string prefix of another from matching.
+
+> ⚠️ **The most instructive result was a defect in the test harness, not the code.** The first storage run used a `text/plain` upload, which the bucket's `allowed_mime_types` (PDF/DOCX) rejects **before RLS is consulted** — so the three _deny_ assertions were passing for the wrong reason and proved nothing at all. Re-running with a genuine PDF fixture was necessary before any storage result meant anything. **A security test that passes for the wrong reason is worse than one that fails**, because it produces a green tick and no curiosity.
+
+### Four new findings
+
+| Gap      | Severity   | Finding                                     | Status                 |
+| -------- | ---------- | ------------------------------------------- | ---------------------- |
+| `GAP-96` | Medium     | CSP had no `base-uri` and no `form-action`  | ✅ Fixed same day      |
+| `GAP-97` | Low        | CSP had no explicit `object-src`            | ✅ Fixed same day      |
+| `GAP-98` | Low        | `X-Powered-By: Next.js` on every response   | ✅ Fixed same day      |
+| `GAP-99` | Low–Medium | No app-level rate limit on the auth actions | ⚪ Assessed, not fixed |
+
+**`GAP-96` is the one that mattered.** `base-uri` and `form-action` are the only two directives in this policy that **do not fall back to `default-src`** — the CSP specification's fallback chain covers fetch directives only. So `default-src 'self'` gave no protection whatsoever on either axis, rather than the inherited `'self'` a reader of the policy would reasonably assume. Without `base-uri`, an injected `<base>` tag retargets every relative URL on the page including the Next.js chunk paths; without `form-action`, an injected `<form>` posts to an attacker's origin. **The second is the more serious here, because Step 4 holds the charity's drafted answers in form state.**
+
+All three fixes were **verified live, not by inspection** — the directives confirmed in a real response header, `X-Powered-By` confirmed absent, and **sign-in re-tested end-to-end**, since a Server Action POST is precisely what `form-action 'self'` could have broken. Seven routes then swept for violations and blocked resources: none.
+
+**`GAP-99` was deliberately not fixed.** `signIn`, `registerUser` and `requestPasswordReset` carry no application-level rate limit and rely on Supabase Auth's built-in limits — a real control, but one this project has never verified (`supabase/config.toml`'s `email_sent = 2` governs the **local** instance only). Adding an app-level limit to sign-in is not a free win: too tight and a legitimate charity locks itself out of its own grant application, which for this product is a worse outcome than the attack being mitigated. That is a product judgement, not a security one. **The action owed at `P5.4` is to read and record the production dashboard's actual limits — the gap is that nobody has looked**, not that the control is known to be absent.
+
+### Everything else that was checked
+
+`npm audit` reports **0 vulnerabilities at every severity** (dated snapshot, re-run at sign-off as `P5.2` requires — the position has changed three times in three weeks). No real value from `.env.local` appears in any tracked file, tested by searching for each secret rather than by eyeballing. No env file has _ever_ been committed except `.env.example`. Server-only keys are unreachable from client code, with `lib/env.ts` checked properly rather than waved through — it is imported only by `instrumentation.ts`, inside a `NEXT_RUNTIME === 'nodejs'` guard. Sentry `beforeSend` scrubbing is live on all three runtimes, **with the wiring checked rather than assumed**: Next.js 16 uses `instrumentation-client.ts`, which would normally make a separate `sentry.client.config.ts` dead code — a dead scrubbing config being worse than none — and it is not dead, because the former explicitly imports the latter. Session expiry measured from a real JWT at exactly 3600s against the 60-minute app timeout.
+
+**Incidental confirmation of `C13`:** the live response carried `X-Vercel-Id: lhr1::lhr1::…` — independent evidence that compute executes in London, which until now rested solely on a dashboard setting.
+
+### Scope limit, stated rather than implied
+
+**Every live check ran against `grant-pathway-dev`.** The code-level findings carry over unchanged. **The three checks that read live configuration — RLS, storage policies, session expiry — prove dev only** and must be re-confirmed at `P5.4`/`P5.5`. Dev and prod have diverged before: the 2026-07-01 reconciliation found six columns and five functions on one and not the other. The artefact says this in its own §2 so a dated sign-off cannot be read as covering more than it does.
+
+`type-check`, `lint --max-warnings 0`, 280 tests and a clean `next build` all pass. One build run failed first with parse errors in `.next/dev/types/routes.d.ts` — the running dev server writing generated types while the build type-checked, not a defect; recorded in the artefact so it is not rediscovered and misattributed. `ADR-TRACEABILITY.md` → v2.74 (**99 rows, each number used exactly once**); `technical-design.md` and `ADR-SEC-004`'s CSP tables corrected, both of which were **already stale on two other directives** before this change.
+
+---
+
+## 2026-08-15 — `P5.4a` closed: staying on Vercel, two stale rationales in `ADR-STACK-004` corrected, proposal row removed
 
 **WJ's decision, taken on the evaluation below: stay on Vercel, correct the two overstated rationales, remove `P5.4a`, proceed to `P5.2`.** Documentation only — no code changed.
 

@@ -894,8 +894,15 @@ Static security headers are configured in `next.config.ts`. (ADR-SEC-004)
 | `img-src`         | `'self' data:`                                               |
 | `connect-src`     | `'self' https://*.supabase.co https://*.ingest.de.sentry.io` |
 | `frame-ancestors` | `'none'`                                                     |
+| `base-uri`        | `'self'` — _added 2026-08-15, `GAP-96`_                      |
+| `form-action`     | `'self'` — _added 2026-08-15, `GAP-96`_                      |
+| `object-src`      | `'none'` — _added 2026-08-15, `GAP-97`_                      |
 
 In development, `'unsafe-eval'` is added to `script-src` for React call-stack reconstruction.
+
+**Why `base-uri` and `form-action` are listed explicitly (added 2026-08-15, `P5.2` security review).** They are the only two directives here that **do not fall back to `default-src`** — the CSP specification's fallback chain covers fetch directives only. Until they were added, `default-src 'self'` gave no protection on either axis: an injected `<base>` tag could retarget every relative URL on the page including the Next.js chunk paths, and an injected `<form>` could post to an attacker's origin. The second is the one that matters most in this application, because Step 4 holds the charity's drafted answers in form state. `object-src` **does** inherit, so `'none'` is a tightening rather than a fix — nothing here loads a plugin, and `'none'` is narrower than the inherited `'self'`.
+
+**`X-Powered-By` is suppressed** via `poweredByHeader: false` in `next.config.ts` (`GAP-98`, same review). Next.js sets it by default; it disclosed the framework on every response.
 
 ### Secrets management
 

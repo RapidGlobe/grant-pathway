@@ -32,6 +32,23 @@ function buildCsp(nonce: string): string {
     // Sentry EU ingest — must be present or browser SDK requests are silently blocked
     "connect-src 'self' https://*.supabase.co https://*.ingest.de.sentry.io",
     "frame-ancestors 'none'",
+    // Added 2026-08-15 (P5.2 security review, GAP-96/GAP-97).
+    //
+    // base-uri and form-action are the two directives here that do NOT fall
+    // back to default-src — the CSP spec's fallback chain covers fetch
+    // directives only. Without them, 'default-src self' gives no protection at
+    // all on either axis:
+    //   base-uri   — an injected <base> tag silently retargets every relative
+    //                URL on the page, including the Next.js chunk paths.
+    //   form-action— an injected <form> can post to an attacker's origin.
+    //                This is the one that matters most here: Step 4 holds the
+    //                charity's drafted answers in form state.
+    // object-src does inherit from default-src, so 'none' is a tightening
+    // rather than a fix — nothing in this app loads a plugin, and 'none' is
+    // narrower than default-src's 'self'.
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
   ].join('; ')
 }
 
