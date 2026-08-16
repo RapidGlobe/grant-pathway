@@ -94,6 +94,16 @@ Sections A–G are all recorded, every mismatch either remediated or raised as i
 
 **`G3`** — one verified sending domain, several keys by design: `RESEND_API_KEY` is Production-scope only in Vercel, local development uses its own, and the two Supabase projects hold different SMTP passwords.
 
+### Resend TLS applied — Enforced, one day after it was decided
+
+`grantpathway.org.uk` → Configuration → TLS now reads **Enforced**, screenshot-verified. It governs the last hop only — Resend to the recipient's mail provider — and covers both email paths, since the SMTP and REST routes share the one verified domain. Under Opportunistic, a verification or password-reset token could travel in clear text where TLS couldn't be negotiated; that was the only place in this system where a credential was permitted to go unencrypted.
+
+**The "DECIDED, NOT YET APPLIED" wording in `ADR-OPS-003` stood for exactly one day, and it was accurate while it stood.** It's superseded now but kept rather than deleted — recording the gap between deciding and applying is the practice, after `P5.3`'s gate row and `P5.3b`'s status line were both wrong for want of it.
+
+⚠️ **Applying the setting closes the decision and not the open question — which is now sharper, not softer.** While TLS was Opportunistic, an unanswerable failure question was hypothetical: nothing was being refused. **From today a refusal is possible and we still cannot say we would see it.** The partial answer came from Resend's documentation chatbot rather than support: a `failed` event exists, but whether a TLS rejection surfaces through it distinguishably is unconfirmed. **The support ticket is more pressing than it was yesterday.** The failure mode to hold in mind is a charity that never receives its verification email and gives up — silent at both ends, because the registration and reset flows are deliberately non-revealing.
+
+**Sending region re-confirmed in the same screenshot** — `Ireland (eu-west-1)`. `GAP-102` (the published policy places Resend in the United States) now rests on directly observed evidence twice over rather than a single reading.
+
 ### `TS-07` corrected — second miscount of the same entry, now restructured so it can't recur
 
 Answering "what is Upstash actually for?" exposed that `technology-stack.md`'s TS-07 was wrong again. It read "**both** AI API routes". There are **four call sites across two limiters**: `actions/charity.ts`'s Charity Commission lookup also uses `aiRatelimit` and had never appeared in the entry, and `resendRatelimit` was absent from it altogether.
