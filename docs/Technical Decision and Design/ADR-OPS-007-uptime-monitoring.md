@@ -99,18 +99,24 @@ Pinging the homepage confirms the CDN is responding, but not that the applicatio
   - **Add the second monitor rather than re-pointing this one.** Keeping both is diagnostic: both green means healthy; domain red with Vercel green isolates the fault to DNS or the certificate rather than the application; both red means the app itself is down.
   - **Observed:** checks run from **North America** (free plan auto-selects region) with a ~1,930 ms response. Adequate for availability measurement, but it is not a UK-user latency figure and should not be read as one.
 - No additional environment variables required — the health endpoint uses the Supabase connection already configured.
+- ⚠️ **A SECOND uptime monitor exists and this ADR did not know about it — found 2026-08-16, recorded here rather than removed.** Sentry has been running _"Uptime Monitoring for `https://grant-pathway-three.vercel.app`"_ at **1-minute** intervals, green across the full 14-day window and wired to three alert rules. **It surfaced only because `SentryUptimeBot` appeared in the Axiom log stream** — nothing in this project referenced it, and until this note the document set described a one-monitor world.
+  - **They are not duplicates, and deleting either would lose something.** Sentry polls **`/`** and answers _"is the site serving?"_. UptimeRobot polls **`/api/health`**, which returns 503 when the database is unreachable, and answers _"is the service actually working?"_. **A site can serve its pages perfectly while the database is down** — which is exactly the Supabase spend-cap failure mode this ADR's UptimeRobot monitor was justified on, since Supabase sends no warning before the cap bites.
+  - **They also fail independently.** An outage at Sentry does not blind UptimeRobot and vice versa. For a service with one operator and no on-call rota, two unrelated watchers is a feature.
+  - **The 1-minute interval is the more sensitive of the two**, so in practice Sentry will usually notice an outright outage first and UptimeRobot will be the one that notices a _sick_ service.
+  - **Decision owed, not action:** keep both and record why (the position taken here), or drop one deliberately. **What must not happen is a future session finding two monitors, assuming redundancy, and deleting the health-endpoint one** — which is the one that catches the failure that actually threatens this service.
 
 ## Observability Stack — Complete Picture
 
 This ADR completes the observability stack for Grant Pathway v1:
 
-| Layer               | Tool                 | What it covers                              | Where to look                         |
-| ------------------- | -------------------- | ------------------------------------------- | ------------------------------------- |
-| Uptime              | UptimeRobot          | Is the app reachable? Is the DB responding? | Email alert and UptimeRobot dashboard |
-| App errors          | Sentry EU            | Unhandled exceptions, AI API failures       | Sentry dashboard (eu.sentry.io)       |
-| DB / Auth / Storage | Supabase dashboard   | Slow queries, auth failures, storage errors | Supabase project dashboard            |
-| Deployments         | Vercel dashboard     | Build failures, deployment status           | Vercel dashboard                      |
-| Dev debugging       | Vercel function logs | Real-time logs during development           | Vercel CLI or dashboard               |
+| Layer               | Tool                 | What it covers                               | Where to look                         |
+| ------------------- | -------------------- | -------------------------------------------- | ------------------------------------- |
+| Uptime — service    | UptimeRobot          | `/api/health`, 5 min — is the DB responding? | Email alert and UptimeRobot dashboard |
+| Uptime — site       | Sentry               | `/`, 1 min — is the site serving at all?     | Sentry → Monitors → Uptime Monitors   |
+| App errors          | Sentry EU            | Unhandled exceptions, AI API failures        | Sentry dashboard (eu.sentry.io)       |
+| DB / Auth / Storage | Supabase dashboard   | Slow queries, auth failures, storage errors  | Supabase project dashboard            |
+| Deployments         | Vercel dashboard     | Build failures, deployment status            | Vercel dashboard                      |
+| Dev debugging       | Vercel function logs | Real-time logs during development            | Vercel CLI or dashboard               |
 
 **Supabase logs to check when something goes wrong:**
 
