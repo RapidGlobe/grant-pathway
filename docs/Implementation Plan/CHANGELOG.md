@@ -59,7 +59,23 @@ All three Sentry configs set `environment: process.env.NODE_ENV`. **Vercel build
 - **`tracesSampleRate` was left alone**, against the original recommendation. Applying the new value would have raised previews from 10% to **100%** sampling — increasing quota use while presenting as part of the fix. The sampling split that matters is local-versus-deployed, which `NODE_ENV` already expresses correctly.
 - **`||`, not `??`.** `.env.local` carries `VERCEL_ENV=` with a blank value, and `??` falls through only on null/undefined — so the originally proposed expression would have tagged every local event with an empty string. **That is `GAP-50`'s failure mode reproduced inside the fix for a different gap**, caught by reading `.env.local` instead of assuming the variable was simply absent.
 
-⚠️ **The client half is inert until Vercel's "Automatically expose System Environment Variables" is enabled.** Non-public variables never reach the browser — confirmed in the bundled Next.js docs rather than from memory — so the client needs `NEXT_PUBLIC_VERCEL_ENV`, and `.env.local` carries only the private copy. Until the toggle is on, **server and edge events are correctly tagged while browser events are not**, which is a mixed state worth knowing about rather than discovering.
+✅ **Verified and closed the same day — and the "waiting on a Vercel toggle" caveat written above it was wrong.** Vercel's **"Enable access to System Environment Variables"** was already on. The inference that it was off came from `NEXT_PUBLIC_VERCEL_ENV` being absent from `.env.local`, which does not reflect the project setting. **Kept here rather than quietly corrected**, because it is the second inference in two days drawn from a local file about a remote environment — the `smtp_pass` reading was the first.
+
+**What actually proves it: a clean build with `NEXT_PUBLIC_VERCEL_ENV=preview` inlines `environment:"preview"` as a literal into the client chunk.** The whole fallback chain folds at build time, which is the discriminating result. Reading the live production client — `environment: "production"`, release matching the commit, DSN set — confirms the deployment is live but proves nothing on its own, since production reports the same value under the old code.
+
+**The one remaining assumption is Vercel's documented behaviour**, that it sets `NEXT_PUBLIC_VERCEL_ENV` to `preview` on preview builds. The code is proven correct for whatever value it receives; the platform supplying the right value is taken on documentation, and is what to re-check if a preview ever tags wrongly.
+
+### `GAP-108` — every preview deployment this project has made was dead on arrival
+
+**Found by trying to verify `GAP-107` on a real preview.** A throwaway branch built green, the Vercel check passed, and the page returned "This page couldn't load — a server error occurred."
+
+**Vercel's build succeeding is not evidence the app runs.** `lib/env.ts` validates at server startup, not at build time. **Five variables are scoped Production-only** — `RESEND_API_KEY`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `NEXT_PUBLIC_SITE_URL`, `PREPROCESS_CHAR_CEILING` — and the first three are ones the schema throws on.
+
+So **no pull-request preview has ever been usable**, including both open Dependabot PRs. Their green Vercel check says "Deployment has completed", which is true and says nothing about whether it serves.
+
+> ⚠️ **The fix is a security decision, not a configuration chore.** Copying the live Bedrock and Resend credentials into Preview scope would let any automatically-created preview spend real money and send real email as the charity-facing sender. And `SUPABASE_SERVICE_ROLE_KEY` and `NEXT_PUBLIC_SUPABASE_URL` are **already** Preview-scoped — so what their Preview values point at should be checked first, since a working preview aimed at the production database is `GAP-103` running in the other direction.
+
+**Nothing in the project would have surfaced this**, which is the same absent-signal pattern as `GAP-100` and `GAP-103`. One line of Vercel's runtime log would confirm the cause before anything is changed.
 
 **Verified in the built client bundle**, not inferred: a clean `next build` shows the fallback chain reaching Sentry's init. That also revealed `@sentry/nextjs` already defaults `environment` to `` `vercel-${NEXT_PUBLIC_VERCEL_ENV}` `` when none is passed — a viable alternative fix, rejected to avoid the `vercel-` prefix and keep `development` locally. `lib/env-vars.ts` gained both new variables after `__tests__/env-blank-handling.test.ts` failed without them, which is `GAP-50`'s staleness guard working exactly as intended.
 
