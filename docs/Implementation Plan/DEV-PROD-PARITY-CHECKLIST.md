@@ -47,7 +47,13 @@ Run against the Supabase Management API (`GET /v1/projects/{ref}/config/auth`) u
 
 **229 of 242 keys are identical. 13 differ.** Of those, **5 are real problems, 6 are the known template gap, and 2 are correct by design.**
 
-### 🔴 Real divergence — production is missing dev's password hardening entirely
+### 🔴 Real divergence — production is missing dev's password hardening entirely → ✅ **APPLIED 2026-08-16**
+
+> **All five were set on production by WJ on 2026-08-16**, screenshot-verified on `grant-pathway-prod` → Authentication → Sign In / Providers → Email. Production now matches dev on every row in the table below.
+>
+> ⚠️ **`GAP-104` stays 🔵 Partial, not ✅, and this document is the reason why.** The evidence is a dashboard screenshot — the settings are _configured_, and no behaviour has been observed under them. **That is the exact class of proof this checklist exists to distrust**: `GAP-103`, `GAP-101` and the template gap all looked verified on the same kind of evidence. **Two behavioural checks are deferred to `P5.5` (WJ's decision, 2026-08-16)** and written into `IMPLEMENTATION-PLAN.md` P5.5 §3 so the deferral survives the session — a registration with a breach-list password (the only test that distinguishes Supabase's check from `lib/validation.ts` doing the work), and a password change with an incorrect current password.
+>
+> **One consequence surfaces immediately: `GAP-106`.** With the leaked-password check on, all three password forms render a single message for every `weak_password` cause — _"must be at least 12 characters and include both letters and numbers"_ — which a breached password usually already satisfies. Latent on dev since 2026-06-29; live on production from 2026-08-16.
 
 | Setting                                             | Dev              | Prod      |
 | --------------------------------------------------- | ---------------- | --------- |
@@ -65,7 +71,7 @@ Run against the Supabase Management API (`GET /v1/projects/{ref}/config/auth`) u
 - **`password_hibp_enabled` has no application-side equivalent.** It is a Supabase feature backed by HaveIBeenPwned. With it off, that element of the documented `FR-02` policy **is not in force on production at all**, and no amount of application code compensates.
 - **`security_update_password_require_current_password`** resolves the assumption `P5.4` flagged: `actions/auth.ts`'s `changePassword` unconditionally sends `current_password`, and it has only ever been exercised against **dev, where the setting is ON**. Its behaviour on production, with the setting OFF, has never been observed.
 
-**Recommended action: set production to match dev on all five.** Dev is right; no decision is needed beyond confirming that.
+**Recommended action: set production to match dev on all five.** Dev is right; no decision is needed beyond confirming that. — ✅ **Done 2026-08-16.** The table above records the values as they stood on 2026-08-15; the Prod column is now historical. See the note under this section's heading for what remains outstanding, which is verification rather than configuration.
 
 ### 🟠 Email templates — the known gap, now fully scoped
 
@@ -87,7 +93,17 @@ Production runs Supabase's stock templates. **Exactly two are customised on dev*
 | Setting          | Why the difference is right                                                                                                               |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `uri_allow_list` | Dev carries `http://localhost:3000/**` for local development; prod carries the three real hosts set by `GAP-100`. **They should differ.** |
-| `smtp_pass`      | Different stored values. See the credential note below.                                                                                   |
+| `smtp_pass`      | Different stored values. See the credential note directly below this table.                                                               |
+
+#### Credential note — the `smtp_pass` values, and the rotation that was considered and declined
+
+**Written 2026-08-16. The 2026-08-15 table above promised this note and it was never written** — recorded here rather than quietly filled in, because a dangling cross-reference in a parity document is the same failure mode the document exists to catch.
+
+The audit printed both projects' `smtp_pass` values into the session transcript in full: **two 64-character hexadecimal strings**. They differ between dev and prod, which is why the row sits under "correct by design" rather than as a mismatch — a difference in stored credential is expected and is not drift.
+
+**They are not usable Resend API keys.** Resend keys carry an `re_` prefix and are far shorter; a 64-character hex string is a transformed representation, not the plaintext credential. **Rotation was therefore considered and declined by WJ on 2026-08-16**, on the basis that no usable secret had been disclosed. Had it gone ahead, the key lives in **four** places and all four must move together or email fails silently: the Vercel `RESEND_API_KEY` variable (all scopes), the SMTP password on **both** Supabase projects, and `.env.local`.
+
+⚠️ **The inference is sound but is an inference.** It rests on the format of a Resend key, not on a statement from Supabase, whose Management API documentation does not describe how `smtp_pass` is returned. If that assumption is ever shown to be wrong, the rotation above is the remedy and the four locations are the checklist.
 
 ### ✅ Verified identical — 229 keys, including everything else on this checklist
 
@@ -105,19 +121,19 @@ Record **both** values. A setting that matches is as worth recording as one that
 
 ### A. Auth → Sign In / Providers → Email
 
-| #   | Setting                                    | Prod (known 2026-08-15) | Dev | Match? |
-| --- | ------------------------------------------ | ----------------------- | --- | ------ |
-| A1  | Enable email provider                      | ON                      |     |        |
-| A2  | Secure email change                        | ON                      |     |        |
-| A3  | **Secure password change**                 | **OFF**                 |     |        |
-| A4  | **Require current password when updating** | **OFF**                 |     |        |
-| A5  | **Prevent use of leaked passwords**        | **OFF**                 |     |        |
-| A6  | **Minimum password length**                | **6**                   |     |        |
-| A7  | **Password requirements**                  | **none set**            |     |        |
-| A8  | Email OTP expiration                       | 3600s                   |     |        |
-| A9  | Email OTP length                           | 8                       |     |        |
+| #   | Setting                                    | Prod (known 2026-08-15)                  | Dev              | Match? |
+| --- | ------------------------------------------ | ---------------------------------------- | ---------------- | ------ |
+| A1  | Enable email provider                      | ON                                       |                  |        |
+| A2  | Secure email change                        | ON                                       |                  |        |
+| A3  | **Secure password change**                 | OFF → **ON** (2026-08-16)                | ON               | ✅ now |
+| A4  | **Require current password when updating** | OFF → **ON** (2026-08-16)                | ON               | ✅ now |
+| A5  | **Prevent use of leaked passwords**        | OFF → **ON** (2026-08-16)                | ON               | ✅ now |
+| A6  | **Minimum password length**                | 6 → **12** (2026-08-16)                  | 12               | ✅ now |
+| A7  | **Password requirements**                  | none → **letters + digits** (2026-08-16) | letters + digits | ✅ now |
+| A8  | Email OTP expiration                       | 3600s                                    | 3600s            | ✅     |
+| A9  | Email OTP length                           | 8                                        | 8                | ✅     |
 
-⚠️ **A3–A7 are `GAP-104`.** The app enforces 12 characters itself (`lib/validation.ts`), so A6/A7 are not a live hole — but **the leaked-password check (A5) cannot be done by the application**, so that element of the documented `FR-02` policy is simply not in force on production.
+⚠️ **A3–A7 are `GAP-104`, and all five were applied to production on 2026-08-16** — the Prod column records both the value found and the value set. The app enforces 12 characters itself (`lib/validation.ts`), so A6/A7 were never a live hole; **the leaked-password check (A5) is the one the application could not perform**, and that element of the documented `FR-02` policy was not in force on production until this change. **Configured is not verified** — see the note under the audit result above for the two checks deferred to `P5.5`.
 
 ⚠️ **A4 matters for a specific reason.** `actions/auth.ts`'s `changePassword` unconditionally sends `current_password`. `P5.4` already flagged that as an assumption rather than a verified fact. If dev has it ON and prod OFF, password change behaves differently in the two places — and every test to date ran against dev.
 

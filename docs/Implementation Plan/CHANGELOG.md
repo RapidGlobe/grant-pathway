@@ -10,7 +10,35 @@
 
 ---
 
-## 2026-08-15 (latest) — The live site had been using the development database all along; `GAP-103` found, fixed and verified, and an earlier "proven on production" result retracted
+## 2026-08-16 (latest) — `GAP-104`'s password settings applied to production; `GAP-106` raised as a direct consequence; the Resend rotation considered and declined
+
+**`P5.4` continued.** Three items from the day's list, one of which was a decision to _not_ do something.
+
+### `GAP-104` — production's five password settings brought into line with dev
+
+WJ set all five on `grant-pathway-prod`: minimum length 6 → **12**, requirements none → **letters and digits**, **Prevent use of leaked passwords** OFF → **ON**, **Secure password change** OFF → **ON**, **Require current password when updating** OFF → **ON**. Production now matches dev on all 242 audited auth-configuration keys except `uri_allow_list` and `smtp_pass`, both of which should differ.
+
+**No decision was needed, and that was the useful part of the `GAP-105` audit.** Reading production alone had suggested five weak settings and an argument about what the right values were. The comparison showed dev holding **every one** correctly — so this was one environment missing the 2026-06-29 hardening pass (`VQ-009`), not two environments disagreeing.
+
+**Nothing user-facing changed.** `lib/validation.ts` already enforced 12 characters and letters-and-digits application-side, and `actions/auth.ts` already maps Supabase's rejection onto the existing `weak_password` state, so no new error path became reachable.
+
+> ⚠️ **`GAP-104` is recorded as 🔵 Partial, not ✅ — deliberately.** The evidence is a dashboard screenshot: the settings are **configured**, and no behaviour has been observed under them. On 2026-08-15 that exact class of evidence was wrong three times in one day. **Two behavioural checks are deferred to `P5.5` at WJ's decision** and written into `IMPLEMENTATION-PLAN.md` P5.5 §3 rather than left in conversation — a registration with a breach-list password, and a password change with an incorrect current password. `P5.5` closes the row; `P5.4` does not.
+
+### `GAP-106` — one password error message, three possible causes
+
+Turning the leaked-password check on makes a pre-existing message reachable in a state where it is wrong. All three password forms render a single sentence for every `weak_password` rejection — _"Your password must be at least 12 characters and include both letters and numbers"_ — but `@supabase/auth-js` types three distinct causes (`length`, `characters`, `pwned`). **A breached password normally satisfies both conditions the sentence names**, so the user is told to do what they have already done, with no way to act on it.
+
+**The mapping was correct when written**: until today the breach check was off in production, so length and characters really were the only causes. Latent on dev since 2026-06-29; live on production from now. **Raised rather than fixed on the spot** — it is user-facing copy on the registration path, `P5.1` closed with the current wording reviewed, and the fix should be a product decision on what a breach rejection says. `P5.5`'s `GAP-104` test will produce the message as a by-product, which is the cheapest possible confirmation.
+
+### The Resend API key — rotation considered and declined
+
+The `GAP-105` audit printed both projects' `smtp_pass` values into the transcript. **Decision (WJ, 2026-08-16): do not rotate.** The values were two 64-character hexadecimal strings; Resend API keys carry an `re_` prefix and are much shorter, so what was disclosed cannot be a usable credential. The reasoning and the four locations a rotation would have to touch — Vercel, both Supabase projects, `.env.local` — are recorded in `DEV-PROD-PARITY-CHECKLIST.md` under the credential note, **which that document had promised since 2026-08-15 and never contained.** The dangling reference is fixed in the same pass, because an unwritten note in a parity document is the failure mode that document exists to catch.
+
+**Also closed:** the temporary Supabase Management API token was revoked, and `SUPABASE_ACCESS_TOKEN` confirmed absent from `.env.local`.
+
+---
+
+## 2026-08-15 — The live site had been using the development database all along; `GAP-103` found, fixed and verified, and an earlier "proven on production" result retracted
 
 **`P5.4` continued. Five of the Supabase steps complete, the Vercel environment variables set, UptimeRobot live, and two decisions taken.** The session's most important outcome is a correction.
 
