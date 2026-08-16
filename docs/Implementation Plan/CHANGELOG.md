@@ -94,6 +94,16 @@ Sections A–G are all recorded, every mismatch either remediated or raised as i
 
 **`G3`** — one verified sending domain, several keys by design: `RESEND_API_KEY` is Production-scope only in Vercel, local development uses its own, and the two Supabase projects hold different SMTP passwords.
 
+### `TS-07` corrected — second miscount of the same entry, now restructured so it can't recur
+
+Answering "what is Upstash actually for?" exposed that `technology-stack.md`'s TS-07 was wrong again. It read "**both** AI API routes". There are **four call sites across two limiters**: `actions/charity.ts`'s Charity Commission lookup also uses `aiRatelimit` and had never appeared in the entry, and `resendRatelimit` was absent from it altogether.
+
+⚠️ **Same class of error as the 2026-07-30 correction, in the opposite direction** — that one fixed an overcount of three when there were two. **A prose count in a document that isn't the source of truth will keep going stale**, so it's now a table: a future change adds or removes a row rather than requiring a sentence to be re-counted.
+
+Two facts recorded that were nowhere in the document: the **Charity Commission lookup shares the AI limiter despite not being an AI call** — defensible, both are metered external services, but the name doesn't say so — and **cron routes are deliberately excluded** from both limiters. The service-status row now reads one Redis database, `eu-west-1` (Ireland), free tier, shared by dev and production.
+
+**Found because two project documents disagreed:** `security-review-2026-08-15.md` had recorded all three `aiRatelimit` sites correctly on 15 August.
+
 ### `GAP-109` — Upstash processes email addresses and the privacy policy doesn't name it
 
 Because `resendRatelimit` is keyed by email, every verification resend writes a user's address into Redis. The published policy's processor table names **Supabase, AWS Bedrock, Resend, Vercel and Sentry** — five. Upstash is absent.
