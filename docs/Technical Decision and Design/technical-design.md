@@ -908,21 +908,29 @@ In development, `'unsafe-eval'` is added to `script-src` for React call-stack re
 
 Environment variables are stored in Vercel (scoped per environment) and in `.env.local` locally. (ADR-SEC-006)
 
-| Variable                        | Browser accessible | Used in                                 |
-| ------------------------------- | ------------------ | --------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Yes                | Client and server                       |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes                | Client and server                       |
-| `NEXT_PUBLIC_SENTRY_DSN`        | Yes                | Client-side Sentry SDK                  |
-| `SUPABASE_SERVICE_ROLE_KEY`     | **No**             | API routes only                         |
-| `AWS_ACCESS_KEY_ID`             | **No**             | AI API routes only (Amazon Bedrock)     |
-| `AWS_SECRET_ACCESS_KEY`         | **No**             | AI API routes only (Amazon Bedrock)     |
-| `AWS_REGION`                    | **No**             | AI API routes only — value: `eu-west-2` |
-| `UPSTASH_REDIS_REST_URL`        | **No**             | AI API routes only                      |
-| `UPSTASH_REDIS_REST_TOKEN`      | **No**             | AI API routes only                      |
-| `RESEND_API_KEY`                | **No**             | Email sending (Resend)                  |
-| `CRON_SECRET`                   | **No**             | Cron route authentication               |
-| `SENTRY_DSN`                    | **No**             | Server-side Sentry SDK                  |
-| `AI_ENABLED`                    | **No**             | Kill-switch for all AI routes           |
+| Variable                        | Browser accessible | Used in                                                                |
+| ------------------------------- | ------------------ | ---------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Yes                | Client and server                                                      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes                | Client and server                                                      |
+| `NEXT_PUBLIC_SENTRY_DSN`        | Yes                | Client-side Sentry SDK                                                 |
+| `SUPABASE_SERVICE_ROLE_KEY`     | **No**             | API routes only                                                        |
+| `AWS_ACCESS_KEY_ID`             | **No**             | AI API routes only (Amazon Bedrock)                                    |
+| `AWS_SECRET_ACCESS_KEY`         | **No**             | AI API routes only (Amazon Bedrock)                                    |
+| `AWS_REGION`                    | **No**             | AI API routes only — value: `eu-west-2`                                |
+| `UPSTASH_REDIS_REST_URL`        | **No**             | AI API routes only                                                     |
+| `UPSTASH_REDIS_REST_TOKEN`      | **No**             | AI API routes only                                                     |
+| `RESEND_API_KEY`                | **No**             | Email sending (Resend)                                                 |
+| `CRON_SECRET`                   | **No**             | Cron route authentication                                              |
+| `SENTRY_DSN`                    | **No**             | Server-side Sentry SDK                                                 |
+| `AI_ENABLED`                    | **No**             | Kill-switch for all AI routes                                          |
+| `NEXT_PUBLIC_VERCEL_ENV`        | Yes                | Sentry `environment` tag on the client — supplied by Vercel, not by us |
+| `VERCEL_ENV`                    | **No**             | Sentry `environment` tag on server and edge — supplied by Vercel       |
+
+**The last two are supplied by the platform, not set by hand** (added 2026-08-16, `GAP-107`). They exist because `NODE_ENV` cannot distinguish a preview deployment from production — Vercel builds previews in production mode, so both reported `production` and a Sentry alert scoped to production also matched preview traffic. `lib/sentry-environment.ts` resolves the tag once for all three runtimes as `NEXT_PUBLIC_VERCEL_ENV || VERCEL_ENV || NODE_ENV`.
+
+⚠️ **Two details in that expression are deliberate and easy to undo by accident.** The public copy comes first because **non-public variables never reach the browser**, so the client would otherwise fall back to `NODE_ENV` and keep the old, imprecise tag. And it uses `||` rather than `??` because `.env.local` carries `VERCEL_ENV=` with a **blank** value — `??` falls through only on null/undefined, so it would tag every local event with an empty string. That is `GAP-50`'s failure mode, and it appeared inside the fix for a different gap.
+
+Both are listed in `lib/env-vars.ts`'s inventory, which `__tests__/env-blank-handling.test.ts` enforces — the test failed on the first run without them.
 
 A `.env.example` file with placeholder values is committed to the repository. `.env.local` is in `.gitignore` and must never be committed.
 
