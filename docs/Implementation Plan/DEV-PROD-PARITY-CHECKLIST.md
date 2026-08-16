@@ -73,7 +73,11 @@ Run against the Supabase Management API (`GET /v1/projects/{ref}/config/auth`) u
 
 **Recommended action: set production to match dev on all five.** Dev is right; no decision is needed beyond confirming that. — ✅ **Done 2026-08-16.** The table above records the values as they stood on 2026-08-15; the Prod column is now historical. See the note under this section's heading for what remains outstanding, which is verification rather than configuration.
 
-### 🟠 Email templates — the known gap, now fully scoped
+### 🟠 Email templates — the known gap, now fully scoped → ✅ **COPIED 2026-08-16**
+
+> **Dev's confirmation and recovery templates, subjects included, were copied verbatim into production by WJ on 2026-08-16.** The other four (invite, magic link, email change, reauthentication) were left stock on both, which is what the audit found and what `ADR-OPS-003`'s table should say.
+>
+> ⚠️ **Same standing as `GAP-104`: copied is not delivered.** No production email has been sent through the new templates. The check is a real registration against production, which lands in `P5.5` alongside the two password tests — one run covers all three.
 
 Production runs Supabase's stock templates. **Exactly two are customised on dev**, and both differ:
 
@@ -141,16 +145,16 @@ Record **both** values. A setting that matches is as worth recording as one that
 
 **Known divergent — prod is on Supabase defaults.** Found 15 August by comparing two verification emails side by side.
 
-| #   | Template             | Prod           | Dev     | Match? |
-| --- | -------------------- | -------------- | ------- | ------ |
-| B1  | Confirm signup       | ❌ **default** | branded | **NO** |
-| B2  | Invite user          |                |         |        |
-| B3  | Magic link / OTP     |                |         |        |
-| B4  | Change email address |                |         |        |
-| B5  | Reset password       |                |         |        |
-| B6  | Reauthentication     |                |         |        |
+| #   | Template             | Prod                          | Dev     | Match? |
+| --- | -------------------- | ----------------------------- | ------- | ------ |
+| B1  | Confirm signup       | default → **branded** (08-16) | branded | ✅ now |
+| B2  | Invite user          | stock                         | stock   | ✅     |
+| B3  | Magic link / OTP     | stock                         | stock   | ✅     |
+| B4  | Change email address | stock                         | stock   | ✅     |
+| B5  | Reset password       | default → **branded** (08-16) | branded | ✅ now |
+| B6  | Reauthentication     | stock                         | stock   | ✅     |
 
-**The fix is to copy dev's HTML into prod for each**, not to rewrite it. Dev's templates are the approved ones and match the tone-and-voice guide.
+**The fix was to copy dev's HTML into prod**, not to rewrite it — dev's templates are the approved ones and match the tone-and-voice guide. **Done 2026-08-16 for B1 and B5**, subjects included. B2, B3, B4 and B6 are stock on **both** environments and were deliberately left alone: matching stock is parity, and customising them here would create the divergence this document exists to remove.
 
 ### C. Auth → Emails → Security notifications
 

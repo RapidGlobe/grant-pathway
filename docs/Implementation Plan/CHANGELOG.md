@@ -34,6 +34,12 @@ Turning the leaked-password check on makes a pre-existing message reachable in a
 
 The `GAP-105` audit printed both projects' `smtp_pass` values into the transcript. **Decision (WJ, 2026-08-16): do not rotate.** The values were two 64-character hexadecimal strings; Resend API keys carry an `re_` prefix and are much shorter, so what was disclosed cannot be a usable credential. The reasoning and the four locations a rotation would have to touch — Vercel, both Supabase projects, `.env.local` — are recorded in `DEV-PROD-PARITY-CHECKLIST.md` under the credential note, **which that document had promised since 2026-08-15 and never contained.** The dangling reference is fixed in the same pass, because an unwritten note in a parity document is the failure mode that document exists to catch.
 
+### Email templates copied into production
+
+Dev's **confirmation** and **recovery** templates — subjects included — were copied verbatim into `grant-pathway-prod`. The other four (invite, magic link, email change, reauthentication) are stock on **both** environments and were deliberately left alone: matching stock is parity, and customising them here would create a fresh divergence. This closes the `GAP-105` audit's second recommendation.
+
+**Same standing as `GAP-104`: copied is not delivered.** No production email has yet been sent through them. One real registration against production at `P5.5` covers this and both password checks together.
+
 **Also closed:** the temporary Supabase Management API token was revoked, and `SUPABASE_ACCESS_TOKEN` confirmed absent from `.env.local`.
 
 ---
