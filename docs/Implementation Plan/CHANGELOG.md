@@ -79,7 +79,30 @@ So **no pull-request preview has ever been usable**, including both open Dependa
 
 **Verified in the built client bundle**, not inferred: a clean `next build` shows the fallback chain reaching Sentry's init. That also revealed `@sentry/nextjs` already defaults `environment` to `` `vercel-${NEXT_PUBLIC_VERCEL_ENV}` `` when none is passed — a viable alternative fix, rejected to avoid the `vercel-` prefix and keep `development` locally. `lib/env-vars.ts` gained both new variables after `__tests__/env-blank-handling.test.ts` failed without them, which is `GAP-50`'s staleness guard working exactly as intended.
 
-**`GAP-105` now has section G alone outstanding.** `G4` is answered from `VQ-021` (separate IAM users by design, both `eu-west-2`); `G2` and `G3` need values read from Vercel. **`G2` is the consequential one:** `lib/rate-limit.ts` uses the fixed prefixes `grant-pathway:ai` and `grant-pathway:resend` with no environment segment, so a shared Upstash instance means development consumes real users' AI allowance.
+### `GAP-105` closed — the parity audit is complete, and it produced five gaps
+
+Sections A–G are all recorded, every mismatch either remediated or raised as its own gap.
+
+**`G2` — one Upstash database, so it is shared. The predicted consequence was wrong, and instructively so.** The checklist assumed the fixed key prefixes (`grant-pathway:ai`, no environment segment) meant counters were shared throughout. The prefixes don't separate environments — but the **identifiers** do, for one limiter and not the other:
+
+| Limiter                    | Keyed by                                  | Actually shared?                                               |
+| -------------------------- | ----------------------------------------- | -------------------------------------------------------------- |
+| `aiRatelimit` (5/60s)      | `user.id` — a Supabase UUID               | **No.** Separate projects, different UUIDs, keys never collide |
+| `resendRatelimit` (3/hour) | **email address** (`actions/auth.ts:581`) | **Yes.** Same string in both environments                      |
+
+⚠️ **The email-resend limit is a `P5.5` trap.** Three resends for an address on dev leave none for that address on production, and `P5.5` re-runs every plan against production using accounts already exercised on dev. **A resend that silently does nothing would read as a production email fault** rather than a counter consumed an hour earlier somewhere else. Use fresh addresses, or wait the hour. The monthly 50-request AI cap is unaffected — it lives in the database, so each project counts its own.
+
+**`G3`** — one verified sending domain, several keys by design: `RESEND_API_KEY` is Production-scope only in Vercel, local development uses its own, and the two Supabase projects hold different SMTP passwords.
+
+### `GAP-109` — Upstash processes email addresses and the privacy policy doesn't name it
+
+Because `resendRatelimit` is keyed by email, every verification resend writes a user's address into Redis. The published policy's processor table names **Supabase, AWS Bedrock, Resend, Vercel and Sentry** — five. Upstash is absent.
+
+**Two mitigating facts, stated rather than left to be rediscovered:** the data is transient (a 3-per-hour window, so keys live about an hour), and the database is in `eu-west-1` (Ireland) — EEA, adequacy-covered, so no IDTA question arises. **The omission is the finding, not the location.** The internal `legal-review-options-2026-07-29.md` does list Upstash, so the service was known to the legal work; it's the external document that didn't carry it.
+
+⚠️ **Raised, not edited** — same reasoning as `GAP-102`. And this is now the **second** finding against the same solicitor-reviewed policy, which is itself worth noticing: they may belong in one re-review rather than two separate amendments.
+
+> **Five gaps came out of the parity work** — `GAP-104`, `GAP-106`, `GAP-107` (fixed and verified), `GAP-109`, plus `GAP-108` from trying to verify one of them. **None would have surfaced any other way**, which is the case `GAP-105` was opened to make. `G4` is answered from `VQ-021` (separate IAM users by design, both `eu-west-2`); `G2` and `G3` need values read from Vercel. **`G2` is the consequential one:** `lib/rate-limit.ts` uses the fixed prefixes `grant-pathway:ai` and `grant-pathway:resend` with no environment segment, so a shared Upstash instance means development consumes real users' AI allowance.
 
 **Also closed:** the temporary Supabase Management API token was revoked, and `SUPABASE_ACCESS_TOKEN` confirmed absent from `.env.local`.
 
