@@ -9,9 +9,10 @@ Sentry.init({
   // which reports 'production' for preview deployments too.
   environment: sentryEnvironment,
 
-  // Deliberately still keyed on NODE_ENV — see the note in
-  // sentry.client.config.ts. The sampling split is local-versus-deployed.
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  // 100% everywhere — raised from 0.1 on 2026-08-16 so GAP-03's P95 monitors
+  // have enough samples to mean anything. Full reasoning in
+  // sentry.client.config.ts.
+  tracesSampleRate: 1.0,
 
   // Strip PII and sensitive content from all events before sending to Sentry.
   // Defensive scrubbing regardless of sendDefaultPii setting (ADR-SEC-006).

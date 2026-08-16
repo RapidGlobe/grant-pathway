@@ -9,12 +9,22 @@ Sentry.init({
   // which reports 'production' for preview deployments too.
   environment: sentryEnvironment,
 
-  // Capture 100% of transactions locally; 10% on any deployed environment.
-  // Deliberately still keyed on NODE_ENV rather than on `sentryEnvironment`:
-  // the split that matters for sampling is local-versus-deployed, and keying
-  // it on the new value would raise previews from 10% to 100%, increasing
-  // quota use rather than reducing it. GAP-107 is about the tag, not the rate.
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+  // Capture 100% of transactions everywhere, including production.
+  //
+  // Raised from 0.1 on 2026-08-16 (decision: WJ) when GAP-03's two P95
+  // monitors were created. At 10% sampling those monitors are not merely less
+  // precise, they are meaningless: a P5.5 run of ~20 summaries would give
+  // Sentry two spans, and a 95th percentile of two samples is noise. The 0.1
+  // default exists for applications serving millions of requests; this one
+  // serves dozens, so full sampling costs effectively nothing and is what
+  // makes the alerts trustworthy.
+  //
+  // Worth knowing if quota is ever reviewed: most sampled volume here is not
+  // user traffic. The Sentry uptime monitor hits `/` every minute and
+  // UptimeRobot hits `/api/health` every five, so roughly 1,700 requests a day
+  // are automated checks. Still far inside quota, but it means "spans used" is
+  // a poor proxy for how busy the service actually is.
+  tracesSampleRate: 1.0,
 
   // Strip PII and sensitive content from all events before sending to Sentry.
   // Defensive scrubbing regardless of sendDefaultPii setting (ADR-SEC-006).
