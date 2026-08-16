@@ -40,6 +40,20 @@ Dev's **confirmation** and **recovery** templates — subjects included — were
 
 **Same standing as `GAP-104`: copied is not delivered.** No production email has yet been sent through them. One real registration against production at `P5.5` covers this and both password checks together.
 
+### Parity checklist section F — closed with no action
+
+Both `guidelines-temp` buckets read identical on the two projects: private, 10 MB, `application/pdf` and the OOXML `.docx` type, **3 policies**. **F1 was the row flagged as most likely to be quietly wrong and it was not.** The `on conflict (id) do nothing` risk was real — a pre-existing bucket would have kept its own settings while the migration reported success — it simply never fired, because no bucket pre-existed on either project. The policy count is right rather than merely equal: `20260806000000_gap48_storage_rls_flat_prefix.sql` drops three and creates three.
+
+Extensions are identical too — five each, `uuid-ossp` the only one any migration creates, so **nothing had been switched on by hand on either project**. Recorded by absence as well: **no `pg_cron`**, which confirms `ADR-OPS-004`'s decision to schedule through Vercel Cron by observation instead of by reading the ADR.
+
+### `GAP-107` — Sentry cannot tell production from preview, and two alert rules are about to depend on it
+
+All three Sentry configs set `environment: process.env.NODE_ENV`. **Vercel builds previews in production mode**, so preview and production deployments both report `production`; only local development differs. `VERCEL_ENV` carries the real distinction and is unused. The same expression drives `tracesSampleRate`, so previews are also sampled at the production rate.
+
+⚠️ **The timing is the point.** `P5.4` step 13 creates the new-issue alert rule and `GAP-03`'s P95 performance alert, both specified as production-scoped. Built today, they would be scoped on an axis that does not mean what the rule says. **This is the `GAP-103` pattern in the observability layer** — a signal that cannot distinguish two environments, relied on as though it could. Decide it before step 13, not after.
+
+**`GAP-105` now has section G alone outstanding.** `G4` is answered from `VQ-021` (separate IAM users by design, both `eu-west-2`); `G2` and `G3` need values read from Vercel. **`G2` is the consequential one:** `lib/rate-limit.ts` uses the fixed prefixes `grant-pathway:ai` and `grant-pathway:resend` with no environment segment, so a shared Upstash instance means development consumes real users' AI allowance.
+
 **Also closed:** the temporary Supabase Management API token was revoked, and `SUPABASE_ACCESS_TOKEN` confirmed absent from `.env.local`.
 
 ---
