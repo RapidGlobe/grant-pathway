@@ -182,11 +182,17 @@ It also provides a searchable audit trail for AI usage patterns, error rates per
 
 | Attribute        | Detail                                                                                                         |
 | ---------------- | -------------------------------------------------------------------------------------------------------------- |
-| Cost             | Free tier — 10 GB/month, 90-day retention. Zero cost at v1 scale.                                              |
+| Cost             | Free tier — 10 GB/month, ~~90-day retention~~ **30 days — see correction below**. Zero cost at v1 scale.       |
 | Setup effort     | ~15 minutes. One log drain URL in Vercel project settings; no SDK changes or code modifications required.      |
 | What it replaces | Nothing — complements Sentry. Does not replace error tracking or performance monitoring.                       |
 | When to add      | P5.4 — alongside Sentry performance monitoring configuration, once production traffic baseline is established. |
-| Data region      | Axiom EU region available; select at account setup to satisfy C13.                                             |
+| Data region      | Axiom EU region available; select at account setup. **Does not fully satisfy C13 — see correction below.**     |
+
+> ⚠️ **Corrected 2026-08-16, at the point of actually creating the account.** This review is a dated snapshot, so the rows above are annotated rather than rewritten — but two of its figures were wrong, and both mattered to the recommendation.
+>
+> **Retention is 30 days, not 90.** The dataset creation form states "Organization default: 30 days", and entering 90 under Custom is rejected outright: _"Retention days must be less than or equal to 30 days."_ **The free tier is a rolling 30-day window, not a quarter.** The addition is still worth making — a month of latency history is enough to set `GAP-03`'s P95 threshold from real numbers and to spot a trend — but **Axiom is not an archive**, and any figure that has to survive longer than a month must be written down somewhere else. That lands directly on `P5.5`'s `NFR-01` measurement, which already says to record the actual numbers; this is the reason why.
+>
+> **"Select the EU region to satisfy C13" overstates what the setting does.** Axiom's own signup screen says of EU Central 1 (AWS): _"includes a smaller set of ingest options, and some operations may be processed outside the EU."_ So the honest position is **stored in the EU, with some operations processed elsewhere** — weaker than the policy's existing wording for Sentry ("stored in the European Union", adequacy-covered) and weaker than `C13`'s note that no international transfer occurs. EU Central 1 remains the right choice, being the best available; what changes is what may be claimed about it. **Axiom must appear in the privacy policy's processor table with a transfer sentence that reflects this**, and it is the third service found missing from or misdescribed in that table in one day — see `GAP-102`, `GAP-109`.
 
 ---
 
