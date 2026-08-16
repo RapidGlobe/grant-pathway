@@ -104,6 +104,20 @@ Sections A–G are all recorded, every mismatch either remediated or raised as i
 
 **Sending region re-confirmed in the same screenshot** — `Ireland (eu-west-1)`. `GAP-102` (the published policy places Resend in the United States) now rests on directly observed evidence twice over rather than a single reading.
 
+### `master` branch protection decided — the last undecided item in `P5.4`
+
+**Decision (WJ, 2026-08-16): protection stays configured on `master`, and the admin bypass stays with it.** `ADR-OPS-002`'s first consequence had been open since **2026-04-21**.
+
+**What settled it was noticing that branch protection is not a production gate on this project.** **Vercel deploys from `master` on push, independently of CI** — so protection governs what enters the branch, not what reaches users. Turning on `enforce_admins` would block a _merge_ on a red run and do nothing whatever about a _deployment_.
+
+⚠️ **The runbook item's own wording carried that error**, and it is kept in place rather than quietly fixed: it said to drop the bypass "so a red CI run cannot reach production". It wouldn't have. The item was framed as a production-safety choice when it is a branch-hygiene one.
+
+Two supporting reasons: with one contributor the same person is author, reviewer and approver, so enforcement buys ceremony rather than a second pair of eyes; and required checks are evaluated against the pushed commit but only run afterwards, so enforcement blocks direct pushes outright — contradicting `AGENTS.md` §5, and amounting to roughly fifteen self-approved pull requests on 2026-08-16 alone.
+
+**The control actually relied on is running `type-check`, `lint --max-warnings 0`, the full suite and a clean `next build` before pushing** — done ahead of every code push today. **Residual risk recorded as accepted, not absent.** Revisit on either trigger: a second contributor joining, or a decision to gate deployment properly — which is a change to **Vercel**, not GitHub, and belongs in `P5.6`.
+
+**Also closed today:** Sentry's two default alert rules deleted, so one error now produces one email instead of three; and the second uptime monitor written into `ADR-OPS-007`, with a warning against a future session deleting the health-endpoint one as a duplicate.
+
 ### `TS-07` corrected — second miscount of the same entry, now restructured so it can't recur
 
 Answering "what is Upstash actually for?" exposed that `technology-stack.md`'s TS-07 was wrong again. It read "**both** AI API routes". There are **four call sites across two limiters**: `actions/charity.ts`'s Charity Commission lookup also uses `aiRatelimit` and had never appeared in the entry, and `resendRatelimit` was absent from it altogether.
