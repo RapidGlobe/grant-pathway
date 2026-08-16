@@ -52,6 +52,17 @@ All three Sentry configs set `environment: process.env.NODE_ENV`. **Vercel build
 
 ⚠️ **The timing is the point.** `P5.4` step 13 creates the new-issue alert rule and `GAP-03`'s P95 performance alert, both specified as production-scoped. Built today, they would be scoped on an axis that does not mean what the rule says. **This is the `GAP-103` pattern in the observability layer** — a signal that cannot distinguish two environments, relied on as though it could. Decide it before step 13, not after.
 
+**Fixed the same day, at WJ's instruction.** New `lib/sentry-environment.ts` resolves the tag once for all three runtimes: `NEXT_PUBLIC_VERCEL_ENV || VERCEL_ENV || NODE_ENV`.
+
+**Two things changed between raising it and building it, and both would have made the "fix" wrong:**
+
+- **`tracesSampleRate` was left alone**, against the original recommendation. Applying the new value would have raised previews from 10% to **100%** sampling — increasing quota use while presenting as part of the fix. The sampling split that matters is local-versus-deployed, which `NODE_ENV` already expresses correctly.
+- **`||`, not `??`.** `.env.local` carries `VERCEL_ENV=` with a blank value, and `??` falls through only on null/undefined — so the originally proposed expression would have tagged every local event with an empty string. **That is `GAP-50`'s failure mode reproduced inside the fix for a different gap**, caught by reading `.env.local` instead of assuming the variable was simply absent.
+
+⚠️ **The client half is inert until Vercel's "Automatically expose System Environment Variables" is enabled.** Non-public variables never reach the browser — confirmed in the bundled Next.js docs rather than from memory — so the client needs `NEXT_PUBLIC_VERCEL_ENV`, and `.env.local` carries only the private copy. Until the toggle is on, **server and edge events are correctly tagged while browser events are not**, which is a mixed state worth knowing about rather than discovering.
+
+**Verified in the built client bundle**, not inferred: a clean `next build` shows the fallback chain reaching Sentry's init. That also revealed `@sentry/nextjs` already defaults `environment` to `` `vercel-${NEXT_PUBLIC_VERCEL_ENV}` `` when none is passed — a viable alternative fix, rejected to avoid the `vercel-` prefix and keep `development` locally. `lib/env-vars.ts` gained both new variables after `__tests__/env-blank-handling.test.ts` failed without them, which is `GAP-50`'s staleness guard working exactly as intended.
+
 **`GAP-105` now has section G alone outstanding.** `G4` is answered from `VQ-021` (separate IAM users by design, both `eu-west-2`); `G2` and `G3` need values read from Vercel. **`G2` is the consequential one:** `lib/rate-limit.ts` uses the fixed prefixes `grant-pathway:ai` and `grant-pathway:resend` with no environment segment, so a shared Upstash instance means development consumes real users' AI allowance.
 
 **Also closed:** the temporary Supabase Management API token was revoked, and `SUPABASE_ACCESS_TOKEN` confirmed absent from `.env.local`.

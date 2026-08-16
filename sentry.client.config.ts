@@ -1,12 +1,19 @@
 // ⚠️ Three-file rule: any init option added here must also be added to
 // sentry.server.config.ts and sentry.edge.config.ts
 import * as Sentry from '@sentry/nextjs'
+import { sentryEnvironment } from '@/lib/sentry-environment'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  environment: process.env.NODE_ENV,
+  // GAP-107 — see `lib/sentry-environment.ts`. Was `process.env.NODE_ENV`,
+  // which reports 'production' for preview deployments too.
+  environment: sentryEnvironment,
 
-  // Capture 100% of transactions in dev; reduce in production if needed
+  // Capture 100% of transactions locally; 10% on any deployed environment.
+  // Deliberately still keyed on NODE_ENV rather than on `sentryEnvironment`:
+  // the split that matters for sampling is local-versus-deployed, and keying
+  // it on the new value would raise previews from 10% to 100%, increasing
+  // quota use rather than reducing it. GAP-107 is about the tag, not the rate.
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
   // Strip PII and sensitive content from all events before sending to Sentry.

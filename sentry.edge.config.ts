@@ -1,11 +1,16 @@
 // ⚠️ Three-file rule: any init option added here must also be added to
 // sentry.client.config.ts and sentry.server.config.ts
 import * as Sentry from '@sentry/nextjs'
+import { sentryEnvironment } from '@/lib/sentry-environment'
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV,
+  // GAP-107 — see `lib/sentry-environment.ts`. Was `process.env.NODE_ENV`,
+  // which reports 'production' for preview deployments too.
+  environment: sentryEnvironment,
 
+  // Deliberately still keyed on NODE_ENV — see the note in
+  // sentry.client.config.ts. The sampling split is local-versus-deployed.
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
   // Strip PII and sensitive content from all events before sending to Sentry.

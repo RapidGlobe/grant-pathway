@@ -36,11 +36,19 @@ export const APP_ENV_VARS = [
   'NEXT_PUBLIC_SITE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'NEXT_PUBLIC_SUPABASE_URL',
+  // Both added 2026-08-16 with GAP-107. Supplied by Vercel rather than by us,
+  // so they sit closer to the excluded `NODE_ENV` than to the rest of this
+  // list — but they are included deliberately, because `.env.local` carries
+  // `VERCEL_ENV=` with a blank value, which is exactly the case this list
+  // exists to normalise. `lib/sentry-environment.ts` uses `||` as well, since
+  // normalisation runs only on the server and the client reads an inlined copy.
+  'NEXT_PUBLIC_VERCEL_ENV',
   'PREPROCESS_CHAR_CEILING',
   'RESEND_API_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
   'UPSTASH_REDIS_REST_TOKEN',
   'UPSTASH_REDIS_REST_URL',
+  'VERCEL_ENV',
 ] as const
 
 /**
