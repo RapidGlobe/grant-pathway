@@ -70,6 +70,24 @@ This document captures the agreed non-functional requirements for the v1 build. 
 
 **Notes:** The architecture should be designed to scale from launch figures to the 12–18 month target without requiring a major rebuild. Managed cloud services (auto-scaling hosting, managed database) are preferred over self-managed infrastructure to keep operational overhead low for a solo developer.
 
+✅ **MEASURED 2026-08-17 — the launch tier is no longer a prediction (`GAP-113`).** Until this date every test this project had run used exactly one user, so the table below was an expectation with nothing behind it. `scripts/load-test.ts` now drives N distinct users, each with their own profile, application and guidelines, through concurrent `POST /api/generate-summary` calls.
+
+| Concurrent users | Single-user baseline | p50   | p95   | vs baseline | Cross-contamination | Success |
+| ---------------- | -------------------- | ----- | ----- | ----------- | ------------------- | ------- |
+| 3                | 21.3s                | 22.4s | 22.6s | 1.05×       | none                | 3/3     |
+| 5                | 22.8s                | 24.8s | 25.3s | 1.09×       | none                | 5/5     |
+| 10               | 22.6s                | 25.1s | 26.4s | 1.11×       | none                | 10/10   |
+
+**The launch-tier row below is confirmed as written.** It predicted "All succeed; each takes 20–45s independently; no cross-user interference" — observed at 10 users: every request succeeded, individual durations ran 24.5–26.4s, and **no summary contained another user's canary phrase**. Degradation from 1 to 10 concurrent users is about **11%**, which is close to flat.
+
+**How cross-contamination was checked, since "no interference" is easy to assert and hard to prove:** each user's guideline pack embeds a unique canary string, and every returned summary is searched for every _other_ user's canary. A hit fails the run. This tests the outcome that would actually matter — one charity seeing another's material — rather than testing that the service did not fall over.
+
+⚠️ **Three limits on this evidence, stated so the figures are not over-read:**
+
+1. **Run against `grant-pathway-dev` on a local `next dev` server**, not a production build on Vercel. **What transfers:** Bedrock's behaviour under concurrent load and the cross-contamination result, since both are properties of the AI layer and the request-scoped code, which are identical across environments. **What does not transfer:** Vercel function scaling and cold starts, the production connection pool, and single-region (`lhr1`) execution. A production run is still owed.
+2. **The ~100-user tier remains asserted, not demonstrated** (decision: WJ, 2026-08-17 — test 10, extrapolate 100 if asked). The near-flat curve to 10 is encouraging but does not establish 100, and the row below should be read as a design expectation.
+3. **p95 at these sample sizes is indicative only.** Ten samples cannot support a meaningful 95th percentile; the figure is reported because the spread is narrow, not because it is statistically robust.
+
 **Concurrent AI generation behaviour (capacity plan — 2026-06-08):**
 
 Each user has their own per-minute rate limit (5 AI calls / 60 seconds via Upstash Redis). There is no global rate limit across users. Expected behaviour at each scale tier:
@@ -90,7 +108,7 @@ Each user has their own per-minute rate limit (5 AI calls / 60 seconds via Upsta
 
 Against C1's £150/month total, the ≈£100 Bedrock ceiling sits alongside ~£36 of fixed infrastructure (Vercel Pro + Supabase Pro), leaving ~£14 unallocated. The monthly cap is the control `P5.4` explicitly records as "the real control" on spend — it bounds cost per user rather than failing the whole service, which is why an automated IAM hard-stop was assessed and **accepted as a documented deviation rather than built** (WJ, 2026-07-30): a revocation would cut AI off mid-application for every user at once, with no warning. **C1 was raised from £100 to £150/month on 2026-08-05** (WJ's decision; `P5.0` register ref **R-06**) because the £100 total was already breached by committed spend before a single AI call, and had come to be quoted three incompatible ways across the document set — as a total, as total API spend, and as AI spend alone. It is a **total**.
 
-The main risk before the first marketing push is unmeasured AI route latency under concurrent load. Structured latency logging added to the AI routes (2026-06-08, GAP-27 partial) will provide baseline data — **two routes today**, `generate-summary` and `refine-answer`. (Corrected 2026-07-30, audit finding **L2**: this read "all three AI routes", which was true when the logging was added but has not been since `/api/generate-draft` was deleted on 2026-07-01.) Sentry performance monitoring to be configured at P5.4 once production traffic baseline is established.
+~~The main risk before the first marketing push is unmeasured AI route latency under concurrent load.~~ **Substantially closed 2026-08-17 — measured at 3, 5 and 10 concurrent users, see above (`GAP-113`).** What remains unmeasured is the same test against production rather than dev, and any tier above 10. Structured latency logging added to the AI routes (2026-06-08, GAP-27 partial) will provide baseline data — **two routes today**, `generate-summary` and `refine-answer`. (Corrected 2026-07-30, audit finding **L2**: this read "all three AI routes", which was true when the logging was added but has not been since `/api/generate-draft` was deleted on 2026-07-01.) Sentry performance monitoring to be configured at P5.4 once production traffic baseline is established.
 
 ---
 
