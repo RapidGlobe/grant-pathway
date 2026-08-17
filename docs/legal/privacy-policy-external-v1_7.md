@@ -6,8 +6,6 @@
 
 **Last updated: 17 August 2026**
 
-> ⚠️ **DRAFT FOR REVIEW — NOT PUBLISHED.** This is a proposed v1.7. The live policy remains **v1.6** (`privacy-policy-external.md`) until WJ approves this draft and it is published. Changes from v1.6 are confined to Sections 2, 5, 6 and 7 and are itemised in `solicitor-brief-processor-table-2026-08-17.md`. **No wording outside those four sections has been altered.**
-
 ---
 
 ## 1. Who We Are
@@ -83,6 +81,7 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 | Sending service emails (welcome, inactivity warning)                                         | **Contract / Legitimate interests** — necessary to operate the account lifecycle and keep you informed                                                                                                 |
 | Managing the fair-use limit                                                                  | **Legitimate interests** — necessary to manage running costs and ensure fair access for all users                                                                                                      |
 | Error monitoring and security                                                                | **Legitimate interests** — necessary to keep the service reliable and protect against abuse                                                                                                            |
+| Keeping technical logs of requests made to the service, including IP addresses               | **Legitimate interests** — necessary to keep the service running, diagnose faults, and detect and prevent abuse. These logs are deleted automatically after 30 days                                    |
 | Recording your feedback preference, and contacting you about your experience if you opted in | **Consent** — we only do this if you ticked the optional box at registration. You may withdraw your consent at any time, and doing so has no effect on your ability to use the service (see Section 8) |
 
 **Where we rely on legitimate interests**, we have considered whether the processing is necessary, whether it could reasonably be achieved another way, and whether it would override your interests or rights. In each case above the processing is limited to what is needed to run the service safely and within cost, and we are satisfied it does not.
@@ -113,7 +112,7 @@ Each provider is bound by a data processing agreement and is only permitted to u
 
 Almost all of your data stays within the United Kingdom or the European Economic Area (EEA). The EEA is covered by the UK's adequacy decision, which means personal data may be transferred there without any additional safeguard being required.
 
-**Processed in the UK:** your account, organisation profile and application content (Supabase, London); the AI processing described in Section 5 (Amazon Web Services Bedrock, London); and the running of the service itself. **Vercel**, which hosts Grant Pathway, runs our application code in its **London** data centre, so the handling of your information as you use the service takes place in the UK. Vercel is a United States company, and your requests reach us through its global network before being handled in London; it does not store your data. AI processing takes place within the UK or EEA and does not constitute an international transfer.
+**Processed in the UK:** your account, organisation profile and application content (Supabase, London); the AI processing described in Section 5 (Amazon Web Services Bedrock, London); and the running of the service itself. **Vercel**, which hosts Grant Pathway, runs our application code in its **London** data centre, so the handling of your information as you use the service takes place in the UK. Vercel is a United States company, and your requests reach us through its global network before being handled in London. Vercel does not store your account details or your application content — those are held by Supabase in London — but it does keep short-term technical logs of requests, which include your IP address. AI processing takes place within the UK or EEA and does not constitute an international transfer.
 
 **Processed in the EEA:** error reports (Sentry, Germany), rate-limiting data (Upstash, Ireland) and the technical logs described in Section 2 (Axiom, Germany). These are covered by the UK's adequacy decision, so no additional transfer mechanism is required.
 
@@ -123,23 +122,23 @@ Almost all of your data stays within the United Kingdom or the European Economic
 
 - **Resend**, which sends our transactional email, processes your data in the **United States**. Although email for our domain is sent from Irish infrastructure, Resend's own data processing agreement states that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address and the content of the email.
 
-Where personal data is transferred outside the United Kingdom to these providers, or to any provider outside the United Kingdom we may substitute for them in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK. Resend relies on the EU standard contractual clauses, the UK addendum to those clauses, and the EU–US Data Privacy Framework including its UK Extension.
+Where personal data is transferred outside the United Kingdom to Resend, or to any provider outside the United Kingdom we may substitute for it or for any other provider in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK. Resend relies on the EU standard contractual clauses, the UK addendum to those clauses, and the EU–US Data Privacy Framework including its UK Extension.
 
 ---
 
 ## 7. How Long We Keep Your Information
 
-| Data                                     | Retention period                                                                                       |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below)             |
-| Application content                      | Deleted when your account is deleted                                                                   |
-| AI usage log                             | Deleted when your account is deleted                                                                   |
-| Your name and feedback preference        | Deleted when your account is deleted                                                                   |
-| Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below) |
-| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                      |
-| Technical logs                           | Held for 30 days, then automatically and permanently deleted                                           |
-| Rate-limiting data                       | Held only transiently — around one hour — and then automatically deleted                               |
-| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                        |
+| Data                                     | Retention period                                                                                                                       |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below)                                             |
+| Application content                      | Deleted when your account is deleted                                                                                                   |
+| AI usage log                             | Deleted when your account is deleted                                                                                                   |
+| Your name and feedback preference        | Deleted when your account is deleted                                                                                                   |
+| Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below)                                 |
+| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                                                      |
+| Technical logs                           | Held for 30 days by our logging provider, and for a shorter period by our hosting provider, then automatically and permanently deleted |
+| Rate-limiting data                       | Held only transiently — around one hour — and then automatically deleted                                                               |
+| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                                                        |
 
 **Inactivity deletion:** If your account has not been used for two years, we will send a warning email to your registered address. If you do not log in within 30 days of that warning, your account and all associated data will be permanently deleted. You will receive no further warning before deletion occurs.
 
