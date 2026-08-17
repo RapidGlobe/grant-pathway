@@ -1,10 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.6
+**Version:** 1.7
 
-**Effective date: 7 August 2026**
+**Effective date: 17 August 2026**
 
-**Last updated: 7 August 2026**
+**Last updated: 17 August 2026**
 
 ---
 
@@ -42,6 +42,7 @@ When you register and use Grant Pathway, you provide:
 
 - **Usage data** — a count of AI-assisted requests made per account each month, used to manage the fair-use limit
 - **Session data** — a secure token stored in your browser that keeps you signed in while you use the service
+- **Technical logs** — when your browser or device contacts our service, our systems record standard technical information about the request, including your **IP address**, the page or feature requested, the time, and the type of browser you are using. We use these logs only to keep the service running, diagnose faults, and detect abuse. They are automatically deleted after 30 days (see Section 7)
 - **Error reports** — if something goes wrong, limited technical information about the error may be collected to help us diagnose and fix the problem
 
 ### Where we get your information from
@@ -80,6 +81,7 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 | Sending service emails (welcome, inactivity warning)                                         | **Contract / Legitimate interests** — necessary to operate the account lifecycle and keep you informed                                                                                                 |
 | Managing the fair-use limit                                                                  | **Legitimate interests** — necessary to manage running costs and ensure fair access for all users                                                                                                      |
 | Error monitoring and security                                                                | **Legitimate interests** — necessary to keep the service reliable and protect against abuse                                                                                                            |
+| Keeping technical logs of requests made to the service, including IP addresses               | **Legitimate interests** — necessary to keep the service running, diagnose faults, and detect and prevent abuse. These logs are deleted automatically after 30 days                                    |
 | Recording your feedback preference, and contacting you about your experience if you opted in | **Consent** — we only do this if you ticked the optional box at registration. You may withdraw your consent at any time, and doing so has no effect on your ability to use the service (see Section 8) |
 
 **Where we rely on legitimate interests**, we have considered whether the processing is necessary, whether it could reasonably be achieved another way, and whether it would override your interests or rights. In each case above the processing is limited to what is needed to run the service safely and within cost, and we are satisfied it does not.
@@ -90,13 +92,15 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 
 We do not sell your data. We do not share it for advertising or marketing purposes. We work with a small number of trusted third-party service providers who process data on our behalf:
 
-| Provider                          | What they do                                                                                  | Where they are based                     |
-| --------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                  |
-| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union          |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States                            |
-| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United States (with global edge network) |
-| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | European Union                           |
+| Provider                          | What they do                                                                                  | Where your data is processed                                            |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                 |
+| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                         |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6) |
+| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company, see Section 6         |
+| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                |
+| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                |
+| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | Germany (European Union) — see Section 6                                |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
@@ -106,25 +110,35 @@ Each provider is bound by a data processing agreement and is only permitted to u
 
 ## 6. International Data Transfers
 
-Two of our service providers are based outside the United Kingdom — Resend and Vercel (both United States). Where personal data is transferred to these providers, or to any provider outside the United Kingdom we may substitute for these in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK.
+Almost all of your data stays within the United Kingdom or the European Economic Area (EEA). The EEA is covered by the UK's adequacy decision, which means personal data may be transferred there without any additional safeguard being required.
 
-AI processing (Amazon Web Services Bedrock) takes place within the UK or EEA and does not constitute an international transfer.
+**Processed in the UK:** your account, organisation profile and application content (Supabase, London); the AI processing described in Section 5 (Amazon Web Services Bedrock, London); and the running of the service itself. **Vercel**, which hosts Grant Pathway, runs our application code in its **London** data centre, so the handling of your information as you use the service takes place in the UK. Vercel is a United States company, and your requests reach us through its global network before being handled in London. Vercel does not store your account details or your application content — those are held by Supabase in London — but it does keep short-term technical logs of requests, which include your IP address. AI processing takes place within the UK or EEA and does not constitute an international transfer.
 
-Error reports processed by Sentry are stored in the European Union, which is covered by the UK's adequacy decision for EU/EEA countries — no additional transfer mechanism is required.
+**Processed in the EEA:** error reports (Sentry, Germany), rate-limiting data (Upstash, Ireland) and the technical logs described in Section 2 (Axiom, Germany). These are covered by the UK's adequacy decision, so no additional transfer mechanism is required.
+
+**A note on Axiom.** Axiom operates its service in two parts, and only one of them handles your data. Your technical logs — including your IP address — are received, stored and searched entirely within its **European Union** deployment; that data does not leave the EU. Separately, Axiom runs a single global system that manages our own account with them: signing our staff in, managing access tokens, and billing. That part operates outside the EU, but it handles **our account details, not your personal data**.
+
+**Transfers outside the UK and EEA.** One provider processes your data in the United States:
+
+- **Resend**, which sends our transactional email, processes your data in the **United States**. Although email for our domain is sent from Irish infrastructure, Resend's own data processing agreement states that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address and the content of the email.
+
+Where personal data is transferred outside the United Kingdom to Resend, or to any provider outside the United Kingdom we may substitute for it or for any other provider in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK. Resend relies on the EU standard contractual clauses, the UK addendum to those clauses, and the EU–US Data Privacy Framework including its UK Extension.
 
 ---
 
 ## 7. How Long We Keep Your Information
 
-| Data                                     | Retention period                                                                                       |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below)             |
-| Application content                      | Deleted when your account is deleted                                                                   |
-| AI usage log                             | Deleted when your account is deleted                                                                   |
-| Your name and feedback preference        | Deleted when your account is deleted                                                                   |
-| Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below) |
-| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                      |
-| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                        |
+| Data                                     | Retention period                                                                                                                       |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Account details and organisation profile | Until you delete your account, or until the inactivity deletion policy applies (see below)                                             |
+| Application content                      | Deleted when your account is deleted                                                                                                   |
+| AI usage log                             | Deleted when your account is deleted                                                                                                   |
+| Your name and feedback preference        | Deleted when your account is deleted                                                                                                   |
+| Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below)                                 |
+| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                                                      |
+| Technical logs                           | Held for 30 days by our logging provider, and for a shorter period by our hosting provider, then automatically and permanently deleted |
+| Rate-limiting data                       | Held only transiently — around one hour — and then automatically deleted                                                               |
+| Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                                                        |
 
 **Inactivity deletion:** If your account has not been used for two years, we will send a warning email to your registered address. If you do not log in within 30 days of that warning, your account and all associated data will be permanently deleted. You will receive no further warning before deletion occurs.
 
@@ -159,6 +173,7 @@ There is no charge for exercising your rights in most cases.
 
 Grant Pathway uses a small number of cookies that are strictly necessary to operate the service:
 
+- **Sign-in cookies** — when you open the sign-in page, a small number of temporary cookies are set so that the sign-in can be completed securely. They are part of the sign-in process itself and are not used to identify or track you.
 - **Authentication cookie** — a secure, encrypted token that keeps you signed in during your session. This cookie is deleted when you sign out or when your session expires.
 
 We do not use advertising cookies, analytics cookies, or any third-party tracking technology. Because we only use cookies that are strictly necessary for the service to function, we are not required to ask for your consent to set them — but we want to be transparent about their use.
@@ -201,6 +216,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.6_
-_Effective date: 7 August 2026_
-_Last updated: 7 August 2026_
+_Version: 1.7_
+_Effective date: 17 August 2026_
+_Last updated: 17 August 2026_
