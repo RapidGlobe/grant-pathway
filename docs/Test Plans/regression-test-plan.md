@@ -745,7 +745,7 @@ A second, unrelated defect was found once the modal could be read properly: the 
 
 **Result:** ☐ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
-**Notes:** _Not yet run._ ⚠️ **Step 5 is the point of the case.** Two users' guideline text passing through the same AI routes at once is where a cross-contamination fault would appear, and it would be a serious one — one charity seeing another's guidelines or answers. ⚠️ **Two tabs in one browser is not this test** — they share a session cookie and prove nothing about two users. ⚠️ **A load test at `NFR-03`'s stated ~10 concurrent users is NOT covered here and remains untested** (WJ, 2026-08-17: worth doing, but not now). This case proves two users do not interfere; it says nothing about throughput, queueing or Bedrock throttling at ten.
+**Notes:** _Not yet run._ ⚠️ **Step 5 is the point of the case.** Two users' guideline text passing through the same AI routes at once is where a cross-contamination fault would appear, and it would be a serious one — one charity seeing another's guidelines or answers. ⚠️ **Two tabs in one browser is not this test** — they share a session cookie and prove nothing about two users. ⚠️ **A load test at `NFR-03`'s stated ~10 concurrent users is NOT covered here** — it is **required** (WJ, 2026-08-17: _"The load test has to be attempted, full stop"_) and tracked separately as `GAP-113`, awaiting only a decision on where it sits. Do not read RT-17 passing as the concurrency question being answered. This case proves two users do not interfere; it says nothing about throughput, queueing or Bedrock throttling at ten.
 
 ---
 
