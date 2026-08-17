@@ -49,6 +49,11 @@ export const APP_ENV_VARS = [
   'UPSTASH_REDIS_REST_TOKEN',
   'UPSTASH_REDIS_REST_URL',
   'VERCEL_ENV',
+  // Added 2026-08-17 with GAP-110. Supplied by Vercel at runtime, never by us,
+  // and absent locally — same shape as VERCEL_ENV above. Read only by
+  // /api/health, which reports it so the function's execution region can be
+  // observed rather than inferred from a dashboard checkbox.
+  'VERCEL_REGION',
 ] as const
 
 /**
