@@ -10,7 +10,41 @@
 
 ---
 
-## 2026-08-17 (latest) — `P5.4` complete; privacy policy v1.7 drafted; `P5.5`'s own premise found stale
+## 2026-08-17 (latest) — `GAP-106` fixed; privacy policy v1.7 published; `GAP-112`'s trigger built
+
+### `GAP-106` — the password error that told users to do what they had already done
+
+Supabase reports three causes under one `weak_password` code — `length`, `characters`, `pwned`. All three forms rendered one message: _"Your password must be at least 12 characters and include both letters and numbers."_
+
+**For a breach-list rejection that message is wrong, not merely unhelpful.** `Password123456` is 14 characters with letters and digits, so a user rejected for it was told to do what they had already done, with no way forward, on the registration page.
+
+**It was correct when written.** Until 2026-08-16 the leaked-password check was off in production, so length and characters were genuinely the only causes. **Turning it on under `GAP-104` — a security improvement — is what created the defect.** Worth keeping: a correct fix made something else wrong somewhere it had no reason to look.
+
+**Decision (WJ): tell the user the truth.** Wording recorded as **`PDR-UI-009`**:
+
+> "This password is known to have been exposed in a data breach somewhere on the internet. It may never have been yours — but it is no longer safe, so please pick a different one."
+
+**The clause "it may never have been yours" is the point of the sentence.** Without it the natural reading is "my account has been hacked", sending a user to check their bank and email, when the password is usually just a common one leaked by somebody else years ago. Three shorter drafts were rejected for lacking it.
+
+**Built:** a `breached_password` state through three actions and three forms. The cause is read from the SDK's `reasons` array **through a type guard, not a cast** — `error.code` narrows to the generic `AuthError`, which does not declare the field. Client-side validation is deliberately untouched, since it cannot know about breach lists.
+
+`type-check`, `lint --max-warnings 0`, **289 tests pass (was 280)**. Nine new tests guard the mapping and assert the breach branch never repeats the length-and-characters advice.
+
+⚠️ **One test was wrong before the code was.** The first version counted `code === 'weak_password'` across the whole file and failed at 6 — three of those are comments naming the code directly above the branch. The temptation was to change the source to satisfy the test. Recorded because the instinct to trust a failing test over working code is the wrong one exactly this often.
+
+⚠️ **Still unobserved.** Predicted from the code and from `GAP-104`'s settings change. `P5.5` §3's registration with `Password123456` produces it as a by-product — the cheapest confirmation available. **Built before the flagship runs deliberately**, since three test plans exercise registration and would otherwise record the old copy.
+
+### Privacy policy v1.7 published
+
+Published as **1.7**, not 1.8 (WJ): a public version history reads as a sequence, and a missing 1.7 invites "what was it and why can't I see it?" The draft-versus-published distinction belongs in the file name and the changelog, not in a burnt version number. `/privacy` renders `privacy-policy-external.md` directly, so publishing was a file swap. The internal copy was mirrored with a v1.7 change block and the two bodies verified identical apart from the changelog blocks; the draft file was deleted rather than left alongside the published one.
+
+### `GAP-112` — the mechanism, built the day it was raised
+
+`AGENTS.md` §3 gains **Step 2a**, a service-change trigger placed between the Tier 2 and Tier 3 steps so it runs on every task. **Phrased around the act, not the artefact** — the Tier 2 `docs/legal/` row named the right file all along and failed four times, because adding a dependency does not feel like editing a legal document.
+
+---
+
+## 2026-08-17 (earlier) — `P5.4` complete; privacy policy v1.7 drafted; `P5.5`'s own premise found stale
 
 Three pieces of work: closing `P5.4`, drafting the privacy policy changes, and starting `P5.5`'s documentation half.
 

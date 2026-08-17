@@ -68,6 +68,13 @@ export function AccountSettingsForm({ email }: AccountSettingsFormProps) {
           newPassword:
             'Your password must be at least 12 characters and include both letters and numbers',
         })
+      } else if (result.status === 'breached_password') {
+        // GAP-106: the breach-list cause needs its own message — a breached
+        // password has usually already met the rules the other message states.
+        setFieldErrors({
+          newPassword:
+            'This password is known to have been exposed in a data breach somewhere on the internet. It may never have been yours — but it is no longer safe, so please pick a different one.',
+        })
       } else {
         setServerError('Something went wrong. Please try again.')
       }

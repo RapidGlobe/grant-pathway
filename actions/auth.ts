@@ -101,11 +101,38 @@ const changePasswordSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
+// Password rejection causes (GAP-106)
+// ---------------------------------------------------------------------------
+
+/**
+ * Supabase reports three distinct causes as a single `weak_password` code —
+ * `@supabase/auth-js` types them as `["length", "characters", "pwned"]` — and
+ * `error.code` alone cannot tell them apart. `AuthWeakPasswordError` carries
+ * the causes in `reasons`; the generic `AuthError` type does not declare that
+ * field, so it is read through a narrow guard rather than a cast.
+ *
+ * Why this matters (GAP-106): a password rejected for appearing in a breach
+ * list has usually already satisfied the length and character rules —
+ * `Password123456` is 14 characters with letters and digits — so rendering the
+ * rule message tells the user to do something they have already done, with no
+ * way forward. The `pwned` case needs its own message.
+ *
+ * This only became reachable on 2026-08-16, when `password_hibp_enabled` was
+ * turned on in production under GAP-104. Before that, length and characters
+ * were genuinely the only two causes and the single message was correct.
+ */
+function isBreachedPassword(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null) return false
+  const { reasons } = error as { reasons?: unknown }
+  return Array.isArray(reasons) && reasons.includes('pwned')
+}
+
+// ---------------------------------------------------------------------------
 // S0.1 — Registration
 // ---------------------------------------------------------------------------
 
 export type RegisterState = {
-  error: 'email_exists' | 'weak_password' | 'unknown' | null
+  error: 'email_exists' | 'weak_password' | 'breached_password' | 'unknown' | null
 }
 
 /**
@@ -176,7 +203,8 @@ export async function registerUser(
     // validation should catch this first, but the server is the source of
     // truth, so surface a specific message rather than the generic fallback.
     if (error.code === 'weak_password') {
-      return { error: 'weak_password' }
+      // GAP-106: distinguish the breach-list cause from the rule causes.
+      return { error: isBreachedPassword(error) ? 'breached_password' : 'weak_password' }
     }
     Sentry.captureException(error, { tags: { action: 'registerUser' } })
     return { error: 'unknown' }
@@ -326,7 +354,14 @@ export async function requestPasswordReset(
 }
 
 export type ResetPasswordState = {
-  status: 'idle' | 'success' | 'expired' | 'same_password' | 'weak_password' | 'error'
+  status:
+    | 'idle'
+    | 'success'
+    | 'expired'
+    | 'same_password'
+    | 'weak_password'
+    | 'breached_password'
+    | 'error'
 }
 
 /**
@@ -388,7 +423,8 @@ export async function resetPassword(
     // Supabase Auth rejects passwords that don't meet its configured strength
     // requirements with error.code === 'weak_password' (AuthWeakPasswordError).
     if (error.code === 'weak_password') {
-      return { status: 'weak_password' }
+      // GAP-106: distinguish the breach-list cause from the rule causes.
+      return { status: isBreachedPassword(error) ? 'breached_password' : 'weak_password' }
     }
     return { status: 'error' }
   }
@@ -472,7 +508,7 @@ export async function signIn(_prevState: SignInState, formData: FormData): Promi
 // ---------------------------------------------------------------------------
 
 export type ChangePasswordResult = {
-  status: 'success' | 'wrong_password' | 'weak_password' | 'error'
+  status: 'success' | 'wrong_password' | 'weak_password' | 'breached_password' | 'error'
 }
 
 /**
@@ -530,7 +566,10 @@ export async function changePassword(
     // Supabase Auth rejects passwords that don't meet its configured strength
     // requirements with error.code === 'weak_password' (AuthWeakPasswordError).
     if (updateError.code === 'weak_password') {
-      return { status: 'weak_password' }
+      // GAP-106: distinguish the breach-list cause from the rule causes.
+      return {
+        status: isBreachedPassword(updateError) ? 'breached_password' : 'weak_password',
+      }
     }
     // Logged so the real cause (e.g. a GoTrue-side setting the app doesn't
     // implement, rate limiting, session/reauth issues) is visible in

@@ -105,6 +105,19 @@ Each requirement is marked **Must Have** or **Should Have**. Should Have require
 
 ---
 
+**AC-FR-02-02c — Password found in a known data breach rejected, with a message that says so** _(Added 2026-08-17, `GAP-106`, `PDR-UI-009`)_
+
+- **Given** I am on `/register`
+- **When** I enter a password that satisfies every rule above — 12 or more characters, with both letters and digits — but which appears in a known breach list (for example `Password123456`)
+- **And** I submit the form
+- **Then** I see the error: _"This password is known to have been exposed in a data breach somewhere on the internet. It may never have been yours — but it is no longer safe, so please pick a different one."_
+- **And** I do **not** see the length-and-characters message, which this password already satisfies
+- **And** my account is not created
+
+⚠️ **This criterion exists because the two above were previously shown for this case as well.** Supabase reports all three causes under one error code; until the breach check was enabled in production on 2026-08-16 that was harmless, because only length and characters could occur. The same applies to password reset and to changing a password from account settings, which share the state.
+
+---
+
 **AC-FR-02-03 — Password confirmation must match**
 
 - **Given** I am on `/register`

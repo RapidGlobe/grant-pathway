@@ -753,15 +753,16 @@ This section defines the content, fields, validation rules, error states, and po
 
 **Validation:**
 
-| Field                 | Rule                                                             | Error message                                                                       |
-| --------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| First name            | Required                                                         | "Please enter your first name"                                                      |
-| Last name             | Required                                                         | "Please enter your last name"                                                       |
-| Email                 | Required, valid format                                           | "Please enter a valid email address"                                                |
-| Email                 | Not already registered                                           | "An account with this email address already exists"                                 |
-| Password              | Required, minimum 12 characters, must contain letters and digits | "Your password must be at least 12 characters and include both letters and numbers" |
-| Password confirmation | Must match password                                              | "Your passwords do not match"                                                       |
-| Terms checkbox        | Must be checked                                                  | "Please accept the Terms of Service and Privacy Policy to continue"                 |
+| Field                 | Rule                                                                     | Error message                                                                                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| First name            | Required                                                                 | "Please enter your first name"                                                                                                                                                     |
+| Last name             | Required                                                                 | "Please enter your last name"                                                                                                                                                      |
+| Email                 | Required, valid format                                                   | "Please enter a valid email address"                                                                                                                                               |
+| Email                 | Not already registered                                                   | "An account with this email address already exists"                                                                                                                                |
+| Password              | Required, minimum 12 characters, must contain letters and digits         | "Your password must be at least 12 characters and include both letters and numbers"                                                                                                |
+| Password              | Not found in a known breach list (checked by Supabase, server-side only) | "This password is known to have been exposed in a data breach somewhere on the internet. It may never have been yours — but it is no longer safe, so please pick a different one." |
+| Password confirmation | Must match password                                                      | "Your passwords do not match"                                                                                                                                                      |
+| Terms checkbox        | Must be checked                                                          | "Please accept the Terms of Service and Privacy Policy to continue"                                                                                                                |
 
 **On success:** Account created, Email 1 sent, user redirected to `/verify-email`.
 
@@ -830,10 +831,11 @@ On submission (regardless of whether email is registered): "If an account exists
 
 **Validation (State 2):**
 
-| Field                | Rule                                                             | Error message                                                                       |
-| -------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| New password         | Required, minimum 12 characters, must contain letters and digits | "Your password must be at least 12 characters and include both letters and numbers" |
-| Confirm new password | Must match                                                       | "Your passwords do not match"                                                       |
+| Field                | Rule                                                                     | Error message                                                                                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| New password         | Required, minimum 12 characters, must contain letters and digits         | "Your password must be at least 12 characters and include both letters and numbers"                                                                                                |
+| New password         | Not found in a known breach list (checked by Supabase, server-side only) | "This password is known to have been exposed in a data breach somewhere on the internet. It may never have been yours — but it is no longer safe, so please pick a different one." |
+| Confirm new password | Must match                                                               | "Your passwords do not match"                                                                                                                                                      |
 
 On success: "Your password has been updated." with Sign in button. On expired link: heading "This link has expired", message "Your reset link is no longer valid. Please request a new one." (corrected 2026-07-13 -- previously misquoted as "This reset link has expired. Please request a new one."; verified against `components/reset-password-form.tsx`), with a "Request a new link" button back to State 1.
 
@@ -1055,11 +1057,12 @@ The auto-generation model originally specified here (AI writes a draft for every
 
 **Password change validation:**
 
-| Field                | Rule                                                             | Error                                                                                                                    |
-| -------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Current password     | Required, must match stored password                             | "Your current password is incorrect"                                                                                     |
-| New password         | Required, minimum 12 characters, must contain letters and digits | "Your password must be at least 12 characters and include both letters and numbers"                                      |
-| Confirm new password | Must match new password                                          | "Passwords do not match" (corrected 2026-07-13 -- no "Your" prefix, unlike Register/Reset Password's equivalent message) |
+| Field                | Rule                                                                     | Error                                                                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Current password     | Required, must match stored password                                     | "Your current password is incorrect"                                                                                                                                               |
+| New password         | Required, minimum 12 characters, must contain letters and digits         | "Your password must be at least 12 characters and include both letters and numbers"                                                                                                |
+| New password         | Not found in a known breach list (checked by Supabase, server-side only) | "This password is known to have been exposed in a data breach somewhere on the internet. It may never have been yours — but it is no longer safe, so please pick a different one." |
+| Confirm new password | Must match new password                                                  | "Passwords do not match" (corrected 2026-07-13 -- no "Your" prefix, unlike Register/Reset Password's equivalent message)                                                           |
 
 On success: "Your password has been updated." Form fields cleared.
 

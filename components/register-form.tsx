@@ -109,6 +109,23 @@ export function RegisterForm() {
         </div>
       )}
 
+      {/* GAP-106: the breach-list cause, kept separate from the rule causes above.
+          A breached password has usually already met the length and character
+          rules, so the rule message would tell the user to do what they have
+          already done. */}
+      {state.error === 'breached_password' && (
+        <div
+          role="alert"
+          className="mb-6 flex items-start gap-3 rounded-lg border border-[#FCA5A5] bg-[#FEF2F2] p-4"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#DC2626]" aria-hidden="true" />
+          <p className="text-[0.875rem] text-[#991B1B]">
+            This password is known to have been exposed in a data breach somewhere on the internet.
+            It may never have been yours — but it is no longer safe, so please pick a different one.
+          </p>
+        </div>
+      )}
+
       {/* Form-level error: unexpected server failure */}
       {state.error === 'unknown' && (
         <div
