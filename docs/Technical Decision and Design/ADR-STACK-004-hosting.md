@@ -48,6 +48,23 @@ Vercel is the hosting platform. The Pro plan is required to configure `maxDurati
 - The 4.5MB request body limit on Vercel means file uploads must bypass Vercel entirely (ADR-FILE-001 BLOCKER).
 - AI generation routes must explicitly set `export const maxDuration = 90` in the route file.
 - Environment variables are managed in the Vercel dashboard (ADR-SEC-006).
+- **Function Regions must be London (`lhr1`) only, and this must be re-checked after any Vercel project change.** Added 2026-08-17 — see the region decision below. It is a **dashboard-only setting with no representation in the repository**, so nothing in a code review or a CI run would reveal a change to it. It belongs in `DEV-PROD-PARITY-CHECKLIST.md` for that reason.
+
+## Function region — decided 2026-08-17 (WJ)
+
+**Decision: London (`lhr1`) alone. Dublin (`dub1`) considered as a secondary region and rejected.**
+
+⚠️ **This was not a free choice being made for the first time — it corrects a default nobody had looked at.** Vercel's default Function Region for all new projects is **Washington, D.C. (`iad1`)**, and this project had both `lhr1` and `iad1` selected. Application code was therefore executing in the United States. Observed in Axiom on 2026-08-17, filtered to `vercel.source == "lambda"` over one 30-minute window: **`fra1` 28, `sfo1` 21, `iad1` 5, `cle1` 1, `lhr1` 1** — roughly half the invocations outside the UK and EEA. Raised as **`GAP-110`**.
+
+**Why `lhr1` alone, and not `lhr1` + `dub1`:**
+
+1. **Multi-region compute buys no real resilience while the database is single-region.** Supabase and Bedrock are both `eu-west-2` (London). If London fails, Dublin functions still reach for a London database and a London AI endpoint, and fail too — with an extra sea crossing first. The failover cannot fire in the scenario that would justify it.
+2. **`C13` says UK, not UK-or-EEA.** Dublin is Ireland — benign under the adequacy decision, but it reintroduces a "why is this one different" paragraph into a privacy policy we are trying to simplify. This ADR already records that relaxing `C13` to UK-or-EEA reopens the hosting decision itself, so that relaxation is not a small edit.
+3. **Latency would get worse, not better.** With two regions Vercel routes to the nearest **region**, not the nearest **database**. An Irish or northern-UK user could land on `dub1` and round-trip to London on every query.
+
+**Revisit triggers:** the database gaining a read replica or a multi-region configuration, or real `lhr1` outages appearing in UptimeRobot. Both are post-launch concerns.
+
+**Minor note for whoever reads Vercel's docs next:** the documentation's own screenshot says "up to 3 regions on your current Pro plan"; the live panel on this project says **5**. Go by the panel.
 
 ## Source
 
