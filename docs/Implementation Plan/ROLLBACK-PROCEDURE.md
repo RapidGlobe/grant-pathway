@@ -105,6 +105,52 @@ For anything ambiguous, take a fresh manual backup **before** you change anythin
 
 ---
 
+## 7b. GitHub is down and you need to deploy
+
+**Written 2026-08-17, during a real GitHub outage** — major outage, impact critical, from 13:40 UTC. API, Issues, Pull Requests and Actions were all down; Git Operations and Webhooks were degraded. **Vercel builds from GitHub, so for several hours there was no route to production.** Nothing needed shipping urgently, which was luck rather than design. `GAP-114`.
+
+**First, check it is actually GitHub:** [githubstatus.com](https://www.githubstatus.com). Note which components are affected — "Git Operations degraded" and "API major outage" are very different situations. On 2026-08-17 `git push` kept working throughout while everything else was failing.
+
+### Your code is not stranded
+
+There is a **local mirror** of the whole repository, including every document:
+
+```
+C:/Dev/grant-pathway-backup.git
+```
+
+It is configured as a git remote named `backup`. Push to it at any time:
+
+```
+git push backup --all && git push backup --tags
+```
+
+To restore from it into a fresh working copy:
+
+```
+git clone C:/Dev/grant-pathway-backup.git grant-pathway-restored
+```
+
+✅ **Verified 2026-08-17 by actually doing it** — cloned to a scratch directory, 1055 commits, working tree complete. Not assumed to work.
+
+⚠️ **Know what this mirror does and does not protect.** It is on the **same machine** as the working copy. It protects against GitHub being unavailable, a repository being deleted, or a bad force-push. **It does not protect against losing the machine.** An off-machine remote is `GAP-114`'s outstanding item and needs an account on a second provider.
+
+### Deploying without GitHub
+
+Vercel's CLI deploys from a local directory and **does not involve GitHub at all**:
+
+```
+npx vercel --prod
+```
+
+⚠️ **This has NOT been tried on this project.** It is written here because it is the obvious route, not because it is a proven one — and `GAP-114` records that an untried recovery path is an assumption, not a plan. **Try it once while nothing is on fire**, confirm what it prompts for, and replace this warning with what actually happened. Expect it to ask you to link the local directory to the existing Vercel project the first time.
+
+### If you cannot deploy at all
+
+**Say so, and wait.** For a free service with no SLA and no users mid-application, a few hours without the ability to deploy is an inconvenience, not an incident. The wrong response is improvising a deployment path under time pressure using a tool nobody has run before.
+
+---
+
 ## 8. After any incident
 
 - [ ] Write it up in `CHANGELOG.md` — what happened, what you did, how long it lasted (`ADR-OPS-004`)
