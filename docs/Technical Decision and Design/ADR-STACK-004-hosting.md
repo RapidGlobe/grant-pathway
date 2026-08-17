@@ -54,7 +54,11 @@ Vercel is the hosting platform. The Pro plan is required to configure `maxDurati
 
 **Decision: London (`lhr1`) alone. Dublin (`dub1`) considered as a secondary region and rejected.**
 
-⚠️ **This was not a free choice being made for the first time — it corrects a default nobody had looked at.** Vercel's default Function Region for all new projects is **Washington, D.C. (`iad1`)**, and this project had both `lhr1` and `iad1` selected. Application code was therefore executing in the United States. Observed in Axiom on 2026-08-17, filtered to `vercel.source == "lambda"` over one 30-minute window: **`fra1` 28, `sfo1` 21, `iad1` 5, `cle1` 1, `lhr1` 1** — roughly half the invocations outside the UK and EEA. Raised as **`GAP-110`**.
+⚠️ **This was not a free choice being made for the first time — it corrects a default nobody had looked at.** Vercel's default Function Region for all new projects is **Washington, D.C. (`iad1`)**, and this project had both `lhr1` and `iad1` selected. Raised as **`GAP-110`**.
+
+✅ **Verified 2026-08-17: `/api/health` returns `region: "lhr1"`.** Functions execute in London. The route reports `VERCEL_REGION`, which Vercel sets inside the running function, so this is the system stating its own region rather than a dashboard stating an intention.
+
+⚠️ **The gap was raised on evidence that turned out to be wrong, and the correction matters more than the fix.** Axiom's `vercel.region` field showed roughly half of all `source == "lambda"` execution in US regions (`fra1` 28, `sfo1` 21, `iad1` 5, `cle1` 1, `lhr1` 1 in one window), and that was read as US execution. **`fra1` was consistently the largest value while Frankfurt has never been ticked in Function Regions** — which should have been the tell. The field does not report execution region; it is almost certainly the edge location that received the request. **`iad1` genuinely was selected and the setting was genuinely wrong. The claim that half of all execution was happening in the United States was not established, and now cannot be** — the only measurement taken has been discredited.
 
 **Why `lhr1` alone, and not `lhr1` + `dub1`:**
 
