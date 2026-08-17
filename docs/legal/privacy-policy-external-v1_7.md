@@ -98,10 +98,10 @@ We do not sell your data. We do not share it for advertising or marketing purpos
 | **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                 |
 | **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                         |
 | **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6) |
-| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United States (with global edge network)                                |
+| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company, see Section 6         |
 | **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                |
-| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | European Union                                                          |
-| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | European Union (EU Central) — see Section 6                             |
+| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                |
+| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | Germany (European Union) — see Section 6                                |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
@@ -115,7 +115,7 @@ Almost all of your data stays within the United Kingdom or the European Economic
 
 **Processed in the UK:** your account, organisation profile and application content (Supabase, London); the AI processing described in Section 5 (Amazon Web Services Bedrock, London); and the running of the service itself. **Vercel**, which hosts Grant Pathway, runs our application code in its **London** data centre, so the handling of your information as you use the service takes place in the UK. Vercel is a United States company, and your requests reach us through its global network before being handled in London; it does not store your data. AI processing takes place within the UK or EEA and does not constitute an international transfer.
 
-**Processed in the EEA:** error reports (Sentry), rate-limiting data (Upstash, Ireland) and the technical logs described in Section 2 (Axiom, EU Central). These are covered by the UK's adequacy decision, so no additional transfer mechanism is required.
+**Processed in the EEA:** error reports (Sentry, Germany), rate-limiting data (Upstash, Ireland) and the technical logs described in Section 2 (Axiom, Germany). These are covered by the UK's adequacy decision, so no additional transfer mechanism is required.
 
 **A note on Axiom.** Axiom operates its service in two parts, and only one of them handles your data. Your technical logs — including your IP address — are received, stored and searched entirely within its **European Union** deployment; that data does not leave the EU. Separately, Axiom runs a single global system that manages our own account with them: signing our staff in, managing access tokens, and billing. That part operates outside the EU, but it handles **our account details, not your personal data**.
 
