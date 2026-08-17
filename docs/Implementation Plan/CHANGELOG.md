@@ -10,7 +10,49 @@
 
 ---
 
-## 2026-08-16 (latest) — `GAP-104`'s password settings applied to production; `GAP-106` raised as a direct consequence; the Resend rotation considered and declined
+## 2026-08-17 (latest) — `P5.4` complete; privacy policy v1.7 drafted; `P5.5`'s own premise found stale
+
+Three pieces of work: closing `P5.4`, drafting the privacy policy changes, and starting `P5.5`'s documentation half.
+
+### `P5.4` is complete — the last item was a day's patience, not a task
+
+`GAP-50`'s blank-`CRON_SECRET` concern is now disproven on **all three** production cron routes, each observed in Axiom with `status 200` and user agent `vercel-cron/1.0` — Vercel's own scheduler, which supplies the secret itself, so this is the real authenticated path rather than a synthetic call.
+
+| Route                           | Observed                 |
+| ------------------------------- | ------------------------ |
+| `/api/cron/cleanup-guidelines`  | 2026-08-16, 13:00:48 UTC |
+| `/api/cron/inactivity-warning`  | 2026-08-17, 08:00:04 UTC |
+| `/api/cron/inactivity-deletion` | 2026-08-17, 09:01:18 UTC |
+
+**The point worth recording is the standard, not the result.** All three routes read the same `CRON_SECRET` and compare it identically, so the first 200 on 2026-08-16 already proved the secret was set, non-blank and matching. It was recorded as **two-of-three unverified** anyway, and the remaining two were simply waited for. The inference turned out to be right and the wait cost nothing — which is the argument for keeping the standard rather than the argument for relaxing it.
+
+⚠️ **A timezone trap cost real time and is now written down.** **Axiom renders `_time` in the viewer's local timezone; every schedule in `vercel.json` is UTC.** In British Summer Time the 08:00 UTC warning job appears at 09:00, and it was briefly read as a missing run before `vercel.json` settled it. The note, the working query, and the benign `<nil>` `statusCode` artefact (each invocation emits several log lines, and the duration/memory one carries no status) are all recorded in `P5.4-RUNBOOK.md` step 4.
+
+**Phase 5 moves to seven of ten done.** `P5.5` is next.
+
+### Privacy policy — the brief was written, then WJ changed the destination
+
+The solicitor brief was produced as instructed: one re-review covering `GAP-102` (Resend placed in the US, console says Ireland), `GAP-109` (Upstash absent while storing email addresses) and Axiom's residency caveat, plus the fourth and larger finding — **nothing connects "a service was added" to "update the processor table"**, which is why three surfaced in two days.
+
+**WJ then decided not to commission a further solicitor review for now**, each one carrying a fee, and asked for the changes to be drafted so he could judge whether a review is warranted. `docs/legal/privacy-policy-external-v1_7.md` is that draft. **v1.6 remains the published policy and is unchanged.**
+
+⚠️ **The draft goes one place beyond the brief, and it is the most substantive change of the set.** v1.6 disclosed **no IP-address collection anywhere**, so Section 2 gained a `Technical logs` bullet. **That omission pre-dates Axiom** — Vercel has always logged IPs — so the Axiom work exposed a pre-existing gap rather than creating one. Resend is now described as both entity and infrastructure, which is the conservative reading of the question the brief had put to the solicitor.
+
+`GAP-110` for the missing mechanism is **held at WJ's instruction** until he has reviewed v1.7.
+
+### `P5.5` item 2 — the prerequisite's premise was checked before acting on it, and is largely stale
+
+P5.5 item 2 asserts Phase 6's features are barely covered, **verified 2026-07-30**: governance facts in one plan, citations in three. August's runs have since overtaken both — each is now covered as real cases with recorded results in three plans. Acting on the wording would have meant writing coverage that already exists.
+
+**Re-checking found a genuine gap that the wording does not mention.** **P6.5's reuse-a-previous-application path has no positive test anywhere in the functional suite.** Both flagships mention reuse only to assert the prompt does _not_ appear on a fresh account — testing its absence. The path has been driven end to end exactly once, by `accessibility-test-plan.md`'s AC-14 on 2026-08-12, against dev, under a WCAG 3.3.7 Redundant Entry pass criterion that could hold while the feature was functionally broken. Given Phase 6 is the stated reason the go-live gate exists, the production runs would otherwise have proven every Phase 6 feature except that one.
+
+Recorded in `docs/Test Plans/phase-6-coverage-review-2026-08-17.md` with three options for where the case belongs. **No test plan edited** pending that decision.
+
+Item 2 also names the user guide as "still at v1.3". It is at **v1.19**, so the stated reason to refresh it no longer holds; whether it needs a Phase 6 pass is now an open question rather than a settled instruction.
+
+---
+
+## 2026-08-16 — `GAP-104`'s password settings applied to production; `GAP-106` raised as a direct consequence; the Resend rotation considered and declined
 
 **`P5.4` continued.** Three items from the day's list, one of which was a decision to _not_ do something.
 
