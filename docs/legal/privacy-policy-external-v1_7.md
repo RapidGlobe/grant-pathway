@@ -173,6 +173,7 @@ There is no charge for exercising your rights in most cases.
 
 Grant Pathway uses a small number of cookies that are strictly necessary to operate the service:
 
+- **Sign-in cookies** — when you open the sign-in page, a small number of temporary cookies are set so that the sign-in can be completed securely. They are part of the sign-in process itself and are not used to identify or track you.
 - **Authentication cookie** — a secure, encrypted token that keeps you signed in during your session. This cookie is deleted when you sign out or when your session expires.
 
 We do not use advertising cookies, analytics cookies, or any third-party tracking technology. Because we only use cookies that are strictly necessary for the service to function, we are not required to ask for your consent to set them — but we want to be transparent about their use.
