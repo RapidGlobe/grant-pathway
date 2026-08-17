@@ -93,15 +93,15 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 
 We do not sell your data. We do not share it for advertising or marketing purposes. We work with a small number of trusted third-party service providers who process data on our behalf:
 
-| Provider                          | What they do                                                                                  | Where your data is processed                                                |
-| --------------------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                     |
-| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                             |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | Ireland (European Union). Resend is a United States company — see Section 6 |
-| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United States (with global edge network)                                    |
-| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                    |
-| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | European Union                                                              |
-| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | European Union — see Section 6                                              |
+| Provider                          | What they do                                                                                  | Where your data is processed                                            |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                 |
+| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                         |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6) |
+| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United States (with global edge network)                                |
+| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                |
+| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | European Union                                                          |
+| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | European Union — see Section 6                                          |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
@@ -115,15 +115,15 @@ Most of your data stays within the United Kingdom or the European Economic Area 
 
 **Processed in the UK:** your account, organisation profile and application content (Supabase, London), and the AI processing described in Section 5 (Amazon Web Services Bedrock, London). AI processing takes place within the UK or EEA and does not constitute an international transfer.
 
-**Processed in the EEA:** error reports (Sentry), rate-limiting data (Upstash, Ireland) and transactional email (Resend, Ireland). These are covered by the UK's adequacy decision and no additional transfer mechanism is required for the storage location itself.
+**Processed in the EEA:** error reports (Sentry) and rate-limiting data (Upstash, Ireland). These are covered by the UK's adequacy decision, so no additional transfer mechanism is required.
 
-**Transfers outside the UK and EEA.** Two of our providers involve processing outside the UK and EEA, and one may do so in limited circumstances:
+**Transfers outside the UK and EEA.** Some of your data is processed in the United States, and one provider may process outside the EU in limited circumstances:
 
-- **Vercel**, which hosts the application, is based in the **United States** and operates a global edge network.
-- **Resend** sends our email from **Ireland**, but is a **United States company**, so its staff may be able to access data from the United States in the course of supporting the service.
+- **Resend**, which sends our transactional email, processes your data in the **United States**. Although email for our domain is sent from Irish infrastructure, Resend's own data processing agreement states that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address and the content of the email.
+- **Vercel**, which hosts the application, is a **United States** company and operates a global network of data centres. Every request you make to Grant Pathway passes through Vercel, so your information is handled by it in transit — although Vercel does not store your data.
 - **Axiom** stores our technical logs in the **European Union**, but Axiom states that for this region some operations may be processed outside the EU.
 
-Where personal data is transferred outside the United Kingdom to these providers, or to any provider outside the United Kingdom we may substitute for them in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK.
+Where personal data is transferred outside the United Kingdom to these providers, or to any provider outside the United Kingdom we may substitute for them in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK. Resend relies on the EU standard contractual clauses, the UK addendum to those clauses, and the EU–US Data Privacy Framework including its UK Extension.
 
 ---
 
