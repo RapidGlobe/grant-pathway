@@ -10,7 +10,7 @@
 
 ---
 
-## 2026-08-18 (latest) — `GAP-114` mitigations (1) and (2); privacy policy v1.8; SAR procedure reviewed; gaps register sorted
+## 2026-08-18 (latest) — `GAP-114` CLOSED, all four mitigations; privacy policy v1.8; SAR procedure reviewed; gaps register sorted and its prettier bug root-caused
 
 ### The SAR procedure would have answered a real request from the development database
 
@@ -33,6 +33,22 @@ WJ went looking for `GAP-102` and could not find it. Rows ran `GAP-01` ascending
 ⚠️ **Why this was more than untidiness.** This register is the document `AGENTS.md` §2 sends every session to before starting work. **The failure mode is silent** — a session that cannot find a row concludes there is no such gap, and proceeds as though the risk were unrecorded.
 
 ⚠️ **Two things to know for next time, both recorded in the file itself.** **`prettier --write` still corrupts this table** — the standing warning from 2026-08-12 holds, so `--check` was run instead and passes, keeping CI green. That bug is still un-root-caused and remains WJ's decision rather than a workaround baked in silently. **And the sort's own commit was swallowed:** a concurrent session committed the index between staging and commit, so the register change landed inside `d5cdb18` ("SAR procedure v1.5"), whose message says nothing about it. History was not rewritten to unpick it — another session was actively pushing. **The durable trail is the register's own Document History entry, v2.92**, not the commit message.
+
+### The recovery position, written down at last — `GAP-114` closed
+
+Mitigations (3) and (4) are now `ROLLBACK-PROCEDURE.md` §7c. **The gap was never a missing backup; it was that nobody had written down what the position is.**
+
+**Only two stores hold durable data:** the production Postgres database (daily `PHYSICAL` snapshots, 7-day retention, `eu-west-2`, verified on the live project twice) and the git repository with every project document in it (three proven copies). Everything else — Storage, Upstash, Axiom, Resend, Sentry — is transient by design or vendor-held on a rolling window and needs no backup. **Measured restore: 6 minutes. RPO: up to 24 hours**, point-in-time recovery having been rejected at ~£100/month against a £150 ceiling.
+
+⚠️ **Two honest limits, both stated in §7c rather than smoothed over.** The 6 minutes came from a restore **to a new project**; an in-place restore of production has never been run, and a new project would also need its connection details swapped into Vercel before the service worked. And **no from-nothing rebuild has ever been timed**, so there is no whole-service recovery figure — which is precisely why Option A was chosen over inventing one.
+
+**The credential question inverted the obvious answer, and it is the most useful thing this exercise produced.** The ~15 Vercel production environment variables have no second copy — and need none: every value can be reissued at source, and `CRON_SECRET` was invented here, so a new one can simply be made up. ✅ **WJ confirmed he can log into all seven vendor accounts independently of this machine.** **So the single point of failure is vendor account access, not the secrets** — and if the password manager holding those logins lives only on this laptop, that is the exposure. Recorded as the thing to check, in place of a secrets-backup task that would have been busywork.
+
+**Accepted risk — Option A (WJ):** a free service with no SLA and, pre-launch, no users accepts a day without deployment and up to 24 hours of data loss; no further redundancy before launch.
+
+⚠️ **Written with an explicit expiry, which is the reason this option was preferred to a made-up recovery time.** Post-launch the same outage costs charities their work mid-application, and `DR-BM-002`'s succession assumption compounds it. **Trigger: the Phase 6 → Go-Live gate cannot be signed until the statement is replaced with a measured recovery time or consciously re-accepted with reasons.** Replacing it needs an in-place restore drill plus one timed from-nothing rebuild. **The Storage-exclusion acceptance carries the same shape of expiry** — it costs nothing only while that bucket stays transient.
+
+**`GAP-114` moves to ✅ Closed, four of four.** Raised during an outage on 2026-08-17 and closed the next day.
 
 ### The manual deploy path is now proven rather than assumed
 

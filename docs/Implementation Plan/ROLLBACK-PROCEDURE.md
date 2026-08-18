@@ -196,6 +196,53 @@ npx vercel --prod
 
 ---
 
+## 7c. What is backed up, how long recovery takes, and what we accept losing
+
+**Written 2026-08-18, closing `GAP-114` mitigations (3) and (4).** The gap was never a missing backup — it was that **nobody had written down what the recovery position actually is.** This section is that position. It is deliberately short, and every unproven step is labelled.
+
+### What holds durable data — and it is only two things
+
+| Store                                                    | Backed up?                                                                                                                                                               | Restore path                            |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------- |
+| **Supabase Postgres (production)**                       | ✅ Daily `PHYSICAL` snapshots, **7-day retention**, ~03:05 UTC. Pro plan, `eu-west-2` (London). Verified on the live project twice — 2026-06-22 and 2026-08-15           | Supabase → Database → Backups → Restore |
+| **The git repository** — code and every project document | ✅ **Three copies**: GitHub (`origin`), a local bare mirror at `C:/Dev/grant-pathway-backup.git`, and GitLab off-machine. All three proven by restoring, not by trusting | §7b                                     |
+
+**Everything else is transient by design or vendor-held on a rolling window**, and none of it needs backing up: Supabase Storage (`guidelines-temp`, uploads deleted after processing), Upstash counters (~1 hour), Axiom logs (30 days), Resend send records (up to 90 days), Sentry errors (up to 12 months).
+
+### The recovery time, stated honestly
+
+| Measure                         | Value                                                                                                                           |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Database restore — measured** | **6 minutes** (12:11–12:17, drill of 2026-06-22)                                                                                |
+| **Data loss window (RPO)**      | **Up to 24 hours** — backups are daily, and point-in-time recovery was not purchased (~£100/month against a £150 total ceiling) |
+| **Whole service, from nothing** | ⚠️ **Never measured.** No from-nothing rebuild has been attempted                                                               |
+
+⚠️ **Do not quote the 6 minutes as time-to-service-restored.** That drill was a **"Restore to new project"**. An in-place restore of `grant-pathway-prod` — what a real incident would use — **has never been run**, and a new project would also need its connection details swapped into Vercel before the service worked again.
+
+### What we accept losing
+
+1. **Up to 24 hours of user data** after a database failure. Accepted: point-in-time recovery costs more than the entire monthly budget allows.
+2. **Uploaded guideline files**, which Supabase's backups exclude by design (`ADR-DATA-005`). Accepted **because the bucket is transient** — files are deleted after processing, so there is nothing durable to lose. ⚠️ **This acceptance expires the moment anything is stored there permanently.**
+3. **Technical logs, error reports and email records** older than each vendor's window. Accepted: diagnostic data, not user content.
+
+### Credentials — the thing that would actually stop a rebuild
+
+The ~15 production environment variables in Vercel (Supabase service-role key and database password, AWS Bedrock keys, Resend, Charity Commission, Upstash, Sentry, Axiom, `CRON_SECRET`) **have no second copy, and deliberately do not need one.**
+
+✅ **Confirmed by WJ, 2026-08-18: he can log into all seven vendor accounts independently of this machine.** Every value can be reissued at source — and `CRON_SECRET` was invented here, so a new one can simply be made up and set in Vercel.
+
+⚠️ **This makes vendor account access, not the secrets, the real single point of failure.** The recovery position depends on those logins surviving the loss of this machine. If the password manager holding them is only on this laptop, that is the exposure to fix — not the environment variables.
+
+### Accepted risk statement — Option A (WJ's decision, 2026-08-18)
+
+> **Grant Pathway is a free service with no SLA and, pre-launch, no users. A day without the ability to deploy, and up to 24 hours of data loss in a disaster, are accepted risks.** Source control and every project document exist in three places, and there is a proven route to production that does not involve GitHub. No further redundancy will be built before launch.
+
+⚠️ **This statement expires at launch, and that is the point of writing it down.** Post-launch the same outage costs charities their work mid-application, and `DR-BM-002`'s succession assumption compounds it — the operating knowledge sits with one person.
+
+**Trigger, so it does not quietly rot:** the **Phase 6 → Go-Live gate** must not be signed until this statement is either replaced with a measured recovery time or consciously re-accepted with reasons. Two things are needed to replace it: an **in-place** restore drill on production, and one **from-nothing rebuild** timed end to end. Neither has been done.
+
+---
+
 ## 8. After any incident
 
 - [ ] Write it up in `CHANGELOG.md` — what happened, what you did, how long it lasted (`ADR-OPS-004`)
