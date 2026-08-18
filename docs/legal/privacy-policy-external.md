@@ -1,10 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.7
+**Version:** 1.8
 
-**Effective date: 17 August 2026**
+**Effective date: 18 August 2026**
 
-**Last updated: 17 August 2026**
+**Last updated: 18 August 2026**
 
 ---
 
@@ -92,15 +92,15 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 
 We do not sell your data. We do not share it for advertising or marketing purposes. We work with a small number of trusted third-party service providers who process data on our behalf:
 
-| Provider                          | What they do                                                                                  | Where your data is processed                                            |
-| --------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                 |
-| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                         |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6) |
-| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company, see Section 6         |
-| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                |
-| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                |
-| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | Germany (European Union) — see Section 6                                |
+| Provider                          | What they do                                                                                  | Where your data is processed                                                                           |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                                                |
+| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                                                        |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6)                                |
+| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company                                                       |
+| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                                               |
+| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                                               |
+| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | Germany (European Union) — technical logs; United States — RapidGlobe's account details, billing, etc. |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
@@ -216,6 +216,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.7_
-_Effective date: 17 August 2026_
-_Last updated: 17 August 2026_
+_Version: 1.8_
+_Effective date: 18 August 2026_
+_Last updated: 18 August 2026_

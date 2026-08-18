@@ -1,10 +1,20 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.7
+**Version:** 1.8
 
-**Effective date: 17 August 2026**
+**Effective date: 18 August 2026**
 
-**Last updated: 17 August 2026**
+**Last updated: 18 August 2026**
+
+> **Change from v1.7 (17 August 2026) to v1.8 (18 August 2026): two clarifications from WJ's own post-review read, and one change deliberately NOT made.** **Section 5, Axiom row** — expanded from "Germany (European Union) — see Section 6" to name both halves in the table itself: **"Germany (European Union) — technical logs; United States — RapidGlobe's account details, billing, etc."** The substance is unchanged from v1.7, which already explained the split in Section 6; this puts it where a reader meets the processor rather than three paragraphs later. **Section 5, Vercel row** — the "see Section 6" pointer dropped, the row now reading "United Kingdom (London) — Vercel is a US company". Section 6's Vercel paragraph is unchanged.
+>
+> ⚠️ **The change not made, and it is the important entry.** The revision as submitted also moved **Resend** from "United States" to **"Ireland (European Union) — emails are sent from an Irish data centre"** and rewrote **Section 6** so that transfers outside the UK and EEA read as a future possibility rather than a present fact. **Both were rejected and v1.7's wording is retained.** This is the second time this exact change has been proposed and reverted — the v1.7 draft carried it too, and `GAP-102` was closed on 2026-08-17 having disproven it.
+>
+> **Re-verified against Resend's live documents on 2026-08-18, not merely against yesterday's note:** the DPA (updated 2025-12-31) states **"Company's primary processing operations take place in the United States"**, offers **no EU or EEA data-residency option**, and names the legal entity as **Plus Five Five, Inc.**; the sub-processor page (updated 15 July 2026) lists **21 sub-processors, every one in the USA**, with no EU, EEA or UK entity anywhere on it. Transfers rest on the EU SCCs, the UK SCCs with the Addendum, and the EU–US Data Privacy Framework with its UK Extension.
+>
+> **The Irish reading is not wrong, it answers a different question.** Resend's console shows this domain's **sending region** as Ireland (`eu-west-1`), observed 15–16 August 2026 — that is where mail leaves from. Where data is **processed and who may access it** is what a privacy policy must state, and for that the DPA governs. **Publishing the revision as submitted would have removed a real US transfer disclosure and its safeguard from a solicitor-reviewed document — under-disclosure, which is the direction that carries risk.**
+>
+> ⚠️ **Open, and it does not block this version.** WJ has asked Resend's support to confirm whether the Irish region is egress-only or whether recipient data is also **stored** in Ireland, and whether any EEA residency option exists. **No answer can move this policy off "United States" unless Resend offers and we enable EU residency** — Plus Five Five is a US entity with 21 US sub-processors and US access, which is a transfer either way. A confirmation would let Section 6 distinguish where data rests from who can reach it. **WJ intends to take the wording to the solicitor once that answer arrives.**
 
 > **Change from v1.6 (7 August 2026) to v1.7 (17 August 2026): the processor table brought back into line with the stack, and two disclosure gaps closed.** **Section 5** — **Upstash** and **Axiom** added as processors, neither having been named before (`GAP-109`; Axiom was connected 2026-08-16 and missing the same day). **Vercel** corrected from "United States (with global edge network)" to **United Kingdom (London)**, verified by the function reporting its own `VERCEL_REGION` (`GAP-110`) rather than by a dashboard setting. **Resend** confirmed as **United States** — `GAP-102` alleged this was wrong and the finding was itself wrong: Resend's DPA states processing is in the US and all 22 of its sub-processors are US entities, so the console's Irish sending region describes infrastructure, not processing. The column heading changed to "Where your data is processed", since the old "Where they are based" is what allowed entity and infrastructure to be conflated. **Section 6** rewritten and grouped UK / EEA / outside. Resend is now the only transfer outside the UK and EEA. Axiom's "some operations may be processed outside the EU" caveat is explained rather than quoted — its edge deployment handles ingest, storage and query in the EU, while the global control plane handling our own account sits outside it. Transfer bases named (EU SCCs, UK Addendum, EU–US DPF with UK Extension). **Section 2** — new **Technical logs** bullet. **v1.6 disclosed no IP-address collection anywhere.** This pre-dates Axiom, since Vercel has always logged IPs; the Axiom work exposed it. **Section 4** gained a matching lawful-basis row, and **Section 7** retention rows for technical logs (30 days) and rate-limiting data (~1 hour). **Section 9** — **`GAP-111`**: the policy declared one cookie and the live sign-in page sets **three** (Supabase PKCE code-verifier cookies, none HttpOnly, all written before authentication completes, verified in DevTools). Lawfulness unaffected — they are strictly necessary — the description was wrong. ⚠️ **No further solicitor review was commissioned (WJ, 17 August 2026)** — each carries a fee. The evidence for every change is recorded in `solicitor-brief-processor-table-2026-08-17.md`, which was written for that purpose and kept. **`GAP-112` raised for the underlying cause:** nothing connects adding a service to updating this table, which is why four findings arrived in two days.
 
@@ -110,15 +120,15 @@ Under the UK General Data Protection Regulation (UK GDPR), we must have a legal 
 
 We do not sell your data. We do not share it for advertising or marketing purposes. We work with a small number of trusted third-party service providers who process data on our behalf:
 
-| Provider                          | What they do                                                                                  | Where your data is processed                                            |
-| --------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                 |
-| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                         |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6) |
-| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company, see Section 6         |
-| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                |
-| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                |
-| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | Germany (European Union) — see Section 6                                |
+| Provider                          | What they do                                                                                  | Where your data is processed                                                                           |
+| --------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                                                |
+| **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                                                        |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6)                                |
+| **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company                                                       |
+| **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                                               |
+| **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                                               |
+| **Axiom**                         | Stores technical logs so we can diagnose faults and detect abuse                              | Germany (European Union) — technical logs; United States — RapidGlobe's account details, billing, etc. |
 
 Each provider is bound by a data processing agreement and is only permitted to use your data to deliver the service to us — not for their own commercial purposes.
 
@@ -234,6 +244,6 @@ We would always prefer the opportunity to resolve any concern directly before a 
 
 _Grant Pathway is provided by RapidGlobe Ltd (company number 05615649), registered in England and Wales._
 
-_Version: 1.7_
-_Effective date: 17 August 2026_
-_Last updated: 17 August 2026_
+_Version: 1.8_
+_Effective date: 18 August 2026_
+_Last updated: 18 August 2026_
