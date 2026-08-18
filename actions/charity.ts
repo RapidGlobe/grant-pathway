@@ -5,6 +5,7 @@
 // components stay thin.
 
 import AnthropicBedrock from '@anthropic-ai/bedrock-sdk'
+import * as Sentry from '@sentry/nextjs'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { MODEL, MONTHLY_CAP, APPROACHING_LIMIT_THRESHOLD } from '@/lib/prompts'
@@ -289,10 +290,35 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
     if (res.ok) {
       const data = (await res.json()) as Record<string, unknown>
       charitableObjects = ((data.charitable_objects ?? '') as string).trim()
+
+      // An empty objects field is a legitimate register state, not a failure —
+      // but it is indistinguishable from a failure unless it is recorded (D-016).
+      if (!charitableObjects) {
+        Sentry.captureMessage('charity governing document returned no charitable_objects', {
+          level: 'info',
+          tags: { action: 'lookupCharity', stage: 'governing-document' },
+          extra: { regNumber, keys: Object.keys(data) },
+        })
+      }
+    } else {
+      // A non-2xx status is not fatal — the form still gets name and number, and
+      // the user can type the descriptions. But it must not be silent: before
+      // D-016 this branch did nothing at all, so a broken key, a revoked
+      // subscription and a charity with no objects text were indistinguishable.
+      Sentry.captureMessage('charity governing document lookup failed', {
+        level: 'warning',
+        tags: { action: 'lookupCharity', stage: 'governing-document' },
+        extra: { regNumber, status: res.status, statusText: res.statusText },
+      })
     }
-    // A non-2xx status here is not fatal — we continue without charitable objects
-  } catch {
-    // Timeout or network error for governing document — continue without it
+  } catch (error) {
+    // Timeout or network error for governing document — continue without it,
+    // but report it (D-016). A bare catch here hid a production failure for
+    // an unknown length of time.
+    Sentry.captureException(error, {
+      tags: { action: 'lookupCharity', stage: 'governing-document' },
+      extra: { regNumber },
+    })
   }
 
   // ── Step 3: Bedrock paraphrase ───────────────────────────────────────────
