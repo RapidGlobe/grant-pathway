@@ -1,12 +1,13 @@
 # Subject Access Request (SAR) Procedure
 
-**Version:** 1.5
+**Version:** 1.6
 **Last updated:** 18 August 2026
 **Owner:** Wac Jokhia, RapidGlobe Ltd
 **Legal basis:** UK GDPR Article 15 — Right of Access
 
 | Version | Date           | Changes                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.6     | 18 August 2026 | **Axiom and Sentry included in the export (WJ's decision).** New Step 3c: how to retrieve both, and the two traps — a shared IP address may cover several people, so lines must be attributable before disclosure; and Axiom's 30-day window makes its contribution partial, which the response email now states.                                                                                                                     |
 | 1.5     | 18 August 2026 | **Reviewed against the current stack — the project ref was wrong and three tables were missing.** Step 3 named `grant-pathway-prod` but gave dev's ref. Queries 7–9 added (`application_guidelines`, `application_items`, `user_tooltip_dismissals`); `ai_usage_log` gains `input_token_count`/`output_token_count`. New Step 3b covers the four stores outside the database. Axiom/Sentry inclusion left as an open decision for WJ. |
 | 1.0     | 29 June 2026   | Initial version                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 1.1     | 29 June 2026   | Step 3 rewritten — six numbered queries; warning added that `user_id` is a UUID not an email                                                                                                                                                                                                                                                                                                                                          |
@@ -186,11 +187,29 @@ where user_id = '<user_id>';
 | Store                                          | What it holds                                                                                       | Include in the export?                                                                                                                                                                                            |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Supabase Storage**, bucket `guidelines-temp` | Files the user uploaded, at `guidelines-temp/<user_id>/<filename>`                                  | **Yes — download and include them.** They are the user's own documents. Check the bucket even if the applications look complete; uploads are transient by design and may not correspond to a current application. |
-| **Axiom** (technical logs, 30 days)            | Request logs including the user's **IP address** — disclosed in Privacy Policy Section 2 since v1.7 | **Decision needed — see below.**                                                                                                                                                                                  |
-| **Sentry** (error reports, up to 12 months)    | Error events, which may carry a user identifier                                                     | **Decision needed — see below.**                                                                                                                                                                                  |
+| **Axiom** (technical logs, 30 days)            | Request logs including the user's **IP address** — disclosed in Privacy Policy Section 2 since v1.7 | **Yes — decided by WJ, 2026-08-18.** See Step 3c.                                                                                                                                                                 |
+| **Sentry** (error reports, up to 12 months)    | Error events, which may carry a user identifier                                                     | **Yes — decided by WJ, 2026-08-18.** See Step 3c.                                                                                                                                                                 |
 | **Upstash** (rate-limit counters, ~1 hour)     | A counter keyed by `user.id` or email                                                               | **No.** Transient and expired long before a one-month response window closes. Say so if asked rather than treating it as a hidden store.                                                                          |
 
-⚠️ **Axiom and Sentry are a genuine open question, not an oversight to be quietly resolved by whoever handles the first SAR.** Article 15 covers technical logs where the individual is identifiable, and an IP address in a log tied to a signed-in session usually is. Against that: the logs are keyed by request rather than by user, so retrieval means searching 30 days of log lines, and the exercise risks exposing other people's data if done carelessly. **This needs a decided position before the first real SAR arrives**, not an improvised one under a one-month deadline. Raised with WJ 2026-08-18; unresolved at the time of writing.
+### Step 3c — Retrieving the Axiom and Sentry data
+
+**Decided by WJ, 2026-08-18: both are included in the export.** Article 15 covers technical logs where the individual is identifiable, and an IP address attached to a signed-in session usually identifies them. Including them is the position that needs no argument if the ICO ever asks.
+
+⚠️ **Both stores are keyed by request and by error, not by user, so retrieval is a search rather than a lookup. Read this before starting.**
+
+**Axiom** — dataset `vercel`, 30-day window. There is no `user_id` field to filter on, so work from the identifiers you already hold:
+
+1. From queries 1 and 4–6, note the account's `created_at` and `last_sign_in_at` and the `id` / `application_id` values. These bound the search and give you application IDs that appear in request paths.
+2. Search the dataset for those application IDs and within the account's activity window. **Filter to values you hold — never export a time range wholesale.**
+3. What to collect: request paths, timestamps, and the `request.ip` values recorded against them.
+
+⚠️ **The IP address is the reason Axiom is included, and also the trap. An IP is not unique to a person** — a shared office or household connection may cover several users. **Disclose only lines you can attribute to the requester.** Where a line cannot be attributed with confidence, leave it out and say the search was scoped to attributable requests. **Disclosing another user's request log inside a SAR response is itself a personal data breach**, which is a worse outcome than a slightly incomplete export.
+
+⚠️ **Axiom's contribution is partial by nature — the window is 30 days and anything older is gone.** Say so in the response rather than implying the log covers the life of the account.
+
+**Sentry** — search by the user identifier attached to error events, and by the same activity window; retention is up to 12 months. Export as CSV or JSON. **Strip stack traces and internal file paths** — those are our technical information, not the requester's personal data.
+
+**Record what you searched, not only what you found.** If Axiom returns nothing for a light user, write that in Step 5: it is the evidence the search happened, should the response ever be questioned.
 
 Export each query result as CSV using the download button in the SQL Editor results panel.
 
@@ -222,6 +241,13 @@ The attachment contains the following files:
 - application-items.csv  — the question sets extracted from those guidelines
 - tooltip-dismissals.csv — which in-service help tips you have dismissed
 - uploaded-files/         — the guideline documents you uploaded, in their original format
+- technical-logs.csv     — records of requests your browser made to the service, including IP address, covering the last 30 days
+- error-reports.csv      — technical error reports recorded against your account, where any exist
+
+Two notes on the technical logs. They are kept for 30 days only, so they cover recent
+activity rather than the whole life of your account. They are recorded against individual
+requests rather than against your account, so we have included the entries we can
+confidently attribute to you and excluded anything we could not.
 
 If you have any questions about this data, or if you believe anything is inaccurate,
 please reply to this email and we will look into it.

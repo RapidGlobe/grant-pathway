@@ -10,7 +10,29 @@
 
 ---
 
-## 2026-08-18 (latest) — `GAP-114` mitigations (1) and (2): off-machine mirror built, manual deploy path proven
+## 2026-08-18 (latest) — `GAP-114` mitigations (1) and (2); privacy policy v1.8; SAR procedure reviewed; gaps register sorted
+
+### The SAR procedure would have answered a real request from the development database
+
+Reviewed against the current stack at WJ's direction, having been flagged as the oldest document in `docs/legal/` — v1.4, unchanged since 29 June. **Step 3 named `grant-pathway-prod` and gave the ref `stanwaejdvlvremtffkf`, which is `grant-pathway-dev`.** Following it would have returned nothing, or another test user's data, **while the response email stated in writing that it was a complete copy of the person's personal data.** Wrong from the day it was written; never re-read against the two-project split.
+
+**Three tables were missing because they did not exist on 29 June** — `application_guidelines` (uploaded guideline text and the AI summaries derived from it), `application_items` (extracted question sets, plus `cloned_from_application_id` for reuse), and `user_tooltip_dismissals`. `ai_usage_log` had also gained `input_token_count` / `output_token_count`. **Queries 7–9 added, with a note that their column names were read from the migrations rather than from a live SAR**, and instructions to list a table's columns rather than guess if one errors.
+
+**New Step 3b — four stores no SQL query reaches.** Supabase Storage (`guidelines-temp/<user_id>/`) **included**, since those are the requester's own documents; Upstash **excluded**, being an hour-long counter. **Axiom and Sentry were raised as an explicit open decision rather than improvised** — an Article 15 question is not one to settle under a one-month deadline with a real requester waiting.
+
+**WJ decided the same day: include both.** Written up as Step 3c with the retrieval routes and the two traps stated plainly. **The first is the one that matters: an IP address is not unique to a person**, so a shared office or household connection may cover several users, and lines must be attributable to the requester before they are disclosed. **Disclosing another user's request log inside a SAR response is itself a personal data breach** — a worse outcome than a slightly incomplete export. The second: Axiom's 30-day window makes its contribution partial by nature, so **the response email now says so** rather than implying the log covers the life of the account. Sentry's stack traces are stripped, being our technical information rather than the requester's personal data. **v1.6.**
+
+⚠️ **Nothing here has been exercised.** No SAR has ever been received, so this remains a procedure read from the schema rather than one that has produced an export. **The wrong project ref survived seven weeks precisely because nothing ran it.**
+
+### The gaps register was not in numeric order
+
+WJ went looking for `GAP-102` and could not find it. Rows ran `GAP-01` ascending to `GAP-98`, then `GAP-109`–`GAP-114`, then **descended** `GAP-108` back to `GAP-99` — the tail had been appended in reverse, and each session added to whichever end it happened to be reading.
+
+**Sorted to strict ascending order, 114 rows, integer sort so `GAP-99` precedes `GAP-100`.** Only ordering changed: the multiset of row strings was asserted identical before and after the write, and verified independently afterwards.
+
+⚠️ **Why this was more than untidiness.** This register is the document `AGENTS.md` §2 sends every session to before starting work. **The failure mode is silent** — a session that cannot find a row concludes there is no such gap, and proceeds as though the risk were unrecorded.
+
+⚠️ **Two things to know for next time, both recorded in the file itself.** **`prettier --write` still corrupts this table** — the standing warning from 2026-08-12 holds, so `--check` was run instead and passes, keeping CI green. That bug is still un-root-caused and remains WJ's decision rather than a workaround baked in silently. **And the sort's own commit was swallowed:** a concurrent session committed the index between staging and commit, so the register change landed inside `d5cdb18` ("SAR procedure v1.5"), whose message says nothing about it. History was not rewritten to unpick it — another session was actively pushing. **The durable trail is the register's own Document History entry, v2.92**, not the commit message.
 
 ### The manual deploy path is now proven rather than assumed
 
