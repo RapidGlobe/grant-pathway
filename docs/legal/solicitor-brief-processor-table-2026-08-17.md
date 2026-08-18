@@ -171,3 +171,19 @@ Stated so the review is not wider than it needs to be. None of the following is 
 | Upstash known to earlier legal work | `docs/legal/legal-review-options-2026-07-29.md` line 255                       |
 
 **Related gap register rows:** `GAP-102`, `GAP-109`. Axiom's caveat has no row yet. Full history in `docs/Implementation Plan/ADR-TRACEABILITY.md`.
+
+---
+
+## Addendum 2026-08-18 — Resend's own answers, received from their support
+
+Two questions were put to Resend and answered by Brian, Customer Success Engineer. **Recorded verbatim in substance because vendor statements are the evidence the policy is meant to rest on** — and `AGENTS.md` §3's service-change trigger is explicit that a DPA or a vendor statement governs, not a console screen.
+
+**1. Email is never delivered over an unencrypted connection.** Resend's answer: where the receiving mail server does not support TLS, **the message bounces**, returning a bounce code stating the receiving server does not support TLS. It is not downgraded and sent in clear.
+
+➡️ **This is an addition to the published policy, not a correction to it.** v1.7 makes **no statement at all** about encryption of email in transit — Section 6 covers transfer safeguards and Section 5 the processor, but neither addresses the transport. A sentence confirming that transactional email is only delivered over TLS is a positive, verifiable security property and belongs with the other security statements. **Not drafted here**, to avoid colliding with the review in progress.
+
+**2. Resend's AI features do not process customer data.** Resend's answer: the AI functionality described at `https://resend.com/blog/one-more-ai-thing` applies only to features used **by the account holder while logged in** — for example generating email content in their dashboard. It is not applied to data passing through the sending pipeline.
+
+➡️ **This closes the question of whether Resend introduces an AI sub-processor.** It does not, on the strength of the vendor's own statement, provided nobody uses those dashboard features. **That proviso is the operational condition:** the answer is conditional on account behaviour, not on infrastructure, so it holds only while the Resend dashboard's AI features go unused. Worth knowing before anyone reaches for them to draft a template.
+
+⚠️ **Both answers came from support, not from the DPA.** They are better than console observation — which is what produced the mistaken `GAP-102` finding — but weaker than a contractual term. Treat them as evidence of current behaviour rather than as a commitment, and prefer the DPA where the two ever diverge.
