@@ -10,7 +10,29 @@
 
 ---
 
-## 2026-08-17 (latest) — `GAP-106` fixed; privacy policy v1.7 published; `GAP-112`'s trigger built
+## 2026-08-18 (latest) — off-machine git mirror on GitLab; `GAP-114` mitigation (1) complete
+
+### The repository now survives losing the machine
+
+`GAP-114` (2026-08-17, raised during a live GitHub outage) listed four candidate mitigations. Mitigation (1) — a second git remote — was built the same day as a **local** bare mirror at `C:/Dev/grant-pathway-backup.git`, and its limit was stated at the time: it sits on the same machine as the working copy, so it protects against GitHub being unavailable, a repository being deleted or a bad force-push, **but not against losing the machine.** Completing it needed an account on a second provider, which could not be created on WJ's behalf.
+
+**WJ created it. A private GitLab repository at `rapidglobe-group/grant-pathway` is now wired as a remote named `gitlab`, carrying every local branch.**
+
+✅ **Verified by restoring from it, not by trusting the push output** — cloned from GitLab into a scratch directory: **1056 commits**, `HEAD` at the same commit as local `master`, and `AGENTS.md`, `actions/auth.ts`, `ADR-TRACEABILITY.md` and the published privacy policy all present. `GAP-114`'s own reasoning demanded that check, since an untried recovery path is an assumption rather than a plan.
+
+**Why this matters more than "we have a backup of the code":** every project document lives in the repository, so the decision record, the test plans, the gaps register and the runbooks previously had exactly one hosted copy. The outage took out code, deployment and institutional memory together. Two of those three now have a second home.
+
+⚠️ **Three limits stated rather than glossed.** The mirror is **manual** — nothing pushes to it on a schedule, so it is only as current as the last time somebody ran the two commands. It carries **local branches and tags only**, so GitHub's remote-only Dependabot branches are absent; that is acceptable because they are recreatable, but GitLab is a copy of the work, not of GitHub. And **it is not wired to Vercel**, so it does not deploy — getting to production without GitHub is still mitigation (2)'s `npx vercel --prod` route, **which remains untried**.
+
+⚠️ **`git push gitlab --tags` has not run yet**, so `v0.2.0` is on GitHub but not on GitLab. The command was blocked by the session's permission classifier rather than failing; it is one line for WJ to run and is recorded here so it is not mistaken for a mirror that is complete.
+
+**`ADR-STACK-005` amended.** Option C (GitLab) was rejected as the primary host in April and **remains rejected**; it is now in use as a second remote. GitHub stays the single source of truth and the only deployment trigger. The private-repository, proprietary-licence position is unchanged — the GitLab copy is private, same ownership, same `LICENCE`.
+
+`ROLLBACK-PROCEDURE.md` §7b gains the push and restore commands alongside the local mirror's. **`GAP-114` moves from PARTIAL on mitigation (1) to complete on it; (2), (3) and (4) remain open** — no manual deploy has been proven, no backup-and-restore position has been written down, and no accepted-risk statement with a recovery time exists.
+
+---
+
+## 2026-08-17 — `GAP-106` fixed; privacy policy v1.7 published; `GAP-112`'s trigger built
 
 ### `GAP-106` — the password error that told users to do what they had already done
 

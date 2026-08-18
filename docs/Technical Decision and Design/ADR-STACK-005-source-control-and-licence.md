@@ -48,3 +48,13 @@ BRD Section 1 (Company — Rapidglobe Ltd).
 This decision was actively revisited, not silently left unexamined, after it came to light that `DR-BM-003` (2026-04-09, decided eight days before this ADR) had recorded the opposite conclusion — fully open source under the MIT Licence — with no note reconciling the two records. On review, this ADR's decision (private repository, proprietary licence) was confirmed as correct going forward; no content change was needed here. `DR-BM-003` has been updated to record the reversal on its own page, and `DR-BM-002` (succession plan) has had its continuity mechanism swapped from public hosting to escrow with a named sector body accordingly. See `DR-BM-003` and `DR-BM-002` for the full reasoning.
 
 **Correction 2026-07-10:** the Consequences bullet above referred to the `main` branch; the repository's default branch has always been `master`. Corrected to match (same stale reference already fixed in `ADR-OPS-002`).
+
+## Amended 2026-08-18 — GitLab added as an off-machine mirror
+
+**Option C was rejected as the primary host and remains rejected. It is now in use as a second remote.** GitHub stays the single source of truth and the only deployment trigger; a private GitLab repository at `rapidglobe-group/grant-pathway` holds a mirror of every branch and tag, pushed manually.
+
+**Why the decision moved:** the 2026-08-17 GitHub outage (`GAP-114`) established that GitHub was simultaneously the only copy of source control beyond local clones, the only route to production, **and — because every project document lives in the repository — the only copy of the decision record, test plans and runbooks.** One provider's bad afternoon took out code, deployment and institutional memory together. The mirror addresses the first and third of those; deployment is unchanged and still depends on GitHub, with `npx vercel --prod` as the documented bypass.
+
+**This does not weaken the proprietary licence position.** The GitLab repository is private, under the same ownership, and carries the same `LICENCE`.
+
+Consequences: `ROLLBACK-PROCEDURE.md` §7b holds the push and restore commands and states the mirror's limits — it is manual, carries local refs only, and is not wired to Vercel. `GAP-114` mitigation (1) is complete; (2), (3) and (4) remain open.

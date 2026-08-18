@@ -133,7 +133,36 @@ git clone C:/Dev/grant-pathway-backup.git grant-pathway-restored
 
 ✅ **Verified 2026-08-17 by actually doing it** — cloned to a scratch directory, 1055 commits, working tree complete. Not assumed to work.
 
-⚠️ **Know what this mirror does and does not protect.** It is on the **same machine** as the working copy. It protects against GitHub being unavailable, a repository being deleted, or a bad force-push. **It does not protect against losing the machine.** An off-machine remote is `GAP-114`'s outstanding item and needs an account on a second provider.
+⚠️ **Know what this mirror does and does not protect.** It is on the **same machine** as the working copy. It protects against GitHub being unavailable, a repository being deleted, or a bad force-push. **It does not protect against losing the machine** — that is what the off-machine mirror below is for.
+
+### The off-machine mirror (GitLab)
+
+**Added 2026-08-18**, completing the outstanding half of `GAP-114` mitigation (1). A second hosted copy of the repository lives at:
+
+```
+https://gitlab.com/rapidglobe-group/grant-pathway.git
+```
+
+It is configured as a git remote named `gitlab`. Push to it alongside `origin`:
+
+```
+git push gitlab --all
+git push gitlab --tags
+```
+
+To restore from it into a fresh working copy:
+
+```
+git clone https://gitlab.com/rapidglobe-group/grant-pathway.git grant-pathway-restored
+```
+
+✅ **Verified 2026-08-18 by actually restoring from it, not by trusting the push output** — cloned from GitLab into a scratch directory, **1056 commits**, `HEAD` at the same commit as local `master`, and `AGENTS.md`, `actions/auth.ts`, `ADR-TRACEABILITY.md` and the published privacy policy all present.
+
+⚠️ **This mirror is manual, not automatic.** Nothing pushes to it on a schedule or as part of the normal commit workflow, so **it is only as current as the last time somebody ran the two commands above.** Treat it as a periodic off-machine snapshot, not as a live second remote. Refreshing it takes seconds.
+
+⚠️ **It carries local branches and tags only.** `--all` pushes what exists locally; remote-only branches on GitHub (Dependabot's, for example) are not mirrored. That is acceptable — they are recreatable — but it means GitLab is a copy of the work, not a byte-for-byte copy of GitHub.
+
+⚠️ **GitLab is a source-control mirror and nothing else.** It is not wired to Vercel and does not deploy. If GitHub is down, this mirror protects the code and every document in it; **getting to production is still the `npx vercel --prod` route below.**
 
 ### Deploying without GitHub
 
