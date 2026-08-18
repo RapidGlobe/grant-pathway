@@ -6,8 +6,10 @@
 
 _Tier header added 2026-07-30 (audit findings L4/L5), and it closes a governance gap rather than merely a formatting one. **This document is not named anywhere in `AGENTS.md`'s tier tables** — the audit stated it was named there individually by tier, which is not the case (checked: `AGENTS.md` contains no reference to it at all). So until now it was governed by nothing: no tier table listed it, and it had no self-governing header, meaning no end-of-task checklist ever pointed at it. That is a live operational document — the one an operator reads before deploying — sitting outside the documentation discipline that governs everything else. Per `AGENTS.md` §3 "Adding a new document" ("No change to `AGENTS.md` is required — the tier header makes the doc self-governing"), adding the header here is the complete fix; `AGENTS.md` deliberately not modified. Tier 2 rather than 1 because it describes process rather than product state, but Volatility is Medium not Low on the evidence: it went from v1.1 to v1.3 in five days._
 
-**Version:** 1.5
+**Version:** 1.6
 **Last updated:** 2026-07-31
+
+**Changes in 1.6 (`D-018`):** the environment-variable section gains a credential-validity item — **presence is not validity**, so any changed credential must be exercised once against production, with the cheapest check named per service. Added after production spent an unknown period with a mismatched AWS secret and no working AI features, which four presence-based checks all passed.
 
 **Changes in 1.5:** the open decision under "Standard deploy" is now specified rather than merely named. It previously pointed only at Vercel's Ignored Build Step, which cannot actually wait for CI — `ignoreCommand` runs as the build starts, so there is no conclusion to read. Both candidate mechanisms are now set out with the reasoning and the costs, so the decision can be taken without re-deriving it. Still open, not actioned. Raised while investigating why every push to `master` reports `Bypassed rule violations` — see `CHANGELOG.md` 2026-07-31 (seventh pass), which also confirms audit finding **M6** closed.
 
@@ -42,6 +44,13 @@ This checklist must be completed before deploying any change that touches an API
 - [ ] Any new environment variable is added to `.env.example` with a description
 - [ ] Variable is set in Vercel production environment (not just dev/preview)
 - [ ] Variable is documented in the relevant ADR or AGENTS.md if it controls behaviour
+- [ ] **A credential is not verified until something has used it. Presence is not validity.** For any credential added or changed, **exercise it once against production** and confirm the result, rather than confirming the variable exists in the dashboard.
+  - **AWS Bedrock** — do one real AI call on production and see output. The charity-profile lookup is the cheapest: `/profile` → look up **1194917** → both description fields must populate.
+  - **Supabase** — `/api/health` returning `{"status":"ok"}` covers the database connection.
+  - **Resend** — register a throwaway account and confirm the email arrives.
+  - **Charity Commission** — the same `1194917` lookup covers it; the charity name must pre-fill.
+
+> ⚠️ **Why this item exists (`D-018`, 2026-08-18).** Production's `AWS_SECRET_ACCESS_KEY` did not match its `AWS_ACCESS_KEY_ID`, so **every** Bedrock call failed with a 403 signature error — **no AI feature worked on production at all.** Four separate checks reported "configured": the variables existed, they were scoped to Production, `AI_ENABLED` was correctly unset, and the access key ID was genuinely valid. **`P5.4` signed AI off on exactly that basis.** The defect surfaced only when someone made a real AI call during `P5.5` — and even then it took an hour to diagnose, because the failure was silent in four places at once. **One successful call would have caught it in seconds.**
 
 ### Risk assessment
 

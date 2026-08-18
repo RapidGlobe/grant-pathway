@@ -10,7 +10,7 @@
 
 ---
 
-## 2026-08-18 (latest) — `GAP-114` CLOSED, all four mitigations; privacy policy v1.8; SAR procedure reviewed; gaps register sorted and its prettier bug root-caused
+## 2026-08-18 (latest) — `P5.5` starts and immediately finds that no AI feature worked on production; `GAP-114` CLOSED; privacy policy v1.8; SAR procedure reviewed; gaps register sorted and its prettier bug root-caused
 
 ### The SAR procedure would have answered a real request from the development database
 
@@ -33,6 +33,24 @@ WJ went looking for `GAP-102` and could not find it. Rows ran `GAP-01` ascending
 ⚠️ **Why this was more than untidiness.** This register is the document `AGENTS.md` §2 sends every session to before starting work. **The failure mode is silent** — a session that cannot find a row concludes there is no such gap, and proceeds as though the risk were unrecorded.
 
 ⚠️ **Two things to know for next time, both recorded in the file itself.** **`prettier --write` still corrupts this table** — the standing warning from 2026-08-12 holds, so `--check` was run instead and passes, keeping CI green. That bug is still un-root-caused and remains WJ's decision rather than a workaround baked in silently. **And the sort's own commit was swallowed:** a concurrent session committed the index between staging and commit, so the register change landed inside `d5cdb18` ("SAR procedure v1.5"), whose message says nothing about it. History was not rewritten to unpick it — another session was actively pushing. **The durable trail is the register's own Document History entry, v2.92**, not the commit message.
+
+### `P5.5` began, and the first hour justified the whole task: no AI feature worked on production
+
+**`RT-00` passed against `grant-pathway-prod`** — all five RPC functions present, 32 migrations applied, latest `20260814000000`, matching the repo. **The first result in that suite earned anywhere but dev.** Step 4's `supabase migration list` was substituted with a direct count against `supabase_migrations.schema_migrations`, which gives the same assurance without pulling the production database password onto the machine. **`RT-02` passed** — `/dashboard` with no session returns the sign-in page. Observed in passing: the footer carries the current `master` commit, so **GitHub to Vercel auto-deploy recovered from the 2026-08-17 outage**, and `/privacy` serves v1.8.
+
+**Then `RT-01b`'s charity lookup returned a charity name and two empty description fields — and finding out why took an hour.** Those fields are not copied from the register: they are **AI-paraphrased from the charity's `charitable_objects` by Bedrock**. `D-016`, `D-017` and `D-018` all came out of chasing them.
+
+**The root cause (`D-018`): production's `AWS_SECRET_ACCESS_KEY` did not match its `AWS_ACCESS_KEY_ID`.** Every `bedrock:InvokeModel` call returned a signature mismatch. ⚠️ **The scope is every AI feature** — guideline summaries, refine-answer and the charity paraphrase share those credentials — so **all three flagship plans would have failed at Step 3**, and `P5.5` would have burned a day discovering it the slow way. **Invisible on dev, which holds a different IAM user's key by design** (`DEV-PROD-PARITY-CHECKLIST.md` G4).
+
+⚠️ **The pattern is worth more than the fix: four checks said "configured" and none said "working".** The variables existed, were scoped to Production, `AI_ENABLED` was correctly unset, and **the access key ID was genuinely valid** — AWS confirmed its last use was in `eu-west-2`. **`P5.4` signed AI off on exactly that basis. Presence was checked; validity never was.** `DEPLOYMENT-CHECKLIST.md` v1.6 now carries a credential-validity item naming the cheapest real call per service.
+
+⚠️ **An hour of that time was lost to evidence that erases itself.** `ai_usage_log` had no `charity_paraphrase` row, which was read as "Bedrock was never called" — in fact `reserve_ai_slot` inserted a row and `cancel_ai_slot` removed it when the call failed. **That behaviour is correct**, so users are not charged for service-side failures, **but it destroys the only durable trace that an attempt happened.** Worth remembering next time a missing row looks like proof of a missing call.
+
+**`D-016` — the defect that made the above undiagnosable, and the reason it took an hour rather than a minute.** `actions/charity.ts` had **six silent decision points**: a non-2xx governing-document status did nothing, a network error hit a bare `catch {}`, an empty objects field was indistinguishable from both, and the AI guard could skip on any of four conditions without a word. The lookup reported success throughout. **Each candidate had to be eliminated by hand against the live site** — upstream data, the Charity Commission key, timeouts, RPC permissions, credential presence, variable scoping, Upstash configuration. All instrumented now: every branch logs which condition fired, with the objects length, the HTTP status, the RPC error and the Bedrock message. **Degrading gracefully is right; degrading invisibly is not.**
+
+**`D-017` — and this one is still open. Sentry showed no events at all across 14 days and every environment.** The instrumented failure was reproduced on production and **nothing arrived**. `SENTRY_DSN` is present, and `sentry.server.config.ts` has no sampling and no `beforeSend` rule that drops messages. ⚠️ **WJ's Inbound Data Filters screen then showed roughly 200 events per day being discarded** — so events do arrive and something is dropping them. **Not yet root-caused.** `ADR-OPS-004` and `GAP-03`'s P95 alerting both assume Sentry receives events; until this is settled, **the project's error visibility on production is an assumption.** The mitigation applied today is that `actions/charity.ts` now logs to Axiom as well — **diagnosis should not depend on a single reporting path**, which is the transferable lesson whatever the filter turns out to be.
+
+✅ **Fixed and verified live:** WJ created a new access key pair for IAM user `grant-pathway-prod`, replaced both values in Vercel Production and redeployed. The lookup now returns both descriptions with the AI-provenance notice, and the text is materially correct for the charity. **The first successful AI call ever made on production.** Old Key 1 to be deactivated rather than deleted until its last use is accounted for.
 
 ### The recovery position, written down at last — `GAP-114` closed
 
