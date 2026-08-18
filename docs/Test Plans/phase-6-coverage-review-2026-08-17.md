@@ -94,5 +94,5 @@ The user guide figure is the one worth pausing on. **"Still at v1.3" was the sta
 
 1. Decide Finding 1 (A / B / C).
 2. I write the case, refresh the affected plan, and correct P5.5's two stale figures.
-3. You judge whether the user guide needs a Phase 6 pass.
+3. ~~You judge whether the user guide needs a Phase 6 pass.~~ ✅ **Judged 2026-08-18 (WJ): yes, and it is folded into the P5.5 runs rather than done beforehand** — the runs walk every screen against production, so drift is corrected against observed behaviour instead of guessed at from the code. Its final pass belongs after the last fix, not the last test case.
 4. Only then does item 1 — the production runs — become worth starting.
