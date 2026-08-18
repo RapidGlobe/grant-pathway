@@ -294,6 +294,9 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
       // An empty objects field is a legitimate register state, not a failure —
       // but it is indistinguishable from a failure unless it is recorded (D-016).
       if (!charitableObjects) {
+        console.warn(
+          `[lookupCharity] governing document for ${regNumber} returned no charitable_objects; keys=${Object.keys(data).join(',')}`,
+        )
         Sentry.captureMessage('charity governing document returned no charitable_objects', {
           level: 'info',
           tags: { action: 'lookupCharity', stage: 'governing-document' },
@@ -305,6 +308,9 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
       // the user can type the descriptions. But it must not be silent: before
       // D-016 this branch did nothing at all, so a broken key, a revoked
       // subscription and a charity with no objects text were indistinguishable.
+      console.error(
+        `[lookupCharity] governing document lookup failed for ${regNumber}: HTTP ${res.status} ${res.statusText}`,
+      )
       Sentry.captureMessage('charity governing document lookup failed', {
         level: 'warning',
         tags: { action: 'lookupCharity', stage: 'governing-document' },
@@ -315,6 +321,9 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
     // Timeout or network error for governing document — continue without it,
     // but report it (D-016). A bare catch here hid a production failure for
     // an unknown length of time.
+    console.error(
+      `[lookupCharity] governing document threw for ${regNumber}: ${error instanceof Error ? error.message : String(error)}`,
+    )
     Sentry.captureException(error, {
       tags: { action: 'lookupCharity', stage: 'governing-document' },
       extra: { regNumber },
