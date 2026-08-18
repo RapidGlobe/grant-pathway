@@ -343,9 +343,21 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
   const awsAccessKey = process.env.AWS_ACCESS_KEY_ID
   const awsSecretKey = process.env.AWS_SECRET_ACCESS_KEY
 
+  // D-016: every arm of this guard used to be silent, which made a production
+  // failure undiagnosable — four candidate causes, no way to tell them apart.
+  if (!charitableObjects || !awsAccessKey || !awsSecretKey || process.env.AI_ENABLED === 'false') {
+    console.warn(
+      `[lookupCharity] paraphrase skipped for ${regNumber}: objects=${charitableObjects ? charitableObjects.length + 'chars' : 'EMPTY'} awsKey=${awsAccessKey ? 'set' : 'MISSING'} awsSecret=${awsSecretKey ? 'set' : 'MISSING'} aiEnabled=${process.env.AI_ENABLED ?? 'unset'}`,
+    )
+  }
+
   if (charitableObjects && awsAccessKey && awsSecretKey && process.env.AI_ENABLED !== 'false') {
     // ── Per-minute burst limit ────────────────────────────────────────────────
     const { success: rateLimitOk } = await aiRatelimit.limit(user.id)
+
+    if (!rateLimitOk) {
+      console.warn(`[lookupCharity] paraphrase skipped for ${regNumber}: per-minute rate limit`)
+    }
 
     if (rateLimitOk) {
       // ── Atomic cap check + slot reservation (F-01-02) ────────────────────────
@@ -361,6 +373,12 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
 
       const slotAllowed = !slotError && slotData?.allowed === true
       const logId: string | null = slotData?.log_id ?? null
+
+      if (!slotAllowed || !logId) {
+        console.error(
+          `[lookupCharity] paraphrase skipped for ${regNumber}: slot not reserved. rpcError=${slotError ? slotError.message : 'none'} allowed=${String(slotData?.allowed)} logId=${String(logId)}`,
+        )
+      }
 
       if (slotAllowed && logId) {
         try {
@@ -407,7 +425,14 @@ export async function lookupCharity(query: string): Promise<CharityLookupResult>
             p_input_token_count: message.usage?.input_tokens ?? undefined,
             p_output_token_count: message.usage?.output_tokens ?? undefined,
           })
-        } catch {
+        } catch (bedrockError) {
+          console.error(
+            `[lookupCharity] bedrock paraphrase failed for ${regNumber}: ${bedrockError instanceof Error ? bedrockError.message : String(bedrockError)}`,
+          )
+          Sentry.captureException(bedrockError, {
+            tags: { action: 'lookupCharity', stage: 'bedrock-paraphrase' },
+            extra: { regNumber },
+          })
           // Bedrock unavailable, timeout, or JSON parse error — cancel slot so
           // the user's monthly count is not charged for a service-side failure.
           await supabase.rpc('cancel_ai_slot', { p_log_id: logId, p_user_id: user.id })
