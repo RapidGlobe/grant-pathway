@@ -168,7 +168,7 @@ Stated so the review is not wider than it needs to be. None of the following is 
 | Axiom receives `request.ip`         | Observed in the live log stream, Axiom dataset `vercel`                        |
 | Axiom region and EU caveat          | Quoted from Axiom's own signup screen at region selection                      |
 | Axiom retention = 30 days           | Axiom dataset configuration; the form rejects higher values                    |
-| Upstash known to earlier legal work | `docs/legal/legal-review-options-2026-07-29.md` line 255                       |
+| Upstash known to earlier legal work | `docs/legal/archive/legal-review-options-2026-07-29.md` line 255               |
 
 **Related gap register rows:** `GAP-102`, `GAP-109`. Axiom's caveat has no row yet. Full history in `docs/Implementation Plan/ADR-TRACEABILITY.md`.
 
