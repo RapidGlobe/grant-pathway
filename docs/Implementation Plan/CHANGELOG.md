@@ -10,7 +10,27 @@
 
 ---
 
-## 2026-08-18 (latest) — off-machine git mirror on GitLab; `GAP-114` mitigation (1) complete
+## 2026-08-18 (latest) — `GAP-114` mitigations (1) and (2): off-machine mirror built, manual deploy path proven
+
+### The manual deploy path is now proven rather than assumed
+
+`ROLLBACK-PROCEDURE.md` §7b was written **during** the 2026-08-17 outage and carried an explicit warning that its `npx vercel --prod` route had never been run — because writing an unproven command into an incident procedure is the failure `GAP-114` is about. **WJ ran it deliberately today, with nothing on fire.**
+
+**It works, and it is fast: Ready in 43s.** A preview deploy was run first as a safety check (1m, does not touch production). `whoami` reported `rapidglobe` on team `rapidglobes-projects` with **no login prompt**; there was **no project-linking prompt** either, because `.vercel/project.json` already holds the real project and org IDs. **Production environment variables came through** — Vercel pulls them from the project, not the local machine — which was the assumption most likely to be wrong and is now checked.
+
+✅ **Verified by loading `/api/health` on the deployment — `{"status":"ok","region":"lhr1"}`** — not by trusting the CLI's success line. **This removes the exact block 2026-08-17 hit:** there is now a route to production that does not touch GitHub.
+
+⚠️ **Two traps found in the process, both of which read as failures and are not.**
+
+**Preview URLs are gated.** Deployment Protection is on for previews, so opening one anonymously redirects to a Vercel login. **A preview deploy proves the build, not the page.**
+
+**`grantpathway.org.uk` serves a 123 Reg parking page — "is parked free, courtesy of 123 Reg".** This is the more interesting one, because **the CLI actively implies otherwise**: it hints `To deploy to production (grantpathway.org.uk +1)` and prints `Aliased https://grantpathway.org.uk` on success. The domain is assigned inside Vercel; **its DNS has never been cut over.** The `+1` is the `vercel.app` domain, which is where production has always lived. **Verify CLI deploys against `https://grant-pathway-three.vercel.app`, never the org.uk domain.**
+
+**No gap raised for the domain (WJ, 2026-08-18) — the DNS cutover is `P5.6`'s work and is already specified there.** Worth stating plainly all the same, because it is not cosmetic: `lib/site-url.ts` falls back to `https://grantpathway.org.uk` when `NEXT_PUBLIC_SITE_URL` is unset, `lib/emails/send.ts` sends from `noreply@` at that domain, `app/layout.tsx` uses it as `metadataBase`, and exported Word documents print it in the footer. **Until the cutover, the product names a domain that shows an advert for itself.** That is a launch-gate item, not a deployment defect.
+
+⚠️ **One caveat written into the procedure: `vercel --prod` deploys the local working directory, not GitHub's `master`.** That is simultaneously why it survives an outage and why it would ship uncommitted changes. `git status` before running it.
+
+**`GAP-114` now stands at two of four: (1) and (2) complete, (3) and (4) open** — no backup-and-restore position is written down, and there is no accepted-risk statement with a recovery time.
 
 ### The repository now survives losing the machine
 

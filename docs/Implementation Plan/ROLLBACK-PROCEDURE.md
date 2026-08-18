@@ -172,7 +172,23 @@ Vercel's CLI deploys from a local directory and **does not involve GitHub at all
 npx vercel --prod
 ```
 
-⚠️ **This has NOT been tried on this project.** It is written here because it is the obvious route, not because it is a proven one — and `GAP-114` records that an untried recovery path is an assumption, not a plan. **Try it once while nothing is on fire**, confirm what it prompts for, and replace this warning with what actually happened. Expect it to ask you to link the local directory to the existing Vercel project the first time.
+✅ **Tried and proven 2026-08-18, deliberately while nothing was on fire.** WJ ran it end to end. **What actually happened, so the next person is not guessing:**
+
+1. `npx vercel whoami` — offers to install `vercel@59.1.4` first (answer `y`); then reports `Logged in as rapidglobe`, active team `rapidglobes-projects`. **No login was needed** — the CLI was already authenticated.
+2. `npx vercel` (preview, does not touch production) — **Ready in 1m**, printing an Inspect URL and a preview URL, then a hint: `To deploy to production (grantpathway.org.uk +1), run 'vercel --prod'`.
+3. `npx vercel --prod` — **Ready in 43s**, printing the Inspect URL, a `Production` deployment URL, and an `Aliased` line for `https://grantpathway.org.uk`.
+4. Verified by loading `https://grant-pathway-three.vercel.app/api/health` → `{"status":"ok","region":"lhr1"}`.
+
+**No project-linking prompt appeared**, because `.vercel/project.json` already holds the real `projectId` and `orgId` — that file is gitignored, so **a deploy from a freshly restored clone would ask.** Expect one extra prompt in that case and pick the existing `grant-pathway` project rather than creating a new one.
+
+**Production environment variables came through** — Vercel pulls them from the project, not from your machine, so no local `.env` is required for a CLI production deploy.
+
+⚠️ **Two traps found in the process, both easy to misread as failures:**
+
+- **Preview URLs are gated.** Deployment Protection is on for previews, so opening a preview URL anonymously redirects to a Vercel login. A preview deploy proves the **build**, not the **page**. Verify against production, or while signed in to Vercel.
+- **`grantpathway.org.uk` does not serve the site**, despite the CLI's `Aliased` line and its `production (grantpathway.org.uk +1)` hint. The domain is assigned inside Vercel, but its DNS still points at **123 Reg's parking page** — visiting it shows "is parked free, courtesy of 123 Reg". **The `+1` is the `vercel.app` domain, which is where production actually lives.** The DNS cutover is `P5.6`'s work and is not a deployment problem. **Verify a CLI deploy against `https://grant-pathway-three.vercel.app`, not the org.uk domain.**
+
+⚠️ **`vercel --prod` deploys your local working directory, not GitHub's `master`.** That is exactly why it works during a GitHub outage — and exactly why it will happily ship uncommitted local changes. **Check `git status` is clean before running it.**
 
 ### If you cannot deploy at all
 
