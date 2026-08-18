@@ -43,3 +43,6 @@ next-env.d.ts
 
 # claude code — settings.json is committed and shared; local overrides are personal
 .claude/settings.local.json
+
+# Environment parity snapshots (point-in-time dumps; a stale one is worse than none)
+scripts/parity/*.json
