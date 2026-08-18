@@ -1,17 +1,18 @@
 # Subject Access Request (SAR) Procedure
 
-**Version:** 1.4
-**Last updated:** 29 June 2026
+**Version:** 1.5
+**Last updated:** 18 August 2026
 **Owner:** Wac Jokhia, RapidGlobe Ltd
 **Legal basis:** UK GDPR Article 15 — Right of Access
 
-| Version | Date         | Changes                                                                                      |
-| ------- | ------------ | -------------------------------------------------------------------------------------------- |
-| 1.0     | 29 June 2026 | Initial version                                                                              |
-| 1.1     | 29 June 2026 | Step 3 rewritten — six numbered queries; warning added that `user_id` is a UUID not an email |
-| 1.2     | 29 June 2026 | Notes: added future automation note                                                          |
-| 1.3     | 29 June 2026 | Version history table added; no content changes                                              |
-| 1.4     | 29 June 2026 | SAR contact email changed from wjokhia@rapidglobe.com to admin@rapidglobe.com                |
+| Version | Date           | Changes                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.5     | 18 August 2026 | **Reviewed against the current stack — the project ref was wrong and three tables were missing.** Step 3 named `grant-pathway-prod` but gave dev's ref. Queries 7–9 added (`application_guidelines`, `application_items`, `user_tooltip_dismissals`); `ai_usage_log` gains `input_token_count`/`output_token_count`. New Step 3b covers the four stores outside the database. Axiom/Sentry inclusion left as an open decision for WJ. |
+| 1.0     | 29 June 2026   | Initial version                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| 1.1     | 29 June 2026   | Step 3 rewritten — six numbered queries; warning added that `user_id` is a UUID not an email                                                                                                                                                                                                                                                                                                                                          |
+| 1.2     | 29 June 2026   | Notes: added future automation note                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 1.3     | 29 June 2026   | Version history table added; no content changes                                                                                                                                                                                                                                                                                                                                                                                       |
+| 1.4     | 29 June 2026   | SAR contact email changed from wjokhia@rapidglobe.com to admin@rapidglobe.com                                                                                                                                                                                                                                                                                                                                                         |
 
 ---
 
@@ -68,8 +69,10 @@ before proceeding.
 ## Step 3 — Retrieve the data from Supabase
 
 Log in to the Supabase dashboard at [https://supabase.com](https://supabase.com) and open the
-**grant-pathway-prod** project (`stanwaejdvlvremtffkf`). Navigate to the **SQL Editor** and
-run the queries below, substituting the user's email address where shown.
+**grant-pathway-prod** project (`mvmjryipieepvsjudche`)
+
+> ⚠️ **Check the ref, not just the name.** Until 2026-08-18 this step named `grant-pathway-prod` but gave the ref `stanwaejdvlvremtffkf`, which is **`grant-pathway-dev`**. Following it would have answered a real subject access request from the development database — returning either nothing or the wrong person's test data, while stating in writing that it was a complete copy of their personal data. Prod is `mvmjryipieepvsjudche`; dev is `stanwaejdvlvremtffkf`.. Navigate to the **SQL Editor** and
+> run the queries below, substituting the user's email address where shown.
 
 > **Important:** `user_id` is a UUID, not an email address. The first query resolves the email
 > to a UUID. Copy that UUID before running the remaining queries — do not paste the email address
@@ -130,11 +133,64 @@ order by a.created_at, aa.question_order;
 ### Query 6 — AI usage log
 
 ```sql
-select request_type, token_count, created_at, application_id
+select request_type, token_count, input_token_count, output_token_count,
+       created_at, application_id
 from ai_usage_log
 where user_id = '<user_id>'
 order by created_at;
 ```
+
+### Query 7 — Extracted funder guidelines
+
+**Added 2026-08-18.** The `application_guidelines` table did not exist when this procedure was written. It holds the guideline text the user uploaded or pasted, and the AI summary derived from it — the user's own content, and squarely within Article 15.
+
+```sql
+select ag.application_id, a.funder_name, a.grant_name,
+       ag.source_type, ag.raw_text, ag.summary_json,
+       ag.created_at, ag.updated_at
+from application_guidelines ag
+join applications a on a.id = ag.application_id
+where a.user_id = '<user_id>'
+order by ag.created_at;
+```
+
+### Query 8 — Application items
+
+**Added 2026-08-18.** `application_items` carries the extracted question set and, for applications created by reuse, `cloned_from_application_id` linking to the source application.
+
+```sql
+select ai.application_id, a.funder_name, ai.item_type, ai.item_text,
+       ai.cloned_from_application_id, ai.created_at, ai.updated_at
+from application_items ai
+join applications a on a.id = ai.application_id
+where a.user_id = '<user_id>'
+order by ai.created_at;
+```
+
+### Query 9 — Tooltip dismissals
+
+**Added 2026-08-18.** Trivial in content but it is a record of the individual's interaction with the service, held against their `user_id`, so it is disclosable.
+
+```sql
+select tooltip_key, dismissed_at
+from user_tooltip_dismissals
+where user_id = '<user_id>';
+```
+
+⚠️ **Column names in queries 7–9 were read from the migrations, not from a live SAR.** Run each one and check it returns before assembling the response — a column may have been renamed since. If a query errors, list the table's columns rather than guessing: `select column_name from information_schema.columns where table_name = '<table>';`
+
+### Step 3b — Data held outside the database
+
+**Added 2026-08-18. Four stores hold personal data that no SQL query above will find.** This procedure was written on 2026-06-29, before three of them existed.
+
+| Store                                          | What it holds                                                                                       | Include in the export?                                                                                                                                                                                            |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Supabase Storage**, bucket `guidelines-temp` | Files the user uploaded, at `guidelines-temp/<user_id>/<filename>`                                  | **Yes — download and include them.** They are the user's own documents. Check the bucket even if the applications look complete; uploads are transient by design and may not correspond to a current application. |
+| **Axiom** (technical logs, 30 days)            | Request logs including the user's **IP address** — disclosed in Privacy Policy Section 2 since v1.7 | **Decision needed — see below.**                                                                                                                                                                                  |
+| **Sentry** (error reports, up to 12 months)    | Error events, which may carry a user identifier                                                     | **Decision needed — see below.**                                                                                                                                                                                  |
+| **Upstash** (rate-limit counters, ~1 hour)     | A counter keyed by `user.id` or email                                                               | **No.** Transient and expired long before a one-month response window closes. Say so if asked rather than treating it as a hidden store.                                                                          |
+
+⚠️ **Axiom and Sentry are a genuine open question, not an oversight to be quietly resolved by whoever handles the first SAR.** Article 15 covers technical logs where the individual is identifiable, and an IP address in a log tied to a signed-in session usually is. Against that: the logs are keyed by request rather than by user, so retrieval means searching 30 days of log lines, and the exercise risks exposing other people's data if done carelessly. **This needs a decided position before the first real SAR arrives**, not an improvised one under a one-month deadline. Raised with WJ 2026-08-18; unresolved at the time of writing.
 
 Export each query result as CSV using the download button in the SQL Editor results panel.
 
@@ -162,6 +218,10 @@ The attachment contains the following files:
 - applications.csv       — your grant applications (names, statuses, dates)
 - application-answers.csv — the questions and answers within each application
 - ai-usage-log.csv       — a log of AI-assisted requests made from your account
+- funder-guidelines.csv  — the funder guidelines you uploaded or pasted, and the summaries produced from them
+- application-items.csv  — the question sets extracted from those guidelines
+- tooltip-dismissals.csv — which in-service help tips you have dismissed
+- uploaded-files/         — the guideline documents you uploaded, in their original format
 
 If you have any questions about this data, or if you believe anything is inaccurate,
 please reply to this email and we will look into it.
