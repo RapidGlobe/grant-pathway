@@ -55,7 +55,7 @@ The only place the reuse path has ever been driven end to end is **`accessibilit
 
 **Why this matters for launch specifically:** `IMPLEMENTATION-PLAN.md` states that Phase 6 — of which P6.5 is part — is the reason the go-live gate exists at all. Going into the production test runs, the functional suite would prove every Phase 6 feature except this one.
 
-✅ **DECIDED 2026-08-17 (WJ): option A** — the positive reuse case goes into `regression-test-plan.md` as a new `RT-` case. Not yet written; queued behind the privacy policy work at WJ's direction. The options are kept below as the record of what was weighed.
+✅ **DECIDED 2026-08-17 (WJ): option A** — the positive reuse case goes into `regression-test-plan.md` as a new `RT-` case. ✅ **Written the same day as `RT-16` in `regression-test-plan.md`** — nine steps, on the pre-seeded account, with step 5 (no AI re-generation) called out as the one easiest to wave through. **Never run**; it executes as part of `P5.5` item 1 against production. The options are kept below as the record of what was weighed.
 
 **Decision needed before I write anything:** where should the positive reuse case live?
 
