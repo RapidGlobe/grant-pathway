@@ -144,6 +144,21 @@ export async function saveCharityProfile(data: SaveProfileInput): Promise<SavePr
   )
 
   if (saveError) {
+    // D-019: this branch discarded the Supabase error entirely, so a real save
+    // failure on production produced "Please try again" and nothing else —
+    // no code, no message, no hint whether retrying could ever help.
+    console.error(
+      `[saveCharityProfile] upsert failed for user ${user.id}: code=${saveError.code ?? 'none'} message=${saveError.message} details=${saveError.details ?? 'none'} hint=${saveError.hint ?? 'none'}`,
+    )
+    Sentry.captureException(saveError, {
+      tags: { action: 'saveCharityProfile' },
+      extra: {
+        code: saveError.code,
+        details: saveError.details,
+        hint: saveError.hint,
+        isFirstSave,
+      },
+    })
     return { ok: false, error: 'Could not save your profile. Please try again.' }
   }
 
