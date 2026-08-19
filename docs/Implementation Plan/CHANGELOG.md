@@ -12,6 +12,16 @@
 
 ## 2026-08-19 (latest) — the environment parity audit runs and finds a second unexecuted migration; `D-017` closes as never having been a defect
 
+### Resend answered the Irish-region question, and the policy that survived two attempts to change it was right
+
+Resend's support confirmed in writing what the DPA said all along: **the sending region "only affects where your emails leave our infrastructure"**; recipient data — email addresses, names, message content — **is stored in the United States**; **delivery logs and email event history are stored in the United States**; and **no EU/EEA data-residency option exists**, because the region controls the sending endpoint rather than the storage location. Their authoritative page: https://resend.com/security/gdpr#where-is-resend-data-stored.
+
+✅ **No substantive correction was needed, and that is the entry worth keeping.** The policy has said "United States" since v1.0 and survived two attempts to move it to Ireland — the v1.7 draft and the v1.8 submitted revision, both reverted — plus `GAP-102`, closed as disproven on 2026-08-17. **Three separate readings of the console said Ireland; the DPA said the United States; the DPA was right.** `AGENTS.md` §3's rule that **a vendor console shows infrastructure while a DPA states processing** now has the vendor's own confirmation behind it.
+
+⚠️ **The answer did expose one gap, from the opposite direction to the one being defended against.** Section 6 disclosed the recipient's name and email address and the email's content as transferred to the US, and stopped there — **delivery logs and email event history were never mentioned.** Resend's reply names them separately and places them in the US, so Section 6 now includes them and Section 7's retention row states where they are held. **The transfer analysis was incomplete rather than wrong**, which is the same under-disclosure the reverted revisions would have caused.
+
+**Privacy policy v1.9**, both copies, mirrored per the file's own maintenance note. Section 6 now states plainly that the Irish infrastructure is the point of dispatch only and that no EEA residency option exists, so a future reader does not re-ask the question a third time. **No further solicitor review commissioned** (WJ's standing decision of 2026-08-17); the vendor's written answer is retained as the evidence. **No PDF regeneration needed** — `docs/legal/pdf/` holds only the Terms of Service.
+
 ### The SAR procedure could not have answered a real request — three of its six data queries would have errored
 
 Fixed the day after a review that had already been billed as bringing it up to date. **Query 5 selected from `application_answers`, dropped in July 2026**; questions and answers now live on one row in `application_items`. **Query 7's three content columns — `source_type`, `raw_text`, `summary_json` — do not exist**, the table holds `guideline_text`, and the AI summary is on `applications.ai_summary` entirely elsewhere. **Query 9 selected from `user_tooltip_dismissals`, also dropped in July.** Old Query 8 used `item_text` for a column named `item_label`.

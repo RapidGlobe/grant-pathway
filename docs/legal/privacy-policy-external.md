@@ -1,10 +1,10 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.8
+**Version:** 1.9
 
-**Effective date: 18 August 2026**
+**Effective date: 19 August 2026**
 
-**Last updated: 18 August 2026**
+**Last updated: 19 August 2026**
 
 ---
 
@@ -96,7 +96,7 @@ We do not sell your data. We do not share it for advertising or marketing purpos
 | --------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                                                |
 | **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                                                        |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6)                                |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (Irish infrastructure is the sending endpoint only — see Section 6)                      |
 | **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company                                                       |
 | **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                                               |
 | **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                                               |
@@ -112,7 +112,7 @@ Each provider is bound by a data processing agreement and is only permitted to u
 
 Almost all of your data stays within the United Kingdom or the European Economic Area (EEA). The EEA is covered by the UK's adequacy decision, which means personal data may be transferred there without any additional safeguard being required. Section 5 sets out where each provider processes your data.
 
-**Transfers outside the UK and EEA.** One provider processes your data in the United States: **Resend**, which sends our transactional email. Although email for our domain is sent from Irish infrastructure, Resend's own data processing agreement states that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address and the content of the email.
+**Transfers outside the UK and EEA.** One provider processes your data in the United States: **Resend**, which sends our transactional email. Email for our domain leaves Resend's network from Irish infrastructure, but that setting controls only the point of dispatch and does not affect where data is held. Resend has confirmed to us in writing, and its data processing agreement states, that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address, the content of the email, and the delivery logs and email event history. Resend does not offer an EU or EEA data-residency option.
 
 Where personal data is transferred outside the United Kingdom to Resend, or to any provider outside the United Kingdom we may substitute for it or for any other provider in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK. Resend relies on the EU standard contractual clauses, the UK addendum to those clauses, and the EU–US Data Privacy Framework including its UK Extension.
 
@@ -127,7 +127,7 @@ Where personal data is transferred outside the United Kingdom to Resend, or to a
 | AI usage log                             | Deleted when your account is deleted                                                                                                   |
 | Your name and feedback preference        | Deleted when your account is deleted                                                                                                   |
 | Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below)                                 |
-| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                                                      |
+| Email delivery records                   | Held by Resend in the United States, in accordance with their standard retention policy (up to 90 days)                                |
 | Technical logs                           | Held for 30 days by our logging provider, and for a shorter period by our hosting provider, then automatically and permanently deleted |
 | Rate-limiting data                       | Held only transiently — around one hour — and then automatically deleted                                                               |
 | Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                                                        |

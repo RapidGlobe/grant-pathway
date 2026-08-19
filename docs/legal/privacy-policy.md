@@ -1,10 +1,18 @@
 # Grant Pathway — Privacy Policy
 
-**Version:** 1.8
+**Version:** 1.9
 
-**Effective date: 18 August 2026**
+**Effective date: 19 August 2026**
 
-**Last updated: 18 August 2026**
+**Last updated: 19 August 2026**
+
+> **Change from v1.8 (18 August 2026) to v1.9 (19 August 2026): Resend's support answered the question v1.8 left open, and it confirms the policy was right — with one disclosure gap it also exposes.** WJ asked whether the Irish sending region was egress-only or whether recipient data is also **stored** in Ireland, and whether any EEA residency option exists. **Resend's answer, in writing: the region setting "only affects where your emails leave our infrastructure"; recipient data (email addresses, names, message content) is stored in the United States; delivery logs and email event history are stored in the United States; and there is no EU/EEA data-residency option**, because the region controls the sending endpoint rather than the storage location. Their authoritative reference is https://resend.com/security/gdpr#where-is-resend-data-stored.
+>
+> ✅ **No substantive change was required, which is the point worth recording.** The policy has said "United States" since v1.0 and survived two attempts to move it to Ireland — the v1.7 draft and the v1.8 submitted revision, both reverted, and `GAP-102`, closed as disproven on 2026-08-17. **Three independent readings of the console said Ireland; the DPA said the United States; the DPA was right.** `AGENTS.md` §3's rule that a vendor console shows infrastructure while a DPA states processing now has a vendor's own confirmation behind it.
+>
+> ⚠️ **What the answer did change: delivery logs and email event history were never disclosed as a US transfer.** Section 6 named the recipient's name and email address and the content of the email, and stopped there. Resend's reply names the logs separately and places them in the US, so **Section 6** now includes them and **Section 7**'s email-delivery-records row states where they are held. **The transfer analysis was incomplete, not wrong** — under-disclosure of the same kind the reverted revisions would have caused, arrived at from the opposite direction.
+>
+> **Section 6** also now states plainly that the Irish infrastructure is the point of dispatch and does not affect where data is held, and that **no EU or EEA residency option exists** — closing the question rather than leaving a future reader to re-ask it. **Section 5**'s table cell changed from "email is sent from Irish infrastructure" to "Irish infrastructure is the sending endpoint only", for the same reason. ⚠️ **No further solicitor review commissioned** (WJ's standing decision of 2026-08-17, each carries a fee); the vendor's written answer is retained as the evidence.
 
 > **Change from v1.7 (17 August 2026) to v1.8 (18 August 2026): two clarifications from WJ's own post-review read, and one change deliberately NOT made.** **Section 5, Axiom row** — expanded from "Germany (European Union) — see Section 6" to name both halves in the table itself: **"Germany (European Union) — technical logs; United States — RapidGlobe's account details, billing, etc."** The substance is unchanged from v1.7, which already explained the split in Section 6; this puts it where a reader meets the processor rather than three paragraphs later. **Section 5, Vercel row** — the "see Section 6" pointer dropped, the row now reading "United Kingdom (London) — Vercel is a US company".
 >
@@ -128,7 +136,7 @@ We do not sell your data. We do not share it for advertising or marketing purpos
 | --------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | **Supabase**                      | Stores your account, organisation profile, and application data                               | United Kingdom (London)                                                                                |
 | **Amazon Web Services (Bedrock)** | Powers the AI features that summarise funder guidelines and help refine the answers you write | United Kingdom / European Union                                                                        |
-| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (email is sent from Irish infrastructure — see Section 6)                                |
+| **Resend**                        | Sends transactional emails (welcome email, inactivity warning)                                | United States (Irish infrastructure is the sending endpoint only — see Section 6)                      |
 | **Vercel**                        | Hosts the Grant Pathway web application                                                       | United Kingdom (London) — Vercel is a US company                                                       |
 | **Upstash**                       | Limits how often requests can be made, to protect the service from abuse                      | Ireland (European Union)                                                                               |
 | **Sentry**                        | Captures error reports to help us diagnose and fix technical problems                         | Germany (European Union)                                                                               |
@@ -144,7 +152,7 @@ Each provider is bound by a data processing agreement and is only permitted to u
 
 Almost all of your data stays within the United Kingdom or the European Economic Area (EEA). The EEA is covered by the UK's adequacy decision, which means personal data may be transferred there without any additional safeguard being required. Section 5 sets out where each provider processes your data.
 
-**Transfers outside the UK and EEA.** One provider processes your data in the United States: **Resend**, which sends our transactional email. Although email for our domain is sent from Irish infrastructure, Resend's own data processing agreement states that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address and the content of the email.
+**Transfers outside the UK and EEA.** One provider processes your data in the United States: **Resend**, which sends our transactional email. Email for our domain leaves Resend's network from Irish infrastructure, but that setting controls only the point of dispatch and does not affect where data is held. Resend has confirmed to us in writing, and its data processing agreement states, that personal data is transferred to and processed in the United States as a necessary part of providing the service. This applies to the recipient's name and email address, the content of the email, and the delivery logs and email event history. Resend does not offer an EU or EEA data-residency option.
 
 Where personal data is transferred outside the United Kingdom to Resend, or to any provider outside the United Kingdom we may substitute for it or for any other provider in future, we ensure that appropriate safeguards are in place — typically the UK's International Data Transfer Agreement (IDTA) or equivalent EEA standard contractual clauses — so that your data continues to be protected to the same standard as within the UK. Resend relies on the EU standard contractual clauses, the UK addendum to those clauses, and the EU–US Data Privacy Framework including its UK Extension.
 
@@ -159,7 +167,7 @@ Where personal data is transferred outside the United Kingdom to Resend, or to a
 | AI usage log                             | Deleted when your account is deleted                                                                                                   |
 | Your name and feedback preference        | Deleted when your account is deleted                                                                                                   |
 | Automated backup copies                  | Permanently removed within 7 days of account deletion, as part of standard backup rotation (see below)                                 |
-| Email delivery records                   | Held by Resend in accordance with their standard retention policy (up to 90 days)                                                      |
+| Email delivery records                   | Held by Resend in the United States, in accordance with their standard retention policy (up to 90 days)                                |
 | Technical logs                           | Held for 30 days by our logging provider, and for a shorter period by our hosting provider, then automatically and permanently deleted |
 | Rate-limiting data                       | Held only transiently — around one hour — and then automatically deleted                                                               |
 | Error reports                            | Retained for up to 12 months for diagnostic purposes, anonymised where possible                                                        |
