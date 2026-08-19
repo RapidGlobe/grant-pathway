@@ -14,17 +14,26 @@
 // to 'in_progress', then redirects to Step 4 showing the Q&A interface.
 
 import { useState, useTransition } from 'react'
-import { Users } from 'lucide-react'
+import { Users, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StepIndicator } from '@/components/step-indicator'
 import { assembleAndAdvance, setDraftInProgress } from '@/actions/applications'
 import { ContextualTooltip } from '@/components/contextual-tooltip'
+import { FunderDocumentsList } from '@/components/funder-documents-list'
 
 interface ApplicationStep4SeniorReviewProps {
   applicationId: string
+  /** Funder name, for the supporting-documents reminder (PDR-UI-007). */
+  funderName?: string
+  /** The funder's own supporting-documents list, repeated here (PDR-UI-007). */
+  supportingDocuments?: string[]
 }
 
-export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4SeniorReviewProps) {
+export function ApplicationStep4SeniorReview({
+  applicationId,
+  funderName,
+  supportingDocuments = [],
+}: ApplicationStep4SeniorReviewProps) {
   const [assembleError, setAssembleError] = useState<string | null>(null)
   const [backError, setBackError] = useState<string | null>(null)
   const [isAssembling, startAssembleTransition] = useTransition()
@@ -65,6 +74,31 @@ export function ApplicationStep4SeniorReview({ applicationId }: ApplicationStep4
           reasons grant applications are unsuccessful or withdrawn. Once assembled, you will be able
           to review and approve the full draft before it is exported.
         </p>
+
+        {/* ── The funder's own document list, repeated from Step 4's gate
+            (PDR-UI-007, 2026-08-19). The standing financial-prep items are
+            deliberately NOT repeated here: they already appear on "Before you
+            begin writing", and repeating them buries the funder's list, which
+            is the part still outstanding.
+
+            Passive by decision (WJ): it informs, it does not gate. Grant
+            Pathway cannot know whether the accounts have been attached, and a
+            gate it cannot verify would be a poor gate. ────────────────────── */}
+        {supportingDocuments.length > 0 && (
+          <div className="mt-6">
+            <FunderDocumentsList funderName={funderName} documents={supportingDocuments} />
+            <div className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
+              <AlertTriangle
+                className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]"
+                aria-hidden="true"
+              />
+              <p className="text-[0.8125rem] text-[#78350F]">
+                You will need these documents to complete your application on the funder&rsquo;s own
+                form. Grant Pathway does not submit them for you.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {assembleError && (

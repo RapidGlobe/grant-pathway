@@ -68,7 +68,13 @@ export default async function Step4Page({ params }: Props) {
 
   // S6.7 — Show senior review confirmation before assembly
   if (draftStatus === 'ready_to_assemble') {
-    return <ApplicationStep4SeniorReview applicationId={id} />
+    return (
+      <ApplicationStep4SeniorReview
+        applicationId={id}
+        funderName={funderName}
+        supportingDocuments={parsedSummary?.supportingDocuments ?? []}
+      />
+    )
   }
 
   // S6.7 — Draft already assembled; send user straight to Step 5

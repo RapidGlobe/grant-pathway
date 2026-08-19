@@ -33,7 +33,21 @@ Unlike `funderAiPolicy` (also extracted but deliberately not displayed, with an 
 
 Option A surfaces the data but at the wrong moment — reading a summary is not the same moment as "go and gather this." Option B throws away the only funder-specific signal the extraction produces, for a marginal token saving. Option C puts the data where it is actually actionable: the existing Step 4 gate that already interrupts the user with "go get your documents" advice, just today with a one-size-fits-all list. No new AI call, no schema change, and no removal of existing Step 4 advice — the two lists sit side by side.
 
-## Proposed extension — repeat the checklist before export (raised 2026-08-19)
+## Extension — repeat the funder's list before assembly (decided 2026-08-19)
+
+**Status: DECIDED and BUILT, 2026-08-19.** WJ reviewed two mockups and approved them.
+
+**What was built.** The funder's own supporting-documents list is repeated on the **"Before we put it together"** screen — the senior-review confirmation shown when the draft is ready to assemble — below the existing senior-colleague message, followed by a short amber note: _"You will need these documents to complete your application on the funder's own form. Grant Pathway does not submit them for you."_ **Passive: it informs, it does not gate.**
+
+**Three decisions taken along the way, each reversing an earlier one:**
+
+1. **Placement moved from Step 5 to the senior-review screen.** A first implementation put a full repeat on Step 5 above the review. WJ's own words had been "after draft answer screen 4 and before approve & export", and the senior-review screen is literally between them. **Step 5 is back to its original design** — "Before you approve, please confirm", then the answers.
+2. **The four standing financial-prep items are NOT repeated.** They already appear on "Before you begin writing"; repeating them buries the funder's list, which is the part actually outstanding.
+3. **The amber note is new wording, not the original.** "Before reaching the financial questions" is false by this point — the user has already answered them.
+
+⚠️ **A caveat I raised was wrong, and WJ caught it.** I recorded that a user who reopens an approved application would not see the reminder again. **`reopen_application` sets `current_step = 4` and `draft_status = 'in_progress'`**, returning them to Draft Answers — so reaching Step 5 again requires passing back through this screen, and they **do** see it again. **The only case that skips it is a direct URL to `/step/5` when already at step 5** (a bookmark, or returning to a tab after assembling), which is minor and accepted.
+
+**Original proposal, retained:**
 
 **Status: PROPOSED, not decided.**
 
