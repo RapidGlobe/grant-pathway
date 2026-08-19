@@ -10,7 +10,15 @@
 
 ---
 
-## 2026-08-19 (latest) — the environment parity audit runs, and finds a second migration recorded as applied on production that never executed
+## 2026-08-19 (latest) — the environment parity audit runs and finds a second unexecuted migration; `D-017` closes as never having been a defect
+
+### `D-017` was a wrong reading of a dashboard, and it gated `P5.5` for a day
+
+Sentry has been receiving and displaying events throughout. The Issues list, filtered to project `grant-pathway`, environment `production`, last 30 days, shows **seven issues — including both of the previous day's real defects**: `permission denied for table charity_profiles` (`D-020`) and the AWS `403 ... signature we calculated does not match` (`D-018`), alongside the deliberate `P5.4` test error and four older issues going back a month.
+
+⚠️ **The 2026-08-18 observation — "no events in 14 days across every environment" — was wrong, and this repository already contradicted it.** `GAP-21` was closed on 2026-08-16 by capturing a tagged event on production and reading it in Sentry, two days inside the window reported as empty. **The contradiction was written down in two documents and went unexamined for a day**, during which the handoff instructed that no test plan should run against production until Sentry was fixed.
+
+**The lesson is about the search, not the tool: a dashboard query returning nothing is evidence about the query until the query itself has been verified.** This is the same shape as `D-018`, where an empty `ai_usage_log` was read as "never called" for most of an hour, and it is now the second instance in two days. **Nothing was changed in the code or in Sentry to close this** — which is the strongest available evidence that nothing was broken.
 
 ### `D-020` was right to stay open: it has a second instance
 
