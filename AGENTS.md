@@ -14,11 +14,24 @@ This file governs how all contributors — human and AI — work on this codebas
 
 ## Contents
 
+0. [How to write responses in chat](#0-how-to-write-responses-in-chat) — always
 1. [Next.js version warning](#1-nextjs-version-warning) — pre-task
 2. [ADR consequences check](#2-adr-consequences--mandatory-pre-task-check) — pre-task
 3. [Documentation — tier system and checklist](#3-documentation--mandatory-audit-trail) — post-task
 4. [File references and information search](#4-file-references-and-information-search) — during task
 5. [GitHub — commit and push](#5-github--always-commit-and-push-after-changes) — post-task
+
+---
+
+## 0. How to write responses in chat
+
+**Keep replies short, plain-English and action-first.** Lead with what needs doing. Leave out technical history, evidence trails and reasoning unless asked — long replies cost tokens and bury the decision.
+
+The detail still gets written down: it belongs in the changelog, the ADR or the runbook, not in the chat reply. Say "recorded in X" and move on.
+
+Findings are the exception to brevity in one respect only: a real problem is always stated plainly, in a sentence or two. Being brief never means leaving something out.
+
+**Why:** the project owner is not a developer and skims replies while making decisions across a large document set. Asked for on 2026-08-15 and again on 2026-08-19: _"What needs doing, is what I am interested in. I don't need the full technical history."_
 
 ---
 
