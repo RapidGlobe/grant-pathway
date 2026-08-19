@@ -1,8 +1,8 @@
 # MK Community Foundation — Oak Grants Test Plan — Flagship
 
-**Version:** 2.6
+**Version:** 2.7
 **Date:** 2026-08-14
-**Status:** ✅ **Re-run against the June 2026 edition complete — MKCF-01–09 all Pass; both `GAP-90` and `GAP-91` (MKCF-06's and MKCF-08's caveats) since fixed and live-verified.** This re-run is now current evidence the app handles `MK Comm Found oak-grants-criteria-final-june-2026.pdf` correctly, superseding the 2026-08-10 "not yet re-verified" status. See Document History.
+**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — MKCF-04's AI summary took **44.71s** (dev was 43s on the same document; NFR-01's large-document tier allows 45s, so inside it by 0.3s — **the first production timing that is not comfortable**, worth watching rather than acting on). **MKCF-06 Pass: 19 questions plus 4 financial details, 23 total, matching the hand-derived June 2026 figure exactly, and `GAP-90`'s fix confirmed live** — a suspected failure was examined and found to be the by-design shared citation, not a regression. **Previously: ✅ Re-run against the June 2026 edition complete — MKCF-01–09 all Pass; both `GAP-90` and `GAP-91` (MKCF-06's and MKCF-08's caveats) since fixed and live-verified.** This re-run is now current evidence the app handles `MK Comm Found oak-grants-criteria-final-june-2026.pdf` correctly, superseding the 2026-08-10 "not yet re-verified" status. See Document History.
 **Tester:** WJ, with Claude watching production logs and the persisted database record live throughout
 **Test account:** grantpathway+mkcf1@gmail.com
 
@@ -272,7 +272,9 @@ If portal questions are not in the criteria document, note the question list and
 - No dedicated match-funding question (expected absent — folded into Q6 instead, tested in MKCF-07)
 - No data-entry, dropdown, or administrative fields appearing as writing cards
 
-**Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+**Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes — 2026-08-19, production run:** ✅ **Pass. `GAP-90`'s fix confirmed live on production, and the count is unchanged: 19 questions plus 4 financial details, 23 total** — exactly the June 2026 edition's hand-derived figure from 2026-08-14, so no drift and no regression. ⚠️ **Raised during the run as a suspected `GAP-90` failure, and examined rather than accepted:** the two bank-signatory cards **share a citation**, both badged "Page 3 of the guidelines" and highlighting the same sentence. ✅ **Not a regression.** `GAP-90`'s defect was **byte-identical `questionText`**, and the two now read distinctly — _"The organisation's bank account must have at least two unrelated signatories."_ against _"The bank account signatories must be unrelated to one another — the account must have at least two signatories who are not related."_ — with distinct titles and distinct input types (number, and a Yes/No/Not sure yet dropdown). **The shared citation is by design:** the fix was scoped to `questionText` only, with "citation reuse stays legitimate" recorded at the time (`ADR-TRACEABILITY.md` v2.67), because **MKCF states both facts in a single sentence.** There is one sentence to cite, and citing anything else would point at text that is not the source — which `ADR-DATA-007` exists to prevent. ⚠️ **The fair criticism stands and is recorded, not dismissed:** clicking either badge highlights the same passage, which reads as redundant even though it is truthful. **Changing that would be a new decision, not a `GAP-90` reopening**, and it has not been raised as one. **WJ recorded this as a Pass on that evidence.**
 
 **Notes (update Expected Narrative Questions table with actual observed values; flag if the count has moved from 10):** Count had moved well past 10 — see Defect Log #1. Root cause was a real extraction bug (project-budget questions and compound label+question lines silently dropped), not further drift; fixed same session, confirmed 19 questions on the upload path and 16 on the paste path, both genuine against source. Expected Narrative Questions table above marked superseded rather than rewritten line-by-line, since it's no longer being kept current per-question.
 
