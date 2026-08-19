@@ -33,6 +33,26 @@ Unlike `funderAiPolicy` (also extracted but deliberately not displayed, with an 
 
 Option A surfaces the data but at the wrong moment — reading a summary is not the same moment as "go and gather this." Option B throws away the only funder-specific signal the extraction produces, for a marginal token saving. Option C puts the data where it is actually actionable: the existing Step 4 gate that already interrupts the user with "go get your documents" advice, just today with a one-size-fits-all list. No new AI call, no schema change, and no removal of existing Step 4 advice — the two lists sit side by side.
 
+## Proposed extension — repeat the checklist before export (raised 2026-08-19)
+
+**Status: PROPOSED, not decided.**
+
+**Origin: WJ's wife, from her own use of the live service**, and independently the strongest evidence in this file — she is the only person to have completed a genuine application through Grant Pathway (a real Stony Stratford Town Council submission, 2026-08-06, which also found `GAP-41`).
+
+**The suggestion:** show this same checklist a second time, **between Step 4 (writing) and Step 5 (approve and export)**.
+
+**The argument for it, which is a real one.** The checklist currently appears only at the moment the user is about to _start writing_ — before they have written a word. That is the right moment to say "go and gather things", but it is the **wrong moment to be reminded what is still outstanding**, because nothing is outstanding yet. By the end of Step 4 the user has answered every question Grant Pathway asked and **the product's own framing invites them to think they are finished** — the next button is approve and export. ⚠️ **They are not finished:** the funder still wants accounts, a safeguarding policy, a constitution, and — for A B Charitable Trust — **a 2 to 2½ page overview document that Grant Pathway has not helped them write.**
+
+**This interacts directly with the D5 question** (`docs/impact-assessment-supporting-document-questions.md`). A second showing is where "you still have a document to write" lands hardest, and it delivers a meaningful part of that assessment's value **without any of option C's cost** — no extraction change, no writing surface, no export work, no AI usage. It does not replace option C; it makes the gap visible at the point it matters.
+
+**Sketch of the work:** `ApplicationStep4PrepChecklist` already takes `funderName` and `supportingDocuments`; the Step 5 page already parses `ai_summary`. This is largely reuse with different framing text — the heading would need to change from "Before you begin writing" to something like "Before you submit", and the standing financial-prep advice ("gather these before you start") reads oddly at the end and may need different wording or omitting. **Small.**
+
+**Open questions for the decision:**
+
+- Second full showing, or a condensed reminder? A verbatim repeat risks being skimmed as something already seen.
+- Does the standing 4-item financial checklist belong there at all, or only the funder-specific list?
+- Is it a blocking gate (like Step 4's) or passive information? ⚠️ **A gate the user cannot satisfy inside the product would be a poor gate** — Grant Pathway cannot know whether they have attached their accounts.
+
 ## Date Decided
 
 2026-07-10
