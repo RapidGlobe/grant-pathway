@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle2, Download, FileText, AlertCircle } from 'lucide-react'
+import { CheckCircle2, ClipboardList, Download, FileText, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -16,6 +16,7 @@ import { StepIndicator } from '@/components/step-indicator'
 import { approveApplication, reopenApplication } from '@/actions/applications'
 import type { ApplicationStatus } from '@/lib/application-guard'
 import { ContextualTooltip } from '@/components/contextual-tooltip'
+import { PreparationChecklistBody } from '@/components/preparation-checklist-body'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -38,6 +39,8 @@ interface ApplicationStep5ApproveProps {
   answers: AnswerRow[]
   assembledDraft: string | null
   lastExportedAt: string | null
+  /** Funder-specific documents, for the second showing of the prep checklist (PDR-UI-007). */
+  supportingDocuments?: string[]
 }
 
 // ---------------------------------------------------------------------------
@@ -110,6 +113,7 @@ export function ApplicationStep5Approve({
   answers,
   assembledDraft,
   lastExportedAt,
+  supportingDocuments = [],
 }: ApplicationStep5ApproveProps) {
   const router = useRouter()
 
@@ -263,12 +267,40 @@ export function ApplicationStep5Approve({
       <h1 className="mb-1 text-[1.5rem] font-bold text-[#1E293B]">
         Review and approve your application
       </h1>
+
+      {/* ── Second showing of the preparation checklist (PDR-UI-007, 2026-08-19).
+          Placed above the review, not below it: by this point the user has
+          answered every question Grant Pathway asked and the next action is
+          approve and export, which reads as "you are finished". They are not —
+          the funder still wants documents, and for some funders one of those is
+          a document Grant Pathway has not helped them write.
+
+          PASSIVE BY DECISION (WJ): it informs, it does not gate. The product
+          cannot verify whether the accounts have been attached, and a gate it
+          cannot verify would be a poor gate. ─────────────────────────────── */}
       <p className="mb-6 text-[0.875rem] font-medium text-[#0D6E6E]">
         {funderName}
         {grantName && grantName !== funderName && (
           <span className="font-normal text-[#64748B]"> &middot; {grantName}</span>
         )}
       </p>
+
+      <section
+        aria-labelledby="before-you-submit-heading"
+        className="mb-6 rounded-xl border border-[#E2E8F0] bg-white p-6"
+      >
+        <div className="mb-4 flex items-center gap-3">
+          <ClipboardList className="h-5 w-5 shrink-0 text-[#0D6E6E]" aria-hidden="true" />
+          <h2 id="before-you-submit-heading" className="text-[1.125rem] font-bold text-[#1E293B]">
+            Before you submit
+          </h2>
+        </div>
+        <PreparationChecklistBody
+          variant="before-submitting"
+          funderName={funderName}
+          supportingDocuments={supportingDocuments}
+        />
+      </section>
 
       {/* ── Approval status banner — stays mounted at all times (only its
           content toggles) so NVDA is already watching it when approval

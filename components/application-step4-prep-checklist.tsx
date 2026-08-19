@@ -21,23 +21,17 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { ClipboardList, AlertTriangle } from 'lucide-react'
+import { ClipboardList } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { StepIndicator } from '@/components/step-indicator'
 import { setDraftInProgress } from '@/actions/applications'
+import { PreparationChecklistBody } from '@/components/preparation-checklist-body'
 
 interface ApplicationStep4PrepChecklistProps {
   applicationId: string
   funderName?: string
   supportingDocuments?: string[]
 }
-
-const CHECKLIST_ITEMS = [
-  'Most recent annual accounts or financial statements',
-  'Projected budget for the grant period (income and planned expenditure)',
-  'Details of other funding secured or applied for',
-  'Input from your treasurer, finance lead, or a trustee who understands the budget',
-]
 
 export function ApplicationStep4PrepChecklist({
   applicationId,
@@ -74,41 +68,11 @@ export function ApplicationStep4PrepChecklist({
       </div>
 
       <div className="mb-6 rounded-xl border border-[#E2E8F0] bg-white p-6">
-        <p className="mb-4 text-[0.9375rem] text-[#374151]">
-          The financial sections of this application cannot be completed by AI. Before you start,
-          gather:
-        </p>
-
-        <ul className="mb-5 space-y-3">
-          {CHECKLIST_ITEMS.map((item, i) => (
-            <ChecklistItem key={i} index={i + 1}>
-              {item}
-            </ChecklistItem>
-          ))}
-        </ul>
-
-        {supportingDocuments.length > 0 && (
-          <>
-            <p className="mb-4 text-[0.9375rem] text-[#374151]">
-              {funderName || 'This funder'} also asks you to submit:
-            </p>
-            <ul className="mb-5 space-y-3">
-              {supportingDocuments.map((item, i) => (
-                <ChecklistItem key={i} index={i + 1}>
-                  {item}
-                </ChecklistItem>
-              ))}
-            </ul>
-          </>
-        )}
-
-        <div className="flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-3">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[#B45309]" aria-hidden="true" />
-          <p className="text-[0.8125rem] text-[#78350F]">
-            It is worth involving a senior colleague — such as your CEO, treasurer, or a trustee —
-            before reaching the financial questions.
-          </p>
-        </div>
+        <PreparationChecklistBody
+          variant="before-writing"
+          funderName={funderName}
+          supportingDocuments={supportingDocuments}
+        />
       </div>
 
       {serverError && (
@@ -137,19 +101,5 @@ export function ApplicationStep4PrepChecklist({
         </Button>
       </div>
     </div>
-  )
-}
-
-function ChecklistItem({ index, children }: { index: number; children: React.ReactNode }) {
-  return (
-    <li className="flex items-start gap-3">
-      <span
-        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#0D6E6E] text-[0.6875rem] font-bold text-[#0D6E6E]"
-        aria-hidden="true"
-      >
-        {index}
-      </span>
-      <span className="text-[0.875rem] text-[#374151]">{children}</span>
-    </li>
   )
 }

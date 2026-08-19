@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ApplicationStep5Approve, type AnswerRow } from '@/components/application-step5-approve'
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
+import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
 export const metadata: Metadata = {
   title: 'Approve & Export',
@@ -37,13 +38,29 @@ export default async function Step5Page({ params }: Props) {
   // ── Fetch last_exported_at and assembled_draft (not in ApplicationData type)
   const { data: appRow } = await supabase
     .from('applications')
-    .select('last_exported_at, assembled_draft')
+    .select('last_exported_at, assembled_draft, ai_summary')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
   const lastExportedAt = (appRow?.last_exported_at as string | null) ?? null
   const assembledDraft = (appRow?.assembled_draft as string | null) ?? null
+
+  // ── Supporting documents for the second showing of the preparation checklist
+  // (PDR-UI-007, 2026-08-19). Parsed here rather than threaded from Step 4:
+  // Step 5 is reachable directly by URL and after a reopen, so it cannot rely on
+  // having passed through Step 4 in this session. A parse failure degrades to an
+  // empty list, which hides the funder-specific half and leaves the standing
+  // advice — the same tolerance Step 4 applies.
+  let supportingDocuments: string[] = []
+  const aiSummary = appRow?.ai_summary as string | null | undefined
+  if (aiSummary) {
+    try {
+      supportingDocuments = (JSON.parse(aiSummary) as AiSummaryData).supportingDocuments ?? []
+    } catch {
+      // ai_summary parse failed — the funder-specific list is simply not shown
+    }
+  }
 
   // ── Fetch answers for review ───────────────────────────────────────────────
   const { data: answerRows } = await supabase
@@ -70,6 +87,7 @@ export default async function Step5Page({ params }: Props) {
       status={status}
       answers={answers}
       assembledDraft={assembledDraft}
+      supportingDocuments={supportingDocuments}
       lastExportedAt={lastExportedAt}
     />
   )
