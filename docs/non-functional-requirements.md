@@ -10,13 +10,16 @@ This document captures the agreed non-functional requirements for the v1 build. 
 
 ## NFR-01 — Performance
 
-| Metric                                                           | Target           |
-| ---------------------------------------------------------------- | ---------------- |
-| Page loads and navigation                                        | Under 3 seconds  |
-| AI guideline summarisation — standard documents (up to ~8 pages) | Under 30 seconds |
-| AI guideline summarisation — large documents (over 8 pages)      | Under 45 seconds |
-| AI answer refine (per question)                                  | Under 15 seconds |
-| AI charity-objects paraphrase (profile setup)                    | Under 30 seconds |
+| Metric                                                                 | Target           |
+| ---------------------------------------------------------------------- | ---------------- |
+| Page loads and navigation                                              | Under 3 seconds  |
+| AI guideline summarisation — standard documents (up to ~8 pages)       | Under 30 seconds |
+| AI guideline summarisation — large documents (over 8 pages)            | Under 45 seconds |
+| AI answer refine (per question)                                        | Under 15 seconds |
+| AI charity-objects paraphrase (profile setup)                          | Under 30 seconds |
+| AI guideline summarisation — **eligibility mismatch path** (two calls) | Under 90 seconds |
+
+**The eligibility-mismatch row was added 2026-08-19 (`GAP-115`), and it exists because the path was never budgeted.** When a Step 3 summary returns `eligibilityMismatch: true`, the route makes a **second Bedrock call** to confirm before hard-stopping — `DR-EL-001`'s stop has no override, and a verdict that flips on retry is not the unambiguous mismatch it requires. **The rows above were written for one call and never revisited when the second was added.** **Measured on production 2026-08-19:** a mismatch on a **4-page PDF — a standard document by the 30-second row above — took 58.5 seconds** (26.6s first call, ~29s confirmation; Axiom request `xd7jf-1787150244706-a875c3d9bd42`). That is **more than double this same document's 25-second baseline of 2026-06-04**, and by the size-based rows it would have been judged a pass. ⚠️ **The 90-second target here is honest rather than aspirational:** it reflects what two calls actually cost, not what would be pleasant. **The applicant who waits longest is the one being rejected**, and they are the least likely to complain about it. **Reducing it is `GAP-115` option (c)** — the confirmation call regenerates the entire summary to re-read one boolean, which is the waste worth removing. `maxDuration` on the route was raised 90 → 180 the same day so that a **large** document on this path cannot time out and show a generic failure in place of a correct rejection.
 
 **The paraphrase row was added 2026-08-05 (`P5.0`, register ref R-12).** This document previously specified targets for two of the three user-facing AI operations. The charity-objects paraphrase — which runs during profile setup when a Charity Commission lookup matches, logged as `request_type = 'charity_paraphrase'` — had no target and no evidence anywhere, despite carrying a 60-second function budget (`export const maxDuration = 60` in `app/(authenticated)/profile/page.tsx`). The 30-second target is set by analogy with standard-document summarisation, deliberately well inside the 60s budget, and is **unmeasured** — it joins the `P5.5` measured pass alongside the other two.
 

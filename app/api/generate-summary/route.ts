@@ -121,7 +121,33 @@ const aiSummarySchema = z.object({
   overallWordLimit: z.number().nullable().optional(),
 })
 
-export const maxDuration = 90
+// maxDuration: raised 90 → 180 on 2026-08-19 (`GAP-115`, option (b)).
+//
+// 90 was set when Step 3 made ONE Bedrock call. An eligibility mismatch makes
+// TWO — step 7b re-asks before hard-stopping, because `DR-EL-001`'s stop has no
+// override and a false positive dead-ends an application permanently. Nothing
+// re-examined this ceiling when that second call was added.
+//
+// Measured on production 2026-08-19 (Axiom, request
+// `xd7jf-1787150244706-a875c3d9bd42`): a mismatch on a 4-page PDF took
+// `durationMs: 58527` — a 26.6s first call plus ~29s for the confirmation.
+// That fits inside 90. ⚠️ A LARGE document does not: Clothworkers' multi-form
+// PDF measured 40–47s per call in the 2026-06-04 baseline, so two calls plus
+// pre-processing would exceed 90s and the function would time out — and the
+// user would see a generic failure INSTEAD OF A CORRECT REJECTION they are
+// entitled to. That is the failure this raise removes.
+//
+// 180 and not more: the per-call `AbortSignal.timeout(60_000)` below bounds a
+// mismatch at ~120s of Bedrock time, and 180 leaves room for pre-processing,
+// the DB writes and the citation re-validation on top. It is not sized for a
+// full `withRetry` storm (3 attempts per call) — that path is already an error
+// path, and sizing for it would mean holding a function open for minutes to no
+// user benefit.
+//
+// ⚠️ This does not make a mismatch faster; it stops the slow path failing.
+// Making it faster is `GAP-115` option (c) — a confirm-only prompt, since the
+// second call currently regenerates the entire summary to re-read one boolean.
+export const maxDuration = 180
 
 // Raised to 2000 → 4000 originally: complex structured documents (e.g. AB
 // Charitable Trust with 33 questions across 4 sections) were truncating at
