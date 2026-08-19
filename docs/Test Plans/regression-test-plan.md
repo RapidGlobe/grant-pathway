@@ -156,6 +156,8 @@ Run this before every session, every time, no exceptions. It exists because on 2
 
 **Notes — 2026-08-19:** ⚠️ **That Pass is now known to have been hollow, through no fault of the tester.** Within hours of it, `D-020` (no DML privileges for `authenticated` on five tables) and `D-018` (every Bedrock call failing on a signature mismatch) were found by ordinary testing. **This case has been given steps 5 and 6 so that neither could pass unnoticed again**, and the parity run has since found a **second** migration recorded as applied on production whose statements never executed. **Re-run this case in full against production before `P5.5` restarts** — the 2026-08-18 Pass should not be carried forward.
 
+**Notes — 2026-08-19 re-run, `grant-pathway-prod`:** ✅ **Pass, on the strengthened case.** **Step 5:** `npm run parity` against snapshots captured the same morning — **no structural differences, exit 0.** The single `NOTE` is the `ai_request_type` labels in a different storage order, which is consequence-free and does not block a run. **Step 6:** the `/profile` lookup of **1194917** returned both AI-written descriptions with the provenance notice — _"The descriptions below were drafted by AI from your Charity Commission entry"_. **This is the first Pass of `RT-00` that establishes a signed-in user can actually use the database and that the AI credentials work**, rather than that the migration bookkeeping matches. The charity profile save was also confirmed working, closing the last open thread from `D-020`.
+
 ---
 
 ## Tier 1 — Smoke Tests
