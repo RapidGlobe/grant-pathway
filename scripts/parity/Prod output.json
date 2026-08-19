@@ -1,0 +1,1359 @@
+[
+  {
+    "parity_snapshot": {
+      "captured_at": "2026-08-19T07:12:24.760556+00:00",
+      "database": "postgres",
+      "postgres_version": "17.6",
+      "tables": [
+        {
+          "table_name": "ai_usage_log",
+          "rls_enabled": true,
+          "rls_forced": false
+        },
+        {
+          "table_name": "application_guidelines",
+          "rls_enabled": true,
+          "rls_forced": false
+        },
+        {
+          "table_name": "application_items",
+          "rls_enabled": true,
+          "rls_forced": false
+        },
+        {
+          "table_name": "applications",
+          "rls_enabled": true,
+          "rls_forced": false
+        },
+        {
+          "table_name": "charity_profiles",
+          "rls_enabled": true,
+          "rls_forced": false
+        },
+        {
+          "table_name": "funders",
+          "rls_enabled": true,
+          "rls_forced": false
+        },
+        {
+          "table_name": "user_profiles",
+          "rls_enabled": true,
+          "rls_forced": false
+        }
+      ],
+      "columns": [
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "application_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "input_token_count",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "output_token_count",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "request_type",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "token_count",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "ai_usage_log",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "column_name": "application_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "column_name": "guideline_text",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "added_manually",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "false",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "ai_refined_answer",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "answer_source",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "answer_text",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "application_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "char_limit",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "cloned_from_application_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "decision_maker_visible",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "true",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "field_key",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "guideline_reference",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "is_approved",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "false",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "is_budget_question",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "false",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "item_label",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "item_order",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "item_type",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "limit_type",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "output_mode",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "NO",
+          "column_default": "'generic_export'::item_output_mode",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "rubric_criterion_link",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "source_of_truth",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "validation_mode",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "visibility_condition",
+          "data_type": "jsonb",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "application_items",
+          "column_name": "word_limit",
+          "data_type": "integer",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "ai_summary",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "assembled_draft",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "current_step",
+          "data_type": "integer",
+          "is_nullable": "NO",
+          "column_default": "1",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "draft_status",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "'not_started'::text",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "first_exported_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "funder_id",
+          "data_type": "uuid",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "funder_name",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "grant_name",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "last_exported_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "status",
+          "data_type": "USER-DEFINED",
+          "is_nullable": "NO",
+          "column_default": "'not_started'::application_status",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "applications",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "charity_name",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "lookup_source",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "registration_number",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "what_charity_does",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "where_charity_works",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "column_name": "who_charity_helps",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "funders",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "funders",
+          "column_name": "grant_range",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "funders",
+          "column_name": "guidelines_url",
+          "data_type": "text",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "funders",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "funders",
+          "column_name": "is_active",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "true",
+          "max_length": ""
+        },
+        {
+          "table_name": "funders",
+          "column_name": "name",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "created_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "feedback_consent",
+          "data_type": "boolean",
+          "is_nullable": "NO",
+          "column_default": "false",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "first_name",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "gen_random_uuid()",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "last_inactivity_warned_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "YES",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "last_name",
+          "data_type": "text",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "updated_at",
+          "data_type": "timestamp with time zone",
+          "is_nullable": "NO",
+          "column_default": "now()",
+          "max_length": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "column_name": "user_id",
+          "data_type": "uuid",
+          "is_nullable": "NO",
+          "column_default": "",
+          "max_length": ""
+        }
+      ],
+      "table_grants": [
+        {
+          "table_name": "ai_usage_log",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "ai_usage_log",
+          "grantee": "authenticated",
+          "privileges": "INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "ai_usage_log",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "application_guidelines",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "application_guidelines",
+          "grantee": "authenticated",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "application_guidelines",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "application_items",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "application_items",
+          "grantee": "authenticated",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "application_items",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "applications",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "applications",
+          "grantee": "authenticated",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "applications",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "charity_profiles",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "charity_profiles",
+          "grantee": "authenticated",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "charity_profiles",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "funders",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "funders",
+          "grantee": "authenticated",
+          "privileges": "REFERENCES,SELECT,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "funders",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "user_profiles",
+          "grantee": "anon",
+          "privileges": "REFERENCES,TRIGGER,TRUNCATE"
+        },
+        {
+          "table_name": "user_profiles",
+          "grantee": "authenticated",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        },
+        {
+          "table_name": "user_profiles",
+          "grantee": "service_role",
+          "privileges": "DELETE,INSERT,REFERENCES,SELECT,TRIGGER,TRUNCATE,UPDATE"
+        }
+      ],
+      "policies": [
+        {
+          "table_name": "ai_usage_log",
+          "policy_name": "ai_usage_log: insert own",
+          "cmd": "INSERT",
+          "roles": "public",
+          "using_expr": "",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "ai_usage_log",
+          "policy_name": "ai_usage_log: select own",
+          "cmd": "SELECT",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "policy_name": "application_guidelines: delete own",
+          "cmd": "DELETE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "policy_name": "application_guidelines: insert own",
+          "cmd": "INSERT",
+          "roles": "public",
+          "using_expr": "",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "application_guidelines",
+          "policy_name": "application_guidelines: select own",
+          "cmd": "SELECT",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "application_guidelines",
+          "policy_name": "application_guidelines: update own",
+          "cmd": "UPDATE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "application_items",
+          "policy_name": "application_items: delete own",
+          "cmd": "DELETE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "application_items",
+          "policy_name": "application_items: insert own",
+          "cmd": "INSERT",
+          "roles": "public",
+          "using_expr": "",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "application_items",
+          "policy_name": "application_items: select own",
+          "cmd": "SELECT",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "application_items",
+          "policy_name": "application_items: update own",
+          "cmd": "UPDATE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "applications",
+          "policy_name": "applications: delete own",
+          "cmd": "DELETE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "applications",
+          "policy_name": "applications: insert own",
+          "cmd": "INSERT",
+          "roles": "public",
+          "using_expr": "",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "applications",
+          "policy_name": "applications: select own",
+          "cmd": "SELECT",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "applications",
+          "policy_name": "applications: update own",
+          "cmd": "UPDATE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "charity_profiles",
+          "policy_name": "charity_profiles: delete own",
+          "cmd": "DELETE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "policy_name": "charity_profiles: insert own",
+          "cmd": "INSERT",
+          "roles": "public",
+          "using_expr": "",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "charity_profiles",
+          "policy_name": "charity_profiles: select own",
+          "cmd": "SELECT",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "charity_profiles",
+          "policy_name": "charity_profiles: update own",
+          "cmd": "UPDATE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "funders",
+          "policy_name": "funders: select active",
+          "cmd": "SELECT",
+          "roles": "authenticated",
+          "using_expr": "(is_active = true)",
+          "check_expr": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "policy_name": "user_profiles: delete own",
+          "cmd": "DELETE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "policy_name": "user_profiles: insert own",
+          "cmd": "INSERT",
+          "roles": "public",
+          "using_expr": "",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        },
+        {
+          "table_name": "user_profiles",
+          "policy_name": "user_profiles: select own",
+          "cmd": "SELECT",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": ""
+        },
+        {
+          "table_name": "user_profiles",
+          "policy_name": "user_profiles: update own",
+          "cmd": "UPDATE",
+          "roles": "public",
+          "using_expr": "(user_id = ( SELECT auth.uid() AS uid))",
+          "check_expr": "(user_id = ( SELECT auth.uid() AS uid))"
+        }
+      ],
+      "functions": [
+        {
+          "function_name": "approve_application",
+          "arguments": "p_application_id uuid, p_user_id uuid",
+          "returns": "void",
+          "security_definer": false,
+          "acl": ""
+        },
+        {
+          "function_name": "cancel_ai_slot",
+          "arguments": "p_log_id uuid, p_user_id uuid",
+          "returns": "void",
+          "security_definer": true,
+          "acl": "=X/postgres,postgres=X/postgres,authenticated=X/postgres"
+        },
+        {
+          "function_name": "handle_new_user",
+          "arguments": "",
+          "returns": "trigger",
+          "security_definer": true,
+          "acl": ""
+        },
+        {
+          "function_name": "handle_updated_at",
+          "arguments": "",
+          "returns": "trigger",
+          "security_definer": false,
+          "acl": ""
+        },
+        {
+          "function_name": "reopen_application",
+          "arguments": "p_application_id uuid, p_user_id uuid",
+          "returns": "void",
+          "security_definer": false,
+          "acl": ""
+        },
+        {
+          "function_name": "reserve_ai_slot",
+          "arguments": "p_user_id uuid, p_application_id uuid, p_request_type ai_request_type, p_monthly_cap integer, p_approaching_threshold integer",
+          "returns": "jsonb",
+          "security_definer": true,
+          "acl": "=X/postgres,postgres=X/postgres,authenticated=X/postgres"
+        },
+        {
+          "function_name": "rls_auto_enable",
+          "arguments": "",
+          "returns": "event_trigger",
+          "security_definer": true,
+          "acl": ""
+        },
+        {
+          "function_name": "update_ai_slot_token_count",
+          "arguments": "p_log_id uuid, p_user_id uuid, p_token_count integer, p_input_token_count integer, p_output_token_count integer",
+          "returns": "void",
+          "security_definer": true,
+          "acl": "=X/postgres,postgres=X/postgres,authenticated=X/postgres"
+        }
+      ],
+      "triggers": [
+        {
+          "table_name": "application_guidelines",
+          "trigger_name": "set_updated_at",
+          "definition": "CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.application_guidelines FOR EACH ROW EXECUTE FUNCTION handle_updated_at()"
+        },
+        {
+          "table_name": "application_items",
+          "trigger_name": "set_updated_at",
+          "definition": "CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.application_items FOR EACH ROW EXECUTE FUNCTION handle_updated_at()"
+        },
+        {
+          "table_name": "applications",
+          "trigger_name": "set_updated_at",
+          "definition": "CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.applications FOR EACH ROW EXECUTE FUNCTION handle_updated_at()"
+        },
+        {
+          "table_name": "charity_profiles",
+          "trigger_name": "set_updated_at",
+          "definition": "CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.charity_profiles FOR EACH ROW EXECUTE FUNCTION handle_updated_at()"
+        },
+        {
+          "table_name": "user_profiles",
+          "trigger_name": "set_updated_at",
+          "definition": "CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.user_profiles FOR EACH ROW EXECUTE FUNCTION handle_updated_at()"
+        }
+      ],
+      "enums": [
+        {
+          "enum_name": "ai_request_type",
+          "labels": "guideline_summary,draft_generation,charity_paraphrase"
+        },
+        {
+          "enum_name": "answer_source",
+          "labels": "ai_generated,user_edited,user_written"
+        },
+        {
+          "enum_name": "application_item_type",
+          "labels": "narrative,data,date,number,table,file,consent,eligibility_gate,scoring_criterion,manual_action"
+        },
+        {
+          "enum_name": "application_status",
+          "labels": "not_started,in_progress,approved,exported,mismatch"
+        },
+        {
+          "enum_name": "item_output_mode",
+          "labels": "generic_export,native_template_fill"
+        },
+        {
+          "enum_name": "item_source_of_truth",
+          "labels": "user_input,charity_profile,derived,disclosure"
+        },
+        {
+          "enum_name": "item_validation_mode",
+          "labels": "hard_check,judgement_flag"
+        }
+      ],
+      "indexes": [
+        {
+          "table_name": "ai_usage_log",
+          "index_name": "ai_usage_log_pkey",
+          "definition": "CREATE UNIQUE INDEX ai_usage_log_pkey ON public.ai_usage_log USING btree (id)"
+        },
+        {
+          "table_name": "application_guidelines",
+          "index_name": "application_guidelines_application_id_key",
+          "definition": "CREATE UNIQUE INDEX application_guidelines_application_id_key ON public.application_guidelines USING btree (application_id)"
+        },
+        {
+          "table_name": "application_guidelines",
+          "index_name": "application_guidelines_pkey",
+          "definition": "CREATE UNIQUE INDEX application_guidelines_pkey ON public.application_guidelines USING btree (id)"
+        },
+        {
+          "table_name": "application_items",
+          "index_name": "application_items_application_id_item_order_key",
+          "definition": "CREATE UNIQUE INDEX application_items_application_id_item_order_key ON public.application_items USING btree (application_id, item_order)"
+        },
+        {
+          "table_name": "application_items",
+          "index_name": "application_items_pkey",
+          "definition": "CREATE UNIQUE INDEX application_items_pkey ON public.application_items USING btree (id)"
+        },
+        {
+          "table_name": "applications",
+          "index_name": "applications_pkey",
+          "definition": "CREATE UNIQUE INDEX applications_pkey ON public.applications USING btree (id)"
+        },
+        {
+          "table_name": "charity_profiles",
+          "index_name": "charity_profiles_pkey",
+          "definition": "CREATE UNIQUE INDEX charity_profiles_pkey ON public.charity_profiles USING btree (id)"
+        },
+        {
+          "table_name": "charity_profiles",
+          "index_name": "charity_profiles_user_id_key",
+          "definition": "CREATE UNIQUE INDEX charity_profiles_user_id_key ON public.charity_profiles USING btree (user_id)"
+        },
+        {
+          "table_name": "funders",
+          "index_name": "funders_name_key",
+          "definition": "CREATE UNIQUE INDEX funders_name_key ON public.funders USING btree (name)"
+        },
+        {
+          "table_name": "funders",
+          "index_name": "funders_pkey",
+          "definition": "CREATE UNIQUE INDEX funders_pkey ON public.funders USING btree (id)"
+        },
+        {
+          "table_name": "user_profiles",
+          "index_name": "user_profiles_pkey",
+          "definition": "CREATE UNIQUE INDEX user_profiles_pkey ON public.user_profiles USING btree (id)"
+        },
+        {
+          "table_name": "user_profiles",
+          "index_name": "user_profiles_user_id_key",
+          "definition": "CREATE UNIQUE INDEX user_profiles_user_id_key ON public.user_profiles USING btree (user_id)"
+        }
+      ],
+      "constraints": [
+        {
+          "table_name": "ai_usage_log",
+          "constraint_name": "ai_usage_log_application_id_fkey",
+          "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE SET NULL"
+        },
+        {
+          "table_name": "ai_usage_log",
+          "constraint_name": "ai_usage_log_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "ai_usage_log",
+          "constraint_name": "ai_usage_log_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "application_guidelines",
+          "constraint_name": "application_guidelines_application_id_fkey",
+          "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "application_guidelines",
+          "constraint_name": "application_guidelines_application_id_key",
+          "definition": "UNIQUE (application_id)"
+        },
+        {
+          "table_name": "application_guidelines",
+          "constraint_name": "application_guidelines_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "application_guidelines",
+          "constraint_name": "application_guidelines_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_application_id_fkey",
+          "definition": "FOREIGN KEY (application_id) REFERENCES applications(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_application_id_item_order_key",
+          "definition": "UNIQUE (application_id, item_order)"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_cloned_from_application_id_fkey",
+          "definition": "FOREIGN KEY (cloned_from_application_id) REFERENCES applications(id) ON DELETE SET NULL"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_field_key_check",
+          "definition": "CHECK (((field_key IS NULL) OR (field_key = ANY (ARRAY['governance_total_expenditure'::text, 'governance_reserves'::text, 'governance_trustees_related'::text, 'governance_bank_signatory_count'::text, 'governance_bank_signatories_related'::text]))))"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_guideline_reference_shape",
+          "definition": "CHECK (((guideline_reference IS NULL) OR ((guideline_reference ? 'source_type'::text) AND (guideline_reference ? 'quote'::text) AND ((((guideline_reference ->> 'source_type'::text) = 'page'::text) AND (guideline_reference ? 'page_number'::text) AND (NOT (guideline_reference ? 'heading_path'::text)) AND (NOT (guideline_reference ? 'item_number'::text))) OR (((guideline_reference ->> 'source_type'::text) = 'heading'::text) AND (guideline_reference ? 'heading_path'::text) AND (NOT (guideline_reference ? 'page_number'::text)) AND (NOT (guideline_reference ? 'item_number'::text))) OR (((guideline_reference ->> 'source_type'::text) = 'item'::text) AND (guideline_reference ? 'item_number'::text) AND (NOT (guideline_reference ? 'page_number'::text)) AND (NOT (guideline_reference ? 'heading_path'::text)))))))"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_limit_type_check",
+          "definition": "CHECK ((limit_type = ANY (ARRAY['words'::text, 'characters'::text, 'none'::text])))"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_output_mode_check",
+          "definition": "CHECK ((output_mode = 'generic_export'::item_output_mode))"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "application_items",
+          "constraint_name": "application_items_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "applications",
+          "constraint_name": "applications_current_step_check",
+          "definition": "CHECK (((current_step >= 1) AND (current_step <= 5)))"
+        },
+        {
+          "table_name": "applications",
+          "constraint_name": "applications_draft_status_check",
+          "definition": "CHECK ((draft_status = ANY (ARRAY['not_started'::text, 'in_progress'::text, 'ready_to_assemble'::text, 'assembled'::text, 'exported'::text])))"
+        },
+        {
+          "table_name": "applications",
+          "constraint_name": "applications_funder_id_fkey",
+          "definition": "FOREIGN KEY (funder_id) REFERENCES funders(id) ON DELETE SET NULL"
+        },
+        {
+          "table_name": "applications",
+          "constraint_name": "applications_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "applications",
+          "constraint_name": "applications_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "charity_profiles",
+          "constraint_name": "charity_profiles_lookup_source_check",
+          "definition": "CHECK ((lookup_source = ANY (ARRAY['charity_commission'::text, 'manual'::text])))"
+        },
+        {
+          "table_name": "charity_profiles",
+          "constraint_name": "charity_profiles_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "charity_profiles",
+          "constraint_name": "charity_profiles_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "charity_profiles",
+          "constraint_name": "charity_profiles_user_id_key",
+          "definition": "UNIQUE (user_id)"
+        },
+        {
+          "table_name": "funders",
+          "constraint_name": "funders_name_key",
+          "definition": "UNIQUE (name)"
+        },
+        {
+          "table_name": "funders",
+          "constraint_name": "funders_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "user_profiles",
+          "constraint_name": "user_profiles_pkey",
+          "definition": "PRIMARY KEY (id)"
+        },
+        {
+          "table_name": "user_profiles",
+          "constraint_name": "user_profiles_user_id_fkey",
+          "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+        },
+        {
+          "table_name": "user_profiles",
+          "constraint_name": "user_profiles_user_id_key",
+          "definition": "UNIQUE (user_id)"
+        }
+      ],
+      "buckets": [
+        {
+          "bucket_id": "guidelines-temp",
+          "is_public": false,
+          "file_size_limit": 10485760,
+          "mime_types": "{application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document}"
+        }
+      ],
+      "storage_policies": [
+        {
+          "policy_name": "storage: delete own guidelines",
+          "cmd": "DELETE",
+          "roles": "authenticated",
+          "using_expr": "((bucket_id = 'guidelines-temp'::text) AND starts_with(name, ((( SELECT auth.uid() AS uid))::text || '_'::text)))",
+          "check_expr": ""
+        },
+        {
+          "policy_name": "storage: read own guidelines",
+          "cmd": "SELECT",
+          "roles": "authenticated",
+          "using_expr": "((bucket_id = 'guidelines-temp'::text) AND starts_with(name, ((( SELECT auth.uid() AS uid))::text || '_'::text)))",
+          "check_expr": ""
+        },
+        {
+          "policy_name": "storage: upload own guidelines",
+          "cmd": "INSERT",
+          "roles": "authenticated",
+          "using_expr": "",
+          "check_expr": "((bucket_id = 'guidelines-temp'::text) AND starts_with(name, ((( SELECT auth.uid() AS uid))::text || '_'::text)))"
+        }
+      ],
+      "migrations": [
+        "20260519000000",
+        "20260520000000",
+        "20260520000001",
+        "20260521000000",
+        "20260528000000",
+        "20260528000001",
+        "20260601000000",
+        "20260601000001",
+        "20260601000002",
+        "20260602000000",
+        "20260602000001",
+        "20260603000000",
+        "20260611000001",
+        "20260622000000",
+        "20260622000001",
+        "20260622000002",
+        "20260622000003",
+        "20260701000000",
+        "20260705000000",
+        "20260714000000",
+        "20260714000001",
+        "20260714000002",
+        "20260715000000",
+        "20260715000001",
+        "20260717000000",
+        "20260721000000",
+        "20260723000000",
+        "20260724000000",
+        "20260725000000",
+        "20260805000000",
+        "20260806000000",
+        "20260814000000"
+      ]
+    }
+  }
+]
