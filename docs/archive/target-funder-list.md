@@ -1,12 +1,27 @@
-﻿# Consolidated Target Funder List
+﻿# Consolidated Target Funder List — ARCHIVED
 
-**Tier:** 2 — Check if relevant to the task
-**Volatility:** Medium
-**Update when:** Any change to the set of target grant-giving organisations or their classification
+**Tier:** — (archived; no tier applies)
+**Volatility:** None — read-only historical record
+**Update when:** Never. Do not add funders here.
 
-**Version:** 1.4
+> ## ⚠️ ARCHIVED 2026-08-19 (WJ's decision). Do not use this as a live reference.
+>
+> **Its original aim has been superseded.** This list existed to name the funders the product was designed, tested and validated against, on the premise that **funder identity predicted behaviour** — hence the `Structured` / `Narrative` column and the `funders` table that backed a picker.
+>
+> **That premise no longer holds, and the product no longer works that way.**
+>
+> - **`DR-FD-001` v1.4 (2026-07-15) removed the funder picker and directory entirely** — a charity types the funder's name as free text, and there is no stable funder identity left in the product. `funder_type` was likewise found to have been a schema convenience that named two categories without defining them.
+> - **`DR-TEST-001` (2026-07-24) reorganised the test plans by _guideline shape and capability_ rather than by funder name**, because the shape of the document is what the product actually varies on. `TEST-DASHBOARD.md` is the live definition of test coverage.
+>
+> ⚠️ **The list was also drifting.** Its own v1.4 header admitted the table had not been re-checked against refreshed source documents; the Heritage Fund guidance sat in `docs/Grant Org Guidelines/` without ever appearing here; and the Radcliffe Trust form was used as a live test fixture on 2026-08-19 having never been added to this list at all. **A canonical list that testing routinely goes outside is not canonical.**
+>
+> **Where to look instead:** `docs/Test Plans/TEST-DASHBOARD.md` for what has been tested and against which guideline shapes; `docs/Grant Org Guidelines/` for the actual source documents; `DR-FD-001` and `DR-TEST-001` for the decisions that superseded this.
+>
+> **Kept rather than deleted** because it records the research that shaped Step 4 and Step 5, and several decision records cite it. **Inbound references elsewhere in the docs set have not been rewritten** — they point at a document that is now explicitly marked superseded, which is the honest state.
+
+**Version:** 1.4 (final)
 **Date:** 2026-08-10
-**Status:** Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`. MK Community Foundation's source PDFs refreshed to a June 2026 edition (see version history) — table below not yet re-checked against the new documents for changed amounts, questions, or deadlines.
+**Status:** ❌ **ARCHIVED 2026-08-19** — previously: Active — supersedes the 3-funder test fixture table in `docs/Implementation Plan/archive/STEP4-REDESIGN-PROPOSAL.md`. MK Community Foundation's source PDFs refreshed to a June 2026 edition (see version history) — table below not yet re-checked against the new documents for changed amounts, questions, or deadlines.
 
 This is the canonical reference list of grant-giving organisations used to design, test, and validate Grant Pathway's Step 4 (Q&A interview model) and Step 5 (assembly and export). All product and engineering decisions about funder types, application formats, and output behaviour should be grounded in this list.
 
