@@ -2,7 +2,7 @@
 
 **Version:** 2.3
 **Date:** 2026-07-27
-**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01 Pass.** ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
+**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01, ABC-02 and ABC-03 Pass — AI summary generated in 22 seconds.** ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
 **Tester:** WJ
 **Test account:** grantpathway+ABC2@gmail.com
 
@@ -46,18 +46,18 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 ## Test Results Summary
 
-| Test ID | Test Name                                                        | AI Summary Time | Result        | Notes                                                                                                                                |
-| ------- | ---------------------------------------------------------------- | --------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| ABC-01  | Account registration and charity profile                         | N/A             | Pass          | Redone on `grantpathway+ABC2@gmail.com` after an initial run mistakenly reused `+ABC1@gmail.com` (EL-02's reserved fixture account)  |
-| ABC-02  | Application details — funder and grant name (free text)          | N/A             | Pass          |                                                                                                                                      |
-| ABC-03  | PDF upload and AI summary                                        | Not timed       | Pass          |                                                                                                                                      |
-| ABC-04  | AI summary content accuracy                                      | N/A             | Pass          | Grant range and deadline claims in this plan corrected 2026-07-27 (see Document History)                                             |
-| ABC-05  | Preparation checklist and start writing                          | N/A             | Pass          |                                                                                                                                      |
-| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | N/A             | Pass          | 4 items total (governance fact + B3 + B4 + C11) — B3 briefly thought missing, confirmed present on inspection of the guidelines text |
-| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | N/A             | Pass          |                                                                                                                                      |
-| ABC-08  | Narrative answer writing, AI assist, and citation check          | N/A             | Pass (caveat) | See Defect Log — manually-added governance dropdown stuck at "Not sure yet"; found, fixed, and retested same session                 |
-| ABC-09  | Answer approval and assembly                                     | N/A             | Pass          |                                                                                                                                      |
-| ABC-10  | Word document export; Word document verified; re-export warning  | N/A             | Pass          |                                                                                                                                      |
+| Test ID | Test Name                                                        | AI Summary Time                             | Result        | Notes                                                                                                                                |
+| ------- | ---------------------------------------------------------------- | ------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| ABC-01  | Account registration and charity profile                         | N/A                                         | Pass          | Redone on `grantpathway+ABC2@gmail.com` after an initial run mistakenly reused `+ABC1@gmail.com` (EL-02's reserved fixture account)  |
+| ABC-02  | Application details — funder and grant name (free text)          | N/A                                         | Pass          |                                                                                                                                      |
+| ABC-03  | PDF upload and AI summary                                        | Not timed (dev); **22s (prod, 2026-08-19)** | Pass          |                                                                                                                                      |
+| ABC-04  | AI summary content accuracy                                      | N/A                                         | Pass          | Grant range and deadline claims in this plan corrected 2026-07-27 (see Document History)                                             |
+| ABC-05  | Preparation checklist and start writing                          | N/A                                         | Pass          |                                                                                                                                      |
+| ABC-06  | Narrative question extraction — 2–3 expected; D5 must NOT appear | N/A                                         | Pass          | 4 items total (governance fact + B3 + B4 + C11) — B3 briefly thought missing, confirmed present on inspection of the guidelines text |
+| ABC-07  | Word limit extraction — B4 is 15 words (tightest limit tested)   | N/A                                         | Pass          |                                                                                                                                      |
+| ABC-08  | Narrative answer writing, AI assist, and citation check          | N/A                                         | Pass (caveat) | See Defect Log — manually-added governance dropdown stuck at "Not sure yet"; found, fixed, and retested same session                 |
+| ABC-09  | Answer approval and assembly                                     | N/A                                         | Pass          |                                                                                                                                      |
+| ABC-10  | Word document export; Word document verified; re-export warning  | N/A                                         | Pass          |                                                                                                                                      |
 
 ---
 
@@ -133,6 +133,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
+**Notes — 2026-08-19, production run:** ✅ **Pass.** Funder and grant name entered as free text, no issues.
+
 **Notes:**
 
 ---
@@ -157,6 +159,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 - _(Known limitation: no filename indicator shown on Step 3 confirming which file was loaded — this is expected, not a defect)_
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes — 2026-08-19, production run:** ✅ **Pass. AI summary generated in 22 seconds** — the first timed measurement of this step anywhere, the dev run having recorded it as "Not timed". ⚠️ **This is one figure on one document and is not a performance result**; `GAP-03`'s P95 monitors are what would make it one. **Recorded so the flagship summary table can stop saying "Not timed".**
 
 **Notes:**
 
