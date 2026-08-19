@@ -1,8 +1,8 @@
 # A B Charitable Trust Test Plan — Flagship
 
-**Version:** 2.2
+**Version:** 2.3
 **Date:** 2026-07-27
-**Status:** Fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
+**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01 Pass.** ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
 **Tester:** WJ
 **Test account:** grantpathway+ABC2@gmail.com
 
@@ -106,6 +106,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 - Dashboard shows the empty-state **Start your first application** button (zero applications on this fresh account)
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes — 2026-08-19, production run (`grant-pathway-prod`):** ✅ **Pass.** ⚠️ **Run as a sign-in rather than a registration, and on a different account: `grantpathway+RT01test@gmail.com`, not `grantpathway+ABC2@gmail.com`.** WJ's decision, to keep the number of real accounts created on production under control. **This is within the flagship coverage rule**, whose first step reads "account registration **or login for returning test user**" — registration itself was covered by `RT-01a` on the same environment the same day. ⚠️ **Knowingly accepted consequence: a charity profile is one-per-account (`data-model.md` §2), so setting up Asylum Justice overwrote that account's existing 1194917 profile** from `RT-01b`. Nothing depended on it. **The dev run's notes below stand unchanged.**
 
 **Notes:** Initial run mistakenly reused `grantpathway+ABC1@gmail.com` (reserved for `eligibility-check-test-plan.md` EL-02) and reset its charity profile — caught before proceeding past ABC-02, redone cleanly on `+ABC2@gmail.com`.
 
