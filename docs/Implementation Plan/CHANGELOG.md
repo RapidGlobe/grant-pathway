@@ -10,7 +10,37 @@
 
 ---
 
-## 2026-08-19 (latest) — the environment parity audit runs and finds a second unexecuted migration; `D-017` closes as never having been a defect
+## 2026-08-19 (latest) — `P5.5` runs against production for the first time: both flagships complete, twelve regression cases pass, and four findings come out of it
+
+**The morning's environment work is recorded in the section below this one.** This section covers the test run itself and what it produced.
+
+### Both flagship plans are complete against production, and the suite has proved something about the live service for the first time
+
+`AB-Charitable-Trust-test-plan.md` **ABC-01–10 all Pass**; `MK-Community-Foundation-test-plan.md` **MKCF-01–09 all Pass**. **`RT-00` through `RT-11` and `RT-13` also pass**, `RT-04` with a deferred caveat. **Every green in this suite before today was earned on `grant-pathway-dev`.**
+
+**Run on one shared production account** (`grantpathway+RT01test@gmail.com`) rather than one per plan, at WJ's direction, to keep the number of real accounts on production small. Permitted by the flagship coverage rule, which allows login for a returning test user; `RT-01a` covers registration separately.
+
+✅ **`ABC-10`'s caveat is closed by `MKCF-09`.** `ABC-10` passed while the multi-line export check went unexercised, because the answers written happened to be single paragraphs — **the same hole `RT-09` passed through over `D-015`, a High defect that then hid for six days.** It was recorded as `Pass (caveat)` rather than allowed to look clean, and WJ wrote genuinely multi-line answers in the MK run: **line breaks and blank lines survive into Word.** First confirmation on production that `GAP-41`'s fix holds.
+
+### Four findings, and none of them is a broken feature
+
+**`GAP-115` — an eligibility mismatch makes two Bedrock calls, and nothing accounted for it.** WJ ran a genuine mismatch (Harry's Rainbow against Walton Charity, correctly rejected on both geography and mission) and observed just under 60 seconds. Axiom showed `durationMs: 58527`: a 26.6s first call, then a further ~29s to **confirm the verdict before hard-stopping**. **The second call is deliberate and correct** — `DR-EL-001`'s stop has no override, and a verdict that flips on retry is not the unambiguous mismatch it requires. ⚠️ **What was missing is that the doubling was unbudgeted:** `NFR-01` had no row for it (a 4-page PDF took 58.5s against a 30s target and **more than double its own 25-second baseline**), and `maxDuration` was 90 — so **a large document at 40–47s per call would have timed out and shown a generic failure instead of a correct rejection.** Option (b) built the same day: `maxDuration` **90 → 180**, plus an honest `NFR-01` row. **Option (c), a cheaper confirmation call, is open** — it currently regenerates the entire summary to re-read one boolean.
+
+**`D-021` — project start and end dates render as prose textareas** with word counters and AI-assist buttons, found by `RT-04` against The Radcliffe Trust form. ⚠️ **The model was obeying the prompt:** the `GAP-39`/`GAP-40` clause says a question must never be dropped because its answer is a date, and names "when it starts or finishes" as a real application question. **So the fault is downstream** — the question is correctly identified and rendered with the wrong control. `item_type = 'date'` has existed in the enum since July and has never been used. **Deferred to post-launch (WJ), `RT-04` recorded as `Pass (caveat)`.** **Suppressing date extraction is ruled out, not merely unchosen** — it would trade a cosmetic fault for the silent data-loss fault that clause prevents. The real fix needs a question-type field the extraction schema does not have, **which is the same contract change the supporting-document work needs**, so the two are cheaper together.
+
+**The supporting-document assessment, and a recommendation that reversed twice.** WJ asked whether the product short-changes charities by ignoring A B Charitable Trust's **D5** — a 2–2½ page document, the largest single piece of writing that form asks for. Assessment written from all 25 funder guideline documents, the code, and the docs set. **Of 16 guideline sets only 3 require an applicant-authored document, and two of those are already handled or out of scope** — so the real gap is one shape, and A B Charitable Trust is the only confirmed instance. ⚠️ **v1.1 recorded that D5 was absent from the prep checklist; v1.2 withdrew that** — a screenshot showed it present in full, with the length, all four content areas and the budget condition. **The cheap option was already built.** Final position: **no further work before launch; option C is 3–5 weeks and the case for it is weaker than it first looked**, since the informational half already exists.
+
+**`PDR-UI-007` extended and built — the one change shipped today, and it came from a user.** WJ's wife, **the only person to have completed a genuine application through the live service**, suggested repeating the supporting-documents list before export. She is right about why: the list appeared once, **before the user had written a word** — the right moment to say "gather these", the wrong moment to say "this is still outstanding". The funder's list now repeats on **"Before we put it together"**, passive rather than gating, since the product cannot verify whether the accounts were attached. ⚠️ **Built twice:** the first attempt put it on Step 5, which mockups showed was the wrong screen; Step 5 was reverted to its original design. **A caveat I recorded was also wrong and WJ caught it** — `reopen_application` sets `current_step = 4`, so a reopened application does pass this screen again.
+
+### Two documents retired or created, both because today showed the old shape was wrong
+
+**`target-funder-list.md` archived (WJ).** Its premise — that funder identity predicts behaviour — was superseded by `DR-FD-001` v1.4 (picker and directory removed) and `DR-TEST-001` (plans organised by guideline shape). ⚠️ **It was also drifting:** its own header admitted the table had not been re-checked, Heritage Fund sat in the guidelines folder without appearing in it, and **The Radcliffe Trust form was used as a live test fixture today having never been added to it at all. A canonical list that testing routinely goes outside is not canonical.**
+
+**`RUNNING-AGAINST-PRODUCTION.md` created**, at WJ's direction: _"All the test plans including regression need amending, because they were fine for dev but not for prod."_ Rather than editing the same paragraphs into seven plans, the conventions are held once and each plan links to them. It records the production URL and refs, the shared account, **that fixtures must be in the repository before a run**, **that the suite's numbering is not its running order** (`RT-03` cannot run until a flagship has created a completed application), how to record a production result without destroying the dev one, and what a run costs in metered AI calls and real email.
+
+---
+
+## 2026-08-19 (earlier) — the environment parity audit runs and finds a second unexecuted migration; `D-017` closes as never having been a defect
 
 ### Resend answered the Irish-region question, and the policy that survived two attempts to change it was right
 
