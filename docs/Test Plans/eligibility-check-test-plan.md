@@ -9,6 +9,8 @@
 **Status:** All three cases now executed and clean — no caveats remain. EL-01 Pass; EL-02 re-run deliberately (not as a byproduct) against a fresh throwaway account, all six steps confirmed including the dashboard badge, never independently checked before; EL-03 Pass — no mismatch warning, correctly defaulting to `false` on a partial/adjacent fit, as `DR-EL-001` requires.
 **Tester:** WJ
 
+> ⚠️ **Running this against production? Read [`RUNNING-AGAINST-PRODUCTION.md`](RUNNING-AGAINST-PRODUCTION.md) first.** This plan was written against `grant-pathway-dev` and any account it names below is a **dev** account. Production uses one shared account, its own URL, and a different result-recording convention — all held in that document, which **wins** wherever this plan disagrees with it.
+
 ---
 
 ## Purpose

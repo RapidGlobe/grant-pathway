@@ -7,6 +7,8 @@
 **Tester:** WJ
 **Test account:** grantpathway+idle100@gmail.com
 
+> ⚠️ **Running this against production? Read [`RUNNING-AGAINST-PRODUCTION.md`](RUNNING-AGAINST-PRODUCTION.md) first.** This plan was written against `grant-pathway-dev` and any account it names below is a **dev** account. Production uses one shared account, its own URL, and a different result-recording convention — all held in that document, which **wins** wherever this plan disagrees with it.
+
 ---
 
 ## ⚠️ Read this before running v1.1 for the first time

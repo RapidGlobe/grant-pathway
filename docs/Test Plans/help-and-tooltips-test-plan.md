@@ -9,6 +9,8 @@
 **Status:** ✅ **All six cases now Pass.** Under `DR-TEST-001` (capability-based test strategy). HT-01 through HT-05 all Pass — HT-05's screen-reader step ran live as `accessibility-test-plan.md` AC-08 and passed (`GAP-80`–`GAP-82` found and fixed). **HT-06 run live 2026-08-14 and Pass, no further observations** — every screen's Help button opened its own page in a new tab, no 404s, and the footer/empty-state links still open the root as intended.
 **Tester:** WJ
 
+> ⚠️ **Running this against production? Read [`RUNNING-AGAINST-PRODUCTION.md`](RUNNING-AGAINST-PRODUCTION.md) first.** This plan was written against `grant-pathway-dev` and any account it names below is a **dev** account. Production uses one shared account, its own URL, and a different result-recording convention — all held in that document, which **wins** wherever this plan disagrees with it.
+
 ---
 
 ## Purpose
