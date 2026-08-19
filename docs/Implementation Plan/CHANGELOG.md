@@ -10,7 +10,37 @@
 
 ---
 
-## 2026-08-18 (latest) — `P5.5` starts and immediately finds that no AI feature worked on production; `GAP-114` CLOSED; privacy policy v1.8; SAR procedure reviewed; gaps register sorted and its prettier bug root-caused
+## 2026-08-19 (latest) — the environment parity audit runs, and finds a second migration recorded as applied on production that never executed
+
+### `D-020` was right to stay open: it has a second instance
+
+`scripts/parity/snapshot.sql` was run against both Supabase projects and diffed with the comparator written yesterday. **One structural difference, and it is the same defect `D-020` describes in a different migration.**
+
+`20260528000001_add_qa_model_enum_values.sql` is recorded in production's `supabase_migrations.schema_migrations`, and its two `alter type public.ai_request_type add value` statements had plainly not run — production held three enum labels against dev's five, **missing `refine_answer` and `assemble_draft`**.
+
+⚠️ **The consequence had `P5.5` restarted this morning without the audit.** Both labels are written to `ai_usage_log` by `POST /api/refine-answer` (S6.6) and `POST /api/assemble-draft` (S6.7) — the per-question AI assist and the final assembly. Every one of those calls would have failed at the log write, **after the Bedrock call had already been made and paid for**, and the flagship plans reach both steps. **That is the second time in two days a production-only divergence would have consumed a day of testing to find one test at a time**, which is the case WJ made for auditing first.
+
+⚠️ **What it says about `D-020`'s undiagnosed cause.** That row records two possibilities and declines to choose: the May migration never executed, or a later `REVOKE` undid it. **A second, unrelated migration five months earlier in the history showing the identical signature makes the `REVOKE` theory much the weaker one** — a targeted revoke does not explain missing enum labels. Something is recording versions that did not run. **The mechanism is still not diagnosed, and `D-020` stays OPEN on that basis** rather than being closed on the strength of two repairs.
+
+**Repaired by WJ the same morning**, both statements run in the production SQL Editor — a **second recorded `ADR-DATA-004` exception**, on the same grounds as the first: `supabase db push` skips a version the target already claims to have applied, so the migration file cannot deliver its own contents. The re-snapshot diffs clean across all eleven compared sections.
+
+⚠️ **The limit of a clean run, stated because a clean run invites the wrong conclusion.** The comparator diffs two databases, so it finds a missing migration only where dev actually has the effect. **A migration unexecuted on both projects is invisible to it**, as is anything outside the database — credentials, Supabase Auth settings, Vercel configuration. The script's own header says so and the report repeats it on every clean run.
+
+### The comparator cried wolf on its first clean run, which is a defect in a tool of this kind
+
+The repaired production still printed a **HIGH** finding: the same five enum labels, in a different order, because production gained two of them that morning while dev had held them since May. **A parity tool that reports a false HIGH trains you to stop reading the HIGH section — the one place a real defect appears.** Fixed by comparing such fields as sets.
+
+**The ordering difference is still reported, deliberately, as a new `note` severity that does not affect the exit code.** Enum order genuinely drives `ORDER BY` on an enum column, so discarding it outright would be wrong for a parity tool; nothing in this codebase orders by an enum today, which is what makes it a note rather than a finding. **Both paths were then tested against a synthetic snapshot** with a label deliberately removed — it reports HIGH and exits 1, so suppressing the noise did not suppress the signal.
+
+### `npm run parity` did not run at all, and had never been tried
+
+Two faults, both from the script being written and used in the same session via a long `npx` command with explicit paths. **`tsx` was not a dependency of this project** — the command that appeared to work was silently downloading it each time, so the `package.json` script failed outright on the first genuine attempt. And `compare.ts` resolved snapshot paths against **its own directory** rather than the working directory, so the documented usage line could not have worked either. `tsx` added as a dev dependency, paths now resolved from `process.cwd()`, defaults pointing at `scripts/parity/dev.json` and `prod.json` (both already gitignored — a snapshot is environment state, not source).
+
+**Worth stating plainly: a repeatable audit that only one person can invoke, by retyping a long command, is not repeatable.** The whole argument for this script over a one-off manual audit was that re-running it after any migration costs a minute.
+
+---
+
+## 2026-08-18 — `P5.5` starts and immediately finds that no AI feature worked on production; `GAP-114` CLOSED; privacy policy v1.8; SAR procedure reviewed; gaps register sorted and its prettier bug root-caused
 
 ### The SAR procedure would have answered a real request from the development database
 

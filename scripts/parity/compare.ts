@@ -35,18 +35,21 @@
  *     rows, and user data must never leave production.
  *
  * USAGE
- *   npx tsx scripts/parity/compare.ts
- *   npx tsx scripts/parity/compare.ts --reference dev.json --target prod.json
+ * Save each snapshot as `scripts/parity/dev.json` and `scripts/parity/prod.json`
+ * (both gitignored — a snapshot is environment state, not source), then:
+ *
+ *   npm run parity
+ *   npx tsx scripts/parity/compare.ts --reference a.json --target b.json
  *   npx tsx scripts/parity/compare.ts --json    (machine-readable output)
  *
+ * Paths are relative to the directory the command is run from.
+ *
  * Exit codes: 0 = no differences, 1 = differences found, 2 = could not run.
+ * Findings marked `note` do not affect the exit code.
  */
 
 import { readFileSync } from 'node:fs'
-import { resolve, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const HERE = dirname(fileURLToPath(import.meta.url))
+import { resolve } from 'node:path'
 
 /** A section of the snapshot, and how to identify one row within it. */
 type Section = {
@@ -60,6 +63,19 @@ type Section = {
    * actually broken production: a difference here means the app cannot work.
    */
   severity: 'blocker' | 'high' | 'medium'
+  /**
+   * Fields holding a comma-separated list whose *membership* is what matters,
+   * not the order it happens to be stored in. Compared as sets; a pure
+   * ordering difference is reported as a `note`, not as a finding.
+   *
+   * WHY: on 2026-08-19 the first clean parity run still printed a HIGH finding
+   * because production's `ai_request_type` had gained `refine_answer` and
+   * `assemble_draft` that morning (D-020) while dev had held them since May,
+   * so the same five labels were stored in a different order. A tool that
+   * cries wolf in its HIGH section trains you to stop reading the HIGH
+   * section, which is the one place a real defect would appear.
+   */
+  setFields?: string[]
   /** Why a difference here matters — printed with the findings, not buried. */
   why: string
 }
@@ -105,6 +121,7 @@ const SECTIONS: Section[] = [
     label: 'Enum types',
     identity: ['enum_name'],
     severity: 'high',
+    setFields: ['labels'],
     why: 'A missing label fails only for that value, only at runtime. Nothing else notices.',
   },
   {
@@ -149,7 +166,12 @@ type Snapshot = Record<string, unknown>
 
 type Finding = {
   section: string
-  severity: Section['severity']
+  /**
+   * `note` is not one of the section severities: it is assigned per finding,
+   * for a difference that is real but carries no consequence for this codebase
+   * (see `setFields`). Notes are printed, but do not fail the run.
+   */
+  severity: Section['severity'] | 'note'
   kind: 'missing-in-target' | 'extra-in-target' | 'different'
   identity: string
   detail: string
@@ -161,14 +183,17 @@ function parseArgs(argv: string[]) {
     return i >= 0 && argv[i + 1] ? argv[i + 1] : fallback
   }
   return {
-    reference: get('--reference', 'dev.json'),
-    target: get('--target', 'prod.json'),
+    reference: get('--reference', 'scripts/parity/dev.json'),
+    target: get('--target', 'scripts/parity/prod.json'),
     json: argv.includes('--json'),
   }
 }
 
 function load(file: string): Snapshot {
-  const path = resolve(HERE, file)
+  // Resolved against the working directory, not against this file's directory.
+  // `npm run parity` is run from the repository root, and a path typed on the
+  // command line is naturally read as relative to where it was typed.
+  const path = resolve(process.cwd(), file)
   let raw: string
   try {
     raw = readFileSync(path, 'utf8')
@@ -201,19 +226,61 @@ function load(file: string): Snapshot {
 const identityOf = (row: Row, fields: string[]) =>
   fields.map((f) => String(row[f] ?? '')).join(' · ')
 
-/** Fields that differ between two rows with the same identity. */
-function fieldDiffs(a: Row, b: Row, identity: string[]): string[] {
+const asSet = (value: unknown) =>
+  new Set(
+    String(value ?? '')
+      .split(',')
+      .map((part) => part.trim())
+      .filter((part) => part.length > 0),
+  )
+
+/**
+ * Fields that differ between two rows with the same identity.
+ *
+ * `diffs` are differences that matter. `notes` are differences that are real
+ * but consequence-free here — currently only a set field whose membership
+ * matches while its stored order does not. Notes are deliberately still
+ * reported rather than discarded: enum ordering does drive `ORDER BY` on an
+ * enum column, so ignoring it outright would be the wrong default for a parity
+ * tool. Nothing in this codebase orders by an enum today, which is why it is a
+ * note and not a finding.
+ */
+function fieldDiffs(
+  a: Row,
+  b: Row,
+  identity: string[],
+  setFields: string[] = [],
+): { diffs: string[]; notes: string[] } {
   const keys = new Set([...Object.keys(a), ...Object.keys(b)])
-  const out: string[] = []
+  const diffs: string[] = []
+  const notes: string[] = []
   for (const k of keys) {
     if (identity.includes(k)) continue
     const av = a[k] ?? ''
     const bv = b[k] ?? ''
-    if (String(av) !== String(bv)) {
-      out.push(`${k}: reference=${JSON.stringify(av)} target=${JSON.stringify(bv)}`)
+    if (String(av) === String(bv)) continue
+
+    if (setFields.includes(k)) {
+      const refSet = asSet(av)
+      const tgtSet = asSet(bv)
+      const missing = [...refSet].filter((v) => !tgtSet.has(v))
+      const extra = [...tgtSet].filter((v) => !refSet.has(v))
+      if (missing.length === 0 && extra.length === 0) {
+        notes.push(
+          `${k}: same ${refSet.size} value(s), stored in a different order — reference=${JSON.stringify(av)} target=${JSON.stringify(bv)}`,
+        )
+        continue
+      }
+      const parts: string[] = []
+      if (missing.length > 0) parts.push(`absent in target: ${missing.join(', ')}`)
+      if (extra.length > 0) parts.push(`extra in target: ${extra.join(', ')}`)
+      diffs.push(`${k}: ${parts.join('; ')}`)
+      continue
     }
+
+    diffs.push(`${k}: reference=${JSON.stringify(av)} target=${JSON.stringify(bv)}`)
   }
-  return out
+  return { diffs, notes }
 }
 
 function compareSection(section: Section, reference: Snapshot, target: Snapshot): Finding[] {
@@ -235,7 +302,7 @@ function compareSection(section: Section, reference: Snapshot, target: Snapshot)
       })
       continue
     }
-    const diffs = fieldDiffs(refRow, tgtRow, section.identity)
+    const { diffs, notes } = fieldDiffs(refRow, tgtRow, section.identity, section.setFields)
     if (diffs.length > 0) {
       findings.push({
         section: section.label,
@@ -243,6 +310,15 @@ function compareSection(section: Section, reference: Snapshot, target: Snapshot)
         kind: 'different',
         identity: id,
         detail: diffs.join('; '),
+      })
+    }
+    if (notes.length > 0) {
+      findings.push({
+        section: section.label,
+        severity: 'note',
+        kind: 'different',
+        identity: id,
+        detail: notes.join('; '),
       })
     }
   }
@@ -303,7 +379,7 @@ function main() {
   )
   console.log('')
 
-  const order: Section['severity'][] = ['blocker', 'high', 'medium']
+  const order: Finding['severity'][] = ['blocker', 'high', 'medium', 'note']
   for (const severity of order) {
     const forSeverity = findings.filter((f) => f.severity === severity)
     if (forSeverity.length === 0) continue
@@ -334,8 +410,15 @@ function main() {
     console.log('')
   }
 
-  if (findings.length === 0) {
-    console.log('No structural differences found.')
+  const notes = findings.filter((f) => f.severity === 'note')
+  const failures = findings.filter((f) => f.severity !== 'note')
+
+  if (failures.length === 0) {
+    console.log(
+      notes.length === 0
+        ? 'No structural differences found.'
+        : `No structural differences found. The ${notes.length} note(s) above are consequence-free — read them, but they do not block a test run.`,
+    )
     console.log('')
     console.log('This does NOT mean the environments match. Not covered here:')
     console.log('  * credential validity — exercise each one (DEPLOYMENT-CHECKLIST.md v1.6)')
@@ -344,9 +427,9 @@ function main() {
     process.exit(0)
   }
 
-  const blockers = findings.filter((f) => f.severity === 'blocker').length
+  const blockers = failures.filter((f) => f.severity === 'blocker').length
   console.log(
-    `${findings.length} difference(s) found, ${blockers} at blocker severity. Fix blockers before running any test plan against the target.`,
+    `${failures.length} difference(s) found, ${blockers} at blocker severity. Fix blockers before running any test plan against the target.`,
   )
   process.exit(1)
 }
