@@ -2,7 +2,7 @@
 
 **Version:** 2.3
 **Date:** 2026-07-27
-**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01, ABC-02 and ABC-03 Pass — AI summary generated in 22 seconds.** ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
+**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01 through ABC-05 Pass — AI summary generated in 22 seconds; the Step 3 banner reported 3 questions plus 1 financial detail, matching the dev run exactly.** ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
 **Tester:** WJ
 **Test account:** grantpathway+ABC2@gmail.com
 
@@ -193,6 +193,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
+**Notes — 2026-08-19, production run:** ✅ **Pass, no issues.** ⚠️ **The Step 3 summary banner is recorded here because it is the earliest evidence for ABC-06:** _"We found 3 application questions, plus 1 financial detail you'll complete with your own figures. You'll work through all 4 in the next step."_ **4 items — exactly the dev run's shape**, and it establishes that **D5 was correctly filtered out as a file-upload instruction** before the Q&A interface was even reached. No deadline was asserted, correctly: the guidelines state none.
+
 **Notes:** Grant range confirmed as £10k–£30k/yr; no fabricated deadline appeared, consistent with the guidelines stating none.
 
 ---
@@ -213,6 +215,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 - Step 4 loads with writing cards
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes — 2026-08-19, production run:** ✅ **Pass, no issues.** The "Before you begin writing" checklist gate behaved as specified.
 
 **Notes:**
 
