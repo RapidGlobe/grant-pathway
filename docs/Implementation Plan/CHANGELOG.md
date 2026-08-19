@@ -12,6 +12,24 @@
 
 ## 2026-08-19 (latest) — the environment parity audit runs and finds a second unexecuted migration; `D-017` closes as never having been a defect
 
+### The SAR procedure could not have answered a real request — three of its six data queries would have errored
+
+Fixed the day after a review that had already been billed as bringing it up to date. **Query 5 selected from `application_answers`, dropped in July 2026**; questions and answers now live on one row in `application_items`. **Query 7's three content columns — `source_type`, `raw_text`, `summary_json` — do not exist**, the table holds `guideline_text`, and the AI summary is on `applications.ai_summary` entirely elsewhere. **Query 9 selected from `user_tooltip_dismissals`, also dropped in July.** Old Query 8 used `item_text` for a column named `item_label`.
+
+⚠️ **And the export was incomplete in a way no error would ever have revealed: Query 4 omitted `ai_summary` and `assembled_draft`.** Those are the applicant's own content — the summary of the funder's guidelines and the assembled final draft — and they were simply not being returned. **A broken query announces itself; a missing column does not.**
+
+**All corrected against the live schema, using the parity snapshot's full table-and-column inventory** rather than by reading the migrations, which is how v1.5's queries were written on 2026-08-18 and how three of them came to be wrong. `sar-procedure.md` v1.7.
+
+⚠️ **The standing caveat is unchanged and worth repeating: nothing here has ever been run against a real request.** Three of six queries broke within two months of being written, unnoticed, because nothing runs them — so **re-check this section after any migration** rather than after any review.
+
+### `RT-00` now runs the parity audit and one real AI call, and its last Pass is withdrawn in effect
+
+`RT-00` passed against production on the morning of 2026-08-18 and was worth very little: within hours, ordinary testing found that **no signed-in user could read or write five tables** (`D-020`) and that **no AI feature worked at all** (`D-018`). It compared the set of applied migration versions — **bookkeeping, not execution**.
+
+**Step 5 runs `npm run parity`**, covering grants, tables and RLS flags, functions and ACLs, policies, columns, enums, storage, constraints, triggers and indexes. **This replaces the standalone `authenticated` grant check the case was going to grow** — the script subsumes it. **Step 6 makes one real AI call**, the `/profile` lookup of 1194917: `D-018` survived four checks that said "configured" and none that said "working".
+
+⚠️ **Both limits are written into the case rather than left implicit.** The parity run is a _comparison_, so a migration unexecuted on both projects is invisible to it and it proves nothing about a single project's absolute correctness; and it sees the database only — credentials, Supabase Auth settings and Vercel configuration are outside it. **Re-run `RT-00` in full against production before `P5.5` restarts.** Regression plan v2.20.
+
 ### `D-017` was a wrong reading of a dashboard, and it gated `P5.5` for a day
 
 Sentry has been receiving and displaying events throughout. The Issues list, filtered to project `grant-pathway`, environment `production`, last 30 days, shows **seven issues — including both of the previous day's real defects**: `permission denied for table charity_profiles` (`D-020`) and the AWS `403 ... signature we calculated does not match` (`D-018`), alongside the deliberate `P5.4` test error and four older issues going back a month.

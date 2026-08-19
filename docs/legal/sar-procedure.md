@@ -1,19 +1,20 @@
 # Subject Access Request (SAR) Procedure
 
-**Version:** 1.6
-**Last updated:** 18 August 2026
+**Version:** 1.7
+**Last updated:** 19 August 2026
 **Owner:** Wac Jokhia, RapidGlobe Ltd
 **Legal basis:** UK GDPR Article 15 — Right of Access
 
-| Version | Date           | Changes                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1.6     | 18 August 2026 | **Axiom and Sentry included in the export (WJ's decision).** New Step 3c: how to retrieve both, and the two traps — a shared IP address may cover several people, so lines must be attributable before disclosure; and Axiom's 30-day window makes its contribution partial, which the response email now states.                                                                                                                     |
-| 1.5     | 18 August 2026 | **Reviewed against the current stack — the project ref was wrong and three tables were missing.** Step 3 named `grant-pathway-prod` but gave dev's ref. Queries 7–9 added (`application_guidelines`, `application_items`, `user_tooltip_dismissals`); `ai_usage_log` gains `input_token_count`/`output_token_count`. New Step 3b covers the four stores outside the database. Axiom/Sentry inclusion left as an open decision for WJ. |
-| 1.0     | 29 June 2026   | Initial version                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| 1.1     | 29 June 2026   | Step 3 rewritten — six numbered queries; warning added that `user_id` is a UUID not an email                                                                                                                                                                                                                                                                                                                                          |
-| 1.2     | 29 June 2026   | Notes: added future automation note                                                                                                                                                                                                                                                                                                                                                                                                   |
-| 1.3     | 29 June 2026   | Version history table added; no content changes                                                                                                                                                                                                                                                                                                                                                                                       |
-| 1.4     | 29 June 2026   | SAR contact email changed from wjokhia@rapidglobe.com to admin@rapidglobe.com                                                                                                                                                                                                                                                                                                                                                         |
+| Version | Date           | Changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.7     | 19 August 2026 | **Three of the six data queries could not have run, and all three are fixed.** Query 5 selected from `application_answers`, **dropped in July 2026** — rewritten against `application_items`, which now carries questions and answers on one row. Query 7 selected three columns that do not exist (`source_type`, `raw_text`, `summary_json`) — rewritten against `guideline_text`, with a note that the AI summary lives on `applications.ai_summary`. Old Query 8 used `item_text` for a column named `item_label` and is folded into Query 5; old Query 9 selected from `user_tooltip_dismissals`, **also dropped in July 2026**, and is removed. **Query 4 gained `ai_summary` and `assembled_draft`** — the applicant's own content, previously omitted from the export altogether. ⚠️ **Checked against the live schema** via the `scripts/parity/snapshot.sql` capture, not against the migrations. **Still never run against a real request.** |
+| 1.6     | 18 August 2026 | **Axiom and Sentry included in the export (WJ's decision).** New Step 3c: how to retrieve both, and the two traps — a shared IP address may cover several people, so lines must be attributable before disclosure; and Axiom's 30-day window makes its contribution partial, which the response email now states.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| 1.5     | 18 August 2026 | **Reviewed against the current stack — the project ref was wrong and three tables were missing.** Step 3 named `grant-pathway-prod` but gave dev's ref. Queries 7–9 added (`application_guidelines`, `application_items`, `user_tooltip_dismissals`); `ai_usage_log` gains `input_token_count`/`output_token_count`. New Step 3b covers the four stores outside the database. Axiom/Sentry inclusion left as an open decision for WJ.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 1.0     | 29 June 2026   | Initial version                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 1.1     | 29 June 2026   | Step 3 rewritten — six numbered queries; warning added that `user_id` is a UUID not an email                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 1.2     | 29 June 2026   | Notes: added future automation note                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| 1.3     | 29 June 2026   | Version history table added; no content changes                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 1.4     | 29 June 2026   | SAR contact email changed from wjokhia@rapidglobe.com to admin@rapidglobe.com                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
 ---
 
@@ -110,25 +111,35 @@ where user_id = '<user_id>';
 
 ### Query 4 — Applications
 
+⚠️ **`ai_summary` and `assembled_draft` are the applicant's own content and must be included.** The first is the AI summary of the funder's guidelines for that application; the second is the assembled final draft. Both were absent from this query until 19 August 2026.
+
 ```sql
-select id, funder_name, grant_name, status, current_step,
-       draft_status, created_at, updated_at, last_exported_at
+select id, funder_id, funder_name, grant_name, status, current_step,
+       draft_status, ai_summary, assembled_draft,
+       created_at, updated_at, first_exported_at, last_exported_at
 from applications
 where user_id = '<user_id>'
 order by created_at;
 ```
 
-### Query 5 — Application answers
+### Query 5 — Application questions and answers
+
+⚠️ **This query was rewritten on 19 August 2026. It previously selected from `application_answers`, a table dropped in July 2026** by `20260714000000_p6_2_application_item_graph.sql`, so it would have errored on any real request. Questions and answers now live together in `application_items`, one row per question, with the answer fields on the same row.
+
+**This is the substance of a grant application and the largest body of the applicant's own writing the service holds.** `answer_text` is what they wrote, `ai_refined_answer` is the AI-assisted version, and `answer_source` records which was used.
 
 ```sql
 select a.funder_name, a.grant_name,
-       aa.question_text, aa.answer_text, aa.ai_refined_answer,
-       aa.answer_source, aa.is_approved, aa.word_limit,
-       aa.char_limit, aa.question_order, aa.created_at, aa.updated_at
-from application_answers aa
-join applications a on a.id = aa.application_id
-where aa.user_id = '<user_id>'
-order by a.created_at, aa.question_order;
+       ai.item_type, ai.item_label, ai.field_key, ai.item_order,
+       ai.answer_text, ai.ai_refined_answer, ai.answer_source,
+       ai.is_approved, ai.added_manually,
+       ai.word_limit, ai.char_limit, ai.limit_type,
+       ai.cloned_from_application_id,
+       ai.created_at, ai.updated_at
+from application_items ai
+join applications a on a.id = ai.application_id
+where ai.user_id = '<user_id>'
+order by a.created_at, ai.item_order;
 ```
 
 ### Query 6 — AI usage log
@@ -141,44 +152,24 @@ where user_id = '<user_id>'
 order by created_at;
 ```
 
-### Query 7 — Extracted funder guidelines
+### Query 7 — Uploaded funder guidelines
 
-**Added 2026-08-18.** The `application_guidelines` table did not exist when this procedure was written. It holds the guideline text the user uploaded or pasted, and the AI summary derived from it — the user's own content, and squarely within Article 15.
+**Added 2026-08-18, corrected 2026-08-19.** The `application_guidelines` table did not exist when this procedure was written. It holds the guideline text the user uploaded or pasted — their own content, and squarely within Article 15.
+
+⚠️ **The column names in the previous version did not exist.** It selected `source_type`, `raw_text` and `summary_json`; the table has `guideline_text` and no others of that kind. **The AI summary is not held here — it is `applications.ai_summary`, returned by Query 4.**
 
 ```sql
 select ag.application_id, a.funder_name, a.grant_name,
-       ag.source_type, ag.raw_text, ag.summary_json,
-       ag.created_at, ag.updated_at
+       ag.guideline_text, ag.created_at, ag.updated_at
 from application_guidelines ag
 join applications a on a.id = ag.application_id
-where a.user_id = '<user_id>'
+where ag.user_id = '<user_id>'
 order by ag.created_at;
 ```
 
-### Query 8 — Application items
+⚠️ **Two queries were removed on 19 August 2026, and neither would have run.** The old Query 8 selected `ai.item_text` from `application_items`; that column is named `item_label`, and the query is now folded into Query 5, which covers the whole table. The old Query 9 selected from `user_tooltip_dismissals`, **a table dropped in July 2026** by `20260725000000`. Nothing is lost from the export by removing either.
 
-**Added 2026-08-18.** `application_items` carries the extracted question set and, for applications created by reuse, `cloned_from_application_id` linking to the source application.
-
-```sql
-select ai.application_id, a.funder_name, ai.item_type, ai.item_text,
-       ai.cloned_from_application_id, ai.created_at, ai.updated_at
-from application_items ai
-join applications a on a.id = ai.application_id
-where a.user_id = '<user_id>'
-order by ai.created_at;
-```
-
-### Query 9 — Tooltip dismissals
-
-**Added 2026-08-18.** Trivial in content but it is a record of the individual's interaction with the service, held against their `user_id`, so it is disclosable.
-
-```sql
-select tooltip_key, dismissed_at
-from user_tooltip_dismissals
-where user_id = '<user_id>';
-```
-
-⚠️ **Column names in queries 7–9 were read from the migrations, not from a live SAR.** Run each one and check it returns before assembling the response — a column may have been renamed since. If a query errors, list the table's columns rather than guessing: `select column_name from information_schema.columns where table_name = '<table>';`
+✅ **Every table and column above was checked against the live schema on 19 August 2026** — against the `scripts/parity/snapshot.sql` capture of both Supabase projects, which lists every table and column in each. That is a stronger check than the previous version had, and it found three broken queries; it is still not the same as having run them. ⚠️ **Run each query and confirm it returns before assembling a response.** If one errors, list the table's columns rather than guessing: `select column_name from information_schema.columns where table_name = '<table>';` **And re-check this section after any migration** — three of the six data queries were broken by schema changes within two months of being written, none of which was noticed because nothing runs them.
 
 ### Step 3b — Data held outside the database
 
