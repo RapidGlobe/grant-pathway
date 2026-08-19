@@ -2,7 +2,7 @@
 
 **Version:** 2.3
 **Date:** 2026-07-27
-**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01 through ABC-05 Pass — AI summary generated in 22 seconds; the Step 3 banner reported 3 questions plus 1 financial detail, matching the dev run exactly.** ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
+**Status:** ⚠️ **Production run in progress, 2026-08-19 (`P5.5`)** — results recorded per case as `Notes — 2026-08-19, production run`. **The 2026-07-27 results below were earned on `grant-pathway-dev` and are not evidence about production**; they stand as their own record. **ABC-01 through ABC-09 Pass, no issues — AI summary generated in 22 seconds; the Step 3 banner reported 3 questions plus 1 financial detail, matching the dev run exactly; B4's 15-word limit correct; the dev run's governance-dropdown defect did not recur. ABC-10 (Word export) outstanding.** ⚠️ **ABC-06's "D5 must not appear" expectation is under active review** — see `docs/impact-assessment-supporting-document-questions.md`. ⚠️ **Account substitution for the whole production run: `grantpathway+RT01test@gmail.com`**, signed in rather than registered, to limit the number of real accounts created on production (WJ). Permitted by the flagship coverage rule's "registration **or login** for returning test user"; registration is covered by `RT-01a` on production the same day. **Previously: fully executed 2026-07-27 under Asylum Justice — ABC-01 through ABC-10 all Pass. One real defect found and fixed same session (ABC-08, manually-added governance dropdown stuck at its default) — see Defect Log.
 **Tester:** WJ
 **Test account:** grantpathway+ABC2@gmail.com
 
@@ -253,6 +253,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
+**Notes — 2026-08-19, production run:** ✅ **Pass, no issues — same 4 items as the dev run**, and **D5 correctly absent** as a writing card. ⚠️ **This expectation is now the subject of an open scope question.** D5 asks for a 2–2½ page document and is the largest single piece of writing A B Charitable Trust asks for; the app is silent on it by design. **Whether that stays the intended behaviour is being assessed in `docs/impact-assessment-supporting-document-questions.md` (raised by WJ, 2026-08-19).** **If the assessment leads to a change, this case's expectation changes with it** — recorded here so the Pass is not later mistaken for an endorsement of the exclusion.
+
 **Notes (record exact questions shown):** 4 items shown: 1 governance fact (total annual expenditure, mapped from C3) plus B3, B4, and C11 — matches this table's expectation exactly. B3 was briefly thought missing since the app doesn't label cards with their original letter/number code, only running numbers; confirmed present by checking its question text against the source PDF. D5 correctly absent.
 
 ---
@@ -281,6 +283,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 - _(If B4 shows "15 characters" instead of "15 words" — log as a defect)_
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes — 2026-08-19, production run:** ✅ **Pass, no issues.** B4's 15-word limit — the tightest tested anywhere in this suite — extracted and displayed correctly on production.
 
 **Notes (record limit type and values seen):** B4 showed "15 words" badge and counted in words throughout. A manual test of the AI-refine step on B3 showed a 2-word difference (56→58) between the written and AI-refined answer — expected per this case's own "AI can't always hit an exact count" allowance, not a defect (B3 has no stated limit to breach either way).
 
@@ -319,6 +323,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 
 **Result:** ☒ Pass (caveat) &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
 
+**Notes — 2026-08-19, production run:** ✅ **Pass, no issues.** ✅ **The dev run's defect did not recur** — the manually-added governance dropdown fix of 2026-07-27 holds on production. Narrative answer written, AI-assisted and approved; **this is the first time the refine-answer path has been exercised on production**, which matters because `refine_answer` is the one `ai_request_type` the `D-020` enum gap would genuinely have broken (see the correction in `CHANGELOG.md`, 2026-08-19).
+
 **Notes:** Found a real defect — see Defect Log #1: a manually-added governance dropdown left at its default "Not sure yet" showed no approve panel at all, with no way to remove the item. Root-caused, fixed, and retested same session; confirmed working (both an explicit "Not sure yet" selection and an untouched-then-approved item now save and approve correctly). All other narrative citation checks passed.
 
 ---
@@ -346,6 +352,8 @@ A B Charitable Trust publishes a numbered list of application questions as a PDF
 - Step 5 displays correct funder and grant name
 
 **Result:** ☒ Pass &nbsp;&nbsp; ☐ Fail &nbsp;&nbsp; ☐ Blocked
+
+**Notes — 2026-08-19, production run:** ✅ **Pass, no issues.** Answers approved and assembled. ⚠️ **Worth recording, given this morning:** assembly makes **no AI call at all** — `assembleAndAdvance` in `actions/applications.ts` is plain string concatenation — which is why the missing `assemble_draft` enum label could not have affected this step.
 
 **Notes:**
 
