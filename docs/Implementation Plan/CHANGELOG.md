@@ -10,7 +10,19 @@
 
 ---
 
-## 2026-08-20 (latest) — `GAP-47`'s manual add-on cannot be exercised by hand, and the reason is worth writing down
+## 2026-08-20 (latest) — `RT-17` passes: the service is finally tested with more than one user on it, and `GAP-113` closes in both halves
+
+✅ **`RT-17` PASSES on production — the first time this service has been tested with more than one user on it.** Two real browsers, two accounts (`grantpathway+prodtest@gmail.com` in Chrome, `grantpathway+edgert17test@gmail.com` in Edge), two different funder documents fired as close to simultaneously as hands allow. **No cross-contamination:** each summary was about its own funder — Idlewild arts guidelines for one, MK Community Foundation Oak Grants for the other. **Fair-use counts are per user and independent**, with the two reservations landing **1.7 seconds apart** (13:10:39 and 13:10:41 UTC), so the concurrency was genuine rather than nominal. Concurrent writing and approval did not interfere, and signing one user out left the other working normally.
+
+**Why this mattered more than the load harness.** The harness already showed ten concurrent users not contaminating each other, but it drives the API directly. `RT-17` is the browser path — two sessions, two cookies, dashboard isolation, concurrent autosave, one user signing out while the other works — none of which the harness touches. **Every green result in this project before today was earned with exactly one user on the system**, which is the observation WJ made on 2026-08-17 that produced both this case and `GAP-113`.
+
+⚠️ **One duration exceeded `NFR-01` — 70s against the 45s large-document target — and it is NOT a concurrency effect. It is a second real instance of `GAP-115`.** Axiom gives the breakdown for application `765f31df`: a first Bedrock call of **41.4s** (8,746 in / 4,227 out), then a **second confirmation call of ~29s** returning _"eligibility mismatch NOT confirmed on second call — treating as not a mismatch"_. **So roughly 29 seconds were spent re-checking a mismatch that did not exist.** The other user's request was a single 35.9s call, matching its 44s wall clock. **Both first calls were normal, so two-user load did not slow anything** — which is the answer step 9 was asking for. **This strengthens the case for `GAP-115` option (c)**, the cheaper confirmation call: the first recorded instance at least confirmed a genuine rejection, whereas here the entire summary was regenerated to re-read one boolean and the answer came back negative.
+
+⚠️ **One deviation from the prerequisite, which narrows what was proved without weakening it.** The case asks for two accounts whose emails have never touched dev; only one was new, the other being the existing shared `Prodtest` account. Two distinct users is what the case tests and what it got — separate credentials, profiles and `ai_usage_log` rows. **But a second fresh registration was not exercised, so `GAP-105`'s shared `resendRatelimit` is still untested at two users.**
+
+---
+
+## 2026-08-20 — `GAP-47`'s manual add-on cannot be exercised by hand, and the reason is worth writing down
 
 ⚠️ **ATTEMPTED AND NOT EXERCISED — 2026-08-20, production. Recorded as a limitation of the method, not as a pass or a fail.** Two attempts on a disposable account (`grantpathway+throwaway@gmail.com`, id `8cb6fae8`): the 1.2 MB Clothworkers PDF uploaded, the tab closed **as soon as the upload bar appeared**, and `storage.objects` queried directly for the user id prefix. **Zero rows before deletion and zero after** — so there was never an object to delete and nothing was tested.
 
