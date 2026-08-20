@@ -10,7 +10,19 @@
 
 ---
 
-## 2026-08-20 (latest) — `RT-14` passes on production with row-level proof, and turns up a defect that was never only about deletion (`D-022`)
+## 2026-08-20 (latest) — `GCM-01` re-run on production: extraction and limits exact, one copy defect fixed, and date handling turns out to be inconsistent rather than wrong
+
+**`GCM-01` is mid-run and the extraction half is verified.** All 14 questions match the Idlewild fixture exactly and in order, character limits correct on every one (1600, 240, 800×5, 1600, 800×3) and **counted in characters rather than words**, which is the capability this case exists for. The 2026-07-27 budget-question defect stays fixed — source Q24 is present and `Budget`-tagged along with Q25–27, AI assist suppressed on all four. Citations resolve to the right pages. Nothing over-extracted: consent questions, contact details, the region drop-down and three file uploads all correctly absent.
+
+✅ **One defect found and fixed: budget answers read "1 words".** The Step 4 counter's no-limit branch — taken by budget questions, which carry no character limit — had no singular handling, while the manual-answer counter a few hundred lines up in the same file did. Fixed, 289 tests pass, and **confirmed live on production** rather than assumed from the deploy.
+
+⚠️ **The more interesting finding: `D-021` is an inconsistency, not just a wrong rendering.** Source Q17 and Q18 — expected project start and end date, both mandatory — were **dropped entirely** from this fixture. On the Radcliffe Trust fixture (`RT-04`, 2026-08-19) the equivalent date questions were **extracted and rendered as prose textareas** with word counters and AI-assist buttons. **Same root cause — no question-type field in the extraction schema — opposite symptoms.** And `lib/prompts.ts` still carries the `GAP-39`/`GAP-40` clause stating that dates and durations must never be dropped, so **this fixture contradicts the prompt while the other obeyed it**.
+
+**Why that matters for the deferred fix.** `D-021` was deferred on the reading that the defect is cosmetic — a date rendered as a prose box, with nothing lost. On this fixture something _is_ lost: two mandatory questions the applicant would have to answer are absent from the exported document. **The fix therefore needs to make the behaviour deterministic, not merely choose a better control** — which is an argument for doing it with the supporting-document schema change rather than after it. Recorded against `D-021`; no new defect number, since it is the same root cause.
+
+---
+
+## 2026-08-20 — `RT-14` passes on production with row-level proof, and turns up a defect that was never only about deletion (`D-022`)
 
 ### The deletion itself
 
