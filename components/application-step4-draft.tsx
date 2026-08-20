@@ -1198,7 +1198,7 @@ export function ApplicationStep4Draft({
                   >
                     {limit
                       ? `${count} / ${limit} ${useChars ? 'characters' : 'words'}`
-                      : `${words} words`}
+                      : `${words} ${words === 1 ? 'word' : 'words'}`}
                   </p>
                 )}
               </div>
