@@ -15,6 +15,15 @@
 -- Section 2 is the one the test turns on. Section 3 is the one to read BEFORE
 -- pressing delete.
 --
+-- Email matching is deliberately `lower(email) = lower(...)`, not `=`.
+-- Supabase stores auth.users.email lowercased, so a mixed-case address in a
+-- plain equality test matches NOTHING and every count comes back 0 -- which
+-- looks exactly like a successful deletion. This cost a confusing first run
+-- on 2026-08-20, where a before-snapshot of an existing account reported
+-- seven zeroes. **A zero here is only meaningful if section 1 returned the
+-- user.** If section 1 is empty, the address is wrong or the account is on
+-- the other project -- do not read it as deleted.
+--
 -- WHY THIS EXISTS. RT-14's steps 1-8 prove what the UI does: the confirmation
 -- gate works, the redirect happens, and the old credentials no longer sign in.
 -- None of that proves the rows are gone. A failed cascade step returns a
@@ -59,7 +68,7 @@ select
   last_sign_in_at,
   (email_confirmed_at is not null) as email_confirmed
 from auth.users
-where email = 'grantpathway+RT01test@gmail.com';
+where lower(email) = lower('grantpathway+RT01test@gmail.com');
 
 -- ---------------------------------------------------------------------------
 -- 2. ROW COUNTS — one row per table the deletion route touches, in its order.
@@ -67,13 +76,13 @@ where email = 'grantpathway+RT01test@gmail.com';
 --    AFTER:  every count must be 0, and auth_users must be 0 too.
 -- ---------------------------------------------------------------------------
 with target as (
-  select id from auth.users where email = 'grantpathway+RT01test@gmail.com'
+  select id from auth.users where lower(email) = lower('grantpathway+RT01test@gmail.com')
 ),
 apps as (
   select a.id from public.applications a join target t on a.user_id = t.id
 )
 select 'auth.users' as table_name, 1 as step, count(*) as row_count
-  from auth.users where email = 'grantpathway+RT01test@gmail.com'
+  from auth.users where lower(email) = lower('grantpathway+RT01test@gmail.com')
 union all
 select 'application_items', 2, count(*)
   from public.application_items where application_id in (select id from apps)
@@ -126,6 +135,6 @@ select
 from storage.objects o
 where o.bucket_id = 'guidelines-temp'
   and o.name like (
-    (select id::text from auth.users where email = 'grantpathway+RT01test@gmail.com') || '%'
+    (select id::text from auth.users where lower(email) = lower('grantpathway+RT01test@gmail.com')) || '%'
   )
 order by o.created_at;
