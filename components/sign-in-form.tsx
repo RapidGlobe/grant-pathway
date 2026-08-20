@@ -72,7 +72,16 @@ export function SignInForm({
         the red error style: nothing has gone wrong and nothing was lost —
         auto-save (ADR-ARCH-004) has already persisted the user's work.
       */}
-      {signedOutForInactivity && (
+      {/* Status banners from the URL (?deleted / ?timeout) are suppressed once the
+          form itself has an error to report. Both flags come from query
+          parameters, and `useActionState` posts back to the same URL, so the
+          parameter survives the submission and the banner would otherwise sit
+          alongside a contradictory error -- "Your account has been deleted"
+          directly above "Your email address or password is incorrect", which is
+          what RT-14 observed on production, 2026-08-20. The status message is
+          about what happened BEFORE this page loaded; once the user has tried
+          something and it failed, the failure is the only thing worth showing. */}
+      {signedOutForInactivity && !state.error && (
         <div
           role="status"
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4"
@@ -86,7 +95,7 @@ export function SignInForm({
       )}
 
       {/* Account deleted confirmation banner */}
-      {accountDeleted && (
+      {accountDeleted && !state.error && (
         <div
           role="alert"
           className="mb-6 flex items-start gap-3 rounded-lg border border-[#BBF7D0] bg-[#F0FDF4] p-4"

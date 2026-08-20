@@ -10,7 +10,33 @@
 
 ---
 
-## 2026-08-20 (latest) — `RT-15` runs at its real timers for the first time, and `RT-14`'s standing risk is cleared before the case is even run
+## 2026-08-20 (latest) — `RT-14` passes on production with row-level proof, and turns up a defect that was never only about deletion (`D-022`)
+
+### The deletion itself
+
+✅ **`RT-14` passes on production with row-level proof — 21 rows across seven tables went to 0.** Before: `auth.users` 1, `application_items` 5, `application_guidelines` 1, `applications` 1, `charity_profiles` 1, `ai_usage_log` 11, `user_profiles` 1. After: all seven **0**, and the old credentials are refused. **`ai_usage_log` = 11 matched the dashboard's "11 of 50 AI requests used" exactly**, which is what confirmed the snapshot was reading the right account on the right project. The confirmation email arrived (`FR-44`). ✅ **The 2026-07-23 `service_role` grant defect is confirmed fixed on production** — checked directly before the attempt, and `application_items`, the table that broke the cascade then and carried the largest count now, deleted cleanly. **RT-14's notes had recorded that migration as unapplied to production since 2026-07-23.**
+
+**Why a database snapshot rather than the plan's eight UI steps.** Steps 1–8 cannot distinguish a clean deletion from a cascade that deleted the auth user and left orphaned application rows: **the only visible evidence from the browser is that sign-in fails, which is true either way.** That is exactly the shape of the 2026-07-23 defect, whose fix RT-14's own notes recorded as applied to dev but **not** to production. Checking the grant directly before the attempt turned a four-week-old open risk into a confirmed fact, and it cost one query.
+
+### The defect, and why it was bigger than it looked
+
+⚠️ **One real defect found and fixed: contradictory banners on the sign-in page (`D-022`).** After deletion the page showed **"Your account has been deleted"** and, once a sign-in was attempted with the deleted credentials, **"Your email address or password is incorrect"** — both at once, a green success notice stacked directly above a red error. **Cause:** both status banners are driven by URL query parameters (`?deleted=true`, `?timeout=true`) and the form posts back to the same URL via `useActionState`, so the parameter survives the submission. **It was not specific to deletion** — `?timeout=true` behaved identically, so **`RT-15`'s inactivity message had the same fault**: one cause, two symptoms, and the second would never have been found by looking at RT-14 alone. **Fixed** in `components/sign-in-form.tsx`: both banners are suppressed once the form has an error to report, on the reasoning that a status message describes what happened _before_ the page loaded, and once the user has tried something and it failed, the failure is the only thing worth showing. Both paths verified locally — banner on load, error alone after a failed submission. **Found by WJ, who called it "not a huge problem but does need tidying up".**
+
+**The lesson is about where a fix's blast radius is.** RT-14 found a banner that was wrong after deletion. The cause was not in the deletion flow at all but in how _any_ URL-driven status banner interacts with a form that posts to its own URL — so `RT-15`'s inactivity message carried the identical fault, unnoticed, and had been observed as correct only hours earlier because nobody had failed a sign-in immediately afterwards. **Reading the cause rather than patching the symptom found the second instance for free.**
+
+### What the run added beyond the plan
+
+**Two things the run covered that the plan does not ask for, both worth keeping.** **(1) The confirmation is genuinely case-sensitive:** lowercase `delete` and partial `DElte` were both refused, so the gate tests the exact string rather than merely a non-empty field. **(2) Step 4's first clause does not match the implementation, and the second does.** The button is **not** disabled before `DELETE` is typed — it is only disabled while a deletion is in flight (`disabled={isPending}`) — and the gate lives in the submit handler, which refuses and shows "Please type DELETE in capitals to confirm." **This is a pass under the step's "(or the action is blocked)" wording, and arguably the better pattern**, since a disabled button explains nothing. Recorded because it looked like a defect on sight and cost a code read to settle. ⚠️ **A related nit, not a defect:** the confirmation field uses `DELETE` as its **placeholder**, so at a glance it reads as already filled in — only the grey-versus-black text distinguishes them.
+
+⚠️ **The optional `GAP-47` storage add-on was not exercised** — no object was caught mid-flight, so the `guidelines-temp` half of deletion is still untested on production and must not be read as passing.
+
+### The snapshot script's own two faults
+
+Both are now fixed and written into the file, because each cost a run. **The Supabase SQL Editor displays only the last statement's result**, so a four-section paste executes everything and shows one — which reads as a thin query rather than a display limit. And **the email comparison was case-sensitive** while Supabase stores `auth.users.email` lowercased, so a mixed-case address matched nothing and returned **seven zeroes** for an account that plainly existed. **That is the fourth instance today of an absent result reading as a clean one** — after `D-017`, `RT-16`'s log proof and the load harness's phantom contamination pass. The file now states that a zero means nothing unless section 1 returned the user, and matching on the user id is preferred wherever it is known.
+
+---
+
+## 2026-08-20 — `RT-15` runs at its real timers for the first time, and `RT-14`'s standing risk is cleared before the case is even run
 
 ### `RT-15` — the 55-minute modal has never been seen at 55 minutes. It has now.
 
