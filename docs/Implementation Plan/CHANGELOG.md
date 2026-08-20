@@ -10,7 +10,19 @@
 
 ---
 
-## 2026-08-20 (latest) — `GCM-01` re-run on production: extraction and limits exact, one copy defect fixed, and date handling turns out to be inconsistent rather than wrong
+## 2026-08-20 (latest) — `GAP-47`'s manual add-on cannot be exercised by hand, and the reason is worth writing down
+
+⚠️ **ATTEMPTED AND NOT EXERCISED — 2026-08-20, production. Recorded as a limitation of the method, not as a pass or a fail.** Two attempts on a disposable account (`grantpathway+throwaway@gmail.com`, id `8cb6fae8`): the 1.2 MB Clothworkers PDF uploaded, the tab closed **as soon as the upload bar appeared**, and `storage.objects` queried directly for the user id prefix. **Zero rows before deletion and zero after** — so there was never an object to delete and nothing was tested.
+
+**Why the add-on as written is impractical, which is the useful part.** The step says to interrupt while the summary is generating, and that is the wrong window. **The object exists only from the moment the upload lands until `/api/upload/process` finishes extracting its text** — a couple of seconds — and the summary generation that follows takes 20–60 seconds with the file already gone. **Choosing a fixture with a slower summary does not help**, which was the obvious next idea and is why it is written down: the MKCF Oak Grants document (44s) and Walton Charity (59.8s) are slow in the phase that happens _after_ the deletion. Extraction time scales with file size, so the 1.2 MB fixture — already the largest in the corpus — was the best available shot, and it still closed before a human could react.
+
+**Decision: WJ, 2026-08-20 — stop chasing it.** The Storage deletion carries **14 automated tests**, including one that asserts the documented-but-nonexistent `guidelines-temp/<user_id>/` folder form is rejected — which is the failure mode that actually mattered, since code written against the wrong path would have deleted nothing **silently**. This manual add-on is confirmation on top of that, not primary cover, and a few-second window on production is poor value for the risk it retires. **If it is ever wanted, it needs a deliberately instrumented run** (a delay injected into extraction on dev, the way `RT-15` used shortened timers) rather than faster clicking — and the `RT-15` lesson applies: a result earned inside a diagnostic harness is evidence about the logic, not about the shipped path.
+
+**The wider point about test steps that describe the wrong moment.** The add-on has sat in `RT-14` since 2026-08-06 reading as a small optional extra, and it was never going to work as written — it names the summary-generation phase as the window to interrupt, when the object is already gone by then. **Nobody noticed because nobody ran it**, and it would have kept looking like an outstanding five-minute job indefinitely. The step is now corrected in place rather than left to be rediscovered.
+
+---
+
+## 2026-08-20 — `GCM-01` re-run on production: extraction and limits exact, one copy defect fixed, and date handling turns out to be inconsistent rather than wrong
 
 **`GCM-01` is mid-run and the extraction half is verified.** All 14 questions match the Idlewild fixture exactly and in order, character limits correct on every one (1600, 240, 800×5, 1600, 800×3) and **counted in characters rather than words**, which is the capability this case exists for. The 2026-07-27 budget-question defect stays fixed — source Q24 is present and `Budget`-tagged along with Q25–27, AI assist suppressed on all four. Citations resolve to the right pages. Nothing over-extracted: consent questions, contact details, the region drop-down and three file uploads all correctly absent.
 
