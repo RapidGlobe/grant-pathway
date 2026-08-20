@@ -26,13 +26,17 @@ The case warns that its own most important step is the easiest to wave through: 
 
 **Steps 6–9.** Answers pre-filled; **Q20 compared against the source's exported Word document** — the delivered artefact rather than a database read — matching verbatim, with its citation (`Page 6 of the guidelines`) carried across too. Carried-over answers render badged **"Carried over — please review"** and still require approving, so they are drafts and not inherited approvals. The source card still reads **Exported, last updated 19 August 2026**.
 
-### The finding: the reuse match fails silently, and it cost a real attempt
+### The finding: the reuse match fails silently — left as is pending user feedback
 
 ⚠️ **The first attempt did not get the offer at all.** The funder name carries an **em dash**; it was typed with a **plain hyphen**. `getPreviousApplicationForFunder` matches `funder_name` case-insensitively and trimmed but otherwise **exactly**, so it soft-missed — **no offer appeared, and nothing explained why.** The run continued to Step 2 as a fresh application and was **one click from re-generating the summary**, spending an AI call against the monthly cap to reproduce work that already existed. Pasting the exact name produced the offer immediately.
 
 **This is the documented trade-off behaving as designed, not a defect.** `DR-FD-001` v1.4 removed the curated funder directory and its `funder_id` FK, so there is no stable funder identity left to match on, and the code comment states the choice plainly: a soft miss is deliberately preferred, because it **will never wrongly match two different funders** — and wrongly carrying one funder's questions and answers into another funder's application would be far worse than not offering.
 
 **The finding is narrower than "matching is too strict": it is that the failure is silent.** To a charity typing a funder's name a second time months later, the feature simply does not exist — there is no "we could not find a previous application to this funder" and no near-miss prompt. **Held for WJ, not fixed and not raised as a defect**, because every alternative trades away the property the design chose: fuzzy or trigram matching reintroduces the wrong-match risk, and a "did you mean…" list of near matches is a new UI surface with its own privacy shape. **Recorded here rather than left in the test notes because it is a product decision owed, not a test result.**
+
+✅ **DECIDED 2026-08-20 (WJ): leave as is, and wait for real user feedback before deciding anything further.** No code change, no gap raised. **The reasoning is that the evidence for a fix does not exist yet** — the only observation of the silent miss is a tester typing a name he had just read on screen, which is not the same as a charity returning to a funder months later, and the two alternatives (fuzzy matching, a near-miss "did you mean…" list) both trade away the never-wrongly-match property deliberately, at real cost, to solve a problem whose frequency is unmeasured. **Revisit if a user reports that reuse did not offer itself, or asks for a previous application that the service did not surface.** The decision is recorded rather than the question left open, because an
+undecided product question in a test note is indistinguishable from one nobody
+has read.
 
 ### Coverage this case still does not give
 
