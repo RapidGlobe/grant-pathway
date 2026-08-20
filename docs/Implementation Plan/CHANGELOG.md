@@ -10,7 +10,25 @@
 
 ---
 
-## 2026-08-20 (latest) — the load test runs against production at ten concurrent users and passes: `GAP-113`'s required half is closed
+## 2026-08-20 (latest) — `RT-15` runs at its real timers for the first time, and `RT-14`'s standing risk is cleared before the case is even run
+
+### `RT-15` — the 55-minute modal has never been seen at 55 minutes. It has now.
+
+✅ **`RT-15` passes on production at the shipped 55/60-minute timers — the first complete sequence ever observed, and it closes a question the case had recorded as open.** Modal at 55 with the wording correct, countdown allowed to run out, sign-out at 60 onto the sign-in page with "You've been signed out due to inactivity. Your work has been saved", and the application intact on return with **its last-updated timestamp unchanged**. ⚠️ **The 2026-07-28 close rested on 1–2 minute diagnostic timers**, and a genuine full-length run that same day had shown **no modal at all** — written down then as unconfirmed, Chrome background-tab throttling suspected. **A fix demonstrated only at diagnostic values is not the shipped behaviour working.** It now demonstrably fires at 55 minutes. ⚠️ One boundary: step 7 was checked at dashboard level, not by re-reading the Step 4 answers field by field.
+
+**The transferable point is about what a diagnostic proves.** `D-013` (the modal dismissing itself on any mouse movement, which made it unclickable for as long as it had existed) and `D-014` (the JSX whitespace bug eating the space before "due") were both real, both found only because the timers were shortened to 1–2 minutes, and both confirmed fixed **at those shortened values**. The case then closed. But the same day's full-length attempt had shown nothing at all, and that was recorded honestly as unexplained rather than quietly dropped — **which is the only reason today's run had a question to answer.** A diagnostic harness changes the thing being measured; a pass earned inside one is evidence about the logic, not about the product.
+
+### `RT-14` — groundwork, and the standing risk is already cleared
+
+**A before/after snapshot was written for the case:** `scripts/rt14-account-deletion-snapshot.sql`. **Steps 1–8 cannot distinguish a clean deletion from a cascade that half-succeeded** — if the auth user is deleted but `application_items` rows survive, the only visible evidence from the browser is that sign-in fails, which is true either way. That is not hypothetical: on 2026-07-23 the missing `service_role` grants made every deletion fail on the first cascade step, and **RT-14's notes recorded that fix as applied to dev but NOT to production**, unresolved since.
+
+✅ **Its first run settled that:** all four grant rows are present on production, so migration `20260723000000` is applied there. The risk the case had carried for four weeks is gone before the deletion is attempted — which is the point of checking a grant directly rather than inferring it from a 500 afterwards.
+
+⚠️ **Two faults in the snapshot's own first outing, both recorded in the file because both waste a run.** (1) **The Supabase SQL Editor displays only the last statement's result**, so pasting all four sections runs them all and shows one — which reads as the query returning less than expected rather than as a display limit. (2) **The email comparison was case-sensitive.** Supabase stores `auth.users.email` lowercased, so a mixed-case address matched nothing and every count came back **0** — indistinguishable from an account that had already been deleted. **A fresh instance of the day's recurring shape: an absent result reading as a clean one.** Now `lower(email) = lower(...)`, with the file stating that a zero means nothing unless section 1 returned the user.
+
+---
+
+## 2026-08-20 — the load test runs against production at ten concurrent users and passes: `GAP-113`'s required half is closed
 
 **`NFR-03`'s launch tier is now demonstrated on the live service rather than inferred from dev.** Two users, then ten, against `grant-pathway-prod` on Vercel: **10/10 succeeded, no cross-contamination, p50 22.1s at 1.01× the single-user baseline, max 23.5s** — every request inside `NFR-01`'s 30s standard target — and fair-use counts incremented per user and only their own. **This is the first concurrency test of any kind executed against production.** `GAP-113` half (b), the one WJ hardened from optional to required (_"The load test has to be attempted, full stop."_), is closed.
 
