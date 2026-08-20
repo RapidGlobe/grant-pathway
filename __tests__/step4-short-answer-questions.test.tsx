@@ -142,6 +142,51 @@ describe('date and number questions render as a single-line input', () => {
   })
 })
 
+describe('placeholder hints (WJ, 2026-08-20)', () => {
+  // GCM-01's production run showed a bare box on the funding-amount question
+  // sitting next to the governance money fields, which carry a £ prefix and
+  // thousands separators. WJ chose a placeholder over extending the currency
+  // formatting: it removes the bare look without forcing the answer into a
+  // currency shape, since an AI-extracted budget question is not guaranteed
+  // to be a single figure.
+  it('hints a loose date format, not a calendar one', () => {
+    render(<ApplicationStep4Draft {...baseProps} questions={[dateQuestion]} />)
+    expect(screen.getByPlaceholderText('e.g. April 2027')).toBeInTheDocument()
+  })
+
+  it('hints currency on a budget number question', () => {
+    render(<ApplicationStep4Draft {...baseProps} questions={[numberQuestion]} />)
+    expect(screen.getByPlaceholderText('e.g. £12,500')).toBeInTheDocument()
+  })
+
+  it('hints a plain count on a non-budget number question', () => {
+    // "How many people will your project support?" — a £ hint here would be
+    // actively misleading.
+    render(
+      <ApplicationStep4Draft
+        {...baseProps}
+        questions={[
+          makeQuestion({
+            id: 'q1',
+            questionText: 'How many people will your project support?',
+            itemType: 'number',
+          }),
+        ]}
+      />,
+    )
+    expect(screen.getByPlaceholderText('e.g. 250')).toBeInTheDocument()
+  })
+
+  it('accepts a value the placeholder does not describe', () => {
+    // The placeholder must stay a hint. "on receipt of funding" is a real
+    // answer to a start-date question and has to survive.
+    render(<ApplicationStep4Draft {...baseProps} questions={[dateQuestion]} />)
+    const field = screen.getByLabelText('Answer for question 1')
+    fireEvent.change(field, { target: { value: 'on receipt of funding' } })
+    expect(field).toHaveValue('on receipt of funding')
+  })
+})
+
 describe('no word counter on a short answer', () => {
   it('shows no word count for a date question', () => {
     render(<ApplicationStep4Draft {...baseProps} questions={[dateQuestion]} />)

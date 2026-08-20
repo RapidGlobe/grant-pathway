@@ -1175,7 +1175,20 @@ export function ApplicationStep4Draft({
                   onChange={(e) => handleAnswerChange(q.id, e.target.value)}
                   onBlur={() => handleAnswerBlur(q.id)}
                   aria-label={`Answer for question ${displayNumber}`}
-                  placeholder={q.itemType === 'date' ? 'e.g. April 2027' : ''}
+                  // A hint, not a constraint (WJ, 2026-08-20). The governance
+                  // money fields carry a £ prefix and thousands separators;
+                  // these do not, because an AI-extracted budget question is
+                  // not guaranteed to be a single figure. Without a hint the
+                  // box just looked bare next to them. A placeholder closes
+                  // that gap while still accepting "£12,500", "12500" or a
+                  // sentence — which is the same reasoning as type="text".
+                  placeholder={
+                    q.itemType === 'date'
+                      ? 'e.g. April 2027'
+                      : q.isBudgetQuestion
+                        ? 'e.g. £12,500'
+                        : 'e.g. 250'
+                  }
                   className="h-10 text-[0.875rem] sm:w-60"
                 />
               )}
