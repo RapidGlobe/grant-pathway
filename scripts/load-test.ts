@@ -34,6 +34,13 @@
  *   npx tsx scripts/load-test.ts --users 10 --keep
  *   npx tsx scripts/load-test.ts --users 10 --base-url https://... --i-know-this-is-production
  *
+ * A non-local URL additionally requires `--expect-supabase-project <ref>`,
+ * checked against the credentials actually loaded. Users are created in the
+ * project the credentials point at, but signed in against the target URL's own
+ * project; if those differ, every sign-in fails and test users are left behind
+ * in the wrong project. Supply the target's own credentials, e.g.
+ *   vercel env pull .env.production.local --environment=production
+ *
  * Reads SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL from the
  * environment (`.env.local` by default). Creates its own users, cleans them up
  * afterwards unless `--keep` is passed.
@@ -53,6 +60,7 @@ type Args = {
   keep: boolean
   allowProduction: boolean
   baseline: boolean
+  expectProject: string | undefined
 }
 
 function parseArgs(argv: string[]): Args {
@@ -66,6 +74,7 @@ function parseArgs(argv: string[]): Args {
     keep: argv.includes('--keep'),
     allowProduction: argv.includes('--i-know-this-is-production'),
     baseline: !argv.includes('--no-baseline'),
+    expectProject: get('--expect-supabase-project'),
   }
 }
 
@@ -452,6 +461,58 @@ async function main() {
         'the most likely thing to trip it. Check Organisation → Usage first.\n',
     )
     process.exit(1)
+  }
+
+  // The URL guard above is not enough on its own. It checks where the REQUESTS
+  // go; it says nothing about which Supabase project the script CREATES ITS
+  // USERS IN, which comes from the environment. Point `--base-url` at the
+  // production app while `.env.local` still holds dev credentials and the run
+  // creates its users in dev, then tries to sign them in against production,
+  // where they do not exist — a confusing failure that also leaves junk users
+  // behind in the wrong project. Found 2026-08-20 while preparing a production
+  // run: `.env.local` pointed at dev, and nothing here would have said so.
+  //
+  // This is deliberately NOT inferred. A deployment's Supabase project cannot
+  // be read from its URL — `grant-pathway-three.vercel.app` says nothing about
+  // which project backs it — so any heuristic here either misses the real
+  // mismatch or blocks every legitimate remote run. Instead the operator must
+  // state which project they believe they are driving, and the script checks
+  // that belief against the credentials actually loaded. The ref is the
+  // subdomain of the Supabase URL, and is visible in the browser as the
+  // `sb-<ref>-auth-token` cookie on the target site (the method RT-00 uses).
+  const projectRef = env.url.replace(/^https?:\/\//, '').split('.')[0]
+
+  if (isProduction) {
+    if (!args.expectProject) {
+      console.error(
+        `\nRefusing to run against a remote URL without --expect-supabase-project.\n\n` +
+          `  target:           ${args.baseUrl}\n` +
+          `  credentials load: ${projectRef}\n\n` +
+          'Users are created in the project above, then signed in against the\n' +
+          'target URL, which uses whatever project ITS deployment is configured\n' +
+          'with. If those differ, every sign-in fails and test users are left\n' +
+          'behind in the wrong project — so the intended project must be stated,\n' +
+          'not guessed.\n\n' +
+          `Confirm the target's project ref (DevTools → Application → Cookies →\n` +
+          '`sb-<ref>-auth-token` on the target site), then re-run with\n' +
+          '  --expect-supabase-project <ref>\n\n' +
+          "To supply a different project's credentials:\n" +
+          '  vercel env pull .env.production.local --environment=production\n',
+      )
+      process.exit(1)
+    }
+    if (args.expectProject !== projectRef) {
+      console.error(
+        `\nSupabase project mismatch — refusing to run.\n\n` +
+          `  --expect-supabase-project: ${args.expectProject}\n` +
+          `  credentials actually load: ${projectRef}\n\n` +
+          'The loaded credentials are for a different project than the one you\n' +
+          'named. Running would create users in the wrong project. Load the\n' +
+          "intended project's credentials, e.g.\n" +
+          '  vercel env pull .env.production.local --environment=production\n',
+      )
+      process.exit(1)
+    }
   }
 
   console.log(`\nTarget:  ${args.baseUrl}`)

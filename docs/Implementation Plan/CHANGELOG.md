@@ -10,7 +10,37 @@
 
 ---
 
-## 2026-08-20 (latest) — `RT-16` passes on production: the reuse path gets its first positive test anywhere, and the em-dash soft miss turns out to fail silently
+## 2026-08-20 (later) — `RT-12` passes on production, the load harness is re-confirmed at ten users, and its production guard turns out to have been checking the wrong thing
+
+### `RT-12` — change password, on production
+
+Pass. The success message appeared **and the new password was then used to sign back in**, which is the half that actually proves the change took — the message is written by the same code path whether or not the credential persisted.
+
+### The failing CI job was two days stale, and the answer is that nothing is wrong now
+
+A red `validate-migrations` job was raised for review. **It is from 2026-08-18 16:37 UTC and was fixed six minutes later.** Commit `0d0b79c` (the `D-020` grants restore) granted privileges on `public.application_answers`, a table that no longer exists, so the migration replay failed with `relation "public.application_answers" does not exist`. `459fa2a` corrected it, and **that commit's own run replayed every migration in 2m15s and passed** — checked deliberately, because `validate-migrations` skips its expensive steps when nothing under `supabase/` changed, so a 7-second green is not evidence that the migrations were validated. Every master run since is green, both of today's included.
+
+⚠️ **Worth keeping: a red check in a screenshot carries no date.** The failure was already repaired before it was reported, and establishing that took reading the run's job timings rather than its colour. The same shape as `D-017`, where a dashboard view showing nothing was read as the service being broken.
+
+### The three open dependabot PRs — reviewed, none merged, and the reason is a real one
+
+**`#103` (eslint 9.39.4 → 10.8.1) is blocked upstream and cannot be merged by us.** `eslint-plugin-react`'s `react/display-name` rule calls an API ESLint 10 removed (`contextOrFilename.getFilename is not a function`). **The plugin is not a direct dependency** — it arrives transitively through `eslint-config-next` — so there is nothing to pin or override here; it needs `eslint-config-next` to ship a compatible plugin. The same failure sank the `eslint-10.8.0` branch on 2026-07-25 and 2026-07-29, so this has now cost four CI runs to re-diagnose. **Left open rather than closed**, since closing it loses the diagnosis and dependabot will re-raise it anyway.
+
+**`#101` (10 production dependencies) and `#102` (2 dev dependencies) are green on all three checks and Vercel. Neither was merged, and that is a decision rather than an omission.** Merging to `master` deploys to production immediately — Vercel deploys on push, independently of CI, which is the same property that made branch protection a non-gate in `ADR-OPS-002`. `#101` moves `next` 16.3.0 → 16.3.1, the Bedrock SDK, `@supabase/supabase-js` and seven others, so **it changes the running application in the middle of `P5.5`** — and `AGENTS.md` requires the regression plan to be re-run after any dependency merge. **Every production pass earned on 2026-08-19 and 2026-08-20 was earned on the current build**, several of them costing real Bedrock calls against the monthly cap; merging now would put them all behind a build nobody has tested. **That is a sequencing decision for WJ, not a judgement about the diffs, which are unremarkable patch and minor bumps.**
+
+### The load harness runs clean at ten users again — and its production guard was checking the wrong thing
+
+`scripts/load-test.ts` was re-run at **2 and 10 concurrent users**: no cross-contamination either time, every request succeeded, and ten users came out at **0.99× the single-user baseline** (p50 22.5s against a 22.8s baseline) versus 1.11× on 2026-08-17. **The near-flat curve is now observed twice, three days apart, on different builds** — `NFR-03`'s table records both runs. **This is a confirmation, not new ground:** it was again dev-plus-local, so `NFR-03`'s first stated limit still stands and a production run is still owed.
+
+⚠️ **The production run could not be attempted, and the reason was itself a defect in the harness.** `.env.local` holds **dev** credentials, while the script's production guard checked only whether the target URL was non-local. So `--base-url <production> --i-know-this-is-production` would have **created its users in dev**, tried to sign them in against production where they do not exist, failed every request, and left test users behind in the wrong project — reporting a confusing failure rather than a clear refusal. The guard was guarding the blast radius of the requests and ignoring the blast radius of the writes.
+
+**Fixed the same day.** A non-local target now requires `--expect-supabase-project <ref>` and aborts unless it matches the project the loaded credentials actually belong to. **Deliberately a stated expectation rather than an inferred one:** a deployment's Supabase project cannot be read from its URL — `grant-pathway-three.vercel.app` says nothing about which project backs it — so any heuristic either misses the real mismatch or blocks every legitimate remote run. The operator states which project they believe they are driving; the script checks that belief against the credentials in hand. Both refusal paths and the unchanged local path were tested, and the error text names `vercel env pull` and the `sb-<ref>-auth-token` cookie so the next person is not left guessing where a project ref comes from.
+
+**What a production run still needs, so it is not rediscovered:** production credentials pulled locally (`vercel env pull .env.production.local --environment=production`), and a look at Supabase Organisation → Usage first — the production spend cap takes the service **read-only with no warning email** (`ADR-DATA-005`), and a load test is the most likely thing to trip it.
+
+---
+
+## 2026-08-20 — `RT-16` passes on production: the reuse path gets its first positive test anywhere, and the em-dash soft miss turns out to fail silently
 
 ### The case that had never been run in any environment
 

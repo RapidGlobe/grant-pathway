@@ -75,19 +75,23 @@ This document captures the agreed non-functional requirements for the v1 build. 
 
 ✅ **MEASURED 2026-08-17 — the launch tier is no longer a prediction (`GAP-113`).** Until this date every test this project had run used exactly one user, so the table below was an expectation with nothing behind it. `scripts/load-test.ts` now drives N distinct users, each with their own profile, application and guidelines, through concurrent `POST /api/generate-summary` calls.
 
-| Concurrent users | Single-user baseline | p50   | p95   | vs baseline | Cross-contamination | Success |
-| ---------------- | -------------------- | ----- | ----- | ----------- | ------------------- | ------- |
-| 3                | 21.3s                | 22.4s | 22.6s | 1.05×       | none                | 3/3     |
-| 5                | 22.8s                | 24.8s | 25.3s | 1.09×       | none                | 5/5     |
-| 10               | 22.6s                | 25.1s | 26.4s | 1.11×       | none                | 10/10   |
+| Concurrent users         | Single-user baseline | p50   | p95   | vs baseline | Cross-contamination | Success |
+| ------------------------ | -------------------- | ----- | ----- | ----------- | ------------------- | ------- |
+| 3                        | 21.3s                | 22.4s | 22.6s | 1.05×       | none                | 3/3     |
+| 5                        | 22.8s                | 24.8s | 25.3s | 1.09×       | none                | 5/5     |
+| 10                       | 22.6s                | 25.1s | 26.4s | 1.11×       | none                | 10/10   |
+| 2 _(re-run 2026-08-20)_  | 22.7s                | 19.7s | 21.8s | 0.87×       | none                | 2/2     |
+| 10 _(re-run 2026-08-20)_ | 22.8s                | 22.5s | 23.0s | 0.99×       | none                | 10/10   |
 
 **The launch-tier row below is confirmed as written.** It predicted "All succeed; each takes 20–45s independently; no cross-user interference" — observed at 10 users: every request succeeded, individual durations ran 24.5–26.4s, and **no summary contained another user's canary phrase**. Degradation from 1 to 10 concurrent users is about **11%**, which is close to flat.
+
+✅ **Re-run 2026-08-20 against a fresh build, and the result held — slightly better.** Ten concurrent users came out at **0.99× the single-user baseline** rather than 1.11×, so the near-flat curve is now observed twice, three days apart, on different builds. **No cross-contamination either time.** ⚠️ **The re-run does not lift limit 1 below** — it was again dev-plus-local, so it is a confirmation of the same measurement rather than an extension of it, and **a production run is still owed.** It is recorded because a performance figure observed once is a data point and observed twice is a property; the variance between the two runs (25.1s vs 22.5s at p50) is also useful, since it says the spread between runs is comparable to the spread within one.
 
 **How cross-contamination was checked, since "no interference" is easy to assert and hard to prove:** each user's guideline pack embeds a unique canary string, and every returned summary is searched for every _other_ user's canary. A hit fails the run. This tests the outcome that would actually matter — one charity seeing another's material — rather than testing that the service did not fall over.
 
 ⚠️ **Three limits on this evidence, stated so the figures are not over-read:**
 
-1. **Run against `grant-pathway-dev` on a local `next dev` server**, not a production build on Vercel. **What transfers:** Bedrock's behaviour under concurrent load and the cross-contamination result, since both are properties of the AI layer and the request-scoped code, which are identical across environments. **What does not transfer:** Vercel function scaling and cold starts, the production connection pool, and single-region (`lhr1`) execution. A production run is still owed.
+1. **Run against `grant-pathway-dev` on a local `next dev` server**, not a production build on Vercel — true of the 2026-08-17 runs and of the 2026-08-20 re-run alike. ⚠️ **A production run turned out to be blocked on credentials, which is worth stating because it is the reason this limit persists:** `.env.local` holds dev credentials, and the harness's production guard checked only the target URL, so aiming it at production would have created its users in dev and failed every sign-in. Fixed 2026-08-20 by requiring `--expect-supabase-project <ref>` to match the credentials actually loaded; the run itself needs `vercel env pull` first. **What transfers:** Bedrock's behaviour under concurrent load and the cross-contamination result, since both are properties of the AI layer and the request-scoped code, which are identical across environments. **What does not transfer:** Vercel function scaling and cold starts, the production connection pool, and single-region (`lhr1`) execution. A production run is still owed.
 2. **The ~100-user tier remains asserted, not demonstrated** (decision: WJ, 2026-08-17 — test 10, extrapolate 100 if asked). The near-flat curve to 10 is encouraging but does not establish 100, and the row below should be read as a design expectation.
 3. **p95 at these sample sizes is indicative only.** Ten samples cannot support a meaningful 95th percentile; the figure is reported because the spread is narrow, not because it is statistically robust.
 
