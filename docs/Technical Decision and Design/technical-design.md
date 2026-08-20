@@ -379,6 +379,8 @@ Global reference table — not user-scoped. Seeded and maintained by Rapidglobe.
 
 #### `application_items`
 
+⚠️ **2026-08-20 (`D-021`): `item_type` is no longer always `narrative`.** Extraction now classifies each question as `narrative`, `date` or `number` via a `question_type` field on the AI response schema (`app/api/generate-summary/route.ts`), mapped to the column by `lib/question-types.ts`. `date` and `number` items render as a one-line input with no word counter and no AI assist; `/api/refine-answer` rejects them server-side alongside budget questions. **No migration was required** — both values had been in the enum, unwritten, since P6.2.
+
 **Replaces `application_answers` (P6.2, migration `20260714000000`).** Compatibility mode: only `item_type = 'narrative'` is populated today; the other nine item types exist in the enum but are unused until P6.3 onward. See **ADR-DATA-006** (item-graph model) and **ADR-DATA-007** (guideline reference/citation shape).
 
 | Column                       | Type          | Constraints                                                                                                                                                                                                                                                                     |
