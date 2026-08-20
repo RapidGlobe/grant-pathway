@@ -48,6 +48,7 @@ import {
 } from '@/actions/applications'
 import type { GuidelineCitation } from '@/lib/types'
 import { findQuoteRange } from '@/lib/guideline-citations'
+import { isShortAnswerType } from '@/lib/question-types'
 import {
   GOVERNANCE_ITEMS,
   GOVERNANCE_FIELD_EXPLANATIONS,
@@ -349,7 +350,19 @@ export function ApplicationStep4Draft({
   // by its own per-card counter and must not be double-counted here.
   const combinedLimitQuestions =
     overallWordLimit != null
-      ? questions.filter((q) => q.fieldKey == null && q.wordLimit == null && q.charLimit == null)
+      ? // isShortAnswerType rather than fieldKey == null (D-021): a date or
+        // number answer must never be counted towards a shared word total.
+        // Unreachable today — overallWordLimit is only set for free_form
+        // funders, whose sections are always narrative — but a date item
+        // satisfies the old fieldKey == null test, so this would break
+        // silently and in the user's favour-free direction the day the two
+        // ever meet.
+        questions.filter(
+          (q) =>
+            !isShortAnswerType(q.itemType, q.fieldKey) &&
+            q.wordLimit == null &&
+            q.charLimit == null,
+        )
       : []
   const combinedWordCount = combinedLimitQuestions.reduce(
     (sum, q) => sum + countWords(answers[q.id] ?? ''),
@@ -363,8 +376,12 @@ export function ApplicationStep4Draft({
   // PDR-UI-008 — tt-ai-help-limit and tt-budget-no-ai each attach to the
   // first matching card only, not every card of that kind; computed once
   // here rather than inside the render loop below.
+  // Must match the render gate on the refine block exactly, or the tooltip
+  // attaches to a card that has no button to explain (D-021: a date question
+  // has fieldKey == null and is not a budget question, so it satisfied the old
+  // condition while showing no refine button).
   const firstRefineButtonIndex = questions.findIndex(
-    (q) => !q.isBudgetQuestion && q.fieldKey == null,
+    (q) => !q.isBudgetQuestion && !isShortAnswerType(q.itemType, q.fieldKey),
   )
   const firstBudgetQuestionIndex = questions.findIndex((q) => q.isBudgetQuestion)
 
@@ -923,6 +940,14 @@ export function ApplicationStep4Draft({
       <div className="mb-8 space-y-6">
         {questions.map((q, index) => {
           const isGovernanceItem = q.fieldKey != null
+          // D-021: an AI-extracted date or number question also collects a
+          // single short value, so it gets a one-line input, no word counter
+          // and no AI assist. Deliberately a SECOND predicate rather than a
+          // widening of isGovernanceItem, which additionally gates behaviour
+          // that is genuinely governance-only: the £ prefix and thousands
+          // separators, the Yes/No/Not sure yet select, and the guidance-note
+          // rule below.
+          const isShortAnswer = isShortAnswerType(q.itemType, q.fieldKey)
           // Sequential display number across ALL items in their existing sort
           // order (governance items first, then narrative questions/sections)
           // — not q.questionOrder, which is the raw item_order used for DB
@@ -1135,8 +1160,28 @@ export function ApplicationStep4Draft({
                 </select>
               )}
 
+              {/* Short input — AI-extracted date and number questions (D-021).
+                  Deliberately type="text", not type="date" or type="number":
+                  funders word these asks loosely, and an answer of "April
+                  2027" or "on receipt of funding" is often exactly what the
+                  form invites. A calendar control would refuse it (WJ,
+                  2026-08-20). Width matches the governance inputs above so a
+                  form with both does not look like two different products. */}
+              {isShortAnswer && !isGovernanceItem && (
+                <Input
+                  id={`answer-${q.id}`}
+                  type="text"
+                  value={text}
+                  onChange={(e) => handleAnswerChange(q.id, e.target.value)}
+                  onBlur={() => handleAnswerBlur(q.id)}
+                  aria-label={`Answer for question ${displayNumber}`}
+                  placeholder={q.itemType === 'date' ? 'e.g. April 2027' : ''}
+                  className="h-10 text-[0.875rem] sm:w-60"
+                />
+              )}
+
               {/* Textarea — ordinary narrative questions/sections only */}
-              {!isGovernanceItem && (
+              {!isShortAnswer && (
                 <Textarea
                   id={`answer-${q.id}`}
                   value={text}
@@ -1184,7 +1229,7 @@ export function ApplicationStep4Draft({
                     </>
                   )}
                 </span>
-                {!isGovernanceItem && (
+                {!isShortAnswer && (
                   <p
                     className={`text-right text-[0.75rem] ${
                       // 12px, so all three states need 4.5:1 against both white
@@ -1205,8 +1250,12 @@ export function ApplicationStep4Draft({
                 )}
               </div>
 
-              {/* Refine answer — non-budget narrative questions only; AI assist doesn't apply to governance facts */}
-              {!q.isBudgetQuestion && !isGovernanceItem && (
+              {/* Refine answer — non-budget narrative questions only. AI assist
+                  doesn't apply to governance facts, nor (D-021) to date and
+                  number questions: there is nothing for a language model to
+                  improve about a date, and offering a button that cannot help
+                  is worse than offering none. */}
+              {!q.isBudgetQuestion && !isShortAnswer && (
                 <div className="mt-3">
                   {refineState.status === 'idle' && (
                     <>
@@ -1315,7 +1364,7 @@ export function ApplicationStep4Draft({
                   over-limit message above would be inaccurate here. A deterministic
                   "Trim to limit" button gives a starting point without an LLM call,
                   preserving the "AI never sees financial figures" guarantee. */}
-              {q.isBudgetQuestion && !isGovernanceItem && isOver && (
+              {q.isBudgetQuestion && !isShortAnswer && isOver && (
                 <div className="mt-3">
                   <p className="text-[0.75rem] text-[#DC2626]">
                     {`Your answer exceeds the funder's ${useChars ? 'character' : 'word'} limit. Please trim it — AI assist isn't available for financial figures, so this needs to be adjusted manually before approving.`}

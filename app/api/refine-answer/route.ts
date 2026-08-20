@@ -14,6 +14,11 @@
 // Guards:
 //   - is_budget_question: fetched from DB; request rejected if true (AI must
 //     not help with budget/financial answers — AC-FR-31)
+//   - item_type: fetched from DB; 'date', 'number' and 'data' rejected (D-021).
+//     These are single-value answers with no refine button in the UI, but a
+//     Route Handler is reachable by direct POST regardless of what the UI
+//     offers. Both this and the budget guard run BEFORE the rate limit and the
+//     slot reservation, so a rejected request costs the user nothing.
 //   - Monthly cap: 50 requests/month per user (shared with generate-summary)
 //   - Per-minute rate limit: Upstash Redis burst limit
 //
@@ -111,7 +116,7 @@ export async function POST(request: NextRequest) {
   // rather than trusting the client.
   const { data: answerRow, error: answerError } = await supabase
     .from('application_items')
-    .select('id, application_id, is_budget_question, word_limit')
+    .select('id, application_id, is_budget_question, word_limit, item_type')
     .eq('id', answerId)
     .eq('user_id', user.id)
     .single()
@@ -131,6 +136,26 @@ export async function POST(request: NextRequest) {
       {
         error: 'invalid_request',
         message: 'AI assistance is not available for budget questions.',
+      },
+      { status: 400 },
+    )
+  }
+
+  // Short-answer items must never receive AI assistance either (D-021): the 5
+  // fixed governance facts, and AI-extracted date/number questions. The UI
+  // gives these no refine button, but a Route Handler is reachable by direct
+  // POST regardless of what the UI offers — the same reason the budget check
+  // above reads from the database rather than trusting the client. There is
+  // also nothing for a language model to usefully do to a date.
+  if (
+    answerRow.item_type === 'date' ||
+    answerRow.item_type === 'number' ||
+    answerRow.item_type === 'data'
+  ) {
+    return NextResponse.json(
+      {
+        error: 'invalid_request',
+        message: 'AI assistance is not available for this type of question.',
       },
       { status: 400 },
     )
