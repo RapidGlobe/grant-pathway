@@ -4,6 +4,17 @@
 -- again AFTER, unchanged both times. Compare the two outputs: that comparison
 -- is the evidence, not either run on its own.
 --
+-- >>> RUN ONE SECTION AT A TIME. <<<
+-- The Supabase SQL Editor displays the result of only the LAST statement in a
+-- paste. Pasting this whole file therefore runs all four sections but shows
+-- just one, and the other three vanish silently -- which reads as "the query
+-- returned less than expected" rather than as a display limit. Highlight a
+-- section and press Ctrl+Enter to run the selection alone. Learned the hard
+-- way on the first run, 2026-08-20.
+--
+-- Section 2 is the one the test turns on. Section 3 is the one to read BEFORE
+-- pressing delete.
+--
 -- WHY THIS EXISTS. RT-14's steps 1-8 prove what the UI does: the confirmation
 -- gate works, the redirect happens, and the old credentials no longer sign in.
 -- None of that proves the rows are gone. A failed cascade step returns a
