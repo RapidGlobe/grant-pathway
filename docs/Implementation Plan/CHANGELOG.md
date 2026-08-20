@@ -10,7 +10,19 @@
 
 ---
 
-## 2026-08-20 (latest) — `RT-17` passes: the service is finally tested with more than one user on it, and `GAP-113` closes in both halves
+## 2026-08-20 (latest) — the Schema Drift Check was red on both projects, and the cause is the exact inverse of the trap `RT-00` was strengthened to catch
+
+**Both `check-schema (dev)` and `check-schema (prod)` failed on the 07:39 scheduled run: _"33 tracked locally, 32 recorded as applied on the remote"_.** The missing version was **`20260818000000_restore_authenticated_table_grants`** — the `D-020` fix, applied by hand in the SQL Editor on 2026-08-18 while production was unusable. **The statements ran; the bookkeeping row was never written.**
+
+⚠️ **This is the mirror image of the failure `RT-00` was rewritten to catch, and worth stating as a pair.** On 2026-08-18 `RT-00` passed while five tables were unusable, because it compared the _set of applied migration versions_ — and a version row proves bookkeeping, not execution. **Here execution happened without the row.** So the two failure modes are independent and neither check subsumes the other: the drift check catches a missing row over working schema, and `RT-00`'s parity audit catches working rows over missing schema. Both are needed, which is now the argument for keeping both.
+
+**Verified before recording, not after.** Recording a migration as applied when it has not run is precisely what caused `D-020`, so the effect was checked first: `information_schema.role_table_grants` returned all five `authenticated` SELECT grants on `applications`, `charity_profiles`, `user_profiles`, `ai_usage_log` and `funders` **on both projects**. Only then was the version row inserted, on both, taking each to 33. **A re-run of the workflow passed on both legs.**
+
+**Why it went unnoticed for two days.** The 2026-08-18 run passed at 07:37, hours before the hand-applied fix at 16:37. **The 2026-08-19 run was cancelled**, so today's was the first real execution since — which means a cancelled scheduled run is a silent gap in this check, not merely a missing data point.
+
+---
+
+## 2026-08-20 — `RT-17` passes: the service is finally tested with more than one user on it, and `GAP-113` closes in both halves
 
 ✅ **`RT-17` PASSES on production — the first time this service has been tested with more than one user on it.** Two real browsers, two accounts (`grantpathway+prodtest@gmail.com` in Chrome, `grantpathway+edgert17test@gmail.com` in Edge), two different funder documents fired as close to simultaneously as hands allow. **No cross-contamination:** each summary was about its own funder — Idlewild arts guidelines for one, MK Community Foundation Oak Grants for the other. **Fair-use counts are per user and independent**, with the two reservations landing **1.7 seconds apart** (13:10:39 and 13:10:41 UTC), so the concurrency was genuine rather than nominal. Concurrent writing and approval did not interfere, and signing one user out left the other working normally.
 
