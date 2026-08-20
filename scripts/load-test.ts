@@ -359,13 +359,32 @@ function report(results: Result[], users: TestUser[], baselineMs: number | null)
     }
   }
 
+  // The count that matters here is how many summaries were actually SEARCHED,
+  // not how many users were fired. Reporting `results.length` claimed a pass
+  // over summaries that did not exist: a run where every request 500'd printed
+  // "PASS — no summary contained another user's canary (2 checked)" having
+  // checked nothing at all (observed 2026-08-20, when a malformed Upstash token
+  // made every request fail). **A check that cannot run has not passed** — the
+  // same false-reassurance shape as an empty log query read as a clean result,
+  // which this project has now been bitten by three times.
+  const searched = results.filter((r) => r.ok).length
+
   console.log('\n1. CROSS-CONTAMINATION')
   if (bleeds.length > 0) {
     console.log("   *** FAIL — one user's summary contains another user's content ***")
     bleeds.forEach((b) => console.log(`   ${b}`))
     console.log('   This is a confidentiality failure and a launch blocker. Stop here.')
+  } else if (searched === 0) {
+    console.log('   NOT TESTED — no request returned a summary, so nothing could be')
+    console.log("   searched for another user's canary. This is not a pass. See the")
+    console.log('   failures under SUCCESS RATE below and fix those first.')
+  } else if (searched < results.length) {
+    console.log(
+      `   PARTIAL — no bleed in the ${searched} summary/summaries returned, but ` +
+        `${results.length - searched} request(s) failed and could not be checked.`,
+    )
   } else {
-    console.log(`   PASS — no summary contained another user's canary (${results.length} checked)`)
+    console.log(`   PASS — no summary contained another user's canary (${searched} checked)`)
   }
 
   // 2. Success rate
