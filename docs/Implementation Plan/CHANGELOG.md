@@ -10,7 +10,39 @@
 
 ---
 
-## 2026-08-19 (latest) — `P5.5` runs against production for the first time: both flagships complete, twelve regression cases pass, and four findings come out of it
+## 2026-08-20 (latest) — `RT-16` passes on production: the reuse path gets its first positive test anywhere, and the em-dash soft miss turns out to fail silently
+
+### The case that had never been run in any environment
+
+**`RT-16` (reuse a previous application) passed on `grant-pathway-prod`, tester WJ.** It is the **first positive test of P6.5's reuse path anywhere in the functional suite**. Both flagships mention reuse only to assert the prompt does **not** appear, which tests the feature's absence on a fresh account; the path had been driven end to end exactly once, by `accessibility-test-plan.md`'s `AC-14` on **dev**, under a WCAG redundant-entry criterion that could have held while the feature was functionally broken. **Phase 6 is the stated reason the go-live gate exists, and this was the last Phase 6 feature without a positive test.**
+
+The source was the `MK Community Foundation — Oak Grants` application the `MKCF` flagship exported on 2026-08-19, status **Exported**. It was not re-opened, and finished the run unchanged.
+
+### Step 5 was proven three ways, and the third proof was itself verified first
+
+The case warns that its own most important step is the easiest to wave through: **"the answers appeared" is satisfied by a re-generation as well as by a reuse.** Accepting the offer went straight to Step 3 with the summary populated — no upload screen, no spinner — and three independent negatives were taken: **zero `ai_usage_log` rows** in the window, **no `/api/generate-summary` request** against the new application in Axiom, and **no `[generate-summary]` log line**.
+
+⚠️ **The transferable point is the control run.** The third proof was re-run with the identical filter widened to three days, which returned 15 lines ending at **Aug 19, 17:00:43** — so the empty result is evidence about the application rather than about the query. **An empty log query is indistinguishable from a broken one**, and this repository has already been caught by that once: `D-017` was logged on 2026-08-18 because a Sentry view showed no events, and closed the next day as not a defect because the view was wrong, not Sentry. The negative-proof pattern now has a check attached to it in the case notes.
+
+**Steps 6–9.** Answers pre-filled; **Q20 compared against the source's exported Word document** — the delivered artefact rather than a database read — matching verbatim, with its citation (`Page 6 of the guidelines`) carried across too. Carried-over answers render badged **"Carried over — please review"** and still require approving, so they are drafts and not inherited approvals. The source card still reads **Exported, last updated 19 August 2026**.
+
+### The finding: the reuse match fails silently, and it cost a real attempt
+
+⚠️ **The first attempt did not get the offer at all.** The funder name carries an **em dash**; it was typed with a **plain hyphen**. `getPreviousApplicationForFunder` matches `funder_name` case-insensitively and trimmed but otherwise **exactly**, so it soft-missed — **no offer appeared, and nothing explained why.** The run continued to Step 2 as a fresh application and was **one click from re-generating the summary**, spending an AI call against the monthly cap to reproduce work that already existed. Pasting the exact name produced the offer immediately.
+
+**This is the documented trade-off behaving as designed, not a defect.** `DR-FD-001` v1.4 removed the curated funder directory and its `funder_id` FK, so there is no stable funder identity left to match on, and the code comment states the choice plainly: a soft miss is deliberately preferred, because it **will never wrongly match two different funders** — and wrongly carrying one funder's questions and answers into another funder's application would be far worse than not offering.
+
+**The finding is narrower than "matching is too strict": it is that the failure is silent.** To a charity typing a funder's name a second time months later, the feature simply does not exist — there is no "we could not find a previous application to this funder" and no near-miss prompt. **Held for WJ, not fixed and not raised as a defect**, because every alternative trades away the property the design chose: fuzzy or trigram matching reintroduces the wrong-match risk, and a "did you mean…" list of near matches is a new UI surface with its own privacy shape. **Recorded here rather than left in the test notes because it is a product decision owed, not a test result.**
+
+### Coverage this case still does not give
+
+Two paths remain unexercised, written into the case rather than left implicit: **reuse where the source is not the most recent match** (the lookup takes the single most recently updated candidate), and **reuse from a source at Step 4 rather than Exported**. Only the single-candidate path has ever run.
+
+**Documents updated:** `docs/Test Plans/regression-test-plan.md` → v2.28, `docs/Test Plans/TEST-DASHBOARD.md` → v2.73 (whose version header had drifted three revisions ahead of its own history rows, corrected in passing), `docs/Implementation Plan/IMPLEMENTATION-STATUS.md`.
+
+---
+
+## 2026-08-19 — `P5.5` runs against production for the first time: both flagships complete, twelve regression cases pass, and four findings come out of it
 
 **The morning's environment work is recorded in the section below this one.** This section covers the test run itself and what it produced.
 
