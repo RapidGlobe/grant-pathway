@@ -57,7 +57,7 @@ The nine variables emptied by the incident above were re-entered by hand, and **
 
 **This is the third instance of one shape in three days** — an absent result read as a clean one. `D-017` (an empty Sentry view read as Sentry being broken), `RT-16`'s log proof (which is why a control query was run before trusting the empty one), and now this. **The rule that keeps falling out: a check that could not run has not passed, and reporting code must distinguish the two.**
 
-**What a production run still needs, so it is not rediscovered:** production credentials pulled locally (`vercel env pull .env.production.local --environment=production`), and a look at Supabase Organisation → Usage first — the production spend cap takes the service **read-only with no warning email** (`ADR-DATA-005`), and a load test is the most likely thing to trip it.
+**What a production run still needs, so it is not rediscovered:** the production project's three Supabase values, read from the Supabase dashboard → the target project → Settings → API (**not** `vercel env pull`, which returns the literal string `[SENSITIVE]` for every sensitive-marked variable — including all three Supabase values, so the pulled file is useless for this) and exported for one shell session (`process.env` wins over `.env.local`, so no file need be edited). ⚠️ **The `vercel env pull` route was tried on 2026-08-20 and does not work** — this is the same fact `RT-00` step 1 already records about the Vercel dashboard, arrived at from the other direction. And a look at Supabase Organisation → Usage first — the production spend cap takes the service **read-only with no warning email** (`ADR-DATA-005`), and a load test is the most likely thing to trip it.
 
 ---
 

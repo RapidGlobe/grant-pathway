@@ -38,8 +38,15 @@
  * checked against the credentials actually loaded. Users are created in the
  * project the credentials point at, but signed in against the target URL's own
  * project; if those differ, every sign-in fails and test users are left behind
- * in the wrong project. Supply the target's own credentials, e.g.
- *   vercel env pull .env.production.local --environment=production
+ * in the wrong project. Supply the target's own credentials by exporting the
+ * three variables for that project.
+ *
+ * NOTE: `vercel env pull` does NOT work for this. Vercel returns the literal
+ * string `[SENSITIVE]` for every sensitive-marked variable, which includes all
+ * three Supabase values, so the pulled file cannot authenticate anything.
+ * Confirmed 2026-08-20. Read the keys from the Supabase dashboard instead
+ * (project -> Settings -> API) and export them for one shell session;
+ * `process.env` wins over `.env.local`, so no file need be edited.
  *
  * Reads SUPABASE_SERVICE_ROLE_KEY and NEXT_PUBLIC_SUPABASE_URL from the
  * environment (`.env.local` by default). Creates its own users, cleans them up
@@ -516,7 +523,11 @@ async function main() {
           '`sb-<ref>-auth-token` on the target site), then re-run with\n' +
           '  --expect-supabase-project <ref>\n\n' +
           "To supply a different project's credentials:\n" +
-          '  vercel env pull .env.production.local --environment=production\n',
+          '  (Supabase dashboard -> project -> Settings -> API, then export\n' +
+          '   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY and\n' +
+          '   SUPABASE_SERVICE_ROLE_KEY for this shell session.)\n' +
+          '  Note: `vercel env pull` does NOT work here - it returns the literal\n' +
+          '  string [SENSITIVE] for all three of these values.\n',
       )
       process.exit(1)
     }
@@ -528,7 +539,11 @@ async function main() {
           'The loaded credentials are for a different project than the one you\n' +
           'named. Running would create users in the wrong project. Load the\n' +
           "intended project's credentials, e.g.\n" +
-          '  vercel env pull .env.production.local --environment=production\n',
+          '  (Supabase dashboard -> project -> Settings -> API, then export\n' +
+          '   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY and\n' +
+          '   SUPABASE_SERVICE_ROLE_KEY for this shell session.)\n' +
+          '  Note: `vercel env pull` does NOT work here - it returns the literal\n' +
+          '  string [SENSITIVE] for all three of these values.\n',
       )
       process.exit(1)
     }
