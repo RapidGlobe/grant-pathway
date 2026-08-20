@@ -10,6 +10,22 @@
 
 ---
 
+## 2026-08-20 (latest) — the load test runs against production at ten concurrent users and passes: `GAP-113`'s required half is closed
+
+**`NFR-03`'s launch tier is now demonstrated on the live service rather than inferred from dev.** Two users, then ten, against `grant-pathway-prod` on Vercel: **10/10 succeeded, no cross-contamination, p50 22.1s at 1.01× the single-user baseline, max 23.5s** — every request inside `NFR-01`'s 30s standard target — and fair-use counts incremented per user and only their own. **This is the first concurrency test of any kind executed against production.** `GAP-113` half (b), the one WJ hardened from optional to required (_"The load test has to be attempted, full stop."_), is closed.
+
+**The dev figures held.** 1.01× baseline on production against 1.11× and 0.99× on dev — so `NFR-03`'s first stated limit, which had named **Vercel function scaling, the production connection pool and single-region `lhr1` execution** as the things that would not transfer, was **wrong in the reassuring direction**. It is kept struck through rather than deleted, because a limit that named its own doubts and was then tested is a better record than a tidy table.
+
+**Safety, since a load test is the thing most likely to trip the production spend cap (`ADR-DATA-005`, read-only with no warning email):** Supabase Usage was checked first and sat under 1% of every quota — 76 of 100,000 MAU, 0.043 of 250 GB egress. Ten test users were created on the production project and all ten removed. Incidentally confirmed the same screen: **Micro Compute Hours 1,408 ($18.92)**, two projects running full-time, consistent with the ~£20 Supabase line already in the budget.
+
+⚠️ **Two things this does not measure, stated so the pass is not over-read.** **Cold starts:** the harness warms the route before timing anything, so every figure is warm-path — **the first user of the day still has no measured number**, and on Vercel that is the request most likely to be slow. It needs its own single cold measurement. **The ~100-user tier** stays asserted, under WJ's 2026-08-17 decision to test ten and extrapolate.
+
+⚠️ **`RT-17` is still open and the harness does not close it.** Half (a) of `GAP-113` is the two-user browser case — dashboard isolation, concurrent writing and autosave, one user signing out while the other works. The harness touches none of that. **What it does now settle is the question that mattered most:** two charities' guideline text passing through the same AI routes at once does not bleed, and that is now observed ten times over on the live service rather than argued from code.
+
+**How the credentials were supplied, since the documented route does not work:** the three production Supabase values were read from the Supabase dashboard and exported into a single PowerShell session, `process.env` taking precedence over `.env.local`. `vercel env pull` returns the literal `[SENSITIVE]` for all three — corrected in the entry above and in the harness's own error text.
+
+---
+
 ## 2026-08-20 (later) — `RT-12` passes on production, the load harness is re-confirmed at ten users, and its production guard turns out to have been checking the wrong thing
 
 ### `RT-12` — change password, on production
