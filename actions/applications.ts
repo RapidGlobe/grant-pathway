@@ -10,6 +10,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { uuidSchema, requiredText, optionalText, answerTextSchema } from '@/lib/validation'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
+import { toItemType } from '@/lib/question-types'
 import {
   resolveGovernanceInserts,
   GOVERNANCE_FIELD_KEYS,
@@ -695,9 +696,13 @@ export async function setDraftInProgress(
   // Sync application_items from ai_summary so rows exist before the page
   // renders. This is the primary sync path; the Step 4 page still syncs as a
   // fallback for returning users who navigate directly without the checklist.
-  // item_type is always 'narrative' and source_of_truth always 'user_input'
-  // in compatibility mode (P6.2, ADR-DATA-006) — no other item type is
-  // produced by today's extraction prompt. guideline_reference is populated
+  // source_of_truth is always 'user_input' in compatibility mode (P6.2,
+  // ADR-DATA-006). item_type is 'narrative' for free_form sections (a section
+  // is prose by definition) but is now mapped per question for structured
+  // funders — 'date' and 'number' as well as 'narrative' (D-021, 2026-08-20,
+  // via lib/question-types.ts). This comment said "always 'narrative'" until
+  // then, which was true of every item this table had ever held except the 5
+  // governance items added in July. guideline_reference is populated
   // when the extraction route's citation validation confirmed a real one
   // (P6.3, ADR-DATA-007) — null otherwise, never a bare unverified AI guess.
   if (appRow?.ai_summary) {
@@ -779,7 +784,7 @@ export async function setDraftInProgress(
           .map((q, idx) => ({
             application_id: applicationId,
             user_id: user!.id,
-            item_type: 'narrative' as const,
+            item_type: toItemType(q.question_type),
             source_of_truth: 'user_input' as const,
             item_label: q.text,
             item_order: q.number ?? idx + 1,

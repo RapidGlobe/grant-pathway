@@ -19,6 +19,8 @@ export type AiSummaryQuestion = {
   wordLimit?: number | null
   charLimit?: number | null
   limitType?: 'words' | 'characters' | 'none' | null
+  // D-021: absent or null means 'narrative'. Independent of is_budget_question.
+  question_type?: 'narrative' | 'date' | 'number' | null
   is_budget_question: boolean
   citation?: GuidelineCitation | null
 }

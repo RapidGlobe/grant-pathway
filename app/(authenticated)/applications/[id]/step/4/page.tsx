@@ -6,6 +6,7 @@ import { ApplicationStep4SeniorReview } from '@/components/application-step4-sen
 import { getApplicationOrRedirect } from '@/lib/application-guard'
 import { createClient } from '@/lib/supabase/server'
 import { toGuidelineReferenceColumn } from '@/lib/guideline-citations'
+import { toItemType } from '@/lib/question-types'
 import { resolveGovernanceInserts, isOrphanedItem } from '@/lib/governance-items'
 import type { AiSummaryData } from '@/app/api/generate-summary/route'
 
@@ -250,7 +251,9 @@ export default async function Step4Page({ params }: Props) {
             .map((q, idx) => ({
               application_id: id,
               user_id: user.id,
-              item_type: 'narrative' as const,
+              // Must stay identical to the primary sync in
+              // actions/applications.ts — same helper, deliberately (D-021).
+              item_type: toItemType(q.question_type),
               source_of_truth: 'user_input' as const,
               item_label: q.text,
               item_order: q.number ?? idx + 1,

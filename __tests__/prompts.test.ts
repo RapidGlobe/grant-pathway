@@ -227,7 +227,75 @@ describe('buildSummaryPrompt — grouped budget figures (GAP-51)', () => {
   it('keeps the group tagged as budget so AI assist stays blocked', () => {
     // These are the applicant's own figures. A Budget tag is what stops the
     // model from being invited to invent them.
-    expect(prompt()).toMatch(/each with "is_budget_question" set to true/i)
+    expect(prompt()).toMatch(
+      /each with "question_type" set to "number" and "is_budget_question" set to true/i,
+    )
+  })
+})
+
+// D-021 (2026-08-20). The defect was not a missing enum value — item_type has
+// carried 'date' and 'number' since July. It was that the schema gave the model
+// no way to SAY a question was a date, so the narrative-only gate forced a
+// choice between extracting it as prose (Radcliffe: rendered as a writing card
+// with a word counter) and not extracting it at all (Idlewild: two mandatory
+// date questions dropped from Step 4 and from the export). Same rule, opposite
+// outcomes — which is why these tests assert the CLASSIFY instruction and the
+// removal of the skip, not just the presence of the word "date".
+//
+// These only prove the rule is present. Whether the model obeys it is a live
+// question — GAP-39, GAP-40 and GAP-51 were each rules that read correctly and
+// then behaved differently against a real document. See the verification list
+// in the D-021 plan: GCM-01, RT-04, GCM-06, GCM-07 and one flagship export.
+describe('question type classification (D-021)', () => {
+  const prompt = () =>
+    buildSummaryPrompt('Some funder guidelines.', {
+      charityName: 'Test Charity',
+      charityNumber: null,
+      charitableObjects: 'Objects',
+      region: 'Milton Keynes',
+      beneficiaries: 'Local residents',
+    } as never)
+
+  it('instructs the model to classify every question rather than filter by answer shape', () => {
+    expect(prompt()).toMatch(/CLASSIFY each one by setting "question_type"/i)
+    expect(prompt()).toMatch(/"narrative", "date" or "number"/i)
+    expect(prompt()).toMatch(/CLASSIFYING A QUESTION IS NEVER A REASON TO DROP IT/i)
+  })
+
+  it('defaults to narrative when the type is not obvious', () => {
+    // The safe direction. A date wrongly typed narrative is the old cosmetic
+    // defect; a narrative wrongly typed date loses the writing card entirely.
+    expect(prompt()).toMatch(/NARRATIVE IS THE DEFAULT/i)
+  })
+
+  it('no longer skips date and numeric rows in the table-format skip-list', () => {
+    // "Date field dropdown" sat in the skip-list and is why Idlewild's Q17/Q18
+    // never reached Step 4. The whole D-021 fix fails if it comes back.
+    const p = prompt()
+    expect(p).not.toMatch(/skip rows with types[^.]*"Date field dropdown"/i)
+    expect(p).toMatch(/A ROW TYPED AS A DATE OR NUMERIC FIELD IS NOT SKIPPED/i)
+  })
+
+  it('keeps question_type and is_budget_question independent', () => {
+    // A project cost figure is number + budget. A question about financial
+    // plans is narrative + budget. Collapsing the two would silently change
+    // which questions keep the £ prefix and the Trim-to-limit button.
+    expect(prompt()).toMatch(/"question_type" AND "is_budget_question" ARE INDEPENDENT/i)
+  })
+
+  it('still carries the GAP-39 rule it was built on top of', () => {
+    // D-021's fix must not weaken GAP-39. The classification rule replaces the
+    // narrative-only GATE, not the never-drop-a-short-answer principle.
+    expect(prompt()).toMatch(
+      /NEVER drop a question solely because its answer is a number, a date, a duration/i,
+    )
+    expect(prompt()).toMatch(/THE TEST IS WHAT THE QUESTION IS ABOUT, NOT HOW LONG ITS ANSWER IS/i)
+  })
+
+  it('shows question_type in the example JSON', () => {
+    // The example is what the model actually copies. A rule with no matching
+    // field in the output shape is routinely ignored.
+    expect(prompt()).toMatch(/"question_type": "narrative"/)
   })
 })
 

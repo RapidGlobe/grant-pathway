@@ -73,6 +73,11 @@ const aiSummaryQuestionSchema = z.object({
   wordLimit: z.number().nullable().optional(),
   charLimit: z.number().nullable().optional(),
   limitType: z.enum(['words', 'characters', 'none']).nullable().optional(),
+  // D-021 (2026-08-20): nullable and optional deliberately. A response that
+  // omits the field still validates and falls back to 'narrative' downstream,
+  // which is the pre-D-021 behaviour — so a partial or older response degrades
+  // to what the product did yesterday rather than failing the whole extraction.
+  question_type: z.enum(['narrative', 'date', 'number']).nullable().optional(),
   is_budget_question: z.boolean(),
   citation: citationSchema,
 })

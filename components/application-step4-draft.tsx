@@ -64,8 +64,10 @@ export type QuestionRow = {
   id: string
   questionText: string
   questionOrder: number
-  /** 'narrative' for ordinary AI-extracted questions/sections; 'number' | 'data' for the 5 fixed governance items (fieldKey set). */
-  itemType: 'narrative' | 'data' | 'number'
+  /** 'narrative' for prose questions/sections; 'number' | 'data' for the 5 fixed governance items (fieldKey set); 'date' | 'number' for AI-extracted date/number questions (D-021, fieldKey null). */
+  // 'date' added by D-021 (2026-08-20). Still a narrowing of the 10-value DB
+  // enum — 'table', 'file', 'consent' and the rest remain unwritten.
+  itemType: 'narrative' | 'data' | 'date' | 'number'
   /** Set only for the 5 governance/reserves items (2026-07-15) — null for ordinary narrative items. */
   fieldKey: string | null
   wordLimit: number | null
