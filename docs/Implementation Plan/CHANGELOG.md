@@ -10,7 +10,57 @@
 
 ---
 
-## 2026-08-20 (latest) — `D-021` is fixed: extracted questions now carry a type, and a date renders as a date
+## 2026-08-21 (latest) — `D-021`'s regression risk is closed, and a budget-arithmetic gap the corpus makes real
+
+**`GCM-06` and `GCM-07` were re-run on production after the `D-021` fix and both still Pass.** These were the two cases flagged on 2026-08-20 as the regression risk, on the reasoning that a rule loosened to stop dropping short answers is exactly the kind of change that starts extracting contact details and consent boxes instead. It did not.
+
+All 23 Step 4 cards were reconciled section by section against the source form, and the export was read from `word/document.xml` inside the real downloaded `.docx` rather than from the screen:
+
+- **§4 a–f produced six cards**, with §4e and §4f present — `GAP-39`'s original two misses. They now render as one-line inputs rather than textareas, which is `D-021` working as intended.
+- **§10 produced two unmerged cards** — `GAP-40` holds.
+- **§5 produced four cards** — §5a plus all three of §5b's labelled figures, Budget-tagged with no AI assist — and all three reached the export. `GAP-51` holds.
+- **The front details table's `AMOUNT REQUESTED £` box still produced no card**, so the over-correction check passed for the second time.
+
+⚠️ **`D-021` is still not closed, and the remaining item is worth stating precisely.** Its checklist requires an export containing a **`date`**-typed answer. The Stony Stratford fixture has no date question — §4e exported as `250` and §4f as `12 months`, which is a `number` and a text duration. Reading those as a date would close the defect on the wrong evidence. `GCM-01`'s Idlewild fixture has two `date` cards already proven rendering on 2026-08-20, so that is where it gets discharged. **`RT-04` does not need re-running** — it has been Pass (caveat) on production since 2026-08-19; the re-run was only ever wanted as `D-021` evidence.
+
+**A misattribution corrected in writing rather than quietly.** Step 3's count moved from 19 questions + 2 financial details to 21 + 2. Mid-run this was read as the `D-021` effect and it is not — the extra two are `GAP-51`'s §5b cards from 2026-08-07. `D-021`'s only visible effect on this fixture is the control §4e/§4f are rendered with.
+
+### `GAP-116` — contradictory budget figures are accepted, exported, and in one funder's case disqualifying
+
+The tester completed §5b as Total needed **10000**, Amount requested from SSTC **12500**, Balance outstanding **6500**. The requested amount exceeds the total needed and the balance reconciles to neither. **The app accepted all three without comment and exported them.**
+
+That would be a tidiness question, except that Stony Stratford's own scheme document makes it an eligibility condition: _"The onus is on the applicant to ensure that all financial information given is correct. Any incorrect information given i.e. if the figures do not add up, the application will be deemed ‘ineligible’."_
+
+**The corpus was surveyed rather than assumed.** Of the 25 documents in `docs/Grant Org Guidelines/`, **five are exposed** — one hard trigger and four that ask for a figure the applicant must derive by subtraction, where a wrong number is visibly wrong to the funder:
+
+| Document                     | The condition                                                                                            |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Stony Stratford Town Council | _"if the figures do not add up, the application will be deemed ‘ineligible’"_ — an explicit hard trigger |
+| Garfield Weston Foundation   | _"Total shortfall (expenditure − secured income)"_ — the arithmetic is spelled out in the ask itself     |
+| Wolfson Foundation (stage 1) | _"Total cost of the project, the funds raised and the shortfall"_                                        |
+| Henry Smith Holiday Grants   | Budget must break down expenditure, income _"and any shortfall"_                                         |
+| Clothworkers' Foundation     | _"tell us how you will raise the shortfall"_                                                             |
+
+**So this is one in five of the corpus, not a single funder's quirk** — which is the fact that turns it from an observation into something needing a decision.
+
+⚠️ **The exposure is structural rather than incidental.** Budget cards are deliberately the cards where the AI offers no help (`PDR-AI-008`), because the figures are the applicant's own — **and** there is no validation on them. That makes them the only part of the product with neither assistance nor a safety net, and the failure is silent: an applicant who mistypes a figure learns about it from the funder's rejection, not from Grant Pathway.
+
+**WJ's decision: logged, not built** — _"Lets live with the budget total quandary for the time being, though lets document somewhere."_ It goes to the `P5.5` item 4 gaps audit with three options recorded (do nothing and say so; a non-blocking arithmetic hint that must never block export; or extending the Step 4 pre-export check), and one constraint: **the AI must not be given the job of inferring or correcting the figures**, since `PDR-AI-008` keeps it away from the applicant's own numbers deliberately and arithmetic help is a short step from arithmetic authorship.
+
+### Two smaller gaps, both deferred to the next code iteration
+
+- **`GAP-117`** — §4f, _"For how long will the project run?"_, carries the placeholder `e.g. 250`, identical to §4e's headcount hint. Correct control, wrong hint, and it comes from `D-021`'s own placeholder work keying off `item_type` alone when `number` covers both counts and durations. WJ: _"I dont think card 10 default is a big deal."_
+- **`GAP-118`** — the "BEFORE YOU APPROVE" block and its button show on cards 1–2 while empty but not on cards 12–14. **WJ confirmed this is state-dependent**, so it is an inconsistency between two groups of Budget cards on one screen, not a missing control.
+
+### One alarm ruled out rather than assumed
+
+Every narrative answer exported at exactly **240 characters, ending mid-word**. On a form that declares no character limits, an app trimming to 240 would have been a serious defect. WJ confirmed he pasted a pre-truncated test string and the app trimmed nothing. Recorded because the check mattered: the same evidence would have looked identical either way.
+
+**One pre-existing observation persists unchanged** — card 11 still drops §5a's sentence about supplying three quotations for significant items, against a prompt rule saying to extract questions exactly as written. First noted 2026-08-07, not a regression, still awaiting a decision at the gaps audit.
+
+---
+
+## 2026-08-20 — `D-021` is fixed: extracted questions now carry a type, and a date renders as a date
 
 ✅ **`D-021` IS FIXED IN CODE, 2026-08-20 — but the fix is not yet fully re-tested, and the two halves are recorded separately on purpose.** Extraction now classifies every question as `narrative`, `date` or `number` via a `question_type` field on the AI response schema, mapped to `item_type` by `lib/question-types.ts`; `date` and `number` items render as a one-line input with no word counter and no AI assist, and `/api/refine-answer` rejects them server-side as well as in the UI. **No migration was needed** — both enum values had existed, unwritten, since 2026-07-14. **What the deferral got wrong, stated plainly:** the fix was deferred on the reading that it needed the supporting-document contract change first, and priced at 3–5 weeks behind it. It took a day and a half, because the `is_budget_question` field was already an end-to-end precedent for exactly this shape of change, and because the Word export reads only label and answer text — so a date flows through it untouched.
 
