@@ -10,7 +10,37 @@
 
 ---
 
-## 2026-08-21 (latest) — `GAP-115`'s second Bedrock call caught a false rejection, which changes what option (c) costs
+## 2026-08-21 (latest) — `D-021` is closed: a date is extracted, typed, rendered, answered and exported
+
+**The last item `D-021` owed was an export containing a `date`-typed answer**, and it is now evidenced. Read from `word/document.xml` inside the real downloaded `.docx` rather than from the screen:
+
+```
+4. What is your expected start date for the project?   21st Aug 2026
+5. What is your expected end date for your project?    22nd Aug 2027
+```
+
+**The full chain is proven end to end** — extracted from the guidelines, classified `date`, rendered as a one-line input with no word counter and no AI assist, answered, approved, exported verbatim. `RT-04`'s caveat is lifted and the case is a clean Pass.
+
+**This run needed the `P4 — Arts` profile** — Art Shape Ltd, charity 1023920 — which the funder-to-profile audit earlier the same day had identified as missing despite `GCM-01` depending on it. The table earned its keep within hours of being written.
+
+### The 16 were the right 16
+
+Checked at Step 4 before the export, because a count alone proves nothing:
+
+- Cards 3 and 4 (project start and end date) — typed `date`, one-line inputs, `e.g. April 2027` hint, no counter, no AI assist.
+- Card 10 (total funding requested) — typed `number`, Budget-tagged.
+- **Cards 11, 12 and 13** (cost breakdown, grants raised, pending income) — **left `narrative`**, textareas with word counters. **Over-classification was this fix's real risk**, and it has now failed to happen on two separate fixtures.
+
+**Every character limit was measured against its Step 4 badge:** 1582/1600, 174/240, 702/800 across all seven 800-character cards, 1582/1600 on card 9. Nothing trimmed, nothing over.
+
+### Two observations, neither a defect
+
+- **The date field takes free text, not a validated date.** `21st Aug 2026` exported exactly as typed, which is right for a funder-facing document — but nothing would stop `32nd Blurgust`. **`D-021`'s scope was the control, not validation**, so this is not a regression and not a defect against any requirement. Recorded as an option for the `P5.5` item 4 audit rather than a numbered gap.
+- **The export carried 17 items against Step 4's 16.** The extra was `Are any bank signatories related to each other or to a trustee?`, which **WJ confirmed he added through the "Need to add something about your finances or governance that wasn't asked above? Add it" link** — so the user-added-item path is incidentally evidenced too. **It was queried rather than assumed**: had he not added it, a card appearing in the export that never appeared on screen would have been a defect.
+
+---
+
+## 2026-08-21 — `GAP-115`'s second Bedrock call caught a false rejection, which changes what option (c) costs
 
 **A 1m 7s Step 3 was traced, and the answer reframes the gap.** WJ was setting up `GCM-01` with the new `P4 — Arts` profile (Art Shape Ltd, charity 1023920) against the Idlewild arts fixture, and asked why generation took over a minute. Axiom's `[generate-summary]` lines account for all of it:
 
