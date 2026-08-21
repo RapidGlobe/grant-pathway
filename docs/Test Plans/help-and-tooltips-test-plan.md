@@ -54,7 +54,7 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 | HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass   |                                                                                                                                                                                                        |
 | HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass   |                                                                                                                                                                                                        |
 | HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Pass   | Steps 1-3 pass (axe-core clean; `GAP-38` keyboard fix; focus order confirmed logical). Step 4 (screen reader) now Pass via `accessibility-test-plan.md` AC-08, which found and fixed `GAP-80`–`GAP-82` |
-| HT-06   | Contextual help deep-links — every screen opens the right page        | Pass   | Run live 2026-08-14 by WJ, no further observations — every screen opened its own help page, new tab, no 404s                                                                                           |
+| HT-06   | Contextual help deep-links — every screen opens the right page        | Pass   | Run live 2026-08-14 by WJ, no further observations — every screen opened its own help page, new tab, no 404s                                                                                           | ✅ **Re-confirmed on PRODUCTION 2026-08-21 — mechanics pass, four content gaps raised; see the requirements section below** |
 
 ---
 
@@ -225,6 +225,66 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 **2026-08-14:** Run live by WJ, no further observations. Every screen's Help button opened in a new tab and landed on its named page — no 404s, no wrong-page landings. Footer and dashboard empty-state links confirmed still opening the root, as intended. This closes the case and, with it, this plan's last open item — all six HT cases now Pass.
 
 ---
+
+---
+
+## Help centre content requirements — raised 2026-08-21, OUTSTANDING
+
+⚠️ **These are GitBook edits, not code changes.** The help centre is external (`rapidglobe.gitbook.io/grant-pathway`), so nothing in this repository can make them and nothing in CI can verify them. Recorded here because `HT-06` is the standing check that exercises these pages, and this plan is the only place that reliably gets re-read when the help centre changes.
+
+### 1. "Before you begin writing" is undocumented — raised by WJ during `HT-06`, 2026-08-21
+
+**What happened.** WJ pressed **Help** on the Step 4 preparation gate — the _"Before you begin writing"_ screen — and landed on **"Writing and editing an answer"**, which does not mention that screen at all. The page opens, is the right page for the route, and does not 404, **so `HT-06` still passes on its own terms** — this is a content gap, not a link defect.
+
+**Why it cannot be fixed by re-pointing the link, which is the obvious first instinct.** `lib/help-centre.ts`'s `ROUTE_HELP_PAGES` maps `/applications/[id]/step/4` to `writing-answers/writing-and-editing-an-answer`. **The gate and the answer cards are the same route** — the gate is a state within Step 4, not a page of its own — so the mapping cannot distinguish them without threading UI state into the help link. **Therefore the fix is content on the existing page, not a new page plus a new mapping.**
+
+**Where it goes:** at the **top** of `writing-answers/writing-and-editing-an-answer`, above the existing _"Each question or section extracted from the guidelines appears as a separate card"_ — because the gate is what the user sees first, and help text that opens by describing the cards answers a question they have not reached yet.
+
+**What it needs to say** — the substance, since the gate exists for a reason a user cannot infer from the screen:
+
+- The checklist is deliberate, not an obstacle.
+- Some questions ask for figures — annual accounts, project budget, funding already secured — and **AI cannot answer these**, because they are facts only the organisation holds (`PDR-AI-008`).
+- Reaching them without the numbers means stopping and coming back.
+- The list also includes anything **this particular funder** asks to be submitted alongside the application, which varies per application.
+- Involving a senior colleague — CEO, treasurer or trustee — is worth doing **before** the financial questions rather than after.
+- The way forward is the **"I have what I need — start writing"** button.
+
+### 1b. "Before we put it together" is undocumented too — raised by WJ during `HT-06`, 2026-08-21
+
+**A second instance of the same gap, found minutes after the first.** Step 4's **pre-assembly** gate — _"Before we put it together"_ — also opens `writing-answers/writing-and-editing-an-answer`, which does not mention it either. Same cause as §1: it is a third state on the same `/step/4` route, so the mapping cannot reach it.
+
+⚠️ **Restructure the page rather than bolting on a second section.** Step 4 has **three** distinct states — the entry gate, the answer cards, the pre-assembly gate — all sharing one help page, and **only the middle one is documented.** The page should read in flow order: what you gather before writing, how you write and edit, what you confirm before assembly.
+
+**What the pre-assembly section needs to say:**
+
+- Grant Pathway asks you to confirm that **a senior colleague has reviewed your budget answers** — CEO, treasurer or trustee.
+- The reason: funders verify financial information, and **inaccurate budget answers are one of the most common reasons applications are unsuccessful or withdrawn.** Easier to change now than later.
+- The screen lists the documents **this particular funder** requires, which vary between funders.
+- The draft can still be reviewed and approved after assembly, before export.
+
+⚠️ **The line that must survive editing:** _"Grant Pathway does not submit these documents, or your application, for you."_ **This is a scope boundary, not a detail.** A user who assumes the export reaches the funder misses the deadline — and that failure costs them a grant and produces no support ticket, so it would never surface as feedback. The screen states it; the help centre should too.
+
+### 1c. The dashboard has no help page — and this closes `GAP-45`'s open question
+
+**Raised by WJ during `HT-06`, 2026-08-21:** pressing **Help** on `/dashboard` opens the help centre **Welcome** page rather than anything about the screen.
+
+✅ **This is documented behaviour, not a defect — and WJ has now answered the question it was waiting on.** `lib/help-centre.ts`'s comment states that a route with no entry falls through to the root, that this is _"the deliberate behaviour for /dashboard (no page covers it cleanly — the nearest is reference-and-faqs/application-status-labels)"_, and that it is _"a decision awaiting his confirmation, not an oversight — see `GAP-45`."_ **His confirmation is that the dashboard needs its own words.**
+
+⚠️ **This one needs a CODE change as well as content, unlike §1, §1b and §2.** A new GitBook page is not enough — `ROUTE_HELP_PAGES` has no `/dashboard` entry, so the Help button would keep opening the root until a mapping is added. **Two edits, and the content must land first**, since a mapping pointing at a page that does not exist yet silently 404s and CI cannot catch it.
+
+**What the page needs to cover**, taken from what the dashboard actually shows:
+
+- **The status labels** — not started, in progress, approved, exported, ineligible. `reference-and-faqs/application-status-labels` already covers ground here and should be drawn on or merged rather than duplicated.
+- ⚠️ **Why some applications have no button at all.** An **ineligible** application offers only _Delete_ — no Continue, no Re-open. **This is the highest-value item on the page:** it is a dead end with no explanation on the screen itself, and `DR-EL-001` gives the hard stop no override, so a user cannot resolve it by trying again. Without help text it reads as something broken.
+- **Continue versus Re-open** — why an exported application offers Re-open.
+- **The AI request counter** — _"38 of 50 AI requests used this month"_: what it counts, that it is a monthly fair-use limit (`ADR-AI-008`), and what happens on reaching 50.
+- **Delete** — that it removes the application permanently.
+
+### 2. Where a Word export lands on iPad and iPhone — `GAP-120`, 2026-08-21
+
+**WJ's own requirement**, raised with `GAP-120`: _"prelaunch we will need to put something in the user guide/help centre."_ On iOS and iPadOS, Safari previews the exported document rather than saving it, so the help centre should say where it goes and how to keep it: **Files → On My iPad → Downloads**. **Due before launch even if `GAP-120`'s code fix is not**, since the code fix is deferred to the next iteration and the export works on every platform today — users just cannot find the file.
+
+**Both edits are GitBook and should be made in one sitting.** ⚠️ **Re-run `HT-06` afterwards** — the standing warning in `lib/help-centre.ts` is that a page renamed or moved on the GitBook side silently 404s that route's Help button, nothing in CI can catch it, and no runtime fallback is possible.
 
 ## Document History
 
