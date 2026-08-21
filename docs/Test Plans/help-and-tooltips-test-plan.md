@@ -249,6 +249,21 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - Involving a senior colleague — CEO, treasurer or trustee — is worth doing **before** the financial questions rather than after.
 - The way forward is the **"I have what I need — start writing"** button.
 
+### 1b. "Before we put it together" is undocumented too — raised by WJ during `HT-06`, 2026-08-21
+
+**A second instance of the same gap, found minutes after the first.** Step 4's **pre-assembly** gate — _"Before we put it together"_ — also opens `writing-answers/writing-and-editing-an-answer`, which does not mention it either. Same cause as §1: it is a third state on the same `/step/4` route, so the mapping cannot reach it.
+
+⚠️ **Restructure the page rather than bolting on a second section.** Step 4 has **three** distinct states — the entry gate, the answer cards, the pre-assembly gate — all sharing one help page, and **only the middle one is documented.** The page should read in flow order: what you gather before writing, how you write and edit, what you confirm before assembly.
+
+**What the pre-assembly section needs to say:**
+
+- Grant Pathway asks you to confirm that **a senior colleague has reviewed your budget answers** — CEO, treasurer or trustee.
+- The reason: funders verify financial information, and **inaccurate budget answers are one of the most common reasons applications are unsuccessful or withdrawn.** Easier to change now than later.
+- The screen lists the documents **this particular funder** requires, which vary between funders.
+- The draft can still be reviewed and approved after assembly, before export.
+
+⚠️ **The line that must survive editing:** _"Grant Pathway does not submit these documents, or your application, for you."_ **This is a scope boundary, not a detail.** A user who assumes the export reaches the funder misses the deadline — and that failure costs them a grant and produces no support ticket, so it would never surface as feedback. The screen states it; the help centre should too.
+
 ### 2. Where a Word export lands on iPad and iPhone — `GAP-120`, 2026-08-21
 
 **WJ's own requirement**, raised with `GAP-120`: _"prelaunch we will need to put something in the user guide/help centre."_ On iOS and iPadOS, Safari previews the exported document rather than saving it, so the help centre should say where it goes and how to keep it: **Files → On My iPad → Downloads**. **Due before launch even if `GAP-120`'s code fix is not**, since the code fix is deferred to the next iteration and the export works on every platform today — users just cannot find the file.
