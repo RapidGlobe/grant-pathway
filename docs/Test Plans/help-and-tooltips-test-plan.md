@@ -54,7 +54,7 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 | HT-03   | Hover-disabled tooltip — shows only while disabled                    | Pass   |                                                                                                                                                                                                        |
 | HT-04   | Non-persisted password hint — always shown, not a dismiss bug         | Pass   |                                                                                                                                                                                                        |
 | HT-05   | Accessibility pass — axe-core, keyboard-only, screen reader           | Pass   | Steps 1-3 pass (axe-core clean; `GAP-38` keyboard fix; focus order confirmed logical). Step 4 (screen reader) now Pass via `accessibility-test-plan.md` AC-08, which found and fixed `GAP-80`–`GAP-82` |
-| HT-06   | Contextual help deep-links — every screen opens the right page        | Pass   | Run live 2026-08-14 by WJ, no further observations — every screen opened its own help page, new tab, no 404s                                                                                           |
+| HT-06   | Contextual help deep-links — every screen opens the right page        | Pass   | Run live 2026-08-14 by WJ, no further observations — every screen opened its own help page, new tab, no 404s                                                                                           | ✅ **Re-confirmed on PRODUCTION 2026-08-21 — mechanics pass, four content gaps raised; see the requirements section below** |
 
 ---
 
@@ -263,6 +263,22 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 - The draft can still be reviewed and approved after assembly, before export.
 
 ⚠️ **The line that must survive editing:** _"Grant Pathway does not submit these documents, or your application, for you."_ **This is a scope boundary, not a detail.** A user who assumes the export reaches the funder misses the deadline — and that failure costs them a grant and produces no support ticket, so it would never surface as feedback. The screen states it; the help centre should too.
+
+### 1c. The dashboard has no help page — and this closes `GAP-45`'s open question
+
+**Raised by WJ during `HT-06`, 2026-08-21:** pressing **Help** on `/dashboard` opens the help centre **Welcome** page rather than anything about the screen.
+
+✅ **This is documented behaviour, not a defect — and WJ has now answered the question it was waiting on.** `lib/help-centre.ts`'s comment states that a route with no entry falls through to the root, that this is _"the deliberate behaviour for /dashboard (no page covers it cleanly — the nearest is reference-and-faqs/application-status-labels)"_, and that it is _"a decision awaiting his confirmation, not an oversight — see `GAP-45`."_ **His confirmation is that the dashboard needs its own words.**
+
+⚠️ **This one needs a CODE change as well as content, unlike §1, §1b and §2.** A new GitBook page is not enough — `ROUTE_HELP_PAGES` has no `/dashboard` entry, so the Help button would keep opening the root until a mapping is added. **Two edits, and the content must land first**, since a mapping pointing at a page that does not exist yet silently 404s and CI cannot catch it.
+
+**What the page needs to cover**, taken from what the dashboard actually shows:
+
+- **The status labels** — not started, in progress, approved, exported, ineligible. `reference-and-faqs/application-status-labels` already covers ground here and should be drawn on or merged rather than duplicated.
+- ⚠️ **Why some applications have no button at all.** An **ineligible** application offers only _Delete_ — no Continue, no Re-open. **This is the highest-value item on the page:** it is a dead end with no explanation on the screen itself, and `DR-EL-001` gives the hard stop no override, so a user cannot resolve it by trying again. Without help text it reads as something broken.
+- **Continue versus Re-open** — why an exported application offers Re-open.
+- **The AI request counter** — _"38 of 50 AI requests used this month"_: what it counts, that it is a monthly fair-use limit (`ADR-AI-008`), and what happens on reaching 50.
+- **Delete** — that it removes the application permanently.
 
 ### 2. Where a Word export lands on iPad and iPhone — `GAP-120`, 2026-08-21
 
