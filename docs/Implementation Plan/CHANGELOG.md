@@ -10,7 +10,35 @@
 
 ---
 
-## 2026-08-21 (latest) — a funder-to-profile table, after eligibility stops destroyed four test runs
+## 2026-08-21 (latest) — `GAP-115`'s second Bedrock call caught a false rejection, which changes what option (c) costs
+
+**A 1m 7s Step 3 was traced, and the answer reframes the gap.** WJ was setting up `GCM-01` with the new `P4 — Arts` profile (Art Shape Ltd, charity 1023920) against the Idlewild arts fixture, and asked why generation took over a minute. Axiom's `[generate-summary]` lines account for all of it:
+
+```
+09:51:01  pre-processing: 13110 → 13110 chars
+09:51:34  Bedrock latency: 32850ms, 9440 in + 3272/6000 out, stop_reason: end_turn
+09:52:03  eligibility mismatch NOT confirmed on second call — treating as not a mismatch
+```
+
+A 32.9-second first call, then a **~29-second confirmation call** — matching `GAP-115`'s original measurement almost exactly. That makes **three instances, on three different documents and two different builds**, so the doubling is the normal behaviour of the path rather than an oddity.
+
+### The part that matters: the second call overturned a false rejection
+
+The first call **rejected an arts-sector charity against an arts funder.** The confirmation call disagreed and the application proceeded to Step 4, where it extracted the expected 16 questions.
+
+**That application reached Step 4 only because the second call exists.** `DR-EL-001`'s hard stop has no override — without the confirmation, a correct application would have been dead-ended, and it would have been the fifth eligibility stop of the day on a profile that was right.
+
+⚠️ **This inverts part of the case for `GAP-115` option (c).** (c) proposes replacing the full-prompt confirmation with a narrower confirm-only prompt, to cut both latency and token cost. The gap already carried a warning that _"the second opinion is strong precisely because it repeats the whole analysis; a narrower prompt asks a different question and may not catch what the full one does."_ **That has stopped being theoretical.** (c) is now a change to a safety mechanism with a demonstrated catch, and should be priced as one.
+
+### One thing nobody is measuring
+
+Five of the six `generate-summary` runs in that two-hour window produced a mismatch verdict on the **first** call — four confirmed (all genuine profile mismatches during test setup) and one overturned. The same 13,110-char document was rejected at 09:31 and 09:41 and accepted at 09:51, which is consistent with the profile changing between runs rather than with non-determinism.
+
+**But the two calls' verdicts are only logged when they disagree.** So the first-call over-rejection rate is invisible, and the confirmation call may be masking it. A first-call false positive on a well-matched profile is the same shape as `GCM-01`'s Defect Log #2, the non-deterministic eligibility verdict. Noted for the `P5.5` item 4 audit.
+
+---
+
+## 2026-08-21 — a funder-to-profile table, after eligibility stops destroyed four test runs
 
 **Four test runs in two days were lost to eligibility hard stops, two of them in one session** — and every stop was correct behaviour. `FR-47`/`DR-EL-001` give the stop no override: the application is set to `mismatch`, there is no path to Step 4, and the tester must update the charity profile and start again. About twenty minutes of setup and one Bedrock call go with it each time.
 
