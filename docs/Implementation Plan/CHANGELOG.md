@@ -10,7 +10,50 @@
 
 ---
 
-## 2026-08-21 (latest) — `GAP-108` closed: previews work, and the isolation is proved both ways
+## 2026-08-21 (latest) — The gaps audit ran, and found the service has no public address
+
+`P5.5` item 4 required the gaps register to be audited **before** the Go-Live gate. It was swept into `P5.5-GAPS-AUDIT-2026-08-21.md` — 123 rows, 102 Built, 16 genuinely open, of which 5 needed a decision. WJ took all five recommendations. **Acting on them diverged from the plan in three places, and one of those is a launch blocker.**
+
+### `GAP-119` — `grantpathway.org.uk` is a parked domain
+
+Found by accident. A browser pointed at the production address landed on `/lander` and returned _"grantpathway.org.uk is parked free, courtesy of 123 Reg."_
+
+The domain **is** attached to the Vercel project — apex and `www`, added 2 July 2026 — but its nameservers were never moved. Vercel reports intended `ns1/ns2.vercel-dns.com` against current `ns39/ns40.domaincontrol.com`, both mismatched, and there is **no production alias at all.**
+
+**Three consequences.** The advertised address shows a parking page with third-party ad links. That page sets its own cookies before any consent, including **`caf_ipaddr`, the visitor's IP address**, on a page where Grant Pathway's privacy policy is neither served nor applicable. And anything that builds a link from the site URL — `FR-44`'s verification and password-reset emails — would send people there.
+
+**Why nothing caught it matters more than the fault.** Every `P5.5` production test — both flagships, the regression suite, the ten-user load test, `RT-14`/`RT-15`/`RT-16`, this morning's `GCM-01` — ran against the `*.vercel.app` deployment URL while signed in to Vercel. **All of those results stand: they exercised the real application against the real production database.** What has never been exercised is the **public entry point**, because no test names it. `RT-00` step 1 tells the tester to use "the test URL" without pinning what it should be. Fifty days passed.
+
+**The fix is a nameserver change at the registrar, and it needs waiting time rather than working time** — 24–48 hours of propagation, so it has to be sequenced before the gate, not at it.
+
+### The audit's most useful catch was that its own top item was already done
+
+**`GAP-109` and `GAP-111` were closed on 2026-08-17** — four days before this audit ranked amending the privacy policy as the highest-value decision. Both rows still read 🔴 No task.
+
+Going to draft the amendment found it published: Upstash is in the processor table (Ireland, EEA) and Section 9 carries two cookie bullets where it carried one, both in **v1.7**, with the documents now at **v1.9**.
+
+**The lesson is about the register, not the policy.** `AGENTS.md` §3 Step 2a exists because the privacy policy kept drifting behind the stack. This is the opposite failure and it is just as expensive: **a stale row nearly produced a duplicate amendment to the one artefact here that costs a fee to review.**
+
+### Two corrections to the audit's own first draft
+
+Its cookie measurement was taken against the **parking page**, so it was true and meaningless — and the re-categorising it recommended was unnecessary, because the cookie detail had been in the `GAP-111` row all along. **A re-capture is now impossible:** the public domain is parked and the working deployment sits behind Vercel SSO, so there is no reachable public instance to inspect.
+
+**And `GAP-32` is further along than its row says.** Item C — the PRD's `FR-22` hedge — was rewritten on 2026-08-15 when `P5.4` pushed the migrations to production. Its blocker cleared and nobody updated the row. Only two unsigned ADR notes remain.
+
+### Decisions taken
+
+- **`GAP-115` (c)** — deferred past launch. The second Bedrock call was observed this morning overturning a false rejection, so it is no longer a latency saving but a safety mechanism with a demonstrated catch.
+- **`GAP-116`** — post-launch, as a non-blocking warning. No requirement asks for budget arithmetic, and a clumsy check would block legitimate unusual budgets.
+- **`GAP-27`** — re-scoped to alerting only. Axiom has covered the observability half three times over since 2026-08-16.
+- **`GAP-15`, `GAP-16`, `GAP-35`, `GAP-57`** — re-confirmed as deliberate acceptances, unchanged.
+- **`GAP-104`** — fix before launch, WJ's hands: five Supabase Auth settings on production, all five of which dev already has right. **The leaked-password check is the one that changes behaviour**, having no application-side equivalent.
+- **`GAP-03`** — build before launch. ⚠️ **It was tasked into `P5.4`, and `P5.4` completed without it.** Its 75-second threshold is also wrong now that `maxDuration` moved to 180.
+- **`GAP-11`** — the admin exemption from branch protection is removed. **Every future change now goes via a pull request**, which is only viable because previews started working today.
+- **`GAP-12`** — stays at `P5.6`, correctly sequenced. An interim rollback tag was added instead: the only tag in the repository was `v0.2.0`, so the whole of Phase 5 had no rollback point.
+
+---
+
+## 2026-08-21 — `GAP-108` closed: previews work, and the isolation is proved both ways
 
 **Every pull-request preview this project has ever produced was dead on arrival, and nothing reported it.** The build went green, the Vercel check said "Deployment has completed", and the page returned _"This page couldn't load — a server error occurred."_ Three variables required by `lib/env.ts` were absent from Preview scope, so `instrumentation.ts` threw at server startup.
 

@@ -4,7 +4,7 @@
 **Volatility:** Medium
 **Update when:** A funder is added to or removed from `docs/Grant Org Guidelines/`, a test profile is created or changed, or a run hits an eligibility stop this table did not predict
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-08-21
 
 ---
@@ -35,6 +35,14 @@ It has now happened four times in two days, every time on a profile that was nev
 3. If the funder is not in the table, read its guidelines before running — do not guess.
 
 **Profiles are reusable across funders.** Six profiles cover every funder in active test plans; the table groups them deliberately so the test account does not need fifteen.
+
+⚠️ **Corrected 2026-08-21 (v1.1) — v1.0 claimed three profiles were missing and overstated it.** WJ challenged two of the three and was right about both.
+
+- **`P4 — Arts` is BUILT** — Art Shape Ltd, charity 1023920. It was the one genuinely missing profile, and building it is what let `GCM-01` run and `D-021` close on 2026-08-21.
+- **`P6 — Elmbridge` is NOT NEEDED.** Walton's negative path has already been exercised **twice**, `EL-01`–`EL-03` all pass, and an Elmbridge profile already exists as a _negative_ fixture (`IT-MKCF-03` used "Elmbridge Families Together" against MK). **No case requires a positive Walton match.**
+- **`P5 — Justice` is a look-up, not a build.** The A B Charitable Trust flagship **already ran end to end on production on 2026-08-19** with every case passing, so a profile that satisfies AB exists on some account — **nobody recorded which.** The work is five minutes of writing it down, and it only becomes a build if that flagship is re-run on a fresh account.
+
+**Why this is recorded rather than quietly edited:** "three profiles missing" reads as three charities to invent, and would have sent someone off to build two that were not needed. The table's value is in being accurate about what is actually absent.
 
 ---
 
