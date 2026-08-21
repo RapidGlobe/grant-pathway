@@ -226,6 +226,35 @@ Help centre link (`HELP_CENTRE_BASE_URL`) locations: `nav-authenticated.tsx` (ac
 
 ---
 
+---
+
+## Help centre content requirements — raised 2026-08-21, OUTSTANDING
+
+⚠️ **These are GitBook edits, not code changes.** The help centre is external (`rapidglobe.gitbook.io/grant-pathway`), so nothing in this repository can make them and nothing in CI can verify them. Recorded here because `HT-06` is the standing check that exercises these pages, and this plan is the only place that reliably gets re-read when the help centre changes.
+
+### 1. "Before you begin writing" is undocumented — raised by WJ during `HT-06`, 2026-08-21
+
+**What happened.** WJ pressed **Help** on the Step 4 preparation gate — the _"Before you begin writing"_ screen — and landed on **"Writing and editing an answer"**, which does not mention that screen at all. The page opens, is the right page for the route, and does not 404, **so `HT-06` still passes on its own terms** — this is a content gap, not a link defect.
+
+**Why it cannot be fixed by re-pointing the link, which is the obvious first instinct.** `lib/help-centre.ts`'s `ROUTE_HELP_PAGES` maps `/applications/[id]/step/4` to `writing-answers/writing-and-editing-an-answer`. **The gate and the answer cards are the same route** — the gate is a state within Step 4, not a page of its own — so the mapping cannot distinguish them without threading UI state into the help link. **Therefore the fix is content on the existing page, not a new page plus a new mapping.**
+
+**Where it goes:** at the **top** of `writing-answers/writing-and-editing-an-answer`, above the existing _"Each question or section extracted from the guidelines appears as a separate card"_ — because the gate is what the user sees first, and help text that opens by describing the cards answers a question they have not reached yet.
+
+**What it needs to say** — the substance, since the gate exists for a reason a user cannot infer from the screen:
+
+- The checklist is deliberate, not an obstacle.
+- Some questions ask for figures — annual accounts, project budget, funding already secured — and **AI cannot answer these**, because they are facts only the organisation holds (`PDR-AI-008`).
+- Reaching them without the numbers means stopping and coming back.
+- The list also includes anything **this particular funder** asks to be submitted alongside the application, which varies per application.
+- Involving a senior colleague — CEO, treasurer or trustee — is worth doing **before** the financial questions rather than after.
+- The way forward is the **"I have what I need — start writing"** button.
+
+### 2. Where a Word export lands on iPad and iPhone — `GAP-120`, 2026-08-21
+
+**WJ's own requirement**, raised with `GAP-120`: _"prelaunch we will need to put something in the user guide/help centre."_ On iOS and iPadOS, Safari previews the exported document rather than saving it, so the help centre should say where it goes and how to keep it: **Files → On My iPad → Downloads**. **Due before launch even if `GAP-120`'s code fix is not**, since the code fix is deferred to the next iteration and the export works on every platform today — users just cannot find the file.
+
+**Both edits are GitBook and should be made in one sitting.** ⚠️ **Re-run `HT-06` afterwards** — the standing warning in `lib/help-centre.ts` is that a page renamed or moved on the GitBook side silently 404s that route's Help button, nothing in CI can catch it, and no runtime fallback is possible.
+
 ## Document History
 
 | Version | Date       | Author         | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
