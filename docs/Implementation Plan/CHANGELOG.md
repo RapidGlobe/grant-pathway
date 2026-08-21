@@ -10,6 +10,57 @@
 
 ---
 
+## 2026-08-21 (latest) — P5.5 final testing is complete, and the route to launch is planned
+
+**Closing the day.** `P5.5` items 1–3b are complete: every test layer has been executed against production and every production-only check is evidenced. What follows is what the second half of the day added.
+
+### The tests that closed it
+
+- **`AC-03`** — keyboard-only, run in two halves with real key events. The skip link moves focus into `<main>` (`GAP-58` holds), tab order and focus rings clean, and — the result worth keeping — the **re-export dialog closed with `Escape` and returned focus to the button that opened it.** That is `GAP-59` and `GAP-60` confirmed on production, on the one interaction where a keyboard user is most easily stranded.
+- **`HT-06`** — Help clicked on every screen. Mechanics pass, no 404s. **Four content gaps found**, all now drafted in the help centre repo.
+- **`GAP-104`** — both password checks. The breach rejection works and **its copy is better than predicted**, so `GAP-106` does not reproduce on that path; and `changePassword` refused a wrong current password, which had only ever run against dev.
+- **Cross-browser** — all three engines. **The iPad Safari run went the whole way through to export**, which is what surfaced `GAP-120`.
+- **Feedback opt-in** — two registrations in two different browsers: ticked writes `TRUE`, unticked writes `FALSE`.
+- **Viewport bands** — measured at the boundary: **767px blocks, 768px passes**, no horizontal scroll at any width.
+
+### `GAP-120` — the iPad export, and why it was re-opened
+
+WJ exported successfully on an iPad and then could not find the file. **He called it operator error. It is not.** The server sends `Content-Disposition: attachment`, and then `components/application-step5-approve.tsx` fetches the route into a blob and triggers the download with `a.download` — **which iOS Safari ignores on blob URLs**, so Safari previews the document instead of saving it. Desktop honours it, which is why it has never been seen, and why no test caught it: **nothing exercised a tablet until today.**
+
+### The help centre turned out to be writable
+
+`RapidGlobe/grant-pathway-help-centre` is a git-backed private repo, so the four content gaps were **drafted rather than handed over as a to-do**. Step 4's page is restructured into three parts, because Step 4 has three states on one route and only the middle was documented. A new dashboard page explains why an **Ineligible** application shows only _Delete_ — a dead end with no on-screen explanation and no override.
+
+⚠️ **Deliberately not merged.** Merging may publish to the live help centre, which is WJ's call, not an agent's.
+
+### Two corrections to findings raised earlier the same day
+
+⚠️ **`GAP-119` was wrong twice, and both corrections matter.**
+
+**First:** "the service has no working public address" is false — `https://grant-pathway-three.vercel.app` serves the app to anyone. Two instruments agreed and both looked at the wrong thing: per-deployment URLs _are_ SSO-protected, and `vercel alias ls` does not list the project's stable public URL. **An unauthenticated `curl` settled it in one request.**
+
+**Second:** "no covering task" is also false — **`P5.6` has covered it since 2026-07-29**, naming the `A` record, the registrar nameservers, and the parking-page failure mode, including the warning that a `200` is not evidence of success. **Every substantive fact the gap reported was already written down.**
+
+### The pattern of the day, which is worth more than any single finding
+
+**Three times the register sent work at things already done:** `GAP-109`/`GAP-111` were fixed four days earlier, `GAP-119` was already tasked, `GAP-104`'s settings were already applied. **None was caught by a check** — each surfaced only when someone went to act on the row. Two would have done real damage: a duplicate amendment to a solicitor-reviewed legal document, and WJ sent to reconfigure production settings that were already correct.
+
+⚠️ **And the measuring instruments were wrong more often than the application was.** `vercel env pull` returns empty for sensitive variables in every scope; `vercel env ls` reports scope, not value; `innerText` on an unrendered element falls back to `textContent`; **`offsetParent` is `null` for `position: fixed` regardless of visibility.** Four false readings, three of which nearly became findings against working features. **The application produced two genuine defects all day, both minor.**
+
+### Route to launch
+
+New: `ROUTE-TO-LAUNCH-2026-08-21.md`. **The headline is that Phase 6's launch-gating tasks `P6.1`–`P6.5` have been complete since 2026-07-14** — so nothing left before launch is a large build unless `P5.7` becomes one.
+
+**The DNS records go first**, ahead of work that logically precedes them, because they are the only item with unavoidable _waiting_ time — and doing them early commits to nothing. ⚠️ **Records, not nameservers:** the domain carries MX, SPF including `amazonses.com`, DKIM and DMARC at the registrar, and delegation would break both the mailbox and `FR-44`.
+
+**`P5.7`'s gate position is deliberately left undecided.** The plan says the API question must be settled before any estimate, and the outcomes differ by an order of magnitude — 3–5 days if both registers offer live APIs, 2–4 weeks if either is bulk-data only, which is a different product decision because a stale lookup presented as authoritative is worse than honest manual entry. **Half a day of investigation, then decide.**
+
+### Also today
+
+`GAP-11`'s admin exemption removed — **every change now goes via a pull request**, tested by attempting a direct push and being refused. `v0.9.0` tagged as a pre-launch rollback point, the repository's only prior tag being `v0.2.0`. Production tidied to two test users with all 13 applications intact, deleted via the path `RT-14` proved leaves nothing behind. And `IMPLEMENTATION-STATUS.md`'s two "P5.5" rows disambiguated — **that ambiguity caused a session to report item 4 as executed when four of its sub-checks had never run.**
+
+---
+
 ## 2026-08-21 (latest) — The gaps audit ran, and found the service has no public address
 
 `P5.5` item 4 required the gaps register to be audited **before** the Go-Live gate. It was swept into `P5.5-GAPS-AUDIT-2026-08-21.md` — 123 rows, 102 Built, 16 genuinely open, of which 5 needed a decision. WJ took all five recommendations. **Acting on them diverged from the plan in three places, and one of those is a launch blocker.**
