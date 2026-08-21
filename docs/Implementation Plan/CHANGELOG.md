@@ -10,7 +10,32 @@
 
 ---
 
-## 2026-08-21 (latest) — `D-021`'s regression risk is closed, and a budget-arithmetic gap the corpus makes real
+## 2026-08-21 (latest) — a funder-to-profile table, after eligibility stops destroyed four test runs
+
+**Four test runs in two days were lost to eligibility hard stops, two of them in one session** — and every stop was correct behaviour. `FR-47`/`DR-EL-001` give the stop no override: the application is set to `mismatch`, there is no path to Step 4, and the tester must update the charity profile and start again. About twenty minutes of setup and one Bedrock call go with it each time.
+
+| Date       | Profile used                            | Funder                       | Why it stopped                                                      |
+| ---------- | --------------------------------------- | ---------------------------- | ------------------------------------------------------------------- |
+| 2026-08-19 | Harry's Rainbow (bereaved children, MK) | Walton Charity               | Walton funds **Elmbridge** only                                     |
+| 2026-08-20 | Helping Hands (isolated older adults)   | Henry Smith Holiday Grants   | Funds trips for children **13 and under**                           |
+| 2026-08-21 | National Opera charity                  | Stony Stratford Town Council | Funds the **parish** of Stony Stratford, Fullers Slade, Galley Hill |
+| 2026-08-21 | Two further attempts, same session      | —                            | Reported by WJ; profiles not recorded                               |
+
+**New document at WJ's request: `docs/Test Plans/test-charity-profiles.md`.** It maps all 15 guideline sets in `docs/Grant Org Guidelines/` to the profile that passes, with the criteria read out of each document rather than inferred from the funder's name.
+
+⚠️ **The lesson the table encodes is that the name misleads.** Harry's Rainbow is a children's charity and still failed Walton, because Walton's binding criterion is **where** and not **who**. Most stops in this project have been geographic rather than thematic, and that is the check most easily skipped.
+
+**Six profiles cover every funder in an active test plan** — not fifteen. The audit found **three of the six missing**:
+
+- **`P4 — Arts`** — needed by `GCM-01`, which runs against Idlewild, and never recorded anywhere. Idlewild's arts programme requires an arts-sector registered charity training **early-career professionals aged 18+**, which is a narrow shape to hit by accident.
+- **`P5 — Justice`** — needed by the A B Charitable Trust flagship. AB funds exactly four categories: access to justice, human rights, migrants and refugees, penal reform.
+- **`P6 — Elmbridge`** — needed by the eligibility plan, and its absence is what caused the 2026-08-19 stop.
+
+**Two documents cannot ground a mismatch at all, and are flagged rather than guessed.** The Radcliffe form is blank of eligibility criteria, so a stop there would mean the model reasoned from pre-training knowledge of the funder rather than from the uploaded text — **still untested, and deliberately kept distinct from the stops above, which were all grounded in their documents.** Wolfson's stage-1 document lists required fields, not eligibility rules. Heritage Fund's criteria could not be extracted from the PDF and is marked read-before-running.
+
+---
+
+## 2026-08-21 — `D-021`'s regression risk is closed, and a budget-arithmetic gap the corpus makes real
 
 **`GCM-06` and `GCM-07` were re-run on production after the `D-021` fix and both still Pass.** These were the two cases flagged on 2026-08-20 as the regression risk, on the reasoning that a rule loosened to stop dropping short answers is exactly the kind of change that starts extracting contact details and consent boxes instead. It did not.
 
