@@ -10,7 +10,39 @@
 
 ---
 
-## 2026-08-21 (latest) — `D-021` is closed: a date is extracted, typed, rendered, answered and exported
+## 2026-08-21 (latest) — `GAP-108` closed: previews work, and the isolation is proved both ways
+
+**Every pull-request preview this project has ever produced was dead on arrival, and nothing reported it.** The build went green, the Vercel check said "Deployment has completed", and the page returned _"This page couldn't load — a server error occurred."_ Three variables required by `lib/env.ts` were absent from Preview scope, so `instrumentation.ts` threw at server startup.
+
+**WJ chose option 1 — give Preview its own dev-scoped credentials — and rejected disabling previews on a product argument worth keeping:** with the service live he would rather branch, amend, test and merge than touch live code. **Working previews are what make that workflow possible**, so disabling them removes a safety net rather than a convenience.
+
+### The evidence, in the order it was gathered
+
+1. **The deployment serves** — Ready in 46 seconds, rendering the real sign-in page.
+2. **It is on the dev database** — a dev-only account signed in and produced `sb-stanwaejdvlvremtffkf-auth-token`.
+3. **A production account was then rejected** — and this is what makes it conclusive. A preview reading production would have accepted it. One direction proves the preview reaches dev; the other proves it cannot reach production.
+
+### Two corrections, because the route there was not clean
+
+**`vercel env pull` cannot tell you whether a scope holds a value.** A production-scoped pull returns zero-length values for seven variables production demonstrably uses every day — every variable on this project is sensitive-marked, and sensitive values are not exported. **A finding built on that was published in the register and withdrawn the same day.** Acting on it would have pointed every branch preview at the production database.
+
+**The dashboard is no better.** Its Edit dialog renders a blank Value box for a sensitive variable, which reads as "no value" and is really "Vercel will not show you this" — something `RT-00` step 1 had already recorded. Saving that dialog would have written the blank to production.
+
+**The lesson adopted:** to learn which environment something is really talking to, **read the artefact the running app produces, not the configuration it was handed.** The auth cookie settled in seconds what two rounds of dashboard and CLI inspection could not. This is the third time this project has been misled by a vendor console or CLI — after `GAP-102` (Resend's region) and `GAP-113` (`vercel env pull` returning `[SENSITIVE]`).
+
+### What is not claimed
+
+**AI generation on a preview is untested.** The dev AWS keys had not been re-checked, and dev Bedrock credentials were found rotated and returning 403 on 2026-08-06. **A 403 on preview AI generation is a stale key, not a regression of this fix** — written down so it is not misdiagnosed later.
+
+### One good thing nobody was looking for
+
+Previews sit behind Vercel's deployment protection — an unauthenticated request redirects to Vercel SSO — so they are not publicly reachable. That materially reduces this gap's original concern that preview URLs are less protected than production. It also means an agent cannot reach a preview to verify it, which is why the final three checks had to be WJ's.
+
+**What it unblocks:** the branch-test-merge workflow, and smoke-testing the open Dependabot PRs — no dependency bump in this project's history has ever been opened on a working preview. The setup was one-time; every future branch inherits it.
+
+---
+
+## 2026-08-21 — `D-021` is closed: a date is extracted, typed, rendered, answered and exported
 
 **The last item `D-021` owed was an export containing a `date`-typed answer**, and it is now evidenced. Read from `word/document.xml` inside the real downloaded `.docx` rather than from the screen:
 
